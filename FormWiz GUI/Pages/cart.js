@@ -72,12 +72,39 @@ class CartManager {
         return cart;
     }
 
-    saveCart() {
-        const cartData = JSON.stringify(this.cart);
+    async saveCart() {
+        // Convert LaTeX PDF blobs to base64 before serialization
+        const cartToSave = await Promise.all(this.cart.map(async (item) => {
+            if (item.isLatexPreview && item._latexPdfBlob && item._latexPdfBlob instanceof Blob) {
+                // Convert blob to base64
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const result = reader.result;
+                        const base64Data = result.includes(',') ? result.split(',')[1] : result;
+                        resolve(base64Data);
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(item._latexPdfBlob);
+                });
+                
+                // Create a copy without the blob, but with base64
+                const { _latexPdfBlob, ...itemWithoutBlob } = item;
+                return {
+                    ...itemWithoutBlob,
+                    latexPdfBase64: base64
+                };
+            }
+            // Remove blob reference if it exists (for items that were already converted)
+            const { _latexPdfBlob, ...itemWithoutBlob } = item;
+            return itemWithoutBlob;
+        }));
+        
+        const cartData = JSON.stringify(cartToSave);
         this.setCookie(this.cartCookieName, cartData, 30);
         // Also save to localStorage for compatibility with cart.html
         localStorage.setItem(this.cartCookieName, cartData);
-        console.log('💾 Cart saved to both cookies and localStorage:', this.cart);
+        console.log('💾 Cart saved to both cookies and localStorage:', cartToSave);
 
         // Save to Firebase if user is logged in
         if (typeof firebase !== 'undefined' && firebase.auth) {
@@ -690,25 +717,56 @@ class CartManager {
 
     async processFormPDF(cartItem) {
         try {
-            const formData = new FormData();
-            if (cartItem.formData) {
-                for (const k in cartItem.formData) formData.append(k, cartItem.formData[k]);
+            let blob;
+            
+            // Check if this is a LaTeX preview PDF (client-side generated blob)
+            if (cartItem.isLatexPreview) {
+                console.log('📄 [LATEX PDF] Processing LaTeX preview PDF:', cartItem.title);
+                
+                // Try to get blob from cart item first (if it wasn't serialized)
+                if (cartItem.latexPdf && cartItem.latexPdf instanceof Blob) {
+                    blob = cartItem.latexPdf;
+                } 
+                // If blob was lost during serialization, restore from base64
+                else if (cartItem.latexPdfBase64) {
+                    console.log('📄 [LATEX PDF] Restoring blob from base64');
+                    // Convert base64 back to blob
+                    const byteCharacters = atob(cartItem.latexPdfBase64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    blob = new Blob([byteArray], { type: 'application/pdf' });
+                } else {
+                    throw new Error('LaTeX PDF blob not found in cart item');
+                }
+            } else {
+                // Regular PDF: fetch from server
+                console.log('📄 [REGULAR PDF] Processing regular PDF:', cartItem.title);
+                const formData = new FormData();
+                if (cartItem.formData) {
+                    for (const k in cartItem.formData) formData.append(k, cartItem.formData[k]);
+                }
+                const base = cartItem.formId.replace(/\.pdf$/i, '');
+                const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(base), {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'cors'
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                blob = await res.blob();
             }
-            const base = cartItem.formId.replace(/\.pdf$/i, '');
-            const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(base), {
-                method: 'POST',
-                body: formData,
-                mode: 'cors'
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const blob = await res.blob();
+            
             const url = URL.createObjectURL(blob);
 
             const a = document.createElement('a');
             a.href = url;
             const safeFormId = cartItem.formId.replace(/\W+/g, '_');
             const docId = `${Date.now()}_${safeFormId}`;
-            a.download = `Edited_${cartItem.formId}`;
+            // Use the proper filename for LaTeX preview PDFs, otherwise use the formId
+            const downloadFilename = cartItem.isLatexPreview ? (cartItem.pdfName || cartItem.title || cartItem.formId) : `Edited_${cartItem.formId}`;
+            a.download = downloadFilename.endsWith('.pdf') ? downloadFilename : `${downloadFilename}.pdf`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);

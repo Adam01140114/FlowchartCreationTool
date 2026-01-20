@@ -1269,7 +1269,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
           const hardAlertTitleEl = qBlock.querySelector(`#hardAlertTitle${questionId}`);
           hardAlertTrigger = hardAlertTriggerEl ? hardAlertTriggerEl.value.trim() : "";
           hardAlertTitle = hardAlertTitleEl ? hardAlertTitleEl.value.trim() : "";
-          
+
           // Fallback to window.questionHardAlert if DOM values are empty (for JSON imports)
           if (!hardAlertTrigger || !hardAlertTitle) {
             if (window.questionHardAlert && window.questionHardAlert[questionId]) {
@@ -1277,7 +1277,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
               hardAlertTitle = window.questionHardAlert[questionId].title || "";
             }
           }
-          
+
           // Only include handler call if both trigger and title are set
           if (hardAlertTrigger && hardAlertTitle) {
             hardAlertHandlerCall = ` handleHardAlert${questionId}(this.value);`;
@@ -1306,17 +1306,17 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
               .replace(/\r/g, '\\r')   // Escape carriage returns
               .replace(/\t/g, '\\t');  // Escape tabs
           };
-          
+
           const escapedTrigger = escapeJsString(hardAlertTrigger);
           const escapedTitle = escapeJsString(hardAlertTitle);
-          
+
           formHTML += `
             <script>
               function handleHardAlert${questionId}(value) {
                 const selectedValue = (value || '').trim();
                 const hardAlertTrigger = '${escapedTrigger}';
                 const hardAlertTitle = '${escapedTitle}';
-                
+
                 // Check if the selected value matches the trigger
                 if (selectedValue === hardAlertTrigger) {
                   // Show hard alert with subtitle
@@ -1326,7 +1326,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                     alert(hardAlertTitle);
                   }
                 }
-                
+
                 // CRITICAL: Check all hard alerts and update navigation button state
                 if (typeof checkAllHardAlertsAndUpdateNavigation === 'function') {
                   checkAllHardAlertsAndUpdateNavigation();
@@ -1453,20 +1453,29 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
         if (latexPreviewEnabled) {
           const latexPreviewTriggerEl = qBlock.querySelector(`#latexPreviewTrigger${questionId}`);
           const latexPreviewTitleEl = qBlock.querySelector(`#latexPreviewTitle${questionId}`);
+          const latexPreviewFilenameEl = qBlock.querySelector(`#latexPreviewFilename${questionId}`);
           const latexPreviewContentEl = qBlock.querySelector(`#latexPreviewContent${questionId}`);
           const latexPreviewPriceIdEl = qBlock.querySelector(`#latexPreviewPriceId${questionId}`);
           const latexPreviewAttachmentEl = qBlock.querySelector(`#latexPreviewAttachment${questionId}`);
           const latexPreviewTrigger = latexPreviewTriggerEl ? latexPreviewTriggerEl.value : "";
           const latexPreviewTitle = latexPreviewTitleEl ? latexPreviewTitleEl.value : "LaTeX Preview";
+          const latexPreviewFilenameRaw = latexPreviewFilenameEl ? latexPreviewFilenameEl.value : "";
+          const latexPreviewFilename = (latexPreviewFilenameRaw && latexPreviewFilenameRaw.trim() !== '') ? latexPreviewFilenameRaw.trim() : latexPreviewTitle;
           const latexPreviewContent = latexPreviewContentEl ? latexPreviewContentEl.value : "";
           const latexPreviewPriceId = latexPreviewPriceIdEl ? latexPreviewPriceIdEl.value : "";
           const latexPreviewAttachment = latexPreviewAttachmentEl ? latexPreviewAttachmentEl.value : "Preview Only";
 
           // Store metadata if "Attach to packet" is selected
           if (latexPreviewTrigger && latexPreviewContent && latexPreviewAttachment === "Attach to packet") {
+            // Check if an entry already exists for this questionId and remove it to avoid duplicates
+            const existingIndex = latexPreviewQuestions.findIndex(q => q.questionId === questionId);
+            if (existingIndex !== -1) {
+              latexPreviewQuestions.splice(existingIndex, 1);
+            }
             latexPreviewQuestions.push({
               questionId: questionId,
               title: latexPreviewTitle,
+              filename: latexPreviewFilename,
               priceId: latexPreviewPriceId,
               trigger: latexPreviewTrigger
             });
@@ -1500,6 +1509,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                   const latexContent = \`${escapedLatexContent}\`;
 
                   if (value === '${latexPreviewTrigger}') {
+
                     previewDiv.style.display = 'block';
                     loadingDiv.style.display = 'block';
                     iframe.style.display = 'none';
@@ -1542,18 +1552,6 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                         }
                       });
 
-                      if (collectedFields['user_fullname']) {
-
-                      } else {
-
-                      }
-
-                      // Log FormData contents (for debugging)
-
-                      for (const [key, val] of fd.entries()) {
-
-                      }
-
                       // Send LaTeX content and form data to server endpoint to generate PDF
 
                       const res = await fetch('/latex_to_pdf', { 
@@ -1586,10 +1584,12 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
 
                       }
                     } catch (error) {
+
                       loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to generate PDF from LaTeX. Please check your LaTeX code and try again.</p>';
                       iframe.style.display = 'none';
                     }
                   } else {
+
                     previewDiv.style.display = 'none';
                     // Clean up blob URL and remove stored PDF if exists
                     if (iframe.dataset.blobUrl) {
@@ -1622,33 +1622,27 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                   if (!window.formStatuses) {
                     window.formStatuses = {};
                   }
-                  
+
                   const selectedValue = (value || '').trim();
                   const statusTrigger = '${statusTrigger}';
                   const statusTitle = '${statusTitle}';
-                  
-                  console.log('[STATUS] Dropdown ${questionId} changed. Selected value:', selectedValue);
-                  console.log('[STATUS] Status trigger:', statusTrigger);
-                  console.log('[STATUS] Status title:', statusTitle);
-                  
+
                   // Check if the selected value matches the trigger
                   if (selectedValue === statusTrigger) {
                     // Add status
                     if (!window.formStatuses[statusTitle]) {
                       window.formStatuses[statusTitle] = true;
-                      console.log('[STATUS] Status added:', statusTitle);
-                      console.log('[STATUS] Current statuses:', window.formStatuses);
+
                     } else {
-                      console.log('[STATUS] Status already exists:', statusTitle);
+
                     }
                   } else {
                     // Remove status if it exists
                     if (window.formStatuses[statusTitle]) {
                       delete window.formStatuses[statusTitle];
-                      console.log('[STATUS] Status removed:', statusTitle);
-                      console.log('[STATUS] Current statuses:', window.formStatuses);
+
                     } else {
-                      console.log('[STATUS] Status not found to remove:', statusTitle);
+
                     }
                   }
                 }
@@ -3768,7 +3762,7 @@ formHTML += `</div><br></div>`;
         if (logicRows.length > 0) {
           logicScriptBuffer += `\n(function(){\n`;
           logicScriptBuffer += ` var thisQ=document.getElementById("question-container-${questionId}");\n`;
-          logicScriptBuffer += ` function updateVisibility(){\n  console.log('[Visibility Check Q${questionId}] ===== Starting visibility check ====='); var anyMatch=false;\n`;
+          logicScriptBuffer += ` function updateVisibility(){\n  var anyMatch=false;\n`;
           for (let lr = 0; lr < logicRows.length; lr++) {
             const row = logicRows[lr];
             const rowIndex = lr + 1;
@@ -3831,18 +3825,18 @@ formHTML += `</div><br></div>`;
               // CRITICAL FIX: Check if the previous question is actually visible and answered before evaluating its value
               // This prevents questions from showing prematurely when they depend on questions that haven't been shown yet
               // IMPORTANT: For dropdowns, also check if it's still on the default placeholder option (empty value or selectedIndex 0)
-              logicScriptBuffer += `    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; console.log('[Visibility Check Q${questionId}] Checking Q' + cPrevQNum + ': visible=' + prevQIsVisible + ', value="' + val2 + '", isPlaceholder=' + isDropdownPlaceholder + ', answered=' + prevQIsAnswered); if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();\n`;
+              logicScriptBuffer += `    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();\n`;
               // Special case for special options that check for presence rather than exact value
               if (paVal.toLowerCase() === "any text" || paVal.toLowerCase() === "any amount" || paVal.toLowerCase() === "any date") {
-                logicScriptBuffer += `      if(val2Lower !== ""){ console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' has value, setting anyMatch=true'); anyMatch=true; } else { console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' value is empty'); } }\n`;
+                logicScriptBuffer += `      if(val2Lower !== ""){ anyMatch=true; } else { } }\n`;
               } else {
-                logicScriptBuffer += `      if(val2Lower===cPrevAns){ console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' matches "' + cPrevAns + '", setting anyMatch=true'); anyMatch=true; } else { console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' value "' + val2Lower + '" does not match "' + cPrevAns + '"'); } } else { console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' not answered yet (visible=' + prevQIsVisible + ', value="' + val2 + '", isPlaceholder=' + isDropdownPlaceholder + ')'); }\n`;
+                logicScriptBuffer += `      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }\n`;
               }
-              logicScriptBuffer += `    } else { console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' element not found'); }\n`;
+              logicScriptBuffer += `    } else { }\n`;
             }
             logicScriptBuffer += `  })();\n`;
           }
-          logicScriptBuffer += ` console.log('[Visibility Check Q${questionId}] Final result: anyMatch=' + anyMatch); if(anyMatch){ console.log('[Visibility Check Q${questionId}] Showing question'); thisQ.classList.remove("hidden"); } else { console.log('[Visibility Check Q${questionId}] Hiding question'); \n`;
+          logicScriptBuffer += ` if(anyMatch){ thisQ.classList.remove("hidden"); } else { \n`;
           // Check if this is a numbered dropdown question and reset it before hiding
           // Use fallback check since data-question-type might not be reliable
           logicScriptBuffer += `   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');\n`;
@@ -3932,6 +3926,14 @@ formHTML += `</div><br></div>`;
               logicScriptBuffer += `   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);\n`;
               logicScriptBuffer += `   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
+            } else if (pType2 === "date") {
+              // CRITICAL FIX: Date fields need BOTH "input" AND "change" events
+              // Date pickers often fire "change" when date is selected, not "input"
+              logicScriptBuffer += ` (function(){\n`;
+              logicScriptBuffer += `   var dateQuestion = "${pqVal2}";\n`;
+              logicScriptBuffer += `   var el3= document.getElementById(questionNameIds[dateQuestion]) || document.getElementById("answer"+dateQuestion);\n`;
+              logicScriptBuffer += `   if(el3){ el3.addEventListener("input", function(){ updateVisibility();}); el3.addEventListener("change", function(){ updateVisibility();}); }\n`;
+              logicScriptBuffer += ` })();\n`;
             } else {
               // Use "input" event for text fields
               logicScriptBuffer += ` (function(){\n`;
@@ -3939,7 +3941,7 @@ formHTML += `</div><br></div>`;
               logicScriptBuffer += `   var textQuestion = "${pqVal2}";\n`;
               // IMPORTANT: Try questionNameIds first, then fallback to default naming
               logicScriptBuffer += `   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);\n`;
-              logicScriptBuffer += `   if(el3){ el3.addEventListener("input", function(){ updateVisibility();});}\n`;
+              logicScriptBuffer += `   if(el3){ el3.addEventListener("input", function(){ updateVisibility();}); }\n`;
               logicScriptBuffer += ` })();\n`;
             }
           }
@@ -4087,13 +4089,13 @@ formHTML += `</div><br></div>`;
             const statusRequirementListEl = row.querySelector(
               "#statusRequirementList" + questionId + "_" + rowIndex
             );
-            
+
             if (!pqEl) continue;
             const pqVal = pqEl.value.trim();
             if (!pqVal) continue;
-            
+
             const conditionMessage = messageEl ? messageEl.value.trim() : "";
-            
+
             // Collect all status requirements for this condition
             const statusRequirements = [];
             if (statusRequirementListEl) {
@@ -4105,7 +4107,7 @@ formHTML += `</div><br></div>`;
                 }
               });
             }
-            
+
             // Check if this is a currency condition (has operator and amount)
             if (operatorEl && amountEl) {
               const operatorVal = operatorEl.value.trim();
@@ -4127,7 +4129,7 @@ formHTML += `</div><br></div>`;
                 continue;
               }
             }
-            
+
             // Regular condition (has prevAnswer)
             if (!paEl) continue;
             const paVal = paEl.value.trim();
@@ -4446,13 +4448,16 @@ if (s > 1){
             }
           });
           const radiosSatisfied = Object.values(radioGroups).every(group => group.some(Boolean));
+          // Ensure checkboxRequiredMap and allAreRequiredMap are defined (they might not be initialized yet)
+          const checkboxRequiredMapSafe = (typeof checkboxRequiredMap !== 'undefined' && typeof checkboxRequiredMap === 'object') ? checkboxRequiredMap : (window.checkboxRequiredMap || {});
+          const allAreRequiredMapSafe = (typeof allAreRequiredMap !== 'undefined' && typeof allAreRequiredMap === 'object') ? allAreRequiredMap : (window.allAreRequiredMap || {});
           // Use explicit hasOwnProperty so missing entries default to optional
-          const checkboxRequired = Object.prototype.hasOwnProperty.call(checkboxRequiredMap, questionId)
-            ? checkboxRequiredMap[questionId]
+          const checkboxRequired = Object.prototype.hasOwnProperty.call(checkboxRequiredMapSafe, questionId)
+            ? checkboxRequiredMapSafe[questionId]
             : false;
           // Check if "all are required" is enabled
-          const allAreRequired = Object.prototype.hasOwnProperty.call(allAreRequiredMap, questionId)
-            ? allAreRequiredMap[questionId]
+          const allAreRequired = Object.prototype.hasOwnProperty.call(allAreRequiredMapSafe, questionId)
+            ? allAreRequiredMapSafe[questionId]
             : false;
 
           let checkboxesSatisfied = true;
@@ -4566,7 +4571,9 @@ if (s > 1){
           return answered;
         }
         function answerTriggersEnd(container) {
-          if (!container || !Array.isArray(jumpLogics) || !jumpLogics.length) {
+          // Ensure jumpLogics is defined (it might not be initialized yet)
+          const jumpLogicsArray = (typeof jumpLogics !== 'undefined' && Array.isArray(jumpLogics)) ? jumpLogics : (window.jumpLogics || []);
+          if (!container || !Array.isArray(jumpLogicsArray) || !jumpLogicsArray.length) {
             return false;
           }
           const containerId = ((container.id || '') + '').trim();
@@ -4578,7 +4585,7 @@ if (s > 1){
           if (!questionId) {
             return false;
           }
-          const relevantJumps = jumpLogics.filter(jl => jl.questionId === questionId && typeof jl.jumpTo === 'string' && jl.jumpTo.toLowerCase() === 'end');
+          const relevantJumps = jumpLogicsArray.filter(jl => jl.questionId === questionId && typeof jl.jumpTo === 'string' && jl.jumpTo.toLowerCase() === 'end');
           if (!relevantJumps.length) return false;
 
           // Check for "Any Text" jump option first - this applies to textareas and text inputs
@@ -4986,7 +4993,7 @@ if (s > 1){
 
               return;
             }
-            
+
             // Check alert logic for the current question before navigating
             if (activeContainer && typeof checkAlertLogic === 'function') {
               // Get the question ID from the active container
@@ -6054,6 +6061,58 @@ if (s > 1){
         fieldDiv.appendChild(label);
         fieldDiv.appendChild(input);
         triggerContainer.appendChild(fieldDiv);
+
+        // CRITICAL: Attach autosave listeners to label fields in trigger sequences
+        // These fields are created dynamically and need to save to Firebase
+        const labelFieldId = input.id;
+        const labelFieldName = input.name;
+        input.addEventListener('input', function() {
+
+          setTimeout(() => {
+            try {
+              if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                if (typeof window.saveAnswers === 'function') {
+
+                  window.saveAnswers();
+                } else {
+
+                }
+              } else {
+                if (typeof window.saveAnswersToLocalStorage === 'function') {
+                  window.saveAnswersToLocalStorage();
+                } else {
+
+                }
+              }
+            } catch (error) {
+
+            }
+          }, 100);
+        });
+        input.addEventListener('change', function() {
+
+          setTimeout(() => {
+            try {
+              if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                if (typeof window.saveAnswers === 'function') {
+
+                  window.saveAnswers(true);
+                } else {
+
+                }
+              } else {
+                if (typeof window.saveAnswersToLocalStorage === 'function') {
+                  window.saveAnswersToLocalStorage();
+                } else {
+
+                }
+              }
+            } catch (error) {
+
+            }
+          }, 100);
+        });
+
         // Add conditional logic if enabled
         if (hasConditionalLogic && conditionalConditions.length > 0) {
           // CRITICAL: Ensure field is hidden immediately after appending
@@ -6210,16 +6269,22 @@ if (s > 1){
           input.id = checkboxId;
           input.name = selectionType === 'single' ? (isMultipleTextboxes ? 'radio_group_' + sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizeForId(triggerField.fieldName) : 'radio_group_' + entryNumber) : checkboxId;
           input.value = option.text;
+          input.setAttribute('form', 'customForm'); // CRITICAL: Add form attribute so getFormFields() can find it
           input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #87CEEB; cursor: pointer;';
           // Add event listener for radio buttons to create hidden checkboxes
           if (selectionType === 'single') {
             input.addEventListener('change', function() {
+              const isAutofill = window.isInitialAutofill === true;
+
               if (this.checked) {
                 // Uncheck all other radio buttons in this group and remove their hidden checkboxes
                 const radioGroup = document.querySelectorAll('input[name="' + this.name + '"]');
+
                 radioGroup.forEach(radio => {
                   if (radio !== this) {
+
                     radio.checked = false;
+
                     // Remove hidden checkbox for unchecked radio
                     const originalNodeId = radio.id.replace('_radio', '');
                     const existingHiddenCheckbox = document.getElementById(originalNodeId);
@@ -6248,7 +6313,52 @@ if (s > 1){
                 window.dispatchEvent(new CustomEvent('radioGroupChanged', {
                   detail: { entryNumber: extractedEntryNumber, radioGroup: this.name }
                 }));
+
+                // CRITICAL: Save to Firebase when radio button is selected (but not during autofill)
+                if (!isAutofill) {
+                  setTimeout(() => {
+                    if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                      if (typeof window.saveAnswers === 'function') {
+
+                        window.saveAnswers(true);
+                      } else {
+
+                      }
+                    } else {
+                      if (typeof window.saveAnswersToLocalStorage === 'function') {
+                        window.saveAnswersToLocalStorage();
+                      } else {
+
+                      }
+                    }
+                  }, 100);
+                } else {
+
+                }
+              } else {
+
               }
+            });
+          } else {
+            // For regular checkboxes (not radio buttons), also add autosave
+            input.addEventListener('change', function() {
+
+              setTimeout(() => {
+                if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                  if (typeof window.saveAnswers === 'function') {
+
+                    window.saveAnswers(true);
+                  } else {
+
+                  }
+                } else {
+                  if (typeof window.saveAnswersToLocalStorage === 'function') {
+                    window.saveAnswersToLocalStorage();
+                  } else {
+
+                  }
+                }
+              }, 100);
             });
           }
           const label = document.createElement('label');
@@ -6266,9 +6376,12 @@ if (s > 1){
           checkboxFieldDiv.style.display = 'none';
           // Function to check if any condition is met
           const checkConditionalLogic = () => {
+            const isAutofill = window.isInitialAutofill === true;
+
             let anyMatch = false;
             // Use the parent dropdown's nodeId (same as the select.id base)
             const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+
             conditionalConditions.forEach((conditionNodeId) => {
               if (!conditionNodeId) return;
               // Construct full checkbox ID: {baseNodeId}_{condition}_{entryNumber}
@@ -6276,51 +6389,69 @@ if (s > 1){
               const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
               const checkboxId = fullCheckboxId; // Use the full pattern for dropdown hidden checkboxes
               const radioId = conditionNodeId + "_" + entryNumber + "_radio";
+
               // Try to find checkbox or radio button
               let checkbox = document.getElementById(checkboxId);
               if (!checkbox) {
                 checkbox = document.getElementById(simpleCheckboxId);
               }
               const radio = document.getElementById(radioId);
+
               // Check if checkbox is checked or radio is selected
               if ((checkbox && checkbox.checked) || (radio && radio.checked)) {
+
                 anyMatch = true;
                 return;
+              } else {
+
               }
             });
+
             // Show or hide the checkbox field based on match
             if (anyMatch) {
+
               checkboxFieldDiv.style.display = 'block';
             } else {
+
               checkboxFieldDiv.style.display = 'none';
-              // Reset checkbox values when hidden
-              checkboxOptions.forEach((option) => {
-                // Use the same ID format as when creating the checkbox
-                let checkboxId;
-                if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
-                  const sanitizedFieldName = sanitizeForId(triggerField.fieldName);
-                  const sanitizedOptionNodeId = sanitizeForId(option.nodeId);
-                  if (selectionType === 'single') {
-                    checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId + '_radio';
+              // CRITICAL: Don't reset checkbox/radio values during autofill - they might not be ready yet
+              if (!isAutofill) {
+                // Reset checkbox values when hidden (only if not during autofill)
+                checkboxOptions.forEach((option) => {
+                  // Use the same ID format as when creating the checkbox
+                  let checkboxId;
+                  if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
+                    const sanitizedFieldName = sanitizeForId(triggerField.fieldName);
+                    const sanitizedOptionNodeId = sanitizeForId(option.nodeId);
+                    if (selectionType === 'single') {
+                      checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId + '_radio';
+                    } else {
+                      checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId;
+                    }
                   } else {
-                    checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId;
+                    checkboxId = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
                   }
-                } else {
-                  checkboxId = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
-                }
-                const optionInput = document.getElementById(checkboxId);
-                if (optionInput) {
-                  optionInput.checked = false;
-                  optionInput.dispatchEvent(new Event('change'));
-                }
-              });
+                  const optionInput = document.getElementById(checkboxId);
+                  if (optionInput) {
+
+                    optionInput.checked = false;
+                    optionInput.dispatchEvent(new Event('change'));
+
+                  }
+                });
+              } else {
+
+              }
             }
           };
           // Listen for radio group changes
           const radioGroupHandler = function(event) {
             const eventEntryNumber = event.detail && event.detail.entryNumber;
+            const isAutofill = window.isInitialAutofill === true;
+
             if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber)) {
               setTimeout(() => {
+
                 checkConditionalLogic();
               }, 200);
             }
@@ -6428,6 +6559,7 @@ if (s > 1){
           select.id = baseNodeId + "_" + sanitizedTriggerFieldName + "_" + entryNumber;
         }
         select.name = select.id;
+        select.setAttribute('form', 'customForm'); // CRITICAL: Add form attribute so getFormFields() can find it
         select.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease; margin: 0 auto; display: block;';
         // Add placeholder option
         const placeholderOption = document.createElement('option');
@@ -6479,8 +6611,11 @@ if (s > 1){
           title: (triggerField.hardAlert.title || '').trim()
         } : null;
 
+        // CRITICAL: Log that we're attaching the change event listener
+
         // Add change event listener to call dropdownMirror
         select.addEventListener('change', function() {
+          // CRITICAL: Log immediately to confirm change event is firing
 
           // Check for alert functionality if enabled
           if (alertData && alertData.enabled && alertData.condition && alertData.title) {
@@ -6530,6 +6665,60 @@ if (s > 1){
           if (typeof updateHiddenLogic === 'function') {
             updateHiddenLogic(this.id, this.value);
           }
+          // CRITICAL: After dropdownMirror creates radio buttons, attach autosave listeners to them
+          setTimeout(() => {
+            // Find all radio buttons that were just created by dropdownMirror
+            // These radio buttons will be inside the dropdownWrapper div
+            const dropdownWrapperId = 'dropdowntext_' + this.id;
+            const dropdownWrapper = document.getElementById(dropdownWrapperId);
+            if (dropdownWrapper) {
+              const radioButtons = dropdownWrapper.querySelectorAll('input[type="radio"]');
+              radioButtons.forEach((radio) => {
+                // Only attach listener if not already attached
+                if (!radio.hasAttribute('data-autosave-attached')) {
+                  radio.setAttribute('data-autosave-attached', 'true');
+                  radio.addEventListener('change', function() {
+
+                    // Save immediately when radio is selected
+                    setTimeout(() => {
+                      if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                        if (typeof window.saveAnswers === 'function') {
+
+                          window.saveAnswers(true);
+                        } else {
+
+                        }
+                      } else {
+                        if (typeof window.saveAnswersToLocalStorage === 'function') {
+                          window.saveAnswersToLocalStorage();
+                        } else {
+
+                        }
+                      }
+                    }, 100);
+                  });
+
+                }
+              });
+            }
+          }, 300); // Give dropdownMirror time to create the radio buttons
+          // CRITICAL: Save to Firebase when dropdown in trigger sequence changes
+          setTimeout(() => {
+            if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+              if (typeof window.saveAnswers === 'function') {
+
+                window.saveAnswers(true);
+              } else {
+
+              }
+            } else {
+              if (typeof window.saveAnswersToLocalStorage === 'function') {
+                window.saveAnswersToLocalStorage();
+              } else {
+
+              }
+            }
+          }, 200);
           // Trigger conditional logic re-evaluation for all fields in this trigger sequence
           // Wait a bit for dropdownMirror to finish creating/removing checkboxes
           setTimeout(() => {
@@ -6782,6 +6971,58 @@ if (s > 1){
         fieldDiv.appendChild(label);
         fieldDiv.appendChild(input);
         triggerContainer.appendChild(fieldDiv);
+
+        // CRITICAL: Attach autosave listeners to date fields in trigger sequences
+        // These fields are created dynamically and need to save to Firebase
+        const dateFieldId = input.id;
+        const dateFieldName = input.name;
+        input.addEventListener('input', function() {
+
+          setTimeout(() => {
+            try {
+              if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                if (typeof window.saveAnswers === 'function') {
+
+                  window.saveAnswers();
+                } else {
+
+                }
+              } else {
+                if (typeof window.saveAnswersToLocalStorage === 'function') {
+                  window.saveAnswersToLocalStorage();
+                } else {
+
+                }
+              }
+            } catch (error) {
+
+            }
+          }, 100);
+        });
+        input.addEventListener('change', function() {
+
+          setTimeout(() => {
+            try {
+              if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                if (typeof window.saveAnswers === 'function') {
+
+                  window.saveAnswers(true);
+                } else {
+
+                }
+              } else {
+                if (typeof window.saveAnswersToLocalStorage === 'function') {
+                  window.saveAnswersToLocalStorage();
+                } else {
+
+                }
+              }
+            } catch (error) {
+
+            }
+          }, 100);
+        });
+
         // Add conditional logic if enabled
         if (hasConditionalLogic && conditionalConditions.length > 0) {
           // CRITICAL: Ensure field is hidden immediately after appending
@@ -7106,11 +7347,8 @@ if (s > 1){
             const shortHiddenId = shortHidden.id;
             const selectId = input.id;
             // Build onchange handler using string concatenation to avoid nested template literal issues
+            // CRITICAL: Include autosave in the onchange handler
             input.setAttribute('onchange', 
-              "" +
-              "" +
-              "" +
-              "" +
               "" +
               "var fullField = document.getElementById('" + fullHiddenId + "');" +
               "var shortField = document.getElementById('" + shortHiddenId + "');" +
@@ -7130,8 +7368,53 @@ if (s > 1){
               "if (typeof updateHiddenLogic === 'function') {" +
               "  updateHiddenLogic('" + selectId + "', this.value);" +
               "}" +
-              "setTimeout(function() { " + triggerUpdateFullAddressCode + " }, 50);"
+              "setTimeout(function() { " + triggerUpdateFullAddressCode + " }, 50);" +
+              "setTimeout(function() {" +
+              "  try {" +
+              "    if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {" +
+              "      if (typeof window.saveAnswers === 'function') {" +
+              "        " +
+              "        window.saveAnswers(true);" +
+              "      } else {" +
+              "        " +
+              "      }" +
+              "    } else {" +
+              "      if (typeof window.saveAnswersToLocalStorage === 'function') {" +
+              "        window.saveAnswersToLocalStorage();" +
+              "      } else {" +
+              "        " +
+              "      }" +
+              "    }" +
+              "  } catch (error) {" +
+              "    " +
+              "  }" +
+              "}, 200);"
             );
+
+            // Also add input listener for state dropdown (though it's a select, some browsers fire input events)
+            input.addEventListener('input', function() {
+
+              setTimeout(() => {
+                try {
+                  if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                    if (typeof window.saveAnswers === 'function') {
+
+                      window.saveAnswers();
+                    } else {
+
+                    }
+                  } else {
+                    if (typeof window.saveAnswersToLocalStorage === 'function') {
+                      window.saveAnswersToLocalStorage();
+                    } else {
+
+                    }
+                  }
+                } catch (error) {
+
+                }
+              }, 100);
+            });
 
             // Append hidden fields
             const hiddenWrap = document.createElement('div');
@@ -7162,6 +7445,68 @@ if (s > 1){
           addrWrap.className = 'address-field';
           addrWrap.appendChild(input);
           locationFieldDiv.appendChild(addrWrap);
+
+          // CRITICAL: Attach autosave listeners to location fields
+          // These fields are created dynamically and need to save to Firebase
+          if (input.tagName === 'INPUT' || input.tagName === 'SELECT') {
+            // Store field info for logging
+            const fieldId = input.id;
+            const fieldName = input.name;
+            const fieldType = input.tagName;
+
+            // Add input listener
+            input.addEventListener('input', function() {
+
+              setTimeout(() => {
+                try {
+                  if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                    if (typeof window.saveAnswers === 'function') {
+
+                      window.saveAnswers();
+                    } else {
+
+                    }
+                  } else {
+                    if (typeof window.saveAnswersToLocalStorage === 'function') {
+
+                      window.saveAnswersToLocalStorage();
+                    } else {
+
+                    }
+                  }
+                } catch (error) {
+
+                }
+              }, 100);
+            });
+
+            // Add change listener
+            input.addEventListener('change', function() {
+
+              setTimeout(() => {
+                try {
+                  if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                    if (typeof window.saveAnswers === 'function') {
+
+                      window.saveAnswers(true);
+                    } else {
+
+                    }
+                  } else {
+                    if (typeof window.saveAnswersToLocalStorage === 'function') {
+
+                      window.saveAnswersToLocalStorage();
+                    } else {
+
+                    }
+                  }
+                } catch (error) {
+
+                }
+              }, 100);
+            });
+
+          }
         });
         // Add the full_address hidden field to the location div
         const fullAddressWrap = document.createElement('div');
@@ -8000,16 +8345,16 @@ function checkAlertLogic(changedElement) {
                 } else {
                     prevValue = prevQuestionElement.value;
                 }
-                
+
                 let conditionMet = false;
                 let conditionMessage = condition.message || '';
-                
+
                 // Check if this is a currency condition
                 if (condition.isCurrency && condition.operator && condition.amount !== undefined) {
                     // Parse the currency value (remove $ and commas, then parse as float)
                     const currencyValue = parseFloat(prevValue.toString().replace(/[$,]/g, '')) || 0;
                     const compareAmount = parseFloat(condition.amount) || 0;
-                    
+
                     if (condition.operator === '>') {
                         conditionMet = currencyValue > compareAmount;
                     } else if (condition.operator === '<') {
@@ -8024,7 +8369,7 @@ function checkAlertLogic(changedElement) {
                         conditionMet = true;
                     }
                 }
-                
+
                 // If condition is met, check status requirements if specified
                 if (conditionMet) {
                     // Check status requirements if specified (support both old single and new array format)
@@ -8039,13 +8384,13 @@ function checkAlertLogic(changedElement) {
                                 break;
                             }
                         }
-                        
+
                         if (!allStatusRequirementsMet) {
                             // Not all status requirements are met, skip this condition
                             continue;
                         }
                     }
-                    
+
                     // If we get here, condition is met and all status requirements (if any) are satisfied
                     if (conditionMessage) {
                         showAlert(conditionMessage);
@@ -8280,14 +8625,22 @@ window.showCartModal = function () {
 
   // Add LaTeX preview PDFs to cart preview (if "Attach to packet" is selected)
   if (window.latexPreviewQuestions && window.latexPreviewQuestions.length > 0 && window.latexPdfs) {
+    const processedQuestionIds = new Set(); // Track processed questionIds to avoid duplicates
     for (const latexPreviewQ of window.latexPreviewQuestions) {
+      // Skip if we've already processed this questionId
+      if (processedQuestionIds.has(latexPreviewQ.questionId)) {
+        continue;
+      }
       const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
-      if (latexPdf && latexPreviewQ.title && latexPreviewQ.priceId) {
-        // Use title as the PDF name
-        const pdfName = latexPreviewQ.title.endsWith('.pdf') ? latexPreviewQ.title : (latexPreviewQ.title + '.pdf');
+      // Use filename if available, otherwise fall back to title
+      const filename = latexPreviewQ.filename;
+      const displayName = (filename && typeof filename === 'string' && filename.trim() !== '') ? filename.trim() : latexPreviewQ.title;
+      if (latexPdf && displayName && latexPreviewQ.priceId) {
+        processedQuestionIds.add(latexPreviewQ.questionId);
+        const pdfName = displayName.endsWith('.pdf') ? displayName : (displayName + '.pdf');
         allPdfsToAdd.push({
-          formId: latexPreviewQ.title.replace(/\.pdf$/i, '').toLowerCase(),
-          title: latexPreviewQ.title,
+          formId: displayName.replace(/\.pdf$/i, '').toLowerCase(),
+          title: displayName,
           priceId: latexPreviewQ.priceId,
           pdfName: pdfName
         });
@@ -8364,7 +8717,7 @@ function getUrlParam(name) {
   return u.get(name) || '';
 }
 // Add to cart helper (global, no Firebase required)
-window.addFormToCart = function (priceId) {
+window.addFormToCart = async function (priceId) {
   // 1) Fresh start each submission (prevents dupes/stale items across re-submits)
   clearCartState();
   // 2) Collect form data
@@ -8764,28 +9117,72 @@ window.addFormToCart = function (priceId) {
   }
 
   // Add LaTeX preview PDFs to cart (if "Attach to packet" is selected)
+  // Convert blobs to base64 before saving to ensure they persist through JSON serialization
   if (window.latexPreviewQuestions && window.latexPreviewQuestions.length > 0 && window.latexPdfs) {
+    const processedQuestionIds = new Set(); // Track processed questionIds to avoid duplicates
+    const latexCartItems = []; // Collect LaTeX items separately to convert blobs
+    
     for (const latexPreviewQ of window.latexPreviewQuestions) {
-      const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
-      if (latexPdf && latexPreviewQ.title && latexPreviewQ.priceId) {
-        // Use title as the PDF name
-        const pdfName = latexPreviewQ.title.endsWith('.pdf') ? latexPreviewQ.title : (latexPreviewQ.title + '.pdf');
-        const cartItem = {
-          formId: latexPreviewQ.title.replace(/\.pdf$/i, '').toLowerCase(),
-          title: latexPreviewQ.title,
-          priceId: latexPreviewQ.priceId,
-          pdfName: pdfName,
-          originalFormId: originalFormId,
-          portfolioId: portfolioId,
-          formData: formData,
-          countyName: countyName,
-          defendantName: defendantName,
-          timestamp: nowTs,
-          isLatexPreview: true,
-          latexPdf: latexPdf
-        };
-        cart.push(cartItem);
+      // Skip if we've already processed this questionId
+      if (processedQuestionIds.has(latexPreviewQ.questionId)) {
+        continue;
       }
+      const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
+      // Use filename if available, otherwise fall back to title
+      const filename = latexPreviewQ.filename;
+      const displayName = (filename && typeof filename === 'string' && filename.trim() !== '') ? filename.trim() : latexPreviewQ.title;
+      if (latexPdf && displayName && latexPreviewQ.priceId) {
+        processedQuestionIds.add(latexPreviewQ.questionId);
+        const pdfName = displayName.endsWith('.pdf') ? displayName : (displayName + '.pdf');
+        
+        // Store item with blob for async conversion
+        latexCartItems.push({
+          blob: latexPdf,
+          cartItem: {
+            formId: displayName.replace(/\.pdf$/i, '').toLowerCase(),
+            title: displayName,
+            priceId: latexPreviewQ.priceId,
+            pdfName: pdfName,
+            originalFormId: originalFormId,
+            portfolioId: portfolioId,
+            formData: formData,
+            countyName: countyName,
+            defendantName: defendantName,
+            timestamp: nowTs,
+            isLatexPreview: true,
+            latexPdfQuestionId: latexPreviewQ.questionId
+          }
+        });
+      }
+    }
+    
+    // Convert all blobs to base64 before adding to cart
+    if (latexCartItems.length > 0) {
+      const blobToBase64 = (blob) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result;
+            const base64 = result.includes(',') ? result.split(',')[1] : result;
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      };
+      
+      // Convert all blobs in parallel
+      const conversionPromises = latexCartItems.map(async (item) => {
+        const base64 = await blobToBase64(item.blob);
+        return {
+          ...item.cartItem,
+          latexPdfBase64: base64
+        };
+      });
+      
+      // Wait for all conversions, then add to cart
+      const convertedItems = await Promise.all(conversionPromises);
+      cart.push(...convertedItems);
     }
   }
   // Final deduplication of the entire cart to prevent any duplicates
@@ -11169,7 +11566,9 @@ function handleNext(currentSection){
     sectionStack.push(currentSection);
     let nextSection = currentSection + 1;
     /* ---------- evaluate jump rules ---------- */
-    const relevantJumps = jumpLogics.filter(jl => jl.section === currentSection);
+    // Ensure jumpLogics is defined (it might not be initialized yet)
+    const jumpLogicsForNav = (typeof jumpLogics !== 'undefined' && Array.isArray(jumpLogics)) ? jumpLogics : (window.jumpLogics || []);
+    const relevantJumps = jumpLogicsForNav.filter(jl => jl.section === currentSection);
     let jumpDetected = false;
     for (const jl of relevantJumps){
         const nmId = questionNameIds[jl.questionId] || ('answer'+jl.questionId);
@@ -12756,7 +13155,10 @@ if (typeof handleNext === 'function') {
 
         // Helper: save answers (with debouncing, error handling, and visibility prioritization)
         async function saveAnswers(immediate = false) {
-            if (!isUserLoggedIn || !userId) return;
+            if (!isUserLoggedIn || !userId) {
+
+                return;
+            }
 
             // If immediate save requested, clear any pending debounced save
             if (immediate && saveAnswersTimeout) {
@@ -12766,6 +13168,7 @@ if (typeof handleNext === 'function') {
 
             // If already saving, mark that we need to save again after current save completes
             if (isSaving) {
+
                 pendingSave = true;
                 return;
             }
@@ -12781,43 +13184,58 @@ if (typeof handleNext === 'function') {
 
             // 🔧 NEW: Prevent blank values from being saved in first 3 seconds
             if (window.preventBlankSaves) {
+
                 return;
             }
 
             isSaving = true;
             try {
                 const fields = getFormFields();
+
                 const answers = {};
                 const fieldVisibility = {}; // Track which fields are visible
 
                 fields.forEach(el => {
                     const isVisible = isElementActuallyVisible(el);
                     const fieldName = el.name;
+                    const fieldId = el.id;
+                    const fieldType = el.type || el.tagName;
 
                     // Skip if we already have a visible field's value and this field is hidden
                     if (fieldVisibility[fieldName] === true && !isVisible) {
+
                         return; // Skip this hidden field, we already have a visible one
                     }
 
                     // Store the value
+                    let valueToSave = null;
                     if (el.type === 'checkbox') {
                         // For checkboxes, save true/false
-                        answers[fieldName] = el.checked;
+                        valueToSave = el.checked;
+                        answers[fieldName] = valueToSave;
                     } else if (el.type === 'radio') {
                         // For radio buttons, save the selected value or null if none selected
                         const selectedRadio = document.querySelector('input[name="' + fieldName + '"]:checked');
-                        answers[fieldName] = selectedRadio ? selectedRadio.value : null;
+                        valueToSave = selectedRadio ? selectedRadio.value : null;
+                        answers[fieldName] = valueToSave;
                     } else {
                         // For other fields, save the value
-                        answers[fieldName] = el.value;
+                        valueToSave = el.value;
+                        answers[fieldName] = valueToSave;
                     }
 
                     // Track visibility for this field name
                     fieldVisibility[fieldName] = isVisible;
+
+                    // Log each field being saved (only non-empty values to reduce noise)
+                    if (valueToSave !== null && valueToSave !== '' && valueToSave !== false) {
+
+                    }
                 });
 
                 // Write to Firestore with error handling and retry logic
                 await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
+
                 saveRetryCount = 0; // Reset retry count on success
             } catch (error) {
 
@@ -12853,6 +13271,10 @@ if (typeof handleNext === 'function') {
                 }
             }
         }
+
+        // CRITICAL: Expose saveAnswers to global scope so createTriggerFieldsContainer can access it
+        window.saveAnswers = saveAnswers;
+
         // Helper function to check paragraph limits for autofilled textareas
         function triggerParagraphLimitCheckForAutofilledTextareas() {
             // Find all textareas and check if they need paragraph limit checking
@@ -12915,24 +13337,34 @@ if (typeof handleNext === 'function') {
         }
         // Helper: load answers
         async function loadAnswers() {
+
             if (!isUserLoggedIn || !userId) {
+
                 return;
             }
+
             try {
                 // First, try to load user profile data from a user profile document
                 const userProfileDoc = await db.collection('users').doc(userId).get();
                 let userProfileData = {};
                 if (userProfileDoc.exists) {
                     userProfileData = userProfileDoc.data();
+
+                } else {
+
                 }
                 // Then, try to load form-specific data
                 const doc = await db.collection('users').doc(userId).collection('formAnswers').doc(formId).get();
                 let formData = {};
                 if (doc.exists) {
                     formData = doc.data();
+
+                } else {
+
                 }
                 // Combine user profile data with form data
                 const data = { ...userProfileData, ...formData };
+
                 // Helper function to map Firebase data to form field names
                 function mapFirebaseDataToFormFields(firebaseData) {
                     const mappedData = { ...firebaseData };
@@ -12951,6 +13383,7 @@ if (typeof handleNext === 'function') {
                     return mappedData;
                 }
                 const mappedData = mapFirebaseDataToFormFields(data);
+
                 // 🔧 NEW: Store mappedData globally so showTextboxLabels can access it for immediate autofill
                 window.mappedData = mappedData;
                 // 🔧 NEW: Debug all radio buttons in the form
@@ -12974,16 +13407,21 @@ if (typeof handleNext === 'function') {
                     // Skip hidden fields if there's a visible field with the same name
                     const isVisible = isElementActuallyVisible(el);
                     if (!isVisible && el.name && visibleFieldNames.has(el.name)) {
+
                         return; // Skip this hidden field, there's a visible one
                     }
                     // Check both by name and by ID for autofill
                     let autofillValue = null;
+                    let autofillSource = null;
                     if (mappedData.hasOwnProperty(el.name)) {
                         autofillValue = mappedData[el.name];
+                        autofillSource = 'name: ' + el.name;
                     } else if (el.id && mappedData.hasOwnProperty(el.id)) {
                         autofillValue = mappedData[el.id];
+                        autofillSource = 'id: ' + el.id;
                     }
                     if (autofillValue !== null) {
+
                             // Skip current_date field - it should be set dynamically
                             if (el.id === 'current_date' || el.name === 'current_date') {
                                 return;
@@ -12996,12 +13434,21 @@ if (typeof handleNext === 'function') {
                             if (el.type === 'checkbox' || el.type === 'radio') {
                             if (el.type === 'radio') {
                                 // For radio buttons, we need to check if this specific radio button should be selected
+
                                 if (el.value === autofillValue) {
+
                                     el.checked = true;
+
                                     // Dispatch change event to trigger linked textbox creation
+
                                     const changeEvent = new Event('change', { bubbles: true });
                                     el.dispatchEvent(changeEvent);
+                                    // Verify radio is still checked after change event
+                                    setTimeout(() => {
+
+                                    }, 100);
                             } else {
+
                                     el.checked = false;
                                 }
                             } else {
@@ -13015,23 +13462,72 @@ if (typeof handleNext === 'function') {
                                 }
                             }
                         } else {
-                            el.value = autofillValue;
-                            // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                            if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                                const inputEvent = new Event('input', { bubbles: true });
-                                el.dispatchEvent(inputEvent);
-                                const changeEvent = new Event('change', { bubbles: true });
-                                el.dispatchEvent(changeEvent);
-                            }
-                            // If this is a select element (dropdown), trigger change event to update conditional logic
+                            // CRITICAL: Check if this dropdown value would trigger a hard alert
+                            // If it would, blank out the dropdown instead of autofilling it
                             if (el.tagName === 'SELECT') {
+                                // Find question ID by checking if this dropdown's ID/name matches any hardAlertData dropdownId
+                                let questionId = el.getAttribute('data-question-id');
+                                if (!questionId && window.hardAlertData) {
+                                    // Search through hardAlertData to find matching dropdownId
+                                    questionId = Object.keys(window.hardAlertData).find(qId => {
+                                        const hardAlertInfo = window.hardAlertData[qId];
+                                        return hardAlertInfo && hardAlertInfo.dropdownId && 
+                                               (hardAlertInfo.dropdownId === el.id || hardAlertInfo.dropdownId === el.name);
+                                    });
+                                }
+
+                                if (questionId && window.hardAlertData && window.hardAlertData[questionId]) {
+                                    const hardAlertInfo = window.hardAlertData[questionId];
+                                    if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && 
+                                        (autofillValue || '').toString().trim() === (hardAlertInfo.trigger || '').toString().trim()) {
+
+                                        // Reset dropdown to default "Select an option" instead of autofilling
+                                        if (el.options && el.options.length > 0) {
+                                            const placeholderOption = el.querySelector('option[value=""][disabled]');
+                                            if (placeholderOption) {
+                                                placeholderOption.selected = true;
+                                                el.selectedIndex = 0;
+                                            } else if (el.options[0]) {
+                                                el.selectedIndex = 0;
+                                            }
+                                        }
+                                        return; // Skip autofilling this dropdown
+                                    }
+                                }
+                                // If no hard alert match, proceed with normal autofill
+                                el.value = autofillValue;
+
                                 // Trigger change event to call dropdownMirror and update conditional logic
                                 const changeEvent = new Event('change', { bubbles: true });
                                 el.dispatchEvent(changeEvent);
+                            } else {
+                                el.value = autofillValue;
+
+                                // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                                if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                    const inputEvent = new Event('input', { bubbles: true });
+                                    el.dispatchEvent(inputEvent);
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    el.dispatchEvent(changeEvent);
+                                }
                             }
+                            }
+                        } else {
+                            // Log fields that don't have autofill data
+                            if (el.name || el.id) {
+                                const hasMatchingName = mappedData.hasOwnProperty(el.name);
+                                const hasMatchingId = el.id && mappedData.hasOwnProperty(el.id);
+                                if (!hasMatchingName && !hasMatchingId && el.name) {
+                                    // Only log fields that have names/IDs but no matching data (to reduce noise)
+                                    const fieldType = el.type || el.tagName;
+                                    if (fieldType === 'text' || fieldType === 'SELECT' || fieldType === 'INPUT' || fieldType === 'location') {
+
+                                    }
+                                }
                             }
                         }
                     });
+
                     // After autofilling, trigger visibility updates for dependent questions
                     // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
                     setTimeout(() => {
@@ -13048,6 +13544,7 @@ if (typeof handleNext === 'function') {
                         }
                     }, 2000);
                     // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
+
                     fields.forEach(el => {
                     if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
                         let questionId;
@@ -13072,6 +13569,7 @@ if (typeof handleNext === 'function') {
                                 }
                             }
                         }
+
                             if (typeof showTextboxLabels === 'function') {
                                 showTextboxLabels(questionId, el.value);
                             }
@@ -13080,6 +13578,7 @@ if (typeof handleNext === 'function') {
                             }
                         }
                     });
+
                 // Trigger state hidden field updates for any state dropdowns that were autofilled
                 fields.forEach(el => {
                     if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
@@ -13092,17 +13591,37 @@ if (typeof handleNext === 'function') {
                         }
                     });
                     // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
+
                     fields.forEach(el => {
                         if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
+
+                            // Check radio button state BEFORE dropdownMirror
+                            const radioButtonsBefore = document.querySelectorAll('input[type="radio"]');
+                            const checkedRadiosBefore = Array.from(radioButtonsBefore).filter(r => r.checked);
+
                             if (typeof dropdownMirror === 'function') {
                                 dropdownMirror(el, el.id);
                             }
+                            // Check radio button state AFTER dropdownMirror
+                            setTimeout(() => {
+                                const radioButtonsAfter = document.querySelectorAll('input[type="radio"]');
+                                const checkedRadiosAfter = Array.from(radioButtonsAfter).filter(r => r.checked);
+
+                                // Specifically check the radio button we're concerned about
+                                const targetRadio = document.getElementById('is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual_1_radio');
+                                if (targetRadio) {
+
+                                } else {
+
+                                }
+                            }, 100);
                         // Trigger hidden logic for autofilled dropdowns
                         if (typeof updateHiddenLogic === 'function') {
                             updateHiddenLogic(el.id, el.value);
                             }
                         }
                     });
+
                     // Create hidden checkboxes for all autofilled dropdowns
                     if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
                         createHiddenCheckboxesForAutofilledDropdowns();
@@ -13359,19 +13878,52 @@ if (typeof handleNext === 'function') {
                             }
                         }
                     } else {
-                        el.value = autofillValue;
-                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                            const inputEvent = new Event('input', { bubbles: true });
-                            el.dispatchEvent(inputEvent);
-                            const changeEvent = new Event('change', { bubbles: true });
-                            el.dispatchEvent(changeEvent);
-                        }
-                        // If this is a select element (dropdown), trigger change event to update conditional logic
+                        // CRITICAL: Check if this dropdown value would trigger a hard alert
+                        // If it would, blank out the dropdown instead of autofilling it
                         if (el.tagName === 'SELECT') {
+                            // Find question ID by checking if this dropdown's ID/name matches any hardAlertData dropdownId
+                            let questionId = el.getAttribute('data-question-id');
+                            if (!questionId && window.hardAlertData) {
+                                // Search through hardAlertData to find matching dropdownId
+                                questionId = Object.keys(window.hardAlertData).find(qId => {
+                                    const hardAlertInfo = window.hardAlertData[qId];
+                                    return hardAlertInfo && hardAlertInfo.dropdownId && 
+                                           (hardAlertInfo.dropdownId === el.id || hardAlertInfo.dropdownId === el.name);
+                                });
+                            }
+
+                            if (questionId && window.hardAlertData && window.hardAlertData[questionId]) {
+                                const hardAlertInfo = window.hardAlertData[questionId];
+                                if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && 
+                                    (autofillValue || '').toString().trim() === (hardAlertInfo.trigger || '').toString().trim()) {
+
+                                    // Reset dropdown to default "Select an option" instead of autofilling
+                                    if (el.options && el.options.length > 0) {
+                                        const placeholderOption = el.querySelector('option[value=""][disabled]');
+                                        if (placeholderOption) {
+                                            placeholderOption.selected = true;
+                                            el.selectedIndex = 0;
+                                        } else if (el.options[0]) {
+                                            el.selectedIndex = 0;
+                                        }
+                                    }
+                                    return; // Skip autofilling this dropdown
+                                }
+                            }
+                            // If no hard alert match, proceed with normal autofill
+                            el.value = autofillValue;
                             // Trigger change event to call dropdownMirror and update conditional logic
                             const changeEvent = new Event('change', { bubbles: true });
                             el.dispatchEvent(changeEvent);
+                        } else {
+                            el.value = autofillValue;
+                            // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                            if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                const inputEvent = new Event('input', { bubbles: true });
+                                el.dispatchEvent(inputEvent);
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
+                            }
                         }
                     }
                     // Debug successful autofill
@@ -13392,19 +13944,53 @@ if (typeof handleNext === 'function') {
                     }
                     // Only process fields that have autofill data but are still empty
                     if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
-                        el.value = autofillValue;
-                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                            const inputEvent = new Event('input', { bubbles: true });
-                            el.dispatchEvent(inputEvent);
-                            const changeEvent = new Event('change', { bubbles: true });
-                            el.dispatchEvent(changeEvent);
-                        }
-                        // If this is a select element (dropdown), trigger change event to update conditional logic
+
+                        // CRITICAL: Check if this dropdown value would trigger a hard alert
+                        // If it would, blank out the dropdown instead of autofilling it
                         if (el.tagName === 'SELECT') {
+                            // Find question ID by checking if this dropdown's ID/name matches any hardAlertData dropdownId
+                            let questionId = el.getAttribute('data-question-id');
+                            if (!questionId && window.hardAlertData) {
+                                // Search through hardAlertData to find matching dropdownId
+                                questionId = Object.keys(window.hardAlertData).find(qId => {
+                                    const hardAlertInfo = window.hardAlertData[qId];
+                                    return hardAlertInfo && hardAlertInfo.dropdownId && 
+                                           (hardAlertInfo.dropdownId === el.id || hardAlertInfo.dropdownId === el.name);
+                                });
+                            }
+
+                            if (questionId && window.hardAlertData && window.hardAlertData[questionId]) {
+                                const hardAlertInfo = window.hardAlertData[questionId];
+                                if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && 
+                                    (autofillValue || '').toString().trim() === (hardAlertInfo.trigger || '').toString().trim()) {
+
+                                    // Reset dropdown to default "Select an option" instead of autofilling
+                                    if (el.options && el.options.length > 0) {
+                                        const placeholderOption = el.querySelector('option[value=""][disabled]');
+                                        if (placeholderOption) {
+                                            placeholderOption.selected = true;
+                                            el.selectedIndex = 0;
+                                        } else if (el.options[0]) {
+                                            el.selectedIndex = 0;
+                                        }
+                                    }
+                                    return; // Skip autofilling this dropdown
+                                }
+                            }
+                            // If no hard alert match, proceed with normal autofill
+                            el.value = autofillValue;
                             // Trigger change event to call dropdownMirror and update conditional logic
                             const changeEvent = new Event('change', { bubbles: true });
                             el.dispatchEvent(changeEvent);
+                        } else {
+                            el.value = autofillValue;
+                            // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                            if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                const inputEvent = new Event('input', { bubbles: true });
+                                el.dispatchEvent(inputEvent);
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
+                            }
                         }
                     } else if (autofillValue !== null && el.type === 'checkbox' && !el.checked) {
                         el.checked = !!autofillValue;
@@ -13414,9 +14000,57 @@ if (typeof handleNext === 'function') {
         }, 2000); // Wait 2 seconds for conditional fields to be created
         // 🔧 NEW: Clear autofill flag after fallback autofill is complete
         setTimeout(() => {
-            window.isInitialAutofill = false;
-            // 🔧 NEW: Restore prefill values for any blank fields after Firebase autofill
-            if (window.unifiedFieldsMap) {
+
+            // CRITICAL: Dispatch radioGroupChanged events BEFORE clearing isInitialAutofill flag
+            // This ensures conditional logic handlers see isAutofill=true and won't uncheck radios
+            const autofilledRadioButtons = document.querySelectorAll('input[type="radio"][id*="_radio"]:checked');
+
+            autofilledRadioButtons.forEach(radio => {
+
+                // Create hidden checkbox for the selected radio button
+                const originalNodeId = radio.id.replace('_radio', '');
+                if (typeof createHiddenCheckboxForRadio === 'function') {
+                    createHiddenCheckboxForRadio(originalNodeId, radio.name, radio.value);
+                }
+                // Extract entry number from radio name (format: "radio_group_ENTRYNUMBER")
+                const entryNumberMatch = radio.name.match(/radio_group_(\d+)/);
+                if (entryNumberMatch) {
+                    const entryNumber = entryNumberMatch[1];
+
+                    // Dispatch radioGroupChanged event to trigger conditional logic re-evaluation
+                    // This happens while isInitialAutofill is still true, so conditional logic won't uncheck radios
+                    window.dispatchEvent(new CustomEvent('radioGroupChanged', {
+                        detail: { entryNumber: parseInt(entryNumber), radioGroup: radio.name }
+                    }));
+                    // Check radio state after event dispatch
+                    setTimeout(() => {
+                        const radioAfter = document.getElementById(radio.id);
+                        if (radioAfter) {
+
+                        }
+                    }, 100);
+                }
+            });
+
+            // Wait a bit for conditional logic to process, then clear the flag
+            setTimeout(() => {
+
+                // Verify target radio button state before clearing flag
+                const targetRadioBefore = document.getElementById('is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual_1_radio');
+                if (targetRadioBefore) {
+
+                }
+                window.isInitialAutofill = false;
+
+                // Verify target radio button state after clearing flag
+                setTimeout(() => {
+                    const targetRadioAfter = document.getElementById('is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual_1_radio');
+                    if (targetRadioAfter) {
+
+                    }
+                }, 100);
+                // 🔧 NEW: Restore prefill values for any blank fields after Firebase autofill
+                if (window.unifiedFieldsMap) {
                 Object.keys(window.unifiedFieldsMap).forEach(questionId => {
                     const fields = window.unifiedFieldsMap[questionId];
                     if (Array.isArray(fields)) {
@@ -13480,45 +14114,32 @@ if (typeof handleNext === 'function') {
                         });
                     }
                 });
-            } else {
-            }
-            // 🔧 NEW: Update all hidden address fields after autofill completes
-            if (typeof updateAllHiddenAddressFields === 'function') {
-                updateAllHiddenAddressFields();
-            }
-            // 🔧 NEW: Update all linked checkboxes after autofill completes
-            if (typeof window.updateAllLinkedCheckboxes === 'function') {
-                window.updateAllLinkedCheckboxes();
-            }
-            // Also update inverse checkboxes after autofill
-            if (typeof window.updateAllInverseCheckboxes === 'function') {
-                window.updateAllInverseCheckboxes();
-            }
-            // 🔧 NEW: Create hidden checkboxes for any autofilled radio buttons in numbered dropdowns
-            const autofilledRadioButtons = document.querySelectorAll('input[type="radio"][id*="_radio"]:checked');
-            autofilledRadioButtons.forEach(radio => {
-                // Create hidden checkbox for the selected radio button
-                const originalNodeId = radio.id.replace('_radio', '');
-                if (typeof createHiddenCheckboxForRadio === 'function') {
-                    createHiddenCheckboxForRadio(originalNodeId, radio.name, radio.value);
+                } else {
                 }
-                // Extract entry number from radio name (format: "radio_group_ENTRYNUMBER")
-                const entryNumberMatch = radio.name.match(/radio_group_(\d+)/);
-                if (entryNumberMatch) {
-                    const entryNumber = entryNumberMatch[1];
-                    // Dispatch radioGroupChanged event to trigger conditional logic re-evaluation
-                    window.dispatchEvent(new CustomEvent('radioGroupChanged', {
-                        detail: { entryNumber: parseInt(entryNumber), radioGroup: radio.name }
-                    }));
+                // 🔧 NEW: Update all hidden address fields after autofill completes
+                if (typeof updateAllHiddenAddressFields === 'function') {
+                    updateAllHiddenAddressFields();
                 }
-            });
+                // 🔧 NEW: Update all linked checkboxes after autofill completes
+                if (typeof window.updateAllLinkedCheckboxes === 'function') {
+                    window.updateAllLinkedCheckboxes();
+                }
+                // Also update inverse checkboxes after autofill
+                if (typeof window.updateAllInverseCheckboxes === 'function') {
+                    window.updateAllInverseCheckboxes();
+                }
+                // NOTE: radioGroupChanged events are now dispatched BEFORE isInitialAutofill is set to false
+                // (see code above that processes autofilled radio buttons before clearing the flag)
+            }, 300); // Wait 300ms for conditional logic to process radioGroupChanged events
         }, 2000); // 2 second delay to ensure fallback autofill completes
             } catch (e) {
             }
         }
         // Helper: check if an answer would trigger a jump to the end
         function wouldTriggerJumpToEnd(element, answerValue) {
-            if (!jumpLogics || jumpLogics.length === 0) return false;
+            // Ensure jumpLogics is defined (it might not be initialized yet)
+            const jumpLogicsForCheck = (typeof jumpLogics !== 'undefined' && Array.isArray(jumpLogics)) ? jumpLogics : (window.jumpLogics || []);
+            if (!jumpLogicsForCheck || jumpLogicsForCheck.length === 0) return false;
             // Find the question ID for this element
             let questionId = null;
             for (const [qId, nameId] of Object.entries(questionNameIds)) {
@@ -13529,7 +14150,7 @@ if (typeof handleNext === 'function') {
             }
             if (!questionId) return false;
             // Check if there's a jump logic for this question that would go to 'end'
-            const relevantJumps = jumpLogics.filter(jl => jl.questionId === questionId);
+            const relevantJumps = jumpLogicsForCheck.filter(jl => jl.questionId === questionId);
             for (const jl of relevantJumps) {
                 if (jl.jumpTo.toLowerCase() === 'end') {
                     // Check if the answer matches the jump condition
@@ -13624,6 +14245,10 @@ if (typeof handleNext === 'function') {
             } catch (e) {
             }
         }
+
+        // CRITICAL: Expose saveAnswersToLocalStorage to global scope so createTriggerFieldsContainer can access it
+        window.saveAnswersToLocalStorage = saveAnswersToLocalStorage;
+
         // Helper: load answers from localStorage for non-logged-in users
         function loadAnswersFromLocalStorage() {
             try {
@@ -13723,7 +14348,9 @@ if (typeof handleNext === 'function') {
                         // Second autofill pass for dynamically generated textbox inputs
                         // Use a longer delay to ensure textbox inputs are fully generated
                         setTimeout(() => {
+
                             const allFields = getFormFields();
+
                             // Also try to find fields by ID directly as a fallback
                             const fieldsById = {};
                             allFields.forEach(el => {
@@ -13731,26 +14358,39 @@ if (typeof handleNext === 'function') {
                                     fieldsById[el.id] = el;
                                 }
                             });
+
                             allFields.forEach(el => {
                                 if (data.hasOwnProperty(el.name)) {
+
                                     if (el.type === 'checkbox' || el.type === 'radio') {
                                         el.checked = !!data[el.name];
+
                                     } else {
                                         // Skip current_date field and any field marked as protected - they should be set dynamically
                                         if (el.id !== 'current_date' && el.name !== 'current_date' && !el.hasAttribute('data-protected')) {
                                         el.value = data[el.name];
+
                                         }
                                     }
                                 }
                             });
                             // Additional pass: try to autofill by ID for any fields that might have been missed
+
                             Object.keys(data).forEach(fieldName => {
                                 const fieldById = fieldsById[fieldName];
                                 if (fieldById && !fieldById.value && data[fieldName]) {
+
                                     if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
                                         fieldById.checked = !!data[fieldName];
+
                                     } else {
                                         fieldById.value = data[fieldName];
+
+                                    }
+                                } else {
+                                    // Log fields that have data but weren't found
+                                    if (data[fieldName] !== null && data[fieldName] !== '' && data[fieldName] !== false) {
+
                                     }
                                 }
                             });
@@ -13817,19 +14457,52 @@ if (typeof handleNext === 'function') {
                                         }
                                     }
                                 } else {
-                                    el.value = autofillValue;
-                                    // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                                    if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                                        const inputEvent = new Event('input', { bubbles: true });
-                                        el.dispatchEvent(inputEvent);
-                                        const changeEvent = new Event('change', { bubbles: true });
-                                        el.dispatchEvent(changeEvent);
-                                    }
-                                    // If this is a select element (dropdown), trigger change event to update conditional logic
+                                    // CRITICAL: Check if this dropdown value would trigger a hard alert
+                                    // If it would, blank out the dropdown instead of autofilling it
                                     if (el.tagName === 'SELECT') {
+                                        // Find question ID by checking if this dropdown's ID/name matches any hardAlertData dropdownId
+                                        let questionId = el.getAttribute('data-question-id');
+                                        if (!questionId && window.hardAlertData) {
+                                            // Search through hardAlertData to find matching dropdownId
+                                            questionId = Object.keys(window.hardAlertData).find(qId => {
+                                                const hardAlertInfo = window.hardAlertData[qId];
+                                                return hardAlertInfo && hardAlertInfo.dropdownId && 
+                                                       (hardAlertInfo.dropdownId === el.id || hardAlertInfo.dropdownId === el.name);
+                                            });
+                                        }
+
+                                        if (questionId && window.hardAlertData && window.hardAlertData[questionId]) {
+                                            const hardAlertInfo = window.hardAlertData[questionId];
+                                            if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && 
+                                                (autofillValue || '').toString().trim() === (hardAlertInfo.trigger || '').toString().trim()) {
+
+                                                // Reset dropdown to default "Select an option" instead of autofilling
+                                                if (el.options && el.options.length > 0) {
+                                                    const placeholderOption = el.querySelector('option[value=""][disabled]');
+                                                    if (placeholderOption) {
+                                                        placeholderOption.selected = true;
+                                                        el.selectedIndex = 0;
+                                                    } else if (el.options[0]) {
+                                                        el.selectedIndex = 0;
+                                                    }
+                                                }
+                                                return; // Skip autofilling this dropdown
+                                            }
+                                        }
+                                        // If no hard alert match, proceed with normal autofill
+                                        el.value = autofillValue;
                                         // Trigger change event to call dropdownMirror and update conditional logic
                                         const changeEvent = new Event('change', { bubbles: true });
                                         el.dispatchEvent(changeEvent);
+                                    } else {
+                                        el.value = autofillValue;
+                                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                            const inputEvent = new Event('input', { bubbles: true });
+                                            el.dispatchEvent(inputEvent);
+                                            const changeEvent = new Event('change', { bubbles: true });
+                                            el.dispatchEvent(changeEvent);
+                                        }
                                     }
                                 }
                                 // Debug successful autofill

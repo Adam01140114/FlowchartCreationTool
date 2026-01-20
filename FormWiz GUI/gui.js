@@ -677,6 +677,8 @@ function addQuestion(sectionId, questionId = null) {
             </select><br><br>
             <label>Latex Preview Title:</label>
             <input type="text" id="latexPreviewTitle${currentQuestionId}" placeholder="Enter LaTeX preview title"><br><br>
+            <label>Preview Filename (for cart):</label>
+            <input type="text" id="latexPreviewFilename${currentQuestionId}" placeholder="Enter filename used in cart/packet (e.g., Demand_Letter.pdf)"><br><br>
             <label>Latex Content:</label>
             <textarea id="latexPreviewContent${currentQuestionId}" placeholder="Paste LaTeX code here" rows="8" style="width: 100%; font-family: monospace;"></textarea><br><br>
             <label>Latex Price ID:</label>

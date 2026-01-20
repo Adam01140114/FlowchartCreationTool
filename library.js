@@ -731,8 +731,8 @@ window.exportGuiJson = function(download = true) {
                           const filteredConditions = conditions.filter(c => c && c.trim() !== '');
                           // Only include conditionalLogic if there are actual conditions
                           if (filteredConditions.length > 0) {
-                            dateField.conditionalLogic = {
-                              enabled: time.conditionalLogic.enabled,
+                          dateField.conditionalLogic = {
+                            enabled: time.conditionalLogic.enabled,
                               conditions: filteredConditions
                             };
                           }
@@ -776,7 +776,7 @@ window.exportGuiJson = function(download = true) {
                             (name) => (name || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9\s\/]+/g, '').replace(/\s+/g, '_').replace(/^_+|_+$/g, '');
                           const nestedDropdownName = sanitizeFn(nestedDropdown.fieldName || '');
                           
-                          conditions = conditions.map(condition => {
+                            conditions = conditions.map(condition => {
                             if (!condition || !condition.trim()) return condition;
                             
                             // First, handle forward slash case (if dropdown name has slash)
@@ -807,11 +807,11 @@ window.exportGuiJson = function(download = true) {
                               if (nestedIndex > 0) {
                                 // Extract from nested dropdown name onwards
                                 return condition.substring(nestedIndex);
-                              }
-                            }
+                                  }
+                                }
                             
-                            return condition;
-                          });
+                              return condition;
+                            });
                           
                           dropdownField.conditionalLogic = {
                             enabled: nestedDropdown.conditionalLogic.enabled,
@@ -1409,32 +1409,32 @@ window.exportGuiJson = function(download = true) {
                 // Don't add jump conditions for options leading to numberedDropdown/multipleTextboxes
                 // Those questions will handle their own jump conditions based on their min/max values
                 if (questionType !== "multipleDropdownType" && questionType !== "multipleTextboxes") {
-                  // Check for jumps to other questions - only add jump logic if target is in a different section
-                  // that is either before the current section or more than 1 section above
-                  const targetQuestionId = optionTarget._questionId || "";
-                  if (targetQuestionId) {
-                    // Get the target question's section using the same logic as section assignment
-                    let targetSection = parseInt(getSection(optionTarget) || "1", 10);
-                    // Apply the same section assignment logic for the target question
-                    const targetIsFirstQuestion = questions.every(otherCell => 
-                      otherCell === optionTarget || optionTarget.geometry.y <= otherCell.geometry.y
-                    );
-                    if (targetIsFirstQuestion && targetSection !== 1) {
-                      targetSection = 1;
-                    }
-                    const currentSection = parseInt(section || "1", 10);
-                    // Only add jump logic if:
-                    // 1. Target is in a section before current section, OR
-                    // 2. Target is more than 1 section above current section
-                    const shouldAddJump = targetSection < currentSection || targetSection > currentSection + 1;
-                    if (shouldAddJump) {
-                      // Check if this jump already exists
-                      const exists = jumpConditions.some(j => j.option === optionText.trim() && j.to === targetSection.toString());
-                      if (!exists) {
-                        jumpConditions.push({
-                          option: optionText.trim(),
-                          to: targetSection.toString()
-                        });
+                // Check for jumps to other questions - only add jump logic if target is in a different section
+                // that is either before the current section or more than 1 section above
+                const targetQuestionId = optionTarget._questionId || "";
+                if (targetQuestionId) {
+                  // Get the target question's section using the same logic as section assignment
+                  let targetSection = parseInt(getSection(optionTarget) || "1", 10);
+                  // Apply the same section assignment logic for the target question
+                  const targetIsFirstQuestion = questions.every(otherCell => 
+                    otherCell === optionTarget || optionTarget.geometry.y <= otherCell.geometry.y
+                  );
+                  if (targetIsFirstQuestion && targetSection !== 1) {
+                    targetSection = 1;
+                  }
+                  const currentSection = parseInt(section || "1", 10);
+                  // Only add jump logic if:
+                  // 1. Target is in a section before current section, OR
+                  // 2. Target is more than 1 section above current section
+                  const shouldAddJump = targetSection < currentSection || targetSection > currentSection + 1;
+                  if (shouldAddJump) {
+                    // Check if this jump already exists
+                    const exists = jumpConditions.some(j => j.option === optionText.trim() && j.to === targetSection.toString());
+                    if (!exists) {
+                      jumpConditions.push({
+                        option: optionText.trim(),
+                        to: targetSection.toString()
+                      });
                       }
                     }
                   }
@@ -1631,9 +1631,9 @@ window.exportGuiJson = function(download = true) {
             sanitizedOption = "none";
           } else {
             sanitizedOption = optionText
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, '_')
-              .replace(/^_+|_+$/g, '');
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_+|_+$/g, '');
           }
           // Always use the base nameId prefix for checkbox options
           const nameId = `${baseNameId}_${sanitizedOption}`;
@@ -1672,7 +1672,7 @@ window.exportGuiJson = function(download = true) {
         if (matchingOption) {
           question.conditionalPDF.answer = matchingOption.label;
         } else if (question.options[0].label) {
-          question.conditionalPDF.answer = question.options[0].label;
+        question.conditionalPDF.answer = question.options[0].label;
         }
       } else if (question.conditionalPDF.answer === "Yes" && question.options.length > 0 && question.options[0].label) {
         question.conditionalPDF.answer = question.options[0].label;
@@ -1962,8 +1962,8 @@ window.exportGuiJson = function(download = true) {
                             const filteredConditions = conditions.filter(c => c && c.trim() !== '');
                             // Only include conditionalLogic if there are actual conditions
                             if (filteredConditions.length > 0) {
-                              dateField.conditionalLogic = {
-                                enabled: time.conditionalLogic.enabled,
+                            dateField.conditionalLogic = {
+                              enabled: time.conditionalLogic.enabled,
                                 conditions: filteredConditions
                               };
                             }
@@ -2669,11 +2669,21 @@ window.exportGuiJson = function(download = true) {
                 // Get Latex PDF preview properties
                 const previewTitle = pdfPreviewCell._pdfPreviewTitle || "";
                 const previewContent = pdfPreviewCell._pdfPreviewFile || "";
+                const previewFilename = pdfPreviewCell._pdfPreviewFilename || "";
+                const previewPriceId = pdfPreviewCell._pdfPreviewPriceId || "";
+                let previewAttachment = pdfPreviewCell._pdfPreviewAttachment || "Preview Only";
+                // Normalize attachment value (handle old "Attach To Packet" format)
+                if (previewAttachment === "Attach To Packet") {
+                  previewAttachment = "Attach to packet";
+                }
                 // Set Latex PDF preview properties
                 question.latexPreview.enabled = true;
                 question.latexPreview.trigger = optionText;
                 question.latexPreview.title = previewTitle;
                 question.latexPreview.content = previewContent;
+                question.latexPreview.filename = previewFilename;
+                question.latexPreview.priceId = previewPriceId;
+                question.latexPreview.attachment = previewAttachment;
                 // Only one Latex preview per question, so break after finding one
                 break;
               }
@@ -3405,12 +3415,27 @@ window.exportBothJson = function() {
           (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell))) {
         cellData._pdfPreviewTitle = cell._pdfPreviewTitle !== undefined ? cell._pdfPreviewTitle : "";
         cellData._pdfPreviewFile = cell._pdfPreviewFile !== undefined ? cell._pdfPreviewFile : "";
+        // Only include Filename, Price ID and Attachment for LaTeX preview nodes
+        if (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell)) {
+          cellData._pdfPreviewFilename = cell._pdfPreviewFilename !== undefined ? cell._pdfPreviewFilename : "";
+          cellData._pdfPreviewPriceId = cell._pdfPreviewPriceId !== undefined ? cell._pdfPreviewPriceId : "";
+          cellData._pdfPreviewAttachment = cell._pdfPreviewAttachment !== undefined ? cell._pdfPreviewAttachment : "Preview Only";
+        }
       } else if (cell._pdfPreviewTitle !== undefined) {
         // Include even if not a PDF preview node (for backward compatibility)
         cellData._pdfPreviewTitle = cell._pdfPreviewTitle;
       }
       if (cell._pdfPreviewFile !== undefined) {
         cellData._pdfPreviewFile = cell._pdfPreviewFile;
+      }
+      if (cell._pdfPreviewFilename !== undefined) {
+        cellData._pdfPreviewFilename = cell._pdfPreviewFilename;
+      }
+      if (cell._pdfPreviewPriceId !== undefined) {
+        cellData._pdfPreviewPriceId = cell._pdfPreviewPriceId;
+      }
+      if (cell._pdfPreviewAttachment !== undefined) {
+        cellData._pdfPreviewAttachment = cell._pdfPreviewAttachment;
       }
       // Final verification for PDF preview nodes
       if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
@@ -3628,6 +3653,9 @@ window.saveFlowchart = function() {
       _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null, _pdfLogicEnabled: cell._pdfLogicEnabled||null, _pdfTriggerLimit: cell._pdfTriggerLimit||null, _bigParagraphPdfName: cell._bigParagraphPdfName||null, _bigParagraphPdfFile: cell._bigParagraphPdfFile||null, _bigParagraphPdfPrice: cell._bigParagraphPdfPrice||null,
       _pdfPreviewTitle: cell._pdfPreviewTitle !== undefined ? cell._pdfPreviewTitle : null,
       _pdfPreviewFile: cell._pdfPreviewFile !== undefined ? cell._pdfPreviewFile : null,
+      _pdfPreviewFilename: cell._pdfPreviewFilename !== undefined ? cell._pdfPreviewFilename : null,
+      _pdfPreviewPriceId: cell._pdfPreviewPriceId !== undefined ? cell._pdfPreviewPriceId : null,
+      _pdfPreviewAttachment: cell._pdfPreviewAttachment !== undefined ? cell._pdfPreviewAttachment : null,
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
       _locationIndex: cell._locationIndex !== undefined ? cell._locationIndex : undefined,
@@ -3770,6 +3798,9 @@ window.saveAsFlowchart = function() {
       _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null, _pdfLogicEnabled: cell._pdfLogicEnabled||null, _pdfTriggerLimit: cell._pdfTriggerLimit||null, _bigParagraphPdfName: cell._bigParagraphPdfName||null, _bigParagraphPdfFile: cell._bigParagraphPdfFile||null, _bigParagraphPdfPrice: cell._bigParagraphPdfPrice||null,
       _pdfPreviewTitle: cell._pdfPreviewTitle !== undefined ? cell._pdfPreviewTitle : null,
       _pdfPreviewFile: cell._pdfPreviewFile !== undefined ? cell._pdfPreviewFile : null,
+      _pdfPreviewFilename: cell._pdfPreviewFilename !== undefined ? cell._pdfPreviewFilename : null,
+      _pdfPreviewPriceId: cell._pdfPreviewPriceId !== undefined ? cell._pdfPreviewPriceId : null,
+      _pdfPreviewAttachment: cell._pdfPreviewAttachment !== undefined ? cell._pdfPreviewAttachment : null,
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
       _locationIndex: cell._locationIndex !== undefined ? cell._locationIndex : undefined,
@@ -4206,11 +4237,11 @@ function generateCorrectNodeId(cell) {
     const cleanPdfName = typeof window.sanitizeNameId === 'function'
       ? window.sanitizeNameId(pdfName.trim())
       : pdfName.trim()
-          .toLowerCase()
+      .toLowerCase()
           .replace(/<[^>]+>/g, '') // Remove HTML tags
           .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
-          .replace(/\s+/g, '_') // Replace spaces with underscores
-          .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
     nodeId += cleanPdfName + '_';
   }
   // Add parent text if present (only for option nodes, not question nodes)
@@ -4219,11 +4250,11 @@ function generateCorrectNodeId(cell) {
     const cleanParentText = typeof window.sanitizeNameId === 'function'
       ? window.sanitizeNameId(parentText.trim())
       : parentText.trim()
-          .toLowerCase()
+      .toLowerCase()
           .replace(/<[^>]+>/g, '') // Remove HTML tags
           .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
-          .replace(/\s+/g, '_') // Replace spaces with underscores
-          .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
     nodeId += cleanParentText + '_';
   }
   // Add current node text
@@ -4232,11 +4263,11 @@ function generateCorrectNodeId(cell) {
     const cleanCurrentText = typeof window.sanitizeNameId === 'function'
       ? window.sanitizeNameId(currentText.trim())
       : currentText.trim()
-          .toLowerCase()
+      .toLowerCase()
           .replace(/<[^>]+>/g, '') // Remove HTML tags
           .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
-          .replace(/\s+/g, '_') // Replace spaces with underscores
-          .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
     nodeId += cleanCurrentText;
   }
   // Clean up the final result
@@ -4795,6 +4826,9 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         if (item._pdfPrice !== undefined) newCell._pdfPrice = item._pdfPrice;
         if (item._pdfPreviewTitle !== undefined) newCell._pdfPreviewTitle = item._pdfPreviewTitle;
         if (item._pdfPreviewFile !== undefined) newCell._pdfPreviewFile = item._pdfPreviewFile;
+        if (item._pdfPreviewFilename !== undefined) newCell._pdfPreviewFilename = item._pdfPreviewFilename;
+        if (item._pdfPreviewPriceId !== undefined) newCell._pdfPreviewPriceId = item._pdfPreviewPriceId;
+        if (item._pdfPreviewAttachment !== undefined) newCell._pdfPreviewAttachment = item._pdfPreviewAttachment;
         // Legacy PDF properties for backward compatibility
         if (item._pdfUrl !== undefined) newCell._pdfUrl = item._pdfUrl;
         if (item._priceId !== undefined) newCell._priceId = item._priceId;

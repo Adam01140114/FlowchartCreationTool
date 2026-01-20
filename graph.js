@@ -783,10 +783,36 @@ function showPropertiesPopup(cell) {
              (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell))) {
     const pdfPreviewTitleValue = cell._pdfPreviewTitle || (window.isLatexPdfPreviewNode && window.isLatexPdfPreviewNode(cell) ? 'Latex PDF Preview' : 'PDF Preview');
     const pdfPreviewFileValue = cell._pdfPreviewFile || '';
+    const pdfPreviewPriceIdValue = cell._pdfPreviewPriceId || '';
+    const pdfPreviewFilenameValue = cell._pdfPreviewFilename || '';
     properties = [
       { label: 'Preview Title', value: pdfPreviewTitleValue, id: 'propPdfPreviewTitle', editable: true },
       { label: 'Preview File', value: pdfPreviewFileValue, id: 'propPdfPreviewFile', editable: true }
     ];
+    // Add Filename, Price ID, and Attachment dropdown only for LaTeX preview nodes, positioned after Preview Title
+    if (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell)) {
+      const pdfPreviewAttachmentValue = cell._pdfPreviewAttachment || 'Preview Only';
+      properties.splice(1, 0, { label: 'Preview Filename', value: pdfPreviewFilenameValue, id: 'propPdfPreviewFilename', editable: true });
+      properties.splice(2, 0, { label: 'Price ID', value: pdfPreviewPriceIdValue, id: 'propPdfPreviewPriceId', editable: true });
+      properties.splice(3, 0, { 
+        label: 'Preview', 
+        value: pdfPreviewAttachmentValue, 
+        id: 'propPdfPreviewAttachment', 
+        editable: false,
+        isDropdown: true,
+        dropdownOptions: [
+          { value: 'Preview Only', text: 'Preview Only' },
+          { value: 'Attach to packet', text: 'Attach to packet' }
+        ],
+        dropdownChange: (selectedValue) => {
+          cell._pdfPreviewAttachment = selectedValue;
+          // Trigger autosave
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        }
+      });
+    }
   } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
     // For hidden checkbox nodes, only show Node ID
     properties = [
@@ -2880,8 +2906,8 @@ function showPropertiesPopup(cell) {
           // Special debugging for PDF properties
           if (prop.id === 'propPdfName' || prop.id === 'propPdfFile' || prop.id === 'propPdfPrice') {
           }
-          // Special debugging for PDF preview properties
-          if (prop.id === 'propPdfPreviewTitle' || prop.id === 'propPdfPreviewFile') {
+            // Special debugging for PDF preview properties
+          if (prop.id === 'propPdfPreviewTitle' || prop.id === 'propPdfPreviewFile' || prop.id === 'propPdfPreviewPriceId' || prop.id === 'propPdfPreviewFilename') {
           }
           if (useTextarea) {
             input.style.cssText = `
@@ -2952,7 +2978,7 @@ function showPropertiesPopup(cell) {
             }
             // For PDF Logic fields and PDF Preview fields, keep the input element so it can be found by the save function
             const isPdfLogicField = prop.id && prop.id.startsWith('propPdf');
-            const isPdfPreviewField = prop.id === 'propPdfPreviewTitle' || prop.id === 'propPdfPreviewFile';
+            const isPdfPreviewField = prop.id === 'propPdfPreviewTitle' || prop.id === 'propPdfPreviewFile' || prop.id === 'propPdfPreviewPriceId' || prop.id === 'propPdfPreviewFilename';
             const isBigParagraphField = prop.id === 'propCharacterLimit' || prop.id === 'propLineLimit' || prop.id === 'propParagraphLimit';
             
             if (!isPdfLogicField && !isPdfPreviewField && !isBigParagraphField && input && input.parentNode) {
@@ -3211,6 +3237,28 @@ function showPropertiesPopup(cell) {
                 break;
               case 'propPdfPreviewFile':
                 cell._pdfPreviewFile = newValue;
+                // Update PDF preview node display if function exists
+                if (typeof window.updatePdfPreviewNodeCell === 'function') {
+                  window.updatePdfPreviewNodeCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propPdfPreviewFilename':
+                cell._pdfPreviewFilename = newValue;
+                // Update PDF preview node display if function exists
+                if (typeof window.updatePdfPreviewNodeCell === 'function') {
+                  window.updatePdfPreviewNodeCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propPdfPreviewPriceId':
+                cell._pdfPreviewPriceId = newValue;
                 // Update PDF preview node display if function exists
                 if (typeof window.updatePdfPreviewNodeCell === 'function') {
                   window.updatePdfPreviewNodeCell(cell);
@@ -3565,6 +3613,29 @@ function showPropertiesPopup(cell) {
           }
         }
       } else {
+      }
+      // Check for Preview Filename and Price ID inputs (only for LaTeX preview nodes)
+      if (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell)) {
+        const pdfPreviewFilenameInput = document.getElementById('propPdfPreviewFilename_input');
+        if (pdfPreviewFilenameInput) {
+          const pdfPreviewFilenameValue = pdfPreviewFilenameInput.value.trim();
+          if (pdfPreviewFilenameValue !== cell._pdfPreviewFilename) {
+            cell._pdfPreviewFilename = pdfPreviewFilenameValue;
+            if (typeof window.updatePdfPreviewNodeCell === 'function') {
+              window.updatePdfPreviewNodeCell(cell);
+            }
+          }
+        }
+        const pdfPreviewPriceIdInput = document.getElementById('propPdfPreviewPriceId_input');
+        if (pdfPreviewPriceIdInput) {
+          const pdfPreviewPriceIdValue = pdfPreviewPriceIdInput.value.trim();
+          if (pdfPreviewPriceIdValue !== cell._pdfPreviewPriceId) {
+            cell._pdfPreviewPriceId = pdfPreviewPriceIdValue;
+            if (typeof window.updatePdfPreviewNodeCell === 'function') {
+              window.updatePdfPreviewNodeCell(cell);
+            }
+          }
+        }
       }
       // Trigger autosave after saving PDF preview properties
       if (typeof window.requestAutosave === 'function') {

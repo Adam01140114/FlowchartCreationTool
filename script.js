@@ -1245,6 +1245,9 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       } else if (nodeType === 'latexPdfPreview') {
         cell._pdfPreviewTitle = "Latex PDF Preview";
         cell._pdfPreviewFile = "";
+        cell._pdfPreviewFilename = "";
+        cell._pdfPreviewPriceId = "";
+        cell._pdfPreviewAttachment = "Preview Only";
         if (typeof window.updatePdfPreviewNodeCell === 'function') {
           window.updatePdfPreviewNodeCell(cell);
         }
@@ -4087,7 +4090,7 @@ document.addEventListener("DOMContentLoaded", function() {
           // Check if this is a double-click (within 500ms of the last click while drawing)
           if (timeSinceLastClick < 500 && leftClickCount >= 1) {
             // This is a double-click while drawing - cancel the selection box
-            resetSquareCreationState();
+        resetSquareCreationState();
             // Reset click tracking
             leftClickCount = 0;
             lastLeftClickTime = 0;
@@ -4798,16 +4801,16 @@ function previewForm() {
       } catch (e) {
         console.error('Error storing preview data in localStorage:', e);
         // Fallback to URL method if localStorage fails (though it may still have size limits)
-        const encodedJson = encodeURIComponent(guiJsonStr);
+      const encodedJson = encodeURIComponent(guiJsonStr);
         const guiUrl = `FormWiz GUI/gui.html?preview=${encodedJson}`;
         window.open(guiUrl, '_blank');
         return;
       }
       
       // Still copy to clipboard for manual use if needed
-      navigator.clipboard.writeText(guiJsonStr).then(() => {
-        // Optionally, show a message: copied!
-      });
+    navigator.clipboard.writeText(guiJsonStr).then(() => {
+      // Optionally, show a message: copied!
+    });
       
       // Open the GUI preview in a new tab with the preview key in the URL
       const guiUrl = `FormWiz GUI/gui.html?previewKey=${encodeURIComponent(previewKey)}`;
@@ -5475,7 +5478,7 @@ function copySelectedNodeAsJson() {
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
               '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText', '_linkedLogicNodeId', '_linkedFields', '_linkedCheckboxNodeId', '_linkedCheckboxOptions', '_pdfLogicEnabled', '_pdfTriggerLimit', '_bigParagraphPdfName', '_bigParagraphPdfFile', '_bigParagraphPdfPrice', '_locationIndex', '_locationTitle', '_checkboxes', '_itemOrder', '_times', '_dropdowns', '_lineLimit', '_characterLimit', '_paragraphLimit'
+      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText', '_linkedLogicNodeId', '_linkedFields', '_linkedCheckboxNodeId', '_linkedCheckboxOptions', '_pdfLogicEnabled', '_pdfTriggerLimit', '_bigParagraphPdfName', '_bigParagraphPdfFile', '_bigParagraphPdfPrice', '_locationIndex', '_locationTitle', '_checkboxes', '_itemOrder', '_times', '_dropdowns', '_lineLimit', '_characterLimit', '_paragraphLimit', '_pdfPreviewTitle', '_pdfPreviewFile', '_pdfPreviewFilename', '_pdfPreviewPriceId', '_pdfPreviewAttachment'
       ];
       safeProperties.forEach(prop => {
         // For limit properties, copy even if empty string or null
@@ -5551,15 +5554,15 @@ function copySelectedNodeAsJson() {
       });
     } else {
       // Only copy section preferences for sections referenced by selected nodes
-      nodes.forEach(cell => {
-        const section = cell.section || "1";
-        if (currentSectionPrefs[section]) {
-          copiedSectionPrefs[section] = {
-            name: currentSectionPrefs[section].name,
-            borderColor: currentSectionPrefs[section].borderColor
-          };
-        }
-      });
+    nodes.forEach(cell => {
+      const section = cell.section || "1";
+      if (currentSectionPrefs[section]) {
+        copiedSectionPrefs[section] = {
+          name: currentSectionPrefs[section].name,
+          borderColor: currentSectionPrefs[section].borderColor
+        };
+      }
+    });
     }
     // Create the complete clipboard data
     const clipboardData = {
@@ -5656,7 +5659,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.vertex = true;
         newCell.id = nodeData.newId;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_fileName","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_pdfPreviewTitle","_pdfPreviewFile","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns","_lineLimit","_characterLimit","_paragraphLimit","_currencyAlerts"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_fileName","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_pdfPreviewTitle","_pdfPreviewFile","_pdfPreviewFilename","_pdfPreviewPriceId","_pdfPreviewAttachment","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns","_lineLimit","_characterLimit","_paragraphLimit","_currencyAlerts"].forEach(k => {
           // For limit properties, also copy empty strings and null values
           const isLimitProperty = k === '_lineLimit' || k === '_characterLimit' || k === '_paragraphLimit';
           if (isLimitProperty) {
@@ -6415,12 +6418,12 @@ function resetAllNodeIds() {
   cellsToProcess.forEach(({ cell, correctNodeId }) => {
     const finalNodeId = finalNodeIds.get(cell);
     if (finalNodeId) {
-      // Clear the manually edited flag since we're resetting to automatic generation
-      cell._manuallyEditedNodeId = false;
-      // Update the cell's Node ID
-      if (typeof window.setNodeId === 'function') {
+        // Clear the manually edited flag since we're resetting to automatic generation
+        cell._manuallyEditedNodeId = false;
+        // Update the cell's Node ID
+        if (typeof window.setNodeId === 'function') {
         window.setNodeId(cell, finalNodeId);
-        resetCount++;
+          resetCount++;
       }
     }
   });

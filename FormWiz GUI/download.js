@@ -483,6 +483,7 @@ function loadFormData(formData) {
                             const latexPreviewCheckbox = questionBlock.querySelector(`#enableLatexPreview${question.questionId}`);
                             const latexPreviewTriggerSelect = questionBlock.querySelector(`#latexPreviewTrigger${question.questionId}`);
                             const latexPreviewTitleInput = questionBlock.querySelector(`#latexPreviewTitle${question.questionId}`);
+                            const latexPreviewFilenameInput = questionBlock.querySelector(`#latexPreviewFilename${question.questionId}`);
                             const latexPreviewContentInput = questionBlock.querySelector(`#latexPreviewContent${question.questionId}`);
                             const latexPreviewPriceIdInput = questionBlock.querySelector(`#latexPreviewPriceId${question.questionId}`);
                             const latexPreviewAttachmentSelect = questionBlock.querySelector(`#latexPreviewAttachment${question.questionId}`);
@@ -495,6 +496,9 @@ function loadFormData(formData) {
                                 }
                                 if (latexPreviewTitleInput && question.latexPreview.title) {
                                     latexPreviewTitleInput.value = question.latexPreview.title;
+                                }
+                                if (latexPreviewFilenameInput && question.latexPreview.filename) {
+                                    latexPreviewFilenameInput.value = question.latexPreview.filename;
                                 }
                                 if (latexPreviewContentInput && question.latexPreview.content) {
                                     latexPreviewContentInput.value = question.latexPreview.content;
@@ -3321,6 +3325,7 @@ function exportForm() {
                     enabled: questionBlock.querySelector(`#enableLatexPreview${questionId}`)?.checked || false,
                     trigger: questionBlock.querySelector(`#latexPreviewTrigger${questionId}`)?.value || "",
                     title: questionBlock.querySelector(`#latexPreviewTitle${questionId}`)?.value || "",
+                    filename: questionBlock.querySelector(`#latexPreviewFilename${questionId}`)?.value || "",
                     content: questionBlock.querySelector(`#latexPreviewContent${questionId}`)?.value || "",
                     priceId: questionBlock.querySelector(`#latexPreviewPriceId${questionId}`)?.value || "",
                     attachment: questionBlock.querySelector(`#latexPreviewAttachment${questionId}`)?.value || "Preview Only"

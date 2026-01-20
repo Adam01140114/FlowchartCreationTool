@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <title>Cart - FormWiz</title>
-    <link rel="stylesheet" href="generate.css">
+    <title>Cart - FormStar</title>
+    <link rel="stylesheet" href="../Forms/generate.css">
     <style>
         /* Ensure nav a matches index.html exactly */
         nav a {
@@ -131,11 +131,189 @@
                 border-radius: 0 0 10px 10px;
             }
         }
+        .desktop-nav {
+            display: flex;
+        }
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            transform-origin: 1px;
+        }
+        .mobile-menu-toggle.active span:first-child {
+            transform: rotate(45deg);
+        }
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .mobile-menu-toggle.active span:last-child {
+            transform: rotate(-45deg);
+        }
+        .mobile-nav {
+            display: none !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: -100% !important;
+            width: 85% !important;
+            max-width: 300px !important;
+            height: 100vh !important;
+            background: #2c3e50 !important;
+            flex-direction: column !important;
+            gap: 0 !important;
+            padding: 140px 20px 20px 20px !important;
+            transition: left 0.3s ease !important;
+            z-index: 1000 !important;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3) !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            transform: none !important;
+            margin: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            right: auto !important;
+        }
+        body .mobile-nav.active,
+        html .mobile-nav.active,
+        .mobile-nav.active {
+            left: 0 !important;
+            display: flex !important;
+            right: auto !important;
+            transform: none !important;
+            margin-left: 0 !important;
+            position: fixed !important;
+        }
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 0 12px 25px;
+            border-bottom: 1px solid #34495e;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            margin-top: 0;
+        }
+        .mobile-nav-section {
+            border-bottom: 1px solid #34495e;
+        }
+        .mobile-nav-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 0 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .mobile-nav-submenu {
+            display: none;
+            padding-left: 20px;
+        }
+        .mobile-nav-submenu.active {
+            display: block;
+        }
+        .mobile-nav-submenu a {
+            padding: 10px 0 10px 45px;
+            font-size: 1em;
+            border-bottom: 1px solid #34495e;
+            line-height: 1.1;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        .mobile-nav-submenu a:first-child {
+            border-top: 1px solid #34495e;
+            margin-top: 0px;
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+        .mobile-nav-logout,
+        .mobile-nav-logout a,
+        #mobile-logout-btn {
+            color: #ff7043 !important;
+            font-weight: 700 !important;
+        }
+        .mobile-nav-toggle span {
+            transition: transform 0.3s ease;
+        }
+        .mobile-nav-toggle.active span {
+            transform: rotate(180deg);
+        }
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .mobile-nav-overlay.active {
+            display: block;
+        }
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 25px;
             margin-left: auto;
+        }
+        #cart-icon-link .cart-circle {
+            width: 54px !important;
+            height: 54px !important;
+            background: #2980b9;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        #cart-icon {
+            width: 32px !important;
+            height: 32px !important;
+            display: block;
+        }
+        #cart-count-badge {
+            display: none;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #e74c3c;
+            color: #fff;
+            border-radius: 50%;
+            font-size: 1em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.13);
+            z-index: 2;
+            text-align: center;
         }
         .sign-in-btn {
             background: #fff;
@@ -252,6 +430,15 @@
         }
         .pro-footer, footer {
             flex-shrink: 0;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #374656;
+            color: white;
+        }
+        main {
+            flex: 1 0 auto;
         }
         .cart-container {
             max-width: 467px;
@@ -449,6 +636,97 @@
             font-size: 1.2em;
         }
         @media (max-width: 768px) {
+            html {
+                font-size: 14px !important;
+            }
+            body {
+                overflow-x: hidden;
+            }
+            .mobile-menu-toggle {
+                display: flex !important;
+            }
+            .desktop-nav {
+                display: none !important;
+            }
+            .mobile-nav {
+                display: flex !important;
+            }
+            body .mobile-nav.active,
+            html .mobile-nav.active,
+            .mobile-nav.active {
+                left: 0 !important;
+                right: auto !important;
+                transform: none !important;
+                position: fixed !important;
+            }
+            header {
+                padding: 16px 15px;
+                min-height: 80px;
+                flex-wrap: wrap;
+                gap: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: relative;
+            }
+            header img {
+                width: 119px;
+                height: 73px;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .header-actions {
+                gap: 10px;
+                margin-left: auto;
+                margin-right: 15px;
+            }
+            #logout-btn,
+            .sign-in-btn {
+                display: none !important;
+            }
+            #cart-icon-link .cart-circle {
+                width: 55px !important;
+                height: 55px !important;
+            }
+            #cart-icon {
+                width: 30px !important;
+                height: 30px !important;
+            }
+            .pro-footer-col.nav-col {
+                display: none !important;
+            }
+            .pro-footer {
+                gap: 20px !important;
+                padding: 30px 20px 15px 20px !important;
+                flex-direction: row !important;
+            }
+            .pro-footer-col.address-col {
+                padding-right: 0 !important;
+                border-right: 1.5px solid #2c7a7d !important;
+            }
+            .pro-footer-col.company-col {
+                padding-left: 20px !important;
+                border-right: none !important;
+            }
+            .pro-footer-contact {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .pro-footer-contact a {
+                margin-right: 0 !important;
+            }
+            footer {
+                padding: 20px !important;
+                padding-bottom: 20px !important;
+                margin-bottom: 0 !important;
+            }
+            html, body {
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            .pro-footer, footer {
+                margin-bottom: 0 !important;
+            }
             .cart-container {
                 padding: 20px 30px 24px 30px;
                 width: 95vw;
@@ -484,8 +762,15 @@
 </head>
 <body>
     <header>
-        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='../index.html';">
-        <nav>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href='../index.html';">
+        
+        <nav class="desktop-nav">
             <a href="../index.html">Home
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
@@ -494,12 +779,10 @@
                     <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </a>
                 <div class="dropdown-menu" id="forms-dropdown-menu">
-                    <a href="forms.html">My Forms</a>
+                    <a href="forms.html" class="auth-required" style="display: none;">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
-                    <a href="Family.html">Family</a>
-                    <a href="Property.html">Property</a>
                     <a href="Immigration.html">Immigration</a>
-                    <a href="SmallClaims.html">Small Claims</a>
+                    <a href="smallclaims.html">Small Claims</a>
                     <a href="Other.html">Other</a>
                 </div>
             </div>
@@ -513,12 +796,43 @@
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
         </nav>
+        
+        <nav class="mobile-nav" id="mobile-nav">
+            <a href="../index.html">Home</a>
+            <div class="mobile-nav-section">
+                <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+                <div class="mobile-nav-submenu" id="mobile-forms-menu">
+                    <a href="forms.html" class="auth-required" style="display: none;">My Forms</a>
+                    <a href="FreeForm.html">Free Form</a>
+                    <a href="Immigration.html">Immigration</a>
+                    <a href="smallclaims.html">Small Claims</a>
+                    <a href="Other.html">Other</a>
+                </div>
+            </div>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="FAQ.html">FAQ</a>
+            <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+                <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+            </div>
+        </nav>
+        
         <div class="header-actions">
-            <a href="account.html" class="sign-in-btn">Sign In</a>
+            <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+            <a href="cart.html" id="cart-icon-link" style="display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+                <span class="cart-circle">
+                    <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="10" cy="21" r="1.5"/>
+                        <circle cx="18" cy="21" r="1.5"/>
+                        <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
+                    </svg>
+                    <span id="cart-count-badge" style="display: none;"></span>
+                </span>
+            </a>
         </div>
     </header>
 
-
+    <main>
     <div class="cart-container">
         <div class="cart-header">
             <h1><span style="vertical-align:middle; font-size:1.1em; margin-right:8px;">🛒</span>Your Cart</h1>
@@ -547,15 +861,16 @@
             </div>
         </div>
     </div>
+    </main>
 
     <div class="pro-footer">
         <div class="pro-footer-col address-col">
             <div class="pro-footer-logo">
-                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+                <img src="logo.png" alt="FormStar Logo" style="max-width:120px;max-height:80px;">
             </div>
-            <div class="pro-footer-title">FormWiz</div>
+            <div class="pro-footer-title">Form-Star</div>
             <div class="pro-footer-contact">
-                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
+                <a href="tel:18008508370">1-800-850-8370</a> &nbsp; 
                 <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
             </div>
         </div>
@@ -568,13 +883,16 @@
             <a href="contact.html">Contact Us</a>
         </div>
         <div class="pro-footer-col company-col">
-            <div class="pro-footer-title company-title">About FormWiz</div>
-            <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+            <div class="pro-footer-title company-title">About Form-Star</div>
+            <div class="pro-footer-desc">Form-Star consists of a group of proven professionals with over 70 years of combined <strong>legal</strong>, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify paperwork for everyone.</div>
         </div>
     </div>
     <footer>
-        &copy; 2024 FormWiz. All rights reserved.
+        &copy; 2024 Form-Star. All rights reserved.
     </footer>
+
+    <!-- Authentication Script -->
+    <script src="../auth.js"></script>
 
     <!-- Firebase includes -->
     <script src="https://js.stripe.com/v3/"></script>
@@ -652,21 +970,147 @@
         }
     });
 
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileNav = document.getElementById('mobile-nav');
+            const mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+            const mobileFormsMenu = document.getElementById('mobile-forms-menu');
+            const body = document.body;
+
+            function toggleMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    body.classList.toggle('menu-open');
+                }
+            }
+
+            function closeMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    body.classList.remove('menu-open');
+                }
+            }
+
+            // Toggle mobile menu
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                });
+            }
+
+            // Toggle mobile forms submenu
+            if (mobileFormsToggle && mobileFormsMenu) {
+                mobileFormsToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mobileFormsToggle.classList.toggle('active');
+                    mobileFormsMenu.classList.toggle('active');
+                });
+            }
+
+            // Close mobile menu when clicking on links
+            if (mobileNav) {
+                mobileNav.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' && !e.target.classList.contains('mobile-nav-toggle')) {
+                        closeMobileMenu();
+                    }
+                });
+            }
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (mobileNav && mobileMenuToggle && !mobileNav.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Close mobile menu on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mobileNav && mobileNav.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Body scroll prevention when menu open
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        if (body.classList.contains('menu-open')) {
+                            body.style.overflow = 'hidden';
+                        } else {
+                            body.style.overflow = '';
+                        }
+                    }
+                });
+            });
+            observer.observe(body, { attributes: true });
+        });
+
         // Auth state check: hide Sign In button if signed in, redirect to home.html if not
         document.addEventListener('DOMContentLoaded', function() {
             const auth = firebase.auth();
             const signInButton = document.querySelector('.sign-in-btn');
+            const mobileAuthSection = document.getElementById('mobile-auth-section');
+            const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+            
             auth.onAuthStateChanged(function(user) {
+                // Get all "My Forms" links that require authentication
+                const myFormsLinks = document.querySelectorAll('.auth-required');
+                
                 if (user) {
-                    // User is signed in, hide sign-in button
+                    // User is signed in
                     if (signInButton) {
-                        signInButton.style.display = 'none';
+                        signInButton.textContent = 'Log Out';
+                        signInButton.href = '#';
+                        signInButton.onclick = function(e) {
+                            e.preventDefault();
+                            auth.signOut().then(() => {
+                                window.location.reload();
+                            }).catch((error) => {
+                                alert('Sign Out Error: ' + error.message);
+                            });
+                        };
                     }
+                    
+                    // Show mobile logout button
+                    if (mobileAuthSection) {
+                        mobileAuthSection.style.display = 'block';
+                    }
+                    
+                    // Show "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'block';
+                    });
                 } else {
                     // No user is signed in, redirect to home.html
                     window.location.href = 'home.html';
+                    
+                    // Hide mobile logout button
+                    if (mobileAuthSection) {
+                        mobileAuthSection.style.display = 'none';
+                    }
+                    
+                    // Hide "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'none';
+                    });
                 }
             });
+
+            // Handle mobile logout button click
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        window.location.reload();
+                    }).catch((error) => {
+                        alert('Sign Out Error: ' + error.message);
+                    });
+                });
+            }
         });
 
         // Add event listeners for Clear Cart and Exit buttons
