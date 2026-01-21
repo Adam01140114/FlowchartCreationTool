@@ -1487,6 +1487,10 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
           formHTML += `
             <script>
               function handleHardAlert${questionId}(value) {
+                // Skip hard alerts during Firebase autofill
+                if (typeof window !== 'undefined' && window.isInitialAutofill) {
+                  return;
+                }
                 const selectedValue = (value || '').trim();
                 const hardAlertTrigger = '${escapedTrigger}';
                 const hardAlertTitle = '${escapedTitle}';
@@ -6792,6 +6796,20 @@ if (s > 1){
           condition: (triggerField.hardAlert.condition || '').trim(),
           title: (triggerField.hardAlert.title || '').trim()
         } : null;
+        // Store hard alert metadata on the dropdown for autofill guardrails
+        if (hardAlertData && hardAlertData.enabled && hardAlertData.condition) {
+          select.setAttribute('data-hard-alert-enabled', 'true');
+          select.setAttribute('data-hard-alert-condition', hardAlertData.condition);
+          if (hardAlertData.title) {
+            select.setAttribute('data-hard-alert-title', hardAlertData.title);
+          }
+          console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Attached hard alert metadata to trigger dropdown:', {
+            id: select.id,
+            name: select.name,
+            condition: hardAlertData.condition,
+            title: hardAlertData.title || ''
+          });
+        }
 
         // CRITICAL: Log that we're attaching the change event listener
 
@@ -6827,6 +6845,9 @@ if (s > 1){
             const selectedValue = (this.value || '').trim();
             const hardAlertCondition = hardAlertData.condition;
             if (selectedValue === hardAlertCondition) {
+              if (typeof window !== 'undefined' && window.isInitialAutofill) {
+                return;
+              }
 
               // Use custom alert modal with hard alert flag
               if (typeof showAlert === 'function') {
@@ -6847,6 +6868,12 @@ if (s > 1){
           if (typeof updateHiddenLogic === 'function') {
             updateHiddenLogic(this.id, this.value);
           }
+          // After trigger fields are created, scrub any hard-alert autofill values
+          setTimeout(() => {
+            if (typeof scrubHardAlertAutofillSelects === 'function') {
+              scrubHardAlertAutofillSelects('after-trigger-dropdown-change');
+            }
+          }, 0);
           // CRITICAL: After dropdownMirror creates radio buttons, attach autosave listeners to them
           setTimeout(() => {
             // Find all radio buttons that were just created by dropdownMirror
@@ -8499,6 +8526,34 @@ function checkAllHardAlertsAndUpdateNavigation() {
             }
         }
     }
+}
+
+// Safely clear any autofilled values that would trigger hard alerts
+function scrubHardAlertAutofillSelects(contextLabel) {
+    const selects = document.querySelectorAll('select[data-hard-alert-enabled="true"][data-hard-alert-condition]');
+    selects.forEach(select => {
+        const condition = (select.getAttribute('data-hard-alert-condition') || '').trim();
+        const currentValue = (select.value || '').trim();
+        if (condition && currentValue === condition) {
+            console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Scrubbing hard alert autofill value:', {
+                context: contextLabel || 'unknown',
+                id: select.id,
+                name: select.name,
+                value: currentValue,
+                condition: condition
+            });
+            const placeholderOption = select.querySelector('option[value=""][disabled]');
+            if (placeholderOption) {
+                placeholderOption.selected = true;
+                select.selectedIndex = 0;
+            } else if (select.options && select.options.length > 0) {
+                select.selectedIndex = 0;
+            }
+            // Trigger change to keep dependent logic in sync
+            const changeEvent = new Event('change', { bubbles: true });
+            select.dispatchEvent(changeEvent);
+        }
+    });
 }
 function showAlert(message, isHardAlert) {
     // Check if 3 seconds have passed since page load
@@ -14111,6 +14166,14 @@ if (typeof handleNext === 'function') {
             window.preventBlankSaves = false;
         }, 3000);
                     const fields = getFormFields();
+                    const debugTarget = 'are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_1';
+                    const hasTargetField = fields.some(el => el && (el.id === debugTarget || el.name === debugTarget));
+                    const mappedHasTarget = mappedData && (mappedData.hasOwnProperty(debugTarget) || mappedData.hasOwnProperty(debugTarget + '_dropdown'));
+                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Autofill field snapshot:', {
+                        totalFields: fields.length,
+                        hasTargetField: hasTargetField,
+                        mappedHasTarget: mappedHasTarget
+                    });
                     // First pass: identify which field names have visible fields
                     const visibleFieldNames = new Set();
                     fields.forEach(el => {
@@ -14180,6 +14243,43 @@ if (typeof handleNext === 'function') {
                             // CRITICAL: Check if this dropdown value would trigger a hard alert
                             // If it would, blank out the dropdown instead of autofilling it
                             if (el.tagName === 'SELECT') {
+                                if (el.id && el.id.indexOf('have_you_filed_a_written_claim_against_them') !== -1) {
+                                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Target select encountered in autofill loop:', {
+                                        id: el.id,
+                                        name: el.name,
+                                        autofillValue: autofillValue,
+                                        dataHardAlertEnabled: el.getAttribute('data-hard-alert-enabled'),
+                                        dataHardAlertCondition: el.getAttribute('data-hard-alert-condition')
+                                    });
+                                }
+                                const hardAlertEnabledAttr = el.getAttribute('data-hard-alert-enabled');
+                                const hardAlertConditionAttr = (el.getAttribute('data-hard-alert-condition') || '').trim();
+                                console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Checking select:', {
+                                    id: el.id,
+                                    name: el.name,
+                                    autofillValue: autofillValue,
+                                    hardAlertEnabledAttr: hardAlertEnabledAttr,
+                                    hardAlertConditionAttr: hardAlertConditionAttr
+                                });
+                                if (hardAlertEnabledAttr === 'true' && hardAlertConditionAttr &&
+                                    (autofillValue || '').toString().trim() === hardAlertConditionAttr) {
+                                        console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Skipping autofill due to data-hard-alert match:', {
+                                            id: el.id,
+                                            name: el.name,
+                                            autofillValue: autofillValue,
+                                            hardAlertConditionAttr: hardAlertConditionAttr
+                                        });
+                                        if (el.options && el.options.length > 0) {
+                                            const placeholderOption = el.querySelector('option[value=""][disabled]');
+                                            if (placeholderOption) {
+                                                placeholderOption.selected = true;
+                                                el.selectedIndex = 0;
+                                            } else if (el.options[0]) {
+                                                el.selectedIndex = 0;
+                                            }
+                                        }
+                                        return; // Skip autofilling this dropdown
+                                }
                                 // Find question ID by checking if this dropdown's ID/name matches any hardAlertData dropdownId
                                 let questionId = el.getAttribute('data-question-id');
                                 if (!questionId && window.hardAlertData) {
@@ -14193,8 +14293,22 @@ if (typeof handleNext === 'function') {
 
                                 if (questionId && window.hardAlertData && window.hardAlertData[questionId]) {
                                     const hardAlertInfo = window.hardAlertData[questionId];
+                                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Hard alert data found:', {
+                                        id: el.id,
+                                        name: el.name,
+                                        questionId: questionId,
+                                        hardAlertInfo: hardAlertInfo,
+                                        autofillValue: autofillValue
+                                    });
                                     if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && 
                                         (autofillValue || '').toString().trim() === (hardAlertInfo.trigger || '').toString().trim()) {
+                                        console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Skipping autofill due to hardAlertData match:', {
+                                            id: el.id,
+                                            name: el.name,
+                                            questionId: questionId,
+                                            autofillValue: autofillValue,
+                                            hardAlertTrigger: hardAlertInfo.trigger
+                                        });
 
                                         // Reset dropdown to default "Select an option" instead of autofilling
                                         if (el.options && el.options.length > 0) {
@@ -14211,6 +14325,11 @@ if (typeof handleNext === 'function') {
                                 }
                                 // If no hard alert match, proceed with normal autofill
                                 el.value = autofillValue;
+                                console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Applied autofill to select:', {
+                                    id: el.id,
+                                    name: el.name,
+                                    autofillValue: autofillValue
+                                });
 
                                 // Trigger change event to call dropdownMirror and update conditional logic
                                 const changeEvent = new Event('change', { bubbles: true });
@@ -14253,6 +14372,10 @@ if (typeof handleNext === 'function') {
                                 el.dispatchEvent(event);
                             }
                         });
+                        // After conditional logic creates trigger fields, scrub hard-alert autofills
+                        if (typeof scrubHardAlertAutofillSelects === 'function') {
+                            scrubHardAlertAutofillSelects('post-autofill-visibility');
+                        }
                         // Also call the global visibility updates function
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();

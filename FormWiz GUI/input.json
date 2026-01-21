@@ -6,11 +6,105 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "How many people are you suing?",
-          "type": "numberedDropdown",
+          "text": "Hungry?",
+          "type": "dropdown",
           "logic": {
             "enabled": false,
             "conditions": []
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "hungry",
+          "placeholder": ""
+        },
+        {
+          "questionId": 2,
+          "text": "How many people are you suing?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Yes"
+              },
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "No"
+              }
+            ]
           },
           "jump": {
             "enabled": false,
@@ -256,10 +350,10 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 3,
-  "questionCounter": 2,
+  "questionCounter": 3,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
-  "formName": "Example Form",
+  "formName": "New SC-120",
   "defaultPDFName": "",
   "pdfOutputName": "",
   "stripePriceId": "",

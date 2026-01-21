@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Example Form</title>
+    <title>New SC-120</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="generate.css">
     <link rel="stylesheet" href="generate2.css">
@@ -438,8 +438,13 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 3</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people are you suing?</h3></label><select id="how_many_people_are_you_suing" name="how_many_people_are_you_suing" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_people_are_you_suing', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div><script>
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 3</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="1"
+                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_hungry"></div>
+              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people are you suing?</h3></label><select id="how_many_people_are_you_suing" name="how_many_people_are_you_suing" data-question-id="2" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value); updateHiddenLogic('how_many_people_are_you_suing', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer2"></div><script>
           window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
             if (!input) return;
             // Remove all non-numeric characters except decimal point, including dollar sign
@@ -1491,7 +1496,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
 <input type="hidden" id="user_full_address"     name="user_full_address">
 <input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden">
-<input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
+<input type="checkbox" id="new_sc_120_default_checkbox" name="new_sc_120_default_checkbox" checked style="display: none;">
 </div>
   <script>
     window.showLoginRequiredModal = function() {
@@ -1634,13 +1639,13 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"how_many_people_are_you_suing"};
-var questionNameIds = {"1":"how_many_people_are_you_suing"};
+var questionSlugMap = {"1":"hungry","2":"how_many_people_are_you_suing"};
+var questionNameIds = {"1":"hungry","2":"how_many_people_are_you_suing"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
 var allAreRequiredMap = {};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_name","order":1,"prefill":""},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_suing_name","title":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"1","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_public_entity_yes"]},"hardAlert":{"enabled":true,"condition":"No","title":"You must file a written claim against the defendant before you can sue"}},{"type":"date","label":"When did you file the written claim?","nodeId":"are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_name","order":1,"prefill":""},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_suing_name","title":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"1","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_public_entity_yes"]},"hardAlert":{"enabled":true,"condition":"No","title":"You must file a written claim against the defendant before you can sue"}},{"type":"date","label":"When did you file the written claim?","nodeId":"are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
 window.hardAlertData = {};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
@@ -2844,6 +2849,20 @@ window.pdfPreviewQuestions = [];
           condition: (triggerField.hardAlert.condition || '').trim(),
           title: (triggerField.hardAlert.title || '').trim()
         } : null;
+        // Store hard alert metadata on the dropdown for autofill guardrails
+        if (hardAlertData && hardAlertData.enabled && hardAlertData.condition) {
+          select.setAttribute('data-hard-alert-enabled', 'true');
+          select.setAttribute('data-hard-alert-condition', hardAlertData.condition);
+          if (hardAlertData.title) {
+            select.setAttribute('data-hard-alert-title', hardAlertData.title);
+          }
+          console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Attached hard alert metadata to trigger dropdown:', {
+            id: select.id,
+            name: select.name,
+            condition: hardAlertData.condition,
+            title: hardAlertData.title || ''
+          });
+        }
 
         // CRITICAL: Log that we're attaching the change event listener
 
@@ -2899,6 +2918,12 @@ window.pdfPreviewQuestions = [];
           if (typeof updateHiddenLogic === 'function') {
             updateHiddenLogic(this.id, this.value);
           }
+          // After trigger fields are created, scrub any hard-alert autofill values
+          setTimeout(() => {
+            if (typeof scrubHardAlertAutofillSelects === 'function') {
+              scrubHardAlertAutofillSelects('after-trigger-dropdown-change');
+            }
+          }, 0);
           // CRITICAL: After dropdownMirror creates radio buttons, attach autosave listeners to them
           setTimeout(() => {
             // Find all radio buttons that were just created by dropdownMirror
@@ -3920,15 +3945,15 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       const formId = urlParams.get("formId") || window.formId || 'default';
     var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"1","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"}];
+var pdfLogicPDFs = [{"questionId":"2","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"2","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"2","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"2","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"}];
 var checkboxPdfEntries = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"1":["Name"],"length":0};
-var amountMap = {"1":[],"length":0};
-var labelNodeIdsMap = {"1":["how_many_people_are_you_suing_name"]};
+var labelMap = {"2":["Name"],"length":0};
+var amountMap = {"2":[],"length":0};
+var labelNodeIdsMap = {"2":["how_many_people_are_you_suing_name"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -4282,6 +4307,85 @@ var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
 
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("2");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
 
 /*──────────────────────────────────────────────────────────────*
  * Handle "Mark only one" selection functionality
@@ -4474,6 +4578,34 @@ function checkAllHardAlertsAndUpdateNavigation() {
             }
         }
     }
+}
+
+// Safely clear any autofilled values that would trigger hard alerts
+function scrubHardAlertAutofillSelects(contextLabel) {
+    const selects = document.querySelectorAll('select[data-hard-alert-enabled="true"][data-hard-alert-condition]');
+    selects.forEach(select => {
+        const condition = (select.getAttribute('data-hard-alert-condition') || '').trim();
+        const currentValue = (select.value || '').trim();
+        if (condition && currentValue === condition) {
+            console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Scrubbing hard alert autofill value:', {
+                context: contextLabel || 'unknown',
+                id: select.id,
+                name: select.name,
+                value: currentValue,
+                condition: condition
+            });
+            const placeholderOption = select.querySelector('option[value=""][disabled]');
+            if (placeholderOption) {
+                placeholderOption.selected = true;
+                select.selectedIndex = 0;
+            } else if (select.options && select.options.length > 0) {
+                select.selectedIndex = 0;
+            }
+            // Trigger change to keep dependent logic in sync
+            const changeEvent = new Event('change', { bubbles: true });
+            select.dispatchEvent(changeEvent);
+        }
+    });
 }
 function showAlert(message, isHardAlert) {
     // Check if 3 seconds have passed since page load
@@ -9889,6 +10021,14 @@ if (typeof handleNext === 'function') {
             window.preventBlankSaves = false;
         }, 3000);
                     const fields = getFormFields();
+                    const debugTarget = 'are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_1';
+                    const hasTargetField = fields.some(el => el && (el.id === debugTarget || el.name === debugTarget));
+                    const mappedHasTarget = mappedData && (mappedData.hasOwnProperty(debugTarget) || mappedData.hasOwnProperty(debugTarget + '_dropdown'));
+                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Autofill field snapshot:', {
+                        totalFields: fields.length,
+                        hasTargetField: hasTargetField,
+                        mappedHasTarget: mappedHasTarget
+                    });
                     // First pass: identify which field names have visible fields
                     const visibleFieldNames = new Set();
                     fields.forEach(el => {
@@ -9958,6 +10098,43 @@ if (typeof handleNext === 'function') {
                             // CRITICAL: Check if this dropdown value would trigger a hard alert
                             // If it would, blank out the dropdown instead of autofilling it
                             if (el.tagName === 'SELECT') {
+                                if (el.id && el.id.indexOf('have_you_filed_a_written_claim_against_them') !== -1) {
+                                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Target select encountered in autofill loop:', {
+                                        id: el.id,
+                                        name: el.name,
+                                        autofillValue: autofillValue,
+                                        dataHardAlertEnabled: el.getAttribute('data-hard-alert-enabled'),
+                                        dataHardAlertCondition: el.getAttribute('data-hard-alert-condition')
+                                    });
+                                }
+                                const hardAlertEnabledAttr = el.getAttribute('data-hard-alert-enabled');
+                                const hardAlertConditionAttr = (el.getAttribute('data-hard-alert-condition') || '').trim();
+                                console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Checking select:', {
+                                    id: el.id,
+                                    name: el.name,
+                                    autofillValue: autofillValue,
+                                    hardAlertEnabledAttr: hardAlertEnabledAttr,
+                                    hardAlertConditionAttr: hardAlertConditionAttr
+                                });
+                                if (hardAlertEnabledAttr === 'true' && hardAlertConditionAttr &&
+                                    (autofillValue || '').toString().trim() === hardAlertConditionAttr) {
+                                        console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Skipping autofill due to data-hard-alert match:', {
+                                            id: el.id,
+                                            name: el.name,
+                                            autofillValue: autofillValue,
+                                            hardAlertConditionAttr: hardAlertConditionAttr
+                                        });
+                                        if (el.options && el.options.length > 0) {
+                                            const placeholderOption = el.querySelector('option[value=""][disabled]');
+                                            if (placeholderOption) {
+                                                placeholderOption.selected = true;
+                                                el.selectedIndex = 0;
+                                            } else if (el.options[0]) {
+                                                el.selectedIndex = 0;
+                                            }
+                                        }
+                                        return; // Skip autofilling this dropdown
+                                }
                                 // Find question ID by checking if this dropdown's ID/name matches any hardAlertData dropdownId
                                 let questionId = el.getAttribute('data-question-id');
                                 if (!questionId && window.hardAlertData) {
@@ -9971,8 +10148,22 @@ if (typeof handleNext === 'function') {
 
                                 if (questionId && window.hardAlertData && window.hardAlertData[questionId]) {
                                     const hardAlertInfo = window.hardAlertData[questionId];
+                                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Hard alert data found:', {
+                                        id: el.id,
+                                        name: el.name,
+                                        questionId: questionId,
+                                        hardAlertInfo: hardAlertInfo,
+                                        autofillValue: autofillValue
+                                    });
                                     if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && 
                                         (autofillValue || '').toString().trim() === (hardAlertInfo.trigger || '').toString().trim()) {
+                                        console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Skipping autofill due to hardAlertData match:', {
+                                            id: el.id,
+                                            name: el.name,
+                                            questionId: questionId,
+                                            autofillValue: autofillValue,
+                                            hardAlertTrigger: hardAlertInfo.trigger
+                                        });
 
                                         // Reset dropdown to default "Select an option" instead of autofilling
                                         if (el.options && el.options.length > 0) {
@@ -9989,6 +10180,11 @@ if (typeof handleNext === 'function') {
                                 }
                                 // If no hard alert match, proceed with normal autofill
                                 el.value = autofillValue;
+                                console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Applied autofill to select:', {
+                                    id: el.id,
+                                    name: el.name,
+                                    autofillValue: autofillValue
+                                });
 
                                 // Trigger change event to call dropdownMirror and update conditional logic
                                 const changeEvent = new Event('change', { bubbles: true });
@@ -10031,6 +10227,10 @@ if (typeof handleNext === 'function') {
                                 el.dispatchEvent(event);
                             }
                         });
+                        // After conditional logic creates trigger fields, scrub hard-alert autofills
+                        if (typeof scrubHardAlertAutofillSelects === 'function') {
+                            scrubHardAlertAutofillSelects('post-autofill-visibility');
+                        }
                         // Also call the global visibility updates function
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
