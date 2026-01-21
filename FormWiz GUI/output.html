@@ -433,83 +433,130 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="1"
-                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Upload Your ID</h3></label>
-          <div class="file-upload-container" id="fileUploadContainer2">
-            <div class="file-upload-dropzone" id="fileUploadDropzone2">
-              <input type="file" id="fileUpload_2" name="fileUpload_2" style="display: none;" accept=".pdf" onchange="handleFileUpload(2, this)">
-              <div class="file-upload-content">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 12px; color: #2f7bff;">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="17 8 12 3 7 8"></polyline>
-                  <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                <p class="file-upload-text">Drag and drop a file here, or <span class="file-upload-link">click to browse</span></p>
-                <p class="file-upload-hint">Supports PDF files only</p>
-              </div>
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_s_property_was_damaged">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_s_property_was_damaged" name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_s_property_was_damaged" value="Where the plaintiff’s property was damaged." 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Where the plaintiff’s property was damaged.
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" name="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" value="Where the defendant lives" 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Where the defendant lives
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured" name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured" value="Where the plaintiff was injured." 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Where the plaintiff was injured.
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_a_contract_was_made_signed_performed_or_broken_by_the_defendant">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_a_contract_was_made_signed_performed_or_broken_by_the_defendant" name="please_explain_why_you_are_suing_at_this_location_where_a_contract_was_made_signed_performed_or_broken_by_the_defendant" value="Where a contract was made, signed, performed, or broken by the defendant" 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Where a contract was made, signed, performed, or broken by the defendant
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_other">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_other" name="please_explain_why_you_are_suing_at_this_location_other" value="Other" 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Other
+        </label>
+      </span></div><br></div></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Please explain why you're filing at this courthouse?</h3></label>
+            <div class="text-input-container">
+              <textarea id="please_explain_why_you_re_filing_at_this_courthouse" name="please_explain_why_you_re_filing_at_this_courthouse" rows="5" cols="50" placeholder="" data-line-limit="80" oninput="handleLineSplitting('please_explain_why_you_re_filing_at_this_courthouse', 80); checkParagraphLimit('please_explain_why_you_re_filing_at_this_courthouse', null);"></textarea>
             </div>
-            <div class="file-upload-preview" id="fileUploadPreview2" style="display: none;">
-              <div class="file-upload-preview-content">
-                <div class="file-upload-preview-body" id="fileUploadPreviewBody2"></div>
-                <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 15px;">
-                  <button type="button" class="file-upload-cancel" onclick="removeAllFileUploads(2)" title="Remove all files">Remove All Documents</button>
-                  <button type="button" class="file-upload-add" onclick="triggerFileUpload(2)" title="Upload another document" style="background: #28a745; color: white; border: none; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s ease;">Upload another document</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <script>
-            (function() {
-              const dropzone = document.getElementById('fileUploadDropzone2');
-              const fileInput = document.getElementById('fileUpload_2');
-
-              // Drag and drop handlers
-              dropzone.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                dropzone.classList.add('file-upload-dragover');
-              });
-
-              dropzone.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                dropzone.classList.remove('file-upload-dragover');
-              });
-
-              dropzone.addEventListener('drop', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                dropzone.classList.remove('file-upload-dragover');
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                  fileInput.files = files;
-                  handleFileUpload(2, fileInput);
+            <script>
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
+                  }
+                  hiddenInput.value = lineText;
                 }
-              });
-
-              // Click to browse - handle clicks on dropzone or the "click to browse" link
-              dropzone.addEventListener('click', function(e) {
-                // Don't trigger if clicking directly on the file input
-                if (e.target === fileInput) {
-                  return;
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
                 }
-                // Prevent event bubbling to avoid double-triggering
-                e.preventDefault();
-                e.stopPropagation();
-                // Open file picker
-                fileInput.click();
-              });
-            })();
-          </script>
-        </div><div id="question-container-3" data-question-id="3" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">Tired?</h3></label><select id="tired" name="tired" data-question-id="3"
-                      onchange="dropdownMirror(this, 'tired'); updateHiddenLogic('tired', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+              }
+            </script>
+          </div><div id="question-container-3" data-question-id="3" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">Is your claim about an agreement or contract for personal, family, or household goods, services, or loans?</h3></label><select id="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans" name="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans" data-question-id="3"
+                      onchange="dropdownMirror(this, 'is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans'); updateHiddenLogic('is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_tired"></div>
-              <input type="text" id="tired_dropdown" name="tired_dropdown"
+              <div id="dropdowntext_is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans"></div>
+              <input type="text" id="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans_dropdown" name="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-4" data-question-id="4" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="4"><label><h3 class="question-text">Is your claim related to a retail dispute, such as a credit card or retail installment contract?</h3></label><select id="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract" name="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract" data-question-id="4"
+                      onchange="dropdownMirror(this, 'is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract'); updateHiddenLogic('is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract"></div>
+              <input type="text" id="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract_dropdown" name="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-5" data-question-id="5" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="5"><label><h3 class="question-text">Is your claim related to a vehicle dispute, such as a car purchase, financing, or lease?</h3></label><select id="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease" name="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease" data-question-id="5"
+                      onchange="dropdownMirror(this, 'is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease'); updateHiddenLogic('is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease"></div>
+              <input type="text" id="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease_dropdown" name="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-6" data-question-id="6" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="6"><label><h3 class="question-text">Have you filed more than twelve other small claims within the last twelve months?</h3></label><select id="have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months" name="have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months" data-question-id="6"
+                      onchange="dropdownMirror(this, 'have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months'); updateHiddenLogic('have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months"></div>
+              <input type="text" id="have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months_dropdown" name="have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-7" data-question-id="7" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="7"><label><h3 class="question-text">Have you filed more than two small claims cases for more than $2,500 each within the past year?</h3></label>
+            <script>
+              function handleHardAlert7(value) {
+                const selectedValue = (value || '').trim();
+                const hardAlertTrigger = 'Yes';
+                const hardAlertTitle = 'You cannot file more than two small claims cases for more than $2,500 each within the past year.';
+
+                // Check if the selected value matches the trigger
+                if (selectedValue === hardAlertTrigger) {
+                  // Show hard alert with subtitle
+                  if (typeof showAlert === 'function') {
+                    showAlert(hardAlertTitle, true); // true = hard alert
+                  } else {
+                    alert(hardAlertTitle);
+                  }
+                }
+
+                // CRITICAL: Check all hard alerts and update navigation button state
+                if (typeof checkAllHardAlertsAndUpdateNavigation === 'function') {
+                  checkAllHardAlertsAndUpdateNavigation();
+                }
+              }
+            </script>
+          <select id="have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year" name="have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year" data-question-id="7"
+                      onchange="dropdownMirror(this, 'have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year'); updateHiddenLogic('have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handleHardAlert7(this.value);">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year"></div>
+              <input type="text" id="have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year_dropdown" name="have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year_dropdown"
                    readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
@@ -1683,17 +1730,17 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = 'Test Form';
-var questionSlugMap = {"1":"hungry","2":"","3":"tired"};
-var questionNameIds = {"1":"hungry","2":"fileUpload_2","3":"tired"};
+window.formId = '';
+var questionSlugMap = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_you_re_filing_at_this_courthouse","3":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","4":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","5":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","6":"have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months","7":"have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year"};
+var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_you_re_filing_at_this_courthouse","3":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","4":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","5":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","6":"have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months","7":"have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
-var checkboxRequiredMap = {};
-var allAreRequiredMap = {};
+var checkboxRequiredMap = {"1":true};
+var allAreRequiredMap = {"1":false};
 var unifiedFieldsMap = {};
-window.hardAlertData = {};
+window.hardAlertData = {"7":{"enabled":true,"trigger":"Yes","title":"You cannot file more than two small claims cases for more than $2,500 each within the past year.","dropdownId":"have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year"}};
 var entryTitleMap = {};
-window.fileUploadQuestions = [{"questionId":"2","fileTitle":"Test File","priceId":"price_1Sq5XlFJeSRMFQ8XgrcVh6Or","nameId":"fileUpload_2"}];
+window.fileUploadQuestions = [];
 window.latexPreviewQuestions = [];
 window.pdfPreviewQuestions = [];
 
@@ -3968,7 +4015,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [{"questionId":"3","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"3","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
+    var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
@@ -3980,7 +4027,7 @@ var labelMap = {"length":0};
 var amountMap = {"length":0};
 var labelNodeIdsMap = {};
 var linkedDropdowns = [];
-var hiddenLogicConfigs = [];
+var hiddenLogicConfigs = [{"questionId":"3","questionNameId":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","trigger":"Yes","type":"checkbox","nodeId":"personal_claim","textboxText":""},{"questionId":"4","questionNameId":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","trigger":"Yes","type":"checkbox","nodeId":"retail_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"No","type":"checkbox","nodeId":"regular_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"Yes","type":"checkbox","nodeId":"vehicle_claim","textboxText":""}];
 var linkedFields = [];
 var isHandlingLink = false;
 
@@ -4256,27 +4303,39 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "Test Form";
-var pdfOutputFileName = "sc120.pdf";
-var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
+var pdfFileName = "";
+var pdfOutputFileName = "example.html";
+var stripePriceId = "";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["sc120", ];
+var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+checkboxRequiredMap[1] = true; 
+allAreRequiredMap[1] = false; 
 
 (function(){
  var thisQ=document.getElementById("question-container-2");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
+    var cPrevType="checkbox";
+    var cPrevAns="other";
     var cPrevQNum="1";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
   })();
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
@@ -4323,9 +4382,10 @@ var hiddenTextCalculations = [];
   }
 }
  (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  updateVisibility();
 })();
@@ -4335,18 +4395,79 @@ var hiddenTextCalculations = [];
  function updateVisibility(){
   var anyMatch=false;
   (function(){
-    var cPrevType="fileUpload";
-    var cPrevAns="uploaded a file";
-    var cPrevQNum="2";
-    // Check if file has been uploaded
-    if(cPrevAns === "uploaded a file"){
-      if(typeof window.uploadedFiles !== 'undefined' && window.uploadedFiles[cPrevQNum]){
-        // Handle both single file (backward compatibility) and array of files
-        const filesArray = Array.isArray(window.uploadedFiles[cPrevQNum]) ? window.uploadedFiles[cPrevQNum] : [window.uploadedFiles[cPrevQNum]];
-        if(filesArray.length > 0){
-          anyMatch = true;
-        }
-      }
+    var cPrevType="checkbox";
+    var cPrevAns="where the plaintiff’s property was damaged.";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where the defendant lives";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where the plaintiff was injured.";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where a contract was made, signed, performed, or broken by the defendant";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
     }
   })();
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
@@ -4394,17 +4515,330 @@ var hiddenTextCalculations = [];
   }
 }
  (function(){
-   var fileUploadQuestion = "2";
-   var fileInput = document.getElementById('fileUpload_' + fileUploadQuestion);
-   if(fileInput){
-     fileInput.addEventListener('change', function(){ setTimeout(updateVisibility, 100); });
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-4");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="3";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("4");
+     } else {
+       
+     }
    }
-   // Also listen to file upload container changes (when preview is shown/hidden)
-   var fileUploadContainer = document.getElementById('fileUploadContainer' + fileUploadQuestion);
-   if(fileUploadContainer){
-     var observer = new MutationObserver(function(){ setTimeout(updateVisibility, 100); });
-     observer.observe(fileUploadContainer, { attributes: true, attributeFilter: ['style'], childList: true, subtree: true });
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
    }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-5");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="4";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("5");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "4";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-6");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="3";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="4";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="5";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="5";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("6");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "4";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "5";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "5";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-7");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="6";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("7");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "6";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  updateVisibility();
 })();
