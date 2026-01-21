@@ -6,7 +6,7 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "Have you sent a demand letter to the defendant?",
+          "text": "Hungry?",
           "type": "dropdown",
           "logic": {
             "enabled": false,
@@ -54,13 +54,13 @@
             "text": ""
           },
           "pdfPreview": {
-            "enabled": true,
-            "trigger": "No",
-            "title": "PDF Preview",
-            "file": "sc100.pdf",
-            "priceId": "price_1SqS2XFJeSRMFQ8XXlBzhcqW",
-            "attachment": "Attach to packet",
-            "filename": "sc100.pdf"
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
           },
           "latexPreview": {
             "enabled": false,
@@ -86,23 +86,110 @@
             "No"
           ],
           "labels": [],
-          "nameId": "have_you_sent_a_demand_letter_to_the_defendant",
+          "nameId": "hungry",
           "placeholder": ""
         },
         {
           "questionId": 2,
-          "text": "Hungry?",
-          "type": "dropdown",
+          "text": "",
+          "type": "fileUpload",
           "logic": {
             "enabled": true,
             "conditions": [
               {
                 "prevQuestion": "1",
-                "prevAnswer": "Yes"
-              },
-              {
-                "prevQuestion": "1",
                 "prevAnswer": "No"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "uploadTitle": "Upload Your ID",
+          "fileTitle": "Test File",
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          }
+        },
+        {
+          "questionId": 3,
+          "text": "Tired?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "2",
+                "prevAnswer": "uploaded a file"
               }
             ]
           },
@@ -189,7 +276,7 @@
             "No"
           ],
           "labels": [],
-          "nameId": "hungry",
+          "nameId": "tired",
           "placeholder": ""
         }
       ]
@@ -198,7 +285,7 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 3,
+  "questionCounter": 4,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
