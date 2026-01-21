@@ -1,0 +1,230 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+}
+
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+h1 {
+    color: #333;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.subtitle {
+    color: #666;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.search-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+#zipInput {
+    flex: 1;
+    padding: 15px 20px;
+    font-size: 1.1em;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#zipInput:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+#searchBtn {
+    padding: 15px 30px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#searchBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+#searchBtn:active {
+    transform: translateY(0);
+}
+
+.result {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 30px;
+    color: white;
+    text-align: center;
+    animation: fadeIn 0.5s ease-out;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.result-content h2 {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.result-content p {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.court-info {
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    text-align: left;
+}
+
+.court-details h3 {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+    text-align: center;
+    opacity: 1;
+}
+
+.court-name {
+    font-size: 1.2em;
+    margin: 15px 0;
+    opacity: 1;
+}
+
+.court-address {
+    font-size: 1em;
+    margin: 10px 0;
+    line-height: 1.6;
+    opacity: 0.95;
+}
+
+.court-phone {
+    font-size: 1em;
+    margin: 10px 0;
+    opacity: 0.95;
+}
+
+.additional-locations {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.locations-header {
+    font-weight: 600;
+    margin-bottom: 10px;
+    opacity: 1;
+    font-size: 1em;
+}
+
+.location-item {
+    font-size: 0.95em;
+    margin: 12px 0;
+    padding-left: 10px;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.court-error {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-size: 0.95em;
+    opacity: 0.9;
+}
+
+.error {
+    background: #ff6b6b;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 500;
+    animation: shake 0.5s ease-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.hidden {
+    display: none;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .card {
+        padding: 30px 20px;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+    
+    .search-container {
+        flex-direction: column;
+    }
+    
+    #searchBtn {
+        width: 100%;
+    }
+}
+

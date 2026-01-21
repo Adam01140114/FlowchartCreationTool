@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="generate.css">
     <link rel="stylesheet" href="generate2.css">
+    <script src="../../CountyLookup/zipData.js"></script>
+    <script src="../../CountyLookup/courtData.js"></script>
+    <script src="../../CountyLookup/courtLookup.js"></script>
     <style>
         .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }
         .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 737px; width: 100%; }
@@ -313,6 +316,8 @@ const auth = firebase.auth();
 
 // Auth state management
 if (typeof firebase !== "undefined" && firebase.apps.length > 0) {
+    if (typeof isUserLoggedIn === "undefined") { var isUserLoggedIn = false; }
+    if (typeof userId === "undefined") { var userId = null; }
     auth.onAuthStateChanged(function(user) {
         isUserLoggedIn = !!user;
         userId = user ? user.uid : null;
@@ -433,136 +438,34 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
-      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_s_property_was_damaged">
-        <label class="checkbox-label">
-          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_s_property_was_damaged" name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_s_property_was_damaged" value="Where the plaintiff’s property was damaged." 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Where the plaintiff’s property was damaged.
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives">
-        <label class="checkbox-label">
-          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" name="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" value="Where the defendant lives" 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Where the defendant lives
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured">
-        <label class="checkbox-label">
-          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured" name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured" value="Where the plaintiff was injured." 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Where the plaintiff was injured.
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_a_contract_was_made_signed_performed_or_broken_by_the_defendant">
-        <label class="checkbox-label">
-          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_a_contract_was_made_signed_performed_or_broken_by_the_defendant" name="please_explain_why_you_are_suing_at_this_location_where_a_contract_was_made_signed_performed_or_broken_by_the_defendant" value="Where a contract was made, signed, performed, or broken by the defendant" 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Where a contract was made, signed, performed, or broken by the defendant
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_other">
-        <label class="checkbox-label">
-          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_other" name="please_explain_why_you_are_suing_at_this_location_other" value="Other" 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Other
-        </label>
-      </span></div><br></div></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Please explain why you're filing at this courthouse?</h3></label>
-            <div class="text-input-container">
-              <textarea id="please_explain_why_you_re_filing_at_this_courthouse" name="please_explain_why_you_re_filing_at_this_courthouse" rows="5" cols="50" placeholder="" data-line-limit="80" oninput="handleLineSplitting('please_explain_why_you_re_filing_at_this_courthouse', 80); checkParagraphLimit('please_explain_why_you_re_filing_at_this_courthouse', null);"></textarea>
-            </div>
-            <script>
-              function handleLineSplitting(textareaId, lineLimit) {
-                const textarea = document.getElementById(textareaId);
-                const text = textarea.value;
-                const totalChars = text.length;
-                // Calculate how many lines we need
-                const linesNeeded = Math.ceil(totalChars / lineLimit);
-                // Create or update hidden textboxes for each line
-                for (let i = 1; i <= linesNeeded; i++) {
-                  const startIndex = (i - 1) * lineLimit;
-                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
-                  const lineText = text.substring(startIndex, endIndex);
-                  const hiddenInputId = textareaId + '_line' + i;
-                  let hiddenInput = document.getElementById(hiddenInputId);
-                  if (!hiddenInput) {
-                    // Create new hidden input
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.id = hiddenInputId;
-                    hiddenInput.name = hiddenInputId;
-                    textarea.parentNode.appendChild(hiddenInput);
-                  }
-                  hiddenInput.value = lineText;
-                }
-                // Remove any extra hidden inputs that are no longer needed
-                let lineNum = linesNeeded + 1;
-                while (true) {
-                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
-                  if (extraInput) {
-                    extraInput.remove();
-                    lineNum++;
-                  } else {
-                    break;
-                  }
-                }
-              }
-            </script>
-          </div><div id="question-container-3" data-question-id="3" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">Is your claim about an agreement or contract for personal, family, or household goods, services, or loans?</h3></label><select id="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans" name="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans" data-question-id="3"
-                      onchange="dropdownMirror(this, 'is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans'); updateHiddenLogic('is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans"></div>
-              <input type="text" id="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans_dropdown" name="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-4" data-question-id="4" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="4"><label><h3 class="question-text">Is your claim related to a retail dispute, such as a credit card or retail installment contract?</h3></label><select id="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract" name="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract" data-question-id="4"
-                      onchange="dropdownMirror(this, 'is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract'); updateHiddenLogic('is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract"></div>
-              <input type="text" id="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract_dropdown" name="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-5" data-question-id="5" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="5"><label><h3 class="question-text">Is your claim related to a vehicle dispute, such as a car purchase, financing, or lease?</h3></label><select id="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease" name="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease" data-question-id="5"
-                      onchange="dropdownMirror(this, 'is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease'); updateHiddenLogic('is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease"></div>
-              <input type="text" id="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease_dropdown" name="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-6" data-question-id="6" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="6"><label><h3 class="question-text">Have you filed more than twelve other small claims within the last twelve months?</h3></label><select id="have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months" name="have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months" data-question-id="6"
-                      onchange="dropdownMirror(this, 'have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months'); updateHiddenLogic('have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months"></div>
-              <input type="text" id="have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months_dropdown" name="have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-7" data-question-id="7" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="7"><label><h3 class="question-text">Have you filed more than two small claims cases for more than $2,500 each within the past year?</h3></label>
-            <script>
-              function handleHardAlert7(value) {
-                const selectedValue = (value || '').trim();
-                const hardAlertTrigger = 'Yes';
-                const hardAlertTitle = 'You cannot file more than two small claims cases for more than $2,500 each within the past year.';
-
-                // Check if the selected value matches the trigger
-                if (selectedValue === hardAlertTrigger) {
-                  // Show hard alert with subtitle
-                  if (typeof showAlert === 'function') {
-                    showAlert(hardAlertTitle, true); // true = hard alert
-                  } else {
-                    alert(hardAlertTitle);
-                  }
-                }
-
-                // CRITICAL: Check all hard alerts and update navigation button state
-                if (typeof checkAllHardAlertsAndUpdateNavigation === 'function') {
-                  checkAllHardAlertsAndUpdateNavigation();
-                }
-              }
-            </script>
-          <select id="have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year" name="have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year" data-question-id="7"
-                      onchange="dropdownMirror(this, 'have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year'); updateHiddenLogic('have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handleHardAlert7(this.value);">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year"></div>
-              <input type="text" id="have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year_dropdown" name="have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year_dropdown"
-                   readonly style="display:none;"></div>
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 3</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people are you suing?</h3></label><select id="how_many_people_are_you_suing" name="how_many_people_are_you_suing" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_people_are_you_suing', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
+    <br><br><div class="navigation-buttons" style="display:none;"></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 3</h1>
+      <div class="question-nav" data-section-index="2">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
   <script>
     // Function to show sign-in required modal
     function showSignInRequiredModal() {
@@ -1731,14 +1634,14 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_you_re_filing_at_this_courthouse","3":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","4":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","5":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","6":"have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months","7":"have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year"};
-var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_you_re_filing_at_this_courthouse","3":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","4":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","5":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","6":"have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months","7":"have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year"};
+var questionSlugMap = {"1":"how_many_people_are_you_suing"};
+var questionNameIds = {"1":"how_many_people_are_you_suing"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
-var checkboxRequiredMap = {"1":true};
-var allAreRequiredMap = {"1":false};
-var unifiedFieldsMap = {};
-window.hardAlertData = {"7":{"enabled":true,"trigger":"Yes","title":"You cannot file more than two small claims cases for more than $2,500 each within the past year.","dropdownId":"have_you_filed_more_than_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year"}};
+var checkboxRequiredMap = {};
+var allAreRequiredMap = {};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_name","order":1,"prefill":""},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_suing_name","title":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"1","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_public_entity_yes"]},"hardAlert":{"enabled":true,"condition":"No","title":"You must file a written claim against the defendant before you can sue"}},{"type":"date","label":"When did you file the written claim?","nodeId":"are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
+window.hardAlertData = {};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
 window.latexPreviewQuestions = [];
@@ -4011,23 +3914,23 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     return namePart;
 }
 
-      let isUserLoggedIn = true;
-      let userId = null;
+      if (typeof isUserLoggedIn === 'undefined') { var isUserLoggedIn = true; }
+      if (typeof userId === 'undefined') { var userId = null; }
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
     var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [];
+var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"1","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"}];
 var checkboxPdfEntries = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
-var labelNodeIdsMap = {};
+var labelMap = {"1":["Name"],"length":0};
+var amountMap = {"1":[],"length":0};
+var labelNodeIdsMap = {"1":["how_many_people_are_you_suing_name"]};
 var linkedDropdowns = [];
-var hiddenLogicConfigs = [{"questionId":"3","questionNameId":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","trigger":"Yes","type":"checkbox","nodeId":"personal_claim","textboxText":""},{"questionId":"4","questionNameId":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","trigger":"Yes","type":"checkbox","nodeId":"retail_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"No","type":"checkbox","nodeId":"regular_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"Yes","type":"checkbox","nodeId":"vehicle_claim","textboxText":""}];
+var hiddenLogicConfigs = [];
 var linkedFields = [];
 var isHandlingLink = false;
 
@@ -4090,20 +3993,26 @@ function populateHiddenFieldsFromUrl() {
         if (defendantField) defendantField.value = defendant;
     }
     
-        if (formId) {
+    if (formId) {
         const formIdField = document.getElementById("form_ID");
         if (formIdField) formIdField.value = formId;
     }
     
+    if (zipCode && typeof lookupCourtFromZip === "function") {
+        lookupCourtFromZip();
+    }
 }
 
 // County Lookup Functionality
-const zipCodeToCounty = {};
-
-const countyToCourt = {};
+var zipCodeToCountyLocal = (typeof zipCodeToCounty !== "undefined") ? zipCodeToCounty : ((typeof window !== "undefined" && window.zipCodeToCounty) ? window.zipCodeToCounty : {});
+var countyToCourtLocal = (typeof countyToCourt !== "undefined") ? countyToCourt : ((typeof window !== "undefined" && window.countyToCourt) ? window.countyToCourt : {});
+if (typeof window !== "undefined") {
+    if (!window.zipCodeToCounty) window.zipCodeToCounty = zipCodeToCountyLocal;
+    if (!window.countyToCourt) window.countyToCourt = countyToCourtLocal;
+}
 
 function getCourtByCounty(countyName) {
-    return countyToCourt[countyName] || null;
+    return countyToCourtLocal[countyName] || null;
 }
 
 function formatCourtAddress(courtInfo) {
@@ -4112,7 +4021,7 @@ function formatCourtAddress(courtInfo) {
 }
 
 function getCourtFromZipCode(zipCode) {
-    const county = zipCodeToCounty[zipCode];
+    const county = zipCodeToCountyLocal[zipCode];
     if (!county) return null;
     const courtInfo = getCourtByCounty(county);
     if (!courtInfo) return { county: county, error: "Court information not found for this county" };
@@ -4132,20 +4041,67 @@ function lookupCourtFromZip() {
     const zipField = document.getElementById("form_zip");
     const courtNameField = document.getElementById("court_name");
     const courtAddressField = document.getElementById("court_address");
-    if (!zipField || !courtNameField || !courtAddressField) return;
+    const courtCountyField = document.getElementById("court_county");
+    if (!zipField || !courtNameField || !courtAddressField) {
+        console.log("🏛️ [COURT LOOKUP] Missing fields:", { zip: !!zipField, courtName: !!courtNameField, courtAddress: !!courtAddressField, courtCounty: !!courtCountyField });
+        return;
+    }
     const zipCode = zipField.value.trim();
     if (zipCode.length === 5) {
+        console.log("🏛️ [COURT LOOKUP] Looking up court for zip:", zipCode);
         const courtInfo = getCourtFromZipCode(zipCode);
         if (courtInfo && courtInfo.courtName) {
             courtNameField.value = courtInfo.courtName;
             courtAddressField.value = courtInfo.fullAddress || "";
+            if (courtCountyField) {
+                courtCountyField.value = courtInfo.county ? (courtInfo.county + " County") : "";
+            }
+            console.log("🏛️ [COURT LOOKUP] Found court:", courtInfo.courtName);
         } else {
+            console.log("🏛️ [COURT LOOKUP] No court found for zip:", zipCode, courtInfo && courtInfo.error ? courtInfo.error : "unknown");
             courtNameField.value = "";
             courtAddressField.value = "";
+            if (courtCountyField) {
+                courtCountyField.value = "";
+            }
         }
     } else {
+        console.log("🏛️ [COURT LOOKUP] Invalid zip:", zipCode);
         courtNameField.value = "";
         courtAddressField.value = "";
+        if (courtCountyField) {
+            courtCountyField.value = "";
+        }
+    }
+}
+
+function updateCountyForZipInput(zipInput) {
+    if (!zipInput || !zipInput.id) return;
+    var match = zipInput.id.match(/^(.*)_zip(?:_(\d+))?$/);
+    if (!match) return;
+    var zipCode = (zipInput.value || "").trim();
+    var prefix = match[1];
+    var suffix = match[2] ? "_" + match[2] : "";
+    var countyFieldId = prefix + "_county" + suffix;
+    var countyField = document.getElementById(countyFieldId);
+    if (!countyField) {
+        countyField = document.createElement("input");
+        countyField.type = "text";
+        countyField.id = countyFieldId;
+        countyField.name = countyFieldId;
+        countyField.style.display = "none";
+        var formEl = document.getElementById("customForm");
+        if (formEl) formEl.appendChild(countyField);
+    }
+    if (zipCode.length === 5) {
+        var county = zipCodeToCountyLocal[zipCode];
+        if (county) {
+            countyField.value = county + " County";
+        } else {
+            countyField.value = "";
+        }
+    } else {
+        countyField.value = "";
     }
 }
 
@@ -4157,6 +4113,20 @@ document.addEventListener("DOMContentLoaded", function() {
         if (zipField.value) {
             setTimeout(lookupCourtFromZip, 100);
         }
+    }
+    const allZipFields = document.querySelectorAll('input[id$="_zip"], input[id*="_zip_"]');
+    allZipFields.forEach(function(el) { updateCountyForZipInput(el); });
+});
+
+document.addEventListener("input", function(e) {
+    if (e && e.target && e.target.id && /_zip(?:_\d+)?$/.test(e.target.id)) {
+        updateCountyForZipInput(e.target);
+    }
+});
+
+document.addEventListener("change", function(e) {
+    if (e && e.target && e.target.id && /_zip(?:_\d+)?$/.test(e.target.id)) {
+        updateCountyForZipInput(e.target);
     }
 });
 
@@ -4311,537 +4281,6 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
-checkboxRequiredMap[1] = true; 
-allAreRequiredMap[1] = false; 
-
-(function(){
- var thisQ=document.getElementById("question-container-2");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="other";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("2");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var checkQuestion = "1";
-   var questionContainer = document.getElementById('question-container-' + checkQuestion);
-   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-3");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where the plaintiff’s property was damaged.";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where the defendant lives";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where the plaintiff was injured.";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where a contract was made, signed, performed, or broken by the defendant";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("3");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var checkQuestion = "1";
-   var questionContainer = document.getElementById('question-container-' + checkQuestion);
-   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "1";
-   var questionContainer = document.getElementById('question-container-' + checkQuestion);
-   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "1";
-   var questionContainer = document.getElementById('question-container-' + checkQuestion);
-   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "1";
-   var questionContainer = document.getElementById('question-container-' + checkQuestion);
-   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-4");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="3";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("4");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var selectQuestion = "3";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-5");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="4";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("5");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var selectQuestion = "4";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-6");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="3";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="4";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="5";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="5";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("6");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var selectQuestion = "3";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "4";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "5";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "5";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-7");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="6";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("7");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var selectQuestion = "6";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -13167,16 +12606,15 @@ document.addEventListener('DOMContentLoaded', function() {
   // Save uploaded files to Firebase or localStorage
   async function saveUploadedFilesToStorage(questionId) {
     try {
-      console.log('💾 [FILE UPLOAD SAVE] start questionId=', questionId);
+
       if (!window.uploadedFiles || !window.uploadedFiles[questionId]) {
         const filesData = {};
-        console.log('💾 [FILE UPLOAD SAVE] no files for question', questionId, 'saving empty');
+
         await saveFilesDataToStorage(filesData);
         return;
       }
 
       const files = window.uploadedFiles[questionId];
-      console.log('💾 [FILE UPLOAD SAVE] files to convert:', files.map(f => ({name:f.name,type:f.type,size:f.size})));
 
       const filesData = {};
       const filePromises = files.map(async (file) => {
@@ -13199,18 +12637,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const convertedFiles = await Promise.all(filePromises);
       filesData[questionId] = convertedFiles;
-      console.log('💾 [FILE UPLOAD SAVE] converted keys:', Object.keys(filesData), 'first base64 len:', convertedFiles[0] ? convertedFiles[0].base64.length : 0);
 
       // Skip saving if no files converted
       const totalFiles = Object.values(filesData).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
       if (totalFiles === 0) {
-        console.log('⚠️ [FILE UPLOAD SAVE] No files to save after conversion. Skipping save.');
+
         return;
       }
 
       await saveFilesDataToStorage(filesData);
     } catch (error) {
-      console.error('❌ [FILE UPLOAD SAVE] error', error);
+
     }
   }
 
@@ -13223,16 +12660,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const storageKey = portfolioId ? ('formwiz_uploadedFiles_' + formId + '__' + portfolioId) : ('formwiz_uploadedFiles_' + formId);
 
     // Always save to localStorage as a backup
-    console.log('💾 [FILE UPLOAD SAVE] localStorage key=', storageKey, 'docId=', docId);
-    console.log('💾 [FILE UPLOAD SAVE] filesData for localStorage keys=', Object.keys(filesData));
-    console.log('💾 [FILE UPLOAD SAVE] filesData for localStorage content=', filesData);
+
     const totalFiles = Object.values(filesData).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
     if (totalFiles === 0) {
-      console.log('⚠️ [FILE UPLOAD SAVE] No files found in filesData. Skipping persistence.');
+
       return;
     }
     localStorage.setItem(storageKey, JSON.stringify(filesData));
-    console.log('✅ [FILE UPLOAD SAVE] Saved to localStorage');
 
     // Try to save to Firebase if user is logged in
     if (typeof firebase !== 'undefined' && firebase.auth) {
@@ -13247,13 +12681,11 @@ document.addEventListener('DOMContentLoaded', function() {
           const db = firebase.firestore();
           const userRef = db.collection('users').doc(user.uid);
           const formAnswersRef = userRef.collection('formAnswers').doc(docId);
-          console.log('💾 [FILE UPLOAD SAVE] saving to Firebase docId=', docId, 'uid=', user.uid);
-          console.log('💾 [FILE UPLOAD SAVE] filesData keys=', Object.keys(filesData));
-          console.log('💾 [FILE UPLOAD SAVE] filesData content=', filesData);
+
           if (Object.keys(filesData).length > 0) {
             for (const qId in filesData) {
               const qFiles = filesData[qId];
-              console.log('💾 [FILE UPLOAD SAVE] question', qId, 'has', Array.isArray(qFiles) ? qFiles.length : 'non-array', 'files');
+
             }
           }
 
@@ -13261,11 +12693,9 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadedFiles: filesData,
             lastSaved: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
-          
-          console.log('✅ [FILE UPLOAD SAVE] Successfully saved to Firebase');
 
         } catch (error) {
-          console.error('❌ [FILE UPLOAD SAVE] Firebase error', error);
+
           // localStorage already saved, so we're good
         }
       } else {
@@ -13286,7 +12716,6 @@ document.addEventListener('DOMContentLoaded', function() {
       const docId = portfolioId ? (formId + '__' + portfolioId) : formId;
       const storageKey = portfolioId ? ('formwiz_uploadedFiles_' + formId + '__' + portfolioId) : ('formwiz_uploadedFiles_' + formId);
       const legacyStorageKey = 'formwiz_uploadedFiles_' + formId;
-      console.log('📂 [FILE UPLOAD RESTORE] start formId=', formId, 'portfolioId=', portfolioId, 'docId=', docId, 'storageKey=', storageKey);
 
       let filesData = null;
 
@@ -13320,37 +12749,34 @@ document.addEventListener('DOMContentLoaded', function() {
             const db = firebase.firestore();
             const userRef = db.collection('users').doc(user.uid);
             const docIdsToTry = portfolioId ? [docId] : [docId, formId]; // only fallback to legacy when no portfolioId
-            console.log('📂 [FILE UPLOAD RESTORE] Firebase docIdsToTry=', docIdsToTry, 'uid=', user.uid);
+
             for (const tryDocId of docIdsToTry) {
               const formAnswersRef = userRef.collection('formAnswers').doc(tryDocId);
               const doc = await formAnswersRef.get();
               if (doc.exists) {
                 const data = doc.data();
-                console.log('📂 [FILE UPLOAD RESTORE] Firebase doc data keys=', Object.keys(data));
+
                 if (data.uploadedFiles) {
                   filesData = data.uploadedFiles;
-                  console.log('✅ [FILE UPLOAD RESTORE] Found in Firebase docId=', tryDocId);
-                  console.log('📂 [FILE UPLOAD RESTORE] uploadedFiles type=', typeof filesData, 'isArray=', Array.isArray(filesData));
-                  console.log('📂 [FILE UPLOAD RESTORE] uploadedFiles keys=', Object.keys(filesData));
-                  console.log('📂 [FILE UPLOAD RESTORE] uploadedFiles content=', filesData);
+
                   if (Object.keys(filesData).length > 0) {
                     for (const qId in filesData) {
                       const qFiles = filesData[qId];
-                      console.log('📂 [FILE UPLOAD RESTORE] question', qId, 'has', Array.isArray(qFiles) ? qFiles.length : 'non-array', 'files');
+
                     }
                   }
                   break;
                 } else {
-                  console.log('⚠️ [FILE UPLOAD RESTORE] Firebase doc exists but no uploadedFiles field');
+
                 }
               } else {
-                console.log('⚠️ [FILE UPLOAD RESTORE] Firebase doc missing for', tryDocId);
+
               }
             }
           } catch (error) {
 
             // Fallback to localStorage
-            console.error('❌ [FILE UPLOAD RESTORE] Firebase error', error);
+
           }
         } else {
 
@@ -13366,7 +12792,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (storedData) {
           try {
             filesData = JSON.parse(storedData);
-            console.log('✅ [FILE UPLOAD RESTORE] Found in localStorage key=', storageKey, 'questions=', Object.keys(filesData));
+
           } catch (error) {
 
           }
@@ -13375,7 +12801,7 @@ document.addEventListener('DOMContentLoaded', function() {
           if (legacyData) {
             try {
               filesData = JSON.parse(legacyData);
-              console.log('✅ [FILE UPLOAD RESTORE] Found in legacy localStorage key=', legacyStorageKey, 'questions=', Object.keys(filesData));
+
             } catch (error) {
             }
           }
@@ -13384,7 +12810,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if (!filesData || Object.keys(filesData).length === 0) {
 
-        console.log('📂 [FILE UPLOAD RESTORE] No saved files found');
         return;
       }
 
@@ -13395,12 +12820,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
       for (const questionId in filesData) {
         const savedFiles = filesData[questionId];
-        console.log('📂 [FILE UPLOAD RESTORE] Processing questionId=', questionId, 'savedFiles type=', typeof savedFiles, 'isArray=', Array.isArray(savedFiles));
+
         if (Array.isArray(savedFiles)) {
-          console.log('📂 [FILE UPLOAD RESTORE] savedFiles length=', savedFiles.length);
+
         }
         if (!Array.isArray(savedFiles) || savedFiles.length === 0) {
-          console.log('⚠️ [FILE UPLOAD RESTORE] Skipping questionId', questionId, 'because not array or empty');
+
           continue;
         }
 
@@ -13423,27 +12848,23 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }).filter(file => file !== null);
 
-        console.log('📂 [FILE UPLOAD RESTORE] Restored', restoredFiles.length, 'files for questionId', questionId);
         if (restoredFiles.length > 0) {
           window.uploadedFiles[questionId] = restoredFiles;
-          console.log('✅ [FILE UPLOAD RESTORE] Added to window.uploadedFiles[' + questionId + ']');
 
           // Update UI
           const dropzone = document.getElementById('fileUploadDropzone' + questionId);
           const preview = document.getElementById('fileUploadPreview' + questionId);
-          console.log('📂 [FILE UPLOAD RESTORE] UI elements - dropzone:', !!dropzone, 'preview:', !!preview);
 
           if (dropzone) dropzone.style.display = 'none';
           if (preview) preview.style.display = 'block';
 
           displayUploadedFiles(questionId);
-          console.log('✅ [FILE UPLOAD RESTORE] Called displayUploadedFiles for questionId', questionId);
 
         }
       }
 
     } catch (error) {
-      console.error('❌ [FILE UPLOAD RESTORE] Error in restore function', error);
+
     }
   }
 

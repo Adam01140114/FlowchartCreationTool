@@ -360,6 +360,9 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">',
     '    <link rel="stylesheet" href="generate.css">',
     '    <link rel="stylesheet" href="generate2.css">',
+    '    <script src="../../CountyLookup/zipData.js"></script>',
+    '    <script src="../../CountyLookup/courtData.js"></script>',
+    '    <script src="../../CountyLookup/courtLookup.js"></script>',
     '    <style>',
     '        .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }',
     '        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 737px; width: 100%; }',
@@ -680,6 +683,8 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '',
     '// Auth state management',
     'if (typeof firebase !== "undefined" && firebase.apps.length > 0) {',
+    '    if (typeof isUserLoggedIn === "undefined") { var isUserLoggedIn = false; }',
+    '    if (typeof userId === "undefined") { var userId = null; }',
     '    auth.onAuthStateChanged(function(user) {',
     '        isUserLoggedIn = !!user;',
     '        userId = user ? user.uid : null;',
@@ -7865,7 +7870,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   // 1) Firebase config and check (only if not in test mode)
   if (!isTestMode) {
     formHTML += `
-      let isUserLoggedIn = false;
+      if (typeof isUserLoggedIn === 'undefined') { var isUserLoggedIn = false; }
       const firebaseConfig = {
           apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
           authDomain: "formwiz-3f4fd.firebaseapp.com",
@@ -7879,7 +7884,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       const db = firebase.firestore();
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-      let userId = null;
+      if (typeof userId === 'undefined') { var userId = null; }
       firebase.auth().onAuthStateChanged(async function(user){
           if(user){ 
               isUserLoggedIn = true;
@@ -7914,8 +7919,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   } else {
     // In test mode, set user as logged in by default
     formHTML += `
-      let isUserLoggedIn = true;
-      let userId = null;
+      if (typeof isUserLoggedIn === 'undefined') { var isUserLoggedIn = true; }
+      if (typeof userId === 'undefined') { var userId = null; }
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
     `;
@@ -8014,24 +8019,31 @@ if (document.readyState === 'loading') {
 '        if (defendantField) defendantField.value = defendant;\n' +
 '    }\n' +
 '    \n' +
-'        if (formId) {\n' +
-        '        const formIdField = document.getElementById("form_ID");\n' +
-        '        if (formIdField) formIdField.value = formId;\n' +
-        '    }\n' +
-        '    \n' +
-        '}\n\n' +
-        '// County Lookup Functionality\n' +
-        'const zipCodeToCounty = ' + zipCodeToCountyData + ';\n\n' +
-        'const countyToCourt = ' + countyToCourtData + ';\n\n' +
-        'function getCourtByCounty(countyName) {\n' +
-        '    return countyToCourt[countyName] || null;\n' +
-        '}\n\n' +
+'    if (formId) {\n' +
+'        const formIdField = document.getElementById("form_ID");\n' +
+'        if (formIdField) formIdField.value = formId;\n' +
+'    }\n' +
+'    \n' +
+'    if (zipCode && typeof lookupCourtFromZip === "function") {\n' +
+'        lookupCourtFromZip();\n' +
+'    }\n' +
+'}\n\n' +
+'// County Lookup Functionality\n' +
+'var zipCodeToCountyLocal = (typeof zipCodeToCounty !== "undefined") ? zipCodeToCounty : ((typeof window !== "undefined" && window.zipCodeToCounty) ? window.zipCodeToCounty : ' + zipCodeToCountyData + ');\n' +
+'var countyToCourtLocal = (typeof countyToCourt !== "undefined") ? countyToCourt : ((typeof window !== "undefined" && window.countyToCourt) ? window.countyToCourt : ' + countyToCourtData + ');\n' +
+'if (typeof window !== "undefined") {\n' +
+'    if (!window.zipCodeToCounty) window.zipCodeToCounty = zipCodeToCountyLocal;\n' +
+'    if (!window.countyToCourt) window.countyToCourt = countyToCourtLocal;\n' +
+'}\n\n' +
+'function getCourtByCounty(countyName) {\n' +
+'    return countyToCourtLocal[countyName] || null;\n' +
+'}\n\n' +
         'function formatCourtAddress(courtInfo) {\n' +
         '    if (!courtInfo) return null;\n' +
         '    return courtInfo.address + ", " + courtInfo.city + ", " + courtInfo.state + " " + courtInfo.zip;\n' +
         '}\n\n' +
-        'function getCourtFromZipCode(zipCode) {\n' +
-        '    const county = zipCodeToCounty[zipCode];\n' +
+'function getCourtFromZipCode(zipCode) {\n' +
+'    const county = zipCodeToCountyLocal[zipCode];\n' +
         '    if (!county) return null;\n' +
         '    const courtInfo = getCourtByCounty(county);\n' +
         '    if (!courtInfo) return { county: county, error: "Court information not found for this county" };\n' +
@@ -8050,20 +8062,66 @@ if (document.readyState === 'loading') {
         '    const zipField = document.getElementById("form_zip");\n' +
         '    const courtNameField = document.getElementById("court_name");\n' +
         '    const courtAddressField = document.getElementById("court_address");\n' +
-        '    if (!zipField || !courtNameField || !courtAddressField) return;\n' +
+        '    const courtCountyField = document.getElementById("court_county");\n' +
+        '    if (!zipField || !courtNameField || !courtAddressField) {\n' +
+        '        console.log("🏛️ [COURT LOOKUP] Missing fields:", { zip: !!zipField, courtName: !!courtNameField, courtAddress: !!courtAddressField, courtCounty: !!courtCountyField });\n' +
+        '        return;\n' +
+        '    }\n' +
         '    const zipCode = zipField.value.trim();\n' +
         '    if (zipCode.length === 5) {\n' +
+        '        console.log("🏛️ [COURT LOOKUP] Looking up court for zip:", zipCode);\n' +
         '        const courtInfo = getCourtFromZipCode(zipCode);\n' +
         '        if (courtInfo && courtInfo.courtName) {\n' +
         '            courtNameField.value = courtInfo.courtName;\n' +
         '            courtAddressField.value = courtInfo.fullAddress || "";\n' +
+        '            if (courtCountyField) {\n' +
+        '                courtCountyField.value = courtInfo.county ? (courtInfo.county + " County") : "";\n' +
+        '            }\n' +
+        '            console.log("🏛️ [COURT LOOKUP] Found court:", courtInfo.courtName);\n' +
         '        } else {\n' +
+        '            console.log("🏛️ [COURT LOOKUP] No court found for zip:", zipCode, courtInfo && courtInfo.error ? courtInfo.error : "unknown");\n' +
         '            courtNameField.value = "";\n' +
         '            courtAddressField.value = "";\n' +
+        '            if (courtCountyField) {\n' +
+        '                courtCountyField.value = "";\n' +
+        '            }\n' +
         '        }\n' +
         '    } else {\n' +
+        '        console.log("🏛️ [COURT LOOKUP] Invalid zip:", zipCode);\n' +
         '        courtNameField.value = "";\n' +
         '        courtAddressField.value = "";\n' +
+        '        if (courtCountyField) {\n' +
+        '            courtCountyField.value = "";\n' +
+        '        }\n' +
+        '    }\n' +
+        '}\n\n' +
+        'function updateCountyForZipInput(zipInput) {\n' +
+        '    if (!zipInput || !zipInput.id) return;\n' +
+        '    var match = zipInput.id.match(/^(.*)_zip(?:_(\\d+))?$/);\n' +
+        '    if (!match) return;\n' +
+        '    var zipCode = (zipInput.value || "").trim();\n' +
+        '    var prefix = match[1];\n' +
+        '    var suffix = match[2] ? "_" + match[2] : "";\n' +
+        '    var countyFieldId = prefix + "_county" + suffix;\n' +
+        '    var countyField = document.getElementById(countyFieldId);\n' +
+        '    if (!countyField) {\n' +
+        '        countyField = document.createElement("input");\n' +
+        '        countyField.type = "text";\n' +
+        '        countyField.id = countyFieldId;\n' +
+        '        countyField.name = countyFieldId;\n' +
+        '        countyField.style.display = "none";\n' +
+        '        var formEl = document.getElementById("customForm");\n' +
+        '        if (formEl) formEl.appendChild(countyField);\n' +
+        '    }\n' +
+        '    if (zipCode.length === 5) {\n' +
+        '        var county = zipCodeToCountyLocal[zipCode];\n' +
+        '        if (county) {\n' +
+        '            countyField.value = county + " County";\n' +
+        '        } else {\n' +
+        '            countyField.value = "";\n' +
+        '        }\n' +
+        '    } else {\n' +
+        '        countyField.value = "";\n' +
         '    }\n' +
         '}\n\n' +
         'document.addEventListener("DOMContentLoaded", function() {\n' +
@@ -8074,6 +8132,18 @@ if (document.readyState === 'loading') {
         '        if (zipField.value) {\n' +
         '            setTimeout(lookupCourtFromZip, 100);\n' +
         '        }\n' +
+        '    }\n' +
+        '    const allZipFields = document.querySelectorAll(\'input[id$="_zip"], input[id*="_zip_"]\');\n' +
+        '    allZipFields.forEach(function(el) { updateCountyForZipInput(el); });\n' +
+        '});\n\n' +
+        'document.addEventListener("input", function(e) {\n' +
+        '    if (e && e.target && e.target.id && /_zip(?:_\\d+)?$/.test(e.target.id)) {\n' +
+        '        updateCountyForZipInput(e.target);\n' +
+        '    }\n' +
+        '});\n\n' +
+        'document.addEventListener("change", function(e) {\n' +
+        '    if (e && e.target && e.target.id && /_zip(?:_\\d+)?$/.test(e.target.id)) {\n' +
+        '        updateCountyForZipInput(e.target);\n' +
         '    }\n' +
         '});\n\n' +
         '// Function to replace URL parameter placeholders in text\n' +
@@ -16761,16 +16831,15 @@ document.addEventListener('DOMContentLoaded', function() {
   // Save uploaded files to Firebase or localStorage
   async function saveUploadedFilesToStorage(questionId) {
     try {
-      console.log('💾 [FILE UPLOAD SAVE] start questionId=', questionId);
+
       if (!window.uploadedFiles || !window.uploadedFiles[questionId]) {
         const filesData = {};
-        console.log('💾 [FILE UPLOAD SAVE] no files for question', questionId, 'saving empty');
+
         await saveFilesDataToStorage(filesData);
         return;
       }
 
       const files = window.uploadedFiles[questionId];
-      console.log('💾 [FILE UPLOAD SAVE] files to convert:', files.map(f => ({name:f.name,type:f.type,size:f.size})));
 
       const filesData = {};
       const filePromises = files.map(async (file) => {
@@ -16793,18 +16862,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const convertedFiles = await Promise.all(filePromises);
       filesData[questionId] = convertedFiles;
-      console.log('💾 [FILE UPLOAD SAVE] converted keys:', Object.keys(filesData), 'first base64 len:', convertedFiles[0] ? convertedFiles[0].base64.length : 0);
 
       // Skip saving if no files converted
       const totalFiles = Object.values(filesData).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
       if (totalFiles === 0) {
-        console.log('⚠️ [FILE UPLOAD SAVE] No files to save after conversion. Skipping save.');
+
         return;
       }
 
       await saveFilesDataToStorage(filesData);
     } catch (error) {
-      console.error('❌ [FILE UPLOAD SAVE] error', error);
+
     }
   }
 
@@ -16817,16 +16885,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const storageKey = portfolioId ? ('formwiz_uploadedFiles_' + formId + '__' + portfolioId) : ('formwiz_uploadedFiles_' + formId);
 
     // Always save to localStorage as a backup
-    console.log('💾 [FILE UPLOAD SAVE] localStorage key=', storageKey, 'docId=', docId);
-    console.log('💾 [FILE UPLOAD SAVE] filesData for localStorage keys=', Object.keys(filesData));
-    console.log('💾 [FILE UPLOAD SAVE] filesData for localStorage content=', filesData);
+
     const totalFiles = Object.values(filesData).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
     if (totalFiles === 0) {
-      console.log('⚠️ [FILE UPLOAD SAVE] No files found in filesData. Skipping persistence.');
+
       return;
     }
     localStorage.setItem(storageKey, JSON.stringify(filesData));
-    console.log('✅ [FILE UPLOAD SAVE] Saved to localStorage');
 
     // Try to save to Firebase if user is logged in
     if (typeof firebase !== 'undefined' && firebase.auth) {
@@ -16841,13 +16906,11 @@ document.addEventListener('DOMContentLoaded', function() {
           const db = firebase.firestore();
           const userRef = db.collection('users').doc(user.uid);
           const formAnswersRef = userRef.collection('formAnswers').doc(docId);
-          console.log('💾 [FILE UPLOAD SAVE] saving to Firebase docId=', docId, 'uid=', user.uid);
-          console.log('💾 [FILE UPLOAD SAVE] filesData keys=', Object.keys(filesData));
-          console.log('💾 [FILE UPLOAD SAVE] filesData content=', filesData);
+
           if (Object.keys(filesData).length > 0) {
             for (const qId in filesData) {
               const qFiles = filesData[qId];
-              console.log('💾 [FILE UPLOAD SAVE] question', qId, 'has', Array.isArray(qFiles) ? qFiles.length : 'non-array', 'files');
+
             }
           }
 
@@ -16855,11 +16918,9 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadedFiles: filesData,
             lastSaved: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
-          
-          console.log('✅ [FILE UPLOAD SAVE] Successfully saved to Firebase');
 
         } catch (error) {
-          console.error('❌ [FILE UPLOAD SAVE] Firebase error', error);
+
           // localStorage already saved, so we're good
         }
       } else {
@@ -16880,7 +16941,6 @@ document.addEventListener('DOMContentLoaded', function() {
       const docId = portfolioId ? (formId + '__' + portfolioId) : formId;
       const storageKey = portfolioId ? ('formwiz_uploadedFiles_' + formId + '__' + portfolioId) : ('formwiz_uploadedFiles_' + formId);
       const legacyStorageKey = 'formwiz_uploadedFiles_' + formId;
-      console.log('📂 [FILE UPLOAD RESTORE] start formId=', formId, 'portfolioId=', portfolioId, 'docId=', docId, 'storageKey=', storageKey);
 
       let filesData = null;
 
@@ -16914,37 +16974,34 @@ document.addEventListener('DOMContentLoaded', function() {
             const db = firebase.firestore();
             const userRef = db.collection('users').doc(user.uid);
             const docIdsToTry = portfolioId ? [docId] : [docId, formId]; // only fallback to legacy when no portfolioId
-            console.log('📂 [FILE UPLOAD RESTORE] Firebase docIdsToTry=', docIdsToTry, 'uid=', user.uid);
+
             for (const tryDocId of docIdsToTry) {
               const formAnswersRef = userRef.collection('formAnswers').doc(tryDocId);
               const doc = await formAnswersRef.get();
               if (doc.exists) {
                 const data = doc.data();
-                console.log('📂 [FILE UPLOAD RESTORE] Firebase doc data keys=', Object.keys(data));
+
                 if (data.uploadedFiles) {
                   filesData = data.uploadedFiles;
-                  console.log('✅ [FILE UPLOAD RESTORE] Found in Firebase docId=', tryDocId);
-                  console.log('📂 [FILE UPLOAD RESTORE] uploadedFiles type=', typeof filesData, 'isArray=', Array.isArray(filesData));
-                  console.log('📂 [FILE UPLOAD RESTORE] uploadedFiles keys=', Object.keys(filesData));
-                  console.log('📂 [FILE UPLOAD RESTORE] uploadedFiles content=', filesData);
+
                   if (Object.keys(filesData).length > 0) {
                     for (const qId in filesData) {
                       const qFiles = filesData[qId];
-                      console.log('📂 [FILE UPLOAD RESTORE] question', qId, 'has', Array.isArray(qFiles) ? qFiles.length : 'non-array', 'files');
+
                     }
                   }
                   break;
                 } else {
-                  console.log('⚠️ [FILE UPLOAD RESTORE] Firebase doc exists but no uploadedFiles field');
+
                 }
               } else {
-                console.log('⚠️ [FILE UPLOAD RESTORE] Firebase doc missing for', tryDocId);
+
               }
             }
           } catch (error) {
 
             // Fallback to localStorage
-            console.error('❌ [FILE UPLOAD RESTORE] Firebase error', error);
+
           }
         } else {
 
@@ -16960,7 +17017,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (storedData) {
           try {
             filesData = JSON.parse(storedData);
-            console.log('✅ [FILE UPLOAD RESTORE] Found in localStorage key=', storageKey, 'questions=', Object.keys(filesData));
+
           } catch (error) {
 
           }
@@ -16969,7 +17026,7 @@ document.addEventListener('DOMContentLoaded', function() {
           if (legacyData) {
             try {
               filesData = JSON.parse(legacyData);
-              console.log('✅ [FILE UPLOAD RESTORE] Found in legacy localStorage key=', legacyStorageKey, 'questions=', Object.keys(filesData));
+
             } catch (error) {
             }
           }
@@ -16978,7 +17035,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if (!filesData || Object.keys(filesData).length === 0) {
 
-        console.log('📂 [FILE UPLOAD RESTORE] No saved files found');
         return;
       }
 
@@ -16989,12 +17045,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
       for (const questionId in filesData) {
         const savedFiles = filesData[questionId];
-        console.log('📂 [FILE UPLOAD RESTORE] Processing questionId=', questionId, 'savedFiles type=', typeof savedFiles, 'isArray=', Array.isArray(savedFiles));
+
         if (Array.isArray(savedFiles)) {
-          console.log('📂 [FILE UPLOAD RESTORE] savedFiles length=', savedFiles.length);
+
         }
         if (!Array.isArray(savedFiles) || savedFiles.length === 0) {
-          console.log('⚠️ [FILE UPLOAD RESTORE] Skipping questionId', questionId, 'because not array or empty');
+
           continue;
         }
 
@@ -17017,27 +17073,23 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }).filter(file => file !== null);
 
-        console.log('📂 [FILE UPLOAD RESTORE] Restored', restoredFiles.length, 'files for questionId', questionId);
         if (restoredFiles.length > 0) {
           window.uploadedFiles[questionId] = restoredFiles;
-          console.log('✅ [FILE UPLOAD RESTORE] Added to window.uploadedFiles[' + questionId + ']');
 
           // Update UI
           const dropzone = document.getElementById('fileUploadDropzone' + questionId);
           const preview = document.getElementById('fileUploadPreview' + questionId);
-          console.log('📂 [FILE UPLOAD RESTORE] UI elements - dropzone:', !!dropzone, 'preview:', !!preview);
 
           if (dropzone) dropzone.style.display = 'none';
           if (preview) preview.style.display = 'block';
 
           displayUploadedFiles(questionId);
-          console.log('✅ [FILE UPLOAD RESTORE] Called displayUploadedFiles for questionId', questionId);
 
         }
       }
 
     } catch (error) {
-      console.error('❌ [FILE UPLOAD RESTORE] Error in restore function', error);
+
     }
   }
 

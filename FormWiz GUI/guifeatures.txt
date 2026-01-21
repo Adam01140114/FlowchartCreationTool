@@ -3403,3 +3403,126 @@ app.post('/latex_to_pdf', async (req, res) => {
 ================================================================================
 END OF FEATURE #4 DOCUMENTATION
 ================================================================================
+
+================================================================================
+FEATURE #5: ZIPCODE-TO-COUNTY HIDDEN FIELD FOR LOCATION INPUTS
+================================================================================
+
+PURPOSE:
+--------
+Automatically derives a county name from any location zip code field and stores it
+in a hidden textbox. This supports dynamic, numbered location fields without
+hard-coding any question IDs.
+
+Example:
+- Zip field: how_many_extra_plaintiffs_are_there_please_enter_their_address_zip_1
+- Hidden county field created/updated:
+  how_many_extra_plaintiffs_are_there_please_enter_their_address_county_1
+
+CONTEXT:
+--------
+This feature uses the same zip->county mapping data used by the court lookup
+integration (CountyLookup). It applies to all inputs whose IDs match the pattern:
+- *_zip
+- *_zip_<number>
+
+================================================================================
+PART 1: RUNTIME FUNCTIONALITY (Generated HTML)
+================================================================================
+
+1.1 DYNAMIC COUNTY UPDATE FUNCTION
+-----------------------------------
+Location: Generated HTML script block in `generate.js` (county lookup section)
+
+Purpose:
+- Derive county from zip code for ANY zip input
+- Create the hidden county field if it does not exist
+- Update county value on input/change and on page load
+
+Implementation:
+```javascript
+function updateCountyForZipInput(zipInput) {
+    if (!zipInput || !zipInput.id) return;
+    var match = zipInput.id.match(/^(.*)_zip(?:_(\d+))?$/);
+    if (!match) return;
+
+    var zipCode = (zipInput.value || "").trim();
+    var prefix = match[1];
+    var suffix = match[2] ? "_" + match[2] : "";
+    var countyFieldId = prefix + "_county" + suffix;
+    var countyField = document.getElementById(countyFieldId);
+
+    if (!countyField) {
+        countyField = document.createElement("input");
+        countyField.type = "text";
+        countyField.id = countyFieldId;
+        countyField.name = countyFieldId;
+        countyField.style.display = "none";
+        var formEl = document.getElementById("customForm");
+        if (formEl) formEl.appendChild(countyField);
+    }
+
+    if (zipCode.length === 5) {
+        var county = zipCodeToCountyLocal[zipCode];
+        countyField.value = county ? (county + " County") : "";
+    } else {
+        countyField.value = "";
+    }
+}
+```
+
+1.2 INITIAL LOAD + EVENT LISTENERS
+-----------------------------------
+Location: Generated HTML script block in `generate.js`
+
+Implementation:
+```javascript
+document.addEventListener("DOMContentLoaded", function() {
+    const allZipFields = document.querySelectorAll('input[id$="_zip"], input[id*="_zip_"]');
+    allZipFields.forEach(function(el) { updateCountyForZipInput(el); });
+});
+
+document.addEventListener("input", function(e) {
+    if (e && e.target && e.target.id && /_zip(?:_\d+)?$/.test(e.target.id)) {
+        updateCountyForZipInput(e.target);
+    }
+});
+
+document.addEventListener("change", function(e) {
+    if (e && e.target && e.target.id && /_zip(?:_\d+)?$/.test(e.target.id)) {
+        updateCountyForZipInput(e.target);
+    }
+});
+```
+
+Key Patterns:
+- Matches dynamic IDs using a regex; no hard-coded question IDs
+- Uses the same zip lookup data as court lookup (`zipCodeToCountyLocal`)
+- Creates hidden fields on-the-fly to avoid HTML generation changes
+
+================================================================================
+PART 2: DATA FLOW SUMMARY
+================================================================================
+
+1. User types in any location zip field.
+2. `updateCountyForZipInput()` derives the county from zip.
+3. Hidden `*_county` field is created (if missing) and updated.
+4. On reload, all existing zip fields are scanned and populated.
+
+================================================================================
+PART 3: KEY PATTERNS AND CONVENTIONS
+================================================================================
+
+3.1 NAMING CONVENTIONS
+----------------------
+- Zip field: `{prefix}_zip` or `{prefix}_zip_{n}`
+- County field: `{prefix}_county` or `{prefix}_county_{n}`
+
+3.2 DEPENDENCIES
+----------------
+- `zipCodeToCountyLocal` must be defined and populated from CountyLookup data.
+- County value stored as "<County> County" for consistency with other fields.
+
+================================================================================
+END OF FEATURE #5 DOCUMENTATION
+================================================================================

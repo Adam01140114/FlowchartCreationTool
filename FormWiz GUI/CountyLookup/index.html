@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>California Zip Code to County Lookup</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🏛️ California Small Claims Court Lookup</h1>
+            <p class="subtitle">Enter a zip code to find the county and court information</p>
+            
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    id="zipInput" 
+                    placeholder="Enter a California zip code (e.g., 90001)"
+                    maxlength="5"
+                    autocomplete="off"
+                >
+                <button id="searchBtn">Lookup</button>
+            </div>
+            
+            <div id="result" class="result hidden">
+                <div class="result-content">
+                    <h2 id="countyName"></h2>
+                    <p id="countyDetails"></p>
+                    <div id="courtInfo" class="court-info"></div>
+                </div>
+            </div>
+            
+            <div id="error" class="error hidden"></div>
+        </div>
+    </div>
+    
+    <script src="zipData.js"></script>
+    <script src="courtData.js"></script>
+    <script src="courtLookup.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
