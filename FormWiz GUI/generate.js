@@ -12466,8 +12466,8 @@ async function processAllPdfs() {
     } else {
     }
     // Process Uploaded File PDFs (support multiple files)
-    if (window.uploadedFiles && typeof window.uploadedFiles === 'object' && window.fileUploadQuestions && Array.isArray(window.fileUploadQuestions)) {
-        for (const fileUploadQ of window.fileUploadQuestions) {
+    if (window.uploadedFiles && typeof window.uploadedFiles === 'object' && safeFileUploadQs && Array.isArray(safeFileUploadQs)) {
+        for (const fileUploadQ of safeFileUploadQs) {
             const uploadedFiles = window.uploadedFiles[fileUploadQ.questionId];
             if (uploadedFiles) {
                 // Handle both single file (backward compatibility) and array of files
@@ -12503,8 +12503,8 @@ async function processAllPdfs() {
     }
 
     // Process LaTeX Preview PDFs (if "Attach to packet" is selected)
-    if (window.latexPdfs && typeof window.latexPdfs === 'object' && window.latexPreviewQuestions && Array.isArray(window.latexPreviewQuestions)) {
-        for (const latexPreviewQ of window.latexPreviewQuestions) {
+    if (window.latexPdfs && typeof window.latexPdfs === 'object' && safeLatexPreviewQs && Array.isArray(safeLatexPreviewQs)) {
+        for (const latexPreviewQ of safeLatexPreviewQs) {
             const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
             if (latexPdf && latexPdf instanceof Blob) {
                 // Use title as the base name for the PDF
@@ -12528,11 +12528,11 @@ async function processAllPdfs() {
     }
 
     // Process PDF Preview PDFs (if "Attach to packet" is selected and trigger condition is met)
-    if (window.pdfPreviewQuestions && Array.isArray(window.pdfPreviewQuestions)) {
-        for (const pdfPreviewQ of window.pdfPreviewQuestions) {
+    if (safePdfPreviewQs && Array.isArray(safePdfPreviewQs)) {
+        for (const pdfPreviewQ of safePdfPreviewQs) {
             // Check if trigger condition is met
             if (pdfPreviewQ.trigger) {
-                const questionNameIdsMap = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : (window.questionNameIds || {});
+                const questionNameIdsMap = safeQuestionNameIds;
                 const dropdownEl = document.getElementById(questionNameIdsMap[pdfPreviewQ.questionId]) ||
                                    document.getElementById('answer' + pdfPreviewQ.questionId);
                 if (!dropdownEl) {
@@ -12601,8 +12601,20 @@ async function processAllPdfs() {
 }
 // Function to collect all PDFs that would be downloaded (for preview)
 async function getAllPdfsList() {
+
     const pdfsList = [];
     const processedPdfs = new Set();
+
+    // Safeguard globals
+    const safeQuestionNameIds = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : (window.questionNameIds || {});
+    const safeConditionalPDFs = Array.isArray(window.conditionalPDFs) ? window.conditionalPDFs : [];
+    const safePdfLogicPDFs = Array.isArray(window.pdfLogicPDFs) ? window.pdfLogicPDFs : [];
+    const safeCheckboxPdfEntries = Array.isArray(window.checkboxPdfEntries) ? window.checkboxPdfEntries : [];
+    const safeFileUploadQs = Array.isArray(window.fileUploadQuestions) ? window.fileUploadQuestions : [];
+    const safeLatexPreviewQs = Array.isArray(window.latexPreviewQuestions) ? window.latexPreviewQuestions : [];
+    const safePdfPreviewQs = Array.isArray(window.pdfPreviewQuestions) ? window.pdfPreviewQuestions : [];
+
+    try {
 
     // Process main PDF
     if (pdfOutputFileName) {
@@ -12618,11 +12630,11 @@ async function getAllPdfsList() {
     }
 
     // Process Conditional PDFs
-    if (conditionalPDFs && conditionalPDFs.length > 0) {
-        for (const conditionalPDF of conditionalPDFs) {
+    if (safeConditionalPDFs && safeConditionalPDFs.length > 0) {
+        for (const conditionalPDF of safeConditionalPDFs) {
             if (conditionalPDF.pdfName) {
                 let shouldInclude = false;
-                const questionElement = document.getElementById(questionNameIds[conditionalPDF.questionId]) || 
+                const questionElement = document.getElementById(safeQuestionNameIds[conditionalPDF.questionId]) || 
                                       document.getElementById('answer' + conditionalPDF.questionId);
                 if (questionElement) {
                     let questionValue = '';
@@ -12651,14 +12663,14 @@ async function getAllPdfsList() {
     }
 
     // Process PDF Logic PDFs
-    if (pdfLogicPDFs && pdfLogicPDFs.length > 0) {
-        for (const pdfLogic of pdfLogicPDFs) {
+    if (safePdfLogicPDFs && safePdfLogicPDFs.length > 0) {
+        for (const pdfLogic of safePdfLogicPDFs) {
             if (pdfLogic.pdfName) {
                 let shouldInclude = false;
                 if (pdfLogic.isBigParagraph) {
                     pdfLogic.conditions.forEach(condition => {
                         if (condition.characterLimit) {
-                            const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                            const questionElement = document.getElementById(safeQuestionNameIds[pdfLogic.questionId]) || 
                                                   document.getElementById('answer' + pdfLogic.questionId);
                             if (questionElement) {
                                 const questionValue = questionElement.value || '';
@@ -12670,7 +12682,7 @@ async function getAllPdfsList() {
                     });
                 } else {
                     if (pdfLogic.triggerOption) {
-                        const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                        const questionElement = document.getElementById(safeQuestionNameIds[pdfLogic.questionId]) || 
                                               document.getElementById('answer' + pdfLogic.questionId);
                         if (questionElement) {
                             const selectedValue = questionElement.value;
@@ -12679,7 +12691,7 @@ async function getAllPdfsList() {
                             }
                         }
                     } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
-                        const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                        const questionElement = document.getElementById(safeQuestionNameIds[pdfLogic.questionId]) || 
                                               document.getElementById('answer' + pdfLogic.questionId);
                         if (questionElement) {
                             const selectedValue = parseFloat(questionElement.value) || 0;
@@ -12698,7 +12710,7 @@ async function getAllPdfsList() {
                         }
                     } else if (pdfLogic.isTriggerSequencePdf) {
 
-                        const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                        const numberedDropdownEl = document.getElementById(safeQuestionNameIds[pdfLogic.questionId]) || 
                                                     document.getElementById('answer' + pdfLogic.questionId);
 
                         if (numberedDropdownEl && numberedDropdownEl.value) {
@@ -12738,7 +12750,7 @@ async function getAllPdfsList() {
                         pdfLogic.conditions.forEach(condition => {
                             const prevQuestionId = condition.prevQuestion;
                             const prevAnswer = condition.prevAnswer;
-                            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                            const prevQuestionElement = document.getElementById(safeQuestionNameIds[prevQuestionId]) || 
                                                       document.getElementById('answer' + prevQuestionId);
                             if (prevQuestionElement) {
                                 let prevValue = '';
@@ -12772,8 +12784,8 @@ async function getAllPdfsList() {
     }
 
     // Process Checkbox PDF Entries
-    if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
-        for (const pdfEntry of window.checkboxPdfEntries) {
+    if (safeCheckboxPdfEntries && safeCheckboxPdfEntries.length > 0) {
+        for (const pdfEntry of safeCheckboxPdfEntries) {
             if (pdfEntry.pdfFile) {
                 const baseName = pdfEntry.pdfFile.replace(/\.pdf$/i, '');
                 if (!processedPdfs.has(baseName)) {
@@ -12878,6 +12890,10 @@ async function getAllPdfsList() {
     }
 
     return pdfsList;
+    } catch (err) {
+
+        return [];
+    }
 }
 
 // Function to show the PDF list modal
@@ -12904,6 +12920,7 @@ async function showPreviewPdfsModal() {
         }
 
         // Create list of PDFs
+
         let listHTML = '<style>.pdf-preview-item { padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; cursor: pointer; transition: all 0.3s; } .pdf-preview-item:hover { background: #e9ecef; border-color: #2980b9; }</style>';
         listHTML += '<div style="display: flex; flex-direction: column; gap: 10px;">';
         pdfsList.forEach((pdf, index) => {
@@ -12914,7 +12931,8 @@ async function showPreviewPdfsModal() {
             const isLatex = pdf.type === 'latex' ? 'true' : 'false';
             const isPdfPreview = pdf.type === 'pdfPreview' ? 'true' : 'false';
             const questionId = pdf.questionId || '';
-            const pdfFile = pdf.file || '';
+            const pdfFileRaw = pdf.file;
+            const pdfFile = (typeof pdfFileRaw === 'string') ? pdfFileRaw : '';
             const fileIndex = pdf.fileIndex !== undefined ? pdf.fileIndex : '';
             listHTML += '<div class="pdf-preview-item" data-pdf-name="' + escapedBaseName.replace(/"/g, '&quot;') + '" data-is-uploaded="' + isUploaded + '" data-is-latex="' + isLatex + '" data-is-pdf-preview="' + isPdfPreview + '" data-question-id="' + questionId + '" data-pdf-file="' + (pdfFile ? pdfFile.replace(/"/g, '&quot;') : '') + '" data-file-index="' + fileIndex + '">' +
                     '<strong style="color: #2c3e50; font-size: 1.1em;">' + escapedDisplayName + '</strong>' +
@@ -16344,8 +16362,6 @@ async function handleFileUpload(questionId, input) {
 
   if (!dropzone || !preview || !previewBody) return;
 
-  console.log('📁 [FILE UPLOAD] Handling file upload for question:', questionId, 'File:', file.name, 'Size:', file.size, 'bytes');
-
   // Store the uploaded file for cart processing (support multiple files)
   if (!window.uploadedFiles) {
     window.uploadedFiles = {};
@@ -16444,7 +16460,7 @@ function displayUploadedFiles(questionId) {
 // Remove a single file from the uploads
 async function removeSingleFileUpload(questionId, fileIndex) {
   if (window.uploadedFiles && window.uploadedFiles[questionId] && Array.isArray(window.uploadedFiles[questionId])) {
-    console.log('🗑️ [FILE UPLOAD] Removing file at index', fileIndex, 'from question', questionId);
+
     window.uploadedFiles[questionId].splice(fileIndex, 1);
 
     // If no files left, show dropzone again
@@ -16465,7 +16481,7 @@ async function removeSingleFileUpload(questionId, fileIndex) {
 
 // Remove all files and reset to dropzone
 async function removeAllFileUploads(questionId) {
-  console.log('🗑️ [FILE UPLOAD] Removing all files from question', questionId);
+
   const dropzone = document.getElementById('fileUploadDropzone' + questionId);
   const preview = document.getElementById('fileUploadPreview' + questionId);
   const fileInput = document.getElementById('fileUpload_' + questionId);
@@ -16745,10 +16761,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Save uploaded files to Firebase or localStorage
   async function saveUploadedFilesToStorage(questionId) {
     try {
-      console.log('💾 [FILE UPLOAD SAVE] Saving uploaded files for question:', questionId);
-      
+
       if (!window.uploadedFiles || !window.uploadedFiles[questionId]) {
-        console.log('💾 [FILE UPLOAD SAVE] No files to save for question:', questionId);
+
         // Still save empty state to clear previous files
         const filesData = {};
         await saveFilesDataToStorage(filesData);
@@ -16756,7 +16771,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       const files = window.uploadedFiles[questionId];
-      console.log('💾 [FILE UPLOAD SAVE] Converting', files.length, 'file(s) to base64');
 
       // Convert files to base64 for storage
       const filesData = {};
@@ -16780,15 +16794,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const convertedFiles = await Promise.all(filePromises);
       filesData[questionId] = convertedFiles;
-      
-      console.log('💾 [FILE UPLOAD SAVE] Successfully converted', convertedFiles.length, 'file(s) to base64');
-      console.log('💾 [FILE UPLOAD SAVE] Total data size:', JSON.stringify(filesData).length, 'bytes');
 
       // Save to storage
       await saveFilesDataToStorage(filesData);
-      console.log('✅ [FILE UPLOAD SAVE] Successfully saved files to storage');
+
     } catch (error) {
-      console.error('❌ [FILE UPLOAD SAVE] Error saving files:', error);
+
     }
   }
 
@@ -16796,13 +16807,12 @@ document.addEventListener('DOMContentLoaded', function() {
   async function saveFilesDataToStorage(filesData) {
     // Get form ID from URL or use default
     const formId = getUrlParam('formId') || (window.pdfOutputFileName ? window.pdfOutputFileName.replace(/.pdf$/i, '') : 'default');
-    
+
     // Always save to localStorage as a backup
-    console.log('💾 [FILE UPLOAD SAVE] Saving to localStorage as backup, formId:', formId);
+
     const storageKey = 'formwiz_uploadedFiles_' + formId;
     localStorage.setItem(storageKey, JSON.stringify(filesData));
-    console.log('✅ [FILE UPLOAD SAVE] Successfully saved to localStorage');
-    
+
     // Try to save to Firebase if user is logged in
     if (typeof firebase !== 'undefined' && firebase.auth) {
       // Check for user - wait for auth state if needed
@@ -16812,47 +16822,43 @@ document.addEventListener('DOMContentLoaded', function() {
         // If not available, we've already saved to localStorage
         user = firebase.auth().currentUser;
       }
-      
+
       if (user) {
         try {
-          console.log('💾 [FILE UPLOAD SAVE] Saving to Firebase for user:', user.uid, 'formId:', formId);
+
           const db = firebase.firestore();
           const userRef = db.collection('users').doc(user.uid);
           const formAnswersRef = userRef.collection('formAnswers').doc(formId);
-          
+
           await formAnswersRef.set({
             uploadedFiles: filesData,
             lastSaved: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
-          
-          console.log('✅ [FILE UPLOAD SAVE] Successfully saved to Firebase');
+
         } catch (error) {
-          console.error('❌ [FILE UPLOAD SAVE] Firebase save error:', error);
+
           // localStorage already saved, so we're good
         }
       } else {
-        console.log('💾 [FILE UPLOAD SAVE] No Firebase user found, only saved to localStorage');
+
       }
     } else {
-      console.log('💾 [FILE UPLOAD SAVE] Firebase not available, only saved to localStorage');
+
     }
   }
 
   // Restore uploaded files from Firebase or localStorage
   async function restoreUploadedFilesFromStorage() {
     try {
-      console.log('📂 [FILE UPLOAD RESTORE] Starting file restoration');
-      
+
       // Get form ID from URL or use default
       const formId = getUrlParam('formId') || (window.pdfOutputFileName ? window.pdfOutputFileName.replace(/.pdf$/i, '') : 'default');
-      console.log('📂 [FILE UPLOAD RESTORE] Form ID:', formId);
 
       let filesData = null;
 
       // Check Firebase availability and auth state
       const firebaseAvailable = typeof firebase !== 'undefined' && firebase.auth;
       const isLoggedIn = typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn;
-      console.log('📂 [FILE UPLOAD RESTORE] Firebase available:', firebaseAvailable, 'isLoggedIn:', isLoggedIn);
 
       // Try Firebase first if user is logged in
       if (firebaseAvailable) {
@@ -16876,54 +16882,52 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (user) {
           try {
-            console.log('📂 [FILE UPLOAD RESTORE] Loading from Firebase for user:', user.uid);
+
             const db = firebase.firestore();
             const userRef = db.collection('users').doc(user.uid);
             const formAnswersRef = userRef.collection('formAnswers').doc(formId);
             const doc = await formAnswersRef.get();
-            
-            console.log('📂 [FILE UPLOAD RESTORE] Firebase document exists:', doc.exists);
+
             if (doc.exists) {
               const data = doc.data();
-              console.log('📂 [FILE UPLOAD RESTORE] Firebase document data keys:', Object.keys(data));
+
               if (data.uploadedFiles) {
                 filesData = data.uploadedFiles;
-                console.log('✅ [FILE UPLOAD RESTORE] Found files in Firebase:', Object.keys(filesData).length, 'question(s)');
-                console.log('📂 [FILE UPLOAD RESTORE] Files data:', filesData);
+
               } else {
-                console.log('⚠️ [FILE UPLOAD RESTORE] Firebase document exists but no uploadedFiles field');
+
               }
             } else {
-              console.log('⚠️ [FILE UPLOAD RESTORE] Firebase document does not exist for formId:', formId);
+
             }
           } catch (error) {
-            console.error('❌ [FILE UPLOAD RESTORE] Firebase load error:', error);
+
             // Fallback to localStorage
           }
         } else {
-          console.log('📂 [FILE UPLOAD RESTORE] No Firebase user found, skipping Firebase restore');
+
         }
       } else {
-        console.log('📂 [FILE UPLOAD RESTORE] Firebase not available, skipping Firebase restore');
+
       }
 
       // Fallback to localStorage
       if (!filesData) {
-        console.log('📂 [FILE UPLOAD RESTORE] Loading from localStorage');
+
         const storageKey = 'formwiz_uploadedFiles_' + formId;
         const storedData = localStorage.getItem(storageKey);
         if (storedData) {
           try {
             filesData = JSON.parse(storedData);
-            console.log('✅ [FILE UPLOAD RESTORE] Found files in localStorage:', Object.keys(filesData).length, 'question(s)');
+
           } catch (error) {
-            console.error('❌ [FILE UPLOAD RESTORE] Error parsing localStorage data:', error);
+
           }
         }
       }
 
       if (!filesData || Object.keys(filesData).length === 0) {
-        console.log('📂 [FILE UPLOAD RESTORE] No saved files found');
+
         return;
       }
 
@@ -16938,8 +16942,6 @@ document.addEventListener('DOMContentLoaded', function() {
           continue;
         }
 
-        console.log('📂 [FILE UPLOAD RESTORE] Restoring', savedFiles.length, 'file(s) for question:', questionId);
-
         // Convert base64 back to File objects
         const restoredFiles = savedFiles.map((savedFile, index) => {
           try {
@@ -16951,32 +16953,31 @@ document.addEventListener('DOMContentLoaded', function() {
             const byteArray = new Uint8Array(byteNumbers);
             const blob = new Blob([byteArray], { type: savedFile.type || 'application/pdf' });
             const file = new File([blob], savedFile.name, { type: savedFile.type || 'application/pdf' });
-            console.log('📂 [FILE UPLOAD RESTORE] Restored file', index + 1, ':', file.name, 'Size:', file.size, 'bytes');
+
             return file;
           } catch (error) {
-            console.error('❌ [FILE UPLOAD RESTORE] Error restoring file', index + 1, ':', error);
+
             return null;
           }
         }).filter(file => file !== null);
 
         if (restoredFiles.length > 0) {
           window.uploadedFiles[questionId] = restoredFiles;
-          
+
           // Update UI
           const dropzone = document.getElementById('fileUploadDropzone' + questionId);
           const preview = document.getElementById('fileUploadPreview' + questionId);
-          
+
           if (dropzone) dropzone.style.display = 'none';
           if (preview) preview.style.display = 'block';
-          
+
           displayUploadedFiles(questionId);
-          console.log('✅ [FILE UPLOAD RESTORE] Successfully restored', restoredFiles.length, 'file(s) for question', questionId);
+
         }
       }
 
-      console.log('✅ [FILE UPLOAD RESTORE] File restoration complete');
     } catch (error) {
-      console.error('❌ [FILE UPLOAD RESTORE] Error restoring files:', error);
+
     }
   }
 

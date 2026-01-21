@@ -537,7 +537,7 @@ function loadFormData(formData) {
                                         if (statusTriggerSelect && question.status.trigger) {
                                             statusTriggerSelect.value = question.status.trigger;
                                             statusTriggerSelect.dispatchEvent(new Event('change'));
-                                        }
+                    }
                                         if (statusTitleInput && question.status.title) {
                                             statusTitleInput.value = question.status.title;
                                             statusTitleInput.dispatchEvent(new Event('blur'));
@@ -3354,7 +3354,7 @@ function exportForm() {
                 enabled: questionBlock.querySelector(`#enableHardAlert${questionId}`)?.checked || false,
                 trigger: questionBlock.querySelector(`#hardAlertTrigger${questionId}`)?.value || "",
                 title: questionBlock.querySelector(`#hardAlertTitle${questionId}`)?.value || ""
-            },
+                },
                 options: [],
                 labels: []
             };
