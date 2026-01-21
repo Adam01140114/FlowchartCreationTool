@@ -16761,20 +16761,19 @@ document.addEventListener('DOMContentLoaded', function() {
   // Save uploaded files to Firebase or localStorage
   async function saveUploadedFilesToStorage(questionId) {
     try {
-
+      console.log('💾 [FILE UPLOAD SAVE] start questionId=', questionId);
       if (!window.uploadedFiles || !window.uploadedFiles[questionId]) {
-
-        // Still save empty state to clear previous files
         const filesData = {};
+        console.log('💾 [FILE UPLOAD SAVE] no files for question', questionId, 'saving empty');
         await saveFilesDataToStorage(filesData);
         return;
       }
 
       const files = window.uploadedFiles[questionId];
+      console.log('💾 [FILE UPLOAD SAVE] files to convert:', files.map(f => ({name:f.name,type:f.type,size:f.size})));
 
-      // Convert files to base64 for storage
       const filesData = {};
-      const filePromises = files.map(async (file, index) => {
+      const filePromises = files.map(async (file) => {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onloadend = () => {
@@ -16794,12 +16793,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const convertedFiles = await Promise.all(filePromises);
       filesData[questionId] = convertedFiles;
+      console.log('💾 [FILE UPLOAD SAVE] converted keys:', Object.keys(filesData), 'first base64 len:', convertedFiles[0] ? convertedFiles[0].base64.length : 0);
 
-      // Save to storage
+      // Skip saving if no files converted
+      const totalFiles = Object.values(filesData).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
+      if (totalFiles === 0) {
+        console.log('⚠️ [FILE UPLOAD SAVE] No files to save after conversion. Skipping save.');
+        return;
+      }
+
       await saveFilesDataToStorage(filesData);
-
     } catch (error) {
-
+      console.error('❌ [FILE UPLOAD SAVE] error', error);
     }
   }
 
@@ -16807,43 +16812,61 @@ document.addEventListener('DOMContentLoaded', function() {
   async function saveFilesDataToStorage(filesData) {
     // Get form ID from URL or use default
     const formId = getUrlParam('formId') || (window.pdfOutputFileName ? window.pdfOutputFileName.replace(/.pdf$/i, '') : 'default');
+    const portfolioId = getUrlParam('portfolioId') || '';
+    const docId = portfolioId ? (formId + '__' + portfolioId) : formId;
+    const storageKey = portfolioId ? ('formwiz_uploadedFiles_' + formId + '__' + portfolioId) : ('formwiz_uploadedFiles_' + formId);
 
     // Always save to localStorage as a backup
-
-    const storageKey = 'formwiz_uploadedFiles_' + formId;
+    console.log('💾 [FILE UPLOAD SAVE] localStorage key=', storageKey, 'docId=', docId);
+    console.log('💾 [FILE UPLOAD SAVE] filesData for localStorage keys=', Object.keys(filesData));
+    console.log('💾 [FILE UPLOAD SAVE] filesData for localStorage content=', filesData);
+    const totalFiles = Object.values(filesData).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
+    if (totalFiles === 0) {
+      console.log('⚠️ [FILE UPLOAD SAVE] No files found in filesData. Skipping persistence.');
+      return;
+    }
     localStorage.setItem(storageKey, JSON.stringify(filesData));
+    console.log('✅ [FILE UPLOAD SAVE] Saved to localStorage');
 
     // Try to save to Firebase if user is logged in
     if (typeof firebase !== 'undefined' && firebase.auth) {
       // Check for user - wait for auth state if needed
       let user = firebase.auth().currentUser;
       if (!user && firebase.auth().onAuthStateChanged) {
-        // Don't wait too long - just try to get current user
-        // If not available, we've already saved to localStorage
         user = firebase.auth().currentUser;
       }
 
       if (user) {
         try {
-
           const db = firebase.firestore();
           const userRef = db.collection('users').doc(user.uid);
-          const formAnswersRef = userRef.collection('formAnswers').doc(formId);
+          const formAnswersRef = userRef.collection('formAnswers').doc(docId);
+          console.log('💾 [FILE UPLOAD SAVE] saving to Firebase docId=', docId, 'uid=', user.uid);
+          console.log('💾 [FILE UPLOAD SAVE] filesData keys=', Object.keys(filesData));
+          console.log('💾 [FILE UPLOAD SAVE] filesData content=', filesData);
+          if (Object.keys(filesData).length > 0) {
+            for (const qId in filesData) {
+              const qFiles = filesData[qId];
+              console.log('💾 [FILE UPLOAD SAVE] question', qId, 'has', Array.isArray(qFiles) ? qFiles.length : 'non-array', 'files');
+            }
+          }
 
           await formAnswersRef.set({
             uploadedFiles: filesData,
             lastSaved: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
+          
+          console.log('✅ [FILE UPLOAD SAVE] Successfully saved to Firebase');
 
         } catch (error) {
-
+          console.error('❌ [FILE UPLOAD SAVE] Firebase error', error);
           // localStorage already saved, so we're good
         }
       } else {
-
+        // localStorage already saved
       }
     } else {
-
+      // localStorage already saved
     }
   }
 
@@ -16853,6 +16876,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Get form ID from URL or use default
       const formId = getUrlParam('formId') || (window.pdfOutputFileName ? window.pdfOutputFileName.replace(/.pdf$/i, '') : 'default');
+      const portfolioId = getUrlParam('portfolioId') || '';
+      const docId = portfolioId ? (formId + '__' + portfolioId) : formId;
+      const storageKey = portfolioId ? ('formwiz_uploadedFiles_' + formId + '__' + portfolioId) : ('formwiz_uploadedFiles_' + formId);
+      const legacyStorageKey = 'formwiz_uploadedFiles_' + formId;
+      console.log('📂 [FILE UPLOAD RESTORE] start formId=', formId, 'portfolioId=', portfolioId, 'docId=', docId, 'storageKey=', storageKey);
 
       let filesData = null;
 
@@ -16885,24 +16913,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const db = firebase.firestore();
             const userRef = db.collection('users').doc(user.uid);
-            const formAnswersRef = userRef.collection('formAnswers').doc(formId);
-            const doc = await formAnswersRef.get();
-
-            if (doc.exists) {
-              const data = doc.data();
-
-              if (data.uploadedFiles) {
-                filesData = data.uploadedFiles;
-
+            const docIdsToTry = portfolioId ? [docId] : [docId, formId]; // only fallback to legacy when no portfolioId
+            console.log('📂 [FILE UPLOAD RESTORE] Firebase docIdsToTry=', docIdsToTry, 'uid=', user.uid);
+            for (const tryDocId of docIdsToTry) {
+              const formAnswersRef = userRef.collection('formAnswers').doc(tryDocId);
+              const doc = await formAnswersRef.get();
+              if (doc.exists) {
+                const data = doc.data();
+                console.log('📂 [FILE UPLOAD RESTORE] Firebase doc data keys=', Object.keys(data));
+                if (data.uploadedFiles) {
+                  filesData = data.uploadedFiles;
+                  console.log('✅ [FILE UPLOAD RESTORE] Found in Firebase docId=', tryDocId);
+                  console.log('📂 [FILE UPLOAD RESTORE] uploadedFiles type=', typeof filesData, 'isArray=', Array.isArray(filesData));
+                  console.log('📂 [FILE UPLOAD RESTORE] uploadedFiles keys=', Object.keys(filesData));
+                  console.log('📂 [FILE UPLOAD RESTORE] uploadedFiles content=', filesData);
+                  if (Object.keys(filesData).length > 0) {
+                    for (const qId in filesData) {
+                      const qFiles = filesData[qId];
+                      console.log('📂 [FILE UPLOAD RESTORE] question', qId, 'has', Array.isArray(qFiles) ? qFiles.length : 'non-array', 'files');
+                    }
+                  }
+                  break;
+                } else {
+                  console.log('⚠️ [FILE UPLOAD RESTORE] Firebase doc exists but no uploadedFiles field');
+                }
               } else {
-
+                console.log('⚠️ [FILE UPLOAD RESTORE] Firebase doc missing for', tryDocId);
               }
-            } else {
-
             }
           } catch (error) {
 
             // Fallback to localStorage
+            console.error('❌ [FILE UPLOAD RESTORE] Firebase error', error);
           }
         } else {
 
@@ -16914,20 +16956,29 @@ document.addEventListener('DOMContentLoaded', function() {
       // Fallback to localStorage
       if (!filesData) {
 
-        const storageKey = 'formwiz_uploadedFiles_' + formId;
         const storedData = localStorage.getItem(storageKey);
         if (storedData) {
           try {
             filesData = JSON.parse(storedData);
-
+            console.log('✅ [FILE UPLOAD RESTORE] Found in localStorage key=', storageKey, 'questions=', Object.keys(filesData));
           } catch (error) {
 
+          }
+        } else if (!portfolioId && storageKey !== legacyStorageKey) {
+          const legacyData = localStorage.getItem(legacyStorageKey);
+          if (legacyData) {
+            try {
+              filesData = JSON.parse(legacyData);
+              console.log('✅ [FILE UPLOAD RESTORE] Found in legacy localStorage key=', legacyStorageKey, 'questions=', Object.keys(filesData));
+            } catch (error) {
+            }
           }
         }
       }
 
       if (!filesData || Object.keys(filesData).length === 0) {
 
+        console.log('📂 [FILE UPLOAD RESTORE] No saved files found');
         return;
       }
 
@@ -16938,7 +16989,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
       for (const questionId in filesData) {
         const savedFiles = filesData[questionId];
+        console.log('📂 [FILE UPLOAD RESTORE] Processing questionId=', questionId, 'savedFiles type=', typeof savedFiles, 'isArray=', Array.isArray(savedFiles));
+        if (Array.isArray(savedFiles)) {
+          console.log('📂 [FILE UPLOAD RESTORE] savedFiles length=', savedFiles.length);
+        }
         if (!Array.isArray(savedFiles) || savedFiles.length === 0) {
+          console.log('⚠️ [FILE UPLOAD RESTORE] Skipping questionId', questionId, 'because not array or empty');
           continue;
         }
 
@@ -16961,23 +17017,27 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }).filter(file => file !== null);
 
+        console.log('📂 [FILE UPLOAD RESTORE] Restored', restoredFiles.length, 'files for questionId', questionId);
         if (restoredFiles.length > 0) {
           window.uploadedFiles[questionId] = restoredFiles;
+          console.log('✅ [FILE UPLOAD RESTORE] Added to window.uploadedFiles[' + questionId + ']');
 
           // Update UI
           const dropzone = document.getElementById('fileUploadDropzone' + questionId);
           const preview = document.getElementById('fileUploadPreview' + questionId);
+          console.log('📂 [FILE UPLOAD RESTORE] UI elements - dropzone:', !!dropzone, 'preview:', !!preview);
 
           if (dropzone) dropzone.style.display = 'none';
           if (preview) preview.style.display = 'block';
 
           displayUploadedFiles(questionId);
+          console.log('✅ [FILE UPLOAD RESTORE] Called displayUploadedFiles for questionId', questionId);
 
         }
       }
 
     } catch (error) {
-
+      console.error('❌ [FILE UPLOAD RESTORE] Error in restore function', error);
     }
   }
 
