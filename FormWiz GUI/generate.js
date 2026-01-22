@@ -11983,6 +11983,7 @@ function updateLinkedFields() {
 
         const { linkedFieldId, fields } = linkedField;
         const isTargetLinkedField = linkedFieldId && linkedFieldId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name') !== -1;
+        const isTargetPublicDateLinkedField = linkedFieldId === 'public_date';
         // Find the hidden textbox for this linked field
         let hiddenField = document.getElementById(linkedFieldId);
 
@@ -12013,14 +12014,13 @@ function updateLinkedFields() {
 
             return field;
         }).filter(el => el);
-        if (isTargetLinkedField) {
+        if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
         }
 
         // If no linked textboxes exist (all have been removed), clear the hidden field
         if (linkedTextboxes.length === 0) {
-
-            if (isTargetLinkedField) {
+            if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
             }
             hiddenField.value = '';
@@ -12035,8 +12035,7 @@ function updateLinkedFields() {
 
         if (textboxesWithContent.length === 0) {
             // No textboxes have content, clear the hidden field
-
-            if (isTargetLinkedField) {
+            if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
             }
             hiddenField.value = '';
@@ -12044,8 +12043,7 @@ function updateLinkedFields() {
             // Only one textbox has content, use its value
             const val = textboxesWithContent[0].value.trim();
             const finalValue = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
-
-            if (isTargetLinkedField) {
+            if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
             }
             hiddenField.value = finalValue;
@@ -12080,7 +12078,7 @@ function updateLinkedFields() {
                     ? formatDateForServer(chosenVal)
                     : (/^\d{4}-\d{2}-\d{2}$/.test(chosenVal) ? formatDateForServer(chosenVal) : chosenVal);
 
-                if (isTargetLinkedField) {
+                if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
                 }
             } else {
@@ -12091,7 +12089,7 @@ function updateLinkedFields() {
                 );
                 hiddenField.value = longestTextbox.value.trim();
 
-                if (isTargetLinkedField) {
+                if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
                 }
             }
@@ -12109,6 +12107,7 @@ function clearInactiveLinkedFields() {
             const { fields } = linkedField;
             const linkedFieldId = linkedField.linkedFieldId;
             const isTargetLinkedField = linkedFieldId && linkedFieldId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name') !== -1;
+            const isTargetPublicDateLinkedField = linkedFieldId === 'public_date';
             // Get all the linked textboxes
             const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
             if (linkedTextboxes.length === 0) return;
@@ -12123,7 +12122,7 @@ function clearInactiveLinkedFields() {
             linkedTextboxes.forEach(tb => {
                 const container = tb.closest('.question-container');
                 if (container && container.classList.contains('hidden') && tb.value.trim() !== '') {
-                    if (isTargetLinkedField) {
+                    if (isTargetLinkedField || isTargetPublicDateLinkedField || tb.id.indexOf('are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim') !== -1) {
 
                     }
                     tb.value = '';
@@ -12131,14 +12130,18 @@ function clearInactiveLinkedFields() {
             });
             // If multiple visible textboxes have content, keep only the longest one
             const visibleTextboxesWithContent = visibleTextboxes.filter(tb => tb.value.trim() !== '');
+            const hasVisibleDateInputs = visibleTextboxesWithContent.some(tb => tb.type === 'date');
             if (visibleTextboxesWithContent.length > 1) {
+                if (linkedFieldId === 'public_date' || hasVisibleDateInputs) {
+                    return;
+                }
                 const longestTextbox = visibleTextboxesWithContent.reduce((longest, current) => 
                     current.value.length > longest.value.length ? current : longest
                 );
                 // Clear all other visible textboxes that aren't the longest
                 visibleTextboxes.forEach(tb => {
                     if (tb !== longestTextbox && tb.value.trim() !== '') {
-                        if (isTargetLinkedField) {
+                        if (isTargetLinkedField || isTargetPublicDateLinkedField || tb.id.indexOf('are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim') !== -1) {
 
                         }
                         tb.value = '';
