@@ -6,7 +6,7 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "Hungry?",
+          "text": "Do you have any documentation showing these efforts?",
           "type": "dropdown",
           "logic": {
             "enabled": false,
@@ -86,23 +86,19 @@
             "No"
           ],
           "labels": [],
-          "nameId": "hungry",
+          "nameId": "do_you_have_any_documentation_showing_these_efforts",
           "placeholder": ""
         },
         {
           "questionId": 2,
-          "text": "Thirsty?",
-          "type": "checkbox",
+          "text": "",
+          "type": "fileUpload",
           "logic": {
             "enabled": true,
             "conditions": [
               {
                 "prevQuestion": "1",
                 "prevAnswer": "Yes"
-              },
-              {
-                "prevQuestion": "1",
-                "prevAnswer": "No"
               }
             ]
           },
@@ -113,7 +109,7 @@
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "No"
+            "answer": "Yes"
           },
           "hiddenLogic": {
             "enabled": false,
@@ -171,32 +167,291 @@
             "title": ""
           },
           "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "uploadTitle": "Please attach your documentation",
+          "fileTitle": "attached_documentation",
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          }
+        },
+        {
+          "questionId": 3,
+          "text": "Hungry?",
+          "type": "dropdown",
+          "logic": {
             "enabled": true,
-            "trigger": "Yes",
-            "title": "You must drink water"
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "2",
+                "prevAnswer": "uploaded a file"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
           },
           "options": [
-            {
-              "label": "No",
-              "nameId": "thirsty_no",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            },
-            {
-              "label": "Yes",
-              "nameId": "thirsty_yes",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            }
+            "Yes",
+            "No"
           ],
           "labels": [],
-          "required": true,
-          "markOnlyOne": true,
-          "allAreRequired": false
+          "nameId": "hungry",
+          "placeholder": ""
+        },
+        {
+          "questionId": 4,
+          "text": "Hungry?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": true,
+            "trigger": "Yes",
+            "title": "Latex PDF Preview",
+            "filename": "",
+            "content": "\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{enumitem}\n\n\\begin{document}\n\n% Sender Information (Top Left)\n\\begin{flushleft}\n[user_fullname]\\\\\n[user_full_address]\\\\\nEmail: [user_email]\\\\\nPhone: [user_phone]\\\\[1em]\nDate: [current_date]\n\\end{flushleft}\n\n\\vspace{1em}\n\n% Recipient Information\n[how_many_people_are_you_counter_suing_name_1]\\\\\n[how_many_people_are_you_counter_suing_please_enter_their_address_street_1]\n\n\\vspace{1em}\n\n\\textbf{Re: Demand for Payment}\n\n\\vspace{1em}\n\nDear [how_many_people_are_you_counter_suing_name_1],\n\n\\vspace{1em}\n\nI am writing to formally demand payment in the amount of [how_much_are_you_counter_suing_for] for the following reasons:\n\n[explain_why_they_owe_you_that_money]\n\n\\vspace{1em}\n\nThis amount remains unpaid despite previous attempts to resolve this matter amicably.\n\n\\vspace{1em}\n\nPlease remit payment in full by 14 days from the date of this letter. Payment can be made via cash, check, or bank transfer.\n\n\\vspace{1em}\n\nIf payment is not received by the stated deadline, I will have no choice but to pursue legal action in small claims court to recover the amount owed, along with any applicable court costs and fees.\n\n\\vspace{1em}\n\nI hope we can resolve this matter promptly and avoid further escalation. Please feel free to contact me at [user_phone] or [user_email] if you have any questions or wish to discuss this matter further.\n\n\\vspace{1em}\n\nThank you for your immediate attention to this matter.\n\n\\vspace{1em}\n\nSincerely,\\\\[2em]\n[user_fullname]\n\n\\end{document}\n",
+            "priceId": "price_1SqS2XFJeSRMFQ8XXlBzhcqW",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "hungry_dup2",
+          "placeholder": ""
+        },
+        {
+          "questionId": 5,
+          "text": "Tired?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Yes",
+                "to": "end"
+              },
+              {
+                "option": "No",
+                "to": "end"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "tired",
+          "placeholder": ""
         }
       ]
     }
@@ -204,13 +459,13 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 3,
+  "questionCounter": 6,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
-  "formName": "Example Form",
-  "defaultPDFName": "",
-  "pdfOutputName": "",
-  "stripePriceId": "",
+  "formName": "New SC-120",
+  "defaultPDFName": "Test Form",
+  "pdfOutputName": "sc120.pdf",
+  "stripePriceId": "price_1SB7CbFJeSRMFQ8X2afGFckf",
   "additionalPDFs": [],
   "checklistItems": [],
   "linkedFields": [],

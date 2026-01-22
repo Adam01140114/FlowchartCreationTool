@@ -16895,6 +16895,9 @@ async function handleFileUpload(questionId, input) {
   // Reset the file input so the same file can be uploaded again if needed
   input.value = '';
 
+  // Update hidden checkbox (create and check)
+  updateFileUploadCheckbox(questionId);
+
   // Refresh navigation to update button states
   refreshFileUploadNavigation(questionId);
 
@@ -16983,11 +16986,74 @@ async function removeSingleFileUpload(questionId, fileIndex) {
       // Refresh display
       displayUploadedFiles(questionId);
 
+      // Update hidden checkbox (should still be checked since files remain)
+      updateFileUploadCheckbox(questionId);
+
       // Refresh navigation
       refreshFileUploadNavigation(questionId);
 
       // Save updated file list to storage
       await saveUploadedFilesToStorage(questionId);
+    }
+  }
+}
+
+// Helper function to update hidden checkbox based on file upload status
+function updateFileUploadCheckbox(questionId) {
+  // Find the fileTitle for this question
+  let fileTitle = null;
+  if (window.fileUploadQuestions && Array.isArray(window.fileUploadQuestions)) {
+    const fileUploadQ = window.fileUploadQuestions.find(q => q.questionId == questionId);
+    if (fileUploadQ && fileUploadQ.fileTitle) {
+      fileTitle = fileUploadQ.fileTitle;
+    }
+  }
+  
+  if (!fileTitle) {
+    return; // No fileTitle configured for this question
+  }
+  
+  const checkboxName = fileTitle + '_checked';
+  const checkboxId = checkboxName;
+  
+  // Check if files are uploaded
+  const hasFiles = window.uploadedFiles && 
+                   window.uploadedFiles[questionId] && 
+                   Array.isArray(window.uploadedFiles[questionId]) && 
+                   window.uploadedFiles[questionId].length > 0;
+  
+  if (hasFiles) {
+    // Create or check the hidden checkbox
+    let checkbox = document.getElementById(checkboxId);
+    if (!checkbox) {
+      // Create the hidden checkbox
+      checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = checkboxId;
+      checkbox.name = checkboxName;
+      checkbox.style.display = 'none';
+      checkbox.checked = true;
+      
+      // Add to hidden fields container
+      let hiddenContainer = document.getElementById('hidden_pdf_fields');
+      if (!hiddenContainer) {
+        hiddenContainer = document.createElement('div');
+        hiddenContainer.id = 'hidden_pdf_fields';
+        hiddenContainer.style.display = 'none';
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(hiddenContainer);
+      }
+      hiddenContainer.appendChild(checkbox);
+    } else {
+      // Check the existing checkbox
+      checkbox.checked = true;
+    }
+  } else {
+    // Uncheck and remove the hidden checkbox
+    const checkbox = document.getElementById(checkboxId);
+    if (checkbox) {
+      checkbox.checked = false;
+      checkbox.remove();
     }
   }
 }
@@ -17010,6 +17076,9 @@ async function removeAllFileUploads(questionId) {
     fileInput.value = '';
     fileInput.files = null;
   }
+
+  // Update hidden checkbox (uncheck and remove)
+  updateFileUploadCheckbox(questionId);
 
   // Refresh navigation
   refreshFileUploadNavigation(questionId);
@@ -17527,6 +17596,9 @@ document.addEventListener('DOMContentLoaded', function() {
           if (preview) preview.style.display = 'block';
 
           displayUploadedFiles(questionId);
+
+          // Update hidden checkbox (create and check)
+          updateFileUploadCheckbox(questionId);
 
         }
       }

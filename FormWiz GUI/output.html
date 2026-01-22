@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Example Form</title>
+    <title>New SC-120</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="generate.css">
     <link rel="stylesheet" href="generate2.css">
@@ -438,48 +438,208 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="1"
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Do you have any documentation showing these efforts?</h3></label><select id="do_you_have_any_documentation_showing_these_efforts" name="do_you_have_any_documentation_showing_these_efforts" data-question-id="1"
+                      onchange="dropdownMirror(this, 'do_you_have_any_documentation_showing_these_efforts'); updateHiddenLogic('do_you_have_any_documentation_showing_these_efforts', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_documentation_showing_these_efforts"></div>
+              <input type="text" id="do_you_have_any_documentation_showing_these_efforts_dropdown" name="do_you_have_any_documentation_showing_these_efforts_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Please attach your documentation</h3></label>
+          <div class="file-upload-container" id="fileUploadContainer2">
+            <div class="file-upload-dropzone" id="fileUploadDropzone2">
+              <input type="file" id="fileUpload_2" name="fileUpload_2" style="display: none;" accept=".pdf" onchange="handleFileUpload(2, this)">
+              <div class="file-upload-content">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 12px; color: #2f7bff;">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <p class="file-upload-text">Drag and drop a file here, or <span class="file-upload-link">click to browse</span></p>
+                <p class="file-upload-hint">Supports PDF files only</p>
+              </div>
+            </div>
+            <div class="file-upload-preview" id="fileUploadPreview2" style="display: none;">
+              <div class="file-upload-preview-content">
+                <div class="file-upload-preview-body" id="fileUploadPreviewBody2"></div>
+                <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 15px;">
+                  <button type="button" class="file-upload-cancel" onclick="removeAllFileUploads(2)" title="Remove all files">Remove All Documents</button>
+                  <button type="button" class="file-upload-add" onclick="triggerFileUpload(2)" title="Upload another document" style="background: #28a745; color: white; border: none; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s ease;">Upload another document</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <script>
+            (function() {
+              const dropzone = document.getElementById('fileUploadDropzone2');
+              const fileInput = document.getElementById('fileUpload_2');
+
+              // Drag and drop handlers
+              dropzone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.add('file-upload-dragover');
+              });
+
+              dropzone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('file-upload-dragover');
+              });
+
+              dropzone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('file-upload-dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                  fileInput.files = files;
+                  handleFileUpload(2, fileInput);
+                }
+              });
+
+              // Click to browse - handle clicks on dropzone or the "click to browse" link
+              dropzone.addEventListener('click', function(e) {
+                // Don't trigger if clicking directly on the file input
+                if (e.target === fileInput) {
+                  return;
+                }
+                // Prevent event bubbling to avoid double-triggering
+                e.preventDefault();
+                e.stopPropagation();
+                // Open file picker
+                fileInput.click();
+              });
+            })();
+          </script>
+        </div><div id="question-container-3" data-question-id="3" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="3"
                       onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_hungry"></div>
               <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Thirsty?</h3></label>
-      <script>
-        function handleHardAlert2(checked, value, label) {
-          // Skip hard alerts during Firebase autofill
-          if (typeof window !== 'undefined' && window.isInitialAutofill) {
-            return;
-          }
-          const selectedValue = ((label || value || '') + '').trim();
-          const hardAlertTrigger = 'Yes';
-          const hardAlertTitle = 'You must drink water';
-          if (checked && selectedValue === hardAlertTrigger) {
-            if (typeof showAlert === 'function') {
-              showAlert(hardAlertTitle, true);
-            } else {
-              alert(hardAlertTitle);
-            }
-          }
-          if (typeof checkAllHardAlertsAndUpdateNavigation === 'function') {
-            checkAllHardAlertsAndUpdateNavigation();
-          }
-        }
-      </script>
-    <div><center><div id="checkmark" class="checkbox-group-2">
-      <span class="checkbox-inline" id="checkbox-container-thirsty_no">
-        <label class="checkbox-label">
-          <input type="radio" id="thirsty_no" name="thirsty" value="No" data-label="No"
-                 onchange="handleMarkOnlyOneSelection(this, 2);  updateCheckboxStyle(this); handleHardAlert2(this.checked, this.value, this.getAttribute('data-label'));">
-          No
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-thirsty_yes">
-        <label class="checkbox-label">
-          <input type="radio" id="thirsty_yes" name="thirsty" value="Yes" data-label="Yes"
-                 onchange="handleMarkOnlyOneSelection(this, 2);  updateCheckboxStyle(this); handleHardAlert2(this.checked, this.value, this.getAttribute('data-label'));">
-          Yes
-        </label>
-      </span></div><br></div></div>
+                   readonly style="display:none;"></div><div id="question-container-4" data-question-id="4" class="question-container question-item question-step-hidden" data-section="1" data-question-index="4"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry_dup2" name="hungry_dup2" data-question-id="4"
+                      onchange="dropdownMirror(this, 'hungry_dup2'); updateHiddenLogic('hungry_dup2', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handleLatexPreview4(this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_hungry_dup2"></div>
+              <input type="text" id="hungry_dup2_dropdown" name="hungry_dup2_dropdown"
+                   readonly style="display:none;">
+              <div id="latexPreview4" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #4CAF50; border-radius: 12px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);">
+                <h4 style="margin: 0 0 15px 0; color: #2E7D32; font-size: 18px; font-weight: 600; text-align: center;">Latex PDF Preview</h4>
+                <div id="latexPreviewLoading4" style="text-align: center; padding: 20px; display: none;">
+                  <p style="color: #2E7D32; font-size: 16px;">Generating PDF from LaTeX...</p>
+                </div>
+                <div style="text-align: center; background: white; padding: 10px; border-radius: 8px;">
+                  <iframe id="latexPreviewIframe4" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>
+                </div>
+              </div>
+              <script>
+                async function handleLatexPreview4(value) {
+
+                  const previewDiv = document.getElementById('latexPreview4');
+                  const iframe = document.getElementById('latexPreviewIframe4');
+                  const loadingDiv = document.getElementById('latexPreviewLoading4');
+                  const latexContent = `\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{enumitem}\n\n\\begin{document}\n\n% Sender Information (Top Left)\n\\begin{flushleft}\n[user_fullname]\\\\\n[user_full_address]\\\\\nEmail: [user_email]\\\\\nPhone: [user_phone]\\\\[1em]\nDate: [current_date]\n\\end{flushleft}\n\n\\vspace{1em}\n\n% Recipient Information\n[how_many_people_are_you_counter_suing_name_1]\\\\\n[how_many_people_are_you_counter_suing_please_enter_their_address_street_1]\n\n\\vspace{1em}\n\n\\textbf{Re: Demand for Payment}\n\n\\vspace{1em}\n\nDear [how_many_people_are_you_counter_suing_name_1],\n\n\\vspace{1em}\n\nI am writing to formally demand payment in the amount of [how_much_are_you_counter_suing_for] for the following reasons:\n\n[explain_why_they_owe_you_that_money]\n\n\\vspace{1em}\n\nThis amount remains unpaid despite previous attempts to resolve this matter amicably.\n\n\\vspace{1em}\n\nPlease remit payment in full by 14 days from the date of this letter. Payment can be made via cash, check, or bank transfer.\n\n\\vspace{1em}\n\nIf payment is not received by the stated deadline, I will have no choice but to pursue legal action in small claims court to recover the amount owed, along with any applicable court costs and fees.\n\n\\vspace{1em}\n\nI hope we can resolve this matter promptly and avoid further escalation. Please feel free to contact me at [user_phone] or [user_email] if you have any questions or wish to discuss this matter further.\n\n\\vspace{1em}\n\nThank you for your immediate attention to this matter.\n\n\\vspace{1em}\n\nSincerely,\\\\[2em]\n[user_fullname]\n\n\\end{document}\n`;
+
+                  if (value === 'Yes') {
+
+                    previewDiv.style.display = 'block';
+                    loadingDiv.style.display = 'block';
+                    iframe.style.display = 'none';
+                    // Convert LaTeX to PDF
+                    try {
+                      // Collect all form data for placeholder replacement
+
+                      const form = document.getElementById('customForm');
+                      if (!form) {
+
+                        throw new Error('Form element not found');
+                      }
+
+                      const fd = new FormData();
+                      fd.append('latex', latexContent);
+
+                      // Collect all form data
+                      const formElements = form.querySelectorAll('input, textarea, select');
+                      const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+                      const allFormElements = [...formElements, ...externalFormElements];
+
+                      let collectedFields = {};
+                      allFormElements.forEach(element => {
+                        if (element.name && !element.disabled) {
+                          if (element.type === 'checkbox' || element.type === 'radio') {
+                            if (element.checked) {
+                              fd.append(element.name, 'on');
+                              collectedFields[element.name] = 'on';
+                            }
+                          } else {
+                            let value = element.value;
+                            if (element.type === 'date' && value) {
+                              value = formatDateForServer(value);
+                            }
+                            if (value && value.trim() !== '') {
+                              fd.append(element.name, value);
+                              collectedFields[element.name] = value;
+                            }
+                          }
+                        }
+                      });
+
+                      // Send LaTeX content and form data to server endpoint to generate PDF
+
+                      const res = await fetch('/latex_to_pdf', { 
+                        method: 'POST', 
+                        body: fd, 
+                        credentials: 'include' 
+                      });
+
+                      if (!res.ok) {
+                        throw new Error('Failed to generate PDF from LaTeX');
+                      }
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      // Display in iframe
+                      iframe.src = url;
+                      loadingDiv.style.display = 'none';
+                      iframe.style.display = 'block';
+                      // Store URL for cleanup
+                      iframe.dataset.blobUrl = url;
+
+                      // Store PDF blob if "Attach to packet" is selected
+                      const attachment = 'Preview Only';
+                      if (attachment === 'Attach to packet') {
+                        // Initialize window.latexPdfs if it doesn't exist
+                        if (!window.latexPdfs) {
+                          window.latexPdfs = {};
+                        }
+                        // Store the blob for this question
+                        window.latexPdfs[4] = blob;
+
+                      }
+                    } catch (error) {
+
+                      loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to generate PDF from LaTeX. Please check your LaTeX code and try again.</p>';
+                      iframe.style.display = 'none';
+                    }
+                  } else {
+
+                    previewDiv.style.display = 'none';
+                    // Clean up blob URL and remove stored PDF if exists
+                    if (iframe.dataset.blobUrl) {
+                      URL.revokeObjectURL(iframe.dataset.blobUrl);
+                      iframe.dataset.blobUrl = '';
+                      iframe.src = '';
+                    }
+                    // Remove stored PDF blob if user changes away from trigger
+                    if (window.latexPdfs && window.latexPdfs[4]) {
+                      delete window.latexPdfs[4];
+                    }
+                  }
+                }
+              </script>
+            </div><div id="question-container-5" data-question-id="5" class="question-container question-item question-step-hidden" data-section="1" data-question-index="5"><label><h3 class="question-text">Tired?</h3></label><select id="tired" name="tired" data-question-id="5"
+                      onchange="dropdownMirror(this, 'tired'); updateHiddenLogic('tired', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_tired"></div>
+              <input type="text" id="tired_dropdown" name="tired_dropdown"
+                   readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
@@ -1510,7 +1670,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
 <input type="hidden" id="user_full_address"     name="user_full_address">
 <input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden">
-<input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
+<input type="checkbox" id="new_sc_120_default_checkbox" name="new_sc_120_default_checkbox" checked style="display: none;">
 </div>
   <script>
     window.showLoginRequiredModal = function() {
@@ -1652,17 +1812,17 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = '';
-var questionSlugMap = {"1":"hungry","2":"thirsty"};
-var questionNameIds = {"1":"hungry","2":"thirsty"};
+window.formId = 'Test Form';
+var questionSlugMap = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"","3":"hungry","4":"hungry","5":"tired"};
+var questionNameIds = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"fileUpload_2","3":"hungry","4":"hungry_dup2","5":"tired"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
-var checkboxRequiredMap = {"2":true};
-var allAreRequiredMap = {"2":false};
+var checkboxRequiredMap = {};
+var allAreRequiredMap = {};
 var unifiedFieldsMap = {};
-window.hardAlertData = {"2":{"enabled":true,"trigger":"Yes","title":"You must drink water","type":"checkbox","options":[{"id":"thirsty_no","label":"No","value":"No"},{"id":"thirsty_yes","label":"Yes","value":"Yes"}]}};
+window.hardAlertData = {};
 var entryTitleMap = {};
-window.fileUploadQuestions = [];
+window.fileUploadQuestions = [{"questionId":"2","fileTitle":"attached_documentation","priceId":"price_1Sq5XlFJeSRMFQ8XgrcVh6Or","nameId":"fileUpload_2"}];
 window.latexPreviewQuestions = [];
 window.pdfPreviewQuestions = [];
 
@@ -3955,7 +4115,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       if (typeof userId === 'undefined') { var userId = null; }
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [];
+    var jumpLogics = [{"questionId":"5","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"5","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
@@ -4310,16 +4470,14 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "";
-var pdfOutputFileName = "example.html";
-var stripePriceId = "";
+var pdfFileName = "Test Form";
+var pdfOutputFileName = "sc120.pdf";
+var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["example.html", ];
+var allPdfFileNames = ["sc120", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
-checkboxRequiredMap[2] = true; 
-allAreRequiredMap[2] = false; 
 
 (function(){
  var thisQ=document.getElementById("question-container-2");
@@ -4328,15 +4486,6 @@ allAreRequiredMap[2] = false;
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="yes";
-    var cPrevQNum="1";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
     var cPrevQNum="1";
     var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
     if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
@@ -4392,10 +4541,98 @@ allAreRequiredMap[2] = false;
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-3");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="fileUpload";
+    var cPrevAns="uploaded a file";
+    var cPrevQNum="2";
+    // Check if file has been uploaded
+    if(cPrevAns === "uploaded a file"){
+      if(typeof window.uploadedFiles !== 'undefined' && window.uploadedFiles[cPrevQNum]){
+        // Handle both single file (backward compatibility) and array of files
+        const filesArray = Array.isArray(window.uploadedFiles[cPrevQNum]) ? window.uploadedFiles[cPrevQNum] : [window.uploadedFiles[cPrevQNum]];
+        if(filesArray.length > 0){
+          anyMatch = true;
+        }
+      }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("3");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
  (function(){
    var selectQuestion = "1";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var fileUploadQuestion = "2";
+   var fileInput = document.getElementById('fileUpload_' + fileUploadQuestion);
+   if(fileInput){
+     fileInput.addEventListener('change', function(){ setTimeout(updateVisibility, 100); });
+   }
+   // Also listen to file upload container changes (when preview is shown/hidden)
+   var fileUploadContainer = document.getElementById('fileUploadContainer' + fileUploadQuestion);
+   if(fileUploadContainer){
+     var observer = new MutationObserver(function(){ setTimeout(updateVisibility, 100); });
+     observer.observe(fileUploadContainer, { attributes: true, attributeFilter: ['style'], childList: true, subtree: true });
+   }
  })();
  updateVisibility();
 })();
@@ -10083,6 +10320,14 @@ if (typeof handleNext === 'function') {
             return wouldTrigger;
         }
 
+        // Helper function to check if a radio button would trigger a hard alert
+        // Radio buttons are used for "mark only one" checkbox questions, so they use the same hard alert data
+        function wouldRadioTriggerHardAlert(radioEl) {
+            console.log('🔍 [HARD ALERT RADIO] Checking radio:', { id: radioEl?.id, name: radioEl?.name, value: radioEl?.value, label: radioEl?.getAttribute('data-label') });
+            // Radio buttons use the same hard alert data structure as checkboxes
+            return wouldCheckboxTriggerHardAlert(radioEl);
+        }
+
         async function loadAnswers() {
 
             if (!isUserLoggedIn || !userId) {
@@ -10184,22 +10429,24 @@ if (typeof handleNext === 'function') {
                             }
                             if (el.type === 'checkbox' || el.type === 'radio') {
                             if (el.type === 'radio') {
-                                // For radio buttons, we need to check if this specific radio button should be selected
-
+                                // For radio buttons, check if it would trigger a hard alert before checking
                                 if (el.value === autofillValue) {
+                                    console.log('📝 [AUTOFILL RADIO] First pass - checking radio:', { id: el.id, name: el.name, value: el.value, autofillValue });
+                                    if (wouldRadioTriggerHardAlert(el)) {
+                                        console.log('🛑 [AUTOFILL RADIO] First pass - SKIPPING radio check (hard alert)');
+                                        el.checked = false;
+                                    } else {
+                                        console.log('✅ [AUTOFILL RADIO] First pass - checking radio (safe)');
+                                        el.checked = true;
+                                        // Dispatch change event to trigger linked textbox creation
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
+                                        // Verify radio is still checked after change event
+                                        setTimeout(() => {
 
-                                    el.checked = true;
-
-                                    // Dispatch change event to trigger linked textbox creation
-
-                                    const changeEvent = new Event('change', { bubbles: true });
-                                    el.dispatchEvent(changeEvent);
-                                    // Verify radio is still checked after change event
-                                    setTimeout(() => {
-
-                                    }, 100);
+                                        }, 100);
+                                    }
                             } else {
-
                                     el.checked = false;
                                 }
                             } else {
@@ -10450,9 +10697,16 @@ if (typeof handleNext === 'function') {
                                         el.checked = !!mappedData[el.name];
                                     }
                                 } else if (el.type === 'radio') {
-                                    // For radio buttons, only check the one that matches the value
+                                    // For radio buttons, check if it would trigger a hard alert before checking
                                     if (el.value === mappedData[el.name]) {
-                                        el.checked = true;
+                                        console.log('📝 [AUTOFILL RADIO] Second pass - checking radio:', { id: el.id, name: el.name, value: el.value });
+                                        if (wouldRadioTriggerHardAlert(el)) {
+                                            console.log('🛑 [AUTOFILL RADIO] Second pass - SKIPPING radio check (hard alert)');
+                                            el.checked = false;
+                                        } else {
+                                            console.log('✅ [AUTOFILL RADIO] Second pass - checking radio (safe)');
+                                            el.checked = true;
+                                        }
                                     } else {
                                         el.checked = false;
                                     }
@@ -10476,9 +10730,16 @@ if (typeof handleNext === 'function') {
                                 if (needsAutofill) {
                                 if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
                                         if (fieldById.type === 'radio') {
-                                            // For radio buttons, check if this specific radio should be selected
+                                            // For radio buttons, check if it would trigger a hard alert before checking
                                             if (fieldById.value === mappedData[fieldName]) {
-                                                fieldById.checked = true;
+                                                console.log('📝 [AUTOFILL RADIO] Additional pass (by ID) - checking radio:', { id: fieldById.id, name: fieldById.name, fieldName, value: fieldById.value });
+                                                if (wouldRadioTriggerHardAlert(fieldById)) {
+                                                    console.log('🛑 [AUTOFILL RADIO] Additional pass (by ID) - SKIPPING radio check (hard alert)');
+                                                    fieldById.checked = false;
+                                                } else {
+                                                    console.log('✅ [AUTOFILL RADIO] Additional pass (by ID) - checking radio (safe)');
+                                                    fieldById.checked = true;
+                                                }
                                             } else {
                                                 fieldById.checked = false;
                                             }
@@ -10664,12 +10925,19 @@ if (typeof handleNext === 'function') {
                     }
                     if (el.type === 'checkbox' || el.type === 'radio') {
                         if (el.type === 'radio') {
-                            // For radio buttons, we need to check if this specific radio button should be selected
+                            // For radio buttons, check if it would trigger a hard alert before checking
                             if (el.value === autofillValue) {
-                                el.checked = true;
-                                // Dispatch change event to trigger linked textbox creation
-                                const changeEvent = new Event('change', { bubbles: true });
-                                el.dispatchEvent(changeEvent);
+                                console.log('📝 [AUTOFILL RADIO] Second pass (fallback) - checking radio:', { id: el.id, name: el.name, value: el.value, autofillValue });
+                                if (wouldRadioTriggerHardAlert(el)) {
+                                    console.log('🛑 [AUTOFILL RADIO] Second pass (fallback) - SKIPPING radio check (hard alert)');
+                                    el.checked = false;
+                                } else {
+                                    console.log('✅ [AUTOFILL RADIO] Second pass (fallback) - checking radio (safe)');
+                                    el.checked = true;
+                                    // Dispatch change event to trigger linked textbox creation
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    el.dispatchEvent(changeEvent);
+                                }
                             } else {
                                 el.checked = false;
                             }
@@ -11092,9 +11360,16 @@ if (typeof handleNext === 'function') {
                                     el.checked = !!data[el.name];
                                 }
                             } else if (el.type === 'radio') {
-                                // For radio buttons, set the value and check the matching radio button
+                                // For radio buttons, check if it would trigger a hard alert before checking
                                 if (data[el.name] && el.value === data[el.name]) {
-                                    el.checked = true;
+                                    console.log('📝 [AUTOFILL RADIO] localStorage pass - checking radio:', { id: el.id, name: el.name, value: el.value, dataValue: data[el.name] });
+                                    if (wouldRadioTriggerHardAlert(el)) {
+                                        console.log('🛑 [AUTOFILL RADIO] localStorage pass - SKIPPING radio check (hard alert)');
+                                        el.checked = false;
+                                    } else {
+                                        console.log('✅ [AUTOFILL RADIO] localStorage pass - checking radio (safe)');
+                                        el.checked = true;
+                                    }
                             } else {
                                     el.checked = false;
                                 }
@@ -11203,7 +11478,19 @@ if (typeof handleNext === 'function') {
                                             el.checked = !!data[el.name];
                                         }
                                     } else if (el.type === 'radio') {
-                                        el.checked = !!data[el.name];
+                                        // For radio buttons, check if it would trigger a hard alert before checking
+                                        if (data[el.name] && el.value === data[el.name]) {
+                                            console.log('📝 [AUTOFILL RADIO] Additional pass 1 - checking radio:', { id: el.id, name: el.name, value: el.value, dataValue: data[el.name] });
+                                            if (wouldRadioTriggerHardAlert(el)) {
+                                                console.log('🛑 [AUTOFILL RADIO] Additional pass 1 - SKIPPING radio check (hard alert)');
+                                                el.checked = false;
+                                            } else {
+                                                console.log('✅ [AUTOFILL RADIO] Additional pass 1 - checking radio (safe)');
+                                                el.checked = true;
+                                            }
+                                        } else {
+                                            el.checked = false;
+                                        }
                                     } else {
                                         // Skip current_date field and any field marked as protected - they should be set dynamically
                                         if (el.id !== 'current_date' && el.name !== 'current_date' && !el.hasAttribute('data-protected')) {
@@ -11229,7 +11516,19 @@ if (typeof handleNext === 'function') {
                                             fieldById.checked = !!data[fieldName];
                                         }
                                     } else if (fieldById.type === 'radio') {
-                                        fieldById.checked = !!data[fieldName];
+                                        // For radio buttons, check if it would trigger a hard alert before checking
+                                        if (data[fieldName] && fieldById.value === data[fieldName]) {
+                                            console.log('📝 [AUTOFILL RADIO] Additional pass 2 (by ID) - checking radio:', { id: fieldById.id, name: fieldById.name, fieldName, value: fieldById.value, dataValue: data[fieldName] });
+                                            if (wouldRadioTriggerHardAlert(fieldById)) {
+                                                console.log('🛑 [AUTOFILL RADIO] Additional pass 2 (by ID) - SKIPPING radio check (hard alert)');
+                                                fieldById.checked = false;
+                                            } else {
+                                                console.log('✅ [AUTOFILL RADIO] Additional pass 2 (by ID) - checking radio (safe)');
+                                                fieldById.checked = true;
+                                            }
+                                        } else {
+                                            fieldById.checked = false;
+                                        }
                                     } else {
                                         fieldById.value = data[fieldName];
 
@@ -11284,12 +11583,19 @@ if (typeof handleNext === 'function') {
                                 }
                                 if (el.type === 'checkbox' || el.type === 'radio') {
                                     if (el.type === 'radio') {
-                                        // For radio buttons, we need to check if this specific radio button should be selected
+                                        // For radio buttons, check if it would trigger a hard alert before checking
                                         if (el.value === autofillValue) {
-                                            el.checked = true;
-                                            // Dispatch change event to trigger linked textbox creation
-                                            const changeEvent = new Event('change', { bubbles: true });
-                                            el.dispatchEvent(changeEvent);
+                                            console.log('📝 [AUTOFILL RADIO] Additional pass 3 - checking radio:', { id: el.id, name: el.name, value: el.value, autofillValue });
+                                            if (wouldRadioTriggerHardAlert(el)) {
+                                                console.log('🛑 [AUTOFILL RADIO] Additional pass 3 - SKIPPING radio check (hard alert)');
+                                                el.checked = false;
+                                            } else {
+                                                console.log('✅ [AUTOFILL RADIO] Additional pass 3 - checking radio (safe)');
+                                                el.checked = true;
+                                                // Dispatch change event to trigger linked textbox creation
+                                                const changeEvent = new Event('change', { bubbles: true });
+                                                el.dispatchEvent(changeEvent);
+                                            }
                                         } else {
                                             el.checked = false;
                                         }
