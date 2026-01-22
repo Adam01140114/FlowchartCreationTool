@@ -3018,10 +3018,12 @@ formHTML += `</div><br></div>`;
                     }
                     // Function to remove linked textboxes when checkbox is unchecked
                     function removeLinkedTextboxes() {
+
                         linkedFields.forEach((linkedField) => {
                             if (linkedField.title) {
                                 const hiddenTextbox = document.getElementById(linkedField.title);
                                 if (hiddenTextbox) {
+
                                     // Remove event listeners
                                     if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
                                         hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
@@ -3051,6 +3053,11 @@ formHTML += `</div><br></div>`;
                     // Capture 'this' before the IIFE since inline handlers have 'this' referring to the element
                     input.setAttribute('onchange', `
                         var self = this; (function() {
+                            try {
+                                if (self && self.id && self.id.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
+
+                                }
+                            } catch (e) {}
 
                             const linkedFields = ${linkedFieldsJson};
                             const pdfEntries = ${pdfEntriesJson};
@@ -3072,11 +3079,16 @@ formHTML += `</div><br></div>`;
                                         if (sourceField) {
                                             // linkedField.title already has entry number appended from mapping above
                                             const hiddenTextboxId = linkedField.title;
+                                            if (checkboxId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
+
+                                            }
 
                                             // Check if hidden textbox already exists
                                             const existingHiddenTextbox = document.getElementById(hiddenTextboxId);
                                             if (existingHiddenTextbox) {
+                                                if (checkboxId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
 
+                                                }
                                                 return; // Skip creating duplicate
                                             }
                                             // Create hidden textbox with title as ID
@@ -3086,6 +3098,9 @@ formHTML += `</div><br></div>`;
                                             hiddenTextbox.name = hiddenTextboxId;
                                             hiddenTextbox.style.display = 'none';
                                             hiddenTextbox.value = sourceField.value || '';
+                                            if (checkboxId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
+
+                                            }
 
                                             // Add to form (append to form element, not body)
                                             const form = document.getElementById('customForm');
@@ -3101,7 +3116,9 @@ formHTML += `</div><br></div>`;
                                                 const oldValue = hiddenTextbox.value;
                                                 hiddenTextbox.value = sourceField.value || '';
                                                 if (oldValue !== hiddenTextbox.value) {
+                                                    if (checkboxId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
 
+                                                    }
                                                 }
                                                 // Trigger linked field synchronization if updateLinkedFields function exists
                                                 if (typeof updateLinkedFields === 'function') {
@@ -3118,7 +3135,9 @@ formHTML += `</div><br></div>`;
                                             // This ensures the linked textbox always stays in sync, even if events are missed
                                             const pollInterval = setInterval(function() {
                                                 if (hiddenTextbox.value !== sourceField.value) {
+                                                    if (checkboxId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
 
+                                                    }
                                                     syncLinkedField();
                                                 }
                                             }, 100); // Check every 100ms
@@ -3127,10 +3146,14 @@ formHTML += `</div><br></div>`;
                                             hiddenTextbox._sourceField = sourceField;
                                             hiddenTextbox._pollInterval = pollInterval;
                                         } else {
+                                            if (checkboxId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
 
+                                            }
                                         }
                                     } else {
+                                        if (checkboxId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
 
+                                        }
                                     }
                                 });
                                 // Add PDF entries
@@ -3156,7 +3179,9 @@ formHTML += `</div><br></div>`;
                                     }
                                 });
                             } else {
+                                if (checkboxId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
 
+                                }
                                 // Remove linked textboxes
                                 linkedFields.forEach((linkedField) => {
                                     if (linkedField.title) {
@@ -6803,12 +6828,7 @@ if (s > 1){
           if (hardAlertData.title) {
             select.setAttribute('data-hard-alert-title', hardAlertData.title);
           }
-          console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Attached hard alert metadata to trigger dropdown:', {
-            id: select.id,
-            name: select.name,
-            condition: hardAlertData.condition,
-            title: hardAlertData.title || ''
-          });
+
         }
 
         // CRITICAL: Log that we're attaching the change event listener
@@ -8091,12 +8111,12 @@ if (document.readyState === 'loading') {
         '    const courtAddressField = document.getElementById("court_address");\n' +
         '    const courtCountyField = document.getElementById("court_county");\n' +
         '    if (!zipField || !courtNameField || !courtAddressField) {\n' +
-        '        console.log("🏛️ [COURT LOOKUP] Missing fields:", { zip: !!zipField, courtName: !!courtNameField, courtAddress: !!courtAddressField, courtCounty: !!courtCountyField });\n' +
+        '        \n' +
         '        return;\n' +
         '    }\n' +
         '    const zipCode = zipField.value.trim();\n' +
         '    if (zipCode.length === 5) {\n' +
-        '        console.log("🏛️ [COURT LOOKUP] Looking up court for zip:", zipCode);\n' +
+        '        \n' +
         '        const courtInfo = getCourtFromZipCode(zipCode);\n' +
         '        if (courtInfo && courtInfo.courtName) {\n' +
         '            courtNameField.value = courtInfo.courtName;\n' +
@@ -8104,9 +8124,9 @@ if (document.readyState === 'loading') {
         '            if (courtCountyField) {\n' +
         '                courtCountyField.value = courtInfo.county ? (courtInfo.county + " County") : "";\n' +
         '            }\n' +
-        '            console.log("🏛️ [COURT LOOKUP] Found court:", courtInfo.courtName);\n' +
+        '            \n' +
         '        } else {\n' +
-        '            console.log("🏛️ [COURT LOOKUP] No court found for zip:", zipCode, courtInfo && courtInfo.error ? courtInfo.error : "unknown");\n' +
+        '            \n' +
         '            courtNameField.value = "";\n' +
         '            courtAddressField.value = "";\n' +
         '            if (courtCountyField) {\n' +
@@ -8114,7 +8134,7 @@ if (document.readyState === 'loading') {
         '            }\n' +
         '        }\n' +
         '    } else {\n' +
-        '        console.log("🏛️ [COURT LOOKUP] Invalid zip:", zipCode);\n' +
+        '        \n' +
         '        courtNameField.value = "";\n' +
         '        courtAddressField.value = "";\n' +
         '        if (courtCountyField) {\n' +
@@ -8535,13 +8555,7 @@ function scrubHardAlertAutofillSelects(contextLabel) {
         const condition = (select.getAttribute('data-hard-alert-condition') || '').trim();
         const currentValue = (select.value || '').trim();
         if (condition && currentValue === condition) {
-            console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Scrubbing hard alert autofill value:', {
-                context: contextLabel || 'unknown',
-                id: select.id,
-                name: select.name,
-                value: currentValue,
-                condition: condition
-            });
+
             const placeholderOption = select.querySelector('option[value=""][disabled]');
             if (placeholderOption) {
                 placeholderOption.selected = true;
@@ -11414,6 +11428,16 @@ function showTextboxLabels(questionId, count){
 }
 // Reset all fields in a numbered dropdown question to their default values
 function resetNumberedDropdownFields(questionId) {
+    if (typeof window !== 'undefined' && window.isInitialAutofill) {
+        const questionName = questionNameIds && questionNameIds[questionId] ? questionNameIds[questionId] : '';
+
+        return;
+    }
+    const questionName = questionNameIds && questionNameIds[questionId] ? questionNameIds[questionId] : '';
+    const isTargetNumberedDropdown = questionId === '11' || questionId === 11 || questionName === 'how_many_people_are_you_counter_suing';
+    if (isTargetNumberedDropdown) {
+
+    }
     // Reset the main dropdown select to its default (empty/placeholder)
     const dropdownId = questionNameIds[questionId] || ("answer" + questionId);
     const dropdown = document.getElementById(dropdownId);
@@ -11453,6 +11477,9 @@ function resetNumberedDropdownFields(questionId) {
     // Reset checkboxes (uncheck all)
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
+        if (isTargetNumberedDropdown && checkbox.id.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
+
+        }
         checkbox.checked = false;
     });
     // Reset radio buttons (uncheck all)
@@ -11955,11 +11982,14 @@ function updateLinkedFields() {
     linkedFields.forEach((linkedField, index) => {
 
         const { linkedFieldId, fields } = linkedField;
+        const isTargetLinkedField = linkedFieldId && linkedFieldId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name') !== -1;
         // Find the hidden textbox for this linked field
         let hiddenField = document.getElementById(linkedFieldId);
 
         if (!hiddenField) {
+            if (isTargetLinkedField) {
 
+            }
             // Create the hidden textbox if it doesn't exist
             hiddenField = document.createElement('input');
             hiddenField.type = 'text';
@@ -11983,10 +12013,16 @@ function updateLinkedFields() {
 
             return field;
         }).filter(el => el);
+        if (isTargetLinkedField) {
+
+        }
 
         // If no linked textboxes exist (all have been removed), clear the hidden field
         if (linkedTextboxes.length === 0) {
 
+            if (isTargetLinkedField) {
+
+            }
             hiddenField.value = '';
             return;
         }
@@ -12000,12 +12036,18 @@ function updateLinkedFields() {
         if (textboxesWithContent.length === 0) {
             // No textboxes have content, clear the hidden field
 
+            if (isTargetLinkedField) {
+
+            }
             hiddenField.value = '';
         } else if (textboxesWithContent.length === 1) {
             // Only one textbox has content, use its value
             const val = textboxesWithContent[0].value.trim();
             const finalValue = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
 
+            if (isTargetLinkedField) {
+
+            }
             hiddenField.value = finalValue;
         } else {
             // Multiple textboxes have content
@@ -12038,6 +12080,9 @@ function updateLinkedFields() {
                     ? formatDateForServer(chosenVal)
                     : (/^\d{4}-\d{2}-\d{2}$/.test(chosenVal) ? formatDateForServer(chosenVal) : chosenVal);
 
+                if (isTargetLinkedField) {
+
+                }
             } else {
                 // Fall back to longest text
 
@@ -12046,6 +12091,9 @@ function updateLinkedFields() {
                 );
                 hiddenField.value = longestTextbox.value.trim();
 
+                if (isTargetLinkedField) {
+
+                }
             }
         }
 
@@ -12059,6 +12107,8 @@ function clearInactiveLinkedFields() {
     setTimeout(() => {
         linkedFields.forEach(linkedField => {
             const { fields } = linkedField;
+            const linkedFieldId = linkedField.linkedFieldId;
+            const isTargetLinkedField = linkedFieldId && linkedFieldId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name') !== -1;
             // Get all the linked textboxes
             const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
             if (linkedTextboxes.length === 0) return;
@@ -12073,6 +12123,9 @@ function clearInactiveLinkedFields() {
             linkedTextboxes.forEach(tb => {
                 const container = tb.closest('.question-container');
                 if (container && container.classList.contains('hidden') && tb.value.trim() !== '') {
+                    if (isTargetLinkedField) {
+
+                    }
                     tb.value = '';
                 }
             });
@@ -12085,6 +12138,9 @@ function clearInactiveLinkedFields() {
                 // Clear all other visible textboxes that aren't the longest
                 visibleTextboxes.forEach(tb => {
                     if (tb !== longestTextbox && tb.value.trim() !== '') {
+                        if (isTargetLinkedField) {
+
+                        }
                         tb.value = '';
                     }
                 });
@@ -14169,11 +14225,7 @@ if (typeof handleNext === 'function') {
                     const debugTarget = 'are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_1';
                     const hasTargetField = fields.some(el => el && (el.id === debugTarget || el.name === debugTarget));
                     const mappedHasTarget = mappedData && (mappedData.hasOwnProperty(debugTarget) || mappedData.hasOwnProperty(debugTarget + '_dropdown'));
-                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Autofill field snapshot:', {
-                        totalFields: fields.length,
-                        hasTargetField: hasTargetField,
-                        mappedHasTarget: mappedHasTarget
-                    });
+
                     // First pass: identify which field names have visible fields
                     const visibleFieldNames = new Set();
                     fields.forEach(el => {
@@ -14233,10 +14285,16 @@ if (typeof handleNext === 'function') {
                                 // For checkboxes, use the boolean value
                                 const wasChecked = el.checked;
                                 el.checked = !!autofillValue;
+                                if (el.id && el.id.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
+
+                                }
                                 // Dispatch change event if checkbox state changed to trigger linked textbox creation
                                 if (el.checked !== wasChecked) {
                                     const changeEvent = new Event('change', { bubbles: true });
                                     el.dispatchEvent(changeEvent);
+                                    if (el.id && el.id.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
+
+                                    }
                                 }
                             }
                         } else {
@@ -14244,31 +14302,14 @@ if (typeof handleNext === 'function') {
                             // If it would, blank out the dropdown instead of autofilling it
                             if (el.tagName === 'SELECT') {
                                 if (el.id && el.id.indexOf('have_you_filed_a_written_claim_against_them') !== -1) {
-                                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Target select encountered in autofill loop:', {
-                                        id: el.id,
-                                        name: el.name,
-                                        autofillValue: autofillValue,
-                                        dataHardAlertEnabled: el.getAttribute('data-hard-alert-enabled'),
-                                        dataHardAlertCondition: el.getAttribute('data-hard-alert-condition')
-                                    });
+
                                 }
                                 const hardAlertEnabledAttr = el.getAttribute('data-hard-alert-enabled');
                                 const hardAlertConditionAttr = (el.getAttribute('data-hard-alert-condition') || '').trim();
-                                console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Checking select:', {
-                                    id: el.id,
-                                    name: el.name,
-                                    autofillValue: autofillValue,
-                                    hardAlertEnabledAttr: hardAlertEnabledAttr,
-                                    hardAlertConditionAttr: hardAlertConditionAttr
-                                });
+
                                 if (hardAlertEnabledAttr === 'true' && hardAlertConditionAttr &&
                                     (autofillValue || '').toString().trim() === hardAlertConditionAttr) {
-                                        console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Skipping autofill due to data-hard-alert match:', {
-                                            id: el.id,
-                                            name: el.name,
-                                            autofillValue: autofillValue,
-                                            hardAlertConditionAttr: hardAlertConditionAttr
-                                        });
+
                                         if (el.options && el.options.length > 0) {
                                             const placeholderOption = el.querySelector('option[value=""][disabled]');
                                             if (placeholderOption) {
@@ -14293,22 +14334,9 @@ if (typeof handleNext === 'function') {
 
                                 if (questionId && window.hardAlertData && window.hardAlertData[questionId]) {
                                     const hardAlertInfo = window.hardAlertData[questionId];
-                                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Hard alert data found:', {
-                                        id: el.id,
-                                        name: el.name,
-                                        questionId: questionId,
-                                        hardAlertInfo: hardAlertInfo,
-                                        autofillValue: autofillValue
-                                    });
+
                                     if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && 
                                         (autofillValue || '').toString().trim() === (hardAlertInfo.trigger || '').toString().trim()) {
-                                        console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Skipping autofill due to hardAlertData match:', {
-                                            id: el.id,
-                                            name: el.name,
-                                            questionId: questionId,
-                                            autofillValue: autofillValue,
-                                            hardAlertTrigger: hardAlertInfo.trigger
-                                        });
 
                                         // Reset dropdown to default "Select an option" instead of autofilling
                                         if (el.options && el.options.length > 0) {
@@ -14325,11 +14353,6 @@ if (typeof handleNext === 'function') {
                                 }
                                 // If no hard alert match, proceed with normal autofill
                                 el.value = autofillValue;
-                                console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Applied autofill to select:', {
-                                    id: el.id,
-                                    name: el.name,
-                                    autofillValue: autofillValue
-                                });
 
                                 // Trigger change event to call dropdownMirror and update conditional logic
                                 const changeEvent = new Event('change', { bubbles: true });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New SC-120</title>
+    <title>Example Form</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="generate.css">
     <link rel="stylesheet" href="generate2.css">
@@ -438,13 +438,274 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 3</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="1"
-                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people are you suing?</h3></label><select id="how_many_people_are_you_suing" name="how_many_people_are_you_suing" data-question-id="2" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value); updateHiddenLogic('how_many_people_are_you_suing', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer2"></div><script>
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-103</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">SC-120</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Are you doing business under a fictious business name</h3></label><select id="are_you_doing_business_under_a_fictious_business_name" name="are_you_doing_business_under_a_fictious_business_name" data-question-id="1"
+                      onchange="dropdownMirror(this, 'are_you_doing_business_under_a_fictious_business_name'); updateHiddenLogic('are_you_doing_business_under_a_fictious_business_name', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_doing_business_under_a_fictious_business_name"></div>
+              <input type="text" id="are_you_doing_business_under_a_fictious_business_name_dropdown" name="are_you_doing_business_under_a_fictious_business_name_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Are you suing for more than $12,500?</h3></label><select id="are_you_suing_for_more_than_12_500" name="are_you_suing_for_more_than_12_500" data-question-id="2"
+                      onchange="dropdownMirror(this, 'are_you_suing_for_more_than_12_500'); updateHiddenLogic('are_you_suing_for_more_than_12_500', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_suing_for_more_than_12_500"></div>
+              <input type="text" id="are_you_suing_for_more_than_12_500_dropdown" name="are_you_suing_for_more_than_12_500_dropdown"
+                   readonly style="display:none;"></div>
+      <div class="question-nav" data-section-index="1">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-3" data-question-id="3" class="question-container question-item hidden" data-section="2" data-question-index="1"><label><h3 class="question-text">Please enter your business details</h3></label><div id="labelContainer3"></div><input type="text" id="please_enter_your_business_details_address" name="please_enter_your_business_details_address" style="display: none;"><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 585px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="please_enter_your_business_details_name_1" name="please_enter_your_business_details_name_1" placeholder="Name" class="address-input"></div><br><div style="margin: 10px 0px; padding: 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 6px;"><label style="display: block; margin-bottom: 8px; font-weight: 600; color: rgb(51, 51, 51); font-size: 15px; text-align: center;">Please enter your business address:</label><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_street" name="please_enter_your_business_details_please_enter_your_business_address_street" placeholder="Street" oninput="
+                    (function() {
+                        var streetEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_street');
+                        var cityEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_city');
+                        var stateShortEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_state_short');
+                        var zipEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_zip');
+                        var fullAddressEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_full_address');
+                        if (!fullAddressEl) { return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+
+                    })();
+                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_city" name="please_enter_your_business_details_please_enter_your_business_address_city" placeholder="City" oninput="
+                    (function() {
+                        var streetEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_street');
+                        var cityEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_city');
+                        var stateShortEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_state_short');
+                        var zipEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_zip');
+                        var fullAddressEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_full_address');
+                        if (!fullAddressEl) { return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+
+                    })();
+                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><select id="please_enter_your_business_details_please_enter_your_business_address_state" name="please_enter_your_business_details_please_enter_your_business_address_state" class="address-select-trigger" onchange="
+
+                            var fullField = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_state_hidden');
+                            var shortField = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_state_short');
+
+                            if (typeof updateStateHiddenFields === 'function') {
+
+                                updateStateHiddenFields(this, 'please_enter_your_business_details_please_enter_your_business_address_state_hidden', 'please_enter_your_business_details_please_enter_your_business_address_state_short');
+
+                            } else {
+
+                            }
+                            if (typeof dropdownMirror === 'function') {
+                                dropdownMirror(this, 'please_enter_your_business_details_please_enter_your_business_address_state');
+                            }
+                            // Update full address after state change (with small delay to ensure state_short is updated)
+                            setTimeout(function() { 
+                    (function() {
+                        var streetEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_street');
+                        var cityEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_city');
+                        var stateShortEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_state_short');
+                        var zipEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_zip');
+                        var fullAddressEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_full_address');
+                        if (!fullAddressEl) { return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+
+                    })();
+                 }, 50);
+                        " style="width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_state_hidden" name="please_enter_your_business_details_please_enter_your_business_address_state_hidden" style="display: none;"><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_state_short" name="please_enter_your_business_details_please_enter_your_business_address_state_short" style="display: none;"><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_zip" name="please_enter_your_business_details_please_enter_your_business_address_zip" placeholder="Zip" oninput="
+                    (function() {
+                        var streetEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_street');
+                        var cityEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_city');
+                        var stateShortEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_state_short');
+                        var zipEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_zip');
+                        var fullAddressEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_full_address');
+                        if (!fullAddressEl) { return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+
+                    })();
+                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_full_address" name="please_enter_your_business_details_please_enter_your_business_address_full_address" style="display: none;"></div></div><br></div><div id="question-container-4" data-question-id="4" class="question-container question-item hidden question-step-hidden" data-section="2" data-question-index="2"><label><h3 class="question-text">What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-4">
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_an_individual">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_an_individual" name="what_do_you_do_business_as_an_individual" value="An Individual" 
+                 onchange="toggleNoneOption(this, 4); updateCheckboxStyle(this);">
+          An Individual
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_an_association">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_an_association" name="what_do_you_do_business_as_an_association" value="An Association" 
+                 onchange="toggleNoneOption(this, 4); updateCheckboxStyle(this);">
+          An Association
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_partnership">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_a_partnership" name="what_do_you_do_business_as_a_partnership" value="A Partnership" 
+                 onchange="toggleNoneOption(this, 4); updateCheckboxStyle(this);">
+          A Partnership
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_limited_liability">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_a_limited_liability" name="what_do_you_do_business_as_a_limited_liability" value="A Limited Liability" 
+                 onchange="toggleNoneOption(this, 4); updateCheckboxStyle(this);">
+          A Limited Liability
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_corporation">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_a_corporation" name="what_do_you_do_business_as_a_corporation" value="A Corporation" 
+                 onchange="toggleNoneOption(this, 4); updateCheckboxStyle(this);">
+          A Corporation
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_other">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_other" name="what_do_you_do_business_as_other" value="Other" 
+                 onchange="toggleNoneOption(this, 4); updateCheckboxStyle(this);">
+          Other
+        </label>
+      </span></div><br></div></div><div id="question-container-5" data-question-id="5" class="question-container question-item hidden question-step-hidden" data-section="2" data-question-index="3"><label><h3 class="question-text">Please explain what you do business as</h3></label>
+            <div class="text-input-container">
+              <textarea id="please_explain_what_you_do_business_as" name="please_explain_what_you_do_business_as" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('please_explain_what_you_do_business_as', null);"></textarea>
+            </div>
+            <script>
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
+                  }
+                  hiddenInput.value = lineText;
+                }
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+            </script>
+          </div><div id="question-container-6" data-question-id="6" class="question-container question-item hidden question-step-hidden" data-section="2" data-question-index="4"><label><h3 class="question-text">What county did you file your Fictious Business Name Statement</h3></label><div class="text-input-container"><input type="text" id="what_county_did_you_file_your_fictious_business_name_statement" name="what_county_did_you_file_your_fictious_business_name_statement" placeholder=""></div></div><div id="question-container-7" data-question-id="7" class="question-container question-item hidden question-step-hidden" data-section="2" data-question-index="5"><label><h3 class="question-text">What is your fictious business name statement number</h3></label><div class="text-input-container"><input type="number" id="what_is_your_fictious_business_name_statement_number" name="what_is_your_fictious_business_name_statement_number" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-8" data-question-id="8" class="question-container question-item hidden question-step-hidden" data-section="2" data-question-index="6"><label><h3 class="question-text">What is the date that your fictious businesses name statement expires</h3></label><div class="date-input-container" style="position: relative; cursor: pointer;" onclick="document.getElementById('what_is_the_date_that_your_fictious_businesses_name_statement_expires').showPicker()"><input type="date" id="what_is_the_date_that_your_fictious_businesses_name_statement_expires" name="what_is_the_date_that_your_fictious_businesses_name_statement_expires" style="width: 100%; padding: 12px 16px; border: 1px solid #e1e5e9; border-radius: 8px; font-size: 16px; cursor: pointer; background-color: #ffffff; transition: all 0.2s ease; box-sizing: border-box;"></div></div><div id="question-container-9" data-question-id="9" class="question-container question-item hidden question-step-hidden" data-section="2" data-question-index="7"><label><h3 class="question-text">Are you suing for more than $6,250?</h3></label><select id="are_you_suing_for_more_than_6_250" name="are_you_suing_for_more_than_6_250" data-question-id="9"
+                      onchange="dropdownMirror(this, 'are_you_suing_for_more_than_6_250'); updateHiddenLogic('are_you_suing_for_more_than_6_250', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_suing_for_more_than_6_250"></div>
+              <input type="text" id="are_you_suing_for_more_than_6_250_dropdown" name="are_you_suing_for_more_than_6_250_dropdown"
+                   readonly style="display:none;"></div>
+      <div class="question-nav" data-section-index="2">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-120</h1><div id="question-container-10" data-question-id="10" class="question-container question-item hidden" data-section="3" data-question-index="1"><label><h3 class="question-text">Are you counter-suing by yourself?</h3></label><select id="are_you_counter_suing_by_yourself" name="are_you_counter_suing_by_yourself" data-question-id="10"
+                      onchange="dropdownMirror(this, 'are_you_counter_suing_by_yourself'); updateHiddenLogic('are_you_counter_suing_by_yourself', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_counter_suing_by_yourself"></div>
+              <input type="text" id="are_you_counter_suing_by_yourself_dropdown" name="are_you_counter_suing_by_yourself_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-11" data-question-id="11" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people are you counter suing?</h3></label><select id="how_many_people_are_you_counter_suing" name="how_many_people_are_you_counter_suing" data-question-id="11" onchange="showTextboxLabels(11, this.value); updateHiddenCheckboxes(11, this.value); updateHiddenLogic('how_many_people_are_you_counter_suing', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><br><div id="labelContainer11"></div><script>
           window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
             if (!input) return;
             // Remove all non-numeric characters except decimal point, including dollar sign
@@ -461,14 +722,9 @@ document.addEventListener("DOMContentLoaded", function() {
             input.value = '$' + parts[0] + decimal;
           };
         </script></div>
-      <div class="question-nav" data-section-index="1">
-        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
-        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
-      </div>
-    <br><br><div class="navigation-buttons" style="display:none;"></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 3</h1>
-      <div class="question-nav" data-section-index="2">
-        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
-        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
+      <div class="question-nav" data-section-index="3">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="3">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="3">&rarr;</button>
       </div>
     <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
   <script>
@@ -1496,7 +1752,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
 <input type="hidden" id="user_full_address"     name="user_full_address">
 <input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden">
-<input type="checkbox" id="new_sc_120_default_checkbox" name="new_sc_120_default_checkbox" checked style="display: none;">
+<input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
 </div>
   <script>
     window.showLoginRequiredModal = function() {
@@ -1639,13 +1895,13 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"hungry","2":"how_many_people_are_you_suing"};
-var questionNameIds = {"1":"hungry","2":"how_many_people_are_you_suing"};
+var questionSlugMap = {"1":"are_you_doing_business_under_a_fictious_business_name","2":"are_you_suing_for_more_than_12_500","3":"please_enter_your_business_details","4":"what_do_you_do_business_as","5":"please_explain_what_you_do_business_as","6":"what_county_did_you_file_your_fictious_business_name_statement","7":"what_is_your_fictious_business_name_statement_number","8":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","9":"are_you_suing_for_more_than_6_250","10":"are_you_counter_suing_by_yourself","11":"how_many_people_are_you_counter_suing"};
+var questionNameIds = {"1":"are_you_doing_business_under_a_fictious_business_name","2":"are_you_suing_for_more_than_12_500","3":"please_enter_your_business_details","4":"what_do_you_do_business_as","5":"please_explain_what_you_do_business_as","6":"what_county_did_you_file_your_fictious_business_name_statement","7":"what_is_your_fictious_business_name_statement_number","8":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","9":"are_you_suing_for_more_than_6_250","10":"are_you_counter_suing_by_yourself","11":"how_many_people_are_you_counter_suing"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
-var checkboxRequiredMap = {};
-var allAreRequiredMap = {};
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_name","order":1,"prefill":""},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_suing_name","title":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"1","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_public_entity_yes"]},"hardAlert":{"enabled":true,"condition":"No","title":"You must file a written claim against the defendant before you can sue"}},{"type":"date","label":"When did you file the written claim?","nodeId":"are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
+var checkboxRequiredMap = {"4":true};
+var allAreRequiredMap = {"4":false};
+var unifiedFieldsMap = {"3":[{"type":"label","label":"Name","nodeId":"please_enter_your_business_details_name","order":1,"prefill":""},{"type":"location","fieldName":"Please enter your business address","nodeId":"location_data","order":2}],"11":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_counter_suing_name","order":1,"prefill":""},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_counter_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_counter_suing_name","title":"how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_public_entity_yes"]},"hardAlert":{"enabled":true,"condition":"No","title":"You must file a written claim against them before you can counter-sue"}},{"type":"date","label":"When did you file the written claim?","nodeId":"are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
 window.hardAlertData = {};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
@@ -2856,12 +3112,7 @@ window.pdfPreviewQuestions = [];
           if (hardAlertData.title) {
             select.setAttribute('data-hard-alert-title', hardAlertData.title);
           }
-          console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Attached hard alert metadata to trigger dropdown:', {
-            id: select.id,
-            name: select.name,
-            condition: hardAlertData.condition,
-            title: hardAlertData.title || ''
-          });
+
         }
 
         // CRITICAL: Log that we're attaching the change event listener
@@ -2898,6 +3149,9 @@ window.pdfPreviewQuestions = [];
             const selectedValue = (this.value || '').trim();
             const hardAlertCondition = hardAlertData.condition;
             if (selectedValue === hardAlertCondition) {
+              if (typeof window !== 'undefined' && window.isInitialAutofill) {
+                return;
+              }
 
               // Use custom alert modal with hard alert flag
               if (typeof showAlert === 'function') {
@@ -3943,17 +4197,17 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       if (typeof userId === 'undefined') { var userId = null; }
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [];
+    var jumpLogics = [{"questionId":"2","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1},{"questionId":"2","questionType":"dropdown","jumpOption":"Yes","jumpTo":"3","section":1}];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"2","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"2","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"2","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"2","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"}];
+var pdfLogicPDFs = [{"questionId":"11","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"11","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"11","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"11","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"}];
 var checkboxPdfEntries = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"2":["Name"],"length":0};
-var amountMap = {"2":[],"length":0};
-var labelNodeIdsMap = {"2":["how_many_people_are_you_suing_name"]};
+var labelMap = {"11":["Name"],"length":0};
+var amountMap = {"11":[],"length":0};
+var labelNodeIdsMap = {"11":["how_many_people_are_you_counter_suing_name"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -4068,12 +4322,12 @@ function lookupCourtFromZip() {
     const courtAddressField = document.getElementById("court_address");
     const courtCountyField = document.getElementById("court_county");
     if (!zipField || !courtNameField || !courtAddressField) {
-        console.log("🏛️ [COURT LOOKUP] Missing fields:", { zip: !!zipField, courtName: !!courtNameField, courtAddress: !!courtAddressField, courtCounty: !!courtCountyField });
+        
         return;
     }
     const zipCode = zipField.value.trim();
     if (zipCode.length === 5) {
-        console.log("🏛️ [COURT LOOKUP] Looking up court for zip:", zipCode);
+        
         const courtInfo = getCourtFromZipCode(zipCode);
         if (courtInfo && courtInfo.courtName) {
             courtNameField.value = courtInfo.courtName;
@@ -4081,9 +4335,9 @@ function lookupCourtFromZip() {
             if (courtCountyField) {
                 courtCountyField.value = courtInfo.county ? (courtInfo.county + " County") : "";
             }
-            console.log("🏛️ [COURT LOOKUP] Found court:", courtInfo.courtName);
+            
         } else {
-            console.log("🏛️ [COURT LOOKUP] No court found for zip:", zipCode, courtInfo && courtInfo.error ? courtInfo.error : "unknown");
+            
             courtNameField.value = "";
             courtAddressField.value = "";
             if (courtCountyField) {
@@ -4091,7 +4345,7 @@ function lookupCourtFromZip() {
             }
         }
     } else {
-        console.log("🏛️ [COURT LOOKUP] Invalid zip:", zipCode);
+        
         courtNameField.value = "";
         courtAddressField.value = "";
         if (courtCountyField) {
@@ -4313,15 +4567,6 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="1";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
-  (function(){
-    var cPrevType="dropdown";
     var cPrevAns="no";
     var cPrevQNum="1";
     var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
@@ -4378,8 +4623,793 @@ var hiddenTextCalculations = [];
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-3");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("3");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
  (function(){
    var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+checkboxRequiredMap[4] = true; 
+allAreRequiredMap[4] = false; 
+
+(function(){
+ var thisQ=document.getElementById("question-container-4");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("4");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-5");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="other";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("5");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var checkQuestion = "4";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-6");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="an individual";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="an association";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="a partnership";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="a limited liability";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="a corporation";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="other";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("6");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var checkQuestion = "4";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "4";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "4";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "4";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "4";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "4";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-7");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="text";
+    var cPrevAns="any text";
+    var cPrevQNum="6";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower !== ""){ anyMatch=true; } else { } }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("7");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var textQuestion = "6";
+   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);
+   if(el3){ el3.addEventListener("input", function(){ updateVisibility();}); }
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-8");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="text";
+    var cPrevAns="any text";
+    var cPrevQNum="6";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower !== ""){ anyMatch=true; } else { } }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("8");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var textQuestion = "6";
+   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);
+   if(el3){ el3.addEventListener("input", function(){ updateVisibility();}); }
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-9");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="date";
+    var cPrevAns="any text";
+    var cPrevQNum="8";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower !== ""){ anyMatch=true; } else { } }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("9");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var dateQuestion = "8";
+   var el3= document.getElementById(questionNameIds[dateQuestion]) || document.getElementById("answer"+dateQuestion);
+   if(el3){ el3.addEventListener("input", function(){ updateVisibility();}); el3.addEventListener("change", function(){ updateVisibility();}); }
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-10");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="2";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="9";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="9";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="2";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("10");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "2";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "2";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-11");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="10";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="10";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("11");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "10";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "10";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -4587,13 +5617,7 @@ function scrubHardAlertAutofillSelects(contextLabel) {
         const condition = (select.getAttribute('data-hard-alert-condition') || '').trim();
         const currentValue = (select.value || '').trim();
         if (condition && currentValue === condition) {
-            console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Scrubbing hard alert autofill value:', {
-                context: contextLabel || 'unknown',
-                id: select.id,
-                name: select.name,
-                value: currentValue,
-                condition: condition
-            });
+
             const placeholderOption = select.querySelector('option[value=""][disabled]');
             if (placeholderOption) {
                 placeholderOption.selected = true;
@@ -7269,6 +8293,22 @@ function showTextboxLabels(questionId, count){
 }
 // Reset all fields in a numbered dropdown question to their default values
 function resetNumberedDropdownFields(questionId) {
+    if (typeof window !== 'undefined' && window.isInitialAutofill) {
+        const questionName = questionNameIds && questionNameIds[questionId] ? questionNameIds[questionId] : '';
+        console.log('[LINKED FIELD DEBUG] resetNumberedDropdownFields skipped during autofill', {
+            questionId: questionId,
+            questionName: questionName
+        });
+        return;
+    }
+    const questionName = questionNameIds && questionNameIds[questionId] ? questionNameIds[questionId] : '';
+    const isTargetNumberedDropdown = questionId === '11' || questionId === 11 || questionName === 'how_many_people_are_you_counter_suing';
+    if (isTargetNumberedDropdown) {
+        console.log('[LINKED FIELD DEBUG] resetNumberedDropdownFields called', {
+            questionId: questionId,
+            questionName: questionName
+        });
+    }
     // Reset the main dropdown select to its default (empty/placeholder)
     const dropdownId = questionNameIds[questionId] || ("answer" + questionId);
     const dropdown = document.getElementById(dropdownId);
@@ -7308,6 +8348,12 @@ function resetNumberedDropdownFields(questionId) {
     // Reset checkboxes (uncheck all)
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
+        if (isTargetNumberedDropdown && checkbox.id.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
+            console.log('[LINKED FIELD DEBUG] resetNumberedDropdownFields unchecking checkbox', {
+                checkboxId: checkbox.id,
+                wasChecked: checkbox.checked
+            });
+        }
         checkbox.checked = false;
     });
     // Reset radio buttons (uncheck all)
@@ -7810,11 +8856,17 @@ function updateLinkedFields() {
     linkedFields.forEach((linkedField, index) => {
 
         const { linkedFieldId, fields } = linkedField;
+        const isTargetLinkedField = linkedFieldId && linkedFieldId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name') !== -1;
         // Find the hidden textbox for this linked field
         let hiddenField = document.getElementById(linkedFieldId);
 
         if (!hiddenField) {
-
+            if (isTargetLinkedField) {
+                console.log('[LINKED FIELD DEBUG] updateLinkedFields creating hidden field', {
+                    linkedFieldId: linkedFieldId,
+                    fields: fields
+                });
+            }
             // Create the hidden textbox if it doesn't exist
             hiddenField = document.createElement('input');
             hiddenField.type = 'text';
@@ -7838,10 +8890,24 @@ function updateLinkedFields() {
 
             return field;
         }).filter(el => el);
+        if (isTargetLinkedField) {
+            console.log('[LINKED FIELD DEBUG] updateLinkedFields linked textboxes snapshot', {
+                linkedFieldId: linkedFieldId,
+                linkedTextboxIds: fields,
+                foundIds: linkedTextboxes.map(el => el.id),
+                foundValues: linkedTextboxes.map(el => el.value)
+            });
+        }
 
         // If no linked textboxes exist (all have been removed), clear the hidden field
         if (linkedTextboxes.length === 0) {
 
+            if (isTargetLinkedField) {
+                console.log('[LINKED FIELD DEBUG] updateLinkedFields no linked textboxes, clearing hidden field', {
+                    linkedFieldId: linkedFieldId,
+                    previousValue: hiddenField.value
+                });
+            }
             hiddenField.value = '';
             return;
         }
@@ -7855,12 +8921,26 @@ function updateLinkedFields() {
         if (textboxesWithContent.length === 0) {
             // No textboxes have content, clear the hidden field
 
+            if (isTargetLinkedField) {
+                console.log('[LINKED FIELD DEBUG] updateLinkedFields no content, clearing hidden field', {
+                    linkedFieldId: linkedFieldId,
+                    previousValue: hiddenField.value
+                });
+            }
             hiddenField.value = '';
         } else if (textboxesWithContent.length === 1) {
             // Only one textbox has content, use its value
             const val = textboxesWithContent[0].value.trim();
             const finalValue = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
 
+            if (isTargetLinkedField) {
+                console.log('[LINKED FIELD DEBUG] updateLinkedFields setting hidden field from single textbox', {
+                    linkedFieldId: linkedFieldId,
+                    sourceId: textboxesWithContent[0].id,
+                    sourceValue: val,
+                    finalValue: finalValue
+                });
+            }
             hiddenField.value = finalValue;
         } else {
             // Multiple textboxes have content
@@ -7893,6 +8973,14 @@ function updateLinkedFields() {
                     ? formatDateForServer(chosenVal)
                     : (/^d{4}-d{2}-d{2}$/.test(chosenVal) ? formatDateForServer(chosenVal) : chosenVal);
 
+                if (isTargetLinkedField) {
+                    console.log('[LINKED FIELD DEBUG] updateLinkedFields setting hidden field from latest date', {
+                        linkedFieldId: linkedFieldId,
+                        chosenId: latest.id,
+                        chosenValue: chosenVal,
+                        finalValue: hiddenField.value
+                    });
+                }
             } else {
                 // Fall back to longest text
 
@@ -7901,6 +8989,13 @@ function updateLinkedFields() {
                 );
                 hiddenField.value = longestTextbox.value.trim();
 
+                if (isTargetLinkedField) {
+                    console.log('[LINKED FIELD DEBUG] updateLinkedFields setting hidden field from longest textbox', {
+                        linkedFieldId: linkedFieldId,
+                        chosenId: longestTextbox.id,
+                        chosenValue: longestTextbox.value.trim()
+                    });
+                }
             }
         }
 
@@ -7914,6 +9009,8 @@ function clearInactiveLinkedFields() {
     setTimeout(() => {
         linkedFields.forEach(linkedField => {
             const { fields } = linkedField;
+            const linkedFieldId = linkedField.linkedFieldId;
+            const isTargetLinkedField = linkedFieldId && linkedFieldId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name') !== -1;
             // Get all the linked textboxes
             const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
             if (linkedTextboxes.length === 0) return;
@@ -7928,6 +9025,13 @@ function clearInactiveLinkedFields() {
             linkedTextboxes.forEach(tb => {
                 const container = tb.closest('.question-container');
                 if (container && container.classList.contains('hidden') && tb.value.trim() !== '') {
+                    if (isTargetLinkedField) {
+                        console.log('[LINKED FIELD DEBUG] clearInactiveLinkedFields clearing hidden textbox value', {
+                            linkedFieldId: linkedFieldId,
+                            textboxId: tb.id,
+                            previousValue: tb.value
+                        });
+                    }
                     tb.value = '';
                 }
             });
@@ -7940,6 +9044,13 @@ function clearInactiveLinkedFields() {
                 // Clear all other visible textboxes that aren't the longest
                 visibleTextboxes.forEach(tb => {
                     if (tb !== longestTextbox && tb.value.trim() !== '') {
+                        if (isTargetLinkedField) {
+                            console.log('[LINKED FIELD DEBUG] clearInactiveLinkedFields clearing shorter visible textbox', {
+                                linkedFieldId: linkedFieldId,
+                                textboxId: tb.id,
+                                previousValue: tb.value
+                            });
+                        }
                         tb.value = '';
                     }
                 });
@@ -10024,11 +11135,7 @@ if (typeof handleNext === 'function') {
                     const debugTarget = 'are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_1';
                     const hasTargetField = fields.some(el => el && (el.id === debugTarget || el.name === debugTarget));
                     const mappedHasTarget = mappedData && (mappedData.hasOwnProperty(debugTarget) || mappedData.hasOwnProperty(debugTarget + '_dropdown'));
-                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Autofill field snapshot:', {
-                        totalFields: fields.length,
-                        hasTargetField: hasTargetField,
-                        mappedHasTarget: mappedHasTarget
-                    });
+
                     // First pass: identify which field names have visible fields
                     const visibleFieldNames = new Set();
                     fields.forEach(el => {
@@ -10088,10 +11195,25 @@ if (typeof handleNext === 'function') {
                                 // For checkboxes, use the boolean value
                                 const wasChecked = el.checked;
                                 el.checked = !!autofillValue;
+                                if (el.id && el.id.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
+                                    console.log('[LINKED FIELD DEBUG] Autofill checkbox update', {
+                                        id: el.id,
+                                        name: el.name,
+                                        wasChecked: wasChecked,
+                                        nowChecked: el.checked,
+                                        autofillValue: autofillValue
+                                    });
+                                }
                                 // Dispatch change event if checkbox state changed to trigger linked textbox creation
                                 if (el.checked !== wasChecked) {
                                     const changeEvent = new Event('change', { bubbles: true });
                                     el.dispatchEvent(changeEvent);
+                                    if (el.id && el.id.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
+                                        console.log('[LINKED FIELD DEBUG] Autofill checkbox change dispatched', {
+                                            id: el.id,
+                                            name: el.name
+                                        });
+                                    }
                                 }
                             }
                         } else {
@@ -10099,31 +11221,14 @@ if (typeof handleNext === 'function') {
                             // If it would, blank out the dropdown instead of autofilling it
                             if (el.tagName === 'SELECT') {
                                 if (el.id && el.id.indexOf('have_you_filed_a_written_claim_against_them') !== -1) {
-                                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Target select encountered in autofill loop:', {
-                                        id: el.id,
-                                        name: el.name,
-                                        autofillValue: autofillValue,
-                                        dataHardAlertEnabled: el.getAttribute('data-hard-alert-enabled'),
-                                        dataHardAlertCondition: el.getAttribute('data-hard-alert-condition')
-                                    });
+
                                 }
                                 const hardAlertEnabledAttr = el.getAttribute('data-hard-alert-enabled');
                                 const hardAlertConditionAttr = (el.getAttribute('data-hard-alert-condition') || '').trim();
-                                console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Checking select:', {
-                                    id: el.id,
-                                    name: el.name,
-                                    autofillValue: autofillValue,
-                                    hardAlertEnabledAttr: hardAlertEnabledAttr,
-                                    hardAlertConditionAttr: hardAlertConditionAttr
-                                });
+
                                 if (hardAlertEnabledAttr === 'true' && hardAlertConditionAttr &&
                                     (autofillValue || '').toString().trim() === hardAlertConditionAttr) {
-                                        console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Skipping autofill due to data-hard-alert match:', {
-                                            id: el.id,
-                                            name: el.name,
-                                            autofillValue: autofillValue,
-                                            hardAlertConditionAttr: hardAlertConditionAttr
-                                        });
+
                                         if (el.options && el.options.length > 0) {
                                             const placeholderOption = el.querySelector('option[value=""][disabled]');
                                             if (placeholderOption) {
@@ -10148,22 +11253,9 @@ if (typeof handleNext === 'function') {
 
                                 if (questionId && window.hardAlertData && window.hardAlertData[questionId]) {
                                     const hardAlertInfo = window.hardAlertData[questionId];
-                                    console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Hard alert data found:', {
-                                        id: el.id,
-                                        name: el.name,
-                                        questionId: questionId,
-                                        hardAlertInfo: hardAlertInfo,
-                                        autofillValue: autofillValue
-                                    });
+
                                     if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && 
                                         (autofillValue || '').toString().trim() === (hardAlertInfo.trigger || '').toString().trim()) {
-                                        console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Skipping autofill due to hardAlertData match:', {
-                                            id: el.id,
-                                            name: el.name,
-                                            questionId: questionId,
-                                            autofillValue: autofillValue,
-                                            hardAlertTrigger: hardAlertInfo.trigger
-                                        });
 
                                         // Reset dropdown to default "Select an option" instead of autofilling
                                         if (el.options && el.options.length > 0) {
@@ -10180,11 +11272,6 @@ if (typeof handleNext === 'function') {
                                 }
                                 // If no hard alert match, proceed with normal autofill
                                 el.value = autofillValue;
-                                console.log('🛑 [HARD ALERT AUTOFILL DEBUG] Applied autofill to select:', {
-                                    id: el.id,
-                                    name: el.name,
-                                    autofillValue: autofillValue
-                                });
 
                                 // Trigger change event to call dropdownMirror and update conditional logic
                                 const changeEvent = new Event('change', { bubbles: true });

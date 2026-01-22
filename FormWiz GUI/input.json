@@ -6,7 +6,7 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "Hungry?",
+          "text": "Are you doing business under a fictious business name",
           "type": "dropdown",
           "logic": {
             "enabled": false,
@@ -82,26 +82,935 @@
             "title": ""
           },
           "options": [
-            "Yes",
-            "No"
+            "No",
+            "Yes"
           ],
           "labels": [],
-          "nameId": "hungry",
+          "nameId": "are_you_doing_business_under_a_fictious_business_name",
           "placeholder": ""
         },
         {
           "questionId": 2,
-          "text": "How many people are you suing?",
-          "type": "numberedDropdown",
+          "text": "Are you suing for more than $12,500?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "No"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "No",
+                "to": "3"
+              },
+              {
+                "option": "Yes",
+                "to": "3"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "No",
+            "Yes"
+          ],
+          "labels": [],
+          "nameId": "are_you_suing_for_more_than_12_500",
+          "placeholder": ""
+        }
+      ]
+    },
+    {
+      "sectionId": 2,
+      "sectionName": "SC-103",
+      "questions": [
+        {
+          "questionId": 3,
+          "text": "Please enter your business details",
+          "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
                 "prevQuestion": "1",
                 "prevAnswer": "Yes"
-              },
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "please_enter_your_business_details",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Name",
+              "nodeId": "please_enter_your_business_details_name",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "location",
+              "fieldName": "Please enter your business address",
+              "nodeId": "location_data",
+              "order": 2
+            }
+          ]
+        },
+        {
+          "questionId": 4,
+          "text": "What do you do business as?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": true,
+            "conditions": [
               {
                 "prevQuestion": "1",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "An Individual"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            {
+              "label": "An Individual",
+              "nameId": "what_do_you_do_business_as_an_individual",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "An Association",
+              "nameId": "what_do_you_do_business_as_an_association",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "A Partnership",
+              "nameId": "what_do_you_do_business_as_a_partnership",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "A Limited Liability",
+              "nameId": "what_do_you_do_business_as_a_limited_liability",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "A Corporation",
+              "nameId": "what_do_you_do_business_as_a_corporation",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Other",
+              "nameId": "what_do_you_do_business_as_other",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false,
+          "allAreRequired": false
+        },
+        {
+          "questionId": 5,
+          "text": "Please explain what you do business as",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "4",
+                "prevAnswer": "Other"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "please_explain_what_you_do_business_as",
+          "placeholder": ""
+        },
+        {
+          "questionId": 6,
+          "text": "What county did you file your Fictious Business Name Statement",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "4",
+                "prevAnswer": "An Individual"
+              },
+              {
+                "prevQuestion": "4",
+                "prevAnswer": "An Association"
+              },
+              {
+                "prevQuestion": "4",
+                "prevAnswer": "A Partnership"
+              },
+              {
+                "prevQuestion": "4",
+                "prevAnswer": "A Limited Liability"
+              },
+              {
+                "prevQuestion": "4",
+                "prevAnswer": "A Corporation"
+              },
+              {
+                "prevQuestion": "4",
+                "prevAnswer": "Other"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "what_county_did_you_file_your_fictious_business_name_statement",
+          "placeholder": ""
+        },
+        {
+          "questionId": 7,
+          "text": "What is your fictious business name statement number",
+          "type": "money",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "6",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "what_is_your_fictious_business_name_statement_number",
+          "placeholder": ""
+        },
+        {
+          "questionId": 8,
+          "text": "What is the date that your fictious businesses name statement expires",
+          "type": "date",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "6",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "what_is_the_date_that_your_fictious_businesses_name_statement_expires",
+          "placeholder": ""
+        },
+        {
+          "questionId": 9,
+          "text": "Are you suing for more than $6,250?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "8",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "No",
+            "Yes"
+          ],
+          "labels": [],
+          "nameId": "are_you_suing_for_more_than_6_250",
+          "placeholder": ""
+        }
+      ]
+    },
+    {
+      "sectionId": 3,
+      "sectionName": "SC-120",
+      "questions": [
+        {
+          "questionId": 10,
+          "text": "Are you counter-suing by yourself?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "2",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "9",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "9",
+                "prevAnswer": "Yes"
+              },
+              {
+                "prevQuestion": "2",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "No",
+            "Yes"
+          ],
+          "labels": [],
+          "nameId": "are_you_counter_suing_by_yourself",
+          "placeholder": ""
+        },
+        {
+          "questionId": 11,
+          "text": "How many people are you counter suing?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "10",
+                "prevAnswer": "Yes"
+              },
+              {
+                "prevQuestion": "10",
                 "prevAnswer": "No"
               }
             ]
@@ -177,21 +1086,21 @@
           },
           "options": [],
           "labels": [],
-          "nodeId": "how_many_people_are_you_suing",
+          "nodeId": "how_many_people_are_you_counter_suing",
           "min": "1",
-          "max": "3",
+          "max": "6",
           "allFieldsInOrder": [
             {
               "type": "label",
               "label": "Name",
-              "nodeId": "how_many_people_are_you_suing_name",
+              "nodeId": "how_many_people_are_you_counter_suing_name",
               "order": 1,
               "prefill": ""
             },
             {
               "type": "phone",
               "label": "Phone",
-              "nodeId": "how_many_people_are_you_suing_phone",
+              "nodeId": "how_many_people_are_you_counter_suing_phone",
               "order": 2
             },
             {
@@ -208,11 +1117,11 @@
               "options": [
                 {
                   "text": "Check here if the defendant is on military duty",
-                  "nodeId": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty",
+                  "nodeId": "how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty",
                   "linkedFields": [
                     {
-                      "nodeId": "how_many_people_are_you_suing_name",
-                      "title": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"
+                      "nodeId": "how_many_people_are_you_counter_suing_name",
+                      "title": "how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name"
                     }
                   ],
                   "pdfEntries": [
@@ -224,12 +1133,6 @@
                     },
                     {
                       "triggerNumber": "3",
-                      "pdfName": "MC-031 (Military)",
-                      "pdfFile": "mc031-military.pdf",
-                      "priceId": "price_1SHdb4FJeSRMFQ8XEsxSKU7E"
-                    },
-                    {
-                      "triggerNumber": "1",
                       "pdfName": "MC-031 (Military)",
                       "pdfFile": "mc031-military.pdf",
                       "priceId": "price_1SHdb4FJeSRMFQ8XEsxSKU7E"
@@ -304,7 +1207,7 @@
                       "hardAlert": {
                         "enabled": true,
                         "condition": "No",
-                        "title": "You must file a written claim against the defendant before you can sue"
+                        "title": "You must file a written claim against them before you can counter-sue"
                       }
                     },
                     {
@@ -340,20 +1243,15 @@
           ]
         }
       ]
-    },
-    {
-      "sectionId": 2,
-      "sectionName": "Section 3",
-      "questions": []
     }
   ],
   "groups": [],
   "hiddenFields": [],
-  "sectionCounter": 3,
-  "questionCounter": 3,
+  "sectionCounter": 4,
+  "questionCounter": 12,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
-  "formName": "New SC-120",
+  "formName": "Example Form",
   "defaultPDFName": "",
   "pdfOutputName": "",
   "stripePriceId": "",
