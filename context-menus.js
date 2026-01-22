@@ -797,10 +797,10 @@ function setupContextMenuEventListeners(graph) {
         // Double-click uses the custom menu, but right-click → Properties uses the regular menu
         if (typeof window.isFileNode === 'function' && window.isFileNode(cell)) {
           // Use showPropertiesPopup with showRegularProperties flag to show regular properties menu
-          if (window.showPropertiesPopup) {
-            try {
+        if (window.showPropertiesPopup) {
+          try {
               window.showPropertiesPopup(cell, true); // Pass true to show regular properties
-            } catch (error) {
+          } catch (error) {
               console.error('Error showing properties popup for file node:', error);
             }
           }
@@ -815,18 +815,18 @@ function setupContextMenuEventListeners(graph) {
             try {
               window.showPropertiesPopup(cell);
             } catch (error) {
-            }
-          } else {
-            // Fallback to old properties menu
-            if (typeof showPropertiesMenu === 'function') {
+          }
+        } else {
+          // Fallback to old properties menu
+          if (typeof showPropertiesMenu === 'function') {
               showPropertiesMenu(cell, window.currentMouseEvent || { clientX: 0, clientY: 0 });
-            } else {
-              // Try to wait a bit and check again for showPropertiesPopup
-              setTimeout(() => {
-                if (typeof window.showPropertiesPopup === 'function') {
+          } else {
+            // Try to wait a bit and check again for showPropertiesPopup
+            setTimeout(() => {
+              if (typeof window.showPropertiesPopup === 'function') {
                   window.showPropertiesPopup(cell);
-                }
-              }, 100);
+              }
+            }, 100);
             }
           }
         }

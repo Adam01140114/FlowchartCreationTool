@@ -789,8 +789,8 @@ function showPropertiesPopup(cell, showRegularProperties = false) {
         const index = allQuestions.findIndex(c => c.id === cell.id);
         if (index >= 0) {
           return (index + 1).toString();
-        }
       }
+    }
     }
     
     // Fallback to stored _questionId if available
@@ -3017,7 +3017,7 @@ function showPropertiesPopup(cell, showRegularProperties = false) {
           // Special debugging for PDF properties
           if (prop.id === 'propPdfName' || prop.id === 'propPdfFile' || prop.id === 'propPdfPrice') {
           }
-            // Special debugging for PDF preview properties
+          // Special debugging for PDF preview properties
           if (prop.id === 'propPdfPreviewTitle' || prop.id === 'propPdfPreviewFile' || prop.id === 'propPdfPreviewPriceId') {
           }
           if (useTextarea) {

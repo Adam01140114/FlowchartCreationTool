@@ -1070,6 +1070,24 @@ Implementation is identical to `updateTriggerDropdownAlertUI`, but:
 - Uses `hardAlertUIDropdown` container ID
 - Everything else is the same (condition dropdown, title input)
 
+1.4 CHECKBOX QUESTIONS (Hard Alert Trigger Options)
+---------------------------------------------------
+Location: `updateHardAlertTriggerOptions()` function (around line 4990)
+
+For regular checkbox questions (not trigger sequences), the Hard Alert Trigger
+dropdown is populated from the checkbox option text inputs instead of dropdown
+options. This prevents the "Select an option..." list from being blank.
+
+Implementation details:
+- Detect question type via `#questionType{questionId}`
+- If type is `checkbox`, read option text from:
+  `#checkboxOptions{questionId} input[id^="checkboxOptionText{questionId}_"]`
+- If "None of the above" is enabled, append a "None of the above" option
+- Preserve the currently selected trigger value when re-rendering the list
+
+Whenever checkbox options are added, removed, or edited, call:
+`updateHardAlertTriggerOptions(questionId)` to keep the trigger list in sync.
+
 ================================================================================
 PART 2: EXPORT/IMPORT (FormWiz GUI/download.js)
 ================================================================================
@@ -1179,6 +1197,29 @@ if (hardAlertEnabled) {
   }
 }
 ```
+
+**For Regular Checkbox Questions:**
+
+When the question type is `checkbox`, hard alert data is stored with an explicit
+type and the list of option IDs/labels so runtime logic can detect checked options:
+
+```javascript
+window.hardAlertData[questionId] = {
+  enabled: true,
+  trigger: hardAlertTrigger,   // matches option label or value
+  title: hardAlertTitle,
+  type: 'checkbox',
+  options: [
+    { id: optionNameId, label: optionLabel, value: optionValue }
+  ]
+};
+```
+
+Runtime handler signature for checkbox inputs:
+```javascript
+handleHardAlert{questionId}(checked, value, label)
+```
+The alert triggers when the checkbox is checked and the label/value matches.
 
 **CRITICAL: Embedding `window.hardAlertData` in Generated HTML**
 

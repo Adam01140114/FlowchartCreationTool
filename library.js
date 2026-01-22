@@ -1688,11 +1688,9 @@ window.exportGuiJson = function(download = true) {
       if (question.image) {
         delete question.image;
       }
-      // For "mark only one" checkboxes, remove nameId/placeholder
-      if (question.markOnlyOne) {
-        delete question.nameId;
-        delete question.placeholder;
-      }
+      // For all checkbox questions, remove nameId/placeholder
+      delete question.nameId;
+      delete question.placeholder;
     }
     // --- PATCH: For multipleDropdownType, convert to numberedDropdown format ---
     if (exportType === "multipleDropdownType") {

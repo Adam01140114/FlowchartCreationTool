@@ -1875,6 +1875,62 @@ const cboxOptions = [];
 /* Use the slug as the base prefix (and store it for helpers) */
 const qSlug = questionSlugMap[questionId] || ('answer' + questionId);
 questionNameIds[questionId] = qSlug;      // so helpers know the base
+/* ── Hard Alert (checkbox question) ─────────────────────────── */
+const hardAlertEnabledEl = qBlock.querySelector(`#enableHardAlert${questionId}`);
+const hardAlertEnabled = hardAlertEnabledEl && hardAlertEnabledEl.checked;
+let hardAlertHandlerCall = '';
+let hardAlertTrigger = '';
+let hardAlertTitle = '';
+if (hardAlertEnabled) {
+  const hardAlertTriggerEl = qBlock.querySelector(`#hardAlertTrigger${questionId}`);
+  const hardAlertTitleEl = qBlock.querySelector(`#hardAlertTitle${questionId}`);
+  hardAlertTrigger = hardAlertTriggerEl ? hardAlertTriggerEl.value.trim() : "";
+  hardAlertTitle = hardAlertTitleEl ? hardAlertTitleEl.value.trim() : "";
+  // Fallback to window.questionHardAlert if DOM values are empty (for JSON imports)
+  if (!hardAlertTrigger || !hardAlertTitle) {
+    if (window.questionHardAlert && window.questionHardAlert[questionId]) {
+      hardAlertTrigger = window.questionHardAlert[questionId].trigger || "";
+      hardAlertTitle = window.questionHardAlert[questionId].title || "";
+    }
+  }
+  if (hardAlertTrigger && hardAlertTitle) {
+    hardAlertHandlerCall = ` handleHardAlert${questionId}(this.checked, this.value, this.getAttribute('data-label'));`;
+    const escapeJsString = (str) => {
+      if (!str) return '';
+      return String(str)
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r')
+        .replace(/\t/g, '\\t');
+    };
+    const escapedTrigger = escapeJsString(hardAlertTrigger);
+    const escapedTitle = escapeJsString(hardAlertTitle);
+    formHTML += `
+      <script>
+        function handleHardAlert${questionId}(checked, value, label) {
+          // Skip hard alerts during Firebase autofill
+          if (typeof window !== 'undefined' && window.isInitialAutofill) {
+            return;
+          }
+          const selectedValue = ((label || value || '') + '').trim();
+          const hardAlertTrigger = '${escapedTrigger}';
+          const hardAlertTitle = '${escapedTitle}';
+          if (checked && selectedValue === hardAlertTrigger) {
+            if (typeof showAlert === 'function') {
+              showAlert(hardAlertTitle, true);
+            } else {
+              alert(hardAlertTitle);
+            }
+          }
+          if (typeof checkAllHardAlertsAndUpdateNavigation === 'function') {
+            checkAllHardAlertsAndUpdateNavigation();
+          }
+        }
+      </script>
+    `;
+  }
+}
 /* Required/optional flag (defaults to required) */
 const requiredSelect = qBlock.querySelector(`[id^="checkboxRequired${questionId}_"]`);
 const isCheckboxRequired = !(requiredSelect && requiredSelect.value === 'optional');
@@ -1918,12 +1974,12 @@ for (let co = 0; co < cOptsDivs.length; co++){
     const inputType = markOnlyOne ? 'radio' : 'checkbox';
     const inputName = markOnlyOne ? qSlug : optionNameId; // Radio buttons share the same name
     const onChangeHandler = markOnlyOne ? 
-      `onchange="handleMarkOnlyOneSelection(this, ${questionId}); ${hasAmount ? `toggleAmountField('${optionNameId}_amount', this.checked);` : ''} updateCheckboxStyle(this);"` :
-      `onchange="${hasAmount ? `toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId});` : `toggleNoneOption(this, ${questionId});`} updateCheckboxStyle(this);"`;
+      `onchange="handleMarkOnlyOneSelection(this, ${questionId}); ${hasAmount ? `toggleAmountField('${optionNameId}_amount', this.checked);` : ''} updateCheckboxStyle(this);${hardAlertHandlerCall}"` :
+      `onchange="${hasAmount ? `toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId});` : `toggleNoneOption(this, ${questionId});`} updateCheckboxStyle(this);${hardAlertHandlerCall}"`;
     formHTML += `
       <span class="checkbox-inline" id="checkbox-container-${optionNameId}">
         <label class="checkbox-label">
-          <input type="${inputType}" id="${optionNameId}" name="${inputName}" value="${optionValue}" 
+          <input type="${inputType}" id="${optionNameId}" name="${inputName}" value="${optionValue}" data-label="${labelText}"
                  ${onChangeHandler}>
           ${labelText}
         </label>
@@ -1956,18 +2012,35 @@ if (noneEl?.checked){
     const noneInputType = markOnlyOne ? 'radio' : 'checkbox';
     const noneInputName = markOnlyOne ? qSlug : noneNameId;
     const noneOnChangeHandler = markOnlyOne ? 
-      `onchange="handleMarkOnlyOneSelection(this, ${questionId}); updateCheckboxStyle(this);"` :
-      `onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);"`;
+      `onchange="handleMarkOnlyOneSelection(this, ${questionId}); updateCheckboxStyle(this);${hardAlertHandlerCall}"` :
+      `onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);${hardAlertHandlerCall}"`;
     formHTML += `
       <span class="checkbox-inline" id="checkbox-container-${noneNameId}">
         <label class="checkbox-label">
-          <input type="${noneInputType}" id="${noneNameId}" name="${noneInputName}" value="${noneStr}" 
+          <input type="${noneInputType}" id="${noneNameId}" name="${noneInputName}" value="${noneStr}" data-label="${noneStr}"
                  ${noneOnChangeHandler}>
           ${noneStr}
         </label>
       </span>`;
 }
 formHTML += `</div><br></div>`;
+/* ── store hard alert data for checkbox question ───────────── */
+if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
+  if (!window.hardAlertData) {
+    window.hardAlertData = {};
+  }
+  window.hardAlertData[questionId] = {
+    enabled: true,
+    trigger: hardAlertTrigger,
+    title: hardAlertTitle,
+    type: 'checkbox',
+    options: cboxOptions.map(opt => ({
+      id: opt.optionNameId,
+      label: opt.labelText,
+      value: opt.optionValue
+    }))
+  };
+}
         // If conditional PDF was enabled
         if (pdfEnabled) {
           for (let ck = 0; ck < cboxOptions.length; ck++) {
@@ -8503,11 +8576,26 @@ function checkAllHardAlertsAndUpdateNavigation() {
         });
     }
 
-    // Check regular dropdown questions for hard alerts
+    // Check regular dropdown and checkbox questions for hard alerts
     if (window.hardAlertData) {
         Object.keys(window.hardAlertData).forEach(questionId => {
             const hardAlertInfo = window.hardAlertData[questionId];
-            if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && hardAlertInfo.dropdownId) {
+            if (!hardAlertInfo || !hardAlertInfo.enabled || !hardAlertInfo.trigger) {
+                return;
+            }
+            if (hardAlertInfo.type === 'checkbox' && Array.isArray(hardAlertInfo.options)) {
+                hardAlertInfo.options.forEach(option => {
+                    const optionEl = document.getElementById(option.id);
+                    if (optionEl && optionEl.checked) {
+                        const trigger = hardAlertInfo.trigger.trim();
+                        const optionLabel = (option.label || '').trim();
+                        const optionValue = (optionEl.value || option.value || '').trim();
+                        if (optionLabel === trigger || optionValue === trigger) {
+                            hasActiveHardAlert = true;
+                        }
+                    }
+                });
+            } else if (hardAlertInfo.dropdownId) {
                 const dropdownEl = document.getElementById(hardAlertInfo.dropdownId);
                 if (dropdownEl) {
                     const selectedValue = (dropdownEl.value || '').trim();
@@ -14165,6 +14253,68 @@ if (typeof handleNext === 'function') {
             });
         }
         // Helper: load answers
+        // Helper function to check if a checkbox would trigger a hard alert
+        function wouldCheckboxTriggerHardAlert(checkboxEl) {
+
+            if (!checkboxEl || !window.hardAlertData) {
+
+                return false;
+            }
+            // Find the question ID by finding which question container this checkbox belongs to
+            let questionId = null;
+            const questionContainer = checkboxEl.closest('[data-question-id]');
+            if (questionContainer) {
+                questionId = questionContainer.getAttribute('data-question-id');
+
+            } else {
+                // Fallback: search through hardAlertData to find matching checkbox
+                const checkboxId = checkboxEl.id;
+                const checkboxLabel = checkboxEl.getAttribute('data-label') || '';
+                const checkboxValue = checkboxEl.value || '';
+                questionId = Object.keys(window.hardAlertData).find(qId => {
+                    const hardAlertInfo = window.hardAlertData[qId];
+                    if (hardAlertInfo && hardAlertInfo.type === 'checkbox' && Array.isArray(hardAlertInfo.options)) {
+                        return hardAlertInfo.options.some(opt => 
+                            opt.id === checkboxId || 
+                            opt.label === checkboxLabel || 
+                            opt.value === checkboxValue
+                        );
+                    }
+                    return false;
+                });
+                if (questionId) {
+
+                }
+            }
+            if (!questionId || !window.hardAlertData[questionId]) {
+
+                return false;
+            }
+            const hardAlertInfo = window.hardAlertData[questionId];
+            if (!hardAlertInfo || !hardAlertInfo.enabled || !hardAlertInfo.trigger || hardAlertInfo.type !== 'checkbox') {
+
+                return false;
+            }
+            // Check if this checkbox's label or value matches the hard alert trigger
+            const checkboxLabel = (checkboxEl.getAttribute('data-label') || '').trim();
+            const checkboxValue = (checkboxEl.value || '').trim();
+            const trigger = (hardAlertInfo.trigger || '').trim();
+            const wouldTrigger = checkboxLabel === trigger || checkboxValue === trigger;
+
+            if (wouldTrigger) {
+
+            }
+            return wouldTrigger;
+        }
+
+        // Helper function to check if a radio button would trigger a hard alert
+        // Radio buttons are used for "mark only one" checkbox questions, so they use the same hard alert data
+        function wouldRadioTriggerHardAlert(radioEl) {
+            console.log('🔍 [HARD ALERT RADIO] Checking radio:', { id: radioEl?.id, name: radioEl?.name, value: radioEl?.value, label: radioEl?.getAttribute('data-label') });
+            // Radio buttons use the same hard alert data structure as checkboxes
+            return wouldCheckboxTriggerHardAlert(radioEl);
+        }
+
         async function loadAnswers() {
 
             if (!isUserLoggedIn || !userId) {
@@ -14266,28 +14416,41 @@ if (typeof handleNext === 'function') {
                             }
                             if (el.type === 'checkbox' || el.type === 'radio') {
                             if (el.type === 'radio') {
-                                // For radio buttons, we need to check if this specific radio button should be selected
-
+                                // For radio buttons, check if it would trigger a hard alert before checking
                                 if (el.value === autofillValue) {
+                                    console.log('📝 [AUTOFILL RADIO] First pass - checking radio:', { id: el.id, name: el.name, value: el.value, autofillValue });
+                                    if (wouldRadioTriggerHardAlert(el)) {
+                                        console.log('🛑 [AUTOFILL RADIO] First pass - SKIPPING radio check (hard alert)');
+                                        el.checked = false;
+                                    } else {
+                                        console.log('✅ [AUTOFILL RADIO] First pass - checking radio (safe)');
+                                        el.checked = true;
+                                        // Dispatch change event to trigger linked textbox creation
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
+                                        // Verify radio is still checked after change event
+                                        setTimeout(() => {
 
-                                    el.checked = true;
-
-                                    // Dispatch change event to trigger linked textbox creation
-
-                                    const changeEvent = new Event('change', { bubbles: true });
-                                    el.dispatchEvent(changeEvent);
-                                    // Verify radio is still checked after change event
-                                    setTimeout(() => {
-
-                                    }, 100);
+                                        }, 100);
+                                    }
                             } else {
-
                                     el.checked = false;
                                 }
                             } else {
-                                // For checkboxes, use the boolean value
+                                // For checkboxes, check if it would trigger a hard alert before checking
                                 const wasChecked = el.checked;
-                                el.checked = !!autofillValue;
+                                if (el.type === 'checkbox') {
+
+                                    if (wouldCheckboxTriggerHardAlert(el)) {
+
+                                        el.checked = false;
+                                    } else {
+
+                                        el.checked = !!autofillValue;
+                                    }
+                                } else {
+                                    el.checked = !!autofillValue;
+                                }
                                 if (el.id && el.id.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
 
                                 }
@@ -14512,11 +14675,25 @@ if (typeof handleNext === 'function') {
                                     return;
                                 }
                                 if (el.type === 'checkbox') {
-                                    el.checked = !!mappedData[el.name];
+                                    // Check if this checkbox would trigger a hard alert before checking
+                                    if (wouldCheckboxTriggerHardAlert(el)) {
+                                        // Skip checking this checkbox - it would trigger a hard alert
+                                        el.checked = false;
+                                    } else {
+                                        // Safe to check the checkbox
+                                        el.checked = !!mappedData[el.name];
+                                    }
                                 } else if (el.type === 'radio') {
-                                    // For radio buttons, only check the one that matches the value
+                                    // For radio buttons, check if it would trigger a hard alert before checking
                                     if (el.value === mappedData[el.name]) {
-                                        el.checked = true;
+                                        console.log('📝 [AUTOFILL RADIO] Second pass - checking radio:', { id: el.id, name: el.name, value: el.value });
+                                        if (wouldRadioTriggerHardAlert(el)) {
+                                            console.log('🛑 [AUTOFILL RADIO] Second pass - SKIPPING radio check (hard alert)');
+                                            el.checked = false;
+                                        } else {
+                                            console.log('✅ [AUTOFILL RADIO] Second pass - checking radio (safe)');
+                                            el.checked = true;
+                                        }
                                     } else {
                                         el.checked = false;
                                     }
@@ -14540,15 +14717,28 @@ if (typeof handleNext === 'function') {
                                 if (needsAutofill) {
                                 if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
                                         if (fieldById.type === 'radio') {
-                                            // For radio buttons, check if this specific radio should be selected
+                                            // For radio buttons, check if it would trigger a hard alert before checking
                                             if (fieldById.value === mappedData[fieldName]) {
-                                                fieldById.checked = true;
+                                                console.log('📝 [AUTOFILL RADIO] Additional pass (by ID) - checking radio:', { id: fieldById.id, name: fieldById.name, fieldName, value: fieldById.value });
+                                                if (wouldRadioTriggerHardAlert(fieldById)) {
+                                                    console.log('🛑 [AUTOFILL RADIO] Additional pass (by ID) - SKIPPING radio check (hard alert)');
+                                                    fieldById.checked = false;
+                                                } else {
+                                                    console.log('✅ [AUTOFILL RADIO] Additional pass (by ID) - checking radio (safe)');
+                                                    fieldById.checked = true;
+                                                }
                                             } else {
                                                 fieldById.checked = false;
                                             }
                                         } else {
-                                            // For checkboxes, use boolean value
-                                    fieldById.checked = !!mappedData[fieldName];
+                                            // For checkboxes, check if it would trigger a hard alert before checking
+                                            if (wouldCheckboxTriggerHardAlert(fieldById)) {
+                                                // Skip checking this checkbox - it would trigger a hard alert
+                                                fieldById.checked = false;
+                                            } else {
+                                                // Safe to check the checkbox
+                                                fieldById.checked = !!mappedData[fieldName];
+                                            }
                                         }
                                 } else {
                                     fieldById.value = mappedData[fieldName];
@@ -14722,19 +14912,37 @@ if (typeof handleNext === 'function') {
                     }
                     if (el.type === 'checkbox' || el.type === 'radio') {
                         if (el.type === 'radio') {
-                            // For radio buttons, we need to check if this specific radio button should be selected
+                            // For radio buttons, check if it would trigger a hard alert before checking
                             if (el.value === autofillValue) {
-                                el.checked = true;
-                                // Dispatch change event to trigger linked textbox creation
-                                const changeEvent = new Event('change', { bubbles: true });
-                                el.dispatchEvent(changeEvent);
+                                console.log('📝 [AUTOFILL RADIO] Second pass (fallback) - checking radio:', { id: el.id, name: el.name, value: el.value, autofillValue });
+                                if (wouldRadioTriggerHardAlert(el)) {
+                                    console.log('🛑 [AUTOFILL RADIO] Second pass (fallback) - SKIPPING radio check (hard alert)');
+                                    el.checked = false;
+                                } else {
+                                    console.log('✅ [AUTOFILL RADIO] Second pass (fallback) - checking radio (safe)');
+                                    el.checked = true;
+                                    // Dispatch change event to trigger linked textbox creation
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    el.dispatchEvent(changeEvent);
+                                }
                             } else {
                                 el.checked = false;
                             }
                         } else {
-                            // For checkboxes, use the boolean value
+                            // For checkboxes, check if it would trigger a hard alert before checking
                             const wasChecked = el.checked;
-                            el.checked = !!autofillValue;
+                            if (el.type === 'checkbox') {
+
+                                if (wouldCheckboxTriggerHardAlert(el)) {
+
+                                    el.checked = false;
+                                } else {
+
+                                    el.checked = !!autofillValue;
+                                }
+                            } else {
+                                el.checked = !!autofillValue;
+                            }
                             // Dispatch change event if checkbox state changed to trigger linked textbox creation
                             if (el.checked !== wasChecked) {
                                 const changeEvent = new Event('change', { bubbles: true });
@@ -14857,7 +15065,14 @@ if (typeof handleNext === 'function') {
                             }
                         }
                     } else if (autofillValue !== null && el.type === 'checkbox' && !el.checked) {
-                        el.checked = !!autofillValue;
+                        // Check if this checkbox would trigger a hard alert before checking
+                        if (wouldCheckboxTriggerHardAlert(el)) {
+                            // Skip checking this checkbox - it would trigger a hard alert
+                            el.checked = false;
+                        } else {
+                            // Safe to check the checkbox
+                            el.checked = !!autofillValue;
+                        }
                     }
                 });
             }, 1000); // Additional 1 second delay for stubborn fields
@@ -15123,11 +15338,25 @@ if (typeof handleNext === 'function') {
                     fields.forEach(el => {
                         if (data.hasOwnProperty(el.name)) {
                             if (el.type === 'checkbox') {
-                                el.checked = !!data[el.name];
+
+                                if (wouldCheckboxTriggerHardAlert(el)) {
+
+                                    el.checked = false;
+                                } else {
+
+                                    el.checked = !!data[el.name];
+                                }
                             } else if (el.type === 'radio') {
-                                // For radio buttons, set the value and check the matching radio button
+                                // For radio buttons, check if it would trigger a hard alert before checking
                                 if (data[el.name] && el.value === data[el.name]) {
-                                    el.checked = true;
+                                    console.log('📝 [AUTOFILL RADIO] localStorage pass - checking radio:', { id: el.id, name: el.name, value: el.value, dataValue: data[el.name] });
+                                    if (wouldRadioTriggerHardAlert(el)) {
+                                        console.log('🛑 [AUTOFILL RADIO] localStorage pass - SKIPPING radio check (hard alert)');
+                                        el.checked = false;
+                                    } else {
+                                        console.log('✅ [AUTOFILL RADIO] localStorage pass - checking radio (safe)');
+                                        el.checked = true;
+                                    }
                             } else {
                                     el.checked = false;
                                 }
@@ -15226,9 +15455,29 @@ if (typeof handleNext === 'function') {
                             allFields.forEach(el => {
                                 if (data.hasOwnProperty(el.name)) {
 
-                                    if (el.type === 'checkbox' || el.type === 'radio') {
-                                        el.checked = !!data[el.name];
+                                    if (el.type === 'checkbox') {
 
+                                        if (wouldCheckboxTriggerHardAlert(el)) {
+
+                                            el.checked = false;
+                                        } else {
+
+                                            el.checked = !!data[el.name];
+                                        }
+                                    } else if (el.type === 'radio') {
+                                        // For radio buttons, check if it would trigger a hard alert before checking
+                                        if (data[el.name] && el.value === data[el.name]) {
+                                            console.log('📝 [AUTOFILL RADIO] Additional pass 1 - checking radio:', { id: el.id, name: el.name, value: el.value, dataValue: data[el.name] });
+                                            if (wouldRadioTriggerHardAlert(el)) {
+                                                console.log('🛑 [AUTOFILL RADIO] Additional pass 1 - SKIPPING radio check (hard alert)');
+                                                el.checked = false;
+                                            } else {
+                                                console.log('✅ [AUTOFILL RADIO] Additional pass 1 - checking radio (safe)');
+                                                el.checked = true;
+                                            }
+                                        } else {
+                                            el.checked = false;
+                                        }
                                     } else {
                                         // Skip current_date field and any field marked as protected - they should be set dynamically
                                         if (el.id !== 'current_date' && el.name !== 'current_date' && !el.hasAttribute('data-protected')) {
@@ -15244,9 +15493,29 @@ if (typeof handleNext === 'function') {
                                 const fieldById = fieldsById[fieldName];
                                 if (fieldById && !fieldById.value && data[fieldName]) {
 
-                                    if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
-                                        fieldById.checked = !!data[fieldName];
+                                    if (fieldById.type === 'checkbox') {
 
+                                        if (wouldCheckboxTriggerHardAlert(fieldById)) {
+
+                                            fieldById.checked = false;
+                                        } else {
+
+                                            fieldById.checked = !!data[fieldName];
+                                        }
+                                    } else if (fieldById.type === 'radio') {
+                                        // For radio buttons, check if it would trigger a hard alert before checking
+                                        if (data[fieldName] && fieldById.value === data[fieldName]) {
+                                            console.log('📝 [AUTOFILL RADIO] Additional pass 2 (by ID) - checking radio:', { id: fieldById.id, name: fieldById.name, fieldName, value: fieldById.value, dataValue: data[fieldName] });
+                                            if (wouldRadioTriggerHardAlert(fieldById)) {
+                                                console.log('🛑 [AUTOFILL RADIO] Additional pass 2 (by ID) - SKIPPING radio check (hard alert)');
+                                                fieldById.checked = false;
+                                            } else {
+                                                console.log('✅ [AUTOFILL RADIO] Additional pass 2 (by ID) - checking radio (safe)');
+                                                fieldById.checked = true;
+                                            }
+                                        } else {
+                                            fieldById.checked = false;
+                                        }
                                     } else {
                                         fieldById.value = data[fieldName];
 
@@ -15301,19 +15570,37 @@ if (typeof handleNext === 'function') {
                                 }
                                 if (el.type === 'checkbox' || el.type === 'radio') {
                                     if (el.type === 'radio') {
-                                        // For radio buttons, we need to check if this specific radio button should be selected
+                                        // For radio buttons, check if it would trigger a hard alert before checking
                                         if (el.value === autofillValue) {
-                                            el.checked = true;
-                                            // Dispatch change event to trigger linked textbox creation
-                                            const changeEvent = new Event('change', { bubbles: true });
-                                            el.dispatchEvent(changeEvent);
+                                            console.log('📝 [AUTOFILL RADIO] Additional pass 3 - checking radio:', { id: el.id, name: el.name, value: el.value, autofillValue });
+                                            if (wouldRadioTriggerHardAlert(el)) {
+                                                console.log('🛑 [AUTOFILL RADIO] Additional pass 3 - SKIPPING radio check (hard alert)');
+                                                el.checked = false;
+                                            } else {
+                                                console.log('✅ [AUTOFILL RADIO] Additional pass 3 - checking radio (safe)');
+                                                el.checked = true;
+                                                // Dispatch change event to trigger linked textbox creation
+                                                const changeEvent = new Event('change', { bubbles: true });
+                                                el.dispatchEvent(changeEvent);
+                                            }
                                         } else {
                                             el.checked = false;
                                         }
                                     } else {
-                                        // For checkboxes, use the boolean value
+                                        // For checkboxes, check if it would trigger a hard alert before checking
                                         const wasChecked = el.checked;
-                                        el.checked = !!autofillValue;
+                                        if (el.type === 'checkbox') {
+
+                                            if (wouldCheckboxTriggerHardAlert(el)) {
+
+                                                el.checked = false;
+                                            } else {
+
+                                                el.checked = !!autofillValue;
+                                            }
+                                        } else {
+                                            el.checked = !!autofillValue;
+                                        }
                                         // Dispatch change event if checkbox state changed to trigger linked textbox creation
                                         if (el.checked !== wasChecked) {
                                             const changeEvent = new Event('change', { bubbles: true });
@@ -15402,11 +15689,18 @@ if (typeof handleNext === 'function') {
                                         el.dispatchEvent(changeEvent);
                                     }
                                 } else if (autofillValue !== null && el.type === 'checkbox' && !el.checked) {
-                                    el.checked = !!autofillValue;
-                                    // Dispatch change event to trigger linked textbox creation
-                                    if (el.checked) {
-                                        const changeEvent = new Event('change', { bubbles: true });
-                                        el.dispatchEvent(changeEvent);
+                                    // Check if this checkbox would trigger a hard alert before checking
+                                    if (wouldCheckboxTriggerHardAlert(el)) {
+                                        // Skip checking this checkbox - it would trigger a hard alert
+                                        el.checked = false;
+                                    } else {
+                                        // Safe to check the checkbox
+                                        el.checked = !!autofillValue;
+                                        // Dispatch change event to trigger linked textbox creation
+                                        if (el.checked) {
+                                            const changeEvent = new Event('change', { bubbles: true });
+                                            el.dispatchEvent(changeEvent);
+                                        }
                                     }
                                 }
                             });

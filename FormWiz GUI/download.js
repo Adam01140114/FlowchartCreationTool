@@ -330,6 +330,15 @@ function loadFormData(formData) {
                                 <hr>
                             `;
                             checkboxOptionsDiv.appendChild(optionDiv);
+                            // Add event listeners to option text inputs to update hard alert trigger dropdown
+                            const optionTextInput = optionDiv.querySelector(`#checkboxOptionText${question.questionId}_${idx + 1}`);
+                            if (optionTextInput) {
+                                optionTextInput.addEventListener('input', () => {
+                                    if (typeof updateHardAlertTriggerOptions === 'function') {
+                                        updateHardAlertTriggerOptions(question.questionId);
+                                    }
+                                });
+                            }
                         });
                         // Restore required/optional select (defaults to required)
                         const requiredSelect = questionBlock.querySelector(`[id^="checkboxRequired${question.questionId}_"]`);
@@ -427,6 +436,39 @@ function loadFormData(formData) {
                         }
                         // Update conditional PDF answers for checkbox
                         updateConditionalPDFAnswersForCheckbox(question.questionId);
+                        // ********** Restore Hard Alert Data for Checkbox **********
+                        if (question.hardAlert && question.hardAlert.enabled) {
+                            setTimeout(() => {
+                                const hardAlertCheckbox = questionBlock.querySelector(`#enableHardAlert${question.questionId}`);
+                                const hardAlertTriggerSelect = questionBlock.querySelector(`#hardAlertTrigger${question.questionId}`);
+                                const hardAlertTitleInput = questionBlock.querySelector(`#hardAlertTitle${question.questionId}`);
+                                if (hardAlertCheckbox) {
+                                    hardAlertCheckbox.checked = true;
+                                    toggleHardAlert(question.questionId); // This populates the trigger dropdown with options from DOM
+                                    // Set the trigger value after the dropdown is populated
+                                    setTimeout(() => {
+                                        if (hardAlertTriggerSelect && question.hardAlert.trigger) {
+                                            hardAlertTriggerSelect.value = question.hardAlert.trigger;
+                                            hardAlertTriggerSelect.dispatchEvent(new Event('change'));
+                                        }
+                                        if (hardAlertTitleInput && question.hardAlert.title) {
+                                            hardAlertTitleInput.value = question.hardAlert.title;
+                                            hardAlertTitleInput.dispatchEvent(new Event('blur'));
+                                        }
+                                    }, 100);
+                                }
+                                
+                                // Also restore to window.questionHardAlert
+                                if (!window.questionHardAlert) {
+                                    window.questionHardAlert = {};
+                                }
+                                window.questionHardAlert[question.questionId] = {
+                                    enabled: true,
+                                    trigger: question.hardAlert.trigger || '',
+                                    title: question.hardAlert.title || ''
+                                };
+                            }, 250);
+                        }
                     }
                 }
                 else if (question.type === 'dropdown') {

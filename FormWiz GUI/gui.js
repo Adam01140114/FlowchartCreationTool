@@ -2432,6 +2432,10 @@ function addCheckboxOption(questionId) {
             if (typeof updateAllCalculationDropdowns === 'function') {
                 setTimeout(updateAllCalculationDropdowns, 100);
             }
+            // Update hard alert trigger options
+            if (typeof updateHardAlertTriggerOptions === 'function') {
+                updateHardAlertTriggerOptions(questionId);
+            }
         });
     }
     // 2. For amount name changes
@@ -2483,6 +2487,10 @@ function removeCheckboxOption(questionId, optionNumber) {
     updateJumpOptionsForCheckbox(questionId);
     // Update all checklist logic dropdowns
     updateAllChecklistLogicDropdowns();
+    // Update hard alert trigger options
+    if (typeof updateHardAlertTriggerOptions === 'function') {
+        updateHardAlertTriggerOptions(questionId);
+    }
 }
 function addTextboxAmount(questionId) {
     const unifiedDiv = getUnifiedContainer(questionId);
@@ -4997,22 +5005,54 @@ function updateHardAlertTriggerOptions(questionId) {
     // Clear existing options (except the placeholder)
     triggerSelect.innerHTML = '<option value="">Select an option...</option>';
     
-    // Get all dropdown options for this question
-    const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
-    if (dropdownOptionsDiv) {
-        const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
-        optionInputs.forEach((input) => {
-            const optionText = input.value.trim();
-            if (optionText) {
-                const option = document.createElement('option');
-                option.value = optionText;
-                option.textContent = optionText;
-                if (optionText === currentValue) {
-                    option.selected = true;
+    const questionTypeSelect = document.getElementById(`questionType${questionId}`);
+    const questionType = questionTypeSelect ? questionTypeSelect.value : 'dropdown';
+    
+    if (questionType === 'checkbox') {
+        const checkboxOptionsDiv = document.getElementById(`checkboxOptions${questionId}`);
+        if (checkboxOptionsDiv) {
+            const optionInputs = checkboxOptionsDiv.querySelectorAll(`input[id^="checkboxOptionText${questionId}_"]`);
+            optionInputs.forEach((input) => {
+                const optionText = input.value.trim();
+                if (optionText) {
+                    const option = document.createElement('option');
+                    option.value = optionText;
+                    option.textContent = optionText;
+                    if (optionText === currentValue) {
+                        option.selected = true;
+                    }
+                    triggerSelect.appendChild(option);
                 }
-                triggerSelect.appendChild(option);
+            });
+        }
+        const noneOfTheAboveCheckbox = document.getElementById(`noneOfTheAbove${questionId}`);
+        if (noneOfTheAboveCheckbox && noneOfTheAboveCheckbox.checked) {
+            const option = document.createElement('option');
+            option.value = 'None of the above';
+            option.textContent = 'None of the above';
+            if (currentValue === 'None of the above') {
+                option.selected = true;
             }
-        });
+            triggerSelect.appendChild(option);
+        }
+    } else {
+        // Get all dropdown options for this question
+        const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
+        if (dropdownOptionsDiv) {
+            const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
+            optionInputs.forEach((input) => {
+                const optionText = input.value.trim();
+                if (optionText) {
+                    const option = document.createElement('option');
+                    option.value = optionText;
+                    option.textContent = optionText;
+                    if (optionText === currentValue) {
+                        option.selected = true;
+                    }
+                    triggerSelect.appendChild(option);
+                }
+            });
+        }
     }
     
     // Add change handler to save trigger value
