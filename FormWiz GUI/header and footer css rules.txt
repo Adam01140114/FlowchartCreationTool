@@ -1,0 +1,1937 @@
+# Header and Footer CSS Rules Documentation
+# Complete implementation guide for desktop and mobile responsive header/footer
+
+## OVERVIEW
+This document describes the exact CSS rules and HTML structure for implementing a responsive header and footer with:
+- Desktop: Horizontal navigation menu with dropdowns
+- Mobile: Hamburger menu with slide-out navigation
+- Footer: Three-column layout (desktop) / Two-column layout (mobile)
+
+---
+
+## HTML STRUCTURE
+
+### HEADER STRUCTURE
+
+```html
+<header>
+    <!-- Mobile hamburger menu button -->
+    <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <!-- Logo -->
+    <img src="Images/logo.png" alt="Form-Star Logo" width="130" height="80" onclick="location.href='/index.html';">
+    
+    <!-- Desktop Navigation -->
+    <nav class="desktop-nav">
+        <a href="/index.html">Home
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">
+            <a href="#" id="forms-nav-link">Forms
+                <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <div class="dropdown-menu" id="forms-dropdown-menu">
+                <a href="Pages/forms.html">My Forms</a>
+                <a href="Pages/FreeForm.html">Free Form</a>
+                <a href="Pages/Immigration.html">Immigration</a>
+                <a href="Pages/smallclaims.html">Small Claims</a>
+                <a href="Pages/Other.html">Other</a>
+            </div>
+        </div>
+        <a href="Pages/about.html">About Us
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a href="Pages/contact.html">Contact Us
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a href="Pages/FAQ.html">FAQ
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+    </nav>
+    
+    <!-- Mobile Navigation Menu -->
+    <nav class="mobile-nav" id="mobile-nav">
+        <a href="/index.html">Home</a>
+        <div class="mobile-nav-section">
+            <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+            <div class="mobile-nav-submenu" id="mobile-forms-menu">
+                <a href="Pages/forms.html">My Forms</a>
+                <a href="Pages/FreeForm.html">Free Form</a>
+                <a href="Pages/Immigration.html">Immigration</a>
+                <a href="Pages/smallclaims.html">Small Claims</a>
+                <a href="Pages/Other.html">Other</a>
+            </div>
+        </div>
+        <a href="Pages/about.html">About Us</a>
+        <a href="Pages/contact.html">Contact Us</a>
+        <a href="Pages/FAQ.html">FAQ</a>
+        <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+            <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+        </div>
+    </nav>
+    
+    <!-- Header Actions (Sign In Button and Cart) -->
+    <div class="header-actions">
+        <a href="Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+        <a href="#" id="cart-icon-link" style="display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+            <span class="cart-circle">
+                <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="10" cy="21" r="1.5"/>
+                    <circle cx="18" cy="21" r="1.5"/>
+                    <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
+                </svg>
+                <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+            </span>
+        </a>
+    </div>
+</header>
+```
+
+### FOOTER STRUCTURE
+
+```html
+<!-- Professional Footer Section -->
+<div class="pro-footer">
+    <div class="pro-footer-col address-col">
+        <div class="pro-footer-logo">
+            <img src="Images/logo.png" alt="Form-Star Logo" style="max-width:120px;max-height:80px;">
+        </div>
+        <div class="pro-footer-title">Form-Star</div>
+        <div class="pro-footer-contact">
+            <a href="tel:18008508370">1-800-850-8370</a> &nbsp; 
+            <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
+        </div>
+    </div>
+    <div class="pro-footer-col nav-col">
+        <div class="pro-footer-title">Navigation</div>
+        <a href="/index.html">Home</a>
+        <a href="Pages/FreeForm.html">Forms</a>
+        <a href="Pages/FAQ.html">FAQ</a>
+        <a href="Pages/about.html">About Us</a>
+        <a href="Pages/contact.html">Contact Us</a>
+    </div>
+    <div class="pro-footer-col company-col">
+        <div class="pro-footer-title company-title">About Form-Star</div>
+        <div class="pro-footer-desc">Form-Star consists of a group of proven professionals with over 70 years of combined legal, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify paperwork for everyone.</div>
+    </div>
+</div>
+
+<footer>
+    &copy; 2024 Form-Star. All rights reserved.
+</footer>
+```
+
+---
+
+## CSS RULES
+
+### BASE STYLES (APPLIES TO ALL SCREEN SIZES)
+
+#### Header Base Styles
+
+```css
+header {
+    background-color: #2c3e50;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+header img {
+    cursor: pointer;
+}
+```
+
+#### Desktop Navigation Base Styles
+
+```css
+nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 38px;
+    z-index: 2;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.18em;
+    letter-spacing: 0.02em;
+    padding: 2px 8px;
+    transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+}
+
+nav a:hover {
+    color: #ff7043;
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+}
+```
+
+#### Navigation Chevron (SVG Icons)
+
+```css
+.nav-chevron {
+    display: inline-block;
+    margin-left: 6px;
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+}
+
+.nav-chevron svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+```
+
+#### Header Actions (Sign In Button and Cart)
+
+```css
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-left: auto;
+}
+
+.sign-in-btn {
+    background: #fff;
+    color: #222;
+    font-weight: 700;
+    font-size: 1.08em;
+    border: none;
+    border-radius: 22px;
+    padding: 8px 28px;
+    margin-left: 18px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    outline: none;
+}
+
+.sign-in-btn:hover {
+    background: #f4f4f4;
+    color: #2980b9;
+    box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+}
+```
+
+#### Cart Icon Styles
+
+```css
+#cart-icon-link .cart-circle {
+    width: 54px !important;
+    height: 54px !important;
+    background: #2980b9;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+#cart-icon {
+    width: 32px !important;
+    height: 32px !important;
+    display: block;
+}
+```
+
+#### Desktop Dropdown Menu
+
+```css
+.nav-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 38px;
+    background: #fff;
+    min-width: 210px;
+    box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+    border-radius: 10px;
+    z-index: 10;
+    padding: 12px 0;
+    flex-direction: column;
+    gap: 0;
+}
+
+.dropdown-menu a {
+    color: #222;
+    padding: 12px 28px;
+    text-decoration: none;
+    display: block;
+    font-weight: 600;
+    font-size: 1.08em;
+    border-radius: 0;
+    transition: background 0.18s, color 0.18s;
+}
+
+.dropdown-menu a:hover {
+    background: #eaf1f8;
+    color: #2980b9;
+}
+
+.nav-dropdown-wrapper.open .dropdown-menu {
+    display: flex;
+    animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes dropdownFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.forms-chevron {
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+
+.nav-dropdown-wrapper.open .forms-chevron {
+    transform: rotate(-90deg);
+}
+```
+
+#### Desktop Navigation Visibility
+
+```css
+.desktop-nav {
+    display: flex;
+}
+```
+
+---
+
+### MOBILE STYLES
+
+#### Mobile Menu Toggle (Hamburger Button)
+
+```css
+.mobile-menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.mobile-menu-toggle span {
+    width: 25px;
+    height: 3px;
+    background: #fff;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    transform-origin: 1px;
+}
+
+.mobile-menu-toggle.active span:first-child {
+    transform: rotate(45deg);
+}
+
+.mobile-menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-toggle.active span:last-child {
+    transform: rotate(-45deg);
+}
+```
+
+#### Mobile Navigation Menu
+
+```css
+.mobile-nav {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 85%;
+    max-width: 300px;
+    height: 100vh;
+    background: #2c3e50;
+    flex-direction: column;
+    padding: 140px 20px 20px 20px;  /* Top padding: 140px (not 100px) for proper alignment */
+    transition: left 0.3s ease;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mobile-nav.active {
+    left: 0;  /* Flush with left edge (NOT left: 150px) */
+    display: flex;  /* Ensure menu displays when active */
+}
+
+.mobile-nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 0 12px 25px;
+    border-bottom: 1px solid #34495e;
+    font-size: 1.1em;
+    font-weight: 600;
+    line-height: 1.1;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    margin-top: 0;  /* No negative margin (was margin-top: -20px) */
+}
+
+.mobile-nav-section {
+    border-bottom: 1px solid #34495e;
+}
+
+.mobile-nav-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 0 12px 25px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mobile-nav-submenu {
+    display: none;
+    padding-left: 20px;
+}
+
+.mobile-nav-submenu.active {
+    display: block;
+}
+
+.mobile-nav-submenu a {
+    padding: 10px 0 10px 45px;
+    font-size: 1em;
+    border-bottom: 1px solid #34495e;
+    line-height: 1.1;
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+}
+
+.mobile-nav-logout,
+.mobile-nav-logout a,
+#mobile-logout-btn {
+    color: #ff7043 !important;
+    font-weight: 700 !important;
+}
+
+.mobile-nav-toggle span {
+    transition: transform 0.3s ease;
+}
+
+.mobile-nav-toggle.active span {
+    transform: rotate(180deg);
+}
+```
+
+#### Mobile Overlay (for menu backdrop)
+
+```css
+.mobile-nav-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.mobile-nav-overlay.active {
+    display: block;
+}
+```
+
+---
+
+### MOBILE RESPONSIVE BREAKPOINT (@media max-width: 768px)
+
+```css
+@media (max-width: 768px) {
+    /* Show mobile menu toggle */
+    .mobile-menu-toggle {
+        display: flex;
+    }
+    
+    /* Hide desktop nav */
+    .desktop-nav {
+        display: none !important;
+    }
+    
+    /* Show mobile nav structure */
+    .mobile-nav {
+        display: flex;
+    }
+    
+    /* Typography adjustments */
+    html {
+        font-size: 14px;
+    }
+    
+    body {
+        overflow-x: hidden;
+    }
+    
+    /* Header mobile optimization */
+    header {
+        padding: 16px 15px;
+        min-height: 80px;
+        flex-wrap: wrap;
+        gap: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        position: relative;
+    }
+    
+    header img {
+        width: 119px;
+        height: 73px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    /* Header actions mobile */
+    .header-actions {
+        gap: 10px;
+        margin-left: auto;
+        margin-right: 15px;
+    }
+    
+    .sign-in-btn {
+        font-size: 0.9em;
+        padding: 6px 20px;
+        margin-left: 0;
+    }
+    
+    #cart-icon-link .cart-circle {
+        width: 55px !important;
+        height: 55px !important;
+    }
+    
+    #cart-icon {
+        width: 30px !important;
+        height: 30px !important;
+    }
+    
+    /* Footer mobile - hide navigation column */
+    .pro-footer-col.nav-col {
+        display: none !important;
+    }
+    
+    /* Footer mobile - match homepage layout (two columns side-by-side) */
+    .pro-footer {
+        gap: 20px !important;
+        padding: 30px 20px 15px 20px !important;
+        flex-direction: row !important;  /* CRITICAL: Keep columns side-by-side, not stacked */
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+    
+    /* Reset column constraints for mobile */
+    .pro-footer-col {
+        min-width: unset !important;
+        max-width: unset !important;
+        padding: 0 !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+    
+    /* Address column - remove right padding and border */
+    .pro-footer-col.address-col {
+        padding-right: 0 !important;
+        border-right: 1.5px solid #2c7a7d !important;  /* Keep border between columns */
+    }
+    
+    /* Company column - add left padding for spacing */
+    .pro-footer-col.company-col {
+        padding-left: 20px !important;
+        border-right: none !important;  /* Remove border on last column */
+    }
+    
+    /* Contact info - stack vertically */
+    .pro-footer-contact {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    
+    /* Contact links - remove horizontal margin */
+    .pro-footer-contact a {
+        margin-right: 0 !important;
+    }
+    
+    /* Footer copyright - consistent padding */
+    footer {
+        padding: 20px !important;
+        padding-bottom: 20px !important;
+        margin-bottom: 0 !important;
+    }
+    
+    /* Prevent white space below footer */
+    html, body {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    
+    .pro-footer, footer {
+        margin-bottom: 0 !important;
+    }
+}
+```
+
+---
+
+### FOOTER BASE STYLES (DESKTOP)
+
+```css
+.pro-footer {
+    background: #2c3e50;
+    color: #f3f7f8;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 60px;
+    padding: 48px 10vw 20px 10vw;
+    border-top: 2px solid #2c3e50;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.18em;
+    margin-top: 0;
+}
+
+.pro-footer-col {
+    flex: 1 1 320px;
+    min-width: 220px;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.address-col {
+    border-right: 1.5px solid #2c7a7d;
+    padding-right: 48px;
+    align-items: flex-start;
+}
+
+.nav-col {
+    align-items: flex-start;
+    padding-left: 32px;
+    padding-right: 32px;
+    border-right: 1.5px solid #2c7a7d;
+}
+
+.company-col {
+    align-items: flex-start;
+    padding-left: 48px;
+}
+
+.pro-footer-title {
+    font-weight: 700;
+    font-size: 1.25em;
+    margin-bottom: 6px;
+    color: #fff;
+    letter-spacing: 0.02em;
+}
+
+.company-title {
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+.pro-footer-contact a {
+    color: #b6e2e6;
+    text-decoration: underline;
+    font-weight: 500;
+    margin-right: 18px;
+    transition: color 0.2s;
+}
+
+.pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
+    color: #ff7043;
+}
+
+.pro-footer-logo {
+    margin-bottom: 8px;
+}
+
+.pro-footer-desc {
+    color: #e0e6ea;
+    font-size: 1em;
+    margin-top: 0;
+    line-height: 1.5;
+}
+
+.pro-footer-col.nav-col a {
+    color: #b6e2e6;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 6px;
+    transition: color 0.2s;
+    font-size: 1em;
+}
+
+.pro-footer-col.nav-col a:not(:last-child) {
+    margin-bottom: 8px;
+}
+
+.pro-footer, footer {
+    flex-shrink: 0;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #374656;
+    color: white;
+}
+```
+
+---
+
+### TOUCH-FRIENDLY IMPROVEMENTS
+
+```css
+@media (hover: none) and (pointer: coarse) {
+    nav a {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .sign-in-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+```
+
+---
+
+## JAVASCRIPT FUNCTIONALITY REQUIREMENTS
+
+### Desktop Dropdown Menu Toggle
+
+```javascript
+const formsWrapper = document.getElementById('forms-dropdown-wrapper');
+const formsLink = document.getElementById('forms-nav-link');
+const dropdownMenu = document.getElementById('forms-dropdown-menu');
+let dropdownOpen = false;
+
+function openDropdown() {
+    formsWrapper.classList.add('open');
+    dropdownOpen = true;
+}
+
+function closeDropdown() {
+    formsWrapper.classList.remove('open');
+    dropdownOpen = false;
+}
+
+formsLink.addEventListener('click', function(e) {
+    e.preventDefault();
+    dropdownOpen ? closeDropdown() : openDropdown();
+});
+
+document.addEventListener('mousedown', function(e) {
+    if (!formsWrapper.contains(e.target)) {
+        closeDropdown();
+    }
+});
+
+formsLink.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        dropdownOpen ? closeDropdown() : openDropdown();
+    }
+});
+```
+
+### Mobile Menu Toggle
+
+```javascript
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+const mobileNav = document.getElementById('mobile-nav');
+const mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+const mobileFormsMenu = document.getElementById('mobile-forms-menu');
+const mobileAuthSection = document.getElementById('mobile-auth-section');
+const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+const body = document.body;
+
+function toggleMobileMenu() {
+    if (mobileMenuToggle && mobileNav) {
+        mobileMenuToggle.classList.toggle('active');
+        mobileNav.classList.toggle('active');
+        body.classList.toggle('menu-open');
+    }
+}
+
+function closeMobileMenu() {
+    if (mobileMenuToggle && mobileNav) {
+        mobileMenuToggle.classList.remove('active');
+        mobileNav.classList.remove('active');
+        body.classList.remove('menu-open');
+    }
+}
+
+// Toggle mobile menu
+if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleMobileMenu();
+    });
+}
+
+// Toggle mobile forms submenu
+if (mobileFormsToggle && mobileFormsMenu) {
+    mobileFormsToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        mobileFormsToggle.classList.toggle('active');
+        mobileFormsMenu.classList.toggle('active');
+    });
+}
+
+// Close mobile menu when clicking on links
+if (mobileNav) {
+    mobileNav.addEventListener('click', function(e) {
+        if (e.target.tagName === 'A' && !e.target.classList.contains('mobile-nav-toggle')) {
+            closeMobileMenu();
+        }
+    });
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', function(e) {
+    if (mobileNav && mobileMenuToggle && !mobileNav.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+        closeMobileMenu();
+    }
+});
+
+// Close mobile menu on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && mobileNav && mobileNav.classList.contains('active')) {
+        closeMobileMenu();
+    }
+});
+
+// Show/hide mobile logout button based on auth state
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        // User is signed in - show mobile logout button
+        if (mobileAuthSection) {
+            mobileAuthSection.style.display = 'block';
+        }
+    } else {
+        // User is signed out - hide mobile logout button
+        if (mobileAuthSection) {
+            mobileAuthSection.style.display = 'none';
+        }
+    }
+});
+
+// Handle mobile logout button click
+if (mobileLogoutBtn) {
+    mobileLogoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        auth.signOut().then(() => {
+            window.location.reload();
+        }).catch((error) => {
+            alert('Sign Out Error: ' + error.message);
+        });
+    });
+}
+```
+
+### Body Scroll Prevention When Menu Open
+
+```javascript
+const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.attributeName === 'class') {
+            if (body.classList.contains('menu-open')) {
+                body.style.overflow = 'hidden';
+            } else {
+                body.style.overflow = '';
+            }
+        }
+    });
+});
+observer.observe(body, { attributes: true });
+```
+
+---
+
+## KEY DESIGN SPECIFICATIONS
+
+### Colors
+- Header Background: `#2c3e50` (dark blue-gray)
+- Header Text: `#fff` (white)
+- Header Hover Accent: `#ff7043` (orange)
+- Footer Background: `#2c3e50` (matches header)
+- Footer Text: `#f3f7f8` (light gray-white)
+- Footer Links: `#b6e2e6` (light teal)
+- Footer Link Hover: `#ff7043` (orange)
+- Footer Border: `#2c7a7d` (teal)
+
+### Typography
+- Font Family: 'Montserrat', sans-serif
+- Nav Link Size (Desktop): `1.18em`
+- Nav Link Weight: `700` (bold)
+- Footer Title Size: `1.25em`
+- Footer Text Size: `1em`
+- Mobile Base Font: `14px` (on html element)
+
+### Spacing
+- Header Padding (Desktop): `20px`
+- Header Padding (Mobile): `16px 15px`
+- Nav Gap (Desktop): `38px`
+- Footer Gap (Desktop): `60px`
+- Footer Gap (Mobile): `20px`
+- Footer Padding (Desktop): `48px 10vw 20px 10vw`
+- Footer Padding (Mobile): `30px 20px 15px 20px`
+
+### Breakpoints
+- Mobile: `max-width: 768px`
+- Small Mobile: `max-width: 480px`
+- Tablet: `min-width: 769px and max-width: 1024px`
+
+### Z-Index Layers
+- Mobile Menu Overlay: `999`
+- Mobile Navigation: `1000`
+- Mobile Menu Toggle: `1001`
+- Desktop Nav: `2`
+- Dropdown Menu: `10`
+
+---
+
+## IMPLEMENTATION CHECKLIST
+
+When implementing this header/footer system:
+
+1. ✅ Copy all HTML structure exactly as shown
+2. ✅ Include all CSS rules in the exact order specified
+3. ✅ Ensure mobile menu toggle spans are exactly 3 `<span>` elements
+4. ✅ Include SVG chevron icons in navigation links
+5. ✅ Set up JavaScript event listeners for dropdowns and mobile menu
+6. ✅ **If using external CSS files: Add `!important` to all footer styles**
+7. ✅ **Set `html { font-size: 14px !important; }` in mobile breakpoint**
+8. ✅ **Hide desktop logout button on mobile: `#logout-btn { display: none !important; }`**
+9. ✅ **Override any external `@media (max-width: 900px)` breakpoints**
+10. ✅ **Ensure no white space below footer - remove body/html bottom padding/margin on mobile**
+11. ✅ **Set main content area to `flex: 1 0 auto` if using flexbox layout**
+12. ✅ Test responsive breakpoint at 768px width
+13. ✅ Verify hamburger menu animation (X formation when active)
+14. ✅ Ensure mobile nav slides from left with proper z-index
+15. ✅ **Verify footer columns display side-by-side on mobile (NOT stacked) - use `flex-direction: row !important`**
+16. ✅ Test dropdown menu appears on hover/click (desktop)
+17. ✅ Verify body scroll is disabled when mobile menu is open
+18. ✅ Check that mobile menu closes when clicking outside or on link
+19. ✅ Ensure footer contact info stacks vertically on mobile (phone above email)
+20. ✅ Verify navigation column is hidden on mobile footer
+21. ✅ **Check footer text size matches index.html on mobile (should be smaller due to 14px base font)**
+22. ✅ **Verify no white space appears below copyright notice on mobile**
+23. ✅ **Ensure `.pro-footer` uses `flex-direction: row !important` on mobile (not column)**
+24. ✅ **Verify address and company columns have proper spacing and borders on mobile**
+
+---
+
+## NOTES FOR IMPLEMENTATION
+
+1. **Logo Path**: Update logo `src` attribute to match your file structure
+2. **Link Paths**: Update all `href` attributes to match your site structure
+3. **Font Loading**: Ensure Montserrat font is loaded via Google Fonts or CDN
+4. **SVG Icons**: The chevron SVG must be included exactly as shown for proper styling
+5. **Mobile Menu Animation**: The `.mobile-nav.active` should use `left: 0` to slide flush with the left edge (NOT `left: 150px` which creates a gap). The menu slides from `left: -100%` (off-screen) to `left: 0` (flush with edge).
+6. **Cart Functionality**: Cart icon and badge are included in HTML but require separate cart.js functionality
+7. **Authentication**: Sign-in button and mobile logout require separate auth functionality
+8. **Footer Content**: Update footer text content to match your site information
+9. **Mobile Footer Layout**: On mobile, the footer should display TWO columns side-by-side (address + company), NOT stacked vertically. Use `flex-direction: row !important` in the mobile media query. The navigation column is hidden with `display: none !important`.
+
+---
+
+## CRITICAL: IMPLEMENTING WITH EXTERNAL CSS FILES
+
+**If your page uses external CSS files (like `generate.css`, `generate2.css`, etc.) that have conflicting footer/header styles, you MUST use `!important` flags extensively.**
+
+### Required Overrides for External CSS Conflicts
+
+1. **All Footer CSS Must Use !important**: When external CSS files define `.pro-footer` styles, add `!important` to ALL footer-related CSS rules to override them:
+   ```css
+   .pro-footer {
+       background: #2c3e50 !important;
+       padding: 48px 10vw 20px 10vw !important;
+       flex-direction: row !important;
+       /* ... all properties need !important */
+   }
+   ```
+
+2. **Override External @media Queries**: External CSS might have `@media (max-width: 900px)` that changes footer layout. You must override this:
+   ```css
+   @media (max-width: 900px) and (min-width: 769px) {
+       .pro-footer {
+           flex-direction: row !important;
+           gap: 60px !important;
+           padding: 48px 10vw 20px 10vw !important;
+       }
+       .address-col, .company-col, .nav-col {
+           border-right: 1.5px solid #2c7a7d !important;
+           /* ... preserve desktop layout */
+       }
+   }
+   ```
+
+3. **Mobile Base Font Size**: **CRITICAL** - You must set `html { font-size: 14px !important; }` on mobile to match text sizing:
+   ```css
+   @media (max-width: 768px) {
+       html {
+           font-size: 14px !important;
+       }
+       /* ... rest of mobile styles */
+   }
+   ```
+   Without this, footer text will appear much larger on mobile because `em` units will be based on the default 16px instead of 14px.
+
+4. **Hide Logout Button on Mobile**: Desktop logout button should be hidden on mobile:
+   ```css
+   @media (max-width: 768px) {
+       #logout-btn {
+           display: none !important;
+       }
+   }
+   ```
+   Users access logout through the mobile menu instead.
+
+5. **Prevent White Space Under Footer**: Ensure no extra spacing below footer:
+   ```css
+   @media (max-width: 768px) {
+       html, body {
+           margin-bottom: 0 !important;
+           padding-bottom: 0 !important;
+       }
+       
+       footer {
+           padding: 20px !important;
+           padding-bottom: 20px !important;
+           margin-bottom: 0 !important;
+       }
+       
+       .pro-footer, footer {
+           margin-bottom: 0 !important;
+       }
+   }
+   ```
+
+6. **Flex Layout for Footer Positioning**: If using flexbox layout, ensure main content area grows to push footer down:
+   ```css
+   html, body {
+       height: 100%;
+       margin: 0;
+       display: flex;
+       flex-direction: column;
+   }
+   
+   /* Main content area */
+   #questions, main, .main-content {
+       flex: 1 0 auto;
+   }
+   
+   .pro-footer, footer {
+       flex-shrink: 0;
+   }
+   ```
+   This ensures footer stays at bottom when content is short, and flows naturally when content is long.
+
+### Column Padding Overrides
+
+When external CSS resets padding, explicitly set padding for each footer column:
+```css
+.address-col {
+    padding-right: 48px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 0 !important;
+}
+
+.nav-col {
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.company-col {
+    padding-left: 48px !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+```
+
+### Order of CSS Loading
+
+If possible, load header/footer CSS AFTER external CSS files to reduce need for `!important`:
+```html
+<link rel="stylesheet" href="external-file.css">
+<link rel="stylesheet" href="another-external.css">
+<style>
+    /* Header/Footer CSS here - will override external if no !important needed */
+</style>
+```
+
+However, still use `!important` for footer styles if external CSS uses `!important` or has higher specificity.
+
+---
+
+## TESTING REQUIREMENTS
+
+1. Desktop (≥769px):
+   - Navigation menu is centered horizontally
+   - Dropdown menus appear on hover/click
+   - All links are visible and functional
+   - Footer displays 3 columns with proper spacing
+
+2. Mobile (≤768px):
+   - Hamburger menu appears in top-left
+   - Logo is centered
+   - Desktop nav is hidden
+   - **Desktop logout button is hidden (use mobile menu logout)**
+   - Mobile menu slides in from left when hamburger is clicked
+   - **Mobile menu is flush with left edge (no gap)**
+   - **Menu items are properly aligned with white divider lines**
+   - **Logout button appears in mobile menu when user is signed in (orange color)**
+   - Footer shows only 2 columns (address + company)
+   - Contact info stacks vertically (phone above email)
+   - Navigation column is hidden
+   - **Footer text is smaller (due to 14px base font-size)**
+   - **No white space below footer/copyright notice**
+
+3. Interactions:
+   - Dropdown opens/closes smoothly
+   - Mobile menu animates smoothly
+   - Hover effects work on desktop
+   - Body scroll locks when mobile menu is open
+   - Menu closes when clicking outside or on link
+   - Escape key closes mobile menu
+   - Mobile logout button signs out user when clicked
+
+---
+
+## TROUBLESHOOTING COMMON ISSUES
+
+### Issue: Mobile Menu Not Flush with Left Edge
+
+**Symptom**: When the mobile menu opens, it appears too far to the right, leaving a gap between the menu and the left edge of the screen.
+
+**Cause**: The `.mobile-nav.active` CSS rule has `left: 150px` instead of `left: 0`.
+
+**Fix**: 
+```css
+.mobile-nav.active {
+    left: 0 !important;  /* NOT left: 150px */
+}
+```
+
+**Note**: The `left: 150px` value was from an older implementation. The menu should slide in from completely off-screen (`left: -100%`) to flush with the left edge (`left: 0`).
+
+---
+
+### Issue: Hamburger Menu Items Not Aligned with Divider Lines
+
+**Symptom**: Menu items (Home, Forms, About Us, etc.) appear too high up, not properly aligned with the white horizontal divider lines between items.
+
+**Causes**:
+1. Insufficient top padding on `.mobile-nav`
+2. Negative `margin-top` on `.mobile-nav a` pulling items upward
+
+**Fix**:
+```css
+.mobile-nav {
+    padding: 140px 20px 20px 20px !important;  /* Increase top padding to 140px (not 100px or 120px) */
+}
+
+.mobile-nav a {
+    margin-top: 0 !important;  /* Remove negative margin (was margin-top: -20px) */
+}
+```
+
+**Why**: The top padding creates space at the top of the menu. The negative margin was pulling items up, causing misalignment. Removing the negative margin and increasing padding ensures items align properly with their divider lines.
+
+---
+
+### Issue: Logout Button Not Appearing in Mobile Menu
+
+**Symptom**: When user is signed in, the logout button doesn't show in the hamburger menu, even though it exists in the HTML.
+
+**Cause**: The `#mobile-auth-section` div has `style="display: none;"` by default and JavaScript isn't updating it based on authentication state.
+
+**Fix**: Add JavaScript to show/hide the mobile logout section based on auth state:
+
+```javascript
+// Get mobile auth elements
+const mobileAuthSection = document.getElementById('mobile-auth-section');
+const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+
+// In auth.onAuthStateChanged handler:
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        // User is signed in - show mobile logout button
+        if (mobileAuthSection) {
+            mobileAuthSection.style.display = 'block';
+        }
+    } else {
+        // User is signed out - hide mobile logout button
+        if (mobileAuthSection) {
+            mobileAuthSection.style.display = 'none';
+        }
+    }
+});
+
+// Add click handler for mobile logout
+if (mobileLogoutBtn) {
+    mobileLogoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        auth.signOut().then(() => {
+            window.location.reload();
+        }).catch((error) => {
+            alert('Sign Out Error: ' + error.message);
+        });
+    });
+}
+```
+
+---
+
+### Issue: Logout Button Not Orange in Mobile Menu
+
+**Symptom**: The logout button appears white instead of orange (`#ff7043`) in the mobile menu.
+
+**Cause**: The `.mobile-nav a` rule sets `color: #fff !important;` which overrides the logout button color due to specificity.
+
+**Fix**: Add more specific CSS rules for the logout button:
+
+```css
+.mobile-nav-logout,
+.mobile-nav-logout a,
+#mobile-logout-btn {
+    color: #ff7043 !important;
+    font-weight: 700 !important;
+}
+```
+
+**Why**: Using multiple selectors (class, class + element, and ID) increases specificity to override the general `.mobile-nav a` white color rule.
+
+---
+
+### Issue: Hamburger Menu Button Not Visible on Mobile
+
+**Symptom**: The hamburger menu button (three horizontal lines) doesn't appear on mobile devices.
+
+**Cause**: Missing or incorrect CSS in the mobile media query, or z-index/positioning issues.
+
+**Fix**: Ensure the mobile media query explicitly shows and positions the button:
+
+```css
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: flex !important;
+        position: absolute !important;
+        left: 15px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        z-index: 1001 !important;
+    }
+}
+```
+
+**Why**: The `!important` flags ensure the button is visible and properly positioned even if other CSS conflicts exist.
+
+---
+
+### Issue: Mobile Menu Doesn't Slide In When Clicked
+
+**Symptom**: Clicking the hamburger button doesn't open the mobile menu.
+
+**Causes**:
+1. JavaScript event listeners not properly attached
+2. Missing null checks causing JavaScript errors
+3. CSS display rules preventing menu from showing
+
+**Fix**: 
+1. Ensure JavaScript has proper null checks:
+```javascript
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+const mobileNav = document.getElementById('mobile-nav');
+
+if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (mobileNav) {
+            mobileNav.classList.toggle('active');
+            mobileMenuToggle.classList.toggle('active');
+        }
+    });
+}
+```
+
+2. Ensure CSS allows menu to display when active:
+```css
+.mobile-nav {
+    display: none;  /* Hidden by default */
+}
+
+.mobile-nav.active {
+    left: 0;
+    display: flex;  /* Show when active */
+}
+```
+
+---
+
+### Issue: Mobile Menu Items Have Too Much/Little Spacing
+
+**Symptom**: Menu items are too close together or too far apart, not matching the design.
+
+**Fix**: Adjust the padding on `.mobile-nav` and ensure consistent spacing:
+
+```css
+.mobile-nav {
+    padding: 140px 20px 20px 20px;  /* Top padding controls distance from top */
+}
+
+.mobile-nav a {
+    padding: 12px 0 12px 25px;  /* Vertical padding controls spacing between items */
+    min-height: 50px;  /* Ensures consistent item height */
+}
+```
+
+### Issue: Top-level mobile items look offset because of inherited nav gap
+
+**Symptom**: In the hamburger menu, the top-level links (Forms, About Us, Contact Us, FAQ, Log Out) look like they have extra space above them, even after adjusting padding.
+
+**Cause**: The base `nav` rule uses `display: flex` with `gap: 38px`. When the mobile drawer switches to column layout, that `gap` becomes vertical spacing between children, adding unwanted top space for each item.
+
+**Fix (CSS)**:
+```css
+.mobile-nav {
+    gap: 0; /* overrides desktop nav gap on mobile column layout */
+    padding: 140px 20px 20px 20px; /* adjust as needed after removing gap */
+}
+.mobile-nav a {
+    padding: 12px 0 12px 25px;
+    min-height: 50px;
+    margin-top: 0;
+}
+```
+
+**Why**: Setting `gap: 0` removes the inherited vertical spacing from the desktop nav. Then fine-tune padding/min-height for the visual alignment with divider lines.
+
+### Issue: Desktop logout/sign-in overlaps with hamburger logout on mobile
+
+**Symptom**: The white desktop logout/sign-in button shows at the same time as the hamburger menu on mobile.
+
+**Fix (CSS)**:
+```css
+@media (max-width: 768px) {
+    #logout-btn,
+    .sign-in-btn {
+        display: none !important; /* keep hamburger/mobile logout only */
+    }
+}
+```
+
+**Why**: Hides the desktop header button on small screens so only the hamburger menu and its logout entry are shown.
+
+---
+
+### Issue: Mobile Menu Doesn't Slide Out Fully to Left Edge
+
+**Symptom**: When the hamburger menu is opened, it doesn't slide all the way to the left edge of the screen, leaving a gap or not extending fully.
+
+**Causes**:
+1. External CSS files (like `generate.css`) overriding mobile menu positioning
+2. Conflicting `transform` properties moving the menu
+3. Missing `!important` flags on critical positioning properties
+4. Margin or padding on the menu or parent containers
+
+**Fix (CSS)**:
+```css
+.mobile-nav {
+    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 85% !important;
+    max-width: 300px !important;
+    height: 100vh !important;
+    background: #2c3e50 !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    padding: 140px 20px 20px 20px !important;
+    transition: left 0.3s ease !important;
+    z-index: 1000 !important;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    transform: none !important;
+    margin: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    right: auto !important;
+}
+
+.mobile-nav.active {
+    left: 0 !important;
+    display: flex !important;
+    right: auto !important;
+    transform: none !important;
+    margin-left: 0 !important;
+    position: fixed !important;
+}
+
+/* Also add override in mobile media query */
+@media (max-width: 768px) {
+    body .mobile-nav.active,
+    html .mobile-nav.active,
+    .mobile-nav.active {
+        left: 0 !important;
+        right: auto !important;
+        transform: none !important;
+        position: fixed !important;
+    }
+}
+```
+
+**Why**: 
+- Using `!important` on all positioning properties ensures external CSS can't override them
+- `transform: none !important` prevents any transform-based positioning from interfering
+- Explicit `margin: 0` and `margin-left: 0` ensures no gap between menu and screen edge
+- Higher specificity selectors (`body .mobile-nav.active`) ensure the rules take precedence
+- `position: fixed !important` ensures the menu is positioned relative to the viewport, not parent containers
+
+**Note**: If the menu still doesn't slide fully after applying these fixes, check for:
+- JavaScript errors preventing the `active` class from being added
+- Parent containers with `overflow: hidden` or `position: relative` that might clip the menu
+- Browser DevTools to inspect computed styles and see what's actually being applied
+
+---
+
+### Issue: Mobile Footer Columns Stack Vertically Instead of Side-by-Side
+
+**Symptom**: On mobile, the footer columns (address and company) stack vertically instead of displaying side-by-side like on the homepage.
+
+**Cause**: External CSS files or media queries are setting `flex-direction: column` on `.pro-footer` for mobile breakpoints, overriding the intended two-column layout.
+
+**Fix**: Explicitly set `flex-direction: row !important` in the mobile media query:
+
+```css
+@media (max-width: 768px) {
+    .pro-footer {
+        gap: 20px !important;
+        padding: 30px 20px 15px 20px !important;
+        flex-direction: row !important;  /* CRITICAL: Keep side-by-side layout */
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+    
+    .pro-footer-col {
+        min-width: unset !important;
+        max-width: unset !important;
+        padding: 0 !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+    
+    .pro-footer-col.address-col {
+        padding-right: 0 !important;
+        border-right: 1.5px solid #2c7a7d !important;
+    }
+    
+    .pro-footer-col.company-col {
+        padding-left: 20px !important;
+        border-right: none !important;
+    }
+}
+```
+
+**Why**: The `!important` flags ensure external CSS can't override the layout. The `flex-direction: row` keeps the two columns (address and company) side-by-side, matching the homepage design. The navigation column is hidden with `display: none !important`.
+
+---
+
+### Issue: White Space Appears Below Footer on Mobile
+
+**Symptom**: There's unwanted white space below the footer/copyright notice on mobile devices.
+
+**Cause**: Body or HTML elements have default margins/padding, or footer elements have extra spacing.
+
+**Fix**: Remove all bottom margins and padding:
+
+```css
+@media (max-width: 768px) {
+    html, body {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    
+    footer {
+        padding: 20px !important;
+        padding-bottom: 20px !important;
+        margin-bottom: 0 !important;
+    }
+    
+    .pro-footer, footer {
+        margin-bottom: 0 !important;
+    }
+}
+```
+
+**Why**: Explicitly setting `margin-bottom: 0` and `padding-bottom: 0` on both `html`/`body` and footer elements ensures no extra space appears below the footer.
+
+---
+
+## QUICK REFERENCE: Mobile Menu Positioning Values
+
+**Correct Values** (as of latest implementation):
+- `.mobile-nav` padding: `140px 20px 20px 20px` (top padding: 140px)
+- `.mobile-nav.active` left: `0` (flush with left edge)
+- `.mobile-nav a` margin-top: `0` (no negative margin)
+- `.mobile-menu-toggle` position: `absolute`, `left: 15px`, `top: 50%`, `transform: translateY(-50%)`
+- Logout button color: `#ff7043` with `!important` and high specificity
+
+**Incorrect Values** (common mistakes):
+- ❌ `left: 150px` on `.mobile-nav.active` (causes gap on right, menu doesn't slide fully)
+- ❌ Missing `!important` flags on positioning properties (external CSS can override)
+- ❌ Missing `transform: none !important` (transform can interfere with positioning)
+- ❌ Missing explicit `margin: 0` and `margin-left: 0` (can create gap between menu and screen edge)
+- ❌ `padding: 100px 20px 20px 20px` (items too high, not aligned with dividers)
+- ❌ `margin-top: -20px` on `.mobile-nav a` (pulls items up, misaligns)
+- ❌ Missing `display: flex` on `.mobile-nav.active` (menu won't show)
+- ❌ Missing JavaScript to show/hide `#mobile-auth-section` (logout button won't appear)
+
+---
+
+## MOBILE-FRIENDLY HERO AND CONTENT SECTIONS
+
+### Overview
+This section documents how to make hero/banner sections and "Available Forms" sections mobile-friendly, ensuring proper margins, responsive layouts, and consistent styling across pages.
+
+---
+
+### HERO/BANNER SECTION MOBILE STYLES
+
+#### HTML Structure
+```html
+<main>
+    <!-- Hero/Banner Section -->
+    <section style="width:100%;background:#fff;border-radius:0 0 32px 32px;...">
+        <div style="display:flex;flex-direction:row;align-items:center;gap:48px;max-width:1100px;width:95vw;">
+            <div style="flex:1;min-width:260px;max-width:420px;">
+                <img src="..." alt="..." style="width:100%;max-width:340px;...">
+            </div>
+            <div style="flex:2;min-width:260px;">
+                <h1>Find the Right Form</h1>
+                <p>Easily search and discover forms that fit your needs...</p>
+            </div>
+        </div>
+    </section>
+</main>
+```
+
+#### Mobile CSS (within `@media (max-width: 768px)`)
+```css
+/* Banner/Hero section mobile - "Find the Right Form" */
+main > section:first-child {
+    margin: 0 20px 24px 20px !important;
+    padding: 25px 20px !important;
+    max-width: calc(100% - 40px) !important;
+    width: calc(100% - 40px) !important;  /* CRITICAL: Ensures equal margins */
+    box-sizing: border-box !important;     /* CRITICAL: Includes padding in width */
+    border-radius: 20px !important;
+}
+main > section:first-child > div {
+    flex-direction: column !important;     /* Stack vertically on mobile */
+    gap: 20px !important;
+    width: 100% !important;
+}
+main > section:first-child img {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;            /* Center image */
+}
+main > section:first-child h1 {
+    font-size: 1.8em !important;          /* Reduced from 2.6em */
+    text-align: center !important;
+    margin-bottom: 12px !important;
+}
+main > section:first-child p {
+    font-size: 1.1em !important;         /* Reduced from 1.35em */
+    text-align: center !important;
+    margin-bottom: 0 !important;
+}
+```
+
+#### Very Small Screens (within `@media (max-width: 480px)`)
+```css
+main > section:first-child {
+    margin: 0 15px 20px 15px !important;
+    padding: 20px 15px !important;
+    width: calc(100% - 30px) !important;   /* Tighter margins */
+}
+main > section:first-child h1 {
+    font-size: 1.5em !important;          /* Further reduced */
+}
+main > section:first-child p {
+    font-size: 1em !important;           /* Further reduced */
+}
+```
+
+#### Key Points:
+- **Equal Margins**: Use `width: calc(100% - 40px)` with `box-sizing: border-box` to ensure equal left/right margins
+- **Vertical Stacking**: Change `flex-direction: row` to `column` on mobile
+- **Centered Content**: Center text and images for better mobile readability
+- **Responsive Font Sizes**: Reduce font sizes appropriately (h1: 2.6em → 1.8em → 1.5em)
+
+---
+
+### AVAILABLE FORMS SECTION MOBILE STYLES
+
+#### HTML Structure
+```html
+<div class="main-forms-wrapper">
+    <div class="forms-card">
+        <h1>Available Forms</h1>
+        <div class="subtitle">Browse and add new forms to your portfolio...</div>
+        <input type="text" id="available-forms-search" placeholder="Search By Form Name">
+        <input type="text" id="available-forms-zip" placeholder="Search By ZIP Code">
+        <ul id="available-forms-list" class="forms-list">
+            <!-- Form cards dynamically inserted here -->
+        </ul>
+        <div class="forms-pagination">
+            <button id="forms-prev-btn" class="circle-arrow-btn">...</button>
+            <button id="forms-next-btn" class="circle-arrow-btn">...</button>
+        </div>
+    </div>
+</div>
+```
+
+#### Mobile CSS (within `@media (max-width: 768px)`)
+```css
+/* Main forms wrapper mobile - add side margins */
+.main-forms-wrapper {
+    margin: 8px auto 32px auto !important;
+    gap: 32px !important;
+    padding: 0 15px !important;           /* CRITICAL: Creates side margins */
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+/* Available Forms section mobile - match forms.html */
+.forms-card {
+    padding: 24px 20px 20px 20px !important;
+    margin: 0 auto !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+.forms-card h1 {
+    font-size: 1.6em !important;         /* Reduced from 2.2em */
+}
+.forms-card .subtitle {
+    font-size: 0.95em !important;         /* Reduced from 1.1em */
+    margin-bottom: 20px !important;
+}
+
+/* Forms list mobile - Available Forms 2x2 grid */
+#available-forms-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    column-gap: 40px !important;
+    row-gap: 32px !important;
+    gap: 32px 40px !important;
+    justify-items: center !important;
+    max-width: 500px !important;          /* Constrain width for better layout */
+    margin: 0 auto !important;            /* Center the grid */
+    padding: 0 20px !important;
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+}
+#available-forms-list li {
+    width: auto !important;
+    max-width: 200px !important;
+    min-width: 160px !important;
+    padding: 24px 18px 18px 18px !important;
+}
+
+/* Available forms search mobile - 80% width, centered */
+#available-forms-search {
+    width: 80% !important;                /* Reduced from 100% */
+    max-width: 320px !important;          /* 20% reduction from 400px */
+    padding: 14px !important;
+    font-size: 1em !important;
+    margin: 0 auto 12px auto !important;  /* Center horizontally */
+    display: block !important;
+}
+#available-forms-zip {
+    width: 80% !important;                /* Reduced from 100% */
+    max-width: 176px !important;          /* 20% reduction from 220px */
+    padding: 14px !important;
+    font-size: 1em !important;
+    margin: 0 auto 18px auto !important;  /* Center horizontally */
+    display: block !important;
+}
+
+/* Pagination mobile */
+.forms-pagination {
+    gap: 24px !important;
+    margin-top: 28px !important;
+}
+.circle-arrow-btn {
+    width: 44px !important;
+    height: 44px !important;
+}
+.circle-arrow-btn svg {
+    width: 24px !important;
+    height: 24px !important;
+}
+```
+
+#### Very Small Screens (within `@media (max-width: 480px)`)
+```css
+.forms-card h1 {
+    font-size: 1.4em !important;          /* Further reduced */
+}
+.forms-card .subtitle {
+    font-size: 0.9em !important;          /* Further reduced */
+}
+
+/* Available Forms small mobile - keep 2x2 grid */
+#available-forms-list {
+    column-gap: 32px !important;          /* Reduced gaps */
+    row-gap: 28px !important;
+    gap: 28px 32px !important;
+    padding: 0 15px !important;
+}
+#available-forms-list li {
+    max-width: 100% !important;
+    min-width: 140px !important;          /* Smaller minimum */
+    padding: 20px 14px 16px 14px !important;
+}
+```
+
+#### Key Points:
+- **Parent Container Margins**: Add `padding: 0 15px` to `.main-forms-wrapper` to create side margins for child elements
+- **Search Input Sizing**: Use `width: 80%` with `max-width` constraints and `margin: 0 auto` to center
+- **Grid Layout**: Use CSS Grid (`grid-template-columns: repeat(2, 1fr)`) for form cards on mobile
+- **Centered Grid**: Use `max-width: 500px` with `margin: 0 auto` to center the grid
+- **Consistent Spacing**: Match gap values (40px column, 32px row) with forms.html for consistency
+
+---
+
+### COMMON MOBILE LAYOUT PATTERNS
+
+#### Pattern 1: Equal Side Margins
+```css
+/* For sections that need equal left/right margins */
+.section {
+    margin: 0 20px !important;
+    width: calc(100% - 40px) !important;
+    box-sizing: border-box !important;
+}
+```
+
+#### Pattern 2: Parent Container Padding
+```css
+/* For wrapper containers that need to create margins for children */
+.wrapper {
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+```
+
+#### Pattern 3: Centered Input Fields
+```css
+/* For search inputs and form fields */
+input {
+    width: 80% !important;
+    max-width: 320px !important;         /* Adjust based on design */
+    margin: 0 auto !important;
+    display: block !important;
+}
+```
+
+#### Pattern 4: Responsive Grid
+```css
+/* For card grids on mobile */
+.grid-container {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 32px 40px !important;
+    max-width: 500px !important;
+    margin: 0 auto !important;
+    padding: 0 20px !important;
+}
+```
+
+---
+
+### TROUBLESHOOTING MOBILE LAYOUT ISSUES
+
+#### Issue: Section Touching Screen Edges
+
+**Symptom**: Hero section or content cards have no margin on one or both sides, touching the screen edges.
+
+**Causes**:
+1. Missing `width: calc(100% - 40px)` on the section
+2. Missing `box-sizing: border-box`
+3. Parent container doesn't have padding
+
+**Fix**:
+```css
+/* Option 1: Direct margin on section */
+section {
+    margin: 0 20px !important;
+    width: calc(100% - 40px) !important;
+    box-sizing: border-box !important;
+}
+
+/* Option 2: Padding on parent container */
+.wrapper {
+    padding: 0 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+```
+
+---
+
+#### Issue: Search Inputs Overflowing Container
+
+**Symptom**: Search input fields extend beyond the card edges or screen boundaries.
+
+**Causes**:
+1. `width: 100%` without max-width constraint
+2. Missing `box-sizing: border-box`
+3. Padding causing overflow
+
+**Fix**:
+```css
+input {
+    width: 80% !important;                /* Reduce from 100% */
+    max-width: 320px !important;         /* Add constraint */
+    padding: 14px !important;
+    box-sizing: border-box !important;    /* Include padding in width */
+    margin: 0 auto !important;           /* Center */
+    display: block !important;
+}
+```
+
+---
+
+#### Issue: Form Cards Not Centered or Properly Spaced
+
+**Symptom**: Form cards in grid layout are not centered, have inconsistent spacing, or overflow.
+
+**Causes**:
+1. Missing `max-width` constraint on grid container
+2. Missing `margin: 0 auto` for centering
+3. Incorrect gap values
+
+**Fix**:
+```css
+#available-forms-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    column-gap: 40px !important;
+    row-gap: 32px !important;
+    gap: 32px 40px !important;
+    max-width: 500px !important;          /* Constrain width */
+    margin: 0 auto !important;            /* Center */
+    padding: 0 20px !important;          /* Side padding */
+    justify-items: center !important;     /* Center items */
+}
+```
+
+---
+
+### IMPLEMENTATION CHECKLIST
+
+When making hero and content sections mobile-friendly:
+
+1. ✅ **Hero Section**:
+   - Add `width: calc(100% - 40px)` with `box-sizing: border-box`
+   - Change `flex-direction: row` to `column` on mobile
+   - Center text and images
+   - Reduce font sizes appropriately
+
+2. ✅ **Content Wrapper**:
+   - Add `padding: 0 15px` to parent container (`.main-forms-wrapper`)
+   - Ensure `box-sizing: border-box` is set
+
+3. ✅ **Forms Card**:
+   - Reduce padding on mobile (40px → 24px)
+   - Reduce font sizes (h1: 2.2em → 1.6em → 1.4em)
+   - Ensure `width: 100%` with `max-width: 100%`
+
+4. ✅ **Search Inputs**:
+   - Set `width: 80%` (not 100%)
+   - Add appropriate `max-width` constraint
+   - Center with `margin: 0 auto` and `display: block`
+
+5. ✅ **Form Cards Grid**:
+   - Use CSS Grid with `repeat(2, 1fr)`
+   - Set `max-width: 500px` and `margin: 0 auto` to center
+   - Add proper gaps (40px column, 32px row)
+   - Constrain card sizes (max-width: 200px, min-width: 160px)
+
+6. ✅ **Pagination**:
+   - Size buttons appropriately (44px x 44px)
+   - Set proper gap between buttons (24px)
+
+7. ✅ **Test on Multiple Breakpoints**:
+   - 768px (tablet/mobile)
+   - 480px (small mobile)
+   - Verify margins are equal on both sides
+   - Verify no horizontal scrolling
+
+---
+
+This documentation provides everything needed to make hero sections and Available Forms sections mobile-friendly with proper margins and responsive layouts.
+
+---
+
+This documentation provides everything needed to replicate the exact header and footer implementation on a new page.
+

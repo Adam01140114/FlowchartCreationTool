@@ -19,7 +19,7 @@
         .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }
         .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }
         .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }
-        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; }
+        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; pointer-events: auto !important; }
         .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }
         .question-step-hidden { display: none !important; }
         #box { padding-top: 100px; margin: 50px; }
@@ -69,9 +69,599 @@
         .signin-modal-button { background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; border: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(47, 123, 255, 0.3); transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .signin-modal-button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(47, 123, 255, 0.4); }
         .signin-modal-button:active { transform: translateY(0); }
+        
+        /* ===== HEADER AND FOOTER CSS ===== */
+        /* Header Base Styles */
+        header {
+            background-color: #2c3e50;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        header img {
+            cursor: pointer;
+        }
+        
+        /* Desktop Navigation Base Styles */
+        nav {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 38px;
+            z-index: 2;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.18em;
+            letter-spacing: 0.02em;
+            padding: 2px 8px;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+        }
+        nav a:hover {
+            color: #ff7043;
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+        }
+        
+        /* Navigation Chevron (SVG Icons) */
+        .nav-chevron {
+            display: inline-block;
+            margin-left: 6px;
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+        }
+        .nav-chevron svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Header Actions (Sign In Button and Cart) */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-left: auto;
+        }
+        .sign-in-btn {
+            background: #fff;
+            color: #222;
+            font-weight: 700;
+            font-size: 1.08em;
+            border: none;
+            border-radius: 22px;
+            padding: 8px 28px;
+            margin-left: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            outline: none;
+        }
+        .sign-in-btn:hover {
+            background: #f4f4f4;
+            color: #2980b9;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        }
+        
+        /* Cart Icon Styles */
+        #cart-icon-link .cart-circle {
+            width: 54px !important;
+            height: 54px !important;
+            background: #2980b9;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        #cart-icon {
+            width: 32px !important;
+            height: 32px !important;
+            display: block;
+        }
+        
+        /* Desktop Dropdown Menu */
+        .nav-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 38px;
+            background: #fff;
+            min-width: 210px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+            border-radius: 10px;
+            z-index: 10;
+            padding: 12px 0;
+            flex-direction: column;
+            gap: 0;
+        }
+        .dropdown-menu a {
+            color: #222;
+            padding: 12px 28px;
+            text-decoration: none;
+            display: block;
+            font-weight: 600;
+            font-size: 1.08em;
+            border-radius: 0;
+            transition: background 0.18s, color 0.18s;
+        }
+        .dropdown-menu a:hover {
+            background: #eaf1f8;
+            color: #2980b9;
+        }
+        .nav-dropdown-wrapper.open .dropdown-menu {
+            display: flex;
+            animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .forms-chevron {
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+        }
+        .nav-dropdown-wrapper.open .forms-chevron {
+            transform: rotate(-90deg);
+        }
+        
+        /* Desktop Navigation Visibility */
+        .desktop-nav {
+            display: flex;
+        }
+        
+        /* Mobile Menu Toggle (Hamburger Button) */
+        .mobile-menu-toggle {
+            display: none !important;
+            flex-direction: column !important;
+            justify-content: space-around !important;
+            width: 30px !important;
+            height: 30px !important;
+            background: transparent !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            z-index: 1001 !important;
+            position: absolute !important;
+            left: 15px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+        }
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            transform-origin: 1px;
+        }
+        .mobile-menu-toggle.active span:first-child {
+            transform: rotate(45deg);
+        }
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .mobile-menu-toggle.active span:last-child {
+            transform: rotate(-45deg);
+        }
+        
+        /* Mobile Navigation Menu */
+        .mobile-nav {
+            display: none !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: -100% !important;
+            width: 85% !important;
+            max-width: 300px !important;
+            height: 100vh !important;
+            background: #2c3e50 !important;
+            flex-direction: column !important;
+            gap: 0 !important;
+            padding: 140px 20px 20px 20px !important;
+            transition: left 0.3s ease !important;
+            z-index: 1000 !important;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3) !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            transform: none !important;
+            margin: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            right: auto !important;
+        }
+        .mobile-nav.active {
+            left: 0 !important;
+            display: flex !important;
+            right: auto !important;
+            transform: none !important;
+            margin-left: 0 !important;
+            position: fixed !important;
+        }
+        
+        /* Main Navigation Links (Home, About Us, Contact Us, FAQ) */
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 0 12px 25px;
+            border-bottom: 1px solid #34495e;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            margin-top: 0;
+        }
+        
+        /* Navigation Section Container */
+        .mobile-nav-section {
+            border-bottom: 1px solid #34495e;
+        }
+        
+        /* Dropdown Toggle (Forms with ▼) */
+        .mobile-nav-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            padding: 15px 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .mobile-nav-toggle span {
+            transition: transform 0.3s ease;
+        }
+        .mobile-nav-toggle.active span {
+            transform: rotate(180deg);
+        }
+        
+        /* Submenu Container (My Forms, Free Form, etc.) */
+        .mobile-nav-submenu {
+            display: none;
+            padding-left: 20px;
+        }
+        .mobile-nav-submenu.active {
+            display: block;
+        }
+        
+        /* Submenu Items (Free Form, Immigration, Small Claims, Other) */
+        .mobile-nav-submenu a {
+            padding: 10px 0 10px 45px;
+            font-size: 1em;
+            border-bottom: 1px solid #34495e;
+            line-height: 1.1;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* CRITICAL: First Submenu Item ("My Forms") Vertical Centering */
+        .mobile-nav-submenu a:first-child {
+            border-top: 1px solid #34495e;
+            margin-top: 0px;
+            padding-top: 30px;
+            padding-bottom: 0;
+        }
+        
+        /* Logout Button Styling */
+        .mobile-nav-logout,
+        .mobile-nav-logout a,
+        #mobile-logout-btn {
+            color: #ff7043 !important;
+            font-weight: 700 !important;
+        }
+        
+        /* Mobile Overlay (Dark background when menu is open) */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .mobile-nav-overlay.active {
+            display: block;
+        }
+        
+        /* Footer Base Styles (Desktop) */
+        .pro-footer {
+            background: #2c3e50;
+            color: #f3f7f8;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;
+            padding: 48px 10vw 20px 10vw;
+            border-top: 2px solid #2c3e50;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.18em;
+            margin-top: 0;
+        }
+        .pro-footer-col {
+            flex: 1 1 320px;
+            min-width: 220px;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .address-col {
+            border-right: 1.5px solid #2c7a7d;
+            padding-right: 48px;
+            align-items: flex-start;
+        }
+        .nav-col {
+            align-items: flex-start;
+            padding-left: 32px;
+            padding-right: 32px;
+            border-right: 1.5px solid #2c7a7d;
+        }
+        .company-col {
+            align-items: flex-start;
+            padding-left: 48px;
+        }
+        .pro-footer-title {
+            font-weight: 700;
+            font-size: 1.25em;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+        .company-title {
+            margin-top: 8px;
+            margin-bottom: 0;
+        }
+        .pro-footer-contact a {
+            color: #b6e2e6;
+            text-decoration: underline;
+            font-weight: 500;
+            margin-right: 18px;
+            transition: color 0.2s;
+        }
+        .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
+            color: #ff7043;
+        }
+        .pro-footer-logo {
+            margin-bottom: 8px;
+        }
+        .pro-footer-desc {
+            color: #e0e6ea;
+            font-size: 1em;
+            margin-top: 0;
+            line-height: 1.5;
+        }
+        .pro-footer-col.nav-col a {
+            color: #b6e2e6;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 6px;
+            transition: color 0.2s;
+            font-size: 1em;
+        }
+        .pro-footer-col.nav-col a:not(:last-child) {
+            margin-bottom: 8px;
+        }
+        .pro-footer, footer {
+            flex-shrink: 0;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #374656;
+            color: white;
+        }
+        
+        /* Mobile Responsive Breakpoint (@media max-width: 768px) */
+        @media (max-width: 768px) {
+            /* Show mobile menu toggle */
+            .mobile-menu-toggle {
+                display: flex !important;
+                position: absolute !important;
+                left: 15px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                z-index: 1001 !important;
+            }
+            
+            /* Hide desktop nav */
+            .desktop-nav {
+                display: none !important;
+            }
+            
+            /* Show mobile nav structure */
+            .mobile-nav {
+                display: flex !important;
+            }
+            
+            .mobile-nav.active {
+                left: 0 !important;
+                right: auto !important;
+                transform: none !important;
+                position: fixed !important;
+                margin-left: 0 !important;
+            }
+            
+            /* Typography adjustments */
+            html {
+                font-size: 14px !important;
+            }
+            
+            body {
+                overflow-x: hidden;
+            }
+            
+            /* Header mobile optimization */
+            header {
+                padding: 16px 15px;
+                min-height: 80px;
+                flex-wrap: wrap;
+                gap: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: relative;
+            }
+            
+            header img {
+                width: 119px;
+                height: 73px;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            /* Header actions mobile */
+            .header-actions {
+                gap: 10px;
+                margin-left: auto;
+                margin-right: 15px;
+            }
+            
+            .sign-in-btn {
+                font-size: 0.9em;
+                padding: 6px 20px;
+                margin-left: 0;
+            }
+            
+            #cart-icon-link .cart-circle {
+                width: 55px !important;
+                height: 55px !important;
+            }
+            
+            #cart-icon {
+                width: 30px !important;
+                height: 30px !important;
+            }
+            
+            /* Hide desktop sign-in/logout buttons on mobile */
+            #logout-btn,
+            .sign-in-btn {
+                display: none !important;
+            }
+            
+            /* Footer mobile - hide navigation column */
+            .pro-footer-col.nav-col {
+                display: none !important;
+            }
+            
+            /* Footer mobile - match homepage layout (two columns side-by-side) */
+            .pro-footer {
+                gap: 20px !important;
+                padding: 30px 20px 15px 20px !important;
+                flex-direction: row !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+            }
+            
+            /* Reset column constraints for mobile */
+            .pro-footer-col {
+                min-width: unset !important;
+                max-width: unset !important;
+                padding: 0 !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+            }
+            
+            /* Address column - remove right padding and border */
+            .pro-footer-col.address-col {
+                padding-right: 0 !important;
+                border-right: 1.5px solid #2c7a7d !important;
+            }
+            
+            /* Company column - add left padding for spacing */
+            .pro-footer-col.company-col {
+                padding-left: 20px !important;
+                border-right: none !important;
+            }
+            
+            /* Contact info - stack vertically */
+            .pro-footer-contact {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            
+            /* Contact links - remove horizontal margin */
+            .pro-footer-contact a {
+                margin-right: 0 !important;
+            }
+            
+            /* Footer copyright - consistent padding */
+            footer {
+                padding: 20px !important;
+                padding-bottom: 20px !important;
+                margin-bottom: 0 !important;
+            }
+            
+            /* Prevent white space below footer */
+            html, body {
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            
+            .pro-footer, footer {
+                margin-bottom: 0 !important;
+            }
+        }
+        
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            nav a {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .sign-in-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
     </style>
     <script>
       // Phone formatter: Phone Number
+      window.updatePhoneSplitFields = window.updatePhoneSplitFields || function(inputEl) {
+        if (!inputEl) return;
+        const id = inputEl.id || inputEl.name;
+        if (!id) return;
+        const digits = (inputEl.value || "").replace(/\D/g, "").slice(0, 10);
+        const match = id.match(/^(.*)_([0-9]+)$/);
+        const base = match ? match[1] : id;
+        const suffix = match ? "_" + match[2] : "";
+        const codeField = document.getElementById(base + "_code" + suffix);
+        const noCodeField = document.getElementById(base + "_no_code" + suffix);
+        if (!codeField && !noCodeField) return;
+        const area = digits.slice(0, 3);
+        const rest = digits.slice(3);
+        const codeValue = area ? "(" + area + ")" : "";
+        let noCodeValue = "";
+        if (rest.length > 0) {
+          if (rest.length <= 3) {
+            noCodeValue = rest;
+          } else {
+            noCodeValue = rest.slice(0, 3) + "-" + rest.slice(3, 7);
+          }
+        }
+        if (codeField) codeField.value = codeValue;
+        if (noCodeField) noCodeField.value = noCodeValue;
+      };
       window.formatPhoneInput = window.formatPhoneInput || function(inputEl) {
         if (!inputEl) return;
         const digits = (inputEl.value || "").replace(/\D/g, "").slice(0, 10);
@@ -87,6 +677,7 @@
           formatted += "-" + digits.slice(6, 10);
         }
         inputEl.value = formatted;
+        window.updatePhoneSplitFields(inputEl);
       };
     </script>
 </head>
@@ -219,8 +810,18 @@ function dropdownMirror(selectEl, baseName){
 }
 </script>
 <header>
-    <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href='../../index.html';">
-    <nav>
+    <!-- Mobile hamburger menu button -->
+    <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <!-- Logo -->
+    <img src="logo.png" alt="Form-Star Logo" width="130" height="80" onclick="location.href='../../index.html';">
+    
+    <!-- Desktop Navigation -->
+    <nav class="desktop-nav">
         <a href="../../index.html">Home
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
@@ -231,8 +832,6 @@ function dropdownMirror(selectEl, baseName){
             <div class="dropdown-menu" id="forms-dropdown-menu">
                 <a href="../../Pages/forms.html">My Forms</a>
                 <a href="../../Pages/FreeForm.html">Free Form</a>
-                <a href="../../Pages/Family.html">Family</a>
-                <a href="../../Pages/Property.html">Property</a>
                 <a href="../../Pages/Immigration.html">Immigration</a>
                 <a href="../../Pages/smallclaims.html">Small Claims</a>
                 <a href="../../Pages/Other.html">Other</a>
@@ -248,10 +847,33 @@ function dropdownMirror(selectEl, baseName){
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
     </nav>
+    
+    <!-- Mobile Navigation Menu -->
+    <nav class="mobile-nav" id="mobile-nav">
+        <a href="../../index.html">Home</a>
+        <div class="mobile-nav-section">
+            <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+            <div class="mobile-nav-submenu" id="mobile-forms-menu">
+                <a href="../../Pages/forms.html">My Forms</a>
+                <a href="../../Pages/FreeForm.html">Free Form</a>
+                <a href="../../Pages/Immigration.html">Immigration</a>
+                <a href="../../Pages/smallclaims.html">Small Claims</a>
+                <a href="../../Pages/Other.html">Other</a>
+            </div>
+        </div>
+        <a href="../../Pages/about.html">About Us</a>
+        <a href="../../Pages/contact.html">Contact Us</a>
+        <a href="../../Pages/FAQ.html">FAQ</a>
+        <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+            <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+        </div>
+    </nav>
+    
+    <!-- Header Actions (Sign In Button and Cart) -->
     <div class="header-actions">
         <a href="../../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
         <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
-        <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+        <a href="#" id="cart-icon-link" style="display: inline-flex; align-items: center; text-decoration: none; position: relative;">
             <span class="cart-circle">
                 <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="10" cy="21" r="1.5"/>
@@ -422,7 +1044,7 @@ document.addEventListener("DOMContentLoaded", function() {
         </div>
         <div style="flex: 1;">
             <label for="user_zip" style="display: block; margin-bottom: 5px; font-weight: bold;">ZIP</label>
-            <input type="text" form="customForm" id="user_zip" name="user_zip" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <input type="text" form="customForm" id="user_zip" name="user_zip" maxlength="5" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
         </div>
     </div>
 </div>
@@ -438,207 +1060,28 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Do you have any documentation showing these efforts?</h3></label><select id="do_you_have_any_documentation_showing_these_efforts" name="do_you_have_any_documentation_showing_these_efforts" data-question-id="1"
-                      onchange="dropdownMirror(this, 'do_you_have_any_documentation_showing_these_efforts'); updateHiddenLogic('do_you_have_any_documentation_showing_these_efforts', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_do_you_have_any_documentation_showing_these_efforts"></div>
-              <input type="text" id="do_you_have_any_documentation_showing_these_efforts_dropdown" name="do_you_have_any_documentation_showing_these_efforts_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Please attach your documentation</h3></label>
-          <div class="file-upload-container" id="fileUploadContainer2">
-            <div class="file-upload-dropzone" id="fileUploadDropzone2">
-              <input type="file" id="fileUpload_2" name="fileUpload_2" style="display: none;" accept=".pdf" onchange="handleFileUpload(2, this)">
-              <div class="file-upload-content">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 12px; color: #2f7bff;">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="17 8 12 3 7 8"></polyline>
-                  <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                <p class="file-upload-text">Drag and drop a file here, or <span class="file-upload-link">click to browse</span></p>
-                <p class="file-upload-hint">Supports PDF files only</p>
-              </div>
-            </div>
-            <div class="file-upload-preview" id="fileUploadPreview2" style="display: none;">
-              <div class="file-upload-preview-content">
-                <div class="file-upload-preview-body" id="fileUploadPreviewBody2"></div>
-                <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 15px;">
-                  <button type="button" class="file-upload-cancel" onclick="removeAllFileUploads(2)" title="Remove all files">Remove All Documents</button>
-                  <button type="button" class="file-upload-add" onclick="triggerFileUpload(2)" title="Upload another document" style="background: #28a745; color: white; border: none; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s ease;">Upload another document</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <script>
-            (function() {
-              const dropzone = document.getElementById('fileUploadDropzone2');
-              const fileInput = document.getElementById('fileUpload_2');
-
-              // Drag and drop handlers
-              dropzone.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                dropzone.classList.add('file-upload-dragover');
-              });
-
-              dropzone.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                dropzone.classList.remove('file-upload-dragover');
-              });
-
-              dropzone.addEventListener('drop', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                dropzone.classList.remove('file-upload-dragover');
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                  fileInput.files = files;
-                  handleFileUpload(2, fileInput);
-                }
-              });
-
-              // Click to browse - handle clicks on dropzone or the "click to browse" link
-              dropzone.addEventListener('click', function(e) {
-                // Don't trigger if clicking directly on the file input
-                if (e.target === fileInput) {
-                  return;
-                }
-                // Prevent event bubbling to avoid double-triggering
-                e.preventDefault();
-                e.stopPropagation();
-                // Open file picker
-                fileInput.click();
-              });
-            })();
-          </script>
-        </div><div id="question-container-3" data-question-id="3" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="3"
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people</h3></label><select id="how_many_people" name="how_many_people" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_people', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select><br><div id="labelContainer1"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div><div id="question-container-2" data-question-id="2" class="question-container question-item question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="2"
                       onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_hungry"></div>
               <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-4" data-question-id="4" class="question-container question-item question-step-hidden" data-section="1" data-question-index="4"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry_dup2" name="hungry_dup2" data-question-id="4"
-                      onchange="dropdownMirror(this, 'hungry_dup2'); updateHiddenLogic('hungry_dup2', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handleLatexPreview4(this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry_dup2"></div>
-              <input type="text" id="hungry_dup2_dropdown" name="hungry_dup2_dropdown"
-                   readonly style="display:none;">
-              <div id="latexPreview4" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #4CAF50; border-radius: 12px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);">
-                <h4 style="margin: 0 0 15px 0; color: #2E7D32; font-size: 18px; font-weight: 600; text-align: center;">Latex PDF Preview</h4>
-                <div id="latexPreviewLoading4" style="text-align: center; padding: 20px; display: none;">
-                  <p style="color: #2E7D32; font-size: 16px;">Generating PDF from LaTeX...</p>
-                </div>
-                <div style="text-align: center; background: white; padding: 10px; border-radius: 8px;">
-                  <iframe id="latexPreviewIframe4" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>
-                </div>
-              </div>
-              <script>
-                async function handleLatexPreview4(value) {
-
-                  const previewDiv = document.getElementById('latexPreview4');
-                  const iframe = document.getElementById('latexPreviewIframe4');
-                  const loadingDiv = document.getElementById('latexPreviewLoading4');
-                  const latexContent = `\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{enumitem}\n\n\\begin{document}\n\n% Sender Information (Top Left)\n\\begin{flushleft}\n[user_fullname]\\\\\n[user_full_address]\\\\\nEmail: [user_email]\\\\\nPhone: [user_phone]\\\\[1em]\nDate: [current_date]\n\\end{flushleft}\n\n\\vspace{1em}\n\n% Recipient Information\n[how_many_people_are_you_counter_suing_name_1]\\\\\n[how_many_people_are_you_counter_suing_please_enter_their_address_street_1]\n\n\\vspace{1em}\n\n\\textbf{Re: Demand for Payment}\n\n\\vspace{1em}\n\nDear [how_many_people_are_you_counter_suing_name_1],\n\n\\vspace{1em}\n\nI am writing to formally demand payment in the amount of [how_much_are_you_counter_suing_for] for the following reasons:\n\n[explain_why_they_owe_you_that_money]\n\n\\vspace{1em}\n\nThis amount remains unpaid despite previous attempts to resolve this matter amicably.\n\n\\vspace{1em}\n\nPlease remit payment in full by 14 days from the date of this letter. Payment can be made via cash, check, or bank transfer.\n\n\\vspace{1em}\n\nIf payment is not received by the stated deadline, I will have no choice but to pursue legal action in small claims court to recover the amount owed, along with any applicable court costs and fees.\n\n\\vspace{1em}\n\nI hope we can resolve this matter promptly and avoid further escalation. Please feel free to contact me at [user_phone] or [user_email] if you have any questions or wish to discuss this matter further.\n\n\\vspace{1em}\n\nThank you for your immediate attention to this matter.\n\n\\vspace{1em}\n\nSincerely,\\\\[2em]\n[user_fullname]\n\n\\end{document}\n`;
-
-                  if (value === 'Yes') {
-
-                    previewDiv.style.display = 'block';
-                    loadingDiv.style.display = 'block';
-                    iframe.style.display = 'none';
-                    // Convert LaTeX to PDF
-                    try {
-                      // Collect all form data for placeholder replacement
-
-                      const form = document.getElementById('customForm');
-                      if (!form) {
-
-                        throw new Error('Form element not found');
-                      }
-
-                      const fd = new FormData();
-                      fd.append('latex', latexContent);
-
-                      // Collect all form data
-                      const formElements = form.querySelectorAll('input, textarea, select');
-                      const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
-                      const allFormElements = [...formElements, ...externalFormElements];
-
-                      let collectedFields = {};
-                      allFormElements.forEach(element => {
-                        if (element.name && !element.disabled) {
-                          if (element.type === 'checkbox' || element.type === 'radio') {
-                            if (element.checked) {
-                              fd.append(element.name, 'on');
-                              collectedFields[element.name] = 'on';
-                            }
-                          } else {
-                            let value = element.value;
-                            if (element.type === 'date' && value) {
-                              value = formatDateForServer(value);
-                            }
-                            if (value && value.trim() !== '') {
-                              fd.append(element.name, value);
-                              collectedFields[element.name] = value;
-                            }
-                          }
-                        }
-                      });
-
-                      // Send LaTeX content and form data to server endpoint to generate PDF
-
-                      const res = await fetch('/latex_to_pdf', { 
-                        method: 'POST', 
-                        body: fd, 
-                        credentials: 'include' 
-                      });
-
-                      if (!res.ok) {
-                        throw new Error('Failed to generate PDF from LaTeX');
-                      }
-                      const blob = await res.blob();
-                      const url = URL.createObjectURL(blob);
-                      // Display in iframe
-                      iframe.src = url;
-                      loadingDiv.style.display = 'none';
-                      iframe.style.display = 'block';
-                      // Store URL for cleanup
-                      iframe.dataset.blobUrl = url;
-
-                      // Store PDF blob if "Attach to packet" is selected
-                      const attachment = 'Preview Only';
-                      if (attachment === 'Attach to packet') {
-                        // Initialize window.latexPdfs if it doesn't exist
-                        if (!window.latexPdfs) {
-                          window.latexPdfs = {};
-                        }
-                        // Store the blob for this question
-                        window.latexPdfs[4] = blob;
-
-                      }
-                    } catch (error) {
-
-                      loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to generate PDF from LaTeX. Please check your LaTeX code and try again.</p>';
-                      iframe.style.display = 'none';
-                    }
-                  } else {
-
-                    previewDiv.style.display = 'none';
-                    // Clean up blob URL and remove stored PDF if exists
-                    if (iframe.dataset.blobUrl) {
-                      URL.revokeObjectURL(iframe.dataset.blobUrl);
-                      iframe.dataset.blobUrl = '';
-                      iframe.src = '';
-                    }
-                    // Remove stored PDF blob if user changes away from trigger
-                    if (window.latexPdfs && window.latexPdfs[4]) {
-                      delete window.latexPdfs[4];
-                    }
-                  }
-                }
-              </script>
-            </div><div id="question-container-5" data-question-id="5" class="question-container question-item question-step-hidden" data-section="1" data-question-index="5"><label><h3 class="question-text">Tired?</h3></label><select id="tired" name="tired" data-question-id="5"
-                      onchange="dropdownMirror(this, 'tired'); updateHiddenLogic('tired', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_tired"></div>
-              <input type="text" id="tired_dropdown" name="tired_dropdown"
                    readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
@@ -862,6 +1305,7 @@ document.addEventListener("DOMContentLoaded", function() {
           eligibleElements.forEach(el => {
             const tag = el.tagName;
             const type = (el.type || '').toLowerCase();
+            const elId = (el.id || el.name || '').toLowerCase();
             if (tag === 'SELECT') {
               const value = (el.value || '').trim();
 
@@ -869,7 +1313,24 @@ document.addEventListener("DOMContentLoaded", function() {
             } else if (tag === 'TEXTAREA' || type === 'text' || type === 'email' || type === 'tel' || type === 'url' || type === 'number' || type === 'date' || type === 'time' || type === 'datetime-local') {
               const value = (el.value || '').trim();
 
-              if (!value) allStandardSatisfied = false;
+              if (!value) {
+                allStandardSatisfied = false;
+              } else {
+                // Special validation for zip codes: must have exactly 5 digits
+                if (elId.includes('_zip')) {
+                  const digitsOnly = value.replace(/[^0-9]/g, '');
+                  if (digitsOnly.length !== 5) {
+                    allStandardSatisfied = false;
+                  }
+                }
+                // Special validation for phone numbers: must have exactly 10 digits
+                if (elId.includes('_phone_number') || elId.includes('phone_number_')) {
+                  const digitsOnly = value.replace(/[^0-9]/g, '');
+                  if (digitsOnly.length !== 10) {
+                    allStandardSatisfied = false;
+                  }
+                }
+              }
             } else if (type === 'radio') {
               const group = radioGroups[el.name || el.id] || [];
               group.push(!!el.checked);
@@ -950,12 +1411,30 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (!isElementEligible(inp)) return;
                 const tag = inp.tagName;
                 const type = (inp.type || '').toLowerCase();
+                const inpId = (inp.id || inp.name || '').toLowerCase();
                 if (tag === 'SELECT') {
                   const value = (inp.value || '').trim();
                   if (!value) allStandardSatisfied = false;
                 } else if (tag === 'TEXTAREA' || type === 'text' || type === 'email' || type === 'tel' || type === 'url' || type === 'number' || type === 'date' || type === 'time' || type === 'datetime-local') {
                   const value = (inp.value || '').trim();
-                  if (!value) allStandardSatisfied = false;
+                  if (!value) {
+                    allStandardSatisfied = false;
+                  } else {
+                    // Special validation for zip codes: must have exactly 5 digits
+                    if (inpId.includes('_zip')) {
+                      const digitsOnly = value.replace(/[^0-9]/g, '');
+                      if (digitsOnly.length !== 5) {
+                        allStandardSatisfied = false;
+                      }
+                    }
+                    // Special validation for phone numbers: must have exactly 10 digits
+                    if (inpId.includes('_phone_number') || inpId.includes('phone_number_')) {
+                      const digitsOnly = value.replace(/[^0-9]/g, '');
+                      if (digitsOnly.length !== 10) {
+                        allStandardSatisfied = false;
+                      }
+                    }
+                  }
                 } else if (type === 'radio') {
                   const group = radioGroups[inp.name || inp.id] || [];
                   group.push(!!inp.checked);
@@ -1536,21 +2015,182 @@ document.addEventListener("DOMContentLoaded", function() {
           });
         }
         if (nextBtn) {
-          nextBtn.addEventListener('click', function() {
+          // Use pointerdown event to handle disabled button clicks (click events don't fire on disabled buttons)
+          nextBtn.addEventListener('pointerdown', function(e) {
+            // Only handle if button is disabled
+            if (!nextBtn.disabled && !nextBtn.hasAttribute('disabled')) {
+              return; // Let normal click handler take over
+            }
+            
+            console.log('[DISABLED NEXT BTN] Pointerdown on disabled button, looking for unfilled fields...');
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Find the current active question item - use .question-item class (not .question-step-item)
+            const activeQuestionItem = sectionEl.querySelector('.question-item:not(.question-step-hidden)');
+            console.log('[DISABLED NEXT BTN] Active question item:', activeQuestionItem);
+            console.log('[DISABLED NEXT BTN] Section element:', sectionEl);
+            
+            if (activeQuestionItem) {
+              // Find all visible inputs, selects, and textareas that should be filled
+              const inputs = activeQuestionItem.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), select, textarea');
+              const checkboxGroups = activeQuestionItem.querySelectorAll('.checkbox-group, .radio-group');
+              
+              console.log('[DISABLED NEXT BTN] Found inputs:', inputs.length);
+              console.log('[DISABLED NEXT BTN] Found checkbox/radio groups:', checkboxGroups.length);
+              
+              // Helper function to check if input is properly filled (with special rules for zip/phone)
+              function isInputProperlyFilled(input) {
+                const value = input.value ? input.value.trim() : '';
+                const inputId = (input.id || input.name || '').toLowerCase();
+                
+                // Empty value is never filled
+                if (!value) {
+                  console.log('[DISABLED NEXT BTN] Input is empty:', inputId);
+                  return false;
+                }
+                
+                // Zip code validation: must have exactly 5 digits
+                if (inputId.includes('_zip')) {
+                  const digitsOnly = value.replace(/[^0-9]/g, '');
+                  const isFilled = digitsOnly.length === 5;
+                  console.log('[DISABLED NEXT BTN] Zip validation for', inputId, '- digits:', digitsOnly.length, '- filled:', isFilled);
+                  return isFilled;
+                }
+                
+                // Phone number validation: must have exactly 10 digits
+                if (inputId.includes('_phone_number') || inputId.includes('phone_number_')) {
+                  const digitsOnly = value.replace(/[^0-9]/g, '');
+                  const isFilled = digitsOnly.length === 10;
+                  console.log('[DISABLED NEXT BTN] Phone validation for', inputId, '- digits:', digitsOnly.length, '- filled:', isFilled);
+                  return isFilled;
+                }
+                
+                // Default: any non-empty value is filled
+                return true;
+              }
+              
+              // Check regular inputs first
+              for (const input of inputs) {
+                // Skip hidden elements
+                if (input.offsetParent === null) {
+                  console.log('[DISABLED NEXT BTN] Skipping hidden input:', input.id || input.name);
+                  continue;
+                }
+                
+                const value = input.value ? input.value.trim() : '';
+                console.log('[DISABLED NEXT BTN] Checking input:', input.id || input.name, 'value:', value);
+                
+                if (!isInputProperlyFilled(input)) {
+                  // Found unfilled/incomplete input - scroll to it and highlight
+                  console.log('[DISABLED NEXT BTN] Found unfilled/incomplete input:', input.id || input.name);
+                  input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  input.focus();
+                  
+                  // Add temporary highlight effect
+                  const originalBorder = input.style.border;
+                  const originalBoxShadow = input.style.boxShadow;
+                  input.style.border = '2px solid #e74c3c';
+                  input.style.boxShadow = '0 0 10px rgba(231, 76, 60, 0.5)';
+                  setTimeout(() => {
+                    input.style.border = originalBorder;
+                    input.style.boxShadow = originalBoxShadow;
+                  }, 2000);
+                  return;
+                }
+              }
+              
+              // Check checkbox/radio groups - at least one should be checked
+              for (const group of checkboxGroups) {
+                if (group.offsetParent === null) {
+                  console.log('[DISABLED NEXT BTN] Skipping hidden checkbox/radio group');
+                  continue;
+                }
+                
+                const checkedInputs = group.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked');
+                console.log('[DISABLED NEXT BTN] Checkbox/radio group has', checkedInputs.length, 'checked items');
+                if (checkedInputs.length === 0) {
+                  // No selection made - scroll to the group
+                  console.log('[DISABLED NEXT BTN] Found unchecked checkbox/radio group');
+                  group.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  
+                  // Highlight the group
+                  const originalBorder = group.style.border;
+                  const originalBoxShadow = group.style.boxShadow;
+                  const originalBorderRadius = group.style.borderRadius;
+                  const originalPadding = group.style.padding;
+                  group.style.border = '2px solid #e74c3c';
+                  group.style.boxShadow = '0 0 10px rgba(231, 76, 60, 0.5)';
+                  group.style.borderRadius = '8px';
+                  group.style.padding = '10px';
+                  setTimeout(() => {
+                    group.style.border = originalBorder;
+                    group.style.boxShadow = originalBoxShadow;
+                    group.style.borderRadius = originalBorderRadius;
+                    group.style.padding = originalPadding;
+                  }, 2000);
+                  return;
+                }
+              }
+              
+              // Check for dropdown/select that needs selection
+              const selects = activeQuestionItem.querySelectorAll('select');
+              console.log('[DISABLED NEXT BTN] Found selects:', selects.length);
+              for (const select of selects) {
+                if (select.offsetParent === null) {
+                  console.log('[DISABLED NEXT BTN] Skipping hidden select:', select.id || select.name);
+                  continue;
+                }
+                
+                console.log('[DISABLED NEXT BTN] Checking select:', select.id || select.name, 'value:', select.value, 'selectedIndex:', select.selectedIndex);
+                if (!select.value || select.value === '' || select.selectedIndex === 0) {
+                  console.log('[DISABLED NEXT BTN] Found unfilled select:', select.id || select.name);
+                  select.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  select.focus();
+                  
+                  const originalBorder = select.style.border;
+                  const originalBoxShadow = select.style.boxShadow;
+                  select.style.border = '2px solid #e74c3c';
+                  select.style.boxShadow = '0 0 10px rgba(231, 76, 60, 0.5)';
+                  setTimeout(() => {
+                    select.style.border = originalBorder;
+                    select.style.boxShadow = originalBoxShadow;
+                  }, 2000);
+                  return;
+                }
+              }
+              
+              console.log('[DISABLED NEXT BTN] No unfilled fields found in active question');
+            } else {
+              console.log('[DISABLED NEXT BTN] No active question item found!');
+              // Try alternate selectors as fallback
+              const allQuestionItems = sectionEl.querySelectorAll('.question-item, .question-container');
+              console.log('[DISABLED NEXT BTN] All question items in section:', allQuestionItems.length);
+              allQuestionItems.forEach((item, idx) => {
+                console.log('[DISABLED NEXT BTN] Question item', idx, ':', item.id, 'classes:', item.className);
+              });
+            }
+          });
+          
+          nextBtn.addEventListener('click', function(e) {
+            // Skip if button is disabled (handled by pointerdown)
+            if (nextBtn.disabled || nextBtn.hasAttribute('disabled')) {
+              return;
+            }
 
             if (nextBtn.dataset.advanceMode === 'submit') {
 
               // Check authentication before submitting
               checkAuthBeforeNavigate(function() {
 
-                const formEl = document.getElementById('customForm');
-                if (formEl) {
-                  if (typeof formEl.requestSubmit === 'function') {
-                    formEl.requestSubmit();
-                  } else {
-                    formEl.submit();
-                  }
+              const formEl = document.getElementById('customForm');
+              if (formEl) {
+                if (typeof formEl.requestSubmit === 'function') {
+                  formEl.requestSubmit();
+                } else {
+                  formEl.submit();
                 }
+              }
               });
               return;
             }
@@ -1558,7 +2198,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Check authentication before navigating
             checkAuthBeforeNavigate(function() {
 
-              shiftQuestion(1);
+            shiftQuestion(1);
             });
           });
         }
@@ -1711,33 +2351,35 @@ document.addEventListener("DOMContentLoaded", function() {
     <iframe id="previewPdfIframe" style="width: 100%; height: 98vh; border: none;"></iframe>
   </div>
 </div>
+<!-- Professional Footer Section -->
 <div class="pro-footer">
-        <div class="pro-footer-col address-col">
-            <div class="pro-footer-logo">
-                <img src="logo.png" alt="FormStar Logo" style="max-width:120px;max-height:80px;">
-            </div>
-            <div class="pro-footer-title">FormStar</div>
-            <div class="pro-footer-contact">
-                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
-                <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
-            </div>
+    <div class="pro-footer-col address-col">
+        <div class="pro-footer-logo">
+            <img src="logo.png" alt="Form-Star Logo" style="max-width:120px;max-height:80px;">
         </div>
-        <div class="pro-footer-col nav-col">
-            <div class="pro-footer-title">Navigation</div>
-            <a href="index.html">Home</a>
-            <a href="../Pages/FreeForm.html">Forms</a>
-            <a href="../Pages/FAQ.html">FAQ</a>
-            <a href="../Pages/about.html">About Us</a>
-            <a href="../Pages/contact.html">Contact Us</a>
-        </div>
-        <div class="pro-footer-col company-col">
-            <div class="pro-footer-title company-title">About FormStar</div>
-            <div class="pro-footer-desc">FormStar consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+        <div class="pro-footer-title">Form-Star</div>
+        <div class="pro-footer-contact">
+            <a href="tel:18008508370">1-800-850-8370</a> &nbsp; 
+            <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
         </div>
     </div>
-    <footer>
-        &copy; 2024 FormStar. All rights reserved.
-    </footer>
+    <div class="pro-footer-col nav-col">
+        <div class="pro-footer-title">Navigation</div>
+        <a href="../../index.html">Home</a>
+        <a href="../../Pages/FreeForm.html">Forms</a>
+        <a href="../../Pages/FAQ.html">FAQ</a>
+        <a href="../../Pages/about.html">About Us</a>
+        <a href="../../Pages/contact.html">Contact Us</a>
+    </div>
+    <div class="pro-footer-col company-col">
+        <div class="pro-footer-title company-title">About Form-Star</div>
+        <div class="pro-footer-desc">Form-Star consists of a group of proven professionals with over 70 years of combined legal, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify paperwork for everyone.</div>
+    </div>
+</div>
+
+<footer>
+    &copy; 2026 Form-Star. All rights reserved.
+</footer>
   <style>
   .alert-overlay {
     position: fixed;
@@ -1812,17 +2454,17 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = 'Test Form';
-var questionSlugMap = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"","3":"hungry","4":"hungry","5":"tired"};
-var questionNameIds = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"fileUpload_2","3":"hungry","4":"hungry_dup2","5":"tired"};
+window.formId = '';
+var questionSlugMap = {"1":"how_many_people","2":"hungry"};
+var questionNameIds = {"1":"how_many_people","2":"hungry"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
 var allAreRequiredMap = {};
-var unifiedFieldsMap = {};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_people_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"how_many_people_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this defendant a business?","options":[{"text":"Yes","nodeId":"is_this_defendant_a_business_yes"},{"text":"No","nodeId":"is_this_defendant_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"is_this_defendant_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_defendant_a_business_yes_business_name_statement_number","isAmountOption":true},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"is_this_defendant_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["is_this_defendant_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 For Extra Plaintiff 1","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"3","pdfTitle":"SC-103 For Extra Plaintiff 3","pdfName":"sc103(3).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"5","pdfTitle":"SC-103 For Extra Plaintiff 5","pdfName":"sc103(5).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}]};
 window.hardAlertData = {};
 var entryTitleMap = {};
-window.fileUploadQuestions = [{"questionId":"2","fileTitle":"attached_documentation","priceId":"price_1Sq5XlFJeSRMFQ8XgrcVh6Or","nameId":"fileUpload_2"}];
+window.fileUploadQuestions = [];
 window.latexPreviewQuestions = [];
 window.pdfPreviewQuestions = [];
 
@@ -1994,7 +2636,7 @@ window.pdfPreviewQuestions = [];
         const optionValue = parts[parts.length - 1]; // last part: "yes"
         const entryNumber = parts[parts.length - 2]; // second last: "1"
         const fieldName = parts.slice(0, -2).join('_'); // everything before: "is_this_plaintiff_a_business"
-
+        
         // Try to find checkbox with pattern: *{fieldName}_{optionValue}_{entryNumber}
         // Or pattern: *{fieldName}*_{optionValue}_{entryNumber}
         const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -2004,7 +2646,7 @@ window.pdfPreviewQuestions = [];
           // and contains the field name somewhere
           const endsWithPattern = cb.id.endsWith('_' + optionValue + '_' + entryNumber);
           const containsFieldName = cb.id.includes(fieldName);
-
+          
           if (endsWithPattern && containsFieldName) {
             return cb;
           }
@@ -2830,28 +3472,28 @@ window.pdfPreviewQuestions = [];
               // CRITICAL: Don't reset checkbox/radio values during autofill - they might not be ready yet
               if (!isAutofill) {
                 // Reset checkbox values when hidden (only if not during autofill)
-                checkboxOptions.forEach((option) => {
-                  // Use the same ID format as when creating the checkbox
-                  let checkboxId;
-                  if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
-                    const sanitizedFieldName = sanitizeForId(triggerField.fieldName);
-                    const sanitizedOptionNodeId = sanitizeForId(option.nodeId);
-                    if (selectionType === 'single') {
-                      checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId + '_radio';
-                    } else {
-                      checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId;
-                    }
+              checkboxOptions.forEach((option) => {
+                // Use the same ID format as when creating the checkbox
+                let checkboxId;
+                if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
+                  const sanitizedFieldName = sanitizeForId(triggerField.fieldName);
+                  const sanitizedOptionNodeId = sanitizeForId(option.nodeId);
+                  if (selectionType === 'single') {
+                    checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId + '_radio';
                   } else {
-                    checkboxId = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
+                    checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId;
                   }
-                  const optionInput = document.getElementById(checkboxId);
-                  if (optionInput) {
+                } else {
+                  checkboxId = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
+                }
+                const optionInput = document.getElementById(checkboxId);
+                if (optionInput) {
 
-                    optionInput.checked = false;
-                    optionInput.dispatchEvent(new Event('change'));
+                  optionInput.checked = false;
+                  optionInput.dispatchEvent(new Event('change'));
 
-                  }
-                });
+                }
+              });
               } else {
 
               }
@@ -3856,7 +4498,7 @@ window.pdfPreviewQuestions = [];
           } else {
             // Create text input for other fields
             input = document.createElement('input');
-            input.type = field.label === 'Zip' ? 'number' : 'text';
+            input.type = 'text'; // Use text for all fields including Zip (zip codes can start with 0)
             // For multipleTextboxes: {dropdownName}_{locationFieldName}_{fieldType}
             // For numberedDropdown: {dropdownName}_{locationFieldName}_{fieldType}_{entryNumber}
             if (isMultipleTextboxes) {
@@ -3868,8 +4510,15 @@ window.pdfPreviewQuestions = [];
             input.placeholder = field.label; // e.g., Street, City, Zip
             input.className = 'address-input';
             input.style.textAlign = 'center'; // Ensure text is centered
-            // Add oninput handler to update full address when street, city, or zip changes
-            input.setAttribute('oninput', triggerUpdateFullAddressCode);
+            // Add maxlength and numeric-only for zip fields
+            if (field.label === 'Zip' || field.nodeId === 'zip' || input.id.includes('_zip')) {
+              input.setAttribute('maxlength', '5');
+              input.setAttribute('inputmode', 'numeric');
+              input.setAttribute('oninput', "this.value = this.value.replace(/[^0-9]/g, ''); " + triggerUpdateFullAddressCode);
+            } else {
+              // Add oninput handler to update full address when street, city, or zip changes
+              input.setAttribute('oninput', triggerUpdateFullAddressCode);
+            }
           }
           // Wrap each input in an .address-field div so margins apply
           const addrWrap = document.createElement('div');
@@ -3993,13 +4642,18 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
     const inputType = (type === 'number') ? 'number' : 'text';
     const placeholder = label;
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
+    // Add maxlength and inputmode for zip fields (numeric only, max 5 chars)
+    const isZipField = (label === 'Zip' || label === 'zip' || id.includes('_zip'));
+    const maxLengthAttr = isZipField ? ' maxlength="5"' : '';
+    const inputModeAttr = isZipField ? ' inputmode="numeric"' : '';
+    const zipOnInput = isZipField ? ' oninput="this.value = this.value.replace(/[^0-9]/g, \'\')"' : '';
     return (
       '<div class="address-field">' +
       '<input type="' + inputType + '" ' +
       'id="' + id + '" ' +
       'name="' + id + '" ' +
       'placeholder="' + placeholder + '" ' +
-      'class="address-input"' + valueAttr + '>' +
+      'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + '>' +
       '</div>'
     );
   };
@@ -4115,17 +4769,17 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       if (typeof userId === 'undefined') { var userId = null; }
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [{"questionId":"5","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"5","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
+    var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [];
+var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc103(1).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 1","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"1"},{"questionId":"1","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"1","pdfName":"sc103(3).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 3","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"3"},{"questionId":"1","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"},{"questionId":"1","pdfName":"sc103(5).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 5","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"5"}];
 var checkboxPdfEntries = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
-var labelNodeIdsMap = {};
+var labelMap = {"1":["Name"],"length":0};
+var amountMap = {"1":[],"length":0};
+var labelNodeIdsMap = {"1":["how_many_people_name"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -4470,172 +5124,14 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "Test Form";
-var pdfOutputFileName = "sc120.pdf";
-var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
+var pdfFileName = "";
+var pdfOutputFileName = "example.html";
+var stripePriceId = "";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["sc120", ];
+var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
-
-(function(){
- var thisQ=document.getElementById("question-container-2");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="1";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("2");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-3");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="1";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
-  (function(){
-    var cPrevType="fileUpload";
-    var cPrevAns="uploaded a file";
-    var cPrevQNum="2";
-    // Check if file has been uploaded
-    if(cPrevAns === "uploaded a file"){
-      if(typeof window.uploadedFiles !== 'undefined' && window.uploadedFiles[cPrevQNum]){
-        // Handle both single file (backward compatibility) and array of files
-        const filesArray = Array.isArray(window.uploadedFiles[cPrevQNum]) ? window.uploadedFiles[cPrevQNum] : [window.uploadedFiles[cPrevQNum]];
-        if(filesArray.length > 0){
-          anyMatch = true;
-        }
-      }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("3");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var fileUploadQuestion = "2";
-   var fileInput = document.getElementById('fileUpload_' + fileUploadQuestion);
-   if(fileInput){
-     fileInput.addEventListener('change', function(){ setTimeout(updateVisibility, 100); });
-   }
-   // Also listen to file upload container changes (when preview is shown/hidden)
-   var fileUploadContainer = document.getElementById('fileUploadContainer' + fileUploadQuestion);
-   if(fileUploadContainer){
-     var observer = new MutationObserver(function(){ setTimeout(updateVisibility, 100); });
-     observer.observe(fileUploadContainer, { attributes: true, attributeFilter: ['style'], childList: true, subtree: true });
-   }
- })();
- updateVisibility();
-})();
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -4891,7 +5387,7 @@ function showAlert(message, isHardAlert) {
                     '<div style="font-size: 0.9em; color: #666; font-style: italic;">Please change your answer to proceed</div>' +
                     '</div>';
             } else {
-                alertMessage.textContent = message;
+            alertMessage.textContent = message;
             }
         }
         alertOverlay.style.display = 'flex';
@@ -6210,16 +6706,16 @@ function triggerVisibilityUpdates() {
         const hasDeadline = deadline && typeof deadline.timeRemaining === 'function';
         while (idx < total && (hasDeadline ? deadline.timeRemaining() > 5 : processed < 10)) {
             const container = questionContainers[idx];
-            const questionId = container.id.replace('question-container-', '');
-            try {
-                const questionElement = document.getElementById(questionNameIds[questionId]) || 
-                                      document.getElementById('answer' + questionId);
-                if (questionElement) {
-                    const event = new Event('change', { bubbles: true });
-                    questionElement.dispatchEvent(event);
-                }
-            } catch (error) {
+        const questionId = container.id.replace('question-container-', '');
+        try {
+        const questionElement = document.getElementById(questionNameIds[questionId]) || 
+                              document.getElementById('answer' + questionId);
+        if (questionElement) {
+            const event = new Event('change', { bubbles: true });
+            questionElement.dispatchEvent(event);
             }
+        } catch (error) {
+        }
             idx += 1;
             processed += 1;
         }
@@ -6686,12 +7182,18 @@ function showTextboxLabels(questionId, count){
                         locationFieldDiv.appendChild(hiddenWrap);
                     } else {
                         input = document.createElement('input');
-                        input.type = f.label === 'Zip' ? 'number' : 'text';
+                        input.type = 'text'; // Use text for all fields including Zip (zip codes can start with 0)
                         input.id = locPrefix + '_' + f.nodeId + '_' + j;
                         input.name = input.id;
                         input.placeholder = f.label; // Street, City, Zip
                         input.className = 'address-input';
                         input.style.textAlign = 'center'; // Ensure text is centered
+                        // Add maxlength and numeric-only for zip fields
+                        if (f.label === 'Zip' || f.nodeId === 'zip' || input.id.includes('_zip')) {
+                            input.setAttribute('maxlength', '5');
+                            input.setAttribute('inputmode', 'numeric');
+                            input.oninput = function() { this.value = this.value.replace(/[^0-9]/g, ''); };
+                        }
                     }
                     const fieldWrap = document.createElement('div');
                     fieldWrap.className = 'address-field';
@@ -6771,9 +7273,21 @@ function showTextboxLabels(questionId, count){
                     ' style="margin: 4px auto; max-width: 400px;"' +
                     ' oninput="formatPhoneInput(this)"' +
                     ' value="' + safePrefill + '">' +
+                    '<input type="hidden"' +
+                    ' id="' + field.nodeId + '_code_' + j + '"' +
+                    ' name="' + field.nodeId + '_code_' + j + '">' +
+                    '<input type="hidden"' +
+                    ' id="' + field.nodeId + '_no_code_' + j + '"' +
+                    ' name="' + field.nodeId + '_no_code_' + j + '">' +
                   '</div>';
-                // Append all children (wrapper + input)
+                // Append all children (wrapper + input + hidden fields)
                 Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
+                setTimeout(() => {
+                    const createdInput = document.getElementById(fieldId);
+                    if (createdInput) {
+                        window.formatPhoneInput(createdInput);
+                    }
+                }, 0);
             } else if (field.type === 'amount') {
                 const fieldId = field.nodeId + "_" + j;
                 const inputDiv = document.createElement('div');
@@ -8192,8 +8706,8 @@ function updateLinkedFields() {
 
                 if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
-                }
             }
+        }
         }
 
     });
@@ -9313,48 +9827,48 @@ async function previewPdf(baseName, isUploaded, isLatex, isPdfPreview, questionI
             }
         } else {
             // For server-side PDFs, fetch from server
-            // Collect form data
-            const form = document.getElementById('customForm');
-            const fd = new FormData();
-            const formElements = form.querySelectorAll('input, textarea, select');
-            const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
-            const allFormElements = [...formElements, ...externalFormElements];
+        // Collect form data
+        const form = document.getElementById('customForm');
+        const fd = new FormData();
+        const formElements = form.querySelectorAll('input, textarea, select');
+        const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+        const allFormElements = [...formElements, ...externalFormElements];
 
-            allFormElements.forEach(element => {
-                if (element.name && !element.disabled) {
-                    if (element.type === 'checkbox' || element.type === 'radio') {
-                        if (element.checked) {
-                            fd.append(element.name, 'on');
-                        }
-                    } else {
-                        let value = element.value;
-                        if (element.type === 'date' && value) {
-                            value = formatDateForServer(value);
-                        }
-                        if (value && value.trim() !== '') {
-                            fd.append(element.name, value);
-                        }
+        allFormElements.forEach(element => {
+            if (element.name && !element.disabled) {
+                if (element.type === 'checkbox' || element.type === 'radio') {
+                    if (element.checked) {
+                        fd.append(element.name, 'on');
+                    }
+                } else {
+                    let value = element.value;
+                    if (element.type === 'date' && value) {
+                        value = formatDateForServer(value);
+                    }
+                    if (value && value.trim() !== '') {
+                        fd.append(element.name, value);
                     }
                 }
-            });
-
-            // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
-            const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
-            const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
-            const res = await fetch(endpoint, { 
-                method: 'POST', 
-                body: fd, 
-                credentials: 'include' 
-            });
-
-            if (!res.ok) {
-                throw new Error("HTTP error! status: " + res.status);
             }
+        });
 
-            const blob = await res.blob();
-            if (blob.size === 0) {
-                throw new Error("Received empty PDF blob from server");
-            }
+        // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
+        const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
+        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
+        const res = await fetch(endpoint, { 
+            method: 'POST', 
+            body: fd, 
+            credentials: 'include' 
+        });
+
+        if (!res.ok) {
+            throw new Error("HTTP error! status: " + res.status);
+        }
+
+        const blob = await res.blob();
+        if (blob.size === 0) {
+            throw new Error("Received empty PDF blob from server");
+        }
 
             url = URL.createObjectURL(blob);
         }
@@ -9886,8 +10400,8 @@ function attachCalculationListeners() {
     // Run calculations asynchronously after page is interactive
     if (typeof requestIdleCallback !== 'undefined') {
         requestIdleCallback(() => {
-            runAllHiddenCheckboxCalculations();
-            runAllHiddenTextCalculations();
+    runAllHiddenCheckboxCalculations();
+    runAllHiddenTextCalculations();
         }, { timeout: 1000 });
     } else {
         // Fallback for browsers without requestIdleCallback
@@ -10082,27 +10596,27 @@ if (typeof handleNext === 'function') {
         let saveRetryCount = 0;
         const MAX_RETRIES = 3;
         const DEBOUNCE_DELAY = 1000; // Wait 1 second after last change before saving
-
+        
         // Helper: save answers (with debouncing, error handling, and visibility prioritization)
         async function saveAnswers(immediate = false) {
             if (!isUserLoggedIn || !userId) {
 
                 return;
             }
-
+            
             // If immediate save requested, clear any pending debounced save
             if (immediate && saveAnswersTimeout) {
                 clearTimeout(saveAnswersTimeout);
                 saveAnswersTimeout = null;
             }
-
+            
             // If already saving, mark that we need to save again after current save completes
             if (isSaving) {
 
                 pendingSave = true;
                 return;
             }
-
+            
             // Debounce: wait for user to stop typing
             if (!immediate) {
                 clearTimeout(saveAnswersTimeout);
@@ -10111,32 +10625,32 @@ if (typeof handleNext === 'function') {
                 }, DEBOUNCE_DELAY);
                 return;
             }
-
+            
             // 🔧 NEW: Prevent blank values from being saved in first 3 seconds
             if (window.preventBlankSaves) {
 
                 return;
             }
-
+            
             isSaving = true;
             try {
                 const fields = getFormFields();
 
                 const answers = {};
                 const fieldVisibility = {}; // Track which fields are visible
-
+                
                 fields.forEach(el => {
                     const isVisible = isElementActuallyVisible(el);
                     const fieldName = el.name;
                     const fieldId = el.id;
                     const fieldType = el.type || el.tagName;
-
+                    
                     // Skip if we already have a visible field's value and this field is hidden
                     if (fieldVisibility[fieldName] === true && !isVisible) {
 
                         return; // Skip this hidden field, we already have a visible one
                     }
-
+                    
                     // Store the value
                     let valueToSave = null;
                     if (el.type === 'checkbox') {
@@ -10153,7 +10667,7 @@ if (typeof handleNext === 'function') {
                         valueToSave = el.value;
                         answers[fieldName] = valueToSave;
                     }
-
+                    
                     // Track visibility for this field name
                     fieldVisibility[fieldName] = isVisible;
 
@@ -10162,21 +10676,21 @@ if (typeof handleNext === 'function') {
 
                     }
                 });
-
+                
                 // Write to Firestore with error handling and retry logic
                 await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
 
                 saveRetryCount = 0; // Reset retry count on success
             } catch (error) {
-
+                
                 // Handle resource-exhausted error specifically
                 if (error.code === 'resource-exhausted' || (error.message && error.message.includes('queued writes'))) {
-
+                    
                     // Retry with exponential backoff
                     if (saveRetryCount < MAX_RETRIES) {
                         saveRetryCount++;
                         const backoffDelay = Math.min(1000 * Math.pow(2, saveRetryCount), 10000); // Max 10 seconds
-
+                        
                         setTimeout(() => {
                             saveAnswers(true); // Retry immediately
                         }, backoffDelay);
@@ -10191,7 +10705,7 @@ if (typeof handleNext === 'function') {
                 }
             } finally {
                 isSaving = false;
-
+                
                 // If there's a pending save, trigger it after a short delay
                 if (pendingSave) {
                     pendingSave = false;
@@ -10437,10 +10951,10 @@ if (typeof handleNext === 'function') {
                                         el.checked = false;
                                     } else {
                                         console.log('✅ [AUTOFILL RADIO] First pass - checking radio (safe)');
-                                        el.checked = true;
-                                        // Dispatch change event to trigger linked textbox creation
-                                        const changeEvent = new Event('change', { bubbles: true });
-                                        el.dispatchEvent(changeEvent);
+                                    el.checked = true;
+                                    // Dispatch change event to trigger linked textbox creation
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    el.dispatchEvent(changeEvent);
                                         // Verify radio is still checked after change event
                                         setTimeout(() => {
 
@@ -10459,7 +10973,7 @@ if (typeof handleNext === 'function') {
                                         el.checked = false;
                                     } else {
 
-                                        el.checked = !!autofillValue;
+                                el.checked = !!autofillValue;
                                     }
                                 } else {
                                     el.checked = !!autofillValue;
@@ -10531,7 +11045,7 @@ if (typeof handleNext === 'function') {
                                     }
                                 }
                                 // If no hard alert match, proceed with normal autofill
-                                el.value = autofillValue;
+                            el.value = autofillValue;
 
                                 // Trigger change event to call dropdownMirror and update conditional logic
                                 const changeEvent = new Event('change', { bubbles: true });
@@ -10539,13 +11053,13 @@ if (typeof handleNext === 'function') {
                             } else {
                                 el.value = autofillValue;
 
-                                // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                                if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                                    const inputEvent = new Event('input', { bubbles: true });
-                                    el.dispatchEvent(inputEvent);
-                                    const changeEvent = new Event('change', { bubbles: true });
-                                    el.dispatchEvent(changeEvent);
-                                }
+                            // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                            if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                const inputEvent = new Event('input', { bubbles: true });
+                                el.dispatchEvent(inputEvent);
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
+                            }
                             }
                             }
                         } else {
@@ -10559,7 +11073,7 @@ if (typeof handleNext === 'function') {
                                     if (fieldType === 'text' || fieldType === 'SELECT' || fieldType === 'INPUT' || fieldType === 'location') {
 
                                     }
-                                }
+                            }
                             }
                         }
                     });
@@ -10694,7 +11208,7 @@ if (typeof handleNext === 'function') {
                                         el.checked = false;
                                     } else {
                                         // Safe to check the checkbox
-                                        el.checked = !!mappedData[el.name];
+                                    el.checked = !!mappedData[el.name];
                                     }
                                 } else if (el.type === 'radio') {
                                     // For radio buttons, check if it would trigger a hard alert before checking
@@ -10705,7 +11219,7 @@ if (typeof handleNext === 'function') {
                                             el.checked = false;
                                         } else {
                                             console.log('✅ [AUTOFILL RADIO] Second pass - checking radio (safe)');
-                                            el.checked = true;
+                                        el.checked = true;
                                         }
                                     } else {
                                         el.checked = false;
@@ -10738,7 +11252,7 @@ if (typeof handleNext === 'function') {
                                                     fieldById.checked = false;
                                                 } else {
                                                     console.log('✅ [AUTOFILL RADIO] Additional pass (by ID) - checking radio (safe)');
-                                                    fieldById.checked = true;
+                                                fieldById.checked = true;
                                                 }
                                             } else {
                                                 fieldById.checked = false;
@@ -10750,7 +11264,7 @@ if (typeof handleNext === 'function') {
                                                 fieldById.checked = false;
                                             } else {
                                                 // Safe to check the checkbox
-                                                fieldById.checked = !!mappedData[fieldName];
+                                    fieldById.checked = !!mappedData[fieldName];
                                             }
                                         }
                                 } else {
@@ -10933,10 +11447,10 @@ if (typeof handleNext === 'function') {
                                     el.checked = false;
                                 } else {
                                     console.log('✅ [AUTOFILL RADIO] Second pass (fallback) - checking radio (safe)');
-                                    el.checked = true;
-                                    // Dispatch change event to trigger linked textbox creation
-                                    const changeEvent = new Event('change', { bubbles: true });
-                                    el.dispatchEvent(changeEvent);
+                                el.checked = true;
+                                // Dispatch change event to trigger linked textbox creation
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
                                 }
                             } else {
                                 el.checked = false;
@@ -10951,7 +11465,7 @@ if (typeof handleNext === 'function') {
                                     el.checked = false;
                                 } else {
 
-                                    el.checked = !!autofillValue;
+                            el.checked = !!autofillValue;
                                 }
                             } else {
                                 el.checked = !!autofillValue;
@@ -11000,15 +11514,15 @@ if (typeof handleNext === 'function') {
                             // Trigger change event to call dropdownMirror and update conditional logic
                             const changeEvent = new Event('change', { bubbles: true });
                             el.dispatchEvent(changeEvent);
-                        } else {
-                            el.value = autofillValue;
-                            // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                            if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                                const inputEvent = new Event('input', { bubbles: true });
-                                el.dispatchEvent(inputEvent);
-                                const changeEvent = new Event('change', { bubbles: true });
-                                el.dispatchEvent(changeEvent);
-                            }
+                    } else {
+                        el.value = autofillValue;
+                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                            const inputEvent = new Event('input', { bubbles: true });
+                            el.dispatchEvent(inputEvent);
+                            const changeEvent = new Event('change', { bubbles: true });
+                            el.dispatchEvent(changeEvent);
+                        }
                         }
                     }
                     // Debug successful autofill
@@ -11068,14 +11582,14 @@ if (typeof handleNext === 'function') {
                             const changeEvent = new Event('change', { bubbles: true });
                             el.dispatchEvent(changeEvent);
                         } else {
-                            el.value = autofillValue;
-                            // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                            if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                                const inputEvent = new Event('input', { bubbles: true });
-                                el.dispatchEvent(inputEvent);
-                                const changeEvent = new Event('change', { bubbles: true });
-                                el.dispatchEvent(changeEvent);
-                            }
+                        el.value = autofillValue;
+                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                            const inputEvent = new Event('input', { bubbles: true });
+                            el.dispatchEvent(inputEvent);
+                            const changeEvent = new Event('change', { bubbles: true });
+                            el.dispatchEvent(changeEvent);
+                        }
                         }
                     } else if (autofillValue !== null && el.type === 'checkbox' && !el.checked) {
                         // Check if this checkbox would trigger a hard alert before checking
@@ -11084,7 +11598,7 @@ if (typeof handleNext === 'function') {
                             el.checked = false;
                         } else {
                             // Safe to check the checkbox
-                            el.checked = !!autofillValue;
+                        el.checked = !!autofillValue;
                         }
                     }
                 });
@@ -11132,7 +11646,7 @@ if (typeof handleNext === 'function') {
                 if (targetRadioBefore) {
 
                 }
-                window.isInitialAutofill = false;
+            window.isInitialAutofill = false;
 
                 // Verify target radio button state after clearing flag
                 setTimeout(() => {
@@ -11141,8 +11655,8 @@ if (typeof handleNext === 'function') {
 
                     }
                 }, 100);
-                // 🔧 NEW: Restore prefill values for any blank fields after Firebase autofill
-                if (window.unifiedFieldsMap) {
+            // 🔧 NEW: Restore prefill values for any blank fields after Firebase autofill
+            if (window.unifiedFieldsMap) {
                 Object.keys(window.unifiedFieldsMap).forEach(questionId => {
                     const fields = window.unifiedFieldsMap[questionId];
                     if (Array.isArray(fields)) {
@@ -11206,20 +11720,20 @@ if (typeof handleNext === 'function') {
                         });
                     }
                 });
-                } else {
-                }
-                // 🔧 NEW: Update all hidden address fields after autofill completes
-                if (typeof updateAllHiddenAddressFields === 'function') {
-                    updateAllHiddenAddressFields();
-                }
-                // 🔧 NEW: Update all linked checkboxes after autofill completes
-                if (typeof window.updateAllLinkedCheckboxes === 'function') {
-                    window.updateAllLinkedCheckboxes();
-                }
-                // Also update inverse checkboxes after autofill
-                if (typeof window.updateAllInverseCheckboxes === 'function') {
-                    window.updateAllInverseCheckboxes();
-                }
+            } else {
+            }
+            // 🔧 NEW: Update all hidden address fields after autofill completes
+            if (typeof updateAllHiddenAddressFields === 'function') {
+                updateAllHiddenAddressFields();
+            }
+            // 🔧 NEW: Update all linked checkboxes after autofill completes
+            if (typeof window.updateAllLinkedCheckboxes === 'function') {
+                window.updateAllLinkedCheckboxes();
+            }
+            // Also update inverse checkboxes after autofill
+            if (typeof window.updateAllInverseCheckboxes === 'function') {
+                window.updateAllInverseCheckboxes();
+            }
                 // NOTE: radioGroupChanged events are now dispatched BEFORE isInitialAutofill is set to false
                 // (see code above that processes autofilled radio buttons before clearing the flag)
             }, 300); // Wait 300ms for conditional logic to process radioGroupChanged events
@@ -11357,7 +11871,7 @@ if (typeof handleNext === 'function') {
                                     el.checked = false;
                                 } else {
 
-                                    el.checked = !!data[el.name];
+                                el.checked = !!data[el.name];
                                 }
                             } else if (el.type === 'radio') {
                                 // For radio buttons, check if it would trigger a hard alert before checking
@@ -11368,7 +11882,7 @@ if (typeof handleNext === 'function') {
                                         el.checked = false;
                                     } else {
                                         console.log('✅ [AUTOFILL RADIO] localStorage pass - checking radio (safe)');
-                                        el.checked = true;
+                                    el.checked = true;
                                     }
                             } else {
                                     el.checked = false;
@@ -11475,7 +11989,7 @@ if (typeof handleNext === 'function') {
                                             el.checked = false;
                                         } else {
 
-                                            el.checked = !!data[el.name];
+                                        el.checked = !!data[el.name];
                                         }
                                     } else if (el.type === 'radio') {
                                         // For radio buttons, check if it would trigger a hard alert before checking
@@ -11513,7 +12027,7 @@ if (typeof handleNext === 'function') {
                                             fieldById.checked = false;
                                         } else {
 
-                                            fieldById.checked = !!data[fieldName];
+                                        fieldById.checked = !!data[fieldName];
                                         }
                                     } else if (fieldById.type === 'radio') {
                                         // For radio buttons, check if it would trigger a hard alert before checking
@@ -11591,10 +12105,10 @@ if (typeof handleNext === 'function') {
                                                 el.checked = false;
                                             } else {
                                                 console.log('✅ [AUTOFILL RADIO] Additional pass 3 - checking radio (safe)');
-                                                el.checked = true;
-                                                // Dispatch change event to trigger linked textbox creation
-                                                const changeEvent = new Event('change', { bubbles: true });
-                                                el.dispatchEvent(changeEvent);
+                                            el.checked = true;
+                                            // Dispatch change event to trigger linked textbox creation
+                                            const changeEvent = new Event('change', { bubbles: true });
+                                            el.dispatchEvent(changeEvent);
                                             }
                                         } else {
                                             el.checked = false;
@@ -11609,7 +12123,7 @@ if (typeof handleNext === 'function') {
                                                 el.checked = false;
                                             } else {
 
-                                                el.checked = !!autofillValue;
+                                        el.checked = !!autofillValue;
                                             }
                                         } else {
                                             el.checked = !!autofillValue;
@@ -11658,15 +12172,15 @@ if (typeof handleNext === 'function') {
                                         // Trigger change event to call dropdownMirror and update conditional logic
                                         const changeEvent = new Event('change', { bubbles: true });
                                         el.dispatchEvent(changeEvent);
-                                    } else {
-                                        el.value = autofillValue;
-                                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                                            const inputEvent = new Event('input', { bubbles: true });
-                                            el.dispatchEvent(inputEvent);
-                                            const changeEvent = new Event('change', { bubbles: true });
-                                            el.dispatchEvent(changeEvent);
-                                        }
+                                } else {
+                                    el.value = autofillValue;
+                                    // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                                    if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                        const inputEvent = new Event('input', { bubbles: true });
+                                        el.dispatchEvent(inputEvent);
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
+                                    }
                                     }
                                 }
                                 // Debug successful autofill
@@ -11708,11 +12222,11 @@ if (typeof handleNext === 'function') {
                                         el.checked = false;
                                     } else {
                                         // Safe to check the checkbox
-                                        el.checked = !!autofillValue;
-                                        // Dispatch change event to trigger linked textbox creation
-                                        if (el.checked) {
-                                            const changeEvent = new Event('change', { bubbles: true });
-                                            el.dispatchEvent(changeEvent);
+                                    el.checked = !!autofillValue;
+                                    // Dispatch change event to trigger linked textbox creation
+                                    if (el.checked) {
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
                                         }
                                     }
                                 }
@@ -11837,6 +12351,129 @@ if (typeof handleNext === 'function') {
                     }
                 });
             }
+            
+            // Mobile Menu Toggle
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileNav = document.getElementById('mobile-nav');
+            const mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+            const mobileFormsMenu = document.getElementById('mobile-forms-menu');
+            const mobileAuthSection = document.getElementById('mobile-auth-section');
+            const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+            const body = document.body;
+            
+            function toggleMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    body.classList.toggle('menu-open');
+                }
+            }
+            
+            function closeMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    body.classList.remove('menu-open');
+                }
+            }
+            
+            // Toggle mobile menu
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                });
+            }
+            
+            // Toggle mobile forms submenu
+            if (mobileFormsToggle && mobileFormsMenu) {
+                mobileFormsToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mobileFormsToggle.classList.toggle('active');
+                    mobileFormsMenu.classList.toggle('active');
+                });
+            }
+            
+            // Close mobile menu when clicking on links
+            if (mobileNav) {
+                mobileNav.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' && !e.target.classList.contains('mobile-nav-toggle')) {
+                        closeMobileMenu();
+                    }
+                });
+            }
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (mobileNav && mobileMenuToggle && !mobileNav.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+            
+            // Close mobile menu on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mobileNav && mobileNav.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
+            
+            // Prevent body scroll when menu is open
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        if (body.classList.contains('menu-open')) {
+                            body.style.overflow = 'hidden';
+                        } else {
+                            body.style.overflow = '';
+                        }
+                    }
+                });
+            });
+            if (body) {
+                observer.observe(body, { attributes: true });
+            }
+            
+            // Show/hide mobile logout button based on auth state (if Firebase auth is available)
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        // User is signed in - show mobile logout button
+                        if (mobileAuthSection) {
+                            mobileAuthSection.style.display = 'block';
+                        }
+                        // Hide desktop sign-in button, show logout
+                        const signInBtn = document.getElementById('sign-in-btn');
+                        const logoutBtn = document.getElementById('logout-btn');
+                        if (signInBtn) signInBtn.style.display = 'none';
+                        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                    } else {
+                        // User is signed out - hide mobile logout button
+                        if (mobileAuthSection) {
+                            mobileAuthSection.style.display = 'none';
+                        }
+                        // Show desktop sign-in button, hide logout
+                        const signInBtn = document.getElementById('sign-in-btn');
+                        const logoutBtn = document.getElementById('logout-btn');
+                        if (signInBtn) signInBtn.style.display = 'inline-block';
+                        if (logoutBtn) logoutBtn.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Handle mobile logout button click
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof firebase !== 'undefined' && firebase.auth) {
+                        firebase.auth().signOut().then(function() {
+                            window.location.reload();
+                        }).catch(function(error) {
+                            alert('Sign Out Error: ' + error.message);
+                        });
+                    }
+                });
+            }
+            
             // Update cart count badge in header
             function updateCartCountBadge() {
                 const cartCountElement = document.getElementById('cart-count-badge');
@@ -12067,12 +12704,17 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const inputType = type === 'number' ? 'number' : 'text';
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
+    // Add maxlength and inputmode for zip fields (numeric only, max 5 chars)
+    const isZipField = (label === 'Zip' || label === 'zip' || id.includes('_zip'));
+    const maxLengthAttr = isZipField ? ' maxlength="5"' : '';
+    const inputModeAttr = isZipField ? ' inputmode="numeric"' : '';
+    const zipOnInput = isZipField ? ' oninput="this.value = this.value.replace(/[^0-9]/g, \'\')"' : '';
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
            'id="' + id + '" ' +
            'name="' + id + '" ' +
            'placeholder="' + placeholder + '" ' +
-           'class="address-input"' + valueAttr + '>' +
+           'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + '>' +
            '</div>';
 }
 </script>
@@ -12908,6 +13550,9 @@ async function handleFileUpload(questionId, input) {
   // Reset the file input so the same file can be uploaded again if needed
   input.value = '';
 
+  // Update hidden checkbox (create and check)
+  updateFileUploadCheckbox(questionId);
+
   // Refresh navigation to update button states
   refreshFileUploadNavigation(questionId);
 
@@ -12996,11 +13641,74 @@ async function removeSingleFileUpload(questionId, fileIndex) {
       // Refresh display
       displayUploadedFiles(questionId);
 
+      // Update hidden checkbox (should still be checked since files remain)
+      updateFileUploadCheckbox(questionId);
+
       // Refresh navigation
       refreshFileUploadNavigation(questionId);
 
       // Save updated file list to storage
       await saveUploadedFilesToStorage(questionId);
+    }
+  }
+}
+
+// Helper function to update hidden checkbox based on file upload status
+function updateFileUploadCheckbox(questionId) {
+  // Find the fileTitle for this question
+  let fileTitle = null;
+  if (window.fileUploadQuestions && Array.isArray(window.fileUploadQuestions)) {
+    const fileUploadQ = window.fileUploadQuestions.find(q => q.questionId == questionId);
+    if (fileUploadQ && fileUploadQ.fileTitle) {
+      fileTitle = fileUploadQ.fileTitle;
+    }
+  }
+  
+  if (!fileTitle) {
+    return; // No fileTitle configured for this question
+  }
+  
+  const checkboxName = fileTitle + '_checked';
+  const checkboxId = checkboxName;
+  
+  // Check if files are uploaded
+  const hasFiles = window.uploadedFiles && 
+                   window.uploadedFiles[questionId] && 
+                   Array.isArray(window.uploadedFiles[questionId]) && 
+                   window.uploadedFiles[questionId].length > 0;
+  
+  if (hasFiles) {
+    // Create or check the hidden checkbox
+    let checkbox = document.getElementById(checkboxId);
+    if (!checkbox) {
+      // Create the hidden checkbox
+      checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = checkboxId;
+      checkbox.name = checkboxName;
+      checkbox.style.display = 'none';
+      checkbox.checked = true;
+      
+      // Add to hidden fields container
+      let hiddenContainer = document.getElementById('hidden_pdf_fields');
+      if (!hiddenContainer) {
+        hiddenContainer = document.createElement('div');
+        hiddenContainer.id = 'hidden_pdf_fields';
+        hiddenContainer.style.display = 'none';
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(hiddenContainer);
+      }
+      hiddenContainer.appendChild(checkbox);
+    } else {
+      // Check the existing checkbox
+      checkbox.checked = true;
+    }
+  } else {
+    // Uncheck and remove the hidden checkbox
+    const checkbox = document.getElementById(checkboxId);
+    if (checkbox) {
+      checkbox.checked = false;
+      checkbox.remove();
     }
   }
 }
@@ -13023,6 +13731,9 @@ async function removeAllFileUploads(questionId) {
     fileInput.value = '';
     fileInput.files = null;
   }
+
+  // Update hidden checkbox (uncheck and remove)
+  updateFileUploadCheckbox(questionId);
 
   // Refresh navigation
   refreshFileUploadNavigation(questionId);
@@ -13537,6 +14248,9 @@ document.addEventListener('DOMContentLoaded', function() {
           if (preview) preview.style.display = 'block';
 
           displayUploadedFiles(questionId);
+
+          // Update hidden checkbox (create and check)
+          updateFileUploadCheckbox(questionId);
 
         }
       }
