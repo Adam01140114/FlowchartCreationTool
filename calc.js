@@ -227,13 +227,16 @@ function gatherAllAmountLabels() {
             textboxesCount: cell._textboxes.length
           });
           cell._textboxes.forEach((tb, tbIndex) => {
-            if (tb.isAmountOption) {
+            // Include fields that are marked as amount options OR are currency type fields
+            if (tb.isAmountOption || tb.type === "currency") {
               const amountName = tb.nameId || "";
               const sanitizedAmountName = sanitizeNameId(amountName);
               console.log('[CALC gatherAllAmountLabels] Processing amount option:', {
                 tbIndex,
                 amountName,
-                sanitizedAmountName
+                sanitizedAmountName,
+                isAmountOption: tb.isAmountOption,
+                type: tb.type
               });
               // Generate numbered variants from min to max
               for (let i = min; i <= max; i++) {

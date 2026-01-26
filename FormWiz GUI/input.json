@@ -2,227 +2,11 @@
   "sections": [
     {
       "sectionId": 1,
-      "sectionName": "Introduction",
+      "sectionName": "Employment Info",
       "questions": [
         {
           "questionId": 1,
-          "text": "How many people",
-          "type": "numberedDropdown",
-          "logic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "nodeId": "how_many_people",
-          "min": "1",
-          "max": "5",
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Name",
-              "nodeId": "how_many_people_name",
-              "order": 1,
-              "prefill": ""
-            },
-            {
-              "type": "phone",
-              "label": "Phone Number",
-              "nodeId": "how_many_people_phone_number",
-              "order": 2
-            },
-            {
-              "type": "location",
-              "fieldName": "Please enter their address",
-              "nodeId": "location_data",
-              "order": 3
-            },
-            {
-              "type": "dropdown",
-              "fieldName": "Is this defendant a business?",
-              "options": [
-                {
-                  "text": "Yes",
-                  "nodeId": "is_this_defendant_a_business_yes"
-                },
-                {
-                  "text": "No",
-                  "nodeId": "is_this_defendant_a_business_no"
-                }
-              ],
-              "triggerSequences": [
-                {
-                  "condition": "Yes",
-                  "title": "Additional Information",
-                  "fields": [
-                    {
-                      "type": "location",
-                      "fieldName": "Where did they file their fictitious business name?",
-                      "nodeId": "location_data"
-                    },
-                    {
-                      "type": "label",
-                      "label": "Business Name",
-                      "nodeId": "is_this_defendant_a_business_yes_business_name"
-                    },
-                    {
-                      "type": "label",
-                      "label": "Business Name Statement Number",
-                      "nodeId": "is_this_defendant_a_business_yes_business_name_statement_number",
-                      "isAmountOption": true
-                    },
-                    {
-                      "type": "checkbox",
-                      "fieldName": "What do they do business as?",
-                      "selectionType": "single",
-                      "options": [
-                        {
-                          "text": "An Individual",
-                          "nodeId": "is_this_defendant_a_business_yes_what_do_they_do_business_as_an_individual"
-                        },
-                        {
-                          "text": "An Association",
-                          "nodeId": "is_this_defendant_a_business_yes_what_do_they_do_business_as_an_association"
-                        },
-                        {
-                          "text": "A Partnership",
-                          "nodeId": "is_this_defendant_a_business_yes_what_do_they_do_business_as_a_partnership"
-                        },
-                        {
-                          "text": "A Corporation",
-                          "nodeId": "is_this_defendant_a_business_yes_what_do_they_do_business_as_a_corporation"
-                        },
-                        {
-                          "text": "A Limited Liability Company",
-                          "nodeId": "is_this_defendant_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "date",
-                      "label": "When does their business statement expire?",
-                      "nodeId": "is_this_defendant_a_business_yes_when_does_their_business_statement_expire",
-                      "conditionalLogic": {
-                        "enabled": true,
-                        "conditions": [
-                          "is_this_defendant_a_business_yes_what_do_they_do_business_as_an_individual"
-                        ]
-                      }
-                    },
-                    {
-                      "type": "pdf",
-                      "number": "1",
-                      "pdfTitle": "SC-103 For Extra Plaintiff 1",
-                      "pdfName": "sc103(1).pdf",
-                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
-                    },
-                    {
-                      "type": "pdf",
-                      "number": "2",
-                      "pdfTitle": "SC-103 For Extra Plaintiff 2",
-                      "pdfName": "sc103(2).pdf",
-                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
-                    },
-                    {
-                      "type": "pdf",
-                      "number": "3",
-                      "pdfTitle": "SC-103 For Extra Plaintiff 3",
-                      "pdfName": "sc103(3).pdf",
-                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
-                    },
-                    {
-                      "type": "pdf",
-                      "number": "4",
-                      "pdfTitle": "SC-103 For Extra Plaintiff 4",
-                      "pdfName": "sc103(4).pdf",
-                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
-                    },
-                    {
-                      "type": "pdf",
-                      "number": "5",
-                      "pdfTitle": "SC-103 For Extra Plaintiff 5",
-                      "pdfName": "sc103(5).pdf",
-                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
-                    }
-                  ]
-                }
-              ],
-              "order": 4
-            }
-          ]
-        },
-        {
-          "questionId": 2,
-          "text": "Hungry?",
+          "text": "Are you currently employed",
           "type": "dropdown",
           "logic": {
             "enabled": false,
@@ -302,25 +86,4348 @@
             "No"
           ],
           "labels": [],
-          "nameId": "hungry",
+          "nameId": "are_you_currently_employed",
           "placeholder": ""
+        },
+        {
+          "questionId": 2,
+          "text": "Please enter your work info",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "please_enter_your_work_info",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Job Title",
+              "nodeId": "please_enter_your_work_info_job_title",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Employer Name",
+              "nodeId": "please_enter_your_work_info_employer_name",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "location",
+              "fieldName": "Please enter your work address",
+              "nodeId": "location_data",
+              "order": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": 2,
+      "sectionName": "Legal Info",
+      "questions": [
+        {
+          "questionId": 3,
+          "text": "Do you have a lawyer",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "do_you_have_a_lawyer",
+          "placeholder": ""
+        },
+        {
+          "questionId": 4,
+          "text": "Please enter lawyer info",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "3",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "please_enter_lawyer_info",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Laywer Name",
+              "nodeId": "please_enter_lawyer_info_laywer_name",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Lawyer Firm",
+              "nodeId": "please_enter_lawyer_info_lawyer_firm",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "phone",
+              "label": "Lawyer Phone Number",
+              "nodeId": "please_enter_lawyer_info_lawyer_phone_number",
+              "order": 3
+            },
+            {
+              "type": "amount",
+              "label": "State Bar Number",
+              "nodeId": "please_enter_lawyer_info_state_bar_number",
+              "order": 4
+            },
+            {
+              "type": "location",
+              "fieldName": "Please enter their address",
+              "nodeId": "location_data",
+              "order": 5
+            }
+          ]
+        },
+        {
+          "questionId": 5,
+          "text": "Has your lawyer agreed to cover a portion of your fees?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "3",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "has_your_lawyer_agreed_to_cover_a_portion_of_your_fees",
+          "placeholder": ""
+        },
+        {
+          "questionId": 6,
+          "text": "Have you asked the court to waive your court fees for this case within the last six months?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "5",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "5",
+                "prevAnswer": "Yes"
+              },
+              {
+                "prevQuestion": "3",
+                "prevAnswer": "No"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "have_you_asked_the_court_to_waive_your_court_fees_for_this_case_within_the_last_six_months",
+          "placeholder": ""
+        }
+      ]
+    },
+    {
+      "sectionId": 3,
+      "sectionName": "Qualified Assistance",
+      "questions": [
+        {
+          "questionId": 7,
+          "text": "Do you receive any of the following?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "6",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "6",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Unemployment",
+                "to": "end"
+              },
+              {
+                "option": "Food Stamps",
+                "to": "end"
+              },
+              {
+                "option": "Supp. Sec. Inc.",
+                "to": "end"
+              },
+              {
+                "option": "SSP",
+                "to": "end"
+              },
+              {
+                "option": "County Relief/Gen. Assist.",
+                "to": "end"
+              },
+              {
+                "option": "Medical",
+                "to": "end"
+              },
+              {
+                "option": "CalWORKS or Tribal TANF",
+                "to": "end"
+              },
+              {
+                "option": "IHSS",
+                "to": "end"
+              },
+              {
+                "option": "CAPI",
+                "to": "end"
+              },
+              {
+                "option": "WIC",
+                "to": "end"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Food Stamps"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            {
+              "label": "Food Stamps",
+              "nameId": "do_you_receive_any_of_the_following_food_stamps",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Supp. Sec. Inc.",
+              "nameId": "do_you_receive_any_of_the_following_supp_sec_inc",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "SSP",
+              "nameId": "do_you_receive_any_of_the_following_ssp",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Medical",
+              "nameId": "do_you_receive_any_of_the_following_medical",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "County Relief/Gen. Assist.",
+              "nameId": "do_you_receive_any_of_the_following_county_relief_gen_assist",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "IHSS",
+              "nameId": "do_you_receive_any_of_the_following_ihss",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "CalWORKS or Tribal TANF",
+              "nameId": "do_you_receive_any_of_the_following_calworks_or_tribal_tanf",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "WIC",
+              "nameId": "do_you_receive_any_of_the_following_wic",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "CAPI",
+              "nameId": "do_you_receive_any_of_the_following_capi",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Unemployment",
+              "nameId": "do_you_receive_any_of_the_following_unemployment",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "None of the above",
+              "nameId": "do_you_receive_any_of_the_following_none",
+              "value": "None of the above",
+              "hasAmount": false
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false,
+          "allAreRequired": false
+        }
+      ]
+    },
+    {
+      "sectionId": 4,
+      "sectionName": "Household Income Qualifications",
+      "questions": [
+        {
+          "questionId": 8,
+          "text": "Is your household monthly income less than the amount below?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "7",
+                "prevAnswer": "None of the above"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "is_your_household_monthly_income_less_than_the_amount_below",
+          "placeholder": "",
+          "image": {
+            "url": "income.png",
+            "width": 700,
+            "height": 90
+          }
+        },
+        {
+          "questionId": 9,
+          "text": "What would you like the court to do?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "8",
+                "prevAnswer": "No"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Waive some fees",
+            "Waive all fees",
+            "Let me pay them over time"
+          ],
+          "labels": [],
+          "nameId": "what_would_you_like_the_court_to_do",
+          "placeholder": ""
+        }
+      ]
+    },
+    {
+      "sectionId": 5,
+      "sectionName": "Income Sources",
+      "questions": [
+        {
+          "questionId": 10,
+          "text": "Does your income change a lot from month to month?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "9",
+                "prevAnswer": "Let me pay them over time"
+              },
+              {
+                "prevQuestion": "9",
+                "prevAnswer": "Waive all fees"
+              },
+              {
+                "prevQuestion": "9",
+                "prevAnswer": "Waive some fees"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "does_your_income_change_a_lot_from_month_to_month",
+          "placeholder": ""
+        },
+        {
+          "questionId": 11,
+          "text": "How many sources of income do you have?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "10",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "10",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_sources_of_income_do_you_have",
+          "min": "1",
+          "max": "4",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Income Source",
+              "nodeId": "how_many_sources_of_income_do_you_have_income_source",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "currency",
+              "label": "Income Value",
+              "nodeId": "how_many_sources_of_income_do_you_have_income_value",
+              "order": 2
+            }
+          ]
+        },
+        {
+          "questionId": 12,
+          "text": "Does your income change a lot from month to month?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "8",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "does_your_income_change_a_lot_from_month_to_month_dup2",
+          "placeholder": ""
+        },
+        {
+          "questionId": 13,
+          "text": "How many sources of income do you have?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "12",
+                "prevAnswer": "Yes"
+              },
+              {
+                "prevQuestion": "12",
+                "prevAnswer": "No"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_sources_of_income_do_you_have_dup2",
+          "min": "1",
+          "max": "4",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Income Source",
+              "nodeId": "how_many_sources_of_income_do_you_have_dup2_income_source",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "currency",
+              "label": "Income Value",
+              "nodeId": "how_many_sources_of_income_do_you_have_dup2_income_value",
+              "order": 2
+            }
+          ]
+        },
+        {
+          "questionId": 16,
+          "text": "Does anybody else live in your home?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "12",
+                "prevAnswer": "Yes"
+              },
+              {
+                "prevQuestion": "12",
+                "prevAnswer": "No"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "No",
+                "to": "end"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "does_anybody_else_live_in_your_home",
+          "placeholder": ""
+        },
+        {
+          "questionId": 17,
+          "text": "How many other people live in your household?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "16",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "1",
+                "to": "end"
+              },
+              {
+                "option": "2",
+                "to": "end"
+              },
+              {
+                "option": "3",
+                "to": "end"
+              },
+              {
+                "option": "4",
+                "to": "end"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_other_people_live_in_your_household_dup2",
+          "min": "1",
+          "max": "4",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Name",
+              "nodeId": "how_many_other_people_live_in_your_household_dup2_name",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "amount",
+              "label": "Age",
+              "nodeId": "how_many_other_people_live_in_your_household_dup2_age",
+              "order": 2
+            },
+            {
+              "type": "label",
+              "label": "Relationship",
+              "nodeId": "how_many_other_people_live_in_your_household_dup2_relationship",
+              "order": 3,
+              "prefill": ""
+            },
+            {
+              "type": "currency",
+              "label": "Monthly Income",
+              "nodeId": "how_many_other_people_live_in_your_household_dup2_monthly_income",
+              "order": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": 6,
+      "sectionName": "Living Conditions",
+      "questions": [
+        {
+          "questionId": 14,
+          "text": "Do you have anybody else living in your home?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "10",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "10",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "do_you_have_anybody_else_living_in_your_home",
+          "placeholder": ""
+        },
+        {
+          "questionId": 15,
+          "text": "How many other people live in your household?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "14",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_other_people_live_in_your_household",
+          "min": "1",
+          "max": "4",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Name",
+              "nodeId": "how_many_other_people_live_in_your_household_name",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "amount",
+              "label": "Age",
+              "nodeId": "how_many_other_people_live_in_your_household_age",
+              "order": 2
+            },
+            {
+              "type": "label",
+              "label": "Relationship",
+              "nodeId": "how_many_other_people_live_in_your_household_relationship",
+              "order": 3,
+              "prefill": ""
+            },
+            {
+              "type": "currency",
+              "label": "Monthly Income",
+              "nodeId": "how_many_other_people_live_in_your_household_monthly_income",
+              "order": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": 7,
+      "sectionName": "Financials",
+      "questions": [
+        {
+          "questionId": 18,
+          "text": "Do you have any cash savings?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "14",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "14",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "do_you_have_any_cash_savings",
+          "placeholder": ""
+        },
+        {
+          "questionId": 19,
+          "text": "How much cash saving do you have?",
+          "type": "currency",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "18",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "how_much_cash_saving_do_you_have",
+          "placeholder": ""
+        },
+        {
+          "questionId": 20,
+          "text": "Do you have a bank account?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "18",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "19",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "do_you_have_a_bank_account",
+          "placeholder": ""
+        },
+        {
+          "questionId": 21,
+          "text": "How many bank accounts do you have?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "20",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_bank_accounts_do_you_have",
+          "min": "1",
+          "max": "4",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Bank Name",
+              "nodeId": "how_many_bank_accounts_do_you_have_bank_name",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "currency",
+              "label": "Amount",
+              "nodeId": "how_many_bank_accounts_do_you_have_amount",
+              "order": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": 8,
+      "sectionName": "Assets Owned",
+      "questions": [
+        {
+          "questionId": 22,
+          "text": "Do you own any cars, boats, and other vehicles:",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "20",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "20",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "do_you_own_any_cars_boats_and_other_vehicles",
+          "placeholder": ""
+        },
+        {
+          "questionId": 23,
+          "text": "How many vehicles do you own?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "22",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_vehicles_do_you_own",
+          "min": "1",
+          "max": "4",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Make/Year",
+              "nodeId": "how_many_vehicles_do_you_own_make/year",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "currency",
+              "label": "Fair Market Value",
+              "nodeId": "how_many_vehicles_do_you_own_fair_market_value",
+              "order": 2
+            },
+            {
+              "type": "currency",
+              "label": "Amount Owed",
+              "nodeId": "how_many_vehicles_do_you_own_amount_owed",
+              "order": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": 9,
+      "sectionName": "Real Estate Assets",
+      "questions": [
+        {
+          "questionId": 24,
+          "text": "Do you own any real estate:",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "22",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "22",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "do_you_own_any_real_estate",
+          "placeholder": ""
+        },
+        {
+          "questionId": 25,
+          "text": "How many real estate properties do you have?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "24",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_real_estate_properties_do_you_have",
+          "min": "1",
+          "max": "2",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Address",
+              "nodeId": "how_many_real_estate_properties_do_you_have_address",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "currency",
+              "label": "Fair Market Value",
+              "nodeId": "how_many_real_estate_properties_do_you_have_fair_market_value",
+              "order": 2
+            },
+            {
+              "type": "currency",
+              "label": "Amount Owed",
+              "nodeId": "how_many_real_estate_properties_do_you_have_amount_owed",
+              "order": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": 10,
+      "sectionName": "Personal Property",
+      "questions": [
+        {
+          "questionId": 26,
+          "text": "Do you own any other personal property? (jewelry, furniture, furs, bonds, ect)",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "24",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "24",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect",
+          "placeholder": ""
+        },
+        {
+          "questionId": 27,
+          "text": "How many items",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "26",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_items",
+          "min": "1",
+          "max": "2",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Description",
+              "nodeId": "how_many_items_description",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "currency",
+              "label": "Fair Market Value",
+              "nodeId": "how_many_items_fair_market_value",
+              "order": 2
+            },
+            {
+              "type": "currency",
+              "label": "Amount Owed",
+              "nodeId": "how_many_items_amount_owed",
+              "order": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": 11,
+      "sectionName": "Payroll Deductions",
+      "questions": [
+        {
+          "questionId": 28,
+          "text": "Do you have any payroll deductions?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "26",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "26",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "do_you_have_any_payroll_deductions",
+          "placeholder": ""
+        },
+        {
+          "questionId": 29,
+          "text": "How many deductions?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "28",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_deductions",
+          "min": "1",
+          "max": "4",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Description",
+              "nodeId": "how_many_deductions_description",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "currency",
+              "label": "Fair Market Value",
+              "nodeId": "how_many_deductions_fair_market_value",
+              "order": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": 12,
+      "sectionName": "Monthly Deductions & Expenses",
+      "questions": [
+        {
+          "questionId": 30,
+          "text": "Mark All That Apply:",
+          "type": "checkbox",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "28",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "28",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Insurance (life, health, etc.)"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            {
+              "label": "Insurance (life, health, etc.)",
+              "nameId": "mark_all_that_apply_insurance_life_health_etc",
+              "value": "",
+              "hasAmount": true,
+              "amountName": "value",
+              "amountPlaceholder": "Enter amount"
+            },
+            {
+              "label": "Medical / dental",
+              "nameId": "mark_all_that_apply_medical_dental",
+              "value": "",
+              "hasAmount": true,
+              "amountName": "value",
+              "amountPlaceholder": "Enter amount"
+            },
+            {
+              "label": "Laundry / cleaning",
+              "nameId": "mark_all_that_apply_laundry_cleaning",
+              "value": "",
+              "hasAmount": true,
+              "amountName": "value",
+              "amountPlaceholder": "Enter amount"
+            },
+            {
+              "label": "Clothing",
+              "nameId": "mark_all_that_apply_clothing",
+              "value": "",
+              "hasAmount": true,
+              "amountName": "value",
+              "amountPlaceholder": "Enter amount"
+            },
+            {
+              "label": "Utilities / phone",
+              "nameId": "mark_all_that_apply_utilities_phone",
+              "value": "",
+              "hasAmount": true,
+              "amountName": "value",
+              "amountPlaceholder": "Enter amount"
+            },
+            {
+              "label": "Rent / housing",
+              "nameId": "mark_all_that_apply_rent_housing",
+              "value": "",
+              "hasAmount": true,
+              "amountName": "value",
+              "amountPlaceholder": "Enter amount"
+            },
+            {
+              "label": "School / child care",
+              "nameId": "mark_all_that_apply_school_child_care",
+              "value": "",
+              "hasAmount": true,
+              "amountName": "value",
+              "amountPlaceholder": "Enter amount"
+            },
+            {
+              "label": "Child / spousal support",
+              "nameId": "mark_all_that_apply_child_spousal_support",
+              "value": "",
+              "hasAmount": true,
+              "amountName": "value",
+              "amountPlaceholder": "Enter amount"
+            },
+            {
+              "label": "Transportation / auto / gas",
+              "nameId": "mark_all_that_apply_transportation_auto_gas",
+              "value": "",
+              "hasAmount": true,
+              "amountName": "value",
+              "amountPlaceholder": "Enter amount"
+            },
+            {
+              "label": "Food / supplies",
+              "nameId": "mark_all_that_apply_food_supplies",
+              "value": "",
+              "hasAmount": true,
+              "amountName": "value",
+              "amountPlaceholder": "Enter amount"
+            },
+            {
+              "label": "None of the above",
+              "nameId": "mark_all_that_apply_none",
+              "value": "None of the above",
+              "hasAmount": false
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false,
+          "allAreRequired": false
+        }
+      ]
+    },
+    {
+      "sectionId": 13,
+      "sectionName": "Payment Installments",
+      "questions": [
+        {
+          "questionId": 31,
+          "text": "Do you have any installment payments?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "30",
+                "prevAnswer": "None of the above"
+              },
+              {
+                "prevQuestion": "30",
+                "prevAnswer": "Food / supplies"
+              },
+              {
+                "prevQuestion": "30",
+                "prevAnswer": "Rent / housing"
+              },
+              {
+                "prevQuestion": "30",
+                "prevAnswer": "Utilities / phone"
+              },
+              {
+                "prevQuestion": "30",
+                "prevAnswer": "Clothing"
+              },
+              {
+                "prevQuestion": "30",
+                "prevAnswer": "Laundry / cleaning"
+              },
+              {
+                "prevQuestion": "30",
+                "prevAnswer": "Medical / dental"
+              },
+              {
+                "prevQuestion": "30",
+                "prevAnswer": "Insurance (life, health, etc.)"
+              },
+              {
+                "prevQuestion": "30",
+                "prevAnswer": "School / child care"
+              },
+              {
+                "prevQuestion": "30",
+                "prevAnswer": "Child / spousal support"
+              },
+              {
+                "prevQuestion": "30",
+                "prevAnswer": "Transportation / auto / gas"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "do_you_have_any_installment_payments",
+          "placeholder": ""
+        },
+        {
+          "questionId": 32,
+          "text": "How many installment payments do you have?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "31",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_installment_payments_do_you_have",
+          "min": "1",
+          "max": "3",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Description",
+              "nodeId": "how_many_installment_payments_do_you_have_description",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "currency",
+              "label": "Amount",
+              "nodeId": "how_many_installment_payments_do_you_have_amount",
+              "order": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": 14,
+      "sectionName": "Wage Garnishments",
+      "questions": [
+        {
+          "questionId": 33,
+          "text": "Do you have any wages/earnings withheld by the court:",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "31",
+                "prevAnswer": "No"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "do_you_have_any_wages/earnings_withheld_by_the_court",
+          "placeholder": ""
+        },
+        {
+          "questionId": 34,
+          "text": "How much is being withheld?",
+          "type": "currency",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "33",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "how_much_is_being_withheld",
+          "placeholder": ""
+        }
+      ]
+    },
+    {
+      "sectionId": 15,
+      "sectionName": "Other Expenses",
+      "questions": [
+        {
+          "questionId": 35,
+          "text": "Do you have any other monthly expenses?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "34",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "33",
+                "prevAnswer": "No"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "No",
+                "to": "end"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "do_you_have_any_other_monthly_expenses",
+          "placeholder": ""
+        },
+        {
+          "questionId": 36,
+          "text": "How many other monthly expenses do you have?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "35",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "1",
+                "to": "end"
+              },
+              {
+                "option": "2",
+                "to": "end"
+              },
+              {
+                "option": "3",
+                "to": "end"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_other_monthly_expenses_do_you_have",
+          "min": "1",
+          "max": "3",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Description",
+              "nodeId": "how_many_other_monthly_expenses_do_you_have_description",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "currency",
+              "label": "Amount",
+              "nodeId": "how_many_other_monthly_expenses_do_you_have_amount",
+              "order": 2
+            }
+          ]
         }
       ]
     }
   ],
   "groups": [],
-  "hiddenFields": [],
-  "sectionCounter": 2,
-  "questionCounter": 3,
-  "hiddenFieldCounter": 1,
+  "hiddenFields": [
+    {
+      "hiddenFieldId": "1",
+      "type": "text",
+      "name": "total_house_income",
+      "checked": false,
+      "conditions": [],
+      "calculations": [
+        {
+          "terms": [
+            {
+              "operator": "",
+              "questionNameId": "how_many_other_people_live_in_your_household_monthly_income_1"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_other_people_live_in_your_household_monthly_income_2"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_other_people_live_in_your_household_monthly_income_3"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_other_people_live_in_your_household_monthly_income_4"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_other_people_live_in_your_household_dup2_monthly_income_1"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_other_people_live_in_your_household_dup2_monthly_income_2"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_other_people_live_in_your_household_dup2_monthly_income_3"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_other_people_live_in_your_household_dup2_monthly_income_4"
+            }
+          ],
+          "compareOperator": ">",
+          "threshold": "0",
+          "fillValue": "##total_house_income##"
+        }
+      ]
+    },
+    {
+      "hiddenFieldId": "2",
+      "type": "text",
+      "name": "89b",
+      "checked": false,
+      "conditions": [],
+      "calculations": [
+        {
+          "terms": [
+            {
+              "operator": "",
+              "questionNameId": "total_income_value"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "total_house_income"
+            }
+          ],
+          "compareOperator": ">",
+          "threshold": "0",
+          "fillValue": "##89b##"
+        }
+      ]
+    },
+    {
+      "hiddenFieldId": "3",
+      "type": "text",
+      "name": "total_monthly_expenses",
+      "checked": false,
+      "conditions": [],
+      "calculations": [
+        {
+          "terms": [
+            {
+              "operator": "",
+              "questionNameId": "how_many_deductions_fair_market_value_1"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_deductions_fair_market_value_2"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_deductions_fair_market_value_3"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_deductions_fair_market_value_4"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "mark_all_that_apply_rent_housing_amount"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "mark_all_that_apply_food_supplies_amount"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "mark_all_that_apply_utilities_phone_amount"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "mark_all_that_apply_clothing_amount"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "mark_all_that_apply_laundry_cleaning_amount"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "mark_all_that_apply_medical_dental_amount"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "mark_all_that_apply_insurance_life_health_etc_amount"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "mark_all_that_apply_school_child_care_amount"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "mark_all_that_apply_child_spousal_support_amount"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "mark_all_that_apply_transportation_auto_gas_amount"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_installment_payments_do_you_have_amount_1"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_installment_payments_do_you_have_amount_2"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_installment_payments_do_you_have_amount_3"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_much_is_being_withheld"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_much_cash_saving_do_you_have"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_other_monthly_expenses_do_you_have_amount_1"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_other_monthly_expenses_do_you_have_amount_2"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_other_monthly_expenses_do_you_have_amount_3"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_bank_accounts_do_you_have_amount_1"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_bank_accounts_do_you_have_amount_2"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_bank_accounts_do_you_have_amount_3"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_bank_accounts_do_you_have_amount_4"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_vehicles_do_you_own_amount_owed_1"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_vehicles_do_you_own_amount_owed_2"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_vehicles_do_you_own_amount_owed_3"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_vehicles_do_you_own_amount_owed_4"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_real_estate_properties_do_you_have_amount_owed_1"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_real_estate_properties_do_you_have_amount_owed_2"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_items_amount_owed_1"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_items_amount_owed_2"
+            }
+          ],
+          "compareOperator": ">",
+          "threshold": "0",
+          "fillValue": "##total_monthly_expenses##"
+        }
+      ]
+    },
+    {
+      "hiddenFieldId": "4",
+      "type": "text",
+      "name": "total_income_value",
+      "checked": false,
+      "conditions": [],
+      "calculations": [
+        {
+          "terms": [
+            {
+              "operator": "",
+              "questionNameId": "how_many_sources_of_income_do_you_have_income_value_1"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_sources_of_income_do_you_have_income_value_2"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_sources_of_income_do_you_have_income_value_3"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_sources_of_income_do_you_have_income_value_4"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_sources_of_income_do_you_have_dup2_income_value_1"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_sources_of_income_do_you_have_dup2_income_value_2"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_sources_of_income_do_you_have_dup2_income_value_3"
+            },
+            {
+              "operator": "+",
+              "questionNameId": "how_many_sources_of_income_do_you_have_dup2_income_value_4"
+            }
+          ],
+          "compareOperator": ">",
+          "threshold": "0",
+          "fillValue": "##total_income_value##"
+        }
+      ]
+    }
+  ],
+  "sectionCounter": 16,
+  "questionCounter": 37,
+  "hiddenFieldCounter": 5,
   "groupCounter": 1,
-  "formName": "New SC-120",
-  "defaultPDFName": "",
-  "pdfOutputName": "",
-  "stripePriceId": "",
+  "formName": "Fee Waiver",
+  "defaultPDFName": "Fee Waiver",
+  "pdfOutputName": "feewaiver.pdf",
+  "stripePriceId": "price_1SCYyUFJeSRMFQ8Xzk0GWZpM",
   "additionalPDFs": [],
   "checklistItems": [],
-  "linkedFields": [],
-  "linkedCheckboxes": [],
+  "linkedFields": [
+    {
+      "id": "linkedField0",
+      "linkedFieldId": "income_value_1",
+      "fields": [
+        "how_many_sources_of_income_do_you_have_income_value_1",
+        "how_many_sources_of_income_do_you_have_dup2_income_value_1"
+      ]
+    },
+    {
+      "id": "linkedField1",
+      "linkedFieldId": "household_name_1",
+      "fields": [
+        "how_many_other_people_live_in_your_household_name_1",
+        "how_many_other_people_live_in_your_household_dup2_name_1"
+      ]
+    },
+    {
+      "id": "linkedField2",
+      "linkedFieldId": "income_value_2",
+      "fields": [
+        "how_many_sources_of_income_do_you_have_income_value_2",
+        "how_many_sources_of_income_do_you_have_dup2_income_value_2"
+      ]
+    },
+    {
+      "id": "linkedField3",
+      "linkedFieldId": "income_value_3",
+      "fields": [
+        "how_many_sources_of_income_do_you_have_income_value_3",
+        "how_many_sources_of_income_do_you_have_dup2_income_value_3"
+      ]
+    },
+    {
+      "id": "linkedField4",
+      "linkedFieldId": "income_value_4",
+      "fields": [
+        "how_many_sources_of_income_do_you_have_income_value_4",
+        "how_many_sources_of_income_do_you_have_dup2_income_value_4"
+      ]
+    },
+    {
+      "id": "linkedField5",
+      "linkedFieldId": "income_source_1",
+      "fields": [
+        "how_many_sources_of_income_do_you_have_income_source_1",
+        "how_many_sources_of_income_do_you_have_dup2_income_source_1"
+      ]
+    },
+    {
+      "id": "linkedField6",
+      "linkedFieldId": "income_source_2",
+      "fields": [
+        "how_many_sources_of_income_do_you_have_income_source_2",
+        "how_many_sources_of_income_do_you_have_dup2_income_source_2"
+      ]
+    },
+    {
+      "id": "linkedField7",
+      "linkedFieldId": "income_source_3",
+      "fields": [
+        "how_many_sources_of_income_do_you_have_income_source_3",
+        "how_many_sources_of_income_do_you_have_dup2_income_source_3"
+      ]
+    },
+    {
+      "id": "linkedField8",
+      "linkedFieldId": "income_source_4",
+      "fields": [
+        "how_many_sources_of_income_do_you_have_income_source_4",
+        "how_many_sources_of_income_do_you_have_dup2_income_source_4"
+      ]
+    },
+    {
+      "id": "linkedField9",
+      "linkedFieldId": "household_name_2",
+      "fields": [
+        "how_many_other_people_live_in_your_household_name_2",
+        "how_many_other_people_live_in_your_household_dup2_name_2"
+      ]
+    },
+    {
+      "id": "linkedField10",
+      "linkedFieldId": "household_name_3",
+      "fields": [
+        "how_many_other_people_live_in_your_household_name_3",
+        "how_many_other_people_live_in_your_household_dup2_name_3"
+      ]
+    },
+    {
+      "id": "linkedField11",
+      "linkedFieldId": "household_name_4",
+      "fields": [
+        "how_many_other_people_live_in_your_household_name_4",
+        "how_many_other_people_live_in_your_household_dup2_name_4"
+      ]
+    },
+    {
+      "id": "linkedField12",
+      "linkedFieldId": "household_age_1",
+      "fields": [
+        "how_many_other_people_live_in_your_household_age_1",
+        "how_many_other_people_live_in_your_household_dup2_age_1"
+      ]
+    },
+    {
+      "id": "linkedField13",
+      "linkedFieldId": "household_age_2",
+      "fields": [
+        "how_many_other_people_live_in_your_household_age_2",
+        "how_many_other_people_live_in_your_household_dup2_age_2"
+      ]
+    },
+    {
+      "id": "linkedField14",
+      "linkedFieldId": "household_age_3",
+      "fields": [
+        "how_many_other_people_live_in_your_household_age_3",
+        "how_many_other_people_live_in_your_household_dup2_age_3"
+      ]
+    },
+    {
+      "id": "linkedField15",
+      "linkedFieldId": "household_age_4",
+      "fields": [
+        "how_many_other_people_live_in_your_household_age_4",
+        "how_many_other_people_live_in_your_household_dup2_age_4"
+      ]
+    },
+    {
+      "id": "linkedField16",
+      "linkedFieldId": "household_relationship_1",
+      "fields": [
+        "how_many_other_people_live_in_your_household_relationship_1",
+        "how_many_other_people_live_in_your_household_dup2_relationship_1"
+      ]
+    },
+    {
+      "id": "linkedField17",
+      "linkedFieldId": "household_relationship_2",
+      "fields": [
+        "how_many_other_people_live_in_your_household_relationship_2",
+        "how_many_other_people_live_in_your_household_dup2_relationship_2"
+      ]
+    },
+    {
+      "id": "linkedField18",
+      "linkedFieldId": "household_relationship_3",
+      "fields": [
+        "how_many_other_people_live_in_your_household_relationship_3",
+        "how_many_other_people_live_in_your_household_dup2_relationship_3"
+      ]
+    },
+    {
+      "id": "linkedField19",
+      "linkedFieldId": "household_relationship_4",
+      "fields": [
+        "how_many_other_people_live_in_your_household_relationship_4",
+        "how_many_other_people_live_in_your_household_dup2_relationship_4"
+      ]
+    },
+    {
+      "id": "linkedField20",
+      "linkedFieldId": "household_income_1",
+      "fields": [
+        "how_many_other_people_live_in_your_household_monthly_income_1",
+        "how_many_other_people_live_in_your_household_dup2_monthly_income_1"
+      ]
+    },
+    {
+      "id": "linkedField21",
+      "linkedFieldId": "household_income_2",
+      "fields": [
+        "how_many_other_people_live_in_your_household_monthly_income_2",
+        "how_many_other_people_live_in_your_household_dup2_monthly_income_2"
+      ]
+    },
+    {
+      "id": "linkedField22",
+      "linkedFieldId": "household_income_3",
+      "fields": [
+        "how_many_other_people_live_in_your_household_monthly_income_3",
+        "how_many_other_people_live_in_your_household_dup2_monthly_income_3"
+      ]
+    },
+    {
+      "id": "linkedField23",
+      "linkedFieldId": "household_income_4",
+      "fields": [
+        "how_many_other_people_live_in_your_household_monthly_income_4",
+        "how_many_other_people_live_in_your_household_dup2_monthly_income_4"
+      ]
+    }
+  ],
+  "linkedCheckboxes": [
+    {
+      "id": "linkedCheckbox0",
+      "linkedCheckboxId": "5a",
+      "checkboxes": [
+        "do_you_receive_any_of_the_following_unemployment",
+        "do_you_receive_any_of_the_following_food_stamps",
+        "do_you_receive_any_of_the_following_supp_sec_inc",
+        "do_you_receive_any_of_the_following_ssp",
+        "do_you_receive_any_of_the_following_county_reliefgen_assist",
+        "do_you_receive_any_of_the_following_medical",
+        "do_you_receive_any_of_the_following_calworks_or_tribal_tanf",
+        "do_you_receive_any_of_the_following_ihss",
+        "do_you_receive_any_of_the_following_capi",
+        "do_you_receive_any_of_the_following_wic"
+      ]
+    },
+    {
+      "id": "linkedCheckbox1",
+      "linkedCheckboxId": "income_changes_month_to_month",
+      "checkboxes": [
+        "does_your_income_change_a_lot_from_month_to_month_dup2_yes",
+        "does_your_income_change_a_lot_from_month_to_month_yes"
+      ]
+    }
+  ],
   "inverseCheckboxes": []
 }

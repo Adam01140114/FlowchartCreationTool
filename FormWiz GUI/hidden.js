@@ -562,7 +562,15 @@ function addHiddenFieldWithData(hiddenField) {
                     // question
                     var qSelId = 'calcTermQuestion'+currentHiddenFieldId+'_'+calcIndex+'_'+termNumber;
                     var qSelEl = document.getElementById(qSelId);
-                    if(qSelEl) qSelEl.value = termObj.questionNameId || '';
+                    if(qSelEl) {
+                        var desiredValue = termObj.questionNameId || '';
+                        var hasOption = desiredValue && qSelEl.querySelector('option[value="' + desiredValue + '"]');
+                        if (hasOption) {
+                            qSelEl.value = desiredValue;
+                        } else if (desiredValue) {
+                            qSelEl.dataset.pendingValue = desiredValue;
+                        }
+                    }
                 }
                 // compare operator
                 var cmpOp = document.getElementById('calcCompareOperator'+currentHiddenFieldId+'_'+calcIndex);
@@ -614,7 +622,15 @@ function addHiddenFieldWithData(hiddenField) {
                     }
                     // question
                     var qSel2= document.getElementById('textTermQuestion'+currentHiddenFieldId+'_'+calcIdx+'_'+termNumber2);
-                    if(qSel2) qSel2.value=termObj2.questionNameId||'';
+                    if(qSel2) {
+                        var desiredValue2 = termObj2.questionNameId||'';
+                        var hasOption2 = desiredValue2 && qSel2.querySelector('option[value="' + desiredValue2 + '"]');
+                        if (hasOption2) {
+                            qSel2.value = desiredValue2;
+                        } else if (desiredValue2) {
+                            qSel2.dataset.pendingValue = desiredValue2;
+                        }
+                    }
                 }
                 // compareOp
                 var cmpOp2 = document.getElementById('textCompareOperator'+currentHiddenFieldId+'_'+calcIdx);
@@ -628,6 +644,8 @@ function addHiddenFieldWithData(hiddenField) {
             }
         }
     }
+    // Ensure dropdowns include newly added hidden fields before applying pending selections
+    setTimeout(updateAllCalculationDropdowns, 0);
 }
 /***************************************************
  * Conditional Autofill for text / checkbox fields
@@ -879,6 +897,21 @@ function updateAllCalculationDropdowns() {
         `;
         if (selectedValue) dropdown.value = selectedValue;
     });
+    // Re-apply any pending selections that weren't available when the field was created
+    applyPendingCalculationSelections();
+}
+
+function applyPendingCalculationSelections() {
+    const allDropdowns = document.querySelectorAll('select[id^="textTermQuestion"], select[id^="calcTermQuestion"]');
+    allDropdowns.forEach(dropdown => {
+        const pendingValue = dropdown.dataset.pendingValue;
+        if (!pendingValue) return;
+        const hasOption = dropdown.querySelector('option[value="' + pendingValue + '"]');
+        if (hasOption) {
+            dropdown.value = pendingValue;
+            delete dropdown.dataset.pendingValue;
+        }
+    });
 }
 /**
  * Adds a new calculation for a text field
@@ -1072,10 +1105,10 @@ function generateMoneyQuestionOptions() {
         const qId = qBlock.id.replace('questionBlock','');
         const selEl = qBlock.querySelector('select#questionType' + qId);
         if (!selEl) return;
-        // e.g. 'numberedDropdown', 'money', etc.
+        // e.g. 'numberedDropdown', 'money', 'currency', etc.
         const qType = selEl.value;
-        if (qType === 'money') {
-            // If it's a money question, we can reference it directly
+        if (qType === 'money' || qType === 'currency') {
+            // If it's a money or currency question, we can reference it directly
             const nmEl = qBlock.querySelector('#textboxName' + qId);
             const fieldName = nmEl ? nmEl.value.trim() : ('answer' + qId);
             optionsHTML += `<option value="${fieldName}">${fieldName}</option>`;

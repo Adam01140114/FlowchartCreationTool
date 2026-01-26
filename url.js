@@ -388,6 +388,8 @@ window.exportFlowchartJson = function(download = true) {
   });
   // Get current section preferences using the proper function
   const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.sectionPrefs || {});
+  // Get groups data using the proper function
+  const groupsData = typeof window.getGroupsData === 'function' ? window.getGroupsData() : [];
   // Get default PDF properties
   const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
     window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
@@ -396,7 +398,7 @@ window.exportFlowchartJson = function(download = true) {
   const output = {
     cells: simplifiedCells,
     sectionPrefs: JSON.parse(JSON.stringify(currentSectionPrefs)),
-    groups: JSON.parse(JSON.stringify(groups)),
+    groups: groupsData,
     defaultPdfProperties: defaultPdfProps,
     formName: formName,
     edgeStyle: currentEdgeStyle

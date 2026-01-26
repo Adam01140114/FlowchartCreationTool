@@ -3249,74 +3249,21 @@ window.exportGuiJson = function(download = true) {
         if (term.amountLabel.startsWith('numbered_dropdown:')) {
           const parts = term.amountLabel.split(':');
           if (parts.length >= 3) {
-            const storedValue = parts[1]; // e.g., "how_many_sources_of_income_do_you_have_amount_1"
+            const storedValue = parts[1]; // e.g., "how_many_sources_of_income_do_you_have_income_value_1"
             console.log('[GUI JSON] Found numbered_dropdown, storedValue:', storedValue);
-            
-            // Extract question ID, entry number, and amount name from storedValue
-            // Format: questionName_amountName_#N
-            // Need to find the question that matches this
-            const storedParts = storedValue.split('_');
-            // Find the question by matching the beginning of storedValue
-            let matchedQuestion = null;
-            let entryNumber = null;
-            let amountName = null;
-            
-            // Search through questions to find the matching numberedDropdown
-            for (const questionCell of questions) {
-              const qType = getQuestionType(questionCell);
-              if (qType === "multipleDropdownType") {
-                const questionText = questionCell._questionText || questionCell.value || "";
-                const cleanQuestionName = sanitizeNameId(questionText);
-                // Check if storedValue starts with this question name
-                if (storedValue.startsWith(cleanQuestionName + '_')) {
-                  matchedQuestion = questionCell;
-                  // Extract entry number and amount name
-                  // storedValue format: cleanQuestionName_amountName_#N
-                  const remainder = storedValue.substring(cleanQuestionName.length + 1); // Remove question name and _
-                  // Find the last underscore which separates amount name from number
-                  const lastUnderscoreIndex = remainder.lastIndexOf('_');
-                  if (lastUnderscoreIndex !== -1) {
-                    amountName = remainder.substring(0, lastUnderscoreIndex); // e.g., "amount"
-                    entryNumber = remainder.substring(lastUnderscoreIndex + 1); // e.g., "1"
-                    console.log('[GUI JSON] Extracted from storedValue:', { remainder, amountName, entryNumber, questionId: matchedQuestion._questionId });
-                  }
-                  break;
-                }
-              }
-            }
-            
-            if (matchedQuestion && entryNumber && amountName) {
-              // Get the actual nodeId from the matched question (includes _dupN suffixes)
-              const actualNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(matchedQuestion) : '') || 
-                                   matchedQuestion._nameId || 
-                                   sanitizeNameId(matchedQuestion._questionText || matchedQuestion.value || "");
-              // Format: {nodeId}_{amountName}_{entryNumber}
-              // e.g., "how_many_sources_of_income_do_you_have_income_value_1"
-              // or "how_many_sources_of_income_do_you_have_dup2_income_value_1"
-              questionNameId = `${actualNodeId}_${amountName}_${entryNumber}`;
-              console.log('[GUI JSON] Converted numbered_dropdown to questionNameId:', questionNameId);
-            } else {
-              console.warn('[GUI JSON] Could not match numbered_dropdown storedValue:', storedValue);
-              // Fallback: try to extract from storedValue directly
-              // Look for pattern: ..._amountName_#N at the end
-              const match = storedValue.match(/^(.+?)_([^_]+)_(\d+)$/);
-              if (match) {
-                const questionId = matchedQuestion ? (matchedQuestion._questionId || "") : "";
-                if (questionId) {
-                  questionNameId = `amount${questionId}_${match[3]}_${match[2]}`;
-                  console.log('[GUI JSON] Fallback extraction:', questionNameId);
-                }
-              }
-            }
+            // Use the stored value directly to preserve the exact amount field name.
+            // This avoids re-mapping that can introduce incorrect dup suffixes.
+            questionNameId = storedValue;
           }
         } else if (term.amountLabel.startsWith('question_value:')) {
-          // Handle question_value format: question_value:answer1:how_much (answer1)
+          // Handle question_value format: question_value:answer34:how_much_is_being_withheld
           const parts = term.amountLabel.split(':');
           if (parts.length >= 3) {
+            // Use parts[2] which contains the question's nameId (e.g., "how_much_is_being_withheld")
             const displayPart = parts[2];
-            // Remove the "(answer1)" part if it exists
+            // Remove the "(answer34)" part if it exists
             const cleanQuestionName = displayPart.replace(/\s*\([^)]*\)$/, '');
-            questionNameId = parts[1]; // Use the actual answer ID (e.g., "answer1")
+            questionNameId = cleanQuestionName; // Use the question's nameId, not the answer ID
           }
         } else {
           // For regular labels, use as-is

@@ -148,19 +148,24 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 }
 // Helper function to create styled address input
 function createAddressInput(id, label, index, type = 'text', prefill = '') {
-    const inputType = type === 'number' ? 'number' : 'text';
+    // Check if this is an amount field (ends with _amount or label contains "amount")
+    const isAmountField = id.includes('_amount') || (label && label.toLowerCase().includes('amount'));
+    // For amount fields, use text type with currency formatting instead of number type
+    const inputType = isAmountField ? 'text' : (type === 'number' ? 'number' : 'text');
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
     const styleAttr = ' style="text-align: center;"';
     // Add maxlength and inputmode for zip fields (numeric only, max 5 chars)
     const isZipField = (label === 'Zip' || label === 'zip' || id.includes('_zip'));
     const maxLengthAttr = isZipField ? ' maxlength="5"' : '';
-    const inputModeAttr = isZipField ? ' inputmode="numeric"' : '';
+    const inputModeAttr = isZipField ? ' inputmode="numeric"' : (isAmountField ? ' inputmode="decimal"' : '');
     // Add event listeners to call updateLinkedFields() when input changes
     // This ensures linked fields are updated when user types in amount/income fields
     // For zip fields, also strip non-numeric characters
+    // For amount fields, use currency formatting
     const zipOnInput = isZipField ? "this.value = this.value.replace(/[^0-9]/g, ''); " : '';
-    const eventHandlers = ' oninput="' + zipOnInput + 'if(typeof updateLinkedFields === \'function\') { updateLinkedFields(); }" onchange="if(typeof updateLinkedFields === \'function\') { updateLinkedFields(); }"';
+    const amountOnInput = isAmountField ? "formatCurrencyInput(this); " : '';
+    const eventHandlers = ' oninput="' + zipOnInput + amountOnInput + 'if(typeof updateLinkedFields === \'function\') { updateLinkedFields(); }" onchange="if(typeof updateLinkedFields === \'function\') { updateLinkedFields(); }"';
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
            'id="' + id + '" ' +
@@ -2644,11 +2649,12 @@ for (let co = 0; co < cOptsDivs.length; co++){
         // The amountName from JSON is often "value" which causes all fields to have the same name
         const amountFieldName = optionNameId + '_amount';
         formHTML += `
-          <input type="number" id="${optionNameId}_amount"
+          <input type="text" id="${optionNameId}_amount"
                  name="${amountFieldName}"
                  placeholder="${amountPlaceholder}"
+                 inputmode="decimal"
                  style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
-                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 oninput="formatCurrencyInput(this); if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
                  onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">`;
     }
 }
@@ -6416,7 +6422,7 @@ if (s > 1){
   // Close the form & add the thank-you message
   formHTML += [
     "</form>",
-    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><button onclick="showPreviewPdfsModal()" style="font-size: 1.2em;">Preview PDFs</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href=\'../Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div>',
+    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><span style="font-size: 0.75em; color: #666;">Your paperwork is now ready, please proceed to checkout</span><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Checkout</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href=\'/Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button><br><button id="debugDownloadPdfBtn" onclick="downloadAllPdfs()" style="font-size: 1.2em; display: none;">Download PDF</button><br id="debugDownloadPdfBr" style="display: none;"><br id="debugPreviewPdfsBr" style="display: none;"><button id="debugPreviewPdfsBtn" onclick="showPreviewPdfsModal()" style="font-size: 1.2em; display: none;">Preview PDFs</button><br></div>',
     "</div>",
     "</section>",
     "</div>",
@@ -6562,6 +6568,24 @@ if (s > 1){
   formHTML += `window.fileUploadQuestions = ${JSON.stringify(fileUploadQuestions || [])};\n`;
   formHTML += `window.latexPreviewQuestions = ${JSON.stringify(latexPreviewQuestions || [])};\n`;
   formHTML += `window.pdfPreviewQuestions = ${JSON.stringify(pdfPreviewQuestions || [])};\n`;
+  // Ensure formatCurrencyInput function is always available for amount and currency fields
+  formHTML += `
+  window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+    if (!input) return;
+    // Remove all non-numeric characters except decimal point, including dollar sign
+    let val = (input.value || '').replace(/[^0-9.]/g, '');
+    if (!val) {
+      input.value = '';
+      return;
+    }
+    const parts = val.split('.');
+    parts[0] = parts[0].replace(/^0+(?=\\d)/, '');
+    parts[0] = parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');
+    const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+    // Add dollar sign prefix
+    input.value = '$' + parts[0] + decimal;
+  };
+  `;
   formHTML += `
   // Address helper functions (must exist before conditional logic runs)
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
@@ -7072,6 +7096,39 @@ if (s > 1){
         subtree: true,
         childList: true
       });
+    }
+  });
+  
+  // Debug mode toggle for thank you message buttons
+  let debugModeEnabled = false;
+  document.addEventListener('keydown', function(e) {
+    // Check for Ctrl+Shift (Windows/Linux) or Cmd+Shift (Mac)
+    const isModifierPressed = (e.ctrlKey || e.metaKey) && e.shiftKey;
+    
+    if (isModifierPressed) {
+      debugModeEnabled = !debugModeEnabled;
+      
+      // Toggle visibility of debug buttons
+      const downloadBtn = document.getElementById('debugDownloadPdfBtn');
+      const previewBtn = document.getElementById('debugPreviewPdfsBtn');
+      const downloadBr = document.getElementById('debugDownloadPdfBr');
+      const previewBr = document.getElementById('debugPreviewPdfsBr');
+      
+      if (downloadBtn && previewBtn && downloadBr && previewBr) {
+        if (debugModeEnabled) {
+          downloadBtn.style.display = 'inline-block';
+          previewBtn.style.display = 'inline-block';
+          downloadBr.style.display = 'block';
+          previewBr.style.display = 'block';
+          console.log('Debug mode enabled - PDF buttons visible');
+        } else {
+          downloadBtn.style.display = 'none';
+          previewBtn.style.display = 'none';
+          downloadBr.style.display = 'none';
+          previewBr.style.display = 'none';
+          console.log('Debug mode disabled - PDF buttons hidden');
+        }
+      }
     }
   });
   `;
@@ -8740,21 +8797,25 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
   window.__addressHelpersInjected = true;
   // Create stylized address <input>
   window.createAddressInput = function(id, label, index, type = 'text', prefill = '') {
-    const inputType = (type === 'number') ? 'number' : 'text';
+    // Check if this is an amount field (ends with _amount or label contains "amount")
+    const isAmountField = id.includes('_amount') || (label && label.toLowerCase().includes('amount'));
+    // For amount fields, use text type with currency formatting instead of number type
+    const inputType = isAmountField ? 'text' : ((type === 'number') ? 'number' : 'text');
     const placeholder = label;
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
     // Add maxlength and inputmode for zip fields (numeric only, max 5 chars)
     const isZipField = (label === 'Zip' || label === 'zip' || id.includes('_zip'));
     const maxLengthAttr = isZipField ? ' maxlength="5"' : '';
-    const inputModeAttr = isZipField ? ' inputmode="numeric"' : '';
+    const inputModeAttr = isZipField ? ' inputmode="numeric"' : (isAmountField ? ' inputmode="decimal"' : '');
     const zipOnInput = isZipField ? ' oninput="this.value = this.value.replace(/[^0-9]/g, \\'\\')"' : '';
+    const amountOnInput = isAmountField ? ' oninput="formatCurrencyInput(this)"' : '';
     return (
       '<div class="address-field">' +
       '<input type="' + inputType + '" ' +
       'id="' + id + '" ' +
       'name="' + id + '" ' +
       'placeholder="' + placeholder + '" ' +
-      'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + '>' +
+      'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + amountOnInput + '>' +
       '</div>'
     );
   };
@@ -14500,31 +14561,53 @@ function runSingleHiddenTextCalculation(calcObj) {
         return;
     }
 
+    // Get or create the breakdown field
+    const breakdownFieldName = calcObj.hiddenFieldName + '_breakdown';
+    let breakdownField = document.getElementById(breakdownFieldName);
+    if (!breakdownField) {
+        // Create the breakdown field if it doesn't exist
+        breakdownField = document.createElement('input');
+        breakdownField.type = 'text';
+        breakdownField.id = breakdownFieldName;
+        breakdownField.name = breakdownFieldName;
+        breakdownField.style.display = 'none';
+        const hiddenContainer = document.getElementById('hidden_pdf_fields');
+        if (hiddenContainer) {
+            hiddenContainer.appendChild(breakdownField);
+        }
+    }
+
     // We'll assume that the last matched condition takes precedence
     let finalValue = "";
+    let breakdownString = "";
     calcObj.calculations.forEach(function(oneCalc, calcIndex) {
 
         let val = 0;
+        let breakdown = "";
         // Calculate the sum of all terms
         if (oneCalc.terms && oneCalc.terms.length > 0) {
             // Get the first term's value
             const firstTerm = oneCalc.terms[0];
-
-            val = parseFloat(getMoneyValue(firstTerm.questionNameId)) || 0;
+            const firstVal = parseFloat(getMoneyValue(firstTerm.questionNameId)) || 0;
+            val = firstVal;
+            // Build breakdown string with field name: "value(fieldName)"
+            breakdown = firstVal.toString() + '(' + (firstTerm.questionNameId || '') + ')';
 
             // Process remaining terms
             for (let t = 1; t < oneCalc.terms.length; t++) {
                 const term = oneCalc.terms[t];
-
                 const termVal = parseFloat(getMoneyValue(term.questionNameId)) || 0;
+                const operator = term.operator || '+';
 
-                switch(term.operator) {
+                switch(operator) {
                     case '+': val += termVal; break;
                     case '-': val -= termVal; break;
                     case 'x': val *= termVal; break;
                     case '/': val = termVal !== 0 ? val / termVal : 0; break;
                 }
 
+                // Build breakdown string with field name: " operator value(fieldName)"
+                breakdown += ' ' + operator + ' ' + termVal.toString() + '(' + (term.questionNameId || '') + ')';
             }
         }
 
@@ -14541,16 +14624,20 @@ function runSingleHiddenTextCalculation(calcObj) {
             // Handle special fillValue formats
             if (oneCalc.fillValue === "##total##" || oneCalc.fillValue.match(/^##(.+)##$/)) {
                 finalValue = val.toFixed(2); // Format money values with 2 decimal places
-
+                breakdownString = breakdown; // Store the breakdown for the matched calculation
             } else {
                 finalValue = oneCalc.fillValue;
-
+                breakdownString = breakdown; // Store the breakdown for the matched calculation
             }
         }
     });
 
     // Update the text field
     textField.value = finalValue;
+    // Update the breakdown field
+    if (breakdownField) {
+        breakdownField.value = breakdownString;
+    }
 
 }
 function replacePlaceholderTokens (str){
@@ -17072,20 +17159,24 @@ if (typeof handleNext === 'function') {
     });
 // Helper function to create styled address input
 function createAddressInput(id, label, index, type = 'text', prefill = '') {
-    const inputType = type === 'number' ? 'number' : 'text';
+    // Check if this is an amount field (ends with _amount or label contains "amount")
+    const isAmountField = id.includes('_amount') || (label && label.toLowerCase().includes('amount'));
+    // For amount fields, use text type with currency formatting instead of number type
+    const inputType = isAmountField ? 'text' : (type === 'number' ? 'number' : 'text');
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
     // Add maxlength and inputmode for zip fields (numeric only, max 5 chars)
     const isZipField = (label === 'Zip' || label === 'zip' || id.includes('_zip'));
     const maxLengthAttr = isZipField ? ' maxlength="5"' : '';
-    const inputModeAttr = isZipField ? ' inputmode="numeric"' : '';
+    const inputModeAttr = isZipField ? ' inputmode="numeric"' : (isAmountField ? ' inputmode="decimal"' : '');
     const zipOnInput = isZipField ? ' oninput="this.value = this.value.replace(/[^0-9]/g, \\'\\')"' : '';
+    const amountOnInput = isAmountField ? ' oninput="formatCurrencyInput(this)"' : '';
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
            'id="' + id + '" ' +
            'name="' + id + '" ' +
            'placeholder="' + placeholder + '" ' +
-           'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + '>' +
+           'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + amountOnInput + '>' +
            '</div>';
 }
 </script>
@@ -17599,10 +17690,26 @@ function populateDebugContent() {
       html += '<div style="margin-bottom: 30px;">';
       html += '<h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 1.2em; border-bottom: 2px solid #e0e7ef; padding-bottom: 8px;">' + typeLabels[type] + ' (' + grouped[type].length + ')</h3>';
       grouped[type].forEach(item => {
-        const valueDisplay = item.value === '' ? '<em style="color: #999;">(empty)</em>' : 
-                           item.value === true ? '<span style="color: #38d39f;">✓ checked</span>' :
-                           item.value === false ? '<span style="color: #e74c3c;">✗ unchecked</span>' :
-                           '<span style="color: #2c3e50;">' + String(item.value).substring(0, 100) + (String(item.value).length > 100 ? '...' : '') + '</span>';
+        const isBreakdownField = (item.id && item.id.endsWith('_breakdown')) || (item.name && item.name.endsWith('_breakdown'));
+        const valueStr = String(item.value || '');
+        const isLongValue = valueStr.length > 100;
+        const uniqueId = 'debug-value-' + (item.id || item.name || Math.random().toString(36).substr(2, 9));
+        
+        let valueDisplay;
+        if (item.value === '') {
+          valueDisplay = '<em style="color: #999;">(empty)</em>';
+        } else if (item.value === true) {
+          valueDisplay = '<span style="color: #38d39f;">✓ checked</span>';
+        } else if (item.value === false) {
+          valueDisplay = '<span style="color: #e74c3c;">✗ unchecked</span>';
+        } else if (isBreakdownField || isLongValue) {
+          // For breakdown fields or long values, show full value in a scrollable container
+          valueDisplay = '<div style="max-height: 200px; overflow-y: auto; overflow-x: auto; background: #f9f9f9; border: 1px solid #e0e7ef; border-radius: 4px; padding: 8px; margin-top: 5px; word-break: break-all; font-family: monospace; font-size: 0.9em; white-space: pre-wrap;">' + 
+                        valueStr.replace(/</g, '&lt;').replace(/>/g, '&gt;') + 
+                        '</div>';
+        } else {
+          valueDisplay = '<span style="color: #2c3e50;">' + valueStr.substring(0, 100) + (valueStr.length > 100 ? '...' : '') + '</span>';
+        }
         const requiredBadge = item.required ? '<span style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 8px;">REQUIRED</span>' : '';
         const virtualBadge = item.isVirtual ? '<span style="background: #4f8cff; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 8px;">VIRTUAL</span>' : '';
         // Determine the primary identifier (ID if available, otherwise name)
@@ -18759,6 +18866,8 @@ function generateHiddenPDFFields(formName) {
         if (fType === "text") {
 			//hide fields here
             hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" style="display:none;">`;
+            // Also create a breakdown field for calculation fields
+            hiddenFieldsHTML += `\n<input type="text" id="${fName}_breakdown" name="${fName}_breakdown" style="display:none;">`;
             const rows = block.querySelectorAll(`[id^="textCalculationRow${hid}_"]`);
             if (rows.length) {
                 const calcArr = [];

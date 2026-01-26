@@ -58,6 +58,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileUpload());          // parses multipart/form‑data (fields ➜ req.body, files ➜ req.files)
 app.use(cors());
 
+// Check if pdflatex is available at startup
+(async () => {
+  try {
+    await execAsync('which pdflatex');
+    console.log('✓ pdflatex is available');
+  } catch (error) {
+    console.warn('⚠ WARNING: pdflatex is not installed or not in PATH');
+    console.warn('⚠ LaTeX to PDF conversion will fail until pdflatex is installed');
+    console.warn('⚠ For Render deployment, use the provided Dockerfile which includes LaTeX');
+  }
+})();
+
 // ────────────────────────────────────────────────────────────
 // Firebase
 // ────────────────────────────────────────────────────────────

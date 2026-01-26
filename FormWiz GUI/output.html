@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New SC-120</title>
+    <title>Example Form</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="generate.css">
     <link rel="stylesheet" href="generate2.css">
@@ -1060,8 +1060,17 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people</h3></label><select id="how_many_people" name="how_many_people" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_people', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select><br><div id="labelContainer1"></div><script>
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Employment Info</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">Section 3</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="4"><div class="stepper-circle">4</div><div class="stepper-label">Section 4</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="5"><div class="stepper-circle">5</div><div class="stepper-label">Section 5</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="6"><div class="stepper-circle">6</div><div class="stepper-label">Section 6</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="7"><div class="stepper-circle">7</div><div class="stepper-label">Section 7</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="8"><div class="stepper-circle">8</div><div class="stepper-label">Section 8</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="9"><div class="stepper-circle">9</div><div class="stepper-label">Section 9</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="10"><div class="stepper-circle">10</div><div class="stepper-label">Section 10</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="11"><div class="stepper-circle">11</div><div class="stepper-label">Section 11</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="12"><div class="stepper-circle">12</div><div class="stepper-label">Section 12</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="13"><div class="stepper-circle">13</div><div class="stepper-label">Section 13</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="14"><div class="stepper-circle">14</div><div class="stepper-label">Section 14</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="15"><div class="stepper-circle">15</div><div class="stepper-label">Section 15</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Employment Info</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Do you have any cash savings?</h3></label><select id="do_you_have_any_cash_savings" name="do_you_have_any_cash_savings" data-question-id="1"
+                      onchange="dropdownMirror(this, 'do_you_have_any_cash_savings'); updateHiddenLogic('do_you_have_any_cash_savings', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_cash_savings"></div>
+              <input type="text" id="do_you_have_any_cash_savings_dropdown" name="do_you_have_any_cash_savings_dropdown"
+                   readonly style="display:none;"></div>
+      <div class="question-nav" data-section-index="1">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"></div></div><div id="section7" class="section"><center><h1 class="section-title">Section 7</h1><div id="question-container-2" data-question-id="2" class="question-container question-item hidden" data-section="7" data-question-index="1"><label><h3 class="question-text">How much cash saving do you have?</h3></label><div class="text-input-container"><input type="text" id="how_much_cash_saving_do_you_have" name="how_much_cash_saving_do_you_have" inputmode="decimal" placeholder="Enter amount" oninput="formatCurrencyInput(this)"></div><script>
           window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
             if (!input) return;
             // Remove all non-numeric characters except decimal point, including dollar sign
@@ -1077,17 +1086,374 @@ document.addEventListener("DOMContentLoaded", function() {
             // Add dollar sign prefix
             input.value = '$' + parts[0] + decimal;
           };
-        </script></div><div id="question-container-2" data-question-id="2" class="question-container question-item question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="2"
-                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+        </script></div><div id="question-container-3" data-question-id="3" class="question-container question-item hidden question-step-hidden" data-section="7" data-question-index="2"><label><h3 class="question-text">Do you have a bank account?</h3></label><select id="do_you_have_a_bank_account" name="do_you_have_a_bank_account" data-question-id="3"
+                      onchange="dropdownMirror(this, 'do_you_have_a_bank_account'); updateHiddenLogic('do_you_have_a_bank_account', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div>
-      <div class="question-nav" data-section-index="1">
-        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
-        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
+              <div id="dropdowntext_do_you_have_a_bank_account"></div>
+              <input type="text" id="do_you_have_a_bank_account_dropdown" name="do_you_have_a_bank_account_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-4" data-question-id="4" class="question-container question-item hidden question-step-hidden" data-section="7" data-question-index="3" data-question-type="numberedDropdown"><label><h3 class="question-text">How many bank accounts do you have?</h3></label><select id="how_many_bank_accounts_do_you_have" name="how_many_bank_accounts_do_you_have" data-question-id="4" onchange="showTextboxLabels(4, this.value); updateHiddenCheckboxes(4, this.value); updateHiddenLogic('how_many_bank_accounts_do_you_have', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer4"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
+      <div class="question-nav" data-section-index="7">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="7">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="7">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section8" class="section"><center><h1 class="section-title">Section 8</h1><div id="question-container-5" data-question-id="5" class="question-container question-item hidden" data-section="8" data-question-index="1"><label><h3 class="question-text">Do you own any cars, boats, and other vehicles:</h3></label><select id="do_you_own_any_cars_boats_and_other_vehicles" name="do_you_own_any_cars_boats_and_other_vehicles" data-question-id="5"
+                      onchange="dropdownMirror(this, 'do_you_own_any_cars_boats_and_other_vehicles'); updateHiddenLogic('do_you_own_any_cars_boats_and_other_vehicles', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_own_any_cars_boats_and_other_vehicles"></div>
+              <input type="text" id="do_you_own_any_cars_boats_and_other_vehicles_dropdown" name="do_you_own_any_cars_boats_and_other_vehicles_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-6" data-question-id="6" class="question-container question-item hidden question-step-hidden" data-section="8" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many vehicles do you own?</h3></label><select id="how_many_vehicles_do_you_own" name="how_many_vehicles_do_you_own" data-question-id="6" onchange="showTextboxLabels(6, this.value); updateHiddenCheckboxes(6, this.value); updateHiddenLogic('how_many_vehicles_do_you_own', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer6"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
+      <div class="question-nav" data-section-index="8">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="8">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="8">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section9" class="section"><center><h1 class="section-title">Section 9</h1><div id="question-container-7" data-question-id="7" class="question-container question-item hidden" data-section="9" data-question-index="1"><label><h3 class="question-text">Do you own any real estate:</h3></label><select id="do_you_own_any_real_estate" name="do_you_own_any_real_estate" data-question-id="7"
+                      onchange="dropdownMirror(this, 'do_you_own_any_real_estate'); updateHiddenLogic('do_you_own_any_real_estate', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_own_any_real_estate"></div>
+              <input type="text" id="do_you_own_any_real_estate_dropdown" name="do_you_own_any_real_estate_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-8" data-question-id="8" class="question-container question-item hidden question-step-hidden" data-section="9" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many real estate properties do you have?</h3></label><select id="how_many_real_estate_properties_do_you_have" name="how_many_real_estate_properties_do_you_have" data-question-id="8" onchange="showTextboxLabels(8, this.value); updateHiddenCheckboxes(8, this.value); updateHiddenLogic('how_many_real_estate_properties_do_you_have', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option></select><br><div id="labelContainer8"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
+      <div class="question-nav" data-section-index="9">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="9">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="9">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section10" class="section"><center><h1 class="section-title">Section 10</h1><div id="question-container-9" data-question-id="9" class="question-container question-item hidden" data-section="10" data-question-index="1"><label><h3 class="question-text">Do you own any other personal property? (jewelry, furniture, furs, bonds, ect)</h3></label><select id="do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect" name="do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect" data-question-id="9"
+                      onchange="dropdownMirror(this, 'do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect'); updateHiddenLogic('do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect"></div>
+              <input type="text" id="do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect_dropdown" name="do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-10" data-question-id="10" class="question-container question-item hidden question-step-hidden" data-section="10" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many items</h3></label><select id="how_many_items" name="how_many_items" data-question-id="10" onchange="showTextboxLabels(10, this.value); updateHiddenCheckboxes(10, this.value); updateHiddenLogic('how_many_items', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option></select><br><div id="labelContainer10"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
+      <div class="question-nav" data-section-index="10">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="10">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="10">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section11" class="section"><center><h1 class="section-title">Section 11</h1><div id="question-container-11" data-question-id="11" class="question-container question-item hidden" data-section="11" data-question-index="1"><label><h3 class="question-text">Do you have any payroll deductions?</h3></label><select id="do_you_have_any_payroll_deductions" name="do_you_have_any_payroll_deductions" data-question-id="11"
+                      onchange="dropdownMirror(this, 'do_you_have_any_payroll_deductions'); updateHiddenLogic('do_you_have_any_payroll_deductions', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_payroll_deductions"></div>
+              <input type="text" id="do_you_have_any_payroll_deductions_dropdown" name="do_you_have_any_payroll_deductions_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-12" data-question-id="12" class="question-container question-item hidden question-step-hidden" data-section="11" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many deductions?</h3></label><select id="how_many_deductions" name="how_many_deductions" data-question-id="12" onchange="showTextboxLabels(12, this.value); updateHiddenCheckboxes(12, this.value); updateHiddenLogic('how_many_deductions', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer12"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
+      <div class="question-nav" data-section-index="11">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="11">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="11">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section12" class="section"><center><h1 class="section-title">Section 12</h1><div id="question-container-13" data-question-id="13" class="question-container question-item hidden" data-section="12" data-question-index="1"><label><h3 class="question-text">Mark All That Apply:</h3></label><div><center><div id="checkmark" class="checkbox-group-13">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_insurance_life_health_etc">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_insurance_life_health_etc" name="mark_all_that_apply_insurance_life_health_etc" value="Insurance (life, health, etc.)" data-label="Insurance (life, health, etc.)"
+                 onchange="toggleAmountField('mark_all_that_apply_insurance_life_health_etc_amount', this.checked); toggleNoneOption(this, 13); updateCheckboxStyle(this);">
+          Insurance (life, health, etc.)
+        </label>
+      </span>
+          <input type="text" id="mark_all_that_apply_insurance_life_health_etc_amount"
+                 name="mark_all_that_apply_insurance_life_health_etc_amount"
+                 placeholder="Enter amount"
+                 inputmode="decimal"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="formatCurrencyInput(this); if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_medical_dental">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_medical_dental" name="mark_all_that_apply_medical_dental" value="Medical / dental" data-label="Medical / dental"
+                 onchange="toggleAmountField('mark_all_that_apply_medical_dental_amount', this.checked); toggleNoneOption(this, 13); updateCheckboxStyle(this);">
+          Medical / dental
+        </label>
+      </span>
+          <input type="text" id="mark_all_that_apply_medical_dental_amount"
+                 name="mark_all_that_apply_medical_dental_amount"
+                 placeholder="Enter amount"
+                 inputmode="decimal"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="formatCurrencyInput(this); if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_laundry_cleaning">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_laundry_cleaning" name="mark_all_that_apply_laundry_cleaning" value="Laundry / cleaning" data-label="Laundry / cleaning"
+                 onchange="toggleAmountField('mark_all_that_apply_laundry_cleaning_amount', this.checked); toggleNoneOption(this, 13); updateCheckboxStyle(this);">
+          Laundry / cleaning
+        </label>
+      </span>
+          <input type="text" id="mark_all_that_apply_laundry_cleaning_amount"
+                 name="mark_all_that_apply_laundry_cleaning_amount"
+                 placeholder="Enter amount"
+                 inputmode="decimal"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="formatCurrencyInput(this); if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_clothing">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_clothing" name="mark_all_that_apply_clothing" value="Clothing" data-label="Clothing"
+                 onchange="toggleAmountField('mark_all_that_apply_clothing_amount', this.checked); toggleNoneOption(this, 13); updateCheckboxStyle(this);">
+          Clothing
+        </label>
+      </span>
+          <input type="text" id="mark_all_that_apply_clothing_amount"
+                 name="mark_all_that_apply_clothing_amount"
+                 placeholder="Enter amount"
+                 inputmode="decimal"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="formatCurrencyInput(this); if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_utilities_phone">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_utilities_phone" name="mark_all_that_apply_utilities_phone" value="Utilities / phone" data-label="Utilities / phone"
+                 onchange="toggleAmountField('mark_all_that_apply_utilities_phone_amount', this.checked); toggleNoneOption(this, 13); updateCheckboxStyle(this);">
+          Utilities / phone
+        </label>
+      </span>
+          <input type="text" id="mark_all_that_apply_utilities_phone_amount"
+                 name="mark_all_that_apply_utilities_phone_amount"
+                 placeholder="Enter amount"
+                 inputmode="decimal"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="formatCurrencyInput(this); if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_rent_housing">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_rent_housing" name="mark_all_that_apply_rent_housing" value="Rent / housing" data-label="Rent / housing"
+                 onchange="toggleAmountField('mark_all_that_apply_rent_housing_amount', this.checked); toggleNoneOption(this, 13); updateCheckboxStyle(this);">
+          Rent / housing
+        </label>
+      </span>
+          <input type="text" id="mark_all_that_apply_rent_housing_amount"
+                 name="mark_all_that_apply_rent_housing_amount"
+                 placeholder="Enter amount"
+                 inputmode="decimal"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="formatCurrencyInput(this); if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_school_child_care">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_school_child_care" name="mark_all_that_apply_school_child_care" value="School / child care" data-label="School / child care"
+                 onchange="toggleAmountField('mark_all_that_apply_school_child_care_amount', this.checked); toggleNoneOption(this, 13); updateCheckboxStyle(this);">
+          School / child care
+        </label>
+      </span>
+          <input type="text" id="mark_all_that_apply_school_child_care_amount"
+                 name="mark_all_that_apply_school_child_care_amount"
+                 placeholder="Enter amount"
+                 inputmode="decimal"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="formatCurrencyInput(this); if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_child_spousal_support">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_child_spousal_support" name="mark_all_that_apply_child_spousal_support" value="Child / spousal support" data-label="Child / spousal support"
+                 onchange="toggleAmountField('mark_all_that_apply_child_spousal_support_amount', this.checked); toggleNoneOption(this, 13); updateCheckboxStyle(this);">
+          Child / spousal support
+        </label>
+      </span>
+          <input type="text" id="mark_all_that_apply_child_spousal_support_amount"
+                 name="mark_all_that_apply_child_spousal_support_amount"
+                 placeholder="Enter amount"
+                 inputmode="decimal"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="formatCurrencyInput(this); if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_transportation_auto_gas">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_transportation_auto_gas" name="mark_all_that_apply_transportation_auto_gas" value="Transportation / auto / gas" data-label="Transportation / auto / gas"
+                 onchange="toggleAmountField('mark_all_that_apply_transportation_auto_gas_amount', this.checked); toggleNoneOption(this, 13); updateCheckboxStyle(this);">
+          Transportation / auto / gas
+        </label>
+      </span>
+          <input type="text" id="mark_all_that_apply_transportation_auto_gas_amount"
+                 name="mark_all_that_apply_transportation_auto_gas_amount"
+                 placeholder="Enter amount"
+                 inputmode="decimal"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="formatCurrencyInput(this); if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_food_supplies">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_food_supplies" name="mark_all_that_apply_food_supplies" value="Food / supplies" data-label="Food / supplies"
+                 onchange="toggleAmountField('mark_all_that_apply_food_supplies_amount', this.checked); toggleNoneOption(this, 13); updateCheckboxStyle(this);">
+          Food / supplies
+        </label>
+      </span>
+          <input type="text" id="mark_all_that_apply_food_supplies_amount"
+                 name="mark_all_that_apply_food_supplies_amount"
+                 placeholder="Enter amount"
+                 inputmode="decimal"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="formatCurrencyInput(this); if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_none">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_none" name="mark_all_that_apply_none" value="None of the above" data-label="None of the above"
+                 onchange="handleNoneOfTheAboveToggle(this, 13); updateCheckboxStyle(this);">
+          None of the above
+        </label>
+      </span></div><br></div></div>
+      <div class="question-nav" data-section-index="12">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="12">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="12">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section13" class="section"><center><h1 class="section-title">Section 13</h1><div id="question-container-14" data-question-id="14" class="question-container question-item hidden" data-section="13" data-question-index="1"><label><h3 class="question-text">Do you have any installment payments?</h3></label><select id="do_you_have_any_installment_payments" name="do_you_have_any_installment_payments" data-question-id="14"
+                      onchange="dropdownMirror(this, 'do_you_have_any_installment_payments'); updateHiddenLogic('do_you_have_any_installment_payments', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_installment_payments"></div>
+              <input type="text" id="do_you_have_any_installment_payments_dropdown" name="do_you_have_any_installment_payments_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-15" data-question-id="15" class="question-container question-item hidden question-step-hidden" data-section="13" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many installment payments do you have?</h3></label><select id="how_many_installment_payments_do_you_have" name="how_many_installment_payments_do_you_have" data-question-id="15" onchange="showTextboxLabels(15, this.value); updateHiddenCheckboxes(15, this.value); updateHiddenLogic('how_many_installment_payments_do_you_have', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer15"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
+      <div class="question-nav" data-section-index="13">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="13">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="13">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section14" class="section"><center><h1 class="section-title">Section 14</h1><div id="question-container-16" data-question-id="16" class="question-container question-item hidden" data-section="14" data-question-index="1"><label><h3 class="question-text">Do you have any wages/earnings withheld by the court:</h3></label><select id="do_you_have_any_wages/earnings_withheld_by_the_court" name="do_you_have_any_wages/earnings_withheld_by_the_court" data-question-id="16"
+                      onchange="dropdownMirror(this, 'do_you_have_any_wages/earnings_withheld_by_the_court'); updateHiddenLogic('do_you_have_any_wages/earnings_withheld_by_the_court', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_wages/earnings_withheld_by_the_court"></div>
+              <input type="text" id="do_you_have_any_wages/earnings_withheld_by_the_court_dropdown" name="do_you_have_any_wages/earnings_withheld_by_the_court_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-17" data-question-id="17" class="question-container question-item hidden question-step-hidden" data-section="14" data-question-index="2"><label><h3 class="question-text">How much is being withheld?</h3></label><div class="text-input-container"><input type="text" id="how_much_is_being_withheld" name="how_much_is_being_withheld" inputmode="decimal" placeholder="Enter amount" oninput="formatCurrencyInput(this)"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
+      <div class="question-nav" data-section-index="14">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="14">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="14">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section15" class="section"><center><h1 class="section-title">Section 15</h1><div id="question-container-18" data-question-id="18" class="question-container question-item hidden" data-section="15" data-question-index="1"><label><h3 class="question-text">Do you have any other monthly expenses?</h3></label><select id="do_you_have_any_other_monthly_expenses" name="do_you_have_any_other_monthly_expenses" data-question-id="18"
+                      onchange="dropdownMirror(this, 'do_you_have_any_other_monthly_expenses'); updateHiddenLogic('do_you_have_any_other_monthly_expenses', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_other_monthly_expenses"></div>
+              <input type="text" id="do_you_have_any_other_monthly_expenses_dropdown" name="do_you_have_any_other_monthly_expenses_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-19" data-question-id="19" class="question-container question-item hidden question-step-hidden" data-section="15" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many other monthly expenses do you have?</h3></label><select id="how_many_other_monthly_expenses_do_you_have" name="how_many_other_monthly_expenses_do_you_have" data-question-id="19" onchange="showTextboxLabels(19, this.value); updateHiddenCheckboxes(19, this.value); updateHiddenLogic('how_many_other_monthly_expenses_do_you_have', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer19"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
+      <div class="question-nav" data-section-index="15">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="15">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="15">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
   <script>
     // Function to show sign-in required modal
     function showSignInRequiredModal() {
@@ -2310,7 +2676,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
 <input type="hidden" id="user_full_address"     name="user_full_address">
 <input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden">
-<input type="checkbox" id="new_sc_120_default_checkbox" name="new_sc_120_default_checkbox" checked style="display: none;">
+<input type="text" id="total_monthly_expenses" name="total_monthly_expenses" style="display:none;">
+<input type="text" id="total_monthly_expenses_breakdown" name="total_monthly_expenses_breakdown" style="display:none;">
+<input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
 </div>
   <script>
     window.showLoginRequiredModal = function() {
@@ -2327,7 +2695,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
   </script>
   </form>
-<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><button onclick="showPreviewPdfsModal()" style="font-size: 1.2em;">Preview PDFs</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
+<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><span style="font-size: 0.75em; color: #666;">Your paperwork is now ready, please proceed to checkout</span><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Checkout</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='/Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button><br><button id="debugDownloadPdfBtn" onclick="downloadAllPdfs()" style="font-size: 1.2em; display: none;">Download PDF</button><br id="debugDownloadPdfBr" style="display: none;"><br id="debugPreviewPdfsBr" style="display: none;"><button id="debugPreviewPdfsBtn" onclick="showPreviewPdfsModal()" style="font-size: 1.2em; display: none;">Preview PDFs</button><br></div>
 </div>
 </section>
 </div>
@@ -2455,19 +2823,35 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"how_many_people","2":"hungry"};
-var questionNameIds = {"1":"how_many_people","2":"hungry"};
+var questionSlugMap = {"1":"do_you_have_any_cash_savings","2":"how_much_cash_saving_do_you_have","3":"do_you_have_a_bank_account","4":"how_many_bank_accounts_do_you_have","5":"do_you_own_any_cars_boats_and_other_vehicles","6":"how_many_vehicles_do_you_own","7":"do_you_own_any_real_estate","8":"how_many_real_estate_properties_do_you_have","9":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","10":"how_many_items","11":"do_you_have_any_payroll_deductions","12":"how_many_deductions","13":"mark_all_that_apply","14":"do_you_have_any_installment_payments","15":"how_many_installment_payments_do_you_have","16":"do_you_have_any_wages_earnings_withheld_by_the_court","17":"how_much_is_being_withheld","18":"do_you_have_any_other_monthly_expenses","19":"how_many_other_monthly_expenses_do_you_have"};
+var questionNameIds = {"1":"do_you_have_any_cash_savings","2":"how_much_cash_saving_do_you_have","3":"do_you_have_a_bank_account","4":"how_many_bank_accounts_do_you_have","5":"do_you_own_any_cars_boats_and_other_vehicles","6":"how_many_vehicles_do_you_own","7":"do_you_own_any_real_estate","8":"how_many_real_estate_properties_do_you_have","9":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","10":"how_many_items","11":"do_you_have_any_payroll_deductions","12":"how_many_deductions","13":"mark_all_that_apply","14":"do_you_have_any_installment_payments","15":"how_many_installment_payments_do_you_have","16":"do_you_have_any_wages/earnings_withheld_by_the_court","17":"how_much_is_being_withheld","18":"do_you_have_any_other_monthly_expenses","19":"how_many_other_monthly_expenses_do_you_have"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
-var checkboxRequiredMap = {};
-var allAreRequiredMap = {};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_people_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"how_many_people_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this defendant a business?","options":[{"text":"Yes","nodeId":"is_this_defendant_a_business_yes"},{"text":"No","nodeId":"is_this_defendant_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"is_this_defendant_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_defendant_a_business_yes_business_name_statement_number","isAmountOption":true},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"is_this_defendant_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["is_this_defendant_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 For Extra Plaintiff 1","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"3","pdfTitle":"SC-103 For Extra Plaintiff 3","pdfName":"sc103(3).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"5","pdfTitle":"SC-103 For Extra Plaintiff 5","pdfName":"sc103(5).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}]};
+var checkboxRequiredMap = {"13":true};
+var allAreRequiredMap = {"13":false};
+var unifiedFieldsMap = {"4":[{"type":"label","label":"Bank Name","nodeId":"how_many_bank_accounts_do_you_have_bank_name","order":1,"prefill":""},{"type":"currency","label":"Amount","nodeId":"how_many_bank_accounts_do_you_have_amount","order":2}],"6":[{"type":"label","label":"Make/Year","nodeId":"how_many_vehicles_do_you_own_make/year","order":1,"prefill":""},{"type":"currency","label":"Fair Market Value","nodeId":"how_many_vehicles_do_you_own_fair_market_value","order":2},{"type":"currency","label":"Amount Owed","nodeId":"how_many_vehicles_do_you_own_amount_owed","order":3}],"8":[{"type":"label","label":"Address","nodeId":"how_many_real_estate_properties_do_you_have_address","order":1,"prefill":""},{"type":"currency","label":"Fair Market Value","nodeId":"how_many_real_estate_properties_do_you_have_fair_market_value","order":2},{"type":"currency","label":"Amount Owed","nodeId":"how_many_real_estate_properties_do_you_have_amount_owed","order":3}],"10":[{"type":"label","label":"Description","nodeId":"how_many_items_description","order":1,"prefill":""},{"type":"currency","label":"Fair Market Value","nodeId":"how_many_items_fair_market_value","order":2},{"type":"currency","label":"Amount Owed","nodeId":"how_many_items_amount_owed","order":3}],"12":[{"type":"label","label":"Description","nodeId":"how_many_deductions_description","order":1,"prefill":""},{"type":"currency","label":"Fair Market Value","nodeId":"how_many_deductions_fair_market_value","order":2}],"15":[{"type":"label","label":"Description","nodeId":"how_many_installment_payments_do_you_have_description","order":1,"prefill":""},{"type":"currency","label":"Amount","nodeId":"how_many_installment_payments_do_you_have_amount","order":2}],"19":[{"type":"label","label":"Description","nodeId":"how_many_other_monthly_expenses_do_you_have_description","order":1,"prefill":""},{"type":"currency","label":"Amount","nodeId":"how_many_other_monthly_expenses_do_you_have_amount","order":2}]};
 window.hardAlertData = {};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
 window.latexPreviewQuestions = [];
 window.pdfPreviewQuestions = [];
 
+  window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+    if (!input) return;
+    // Remove all non-numeric characters except decimal point, including dollar sign
+    let val = (input.value || '').replace(/[^0-9.]/g, '');
+    if (!val) {
+      input.value = '';
+      return;
+    }
+    const parts = val.split('.');
+    parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+    // Add dollar sign prefix
+    input.value = '$' + parts[0] + decimal;
+  };
+  
   // Address helper functions (must exist before conditional logic runs)
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
       const hasLocationFields = allFieldsInOrder.some(field =>
@@ -2977,6 +3361,39 @@ window.pdfPreviewQuestions = [];
         subtree: true,
         childList: true
       });
+    }
+  });
+  
+  // Debug mode toggle for thank you message buttons
+  let debugModeEnabled = false;
+  document.addEventListener('keydown', function(e) {
+    // Check for Ctrl+Shift (Windows/Linux) or Cmd+Shift (Mac)
+    const isModifierPressed = (e.ctrlKey || e.metaKey) && e.shiftKey;
+    
+    if (isModifierPressed) {
+      debugModeEnabled = !debugModeEnabled;
+      
+      // Toggle visibility of debug buttons
+      const downloadBtn = document.getElementById('debugDownloadPdfBtn');
+      const previewBtn = document.getElementById('debugPreviewPdfsBtn');
+      const downloadBr = document.getElementById('debugDownloadPdfBr');
+      const previewBr = document.getElementById('debugPreviewPdfsBr');
+      
+      if (downloadBtn && previewBtn && downloadBr && previewBr) {
+        if (debugModeEnabled) {
+          downloadBtn.style.display = 'inline-block';
+          previewBtn.style.display = 'inline-block';
+          downloadBr.style.display = 'block';
+          previewBr.style.display = 'block';
+          console.log('Debug mode enabled - PDF buttons visible');
+        } else {
+          downloadBtn.style.display = 'none';
+          previewBtn.style.display = 'none';
+          downloadBr.style.display = 'none';
+          previewBr.style.display = 'none';
+          console.log('Debug mode disabled - PDF buttons hidden');
+        }
+      }
     }
   });
   var isCreatingFields = false;
@@ -4639,21 +5056,25 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
   window.__addressHelpersInjected = true;
   // Create stylized address <input>
   window.createAddressInput = function(id, label, index, type = 'text', prefill = '') {
-    const inputType = (type === 'number') ? 'number' : 'text';
+    // Check if this is an amount field (ends with _amount or label contains "amount")
+    const isAmountField = id.includes('_amount') || (label && label.toLowerCase().includes('amount'));
+    // For amount fields, use text type with currency formatting instead of number type
+    const inputType = isAmountField ? 'text' : ((type === 'number') ? 'number' : 'text');
     const placeholder = label;
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
     // Add maxlength and inputmode for zip fields (numeric only, max 5 chars)
     const isZipField = (label === 'Zip' || label === 'zip' || id.includes('_zip'));
     const maxLengthAttr = isZipField ? ' maxlength="5"' : '';
-    const inputModeAttr = isZipField ? ' inputmode="numeric"' : '';
+    const inputModeAttr = isZipField ? ' inputmode="numeric"' : (isAmountField ? ' inputmode="decimal"' : '');
     const zipOnInput = isZipField ? ' oninput="this.value = this.value.replace(/[^0-9]/g, \'\')"' : '';
+    const amountOnInput = isAmountField ? ' oninput="formatCurrencyInput(this)"' : '';
     return (
       '<div class="address-field">' +
       '<input type="' + inputType + '" ' +
       'id="' + id + '" ' +
       'name="' + id + '" ' +
       'placeholder="' + placeholder + '" ' +
-      'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + '>' +
+      'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + amountOnInput + '>' +
       '</div>'
     );
   };
@@ -4769,17 +5190,17 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       if (typeof userId === 'undefined') { var userId = null; }
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [];
+    var jumpLogics = [{"questionId":"1","questionType":"dropdown","jumpOption":"No","jumpTo":"7","section":1},{"questionId":"1","questionType":"dropdown","jumpOption":"Yes","jumpTo":"7","section":1},{"questionId":"18","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":15},{"questionId":"19","questionType":"numberedDropdown","jumpOption":"1","jumpTo":"end","section":15},{"questionId":"19","questionType":"numberedDropdown","jumpOption":"2","jumpTo":"end","section":15},{"questionId":"19","questionType":"numberedDropdown","jumpOption":"3","jumpTo":"end","section":15}];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc103(1).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 1","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"1"},{"questionId":"1","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"1","pdfName":"sc103(3).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 3","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"3"},{"questionId":"1","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"},{"questionId":"1","pdfName":"sc103(5).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 5","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"5"}];
+var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"1":["Name"],"length":0};
-var amountMap = {"1":[],"length":0};
-var labelNodeIdsMap = {"1":["how_many_people_name"]};
+var labelMap = {"4":["Bank Name"],"6":["Make/Year"],"8":["Address"],"10":["Description"],"12":["Description"],"15":["Description"],"19":["Description"],"length":0};
+var amountMap = {"4":[],"6":[],"8":[],"10":[],"12":[],"15":[],"19":[],"length":0};
+var labelNodeIdsMap = {"4":["how_many_bank_accounts_do_you_have_bank_name"],"6":["how_many_vehicles_do_you_own_make/year"],"8":["how_many_real_estate_properties_do_you_have_address"],"10":["how_many_items_description"],"12":["how_many_deductions_description"],"15":["how_many_installment_payments_do_you_have_description"],"19":["how_many_other_monthly_expenses_do_you_have_description"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -5130,8 +5551,1544 @@ var stripePriceId = "";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
-var hiddenTextCalculations = [];
+var hiddenTextCalculations = [{"hiddenFieldName":"total_monthly_expenses","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_deductions_fair_market_value_1"},{"operator":"+","questionNameId":"how_many_deductions_fair_market_value_2"},{"operator":"+","questionNameId":"how_many_deductions_fair_market_value_3"},{"operator":"+","questionNameId":"how_many_deductions_fair_market_value_4"},{"operator":"+","questionNameId":"mark_all_that_apply_rent_housing_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_food_supplies_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_utilities_phone_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_clothing_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_laundry_cleaning_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_medical_dental_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_insurance_life_health_etc_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_school_child_care_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_child_spousal_support_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_transportation_auto_gas_amount"},{"operator":"+","questionNameId":"how_many_installment_payments_do_you_have_amount_1"},{"operator":"+","questionNameId":"how_many_installment_payments_do_you_have_amount_2"},{"operator":"+","questionNameId":"how_many_installment_payments_do_you_have_amount_3"},{"operator":"+","questionNameId":"how_much_is_being_withheld"},{"operator":"+","questionNameId":"how_much_cash_saving_do_you_have"},{"operator":"+","questionNameId":"how_many_other_monthly_expenses_do_you_have_amount_1"},{"operator":"+","questionNameId":"how_many_other_monthly_expenses_do_you_have_amount_2"},{"operator":"+","questionNameId":"how_many_other_monthly_expenses_do_you_have_amount_3"}],"compareOperator":">","threshold":"0","fillValue":"##total_monthly_expenses##"}]}];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("2");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-3");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="currency";
+    var cPrevAns="any text";
+    var cPrevQNum="2";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower !== ""){ anyMatch=true; } else { } }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("3");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var textQuestion = "2";
+   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);
+   if(el3){ el3.addEventListener("input", function(){ updateVisibility();}); }
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-4");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="3";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("4");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-5");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="3";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="3";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("5");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-6");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="5";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("6");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "5";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-7");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="5";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="5";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("7");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "5";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "5";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-8");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="7";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("8");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "7";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-9");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="7";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="7";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("9");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "7";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "7";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-10");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="9";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("10");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-11");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="9";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="9";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("11");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-12");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="11";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("12");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "11";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+checkboxRequiredMap[13] = true; 
+allAreRequiredMap[13] = false; 
+
+(function(){
+ var thisQ=document.getElementById("question-container-13");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="11";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="11";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("13");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "11";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "11";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-14");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="rent / housing";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="food / supplies";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="none of the above";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="utilities / phone";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="clothing";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="laundry / cleaning";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="medical / dental";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="insurance (life, health, etc.)";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="child / spousal support";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="school / child care";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="transportation / auto / gas";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("14");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var checkQuestion = "13";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "13";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "13";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "13";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "13";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "13";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "13";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "13";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "13";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "13";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "13";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-15");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="14";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("15");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "14";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-16");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="14";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("16");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "14";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-17");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="16";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("17");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "16";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "15";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-18");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="16";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="currency";
+    var cPrevAns="any text";
+    var cPrevQNum="17";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower !== ""){ anyMatch=true; } else { } }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("18");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "16";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var textQuestion = "17";
+   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);
+   if(el3){ el3.addEventListener("input", function(){ updateVisibility();}); }
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-19");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="18";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("19");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "18";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -10129,31 +12086,52 @@ function runSingleHiddenTextCalculation(calcObj) {
         return;
     }
 
+    // Get or create the breakdown field
+    const breakdownFieldName = calcObj.hiddenFieldName + '_breakdown';
+    let breakdownField = document.getElementById(breakdownFieldName);
+    if (!breakdownField) {
+        // Create the breakdown field if it doesn't exist
+        breakdownField = document.createElement('input');
+        breakdownField.type = 'text';
+        breakdownField.id = breakdownFieldName;
+        breakdownField.name = breakdownFieldName;
+        breakdownField.style.display = 'none';
+        const hiddenContainer = document.getElementById('hidden_pdf_fields');
+        if (hiddenContainer) {
+            hiddenContainer.appendChild(breakdownField);
+        }
+    }
+
     // We'll assume that the last matched condition takes precedence
     let finalValue = "";
+    let breakdownString = "";
     calcObj.calculations.forEach(function(oneCalc, calcIndex) {
 
         let val = 0;
+        let breakdown = "";
         // Calculate the sum of all terms
         if (oneCalc.terms && oneCalc.terms.length > 0) {
             // Get the first term's value
             const firstTerm = oneCalc.terms[0];
-
-            val = parseFloat(getMoneyValue(firstTerm.questionNameId)) || 0;
+            const firstVal = parseFloat(getMoneyValue(firstTerm.questionNameId)) || 0;
+            val = firstVal;
+            breakdown = firstVal.toString();
 
             // Process remaining terms
             for (let t = 1; t < oneCalc.terms.length; t++) {
                 const term = oneCalc.terms[t];
-
                 const termVal = parseFloat(getMoneyValue(term.questionNameId)) || 0;
+                const operator = term.operator || '+';
 
-                switch(term.operator) {
+                switch(operator) {
                     case '+': val += termVal; break;
                     case '-': val -= termVal; break;
                     case 'x': val *= termVal; break;
                     case '/': val = termVal !== 0 ? val / termVal : 0; break;
                 }
 
+                // Build breakdown string
+                breakdown += operator + termVal;
             }
         }
 
@@ -10170,16 +12148,20 @@ function runSingleHiddenTextCalculation(calcObj) {
             // Handle special fillValue formats
             if (oneCalc.fillValue === "##total##" || oneCalc.fillValue.match(/^##(.+)##$/)) {
                 finalValue = val.toFixed(2); // Format money values with 2 decimal places
-
+                breakdownString = breakdown; // Store the breakdown for the matched calculation
             } else {
                 finalValue = oneCalc.fillValue;
-
+                breakdownString = breakdown; // Store the breakdown for the matched calculation
             }
         }
     });
 
     // Update the text field
     textField.value = finalValue;
+    // Update the breakdown field
+    if (breakdownField) {
+        breakdownField.value = breakdownString;
+    }
 
 }
 function replacePlaceholderTokens (str){
@@ -12701,20 +14683,24 @@ if (typeof handleNext === 'function') {
     });
 // Helper function to create styled address input
 function createAddressInput(id, label, index, type = 'text', prefill = '') {
-    const inputType = type === 'number' ? 'number' : 'text';
+    // Check if this is an amount field (ends with _amount or label contains "amount")
+    const isAmountField = id.includes('_amount') || (label && label.toLowerCase().includes('amount'));
+    // For amount fields, use text type with currency formatting instead of number type
+    const inputType = isAmountField ? 'text' : (type === 'number' ? 'number' : 'text');
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
     // Add maxlength and inputmode for zip fields (numeric only, max 5 chars)
     const isZipField = (label === 'Zip' || label === 'zip' || id.includes('_zip'));
     const maxLengthAttr = isZipField ? ' maxlength="5"' : '';
-    const inputModeAttr = isZipField ? ' inputmode="numeric"' : '';
+    const inputModeAttr = isZipField ? ' inputmode="numeric"' : (isAmountField ? ' inputmode="decimal"' : '');
     const zipOnInput = isZipField ? ' oninput="this.value = this.value.replace(/[^0-9]/g, \'\')"' : '';
+    const amountOnInput = isAmountField ? ' oninput="formatCurrencyInput(this)"' : '';
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
            'id="' + id + '" ' +
            'name="' + id + '" ' +
            'placeholder="' + placeholder + '" ' +
-           'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + '>' +
+           'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + amountOnInput + '>' +
            '</div>';
 }
 </script>

@@ -961,6 +961,7 @@ function showPropertiesPopup(cell, showRegularProperties = false) {
     properties = [
       { label: 'Node Text', value: nodeText, id: 'propNodeText', editable: true },
       { label: 'Node ID', value: nodeId, id: 'propNodeId', editable: true },
+      { label: 'Placeholder', value: cell._placeholder || '', id: 'propPlaceholder', editable: true },
       { 
         label: 'Node Type', 
         value: nodeType, 
@@ -3144,6 +3145,9 @@ function showPropertiesPopup(cell, showRegularProperties = false) {
                 break;
               case 'propQuestionNumber':
                 cell._questionId = newValue;
+                break;
+              case 'propPlaceholder':
+                cell._placeholder = newValue;
                 break;
               case 'propLineLimit':
                 console.log('[PROPERTIES] Saving propLineLimit, old value:', cell._lineLimit, 'new value:', newValue);
