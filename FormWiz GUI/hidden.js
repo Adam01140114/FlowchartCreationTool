@@ -12,24 +12,17 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeHiddenPDFFieldsModule();
 });
 /**
- * Creates a container for hidden fields, plus 'Add Hidden Field' button.
+ * Creates empty #groupsContainer / #hiddenFieldsContainer for import/export and programmatic use.
  */
 function initializeHiddenPDFFieldsModule() {
     var formBuilder = document.getElementById('formBuilder');
     if (!formBuilder) return;
     var hiddenFieldsModule = document.createElement('div');
     hiddenFieldsModule.id = 'hiddenFieldsModule';
+    /* Empty shells only — groups/hidden fields are created when loading JSON or via code paths */
     hiddenFieldsModule.innerHTML = `
-        <h2>Form Editor</h2>
         <div id="groupsContainer"></div>
-        <button type="button" onclick="addGroup()">Add Group</button>
-        <hr>
         <div id="hiddenFieldsContainer"></div>
-        <button type="button" onclick="addHiddenField()">Add Hidden Field</button>
-        <button type="button" onclick="openLinkedFieldModal()">Add Linked Field</button>
-        <button type="button" onclick="openLinkedCheckboxModal()">Add Linked Checkbox</button>
-        <button type="button" onclick="openInverseCheckboxModal()">Add Inverse Checkbox</button>
-        <hr>
     `;
     formBuilder.appendChild(hiddenFieldsModule);
 }

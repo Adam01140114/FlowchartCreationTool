@@ -27,15 +27,37 @@ function addSection(sectionId = null) {
     sectionBlock.className = 'section-block';
     sectionBlock.id = `sectionBlock${currentSectionId}`;
     sectionBlock.innerHTML = `
-        <h2 id="sectionLabel${currentSectionId}">Section ${currentSectionId}</h2>
+        <div class="fw-section-head">
+            <h2 id="sectionLabel${currentSectionId}">Section ${currentSectionId}</h2>
+            <button type="button" class="fw-question-collapse-btn" id="fwSectionCollapseBtn${currentSectionId}" aria-expanded="true" aria-controls="fwSectionCollapseBody${currentSectionId}" aria-label="Collapse or expand section" onclick="toggleSectionCollapse(${currentSectionId}, event)">
+                <svg class="fw-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+        </div>
+        <div class="fw-section-body" id="fwSectionCollapseBody${currentSectionId}">
         <label>Section Name: </label>
         <input type="text" id="sectionName${currentSectionId}" placeholder="Enter section name"
-               value="Section ${currentSectionId}" oninput="updateSectionName(${currentSectionId})"><br><br>
+               value="Section ${currentSectionId}" oninput="updateSectionName(${currentSectionId})">
         <div id="questionsSection${currentSectionId}"></div>
-        <button type="button" onclick="addQuestion(${currentSectionId})">Add Question to Section</button>
-        <button type="button" onclick="removeSection(${currentSectionId})">Remove Section</button>
-        <button type="button" onclick="moveSectionUp(${currentSectionId})">Push Section Up</button>
-        <button type="button" onclick="moveSectionDown(${currentSectionId})">Push Section Down</button>
+        </div>
+        <div class="fw-section-footer">
+            <button type="button" class="fw-btn-primary fw-btn--block fw-section-add-question" onclick="addQuestion(${currentSectionId})">Add Question to Section</button>
+            <div class="fw-section-actions-wrap">
+            <div class="fw-section-actions" role="group" aria-label="Section order and removal">
+                <button type="button" class="fw-icon-btn" onclick="removeSection(${currentSectionId})" title="Remove section" aria-label="Remove section">
+                    <svg class="fw-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
+                <button type="button" class="fw-icon-btn" onclick="moveSectionUp(${currentSectionId})" title="Move section up" aria-label="Move section up">
+                    <svg class="fw-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                </button>
+                <button type="button" class="fw-icon-btn" onclick="moveSectionDown(${currentSectionId})" title="Move section down" aria-label="Move section down">
+                    <svg class="fw-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+            </div>
+            <div class="fw-section-actions-close">
+                <button type="button" class="fw-btn-secondary fw-section-close-btn" onclick="toggleSectionCollapse(${currentSectionId}, event)">Close</button>
+            </div>
+            </div>
+        </div>
         <hr>
     `;
     formBuilder.appendChild(sectionBlock);
@@ -85,11 +107,17 @@ function addChecklist() {
         const formBuilder = document.getElementById('formBuilder');
         const checklistDiv = document.createElement('div');
         checklistDiv.id = 'checklistContainer';
+        checklistDiv.className = 'fw-field-section fw-checklist-shell';
         checklistDiv.innerHTML = `
-            <h3>📋 Checklist Items</h3>
-            <div id="checklistItems"></div>
-            <button type="button" onclick="addChecklistItem()">Add Checklist Item</button>
-            <hr>
+            <div class="fw-options-panel-head">
+                <span class="fw-options-panel-title">Checklist items</span>
+            </div>
+            <div class="fw-options-panel-body">
+                <div id="checklistItems" class="fw-checklist-items"></div>
+                <div class="fw-field-toolbar fw-field-toolbar--flush">
+                    <button type="button" onclick="addChecklistItem()">Add checklist item</button>
+                </div>
+            </div>
         `;
         formBuilder.insertBefore(checklistDiv, formBuilder.firstChild);
     }
@@ -100,12 +128,11 @@ function addChecklistItem() {
     if (!checklistItemsContainer) return;
     const itemId = Date.now();
     const itemDiv = document.createElement('div');
-    itemDiv.className = 'checklist-item';
+    itemDiv.className = 'checklist-item fw-addon-card';
     itemDiv.id = `checklistItem${itemId}`;
     itemDiv.innerHTML = `
-        <input type="text" id="checklistText${itemId}" placeholder="Enter checklist item text" style="width: 60%; margin-right: 10px;">
+        <input type="text" id="checklistText${itemId}" placeholder="Enter checklist item text">
         <button type="button" onclick="removeChecklistItem(${itemId})">Remove</button>
-        <br><br>
     `;
     checklistItemsContainer.appendChild(itemDiv);
 }
@@ -120,21 +147,15 @@ function addChecklistLogicCondition(questionId) {
     if (!checklistLogicContainer) return;
     const numConditions = checklistLogicContainer.children.length + 1;
     const conditionDiv = document.createElement('div');
-    conditionDiv.className = 'checklist-logic-condition-row';
+    conditionDiv.className = 'checklist-logic-condition-row fw-addon-card';
     conditionDiv.id = `checklistLogicCondition${questionId}_${numConditions}`;
     conditionDiv.innerHTML = `
-        <span>Condition ${numConditions}:</span><br>
-        <input type="number" placeholder="Previous question number"
+        <span>Condition ${numConditions}:</span>        <input type="number" placeholder="Previous question number"
                id="checklistPrevQuestion${questionId}_${numConditions}"
-               onchange="updateChecklistLogicAnswersForRow(${questionId}, ${numConditions})"><br>
-        <select id="checklistPrevAnswer${questionId}_${numConditions}" style="display: block;">
+               onchange="updateChecklistLogicAnswersForRow(${questionId}, ${numConditions})">        <select id="checklistPrevAnswer${questionId}_${numConditions}" style="display: block;">
             <option value="">-- Select an answer --</option>
-        </select><br>
-        <label>Checklist items to add (one per line):</label><br>
-        <textarea id="checklistItemsToAdd${questionId}_${numConditions}" placeholder="Enter checklist items to add when condition is met" 
-                  style="width: 100%; height: 80px; margin-top: 5px;"></textarea><br>
-        <button type="button" onclick="removeChecklistLogicCondition(${questionId}, ${numConditions})">Remove Condition</button>
-        <hr>
+        </select>        <label>Checklist items to add (one per line):</label>        <textarea id="checklistItemsToAdd${questionId}_${numConditions}" placeholder="Enter checklist items to add when condition is met" 
+                  style="width: 100%; height: 80px; margin-top: 5px;"></textarea>        <button type="button" onclick="removeChecklistLogicCondition(${questionId}, ${numConditions})">Remove Condition</button>
     `;
     checklistLogicContainer.appendChild(conditionDiv);
 }
@@ -167,13 +188,7 @@ function updateChecklistLogicAnswersForRow(questionId, conditionIndex, callback)
         return;
     }
     answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
-    if (questionType === 'radio') {
-        answerSelect.innerHTML += `
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-        `;
-        if (callback) callback();
-    } else if (questionType === 'dropdown') {
+    if (questionType === 'dropdown' || questionType === 'radio') {
         const dropOpts = targetQuestionBlock.querySelectorAll(`#dropdownOptions${prevQNum} input`);
         dropOpts.forEach(opt => {
             const val = opt.value.trim();
@@ -265,31 +280,21 @@ function updateAllChecklistLogicDropdowns() {
 }
 // Function to update all conditional logic dropdowns
 function updateAllConditionalLogicDropdowns() {
-    // Find all conditional logic containers
     const logicContainers = document.querySelectorAll('[id^="logicConditions"]');
     logicContainers.forEach(container => {
         const questionId = container.id.replace('logicConditions', '');
         const conditionRows = container.querySelectorAll('.logic-condition-row');
         conditionRows.forEach((row, index) => {
             const conditionIndex = index + 1;
-            const prevQuestionInput = row.querySelector(`#prevQuestion${questionId}_${conditionIndex}`);
-            const prevAnswerSelect = row.querySelector(`#prevAnswer${questionId}_${conditionIndex}`);
-            if (prevQuestionInput && prevAnswerSelect) {
-                const savedAnswer = prevAnswerSelect.value;
-                const savedQuestion = prevQuestionInput.value;
-                // Only update if there's a question number entered
-                if (savedQuestion) {
-                    // Check if dropdown already has options (more than just "-- Select an answer --")
-                    const currentOptions = prevAnswerSelect.querySelectorAll('option');
-                    if (currentOptions.length <= 1) {
-                        // Only update if dropdown doesn't have options yet
-                        updateLogicAnswersForRow(questionId, conditionIndex);
-                    }
-                    // Restore the saved answer after updating dropdown options
-                    if (savedAnswer) {
-                        prevAnswerSelect.value = savedAnswer;
-                    }
-                }
+            const prevQuestionEl = document.getElementById(`prevQuestion${questionId}_${conditionIndex}`);
+            const answerEl = document.getElementById(`prevAnswer${questionId}_${conditionIndex}`);
+            if (!prevQuestionEl) return;
+            const savedAnswer = answerEl ? answerEl.value : '';
+            fillPrevQuestionSelect(prevQuestionEl, questionId);
+            updateLogicAnswersForRow(questionId, conditionIndex);
+            const newAnswerEl = document.getElementById(`prevAnswer${questionId}_${conditionIndex}`);
+            if (newAnswerEl && savedAnswer !== undefined && savedAnswer !== '') {
+                newAnswerEl.value = savedAnswer;
             }
         });
     });
@@ -380,22 +385,205 @@ function updateSectionLabels() {
  * Re-label questions across all sections (visually),
  * WITHOUT reassigning their DOM IDs.
  */
+function formatQuestionHeadingText(ordinal, rawText) {
+    const t = (rawText || '').trim();
+    const base = `Question ${ordinal}`;
+    if (!t) return base;
+    const display = t.length > 48 ? `${t.slice(0, 45)}…` : t;
+    return `${base} (${display})`;
+}
+
+/** Derive a safe field name/id from question label text (for Name/ID when left blank). */
+function slugifyQuestionFieldName(rawText) {
+    if (!rawText || typeof rawText !== 'string') return '';
+    let s = rawText
+        .trim()
+        .replace(/\[[^\]]*\]/g, ' ')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '')
+        .replace(/_+/g, '_');
+    if (!s) return '';
+    if (/^[0-9]/.test(s)) s = 'q_' + s;
+    if (s.length > 80) s = s.slice(0, 80).replace(/_+$/, '');
+    return s;
+}
+
+/** If Name/ID is empty, set it from the current question text. */
+function maybeAutofillTextboxNameFromQuestion(questionId) {
+    const nameInput = document.getElementById(`textboxName${questionId}`);
+    if (!nameInput) return;
+    if (String(nameInput.value || '').trim() !== '') return;
+    const qInput = document.getElementById(`question${questionId}`);
+    const slug = slugifyQuestionFieldName(qInput ? qInput.value : '');
+    if (!slug) return;
+    nameInput.value = slug;
+}
+
 function updateGlobalQuestionLabels() {
     const sections = document.querySelectorAll('.section-block');
     let globalQuestionIndex = 1;
     sections.forEach((section) => {
         const questionsInSection = section.querySelectorAll('.question-block');
         questionsInSection.forEach((questionBlock) => {
-            // Only rename the visible label
-            const label = questionBlock.querySelector('label');
-            if (label) {
-                label.textContent = `Question ${globalQuestionIndex}:`;
+            const questionId = questionBlock.id.replace('questionBlock', '');
+            const titleEl = document.getElementById(`fwQuestionTitleText${questionId}`);
+            const qInput = document.getElementById(`question${questionId}`);
+            const text = formatQuestionHeadingText(globalQuestionIndex, qInput ? qInput.value : '');
+            if (titleEl) {
+                titleEl.textContent = text;
             }
-            // DO NOT change questionBlock.id or child input IDs
             globalQuestionIndex++;
         });
     });
     questionCounter = globalQuestionIndex;
+    refreshAllLogicPrevQuestionSelects();
+}
+
+/** Ordered list of questions for conditional-logic “previous question” picker (value = internal question id). */
+function getFormQuestionPickerItems() {
+    const items = [];
+    let ordinal = 1;
+    const blocks = document.querySelectorAll('#formBuilder .section-block .question-block');
+    blocks.forEach((block) => {
+        const id = parseInt(block.id.replace('questionBlock', ''), 10);
+        if (Number.isNaN(id)) return;
+        const qInput = document.getElementById(`question${id}`);
+        const label = formatQuestionHeadingText(ordinal, qInput ? qInput.value : '');
+        items.push({ id, label });
+        ordinal++;
+    });
+    return items;
+}
+
+function fillPrevQuestionSelect(selectEl, excludeQuestionId) {
+    if (!selectEl) return;
+    const selected = selectEl.value;
+    selectEl.innerHTML = '<option value="">-- Select a question --</option>';
+    getFormQuestionPickerItems().forEach(({ id, label }) => {
+        if (String(id) === String(excludeQuestionId)) return;
+        const opt = document.createElement('option');
+        opt.value = String(id);
+        opt.textContent = label;
+        selectEl.appendChild(opt);
+    });
+    if (selected && [...selectEl.options].some(o => o.value === selected)) {
+        selectEl.value = selected;
+    }
+}
+
+function refreshAllLogicPrevQuestionSelects() {
+    document.querySelectorAll('.logic-condition-row select[id^="prevQuestion"]').forEach((sel) => {
+        const m = sel.id.match(/^prevQuestion(\d+)_(\d+)$/);
+        if (!m) return;
+        const ownerQuestionId = m[1];
+        fillPrevQuestionSelect(sel, ownerQuestionId);
+    });
+}
+
+function logicQuestionTypeUsesAnswerDropdown(questionType) {
+    return (
+        questionType === 'dropdown' ||
+        questionType === 'radio' ||
+        questionType === 'checkbox' ||
+        questionType === 'numberedDropdown' ||
+        questionType === 'fileUpload'
+    );
+}
+
+/** Populate answer select for conditional logic when the referenced question has discrete options. */
+function populateLogicAnswerSelect(answerSelect, prevQNum, questionType, targetQuestionBlock) {
+    answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+    if (questionType === 'dropdown' || questionType === 'radio') {
+        const dropOpts = targetQuestionBlock.querySelectorAll(`#dropdownOptions${prevQNum} input`);
+        dropOpts.forEach(opt => {
+            const val = opt.value.trim();
+            if (val) {
+                const optionEl = document.createElement('option');
+                optionEl.value = val;
+                optionEl.textContent = val;
+                answerSelect.appendChild(optionEl);
+            }
+        });
+    } else if (questionType === 'checkbox') {
+        const checkOpts = targetQuestionBlock.querySelectorAll(`#checkboxOptions${prevQNum} [id^="checkboxOptionText"]`);
+        checkOpts.forEach(optInput => {
+            const val = optInput.value.trim();
+            if (val) {
+                const optionEl = document.createElement('option');
+                optionEl.value = val;
+                optionEl.textContent = val;
+                answerSelect.appendChild(optionEl);
+            }
+        });
+        const noneOfAbove = targetQuestionBlock.querySelector(`#noneOfTheAbove${prevQNum}`);
+        if (noneOfAbove && noneOfAbove.checked) {
+            const optionEl = document.createElement('option');
+            optionEl.value = 'None of the above';
+            optionEl.textContent = 'None of the above';
+            answerSelect.appendChild(optionEl);
+        }
+    } else if (questionType === 'numberedDropdown') {
+        const rangeStartEl = targetQuestionBlock.querySelector(`#numberRangeStart${prevQNum}`);
+        const rangeEndEl = targetQuestionBlock.querySelector(`#numberRangeEnd${prevQNum}`);
+        if (rangeStartEl && rangeEndEl) {
+            const min = parseInt(rangeStartEl.value, 10) || 1;
+            const max = parseInt(rangeEndEl.value, 10) || min;
+            for (let i = min; i <= max; i++) {
+                const optionEl = document.createElement('option');
+                optionEl.value = i.toString();
+                optionEl.textContent = i.toString();
+                answerSelect.appendChild(optionEl);
+            }
+        }
+    } else if (questionType === 'fileUpload') {
+        const optionEl = document.createElement('option');
+        optionEl.value = 'uploaded a file';
+        optionEl.textContent = 'uploaded a file';
+        answerSelect.appendChild(optionEl);
+    }
+}
+function toggleQuestionCollapse(questionId, ev) {
+    if (ev) ev.preventDefault();
+    const body = document.getElementById(`fwQuestionCollapseBody${questionId}`);
+    const btn = document.getElementById(`fwQuestionCollapseBtn${questionId}`);
+    if (!body || !btn) return;
+    const collapsed = body.classList.toggle('fw-question-body--collapsed');
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    btn.classList.toggle('is-collapsed', collapsed);
+}
+function toggleSectionCollapse(sectionId, ev) {
+    if (ev) ev.preventDefault();
+    const body = document.getElementById(`fwSectionCollapseBody${sectionId}`);
+    const btn = document.getElementById(`fwSectionCollapseBtn${sectionId}`);
+    if (!body || !btn) return;
+    const collapsed = body.classList.toggle('fw-section-body--collapsed');
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    btn.classList.toggle('is-collapsed', collapsed);
+}
+function toggleDropdownOptionsCollapse(questionId, ev) {
+    if (ev) ev.preventDefault();
+    const body = document.getElementById(`fwDropdownOptsBody${questionId}`);
+    const btn = document.getElementById(`fwDropdownOptsCollapseBtn${questionId}`);
+    if (!body || !btn) return;
+    const collapsed = body.classList.toggle('fw-options-panel-body--collapsed');
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    btn.classList.toggle('is-collapsed', collapsed);
+}
+function toggleCheckboxOptionsCollapse(questionId, ev) {
+    if (ev) ev.preventDefault();
+    const body = document.getElementById(`fwCheckboxOptsBody${questionId}`);
+    const btn = document.getElementById(`fwCheckboxOptsCollapseBtn${questionId}`);
+    if (!body || !btn) return;
+    const collapsed = body.classList.toggle('fw-options-panel-body--collapsed');
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    btn.classList.toggle('is-collapsed', collapsed);
+}
+function ensureDropdownDefaultYesNo(questionId) {
+    const container = document.getElementById(`dropdownOptions${questionId}`);
+    if (!container || container.children.length > 0) return;
+    addDropdownOption(questionId, 'Yes');
+    addDropdownOption(questionId, 'No');
 }
 function addJumpCondition(questionId) {
     const jumpConditionsDiv = document.getElementById(`jumpConditions${questionId}`);
@@ -408,7 +596,7 @@ function addJumpCondition(questionId) {
     const questionType = questionTypeSelect ? questionTypeSelect.value : '';
     const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'currency' || questionType === 'date' || questionType === 'dateRange';
     const conditionDiv = document.createElement('div');
-    conditionDiv.className = 'jump-condition';
+    conditionDiv.className = 'jump-condition fw-addon-card';
     conditionDiv.id = `jumpCondition${questionId}_${conditionId}`;
     if (isTextboxQuestion) {
         // For textbox questions, skip the "If selected" dropdown
@@ -416,7 +604,6 @@ function addJumpCondition(questionId) {
             <label>Jump to:</label>
             <input type="text" id="jumpTo${questionId}_${conditionId}" placeholder="Section number or 'end'">
             <button type="button" onclick="removeJumpCondition(${questionId}, ${conditionId})">Remove</button>
-            <hr>
         `;
     } else {
         // For other question types, keep the original structure
@@ -428,7 +615,6 @@ function addJumpCondition(questionId) {
             <label>Jump to:</label>
             <input type="text" id="jumpTo${questionId}_${conditionId}" placeholder="Section number or 'end'">
             <button type="button" onclick="removeJumpCondition(${questionId}, ${conditionId})">Remove</button>
-            <hr>
         `;
     }
     jumpConditionsDiv.appendChild(conditionDiv);
@@ -437,10 +623,8 @@ function addJumpCondition(questionId) {
         const questionTypeSelect = document.getElementById(`questionType${questionId}`);
         if (questionTypeSelect) {
             const questionType = questionTypeSelect.value;
-            if (questionType === 'dropdown') {
+            if (questionType === 'dropdown' || questionType === 'radio') {
                 updateJumpOptions(questionId, conditionId);
-            } else if (questionType === 'radio') {
-                updateJumpOptionsForRadio(questionId, conditionId);
             } else if (questionType === 'checkbox') {
                 updateJumpOptionsForCheckbox(questionId, conditionId);
             } else if (questionType === 'numberedDropdown') {
@@ -506,16 +690,20 @@ function addQuestion(sectionId, questionId = null) {
     questionBlock.className = 'question-block';
     questionBlock.id = `questionBlock${currentQuestionId}`;
     questionBlock.innerHTML = `
-        <label>Question ${currentQuestionId}: </label>
+        <div class="fw-question-head">
+            <span class="fw-question-title" id="fwQuestionTitleText${currentQuestionId}">Question</span>
+            <button type="button" class="fw-question-collapse-btn" id="fwQuestionCollapseBtn${currentQuestionId}" aria-expanded="true" aria-controls="fwQuestionCollapseBody${currentQuestionId}" aria-label="Collapse or expand question" onclick="toggleQuestionCollapse(${currentQuestionId}, event)">
+                <svg class="fw-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+        </div>
+        <div class="fw-question-body" id="fwQuestionCollapseBody${currentQuestionId}">
         <div style="display: flex; align-items: center; gap: 5px;">
             <input type="text" placeholder="Enter your question" id="question${currentQuestionId}" style="flex: 1;">
-            <button type="button" onclick="showUrlVariableMenu(${currentQuestionId}, event)" title="Insert URL Parameter Variable" style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">📎 URL Var</button>
-        </div><br>
-        <label>Question Type: </label>
+            <button type="button" onclick="showUrlVariableMenu(${currentQuestionId}, event)" title="Insert URL parameter variable" aria-label="Add variable from URL parameter">Add Variable</button>
+        </div>        <label>Question Type: </label>
         <center>
         <select id="questionType${currentQuestionId}" onchange="toggleOptions(${currentQuestionId})">
             <option value="text">Text</option>
-            <option value="radio">Yes/No</option>
             <option value="dropdown">Dropdown</option>
             <option value="checkbox">Checkbox</option>
             <option value="numberedDropdown">Numbered Dropdown</option>
@@ -529,33 +717,29 @@ function addQuestion(sectionId, questionId = null) {
             <option value="bigParagraph">Big Paragraph</option>
             <option value="location">Location</option>
             <option value="fileUpload">File Upload</option>
-        </select><br><br>
-        <!-- Name/ID and Placeholder for Text, Big Paragraph, Money, etc. -->
-        <div id="textboxOptions${currentQuestionId}" class="textbox-options" style="display: none;">
+        </select>        <!-- Name/ID and Placeholder for Text, Big Paragraph, Money, etc. -->
+        <div id="textboxOptions${currentQuestionId}" class="textbox-options fw-nested-block" style="display: none;">
             <label>Name/ID: </label>
-            <input type="text" id="textboxName${currentQuestionId}" placeholder="Enter field name"><br><br>
-            <label>Placeholder: </label>
+            <input type="text" id="textboxName${currentQuestionId}" placeholder="Enter field name">            <label>Placeholder: </label>
             <input type="text" id="textboxPlaceholder${currentQuestionId}" placeholder="Enter placeholder">
         </div>
         <!-- Line Limit for Big Paragraph -->
-        <div id="lineLimitOptions${currentQuestionId}" class="line-limit-options" style="display: none;">
+        <div id="lineLimitOptions${currentQuestionId}" class="line-limit-options fw-nested-block" style="display: none;">
             <label>Line Limit: </label>
-            <input type="number" id="lineLimit${currentQuestionId}" placeholder="Enter line limit" min="1" max="100"><br><br>
-            <label>Max character limit: </label>
-            <input type="number" id="maxCharacterLimit${currentQuestionId}" placeholder="Enter max character limit" min="1" max="10000"><br><br>
-            <label>Paragraph limit: </label>
+            <input type="number" id="lineLimit${currentQuestionId}" placeholder="Enter line limit" min="1" max="100">            <label>Max character limit: </label>
+            <input type="number" id="maxCharacterLimit${currentQuestionId}" placeholder="Enter max character limit" min="1" max="10000">            <label>Paragraph limit: </label>
             <input type="number" id="paragraphLimit${currentQuestionId}" placeholder="Enter paragraph limit" min="1" max="10000">
         </div>
         <!-- Numbered Dropdown Options -->
-        <div id="numberedDropdownBlock${currentQuestionId}" class="numbered-dropdown-options" style="display: none;">
+        <div id="numberedDropdownBlock${currentQuestionId}" class="numbered-dropdown-options fw-field-section" style="display: none;">
+            <div class="fw-nested-block">
             <label>Node Id: </label>
-            <input type="text" id="nodeId${currentQuestionId}" placeholder="Enter node ID" style="width: 200px;"><br><br>
-            <label>Number Range: </label>
+            <input type="text" id="nodeId${currentQuestionId}" placeholder="Enter node ID" style="width: 200px;">            <label>Number Range: </label>
             <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">
-            <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})"><br><br>
-            <label>Entry Title: </label>
-            <input type="text" id="entryTitle${currentQuestionId}" placeholder="e.g., Please enter car info" style="width: 250px;"><br><br>
-            <div style="text-align: center; margin: 15px 0;">
+            <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">            <label>Entry Title: </label>
+            <input type="text" id="entryTitle${currentQuestionId}" placeholder="e.g., Please enter car info" style="width: 250px;">
+            </div>
+            <div class="fw-field-toolbar">
                 <button type="button" onclick="addTextboxAmount(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Amount</button>
                 <button type="button" onclick="addLocationFields(${currentQuestionId}, 'numberedDropdown')" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #4CAF50; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Location</button>
                 <button type="button" onclick="addTextboxLabel(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Label</button>
@@ -566,36 +750,45 @@ function addQuestion(sectionId, questionId = null) {
             <!-- Hidden containers for backward compatibility -->
             <div id="textboxLabels${currentQuestionId}" style="display: none;"></div>
             <div id="textboxAmounts${currentQuestionId}" style="display: none;"></div>
-        </div><br>
-        <!-- Shared Unified Fields Container (for both numberedDropdown and multipleTextboxes) -->
-        <div id="unifiedFieldsContainer${currentQuestionId}" style="display: none;">
+        </div>        <!-- Shared Unified Fields Container (for both numberedDropdown and multipleTextboxes) -->
+        <div id="unifiedFieldsContainer${currentQuestionId}" class="fw-unified-fields-wrap fw-nested-block" style="display: none;">
             <label>Fields (in creation order):</label>
             <div id="unifiedFields${currentQuestionId}"></div>
-        </div><br>
-        <!-- Dropdown Options -->
-        <div id="optionsBlock${currentQuestionId}" class="dropdown-options" style="display: none;">
-            <label>Options: </label>
-            <div id="dropdownOptions${currentQuestionId}"></div>
-            <button type="button" onclick="addDropdownOption(${currentQuestionId})">Add Option</button>
-        </div><br>
-		 <!-- ADD THIS IMAGE BLOCK -->
-        <div id="dropdownImageBlock${currentQuestionId}" class="dropdown-image-options" style="display:none;">
-            <button type="button" onclick="toggleDropdownImageFields(${currentQuestionId})">Add Image</button>
-            <div id="dropdownImageFields${currentQuestionId}" style="display:none; margin-top:8px;">
-                <label>Image URL:</label><br>
-                <input type="text" id="dropdownImageURL${currentQuestionId}" placeholder="Enter image URL"><br><br>
-                <label>Width:</label><br>
-                <input type="number" id="dropdownImageWidth${currentQuestionId}" placeholder="Width"><br><br>
-                <label>Height:</label><br>
-                <input type="number" id="dropdownImageHeight${currentQuestionId}" placeholder="Height"><br><br>
-                <button type="button" onclick="deleteDropdownImage(${currentQuestionId})">Delete Image</button>
+        </div>        <!-- Dropdown Options -->
+        <div id="optionsBlock${currentQuestionId}" class="dropdown-options fw-options-panel" style="display: none;">
+            <div class="fw-options-panel-head">
+                <span class="fw-options-panel-title">Options</span>
+                <button type="button" class="fw-question-collapse-btn fw-options-collapse-btn" id="fwDropdownOptsCollapseBtn${currentQuestionId}" aria-expanded="true" aria-controls="fwDropdownOptsBody${currentQuestionId}" aria-label="Collapse or expand options" onclick="toggleDropdownOptionsCollapse(${currentQuestionId}, event)">
+                    <svg class="fw-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
             </div>
-        </div><br>
-        <!-- Dropdown Options -->
-        <div id="checkboxOptionsBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
-            <label>Options: </label>
-            <div id="checkboxOptions${currentQuestionId}"></div>
-            <button type="button" onclick="addCheckboxOption(${currentQuestionId})">Add Option</button>
+            <div class="fw-options-panel-body" id="fwDropdownOptsBody${currentQuestionId}">
+                <div id="dropdownOptions${currentQuestionId}" class="fw-options-list"></div>
+                <button type="button" onclick="addDropdownOption(${currentQuestionId})">Add Option</button>
+            </div>
+        </div>		 <!-- ADD THIS IMAGE BLOCK -->
+        <div id="dropdownImageBlock${currentQuestionId}" class="dropdown-image-options fw-options-panel" style="display:none;">
+            <div class="fw-options-panel-head">
+                <span class="fw-options-panel-title">Image</span>
+            </div>
+            <div class="fw-options-panel-body">
+                <button type="button" onclick="toggleDropdownImageFields(${currentQuestionId})">Add Image</button>
+                <div id="dropdownImageFields${currentQuestionId}" class="fw-addon-card" style="display:none; margin-top:12px;">
+                    <label>Image URL:</label>                <input type="text" id="dropdownImageURL${currentQuestionId}" placeholder="Enter image URL">                <label>Width:</label>                <input type="number" id="dropdownImageWidth${currentQuestionId}" placeholder="Width">                <label>Height:</label>                <input type="number" id="dropdownImageHeight${currentQuestionId}" placeholder="Height">                <button type="button" onclick="deleteDropdownImage(${currentQuestionId})">Delete Image</button>
+                </div>
+            </div>
+        </div>        <!-- Dropdown Options -->
+        <div id="checkboxOptionsBlock${currentQuestionId}" class="checkbox-options fw-options-panel" style="display: none;">
+            <div class="fw-options-panel-head">
+                <span class="fw-options-panel-title">Options</span>
+                <button type="button" class="fw-question-collapse-btn fw-options-collapse-btn" id="fwCheckboxOptsCollapseBtn${currentQuestionId}" aria-expanded="true" aria-controls="fwCheckboxOptsBody${currentQuestionId}" aria-label="Collapse or expand options" onclick="toggleCheckboxOptionsCollapse(${currentQuestionId}, event)">
+                    <svg class="fw-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+            </div>
+            <div class="fw-options-panel-body" id="fwCheckboxOptsBody${currentQuestionId}">
+                <div id="checkboxOptions${currentQuestionId}" class="fw-options-list"></div>
+                <button type="button" onclick="addCheckboxOption(${currentQuestionId})">Add Option</button>
+            </div>
             <div id="noneOfTheAboveContainer${currentQuestionId}" style="margin-top:10px; margin-bottom:10px;">
                 <label><input type="checkbox" id="noneOfTheAbove${currentQuestionId}">Include "None of the above" option</label>
             </div>
@@ -605,12 +798,13 @@ function addQuestion(sectionId, questionId = null) {
             <div id="allAreRequiredContainer${currentQuestionId}" style="margin-top:10px; margin-bottom:10px;">
                 <label><input type="checkbox" id="allAreRequired${currentQuestionId}">All are required</label>
             </div>
-        </div><br>
-        <!-- Multiple Textboxes Options -->
-        <div id="multipleTextboxesOptionsBlock${currentQuestionId}" class="multiple-textboxes-options" style="display: none;">
+        </div>        <!-- Multiple Textboxes Options -->
+        <div id="multipleTextboxesOptionsBlock${currentQuestionId}" class="multiple-textboxes-options fw-field-section" style="display: none;">
+            <div class="fw-nested-block">
             <label>Node ID: </label>
-            <input type="text" id="multipleTextboxesNodeId${currentQuestionId}" placeholder="Enter custom node ID" oninput="updateMultipleTextboxesNodeId(${currentQuestionId})"><br><br>
-            <div style="text-align: center; margin: 15px 0;">
+            <input type="text" id="multipleTextboxesNodeId${currentQuestionId}" placeholder="Enter custom node ID" oninput="updateMultipleTextboxesNodeId(${currentQuestionId})">
+            </div>
+            <div class="fw-field-toolbar">
                 <button type="button" onclick="addTextboxAmount(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Amount</button>
                 <button type="button" onclick="addLocationFields(${currentQuestionId}, 'multipleTextboxes')" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #4CAF50; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Location</button>
                 <button type="button" onclick="addTextboxLabel(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Label</button>
@@ -621,106 +815,87 @@ function addQuestion(sectionId, questionId = null) {
             <!-- Hidden containers for backward compatibility -->
             <div id="textboxLabels${currentQuestionId}" style="display: none;"></div>
             <div id="textboxAmounts${currentQuestionId}" style="display: none;"></div>
-        </div><br>
-        <!-- File Upload Options -->
-        <div id="fileUploadOptionsBlock${currentQuestionId}" class="file-upload-options" style="display: none;">
+        </div>        <!-- File Upload Options -->
+        <div id="fileUploadOptionsBlock${currentQuestionId}" class="file-upload-options fw-nested-block" style="display: none;">
             <label>Upload Title: </label>
-            <input type="text" id="fileUploadTitle${currentQuestionId}" placeholder="e.g., Please upload a picture of your ID"><br><br>
-            <label>File Title: </label>
+            <input type="text" id="fileUploadTitle${currentQuestionId}" placeholder="e.g., Please upload a picture of your ID">            <label>File Title: </label>
             <input type="text" id="fileUploadFileTitle${currentQuestionId}" placeholder="e.g., Personal_ID">
-        </div><br>
-        <!-- Linking Logic for Dropdown -->
-        <div id="linkingLogicBlock${currentQuestionId}" class="linking-options" style="display: none;">
-            <label>Enable Dropdown Linking: </label>
-            <input type="checkbox" id="enableLinking${currentQuestionId}" onchange="toggleLinkingLogic(${currentQuestionId})">
-            <div id="linkingBlock${currentQuestionId}" style="display:none; margin-top:10px;">
-                <label>Link with question:</label>
-                <select id="linkingTarget${currentQuestionId}">
-                    <option value="">Select a question</option>
-                </select>
-            </div>
-        </div><br>
+        </div>        <div class="fw-question-toggles">
+        <!-- Conditional Logic (first in list) -->
+        <label class="fw-toggle-line">
+            <span class="fw-toggle-line__text">Enable Conditional Logic: </span>
+            <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
+        </label>
+        <div id="logicBlock${currentQuestionId}" class="fw-logic-stack fw-nested-block" style="display: none;">
+            <span class="fw-logic-intro">Show this question if ANY of these conditions match:</span>
+            <div id="logicConditions${currentQuestionId}" class="fw-logic-rows"></div>
+            <div class="fw-logic-actions"><button type="button" onclick="addLogicCondition(${currentQuestionId})">+ Add OR Condition</button></div>
+        </div>
         <!-- Subtitle Feature -->
-        <label>Enable Subtitle: </label>
-        <input type="checkbox" id="enableSubtitle${currentQuestionId}" onchange="toggleSubtitle(${currentQuestionId})">
-        <div id="subtitleBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+        <label class="fw-toggle-line">
+            <span class="fw-toggle-line__text">Enable Subtitle: </span>
+            <input type="checkbox" id="enableSubtitle${currentQuestionId}" onchange="toggleSubtitle(${currentQuestionId})">
+        </label>
+        <div id="subtitleBlock${currentQuestionId}" class="fw-nested-block" style="display: none; margin-top: 10px;">
             <label>Subtitle Text:</label>
             <input type="text" id="subtitleText${currentQuestionId}" placeholder="Enter subtitle text">
-        </div><br>
-        <!-- Info Box Feature -->
-        <label>Enable Info Box: </label>
-        <input type="checkbox" id="enableInfoBox${currentQuestionId}" onchange="toggleInfoBox(${currentQuestionId})">
-        <div id="infoBoxBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+        </div>        <!-- Info Box Feature -->
+        <label class="fw-toggle-line">
+            <span class="fw-toggle-line__text">Enable Info Box: </span>
+            <input type="checkbox" id="enableInfoBox${currentQuestionId}" onchange="toggleInfoBox(${currentQuestionId})">
+        </label>
+        <div id="infoBoxBlock${currentQuestionId}" class="fw-nested-block" style="display: none; margin-top: 10px;">
             <label>Information Text:</label>
             <textarea id="infoBoxText${currentQuestionId}" placeholder="Enter information for tooltip/popup" rows="3" style="width: 100%;"></textarea>
-        </div><br>
-        <!-- PDF Preview Feature -->
-        <label>Enable PDF Preview: </label>
-        <input type="checkbox" id="enablePdfPreview${currentQuestionId}" onchange="togglePdfPreview(${currentQuestionId})">
-        <div id="pdfPreviewBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+        </div>        <!-- PDF Preview Feature -->
+        <label class="fw-toggle-line">
+            <span class="fw-toggle-line__text">Enable PDF Preview: </span>
+            <input type="checkbox" id="enablePdfPreview${currentQuestionId}" onchange="togglePdfPreview(${currentQuestionId})">
+        </label>
+        <div id="pdfPreviewBlock${currentQuestionId}" class="fw-nested-block" style="display: none; margin-top: 10px;">
             <label>Preview Trigger:</label>
             <select id="pdfPreviewTrigger${currentQuestionId}">
                 <option value="">Select an option...</option>
-            </select><br><br>
-            <label>PDF Preview Title:</label>
-            <input type="text" id="pdfPreviewTitle${currentQuestionId}" placeholder="Enter PDF preview title"><br><br>
-            <label>PDF Preview File:</label>
-            <input type="text" id="pdfPreviewFile${currentQuestionId}" placeholder="Enter PDF file name or URL"><br><br>
-            <label>PDF Preview Price ID:</label>
-            <input type="text" id="pdfPreviewPriceId${currentQuestionId}" placeholder="Enter Stripe price ID (e.g., price_1..."><br><br>
-            <label>PDF Preview Attachment:</label>
+            </select>            <label>PDF Preview Title:</label>
+            <input type="text" id="pdfPreviewTitle${currentQuestionId}" placeholder="Enter PDF preview title">            <label>PDF Preview File:</label>
+            <input type="text" id="pdfPreviewFile${currentQuestionId}" placeholder="Enter PDF file name or URL">            <label>PDF Preview Price ID:</label>
+            <input type="text" id="pdfPreviewPriceId${currentQuestionId}" placeholder="Enter Stripe price ID (e.g., price_1...">            <label>PDF Preview Attachment:</label>
             <select id="pdfPreviewAttachment${currentQuestionId}">
                 <option value="Preview Only">Preview Only</option>
                 <option value="Attach to packet">Attach to packet</option>
-            </select><br><br>
-            <label>PDF Preview Filename (for cart):</label>
-            <input type="text" id="pdfPreviewFilename${currentQuestionId}" placeholder="Enter filename for cart entry"><br><br>
-        </div><br>
-        <!-- LaTeX Preview Feature -->
-        <label>Enable Latex Preview: </label>
-        <input type="checkbox" id="enableLatexPreview${currentQuestionId}" onchange="toggleLatexPreview(${currentQuestionId})">
-        <div id="latexPreviewBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+            </select>            <label>PDF Preview Filename (for cart):</label>
+            <input type="text" id="pdfPreviewFilename${currentQuestionId}" placeholder="Enter filename for cart entry">        </div>        <!-- LaTeX Preview Feature -->
+        <label class="fw-toggle-line">
+            <span class="fw-toggle-line__text">Enable Latex Preview: </span>
+            <input type="checkbox" id="enableLatexPreview${currentQuestionId}" onchange="toggleLatexPreview(${currentQuestionId})">
+        </label>
+        <div id="latexPreviewBlock${currentQuestionId}" class="fw-nested-block" style="display: none; margin-top: 10px;">
             <label>Latex Preview Trigger:</label>
             <select id="latexPreviewTrigger${currentQuestionId}">
                 <option value="">Select an option...</option>
-            </select><br><br>
-            <label>Latex Preview Title:</label>
-            <input type="text" id="latexPreviewTitle${currentQuestionId}" placeholder="Enter LaTeX preview title"><br><br>
-            <label>Preview Filename (for cart):</label>
-            <input type="text" id="latexPreviewFilename${currentQuestionId}" placeholder="Enter filename used in cart/packet (e.g., Demand_Letter.pdf)"><br><br>
-            <label>Latex Content:</label>
-            <textarea id="latexPreviewContent${currentQuestionId}" placeholder="Paste LaTeX code here" rows="8" style="width: 100%; font-family: monospace;"></textarea><br><br>
-            <label>Latex Price ID:</label>
-            <input type="text" id="latexPreviewPriceId${currentQuestionId}" placeholder="Enter Stripe price ID (e.g., price_1..."><br><br>
-            <label>Latex Attachment:</label>
+            </select>            <label>Latex Preview Title:</label>
+            <input type="text" id="latexPreviewTitle${currentQuestionId}" placeholder="Enter LaTeX preview title">            <label>Preview Filename (for cart):</label>
+            <input type="text" id="latexPreviewFilename${currentQuestionId}" placeholder="Enter filename used in cart/packet (e.g., Demand_Letter.pdf)">            <label>Latex Content:</label>
+            <textarea id="latexPreviewContent${currentQuestionId}" placeholder="Paste LaTeX code here" rows="8" style="width: 100%; font-family: monospace;"></textarea>            <label>Latex Price ID:</label>
+            <input type="text" id="latexPreviewPriceId${currentQuestionId}" placeholder="Enter Stripe price ID (e.g., price_1...">            <label>Latex Attachment:</label>
             <select id="latexPreviewAttachment${currentQuestionId}">
                 <option value="Preview Only">Preview Only</option>
                 <option value="Attach to packet">Attach to packet</option>
-            </select><br><br>
-        </div><br>
-        <!-- Conditional Logic -->
-        <label>Enable Conditional Logic: </label>
-        <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
-        <div id="logicBlock${currentQuestionId}" style="display: none;">
-            <label>Show this question if ANY of these conditions match:</label><br>
-            <div id="logicConditions${currentQuestionId}"></div>
-            <button type="button" onclick="addLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
-        </div><br>
-        <!-- PDF Logic -->
-        <label>Enable PDF Logic: </label>
-        <input type="checkbox" id="pdfLogic${currentQuestionId}" onchange="togglePdfLogic(${currentQuestionId})">
-        <div id="pdfLogicBlock${currentQuestionId}" style="display: none;">
-            <label>Show this question if ANY of these conditions match:</label><br>
-            <div id="pdfLogicConditions${currentQuestionId}"></div>
-            <button type="button" onclick="addPdfLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
-            <br><br>
+            </select>        </div>        <!-- PDF Logic -->
+        <label class="fw-toggle-line">
+            <span class="fw-toggle-line__text">Enable PDF Logic: </span>
+            <input type="checkbox" id="pdfLogic${currentQuestionId}" onchange="togglePdfLogic(${currentQuestionId})">
+        </label>
+        <div id="pdfLogicBlock${currentQuestionId}" class="fw-logic-stack fw-nested-block" style="display: none;">
+            <span class="fw-logic-intro">Show this question if ANY of these conditions match:</span>
+            <div id="pdfLogicConditions${currentQuestionId}" class="fw-logic-rows"></div>
+            <div class="fw-logic-actions"><button type="button" onclick="addPdfLogicCondition(${currentQuestionId})">+ Add OR Condition</button></div>
             <!-- Trigger Option for Numbered Dropdown -->
             <div id="triggerOptionBlock${currentQuestionId}" style="display: none;">
                 <label>Trigger option:</label>
                 <select id="pdfLogicTriggerOption${currentQuestionId}">
                     <option value="">Select trigger option</option>
                 </select>
-                <br><br>
             </div>
             <!-- Trigger Option for Number Questions -->
             <div id="numberTriggerBlock${currentQuestionId}" style="display: none;">
@@ -731,132 +906,164 @@ function addQuestion(sectionId, questionId = null) {
                     <option value=">">></option>
                     <option value="<"><</option>
                 </select>
-                <br><br>
                 <label>Number:</label>
                 <input type="number" id="pdfLogicNumberValue${currentQuestionId}" placeholder="Enter number">
-                <br><br>
             </div>
                 <!-- PDF Details Container -->
                 <div id="pdfDetailsContainer${currentQuestionId}">
-                    <div class="pdf-detail-group" data-pdf-index="1" style="border: 2px solid #007bff; border-radius: 8px; padding: 15px; margin: 10px 0; background: #f8f9ff;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h4 style="margin: 0; color: #007bff;">PDF 1</h4>
+                    <div class="pdf-detail-group" data-pdf-index="1">
+                        <div class="pdf-detail-group__head">
+                            <h4>PDF 1</h4>
                         </div>
                         <label>PDF Name (for cart display):</label>
                         <input type="text" id="pdfLogicPdfDisplayName${currentQuestionId}_1" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
-                        <br><br>
                         <label>Additional PDF to download:</label>
                         <input type="text" id="pdfLogicPdfName${currentQuestionId}_1" placeholder="Enter PDF name (e.g., additional_form.pdf)">
-                        <br><br>
                         <label>Choose your Price ID:</label>
                         <input type="text" id="pdfLogicStripePriceId${currentQuestionId}_1" placeholder="Enter Stripe Price ID (e.g., price_12345)">
-                        <br><br>
-                        <div style="text-align: center; margin-top: 15px;">
+                        <div class="fw-logic-actions" style="margin-top: 12px;">
                             <button type="button" onclick="removePdf(${currentQuestionId}, 1)" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">Remove PDF</button>
                         </div>
                     </div>
                 </div>
             <!-- Add Another PDF Button -->
             <button type="button" onclick="addAnotherPdf(${currentQuestionId})" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;">+ Add Another PDF</button>
-        </div><br>
-        <!-- Alert Logic -->
-        <label>Enable Alert Logic: </label>
-        <input type="checkbox" id="alertLogic${currentQuestionId}" onchange="toggleAlertLogic(${currentQuestionId})">
-        <div id="alertLogicBlock${currentQuestionId}" style="display: none;">
-            <label>Show alert if ANY of these conditions match:</label><br>
-            <div id="alertLogicConditions${currentQuestionId}"></div>
-            <button type="button" onclick="addAlertLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
-        </div><br>
-        <!-- Checklist Logic -->
-        <label>Enable Checklist Logic: </label>
-        <input type="checkbox" id="checklistLogic${currentQuestionId}" onchange="toggleChecklistLogic(${currentQuestionId})">
-        <div id="checklistLogicBlock${currentQuestionId}" style="display: none;">
-            <label>Add checklist items if ANY of these conditions match:</label><br>
-            <div id="checklistLogicContainer${currentQuestionId}"></div>
-            <button type="button" onclick="addChecklistLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
-        </div><br>
-       <!-- Jump Logic -->
-        <label>Enable Jump Logic: </label>
-        <div id="jumpLogic${currentQuestionId}">
-            <input type="checkbox" id="enableJump${currentQuestionId}" 
-                onchange="toggleJumpLogic(${currentQuestionId})">
-            <div id="jumpBlock${currentQuestionId}" style="display: none;">
-                <div id="jumpConditions${currentQuestionId}"></div>
-                <button type="button" onclick="addJumpCondition(${currentQuestionId})">
-                    + Add Jump Option
-                </button>
+        </div>        <!-- Alert Logic -->
+        <label class="fw-toggle-line">
+            <span class="fw-toggle-line__text">Enable Alert Logic: </span>
+            <input type="checkbox" id="alertLogic${currentQuestionId}" onchange="toggleAlertLogic(${currentQuestionId})">
+        </label>
+        <div id="alertLogicBlock${currentQuestionId}" class="fw-logic-stack fw-nested-block" style="display: none;">
+            <span class="fw-logic-intro">Show alert if ANY of these conditions match:</span>
+            <div id="alertLogicConditions${currentQuestionId}" class="fw-logic-rows"></div>
+            <div class="fw-logic-actions"><button type="button" onclick="addAlertLogicCondition(${currentQuestionId})">+ Add OR Condition</button></div>
+        </div>        <!-- Checklist Logic -->
+        <label class="fw-toggle-line">
+            <span class="fw-toggle-line__text">Enable Checklist Logic: </span>
+            <input type="checkbox" id="checklistLogic${currentQuestionId}" onchange="toggleChecklistLogic(${currentQuestionId})">
+        </label>
+        <div id="checklistLogicBlock${currentQuestionId}" class="fw-logic-stack fw-nested-block" style="display: none;">
+            <span class="fw-logic-intro">Add checklist items if ANY of these conditions match:</span>
+            <div id="checklistLogicContainer${currentQuestionId}" class="fw-logic-rows"></div>
+            <div class="fw-logic-actions"><button type="button" onclick="addChecklistLogicCondition(${currentQuestionId})">+ Add OR Condition</button></div>
+        </div>       <!-- Jump Logic -->
+        <label class="fw-toggle-line">
+            <span class="fw-toggle-line__text">Enable Jump Logic: </span>
+            <input type="checkbox" id="enableJump${currentQuestionId}" onchange="toggleJumpLogic(${currentQuestionId})">
+        </label>
+        <div id="jumpBlock${currentQuestionId}" class="fw-toggle-nested fw-logic-stack fw-nested-block" style="display: none;">
+            <div id="jumpConditions${currentQuestionId}" class="fw-logic-rows"></div>
+            <div class="fw-logic-actions"><button type="button" onclick="addJumpCondition(${currentQuestionId})">
+                + Add Jump Option
+            </button></div>
+        </div>        <!-- Status Feature -->
+        <label class="fw-toggle-line">
+            <span class="fw-toggle-line__text">Enable Status: </span>
+            <input type="checkbox" id="enableStatus${currentQuestionId}" onchange="toggleStatus(${currentQuestionId})">
+        </label>
+        <div id="statusBlock${currentQuestionId}" class="fw-nested-block" style="display: none; margin-top: 10px;">
+            <label>Status Trigger:</label>
+            <select id="statusTrigger${currentQuestionId}">
+                <option value="">Select an option...</option>
+            </select>            <label>Status Title:</label>
+            <input type="text" id="statusTitle${currentQuestionId}" placeholder="Enter status title (e.g., needs_food)">
+        </div>        <!-- Hard Alert Feature -->
+        <label class="fw-toggle-line">
+            <span class="fw-toggle-line__text">Enable Hard Alert: </span>
+            <input type="checkbox" id="enableHardAlert${currentQuestionId}" onchange="toggleHardAlert(${currentQuestionId})">
+        </label>
+        <div id="hardAlertBlock${currentQuestionId}" class="fw-nested-block" style="display: none; margin-top: 10px;">
+            <label>Hard Alert Trigger:</label>
+            <select id="hardAlertTrigger${currentQuestionId}">
+                <option value="">Select an option...</option>
+            </select>            <label>Hard Alert Title:</label>
+            <input type="text" id="hardAlertTitle${currentQuestionId}" placeholder="Enter hard alert message">
+        </div>        <!-- Conditional Alert Logic -->
+        <div id="conditionalAlertLogic${currentQuestionId}" class="fw-toggle-group" style="display: none;">
+            <label>Enable Conditional Alert: </label>
+            <input type="checkbox" id="enableConditionalAlert${currentQuestionId}" onchange="toggleConditionalAlertLogic(${currentQuestionId})">
+            <div id="conditionalAlertBlock${currentQuestionId}" style="display: none;">
+                <label>Trigger this alert if: </label>                <input type="number" placeholder="Previous question number" id="alertPrevQuestion${currentQuestionId}">                <input type="text" placeholder="Answer value" id="alertPrevAnswer${currentQuestionId}">                <label>Alert Text:</label>                <input type="text" id="alertText${currentQuestionId}" placeholder="Enter alert text">            </div>
+        </div>        <!-- Linking Logic for Dropdown -->
+        <div id="linkingLogicBlock${currentQuestionId}" class="fw-toggle-group" style="display: none;">
+            <label class="fw-toggle-line">
+                <span class="fw-toggle-line__text">Enable Dropdown Linking: </span>
+                <input type="checkbox" id="enableLinking${currentQuestionId}" onchange="toggleLinkingLogic(${currentQuestionId})">
+            </label>
+            <div id="linkingBlock${currentQuestionId}" class="fw-nested-block" style="display:none; margin-top:10px;">
+                <label>Link with question:</label>
+                <select id="linkingTarget${currentQuestionId}">
+                    <option value="">Select a question</option>
+                </select>
             </div>
-        </div><br>
-        <!-- Conditional PDF Logic -->
-        <div id="conditionalPDFLogic${currentQuestionId}" style="display: none;">
-            <label>Enable Conditional PDF: </label>
-            <input type="checkbox" id="enableConditionalPDF${currentQuestionId}" onchange="toggleConditionalPDFLogic(${currentQuestionId})"><br><br>
-            <div id="conditionalPDFBlock${currentQuestionId}" style="display: none;">
+        </div>        <!-- Conditional PDF Logic -->
+        <div id="conditionalPDFLogic${currentQuestionId}" class="fw-toggle-group" style="display: none;">
+            <label class="fw-toggle-line">
+                <span class="fw-toggle-line__text">Enable Conditional PDF: </span>
+                <input type="checkbox" id="enableConditionalPDF${currentQuestionId}" onchange="toggleConditionalPDFLogic(${currentQuestionId})">
+            </label>
+            <div id="conditionalPDFBlock${currentQuestionId}" class="fw-nested-block" style="display: none;">
                 <label>PDF Name:</label>
-                <input type="text" id="conditionalPDFName${currentQuestionId}" placeholder="Enter PDF name"><br><br>
-                <label>Attach PDF if the answer is:</label>
+                <input type="text" id="conditionalPDFName${currentQuestionId}" placeholder="Enter PDF name">                <label>Attach PDF if the answer is:</label>
                 <select id="conditionalPDFAnswer${currentQuestionId}">
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
-                </select><br>
-            </div>
-        </div><br>
-        <!-- Hidden Logic -->
-        <div id="hiddenLogic${currentQuestionId}" style="display: none;">
-            <label>Enable Hidden Logic: </label>
-            <input type="checkbox" id="enableHiddenLogic${currentQuestionId}" onchange="toggleHiddenLogic(${currentQuestionId})"><br><br>
-            <div id="hiddenLogicBlock${currentQuestionId}" style="display: none;">
+                </select>            </div>
+        </div>        <!-- Hidden Logic -->
+        <div id="hiddenLogic${currentQuestionId}" class="fw-toggle-group" style="display: none;">
+            <label class="fw-toggle-line">
+                <span class="fw-toggle-line__text">Enable Hidden Logic: </span>
+                <input type="checkbox" id="enableHiddenLogic${currentQuestionId}" onchange="toggleHiddenLogic(${currentQuestionId})">
+            </label>
+            <div id="hiddenLogicBlock${currentQuestionId}" class="fw-nested-block" style="display: none;">
                 <div id="hiddenLogicConfigs${currentQuestionId}">
                     <!-- First hidden logic configuration will be added here -->
                 </div>
                 <button type="button" onclick="addHiddenLogicConfig(${currentQuestionId})" style="margin-top: 10px;">+ Add Another</button>
             </div>
-        </div><br>
-        <!-- Status Feature -->
-        <label>Enable Status: </label>
-        <input type="checkbox" id="enableStatus${currentQuestionId}" onchange="toggleStatus(${currentQuestionId})">
-        <div id="statusBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
-            <label>Status Trigger:</label>
-            <select id="statusTrigger${currentQuestionId}">
-                <option value="">Select an option...</option>
-            </select><br><br>
-            <label>Status Title:</label>
-            <input type="text" id="statusTitle${currentQuestionId}" placeholder="Enter status title (e.g., needs_food)">
-        </div><br>
-        <!-- Hard Alert Feature -->
-        <label>Enable Hard Alert: </label>
-        <input type="checkbox" id="enableHardAlert${currentQuestionId}" onchange="toggleHardAlert(${currentQuestionId})">
-        <div id="hardAlertBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
-            <label>Hard Alert Trigger:</label>
-            <select id="hardAlertTrigger${currentQuestionId}">
-                <option value="">Select an option...</option>
-            </select><br><br>
-            <label>Hard Alert Title:</label>
-            <input type="text" id="hardAlertTitle${currentQuestionId}" placeholder="Enter hard alert message">
-        </div><br>
-        <!-- Conditional Alert Logic -->
-        <div id="conditionalAlertLogic${currentQuestionId}" style="display: none;">
-            <label>Enable Conditional Alert: </label>
-            <input type="checkbox" id="enableConditionalAlert${currentQuestionId}" onchange="toggleConditionalAlertLogic(${currentQuestionId})">
-            <div id="conditionalAlertBlock${currentQuestionId}" style="display: none;">
-                <label>Trigger this alert if: </label><br>
-                <input type="number" placeholder="Previous question number" id="alertPrevQuestion${currentQuestionId}"><br>
-                <input type="text" placeholder="Answer value" id="alertPrevAnswer${currentQuestionId}"><br><br>
-                <label>Alert Text:</label><br>
-                <input type="text" id="alertText${currentQuestionId}" placeholder="Enter alert text"><br>
-            </div>
-        </div><br>
+        </div>        </div>
+        </div>
         <!-- Question Controls -->
-        <button type="button" onclick="moveQuestionUp(${currentQuestionId}, ${sectionId})">Move Question Up</button>
-        <button type="button" onclick="moveQuestionDown(${currentQuestionId}, ${sectionId})">Move Question Down</button>
-        <button type="button" onclick="removeQuestion(${currentQuestionId})">Remove Question</button>
+        <div class="fw-question-actions-wrap">
+        <div class="fw-question-actions" role="group" aria-label="Question order and removal">
+            <button type="button" class="fw-icon-btn" onclick="removeQuestion(${currentQuestionId})" title="Remove question" aria-label="Remove question">
+                <svg class="fw-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
+            <button type="button" class="fw-icon-btn" onclick="moveQuestionUp(${currentQuestionId}, ${sectionId})" title="Move question up" aria-label="Move question up">
+                <svg class="fw-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
+            </button>
+            <button type="button" class="fw-icon-btn" onclick="moveQuestionDown(${currentQuestionId}, ${sectionId})" title="Move question down" aria-label="Move question down">
+                <svg class="fw-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+        </div>
+        <div class="fw-question-actions-close">
+            <button type="button" class="fw-btn-secondary fw-question-close-btn" onclick="toggleQuestionCollapse(${currentQuestionId}, event)">Close</button>
+        </div>
+        </div>
     `;
+    const questionsInSectionBeforeAdd = questionsSection.querySelectorAll('.question-block').length;
     questionsSection.appendChild(questionBlock);
     // Display the correct sub-block for the default question type
     toggleOptions(currentQuestionId);
     // If brand new question, increment questionCounter
     if (!questionId) {
         questionCounter++;
+    }
+    const qInput = document.getElementById(`question${currentQuestionId}`);
+    if (qInput) {
+        qInput.addEventListener('input', () => {
+            maybeAutofillTextboxNameFromQuestion(currentQuestionId);
+            updateGlobalQuestionLabels();
+        });
+    }
+    updateGlobalQuestionLabels();
+    // New questions after the first in a section: enable conditional logic and show its panel
+    if (!questionId && questionsInSectionBeforeAdd >= 1) {
+        const logicCb = document.getElementById(`logic${currentQuestionId}`);
+        if (logicCb && !logicCb.checked) {
+            logicCb.checked = true;
+            toggleLogic(currentQuestionId);
+        }
     }
     // Update all checklist logic dropdowns to include the new question
     updateAllChecklistLogicDropdowns();
@@ -914,8 +1121,8 @@ function showUrlVariableMenu(questionId, event) {
         item.onmouseover = () => item.style.background = '#f0f0f0';
         item.onmouseout = () => item.style.background = 'white';
         item.innerHTML = `
-            <strong>${variable.display}</strong><br>
-            <small style="color: #666;">${variable.example}</small>
+            <strong>${variable.display}</strong>
+            <small style="display:block;color:#666;margin-top:2px;">${variable.example}</small>
         `;
         item.onclick = () => {
             const cursorPos = questionInput.selectionStart || questionInput.value.length;
@@ -924,6 +1131,7 @@ function showUrlVariableMenu(questionId, event) {
             questionInput.value = textBefore + variable.example + textAfter;
             questionInput.focus();
             questionInput.setSelectionRange(cursorPos + variable.example.length, cursorPos + variable.example.length);
+            updateGlobalQuestionLabels();
             menu.remove();
         };
         menu.appendChild(item);
@@ -989,12 +1197,7 @@ function moveQuestionDown(questionId, sectionId) {
     }
 }
 function updateQuestionLabels(sectionId) {
-    const questionsSection = document.getElementById(`questionsSection${sectionId}`);
-    const questionBlocks = questionsSection.querySelectorAll('.question-block');
-    questionBlocks.forEach((block, index) => {
-        const questionLabel = block.querySelector('label');
-        questionLabel.textContent = `Question ${index + 1}: `;
-    });
+    updateGlobalQuestionLabels();
 }
 function updateJumpOptionsForCheckbox(questionId, conditionId = null) {
     const selectElements = conditionId 
@@ -1032,6 +1235,10 @@ function toggleOptions(questionId) {
     const questionTypeSelect = document.getElementById(`questionType${questionId}`);
     if (!questionTypeSelect) return;
     let questionType = questionTypeSelect.value;
+    if (questionType === 'radio') {
+        questionTypeSelect.value = 'dropdown';
+        questionType = 'dropdown';
+    }
     const optionsBlock = document.getElementById(`optionsBlock${questionId}`);
     const checkboxBlock = document.getElementById(`checkboxOptionsBlock${questionId}`);
     const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`);
@@ -1088,31 +1295,21 @@ function toggleOptions(questionId) {
             // Update existing jump conditions to use simplified format for textbox and date questions
             updateJumpConditionsForTextbox(questionId);
             break;
-        case 'radio':
         case 'dropdown':
         case 'email':
         case 'phone':
             textboxOptionsBlock.style.display = 'block';
-            if (questionType === 'radio' || questionType === 'dropdown') {
-                if (questionType === 'dropdown') {
-                    optionsBlock.style.display = 'block';
-                    dropdownImageBlock.style.display = 'block';
-                    linkingLogicBlock.style.display = 'block';
-                    updateLinkingTargets(questionId);
-                    // Update ALL jump conditions for this dropdown question
-                    const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
-                    jumpConditions.forEach(condition => {
-                        const conditionId = condition.id.split('_')[1];
-                        updateJumpOptions(questionId, conditionId);
-                    });
-                }
-                if (questionType === 'radio') {
-                    const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
-                    jumpConditions.forEach(condition => {
-                        const conditionId = condition.id.split('_')[1];
-                        updateJumpOptionsForRadio(questionId, conditionId);
-                    });
-                }
+            if (questionType === 'dropdown') {
+                optionsBlock.style.display = 'block';
+                dropdownImageBlock.style.display = 'block';
+                linkingLogicBlock.style.display = 'block';
+                updateLinkingTargets(questionId);
+                ensureDropdownDefaultYesNo(questionId);
+                const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
+                jumpConditions.forEach(condition => {
+                    const conditionId = condition.id.split('_')[1];
+                    updateJumpOptions(questionId, conditionId);
+                });
             }
             break;
         case 'checkbox':
@@ -1167,12 +1364,10 @@ function toggleOptions(questionId) {
     }
     // Handle conditional PDF visibility
     const pdfBlock = document.getElementById(`conditionalPDFLogic${questionId}`);
-    if (['radio', 'checkbox', 'dropdown'].includes(questionType)) {
+    if (['checkbox', 'dropdown'].includes(questionType)) {
         pdfBlock.style.display = 'block';
         if (questionType === 'checkbox') {
             updateConditionalPDFAnswersForCheckbox(questionId);
-        } else if (questionType === 'radio') {
-            updateConditionalPDFAnswersForRadio(questionId);
         }
     } else {
         pdfBlock.style.display = 'none';
@@ -1222,6 +1417,8 @@ function toggleOptions(questionId) {
             }
         }
     }
+    // Name/ID: fill from question text when still blank (e.g. after choosing a type that shows it)
+    maybeAutofillTextboxNameFromQuestion(questionId);
     // Update linking targets in case dropdown questions were added/changed
     updateAllLinkingTargets();
 }
@@ -1245,22 +1442,22 @@ function addLogicCondition(questionId) {
     const logicConditionsDiv = document.getElementById(`logicConditions${questionId}`);
     const numConditions = logicConditionsDiv.children.length + 1;
     const conditionRow = document.createElement('div');
-    conditionRow.className = 'logic-condition-row';
+    conditionRow.className = 'logic-condition-row fw-addon-card';
     conditionRow.id = `logicConditionRow${questionId}_${numConditions}`;
     conditionRow.innerHTML = `
-        <span>Condition ${numConditions}:</span><br>
-        <input type="number" placeholder="Previous question number"
-               id="prevQuestion${questionId}_${numConditions}"
-               onchange="console.log('[CONDITIONAL LOGIC DEBUG] Question number input changed:', this.value); updateLogicAnswersForRow(${questionId}, ${numConditions})"><br>
-        <select id="prevAnswer${questionId}_${numConditions}" style="display: block;" 
-                onfocus="console.log('[CONDITIONAL LOGIC DEBUG] Answer dropdown focused for question ${questionId}, condition ${numConditions}');"
-                onclick="console.log('[CONDITIONAL LOGIC DEBUG] Answer dropdown clicked for question ${questionId}, condition ${numConditions}'); const prevQInput = document.getElementById('prevQuestion${questionId}_${numConditions}'); console.log('[CONDITIONAL LOGIC DEBUG] Previous question value:', prevQInput?.value);">
-            <option value="">-- Select an answer --</option>
-        </select><br>
+        <span>Condition ${numConditions}:</span>
+        <label class="fw-logic-prev-label" for="prevQuestion${questionId}_${numConditions}">Previous question</label>
+        <select id="prevQuestion${questionId}_${numConditions}"
+                onchange="updateLogicAnswersForRow(${questionId}, ${numConditions})">
+            <option value="">-- Select a question --</option>
+        </select>
+        <div id="prevAnswerSlot${questionId}_${numConditions}" class="fw-logic-answer-slot"></div>
         <button type="button" onclick="removeLogicCondition(${questionId}, ${numConditions})">Remove</button>
-        <hr>
     `;
     logicConditionsDiv.appendChild(conditionRow);
+    const prevSel = document.getElementById(`prevQuestion${questionId}_${numConditions}`);
+    fillPrevQuestionSelect(prevSel, questionId);
+    updateLogicAnswersForRow(questionId, numConditions);
 }
 function removeLogicCondition(questionId, conditionIndex) {
     const row = document.getElementById(`logicConditionRow${questionId}_${conditionIndex}`);
@@ -1271,14 +1468,12 @@ function addAlertLogicCondition(questionId) {
     const alertLogicConditionsDiv = document.getElementById(`alertLogicConditions${questionId}`);
     const numConditions = alertLogicConditionsDiv.children.length + 1;
     const conditionRow = document.createElement('div');
-    conditionRow.className = 'alert-logic-condition-row';
+    conditionRow.className = 'alert-logic-condition-row fw-addon-card';
     conditionRow.id = `alertLogicConditionRow${questionId}_${numConditions}`;
     conditionRow.innerHTML = `
-        <span>Condition ${numConditions}:</span><br>
-        <input type="number" placeholder="Previous question number"
+        <span>Condition ${numConditions}:</span>        <input type="number" placeholder="Previous question number"
                id="alertPrevQuestion${questionId}_${numConditions}"
-               onchange="updateAlertLogicAnswersForRow(${questionId}, ${numConditions})"><br>
-        <div id="alertAnswerContainer${questionId}_${numConditions}" style="display: block;">
+               onchange="updateAlertLogicAnswersForRow(${questionId}, ${numConditions})">        <div id="alertAnswerContainer${questionId}_${numConditions}" style="display: block;">
         <select id="alertPrevAnswer${questionId}_${numConditions}" style="display: block;">
             <option value="">-- Select an answer --</option>
             </select>
@@ -1294,10 +1489,8 @@ function addAlertLogicCondition(questionId) {
             <label>Alert Amount:</label>
             <input type="number" id="alertAmount${questionId}_${numConditions}" placeholder="Enter amount" step="0.01" style="display: block;">
         </div>
-        <br>
         <label>Alert Message:</label>
         <textarea id="alertConditionMessage${questionId}_${numConditions}" placeholder="Enter alert message for this condition" rows="3" style="width: 100%;"></textarea>
-        <br>
         <button type="button" onclick="toggleStatusRequirement(${questionId}, ${numConditions})" id="statusRequirementBtn${questionId}_${numConditions}">+ Add Status Requirement</button>
         <div id="statusRequirementContainer${questionId}_${numConditions}" style="display: none; margin-top: 10px;">
             <div id="statusRequirementList${questionId}_${numConditions}">
@@ -1305,9 +1498,7 @@ function addAlertLogicCondition(questionId) {
             </div>
             <button type="button" onclick="addStatusRequirement(${questionId}, ${numConditions})" style="margin-top: 10px;">+ Add Another Status Requirement</button>
         </div>
-        <br>
         <button type="button" onclick="removeAlertLogicCondition(${questionId}, ${numConditions})">Remove</button>
-        <hr>
     `;
     alertLogicConditionsDiv.appendChild(conditionRow);
 }
@@ -1342,8 +1533,7 @@ function addStatusRequirement(questionId, conditionIndex) {
     
     const requirementIndex = list.children.length + 1;
     const requirementDiv = document.createElement('div');
-    requirementDiv.className = 'status-requirement-item';
-    requirementDiv.style.cssText = 'margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;';
+    requirementDiv.className = 'status-requirement-item fw-addon-card';
     requirementDiv.innerHTML = `
         <label>Status Requirement ${requirementIndex}:</label>
         <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
@@ -1481,18 +1671,13 @@ function updateAlertLogicAnswersForRow(questionId, conditionIndex) {
     if (!answerSelect) return;
     answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
     
-    if (questionType === 'radio') {
-        answerSelect.innerHTML += `
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-        `;
-    } else if (questionType === 'fileUpload') {
+    if (questionType === 'fileUpload') {
         // For file upload questions, add "uploaded a file" option
         const optionEl = document.createElement('option');
         optionEl.value = 'uploaded a file';
         optionEl.textContent = 'uploaded a file';
         answerSelect.appendChild(optionEl);
-    } else if (questionType === 'dropdown') {
+    } else if (questionType === 'dropdown' || questionType === 'radio') {
         const dropOpts = targetQuestionBlock.querySelectorAll(`#dropdownOptions${prevQNum} input`);
         dropOpts.forEach(opt => {
             const val = opt.value.trim();
@@ -1550,12 +1735,10 @@ function addPdfLogicCondition(questionId) {
     if (questionType === 'bigParagraph') {
         // For Big Paragraph, show character limit selector
         conditionRow = document.createElement('div');
-        conditionRow.className = 'pdf-logic-condition-row';
+        conditionRow.className = 'pdf-logic-condition-row fw-addon-card';
         conditionRow.id = `pdfLogicConditionRow${questionId}_${numConditions}`;
         conditionRow.innerHTML = `
-            <span>Condition ${numConditions}:</span><br>
-            <label>Character Limit:</label><br>
-            <select id="pdfCharacterLimit${questionId}_${numConditions}" style="display: block;">
+            <span>Condition ${numConditions}:</span>            <label>Character Limit:</label>            <select id="pdfCharacterLimit${questionId}_${numConditions}" style="display: block;">
                 <option value="">-- Choose a character limit --</option>
                 <option value="50">50 characters</option>
                 <option value="100">100 characters</option>
@@ -1567,13 +1750,10 @@ function addPdfLogicCondition(questionId) {
                 <option value="1500">1500 characters</option>
                 <option value="2000">2000 characters</option>
                 <option value="custom">Custom limit</option>
-            </select><br>
-            <input type="number" id="pdfCustomCharacterLimit${questionId}_${numConditions}" 
+            </select>            <input type="number" id="pdfCustomCharacterLimit${questionId}_${numConditions}" 
                    placeholder="Enter custom character limit" 
                    style="display: none; margin-top: 5px;"
-                   min="1" max="10000"><br>
-            <button type="button" onclick="removePdfLogicCondition(${questionId}, ${numConditions})">Remove</button>
-            <hr>
+                   min="1" max="10000">            <button type="button" onclick="removePdfLogicCondition(${questionId}, ${numConditions})">Remove</button>
         `;
         // Add event listener for custom character limit
         setTimeout(() => {
@@ -1594,18 +1774,14 @@ function addPdfLogicCondition(questionId) {
     } else {
         // For other question types, show the original previous question logic
         conditionRow = document.createElement('div');
-        conditionRow.className = 'pdf-logic-condition-row';
+        conditionRow.className = 'pdf-logic-condition-row fw-addon-card';
         conditionRow.id = `pdfLogicConditionRow${questionId}_${numConditions}`;
         conditionRow.innerHTML = `
-            <span>Condition ${numConditions}:</span><br>
-            <input type="number" placeholder="Previous question number"
+            <span>Condition ${numConditions}:</span>            <input type="number" placeholder="Previous question number"
                    id="pdfPrevQuestion${questionId}_${numConditions}"
-                   onchange="updatePdfLogicAnswersForRow(${questionId}, ${numConditions})"><br>
-            <select id="pdfPrevAnswer${questionId}_${numConditions}" style="display: block;">
+                   onchange="updatePdfLogicAnswersForRow(${questionId}, ${numConditions})">            <select id="pdfPrevAnswer${questionId}_${numConditions}" style="display: block;">
                 <option value="">-- Select an answer --</option>
-            </select><br>
-            <button type="button" onclick="removePdfLogicCondition(${questionId}, ${numConditions})">Remove</button>
-            <hr>
+            </select>            <button type="button" onclick="removePdfLogicCondition(${questionId}, ${numConditions})">Remove</button>
         `;
     }
     pdfLogicConditionsDiv.appendChild(conditionRow);
@@ -1632,12 +1808,7 @@ function updatePdfLogicAnswersForRow(questionId, conditionIndex) {
     const questionType = targetQuestionBlock.querySelector(`#questionType${prevQNum}`)?.value;
     if (!questionType) return;
     answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
-    if (questionType === 'radio') {
-        answerSelect.innerHTML += `
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-        `;
-    } else if (questionType === 'dropdown') {
+    if (questionType === 'dropdown' || questionType === 'radio') {
         const dropOpts = targetQuestionBlock.querySelectorAll(`#dropdownOptions${prevQNum} input`);
         dropOpts.forEach(opt => {
             const val = opt.value.trim();
@@ -1683,163 +1854,55 @@ function updatePdfLogicAnswersForRow(questionId, conditionIndex) {
         }
     }
 }
-/** On picking a "previous question" for logic, populate possible answers. */
+/** On picking a "previous question" for logic, show answer dropdown (options) or free-text field. */
 function updateLogicAnswersForRow(questionId, conditionIndex) {
-    console.log('[CONDITIONAL LOGIC DEBUG] updateLogicAnswersForRow called', { questionId, conditionIndex });
-    const questionNumberInput = document.getElementById(`prevQuestion${questionId}_${conditionIndex}`);
-    const answerSelect = document.getElementById(`prevAnswer${questionId}_${conditionIndex}`);
-    console.log('[CONDITIONAL LOGIC DEBUG] Elements found:', { 
-        questionNumberInput: !!questionNumberInput, 
-        answerSelect: !!answerSelect,
-        questionNumberInputValue: questionNumberInput?.value 
-    });
-    if (!questionNumberInput || !answerSelect) {
-        console.log('[CONDITIONAL LOGIC DEBUG] Missing required elements, returning');
-        return;
+    const prevQuestionSelect = document.getElementById(`prevQuestion${questionId}_${conditionIndex}`);
+    const answerSlot = document.getElementById(`prevAnswerSlot${questionId}_${conditionIndex}`);
+    if (!prevQuestionSelect || !answerSlot) return;
+
+    const row = document.getElementById(`logicConditionRow${questionId}_${conditionIndex}`);
+    if (row) {
+        row.querySelectorAll(`#conditionLabel${questionId}_${conditionIndex}, #hiddenAnswer${questionId}_${conditionIndex}`).forEach(el => el.remove());
     }
-    const prevQNum = parseInt(questionNumberInput.value);
-    console.log('[CONDITIONAL LOGIC DEBUG] Previous question number:', prevQNum);
+
+    answerSlot.innerHTML = '';
+
+    const prevQNum = parseInt(prevQuestionSelect.value, 10);
     if (!prevQNum) {
-        console.log('[CONDITIONAL LOGIC DEBUG] No question number, resetting dropdown');
-        answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+        const hint = document.createElement('p');
+        hint.className = 'fw-hint fw-logic-answer-hint';
+        hint.textContent = 'Choose a question, then pick an answer or type a value to match.';
+        answerSlot.appendChild(hint);
         return;
     }
+
     const targetQuestionBlock = document.getElementById(`questionBlock${prevQNum}`);
-    console.log('[CONDITIONAL LOGIC DEBUG] Target question block found:', !!targetQuestionBlock);
     if (!targetQuestionBlock) {
-        console.log('[CONDITIONAL LOGIC DEBUG] Invalid question block, showing error');
-        answerSelect.innerHTML = '<option value="">-- (invalid question #) --</option>';
+        const err = document.createElement('p');
+        err.className = 'fw-hint';
+        err.textContent = 'That question no longer exists.';
+        answerSlot.appendChild(err);
         return;
     }
+
     const questionTypeSelector = targetQuestionBlock.querySelector(`#questionType${prevQNum}`);
-    console.log('[CONDITIONAL LOGIC DEBUG] Question type selector found:', !!questionTypeSelector);
-    console.log('[CONDITIONAL LOGIC DEBUG] Question type selector element:', questionTypeSelector);
-    if (questionTypeSelector) {
-        console.log('[CONDITIONAL LOGIC DEBUG] Question type selector value:', questionTypeSelector.value);
-        console.log('[CONDITIONAL LOGIC DEBUG] Question type selector options:', Array.from(questionTypeSelector.options || []).map(opt => ({ value: opt.value, text: opt.textContent, selected: opt.selected })));
-        console.log('[CONDITIONAL LOGIC DEBUG] All question type options:', questionTypeSelector.innerHTML);
+    const questionType = questionTypeSelector ? questionTypeSelector.value : '';
+    if (!questionType) return;
+
+    if (logicQuestionTypeUsesAnswerDropdown(questionType)) {
+        const sel = document.createElement('select');
+        sel.id = `prevAnswer${questionId}_${conditionIndex}`;
+        sel.setAttribute('aria-label', 'Answer to match');
+        answerSlot.appendChild(sel);
+        populateLogicAnswerSelect(sel, prevQNum, questionType, targetQuestionBlock);
+    } else {
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.id = `prevAnswer${questionId}_${conditionIndex}`;
+        inp.placeholder = 'Value to match (free text)';
+        inp.setAttribute('aria-label', 'Value to match for this condition');
+        answerSlot.appendChild(inp);
     }
-    const questionType = questionTypeSelector?.value;
-    console.log('[CONDITIONAL LOGIC DEBUG] Extracted question type:', questionType);
-    console.log('[CONDITIONAL LOGIC DEBUG] Is questionType === "fileUpload"?', questionType === 'fileUpload');
-    console.log('[CONDITIONAL LOGIC DEBUG] Question type comparison (strict):', questionType === 'fileUpload');
-    console.log('[CONDITIONAL LOGIC DEBUG] Question type comparison (loose):', questionType == 'fileUpload');
-    if (!questionType) {
-        console.log('[CONDITIONAL LOGIC DEBUG] No question type found, returning');
-        return;
-    }
-    // Reset the answer select to show it again (in case it was hidden for text questions)
-    answerSelect.style.display = 'block';
-    answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
-    console.log('[CONDITIONAL LOGIC DEBUG] Dropdown reset, checking question type:', questionType);
-    // Remove any existing condition labels and hidden inputs for text questions
-    const existingLabel = document.getElementById(`conditionLabel${questionId}_${conditionIndex}`);
-    const existingHiddenInput = document.getElementById(`hiddenAnswer${questionId}_${conditionIndex}`);
-    if (existingLabel) existingLabel.remove();
-    if (existingHiddenInput) existingHiddenInput.remove();
-    if (questionType === 'radio') {
-        console.log('[CONDITIONAL LOGIC DEBUG] Adding radio options');
-        answerSelect.innerHTML += `
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-        `;
-    } else if (questionType === 'dropdown') {
-        const dropOpts = targetQuestionBlock.querySelectorAll(`#dropdownOptions${prevQNum} input`);
-        dropOpts.forEach(opt => {
-            const val = opt.value.trim();
-            if (val) {
-                const optionEl = document.createElement('option');
-                optionEl.value = val;
-                optionEl.textContent = val;
-                answerSelect.appendChild(optionEl);
-            }
-        });
-    } else if (questionType === 'checkbox') {
-        const checkOpts = targetQuestionBlock.querySelectorAll(`#checkboxOptions${prevQNum} [id^="checkboxOptionText"]`);
-        checkOpts.forEach(optInput => {
-            const val = optInput.value.trim();
-            if (val) {
-                const optionEl = document.createElement('option');
-                optionEl.value = val;
-                optionEl.textContent = val;
-                answerSelect.appendChild(optionEl);
-            }
-        });
-        const noneOfAbove = targetQuestionBlock.querySelector(`#noneOfTheAbove${prevQNum}`);
-        if (noneOfAbove && noneOfAbove.checked) {
-            const optionEl = document.createElement('option');
-            optionEl.value = 'None of the above';
-            optionEl.textContent = 'None of the above';
-            answerSelect.appendChild(optionEl);
-        }
-    } else if (questionType === 'numberedDropdown') {
-        // Get the min and max values from the range inputs
-        const rangeStartEl = targetQuestionBlock.querySelector(`#numberRangeStart${prevQNum}`);
-        const rangeEndEl = targetQuestionBlock.querySelector(`#numberRangeEnd${prevQNum}`);
-        if (rangeStartEl && rangeEndEl) {
-            const min = parseInt(rangeStartEl.value) || 1;
-            const max = parseInt(rangeEndEl.value) || min;
-            // Add each number in the range as an option
-            for (let i = min; i <= max; i++) {
-                const optionEl = document.createElement('option');
-                optionEl.value = i.toString();
-                optionEl.textContent = i.toString();
-                answerSelect.appendChild(optionEl);
-            }
-        }
-    } else if (questionType === 'fileUpload') {
-        console.log('[CONDITIONAL LOGIC DEBUG] ========== FILE UPLOAD DETECTED ==========');
-        console.log('[CONDITIONAL LOGIC DEBUG] Question ID:', questionId);
-        console.log('[CONDITIONAL LOGIC DEBUG] Condition Index:', conditionIndex);
-        console.log('[CONDITIONAL LOGIC DEBUG] Previous Question Number:', prevQNum);
-        console.log('[CONDITIONAL LOGIC DEBUG] Question Type:', questionType);
-        console.log('[CONDITIONAL LOGIC DEBUG] Answer Select Element:', answerSelect);
-        console.log('[CONDITIONAL LOGIC DEBUG] Answer Select ID:', answerSelect.id);
-        console.log('[CONDITIONAL LOGIC DEBUG] Current dropdown options before adding:', Array.from(answerSelect.options).map(opt => ({ value: opt.value, text: opt.textContent })));
-        console.log('[CONDITIONAL LOGIC DEBUG] Current dropdown innerHTML before:', answerSelect.innerHTML);
-        // For file upload questions, add "uploaded a file" option
-        const optionEl = document.createElement('option');
-        optionEl.value = 'uploaded a file';
-        optionEl.textContent = 'uploaded a file';
-        console.log('[CONDITIONAL LOGIC DEBUG] Created option element:', optionEl);
-        console.log('[CONDITIONAL LOGIC DEBUG] Option value:', optionEl.value);
-        console.log('[CONDITIONAL LOGIC DEBUG] Option textContent:', optionEl.textContent);
-        answerSelect.appendChild(optionEl);
-        console.log('[CONDITIONAL LOGIC DEBUG] Option appended. Current dropdown options after adding:', Array.from(answerSelect.options).map(opt => ({ value: opt.value, text: opt.textContent })));
-        console.log('[CONDITIONAL LOGIC DEBUG] Current dropdown innerHTML after:', answerSelect.innerHTML);
-        console.log('[CONDITIONAL LOGIC DEBUG] Dropdown innerHTML length:', answerSelect.innerHTML.length);
-        console.log('[CONDITIONAL LOGIC DEBUG] Dropdown children count:', answerSelect.children.length);
-        console.log('[CONDITIONAL LOGIC DEBUG] Dropdown options count:', answerSelect.options.length);
-        console.log('[CONDITIONAL LOGIC DEBUG] ========== END FILE UPLOAD HANDLING ==========');
-    } else if (questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'currency' || questionType === 'date' || questionType === 'dateRange') {
-        console.log('[CONDITIONAL LOGIC DEBUG] Text-based question, hiding dropdown');
-        console.log('[CONDITIONAL LOGIC DEBUG] Text-based question, hiding dropdown');
-        // For textbox, money, and date questions, hide the answer dropdown since they don't have predefined options
-        answerSelect.style.display = 'none';
-        // Add a hidden input to store the condition value
-        let hiddenInput = document.getElementById(`hiddenAnswer${questionId}_${conditionIndex}`);
-        if (!hiddenInput) {
-            hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.id = `hiddenAnswer${questionId}_${conditionIndex}`;
-            hiddenInput.value = 'Any Text'; // Default value for text questions
-            answerSelect.parentNode.appendChild(hiddenInput);
-        }
-        // Add a label to indicate the condition
-        let conditionLabel = document.getElementById(`conditionLabel${questionId}_${conditionIndex}`);
-        if (!conditionLabel) {
-            conditionLabel = document.createElement('div');
-            conditionLabel.id = `conditionLabel${questionId}_${conditionIndex}`;
-            conditionLabel.style.cssText = 'margin: 5px 0; padding: 5px; background: #e8f4fd; border-radius: 4px; color: #1976d2; font-size: 14px;';
-            conditionLabel.textContent = 'Will trigger when any text is entered';
-            answerSelect.parentNode.insertBefore(conditionLabel, answerSelect);
-        }
-    }
-    console.log('[CONDITIONAL LOGIC DEBUG] ========== FINAL STATE ==========');
-    console.log('[CONDITIONAL LOGIC DEBUG] Final dropdown options:', Array.from(answerSelect.options).map(opt => ({ value: opt.value, text: opt.textContent })));
-    console.log('[CONDITIONAL LOGIC DEBUG] Final dropdown innerHTML:', answerSelect.innerHTML);
-    console.log('[CONDITIONAL LOGIC DEBUG] Final dropdown options count:', answerSelect.options.length);
-    console.log('[CONDITIONAL LOGIC DEBUG] ========== END updateLogicAnswersForRow ==========');
 }
 // Jump logic toggling
 function toggleJumpLogic(questionId) {
@@ -1858,10 +1921,8 @@ function toggleJumpLogic(questionId) {
             if (!isTextboxQuestion) {
                 if (questionType === 'numberedDropdown') {
                     updateJumpOptionsForNumberedDropdown(questionId);
-                } else if (questionType === 'dropdown') {
+                } else if (questionType === 'dropdown' || questionType === 'radio') {
                     updateJumpOptions(questionId);
-                } else if (questionType === 'radio') {
-                    updateJumpOptionsForRadio(questionId);
                 } else if (questionType === 'checkbox') {
                     updateJumpOptionsForCheckbox(questionId);
                 }
@@ -1996,7 +2057,7 @@ function addHiddenLogicConfig(questionId) {
 
     // Create the configuration HTML
     const configHtml = `
-        <div class="hidden-logic-config" id="hiddenLogicConfig${questionId}_${configIndex}" style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 5px;">
+        <div class="hidden-logic-config fw-addon-card" id="hiddenLogicConfig${questionId}_${configIndex}">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <strong>Hidden Logic Configuration ${configIndex + 1}</strong>
                 ${configIndex > 0 ? `<button type="button" onclick="removeHiddenLogicConfig(${questionId}, ${configIndex})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Remove</button>` : ''}
@@ -2004,20 +2065,16 @@ function addHiddenLogicConfig(questionId) {
             <label>Trigger Condition:</label>
             <select id="hiddenLogicTrigger${questionId}_${configIndex}">
                 <option value="">Select Trigger</option>
-            </select><br><br>
-            <label>Hidden Logic Type:</label>
+            </select>            <label>Hidden Logic Type:</label>
             <select id="hiddenLogicType${questionId}_${configIndex}" onchange="toggleHiddenLogicOptions(${questionId}, ${configIndex})">
                 <option value="">Select Type</option>
                 <option value="checkbox">Checkbox</option>
                 <option value="textbox">Textbox</option>
-            </select><br><br>
-            <div id="hiddenLogicOptions${questionId}_${configIndex}" style="display: none;">
+            </select>            <div id="hiddenLogicOptions${questionId}_${configIndex}" style="display: none;">
                 <label>Node ID:</label>
-                <input type="text" id="hiddenLogicNodeId${questionId}_${configIndex}" placeholder="Enter node ID"><br><br>
-                <div id="hiddenLogicTextboxOptions${questionId}_${configIndex}" style="display: none;">
+                <input type="text" id="hiddenLogicNodeId${questionId}_${configIndex}" placeholder="Enter node ID">                <div id="hiddenLogicTextboxOptions${questionId}_${configIndex}" style="display: none;">
                     <label>Textbox Text:</label>
-                    <input type="text" id="hiddenLogicTextboxText${questionId}_${configIndex}" placeholder="Enter textbox text"><br><br>
-                </div>
+                    <input type="text" id="hiddenLogicTextboxText${questionId}_${configIndex}" placeholder="Enter textbox text">                </div>
             </div>
         </div>
     `;
@@ -2089,9 +2146,8 @@ function addAnotherPdf(questionId) {
     newPdfGroup.className = 'pdf-detail-group';
     newPdfGroup.setAttribute('data-pdf-index', nextIndex);
     newPdfGroup.innerHTML = `
-        <div style="border: 2px solid #007bff; border-radius: 8px; padding: 15px; margin: 10px 0; background: #f8f9ff;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h4 style="margin: 0; color: #007bff;">PDF ${nextIndex}</h4>
+            <div class="pdf-detail-group__head">
+                <h4>PDF ${nextIndex}</h4>
             </div>
             <!-- Trigger Option for Numbered Dropdown -->
             <div id="triggerOptionBlock${questionId}_${nextIndex}" style="display: none;">
@@ -2099,21 +2155,16 @@ function addAnotherPdf(questionId) {
                 <select id="pdfLogicTriggerOption${questionId}_${nextIndex}">
                     <option value="">Select trigger option</option>
                 </select>
-                <br><br>
             </div>
             <label>PDF Name (for cart display):</label>
             <input type="text" id="pdfLogicPdfDisplayName${questionId}_${nextIndex}" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
-            <br><br>
             <label>Additional PDF to download:</label>
             <input type="text" id="pdfLogicPdfName${questionId}_${nextIndex}" placeholder="Enter PDF name (e.g., additional_form.pdf)">
-            <br><br>
             <label>Choose your Price ID:</label>
             <input type="text" id="pdfLogicStripePriceId${questionId}_${nextIndex}" placeholder="Enter Stripe Price ID (e.g., price_12345)">
-            <br><br>
-            <div style="text-align: center; margin-top: 15px;">
+            <div class="fw-logic-actions" style="margin-top: 12px;">
                 <button type="button" onclick="removePdf(${questionId}, ${nextIndex})" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">Remove PDF</button>
             </div>
-        </div>
     `;
     pdfDetailsContainer.appendChild(newPdfGroup);
     // Update trigger options for the new PDF if it's a numbered dropdown
@@ -2143,8 +2194,7 @@ function addExtraPdf(questionId, pdfIndex) {
     const extraPdfIndex = existingExtraPdfs.length + 1;
     // Create the extra PDF inputs container
     const extraPdfContainer = document.createElement('div');
-    extraPdfContainer.className = 'extra-pdf-inputs';
-    extraPdfContainer.style.cssText = 'border: 1px solid #28a745; border-radius: 6px; padding: 12px; margin: 10px 0; background: #f8fff8;';
+    extraPdfContainer.className = 'extra-pdf-inputs fw-addon-card';
     extraPdfContainer.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h5 style="margin: 0; color: #28a745;">Extra PDF ${extraPdfIndex}</h5>
@@ -2152,10 +2202,8 @@ function addExtraPdf(questionId, pdfIndex) {
         </div>
         <label>PDF Name (for cart display):</label>
         <input type="text" id="pdfLogicPdfDisplayName${questionId}_${pdfIndex}_extra${extraPdfIndex}" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
-        <br><br>
         <label>Additional PDF to download:</label>
         <input type="text" id="pdfLogicPdfName${questionId}_${pdfIndex}_extra${extraPdfIndex}" placeholder="Enter PDF name (e.g., additional_form.pdf)">
-        <br><br>
         <label>Choose your Price ID:</label>
         <input type="text" id="pdfLogicStripePriceId${questionId}_${pdfIndex}_extra${extraPdfIndex}" placeholder="Enter Stripe Price ID (e.g., price_12345)">
     `;
@@ -2317,18 +2365,20 @@ function updateJumpOptionsForRadio(questionId, conditionId = null) {
 // -------------------------------------------
 // --- Functions to add various sub-options
 // -------------------------------------------
-function addDropdownOption(questionId) {
+function addDropdownOption(questionId, presetText) {
     const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
     const optionCount = dropdownOptionsDiv.children.length + 1;
     const optionDiv = document.createElement('div');
-    optionDiv.className = `option${optionCount}`;
+    optionDiv.className = `option${optionCount} fw-option-card`;
     const optionId = `option${questionId}_${optionCount}`;
+    const initial = presetText != null && String(presetText).length ? String(presetText) : '';
     optionDiv.innerHTML = `
         <input type="text" id="${optionId}" placeholder="Option ${optionCount}">
         <button type="button" onclick="removeDropdownOption(${questionId}, ${optionCount})">Remove</button>
     `;
     dropdownOptionsDiv.appendChild(optionDiv);
     const optionInput = optionDiv.querySelector('input[type="text"]');
+    if (initial) optionInput.value = initial;
     optionInput.addEventListener('input', () => {
         // Update PDF preview trigger options
         updatePdfPreviewTriggerOptions(questionId);
@@ -2364,7 +2414,7 @@ function removeDropdownOption(questionId, optionNumber) {
         optionDiv.remove();
         const options = document.querySelectorAll(`#dropdownOptions${questionId} > div`);
         options.forEach((option, index) => {
-            option.className = `option${index + 1}`;
+            option.className = `option${index + 1} fw-option-card`;
             const inputEl = option.querySelector('input[type="text"]');
             inputEl.id = `option${questionId}_${index + 1}`;
             // reattach remove button
@@ -2396,15 +2446,12 @@ function addCheckboxOption(questionId) {
     const checkboxOptionsDiv = document.getElementById(`checkboxOptions${questionId}`);
     const optionCount = checkboxOptionsDiv.children.length + 1;
     const optionDiv = document.createElement('div');
-    optionDiv.className = `option${optionCount}`;
+    optionDiv.className = `option${optionCount} fw-option-card`;
     optionDiv.innerHTML = `
         <label>Option ${optionCount} Text:</label>
-        <input type="text" id="checkboxOptionText${questionId}_${optionCount}" placeholder="Enter option text"><br><br>
-        <label>Name/ID:</label>
-        <input type="text" id="checkboxOptionName${questionId}_${optionCount}" placeholder="Enter Name/ID"><br><br>
-        <label>Value (optional):</label>
-        <input type="text" id="checkboxOptionValue${questionId}_${optionCount}" placeholder="Enter Value"><br><br>
-        <label>
+        <input type="text" id="checkboxOptionText${questionId}_${optionCount}" placeholder="Enter option text">        <label>Name/ID:</label>
+        <input type="text" id="checkboxOptionName${questionId}_${optionCount}" placeholder="Enter Name/ID">        <label>Value (optional):</label>
+        <input type="text" id="checkboxOptionValue${questionId}_${optionCount}" placeholder="Enter Value">        <label>
             <input type="checkbox" id="checkboxOptionHasAmount${questionId}_${optionCount}" 
                    onchange="toggleAmountPlaceholder(${questionId}, ${optionCount})">
             Enable amount field
@@ -2413,11 +2460,9 @@ function addCheckboxOption(questionId) {
              style="display: none; margin-top: 8px;">
             <label>Amount Field Name:</label>
             <input type="text" id="checkboxOptionAmountName${questionId}_${optionCount}"
-                   placeholder="Enter amount field name"><br><br>
-            <label>Amount Placeholder:</label>
+                   placeholder="Enter amount field name">            <label>Amount Placeholder:</label>
             <input type="text" id="checkboxOptionAmountPlaceholder${questionId}_${optionCount}"
-                   placeholder="Enter amount placeholder"><br>
-        </div>
+                   placeholder="Enter amount placeholder">        </div>
         <button type="button" onclick="removeCheckboxOption(${questionId}, ${optionCount})">Remove</button>
         <hr>
     `;
@@ -2471,7 +2516,7 @@ function removeCheckboxOption(questionId, optionNumber) {
         const options = document.querySelectorAll(`#checkboxOptions${questionId} > div`);
         options.forEach((option, index) => {
             const newOptionNumber = index + 1;
-            option.className = `option${newOptionNumber}`;
+            option.className = `option${newOptionNumber} fw-option-card`;
             option.querySelector('label').innerText = `Option ${newOptionNumber} Text:`;
             option.querySelector(`input[id^="checkboxOptionText"]`).id = `checkboxOptionText${questionId}_${newOptionNumber}`;
             option.querySelector(`input[id^="checkboxOptionName"]`).id = `checkboxOptionName${questionId}_${newOptionNumber}`;
@@ -2515,15 +2560,7 @@ function addTextboxAmount(questionId) {
     unifiedDiv.appendChild(fieldDiv);
 
     // Force the container to be visible and have dimensions
-    unifiedDiv.style.minHeight = '50px';
-    unifiedDiv.style.border = '1px solid #e0e0e0';
-    unifiedDiv.style.borderRadius = '5px';
-    unifiedDiv.style.padding = '10px';
-    unifiedDiv.style.backgroundColor = '#fafafa';
-    unifiedDiv.style.margin = '10px 0';
-    unifiedDiv.style.width = '100%';
-    unifiedDiv.style.display = 'block';
-    unifiedDiv.style.position = 'relative';
+    unifiedDiv.classList.add('fw-unified-fields-wrap--active');
 
     // Add double-click event listener as backup
     const displayDiv = fieldDiv.querySelector('div');
@@ -2643,15 +2680,7 @@ function addTextboxLabel(questionId) {
 
     }
     // Force the container to be visible and have dimensions
-    unifiedDiv.style.minHeight = '50px';
-    unifiedDiv.style.border = '1px solid #e0e0e0';
-    unifiedDiv.style.borderRadius = '5px';
-    unifiedDiv.style.padding = '10px';
-    unifiedDiv.style.backgroundColor = '#fafafa';
-    unifiedDiv.style.margin = '10px 0';
-    unifiedDiv.style.width = '100%';
-    unifiedDiv.style.display = 'block';
-    unifiedDiv.style.position = 'relative';
+    unifiedDiv.classList.add('fw-unified-fields-wrap--active');
 
     // Add double-click event listener as backup
     const displayDiv = fieldDiv.querySelector('div');
@@ -2673,7 +2702,6 @@ function addTextboxLabel(questionId) {
     hiddenLabelDiv.className = `label${labelCount}`;
     hiddenLabelDiv.innerHTML = `
         <input type="text" id="label${questionId}_${labelCount}" placeholder="Label ${labelCount}">
-        <br>
         <label style="font-size: 0.9em; color: #666;">Node ID: </label>
         <input type="text" id="labelNodeId${questionId}_${labelCount}" placeholder="Enter node ID for this label" style="width: 200px; margin-top: 5px;">
         <button type="button" onclick="removeTextboxLabel(${questionId}, ${labelCount})" style="margin-top: 5px;">Remove</button>
@@ -2757,15 +2785,7 @@ function addCheckboxField(questionId) {
     unifiedDiv.appendChild(fieldDiv);
 
     // Force the container to be visible and have dimensions
-    unifiedDiv.style.minHeight = '50px';
-    unifiedDiv.style.border = '1px solid #e0e0e0';
-    unifiedDiv.style.borderRadius = '5px';
-    unifiedDiv.style.padding = '10px';
-    unifiedDiv.style.backgroundColor = '#fafafa';
-    unifiedDiv.style.margin = '10px 0';
-    unifiedDiv.style.width = '100%';
-    unifiedDiv.style.display = 'block';
-    unifiedDiv.style.position = 'relative';
+    unifiedDiv.classList.add('fw-unified-fields-wrap--active');
     // Add double-click event listener as backup
     const displayDiv = fieldDiv.querySelector('div');
     if (displayDiv) {
@@ -3046,15 +3066,7 @@ function addDateField(questionId) {
     unifiedDiv.appendChild(fieldDiv);
 
     // Force the container to be visible and have dimensions
-    unifiedDiv.style.minHeight = '50px';
-    unifiedDiv.style.border = '1px solid #e0e0e0';
-    unifiedDiv.style.borderRadius = '5px';
-    unifiedDiv.style.padding = '10px';
-    unifiedDiv.style.backgroundColor = '#fafafa';
-    unifiedDiv.style.margin = '10px 0';
-    unifiedDiv.style.width = '100%';
-    unifiedDiv.style.display = 'block';
-    unifiedDiv.style.position = 'relative';
+    unifiedDiv.classList.add('fw-unified-fields-wrap--active');
     // Add double-click event listener as backup
     const displayDiv = fieldDiv.querySelector('div');
     if (displayDiv) {
@@ -3093,55 +3105,50 @@ function addDropdownField(questionId) {
     fieldDiv.setAttribute('data-type', 'dropdown');
     fieldDiv.setAttribute('data-order', fieldCount);
     fieldDiv.innerHTML = `
-        <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Dropdown Field</div>
-            <!-- Field Name Section -->
-            <div style="margin-bottom: 15px;">
-                <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Field Name:</div>
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <input type="text" id="dropdownFieldName${questionId}_${fieldCount}" placeholder="Enter dropdown field name" style="width: 80%; max-width: 500px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" onchange="updateDropdownFieldName(${questionId}, ${fieldCount})">
-                </div>
+        <div class="fw-addon-panel fw-unified-dropdown-card">
+            <div class="fw-options-panel-head">
+                <span class="fw-options-panel-title">Dropdown field</span>
             </div>
-            <!-- Add Options Section -->
-            <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f5f5f5;">
-                <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Add Options</div>
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <button type="button" onclick="addDropdownOption(${questionId}, ${fieldCount})" style="margin: 5px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #2196F3; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add dropdown option</button>
+            <div class="fw-options-panel-body">
+                <div class="fw-nested-block">
+                    <span class="fw-mini-label">Field name</span>
+                    <input type="text" id="dropdownFieldName${questionId}_${fieldCount}" placeholder="Enter dropdown field name" onchange="updateDropdownFieldName(${questionId}, ${fieldCount})">
                 </div>
-                <div id="dropdownOptions${questionId}_${fieldCount}" style="margin-top: 10px;">
-                    <!-- Dropdown options will be added here -->
+                <div class="fw-options-panel fw-unified-dropdown-options-panel">
+                    <div class="fw-options-panel-head">
+                        <span class="fw-options-panel-title">Add options</span>
+                    </div>
+                    <div class="fw-options-panel-body">
+                        <div class="fw-field-toolbar fw-field-toolbar--flush">
+                            <button type="button" onclick="addUnifiedDropdownOption(${questionId}, ${fieldCount})">Add dropdown option</button>
+                        </div>
+                        <div id="dropdownOptions${questionId}_${fieldCount}" class="fw-options-list"></div>
+                    </div>
                 </div>
-            </div>
-            <!-- Conditional Logic Section -->
-            <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f0f8ff;">
-                <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Conditional Logic</div>
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <button type="button" onclick="addTriggerSequence(${questionId}, ${fieldCount})" style="margin: 5px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #4CAF50; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add trigger</button>
+                <div class="fw-options-panel fw-unified-conditional-panel">
+                    <div class="fw-options-panel-head">
+                        <span class="fw-options-panel-title">Conditional logic</span>
+                    </div>
+                    <div class="fw-options-panel-body">
+                        <div class="fw-field-toolbar fw-field-toolbar--flush">
+                            <button type="button" onclick="addTriggerSequence(${questionId}, ${fieldCount})">Add trigger</button>
+                        </div>
+                        <div id="triggerSequences${questionId}_${fieldCount}"></div>
+                    </div>
                 </div>
-                <div id="triggerSequences${questionId}_${fieldCount}" style="margin-top: 10px;">
-                    <!-- Trigger sequences will be added here -->
+                <div class="fw-unified-field-meta">Type: <span id="typeText${questionId}_${fieldCount}">Dropdown</span> | Order: ${fieldCount}</div>
+                <div class="fw-logic-actions" style="text-align: center;">
+                    <button type="button" class="fw-btn--danger" onclick="removeUnifiedField(${questionId}, ${fieldCount})">Remove field</button>
                 </div>
-            </div>
-            <div style="font-size: 0.8em; color: #999; margin-top: 10px; text-align: center;">Type: <span id="typeText${questionId}_${fieldCount}">Dropdown</span> | Order: ${fieldCount}</div>
-            <div style="text-align: center; margin-top: 10px;">
-                <button type="button" onclick="removeUnifiedField(${questionId}, ${fieldCount})" style="background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
             </div>
         </div>
     `;
     unifiedDiv.appendChild(fieldDiv);
 
     // Force the container to be visible and have dimensions
-    unifiedDiv.style.minHeight = '50px';
-    unifiedDiv.style.border = '1px solid #e0e0e0';
-    unifiedDiv.style.borderRadius = '5px';
-    unifiedDiv.style.padding = '10px';
-    unifiedDiv.style.backgroundColor = '#fafafa';
-    unifiedDiv.style.margin = '10px 0';
-    unifiedDiv.style.width = '100%';
-    unifiedDiv.style.display = 'block';
-    unifiedDiv.style.position = 'relative';
+    unifiedDiv.classList.add('fw-unified-fields-wrap--active');
     // Add double-click event listener as backup
-    const displayDiv = fieldDiv.querySelector('div');
+    const displayDiv = fieldDiv.querySelector('.fw-unified-dropdown-card');
     if (displayDiv) {
         // Remove any existing event listeners to prevent duplicates
         if (displayDiv._dblclickHandler) {
@@ -3154,7 +3161,7 @@ function addDropdownField(questionId) {
         displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
     }
 }
-function addDropdownOption(questionId, fieldCount) {
+function addUnifiedDropdownOption(questionId, fieldCount) {
     const optionsContainer = document.getElementById(`dropdownOptions${questionId}_${fieldCount}`);
     if (!optionsContainer) {
 
@@ -3163,23 +3170,14 @@ function addDropdownOption(questionId, fieldCount) {
     const optionCount = optionsContainer.children.length + 1;
 
     const optionDiv = document.createElement('div');
-    optionDiv.className = `dropdown-option-${optionCount}`;
-    optionDiv.style.margin = '5px 0';
-    optionDiv.style.padding = '8px';
-    optionDiv.style.border = '1px solid #e0e0e0';
-    optionDiv.style.borderRadius = '4px';
-    optionDiv.style.backgroundColor = '#f5f5f5';
+    optionDiv.className = `dropdown-option-${optionCount} fw-option-card`;
     optionDiv.innerHTML = `
-        <div style="margin-bottom: 10px; text-align: center;">
-            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Option text:</label>
-            <input type="text" id="dropdownOptionText${questionId}_${fieldCount}_${optionCount}" placeholder="Enter option text" style="width: 70%; max-width: 400px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateDropdownOptionText(${questionId}, ${fieldCount}, ${optionCount})">
-        </div>
-        <div style="margin-bottom: 10px; text-align: center;">
-            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Option Node ID:</label>
-            <input type="text" id="dropdownOptionNodeId${questionId}_${fieldCount}_${optionCount}" placeholder="Enter option node ID" style="width: 70%; max-width: 400px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateDropdownOptionNodeId(${questionId}, ${fieldCount}, ${optionCount})">
-        </div>
-        <div style="text-align: center; margin-top: 10px;">
-            <button type="button" onclick="removeDropdownOption(${questionId}, ${fieldCount}, ${optionCount})" style="background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Remove Option</button>
+        <span class="fw-mini-label">Option text</span>
+        <input type="text" id="dropdownOptionText${questionId}_${fieldCount}_${optionCount}" placeholder="Enter option text" onchange="updateDropdownOptionText(${questionId}, ${fieldCount}, ${optionCount})">
+        <span class="fw-mini-label">Option node ID</span>
+        <input type="text" id="dropdownOptionNodeId${questionId}_${fieldCount}_${optionCount}" placeholder="Enter option node ID" onchange="updateDropdownOptionNodeId(${questionId}, ${fieldCount}, ${optionCount})">
+        <div class="fw-logic-actions" style="text-align: center; margin-top: 8px;">
+            <button type="button" class="fw-btn--danger" onclick="removeUnifiedDropdownOption(${questionId}, ${fieldCount}, ${optionCount})">Remove option</button>
         </div>
     `;
     optionsContainer.appendChild(optionDiv);
@@ -3219,8 +3217,11 @@ function updateDropdownOptionNodeId(questionId, fieldCount, optionCount) {
 
     }
 }
-function removeDropdownOption(questionId, fieldCount, optionCount) {
-    const optionDiv = document.querySelector(`.dropdown-option-${optionCount}`);
+function removeUnifiedDropdownOption(questionId, fieldCount, optionCount) {
+    const optionsContainer = document.getElementById(`dropdownOptions${questionId}_${fieldCount}`);
+    const optionDiv = optionsContainer
+        ? optionsContainer.querySelector(`.dropdown-option-${optionCount}`)
+        : document.querySelector(`#dropdownOptions${questionId}_${fieldCount} .dropdown-option-${optionCount}`);
     if (optionDiv) {
         optionDiv.remove();
 
@@ -3235,47 +3236,41 @@ function addTriggerSequence(questionId, fieldCount) {
     const sequenceCount = triggerSequencesContainer.children.length + 1;
 
     const sequenceDiv = document.createElement('div');
-    sequenceDiv.className = `trigger-sequence-${sequenceCount}`;
-    sequenceDiv.style.margin = '10px 0';
-    sequenceDiv.style.padding = '12px';
-    sequenceDiv.style.border = '1px solid #4CAF50';
-    sequenceDiv.style.borderRadius = '8px';
-    sequenceDiv.style.backgroundColor = '#f0f8f0';
+    sequenceDiv.className = `trigger-sequence-${sequenceCount} fw-addon-panel fw-trigger-sequence`;
     sequenceDiv.innerHTML = `
-        <div style="font-weight: bold; color: #2E7D32; margin-bottom: 10px; text-align: center;">Trigger Sequence ${sequenceCount}</div>
-        <!-- Trigger Title Input -->
-        <div style="margin-bottom: 15px;">
-            <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 5px;">Trigger Title:</div>
-            <div style="text-align: center;">
-                <input type="text" id="triggerTitle${questionId}_${fieldCount}_${sequenceCount}" placeholder="Additional Information" value="Additional Information" style="width: 80%; max-width: 400px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; margin: 0 auto; display: block;" onchange="updateTriggerTitle(${questionId}, ${fieldCount}, ${sequenceCount})">
-            </div>
+        <div class="fw-options-panel-head">
+            <span class="fw-options-panel-title">Trigger sequence ${sequenceCount}</span>
         </div>
-        <!-- Trigger Condition Dropdown -->
-        <div style="margin-bottom: 15px;">
-            <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 5px;">Trigger Condition:</div>
-            <div style="text-align: center;">
-                <select id="triggerCondition${questionId}_${fieldCount}_${sequenceCount}" style="width: 80%; max-width: 400px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; margin: 0 auto; display: block;" onchange="updateTriggerCondition(${questionId}, ${fieldCount}, ${sequenceCount})">
+        <div class="fw-options-panel-body">
+            <div class="fw-nested-block">
+                <span class="fw-mini-label">Trigger title</span>
+                <input type="text" id="triggerTitle${questionId}_${fieldCount}_${sequenceCount}" placeholder="Additional Information" value="Additional Information" onchange="updateTriggerTitle(${questionId}, ${fieldCount}, ${sequenceCount})">
+            </div>
+            <div class="fw-nested-block">
+                <span class="fw-mini-label">Trigger condition</span>
+                <select id="triggerCondition${questionId}_${fieldCount}_${sequenceCount}" onchange="updateTriggerCondition(${questionId}, ${fieldCount}, ${sequenceCount})">
                     <option value="">Select an option...</option>
                 </select>
             </div>
-        </div>
-        <!-- Add Field Buttons -->
-        <div style="margin-bottom: 15px; text-align: center;">
-            <div style="font-weight: bold; color: #333; margin-bottom: 10px;">Add Fields for this trigger:</div>
-            <button type="button" onclick="addTriggerLabel(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #007bff; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Label</button>
-            <button type="button" onclick="addTriggerCheckbox(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Checkbox</button>
-            <button type="button" onclick="addTriggerDropdown(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #17a2b8; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Dropdown</button>
-            <button type="button" onclick="addTriggerDate(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #FF9800; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Date</button>
-            <button type="button" onclick="addTriggerLocation(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #28a745; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Location</button>
-            <button type="button" onclick="addTriggerPdf(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #DC3545; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add PDF</button>
-        </div>
-        <!-- Trigger Fields Container -->
-        <div id="triggerFields${questionId}_${fieldCount}_${sequenceCount}" style="margin-top: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa;">
-            <!-- Trigger fields will be added here -->
-        </div>
-        <!-- Remove Trigger Button -->
-        <div style="text-align: center; margin-top: 10px;">
-            <button type="button" onclick="removeTriggerSequence(${questionId}, ${fieldCount}, ${sequenceCount})" style="background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Remove Trigger</button>
+            <div class="fw-options-panel">
+                <div class="fw-options-panel-head">
+                    <span class="fw-options-panel-title">Add fields for this trigger</span>
+                </div>
+                <div class="fw-options-panel-body">
+                    <div class="fw-field-toolbar fw-field-toolbar--flush">
+                        <button type="button" onclick="addTriggerLabel(${questionId}, ${fieldCount}, ${sequenceCount})" style="padding: 6px 12px; border: none; border-radius: 6px; background-color: #007bff; color: white; cursor: pointer; font-size: 12px;">Add Label</button>
+                        <button type="button" onclick="addTriggerCheckbox(${questionId}, ${fieldCount}, ${sequenceCount})" style="padding: 6px 12px; border: none; border-radius: 6px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 12px;">Add Checkbox</button>
+                        <button type="button" onclick="addTriggerDropdown(${questionId}, ${fieldCount}, ${sequenceCount})" style="padding: 6px 12px; border: none; border-radius: 6px; background-color: #17a2b8; color: white; cursor: pointer; font-size: 12px;">Add Dropdown</button>
+                        <button type="button" onclick="addTriggerDate(${questionId}, ${fieldCount}, ${sequenceCount})" style="padding: 6px 12px; border: none; border-radius: 6px; background-color: #FF9800; color: white; cursor: pointer; font-size: 12px;">Add Date</button>
+                        <button type="button" onclick="addTriggerLocation(${questionId}, ${fieldCount}, ${sequenceCount})" style="padding: 6px 12px; border: none; border-radius: 6px; background-color: #28a745; color: white; cursor: pointer; font-size: 12px;">Add Location</button>
+                        <button type="button" onclick="addTriggerPdf(${questionId}, ${fieldCount}, ${sequenceCount})" style="padding: 6px 12px; border: none; border-radius: 6px; background-color: #DC3545; color: white; cursor: pointer; font-size: 12px;">Add PDF</button>
+                    </div>
+                    <div id="triggerFields${questionId}_${fieldCount}_${sequenceCount}" class="fw-trigger-fields-panel"></div>
+                </div>
+            </div>
+            <div class="fw-logic-actions" style="text-align: center;">
+                <button type="button" class="fw-btn--danger" onclick="removeTriggerSequence(${questionId}, ${fieldCount}, ${sequenceCount})">Remove trigger</button>
+            </div>
         </div>
     `;
     triggerSequencesContainer.appendChild(sequenceDiv);
@@ -3331,12 +3326,7 @@ function addTriggerLabel(questionId, fieldCount, sequenceCount) {
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
 
     const fieldDiv = document.createElement('div');
-    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
-    fieldDiv.style.margin = '5px 0';
-    fieldDiv.style.padding = '8px';
-    fieldDiv.style.border = '1px solid #007bff';
-    fieldDiv.style.borderRadius = '4px';
-    fieldDiv.style.backgroundColor = '#f0f8ff';
+    fieldDiv.className = `trigger-field-${triggerFieldCount} fw-addon-card fw-trigger-field fw-trigger-field--label`;
     // Conditional logic UI elements
     const conditionalLogicContainerId = `conditionalLogicUILabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
     const enableConditionalLogicCheckboxId = `enableConditionalLogicLabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
@@ -3380,12 +3370,7 @@ function addTriggerCheckbox(questionId, fieldCount, sequenceCount) {
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
 
     const fieldDiv = document.createElement('div');
-    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
-    fieldDiv.style.margin = '5px 0';
-    fieldDiv.style.padding = '8px';
-    fieldDiv.style.border = '1px solid #9C27B0';
-    fieldDiv.style.borderRadius = '4px';
-    fieldDiv.style.backgroundColor = '#faf0ff';
+    fieldDiv.className = `trigger-field-${triggerFieldCount} fw-addon-card fw-trigger-field fw-trigger-field--checkbox`;
         // Conditional logic UI elements
         const conditionalLogicContainerId = `conditionalLogicUICheckbox${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
         const enableConditionalLogicCheckboxId = `enableConditionalLogicCheckbox${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
@@ -3435,12 +3420,7 @@ function addTriggerDropdown(questionId, fieldCount, sequenceCount) {
     const conditionalLogicContainerId = `conditionalLogicUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
     const enableConditionalLogicCheckboxId = `enableConditionalLogicDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
     const fieldDiv = document.createElement('div');
-    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
-    fieldDiv.style.margin = '5px 0';
-    fieldDiv.style.padding = '8px';
-    fieldDiv.style.border = '1px solid #17a2b8';
-    fieldDiv.style.borderRadius = '4px';
-    fieldDiv.style.backgroundColor = '#f0f8ff';
+    fieldDiv.className = `trigger-field-${triggerFieldCount} fw-addon-card fw-trigger-field fw-trigger-field--dropdown`;
     fieldDiv.innerHTML = `
         <div style="font-weight: bold; color: #17a2b8; margin-bottom: 8px; text-align: center;">Trigger Dropdown ${triggerFieldCount}</div>
         <div style="margin-bottom: 8px; text-align: center;">
@@ -3497,12 +3477,7 @@ function addTriggerDate(questionId, fieldCount, sequenceCount) {
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
 
     const fieldDiv = document.createElement('div');
-    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
-    fieldDiv.style.margin = '5px 0';
-    fieldDiv.style.padding = '8px';
-    fieldDiv.style.border = '1px solid #FF9800';
-    fieldDiv.style.borderRadius = '4px';
-    fieldDiv.style.backgroundColor = '#fff8f0';
+    fieldDiv.className = `trigger-field-${triggerFieldCount} fw-addon-card fw-trigger-field fw-trigger-field--date`;
     // Create a unique ID for the conditional logic container
     const conditionalLogicContainerId = `conditionalLogicUI${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
     const enableConditionalLogicCheckboxId = `enableConditionalLogic${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
@@ -3541,12 +3516,7 @@ function addTriggerLocation(questionId, fieldCount, sequenceCount) {
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
 
     const fieldDiv = document.createElement('div');
-    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
-    fieldDiv.style.margin = '5px 0';
-    fieldDiv.style.padding = '12px';
-    fieldDiv.style.border = '1px solid #28a745';
-    fieldDiv.style.borderRadius = '6px';
-    fieldDiv.style.backgroundColor = '#f0fff0';
+    fieldDiv.className = `trigger-field-${triggerFieldCount} fw-addon-card fw-trigger-field fw-trigger-field--location`;
     fieldDiv.innerHTML = `
         <div style="font-weight: bold; color: #28a745; margin-bottom: 8px; text-align: center; font-size: 14px;">Location Data Added</div>
         <div style="margin: 10px 0; text-align: center;">
@@ -3568,12 +3538,7 @@ function addTriggerPdf(questionId, fieldCount, sequenceCount) {
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
 
     const fieldDiv = document.createElement('div');
-    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
-    fieldDiv.style.margin = '5px 0';
-    fieldDiv.style.padding = '8px';
-    fieldDiv.style.border = '1px solid #DC3545';
-    fieldDiv.style.borderRadius = '4px';
-    fieldDiv.style.backgroundColor = '#fff0f0';
+    fieldDiv.className = `trigger-field-${triggerFieldCount} fw-addon-card fw-trigger-field fw-trigger-field--pdf`;
     fieldDiv.innerHTML = `
         <div style="font-weight: bold; color: #DC3545; margin-bottom: 8px; text-align: center;">Trigger PDF ${triggerFieldCount}</div>
         <div style="margin-bottom: 8px; text-align: center;">
@@ -3626,12 +3591,7 @@ function addTriggerCheckboxOption(questionId, fieldCount, sequenceCount, trigger
     const optionCount = optionsContainer.children.length + 1;
 
     const optionDiv = document.createElement('div');
-    optionDiv.className = `trigger-checkbox-option-${optionCount}`;
-    optionDiv.style.margin = '3px 0';
-    optionDiv.style.padding = '6px';
-    optionDiv.style.border = '1px solid #e0e0e0';
-    optionDiv.style.borderRadius = '3px';
-    optionDiv.style.backgroundColor = '#f5f5f5';
+    optionDiv.className = `trigger-checkbox-option-${optionCount} fw-addon-card`;
     optionDiv.innerHTML = `
         <div style="margin-bottom: 6px; text-align: center;">
             <label style="font-weight: bold; color: #333; display: block; margin-bottom: 3px; font-size: 12px;">Option text:</label>
@@ -3670,12 +3630,7 @@ function addTriggerDropdownOption(questionId, fieldCount, sequenceCount, trigger
     const optionCount = optionsContainer.children.length + 1;
 
     const optionDiv = document.createElement('div');
-    optionDiv.className = `trigger-dropdown-option-${optionCount}`;
-    optionDiv.style.margin = '3px 0';
-    optionDiv.style.padding = '6px';
-    optionDiv.style.border = '1px solid #e0e0e0';
-    optionDiv.style.borderRadius = '3px';
-    optionDiv.style.backgroundColor = '#f5f5f5';
+    optionDiv.className = `trigger-dropdown-option-${optionCount} fw-addon-card`;
     optionDiv.innerHTML = `
         <div style="margin-bottom: 6px; text-align: center;">
             <label style="font-weight: bold; color: #333; display: block; margin-bottom: 3px; font-size: 12px;">Option text:</label>
@@ -4608,15 +4563,7 @@ function addTimeField(questionId) {
     unifiedDiv.appendChild(fieldDiv);
 
     // Force the container to be visible and have dimensions
-    unifiedDiv.style.minHeight = '50px';
-    unifiedDiv.style.border = '1px solid #e0e0e0';
-    unifiedDiv.style.borderRadius = '5px';
-    unifiedDiv.style.padding = '10px';
-    unifiedDiv.style.backgroundColor = '#fafafa';
-    unifiedDiv.style.margin = '10px 0';
-    unifiedDiv.style.width = '100%';
-    unifiedDiv.style.display = 'block';
-    unifiedDiv.style.position = 'relative';
+    unifiedDiv.classList.add('fw-unified-fields-wrap--active');
     // Add double-click event listener as backup
     const displayDiv = fieldDiv.querySelector('div');
     if (displayDiv) {
@@ -4639,10 +4586,8 @@ function addMultipleTextboxOption(questionId) {
     optionDiv.innerHTML = `
         <h4>Textbox ${optionCount}</h4>
         <label>Label:</label>
-        <input type="text" id="multipleTextboxLabel${questionId}_${optionCount}" placeholder="Label ${optionCount}"><br><br>
-        <label>Name/ID:</label>
-        <input type="text" id="multipleTextboxName${questionId}_${optionCount}" placeholder="Name/ID ${optionCount}"><br><br>
-        <label>Placeholder:</label>
+        <input type="text" id="multipleTextboxLabel${questionId}_${optionCount}" placeholder="Label ${optionCount}">        <label>Name/ID:</label>
+        <input type="text" id="multipleTextboxName${questionId}_${optionCount}" placeholder="Name/ID ${optionCount}">        <label>Placeholder:</label>
         <input type="text" id="multipleTextboxPlaceholder${questionId}_${optionCount}" placeholder="Placeholder ${optionCount}">
         <button type="button" onclick="removeMultipleTextboxOption(${questionId}, ${optionCount})">Remove Textbox</button>
         <hr>
@@ -4790,7 +4735,7 @@ function generateAllQuestionOptions() {
         var questionText= txtEl? txtEl.value:('Question '+qId);
         var selEl= qBlock.querySelector('select');
         var qType= selEl? selEl.value:'text';
-        if(['dropdown','radio','checkbox','numberedDropdown'].indexOf(qType)!==-1){
+        if(['dropdown','checkbox','numberedDropdown'].indexOf(qType)!==-1){
             optionsHTML+='<option value="'+qId+'">Question '+qId+': '+questionText+'</option>';
         }
     });
@@ -5164,10 +5109,8 @@ function addMultipleAmountOption(questionId) {
     amountDiv.innerHTML = `
         <h4>Amount ${amountCount}</h4>
         <label>Label:</label>
-        <input type="text" id="multipleAmountLabel${questionId}_${amountCount}" placeholder="Label ${amountCount}"><br><br>
-        <label>Name/ID:</label>
-        <input type="text" id="multipleAmountName${questionId}_${amountCount}" placeholder="Name/ID ${amountCount}"><br><br>
-        <label>Placeholder:</label>
+        <input type="text" id="multipleAmountLabel${questionId}_${amountCount}" placeholder="Label ${amountCount}">        <label>Name/ID:</label>
+        <input type="text" id="multipleAmountName${questionId}_${amountCount}" placeholder="Name/ID ${amountCount}">        <label>Placeholder:</label>
         <input type="text" id="multipleAmountPlaceholder${questionId}_${amountCount}" placeholder="Placeholder ${amountCount}">
         <button type="button" onclick="removeMultipleAmountOption(${questionId}, ${amountCount})">Remove Amount</button>
         <hr>
@@ -5194,6 +5137,9 @@ function removeMultipleAmountOption(questionId, amountNumber) {
 // ===========  FORM NAME MODULE  =============
 // ============================================
 function addFormNameModule() {
+    if (document.getElementById('formNameInput')) {
+        return;
+    }
     // Check if Form Name module already exists
     if (document.getElementById('formNameContainer')) {
         return;
@@ -5237,6 +5183,9 @@ function addFormNameModule() {
 // ===========  PDF CONFIGURATION MODULE  =====
 // ============================================
 function createPdfConfigurationModule() {
+    if (document.getElementById('formPDFName')) {
+        return;
+    }
     // Check if PDF configuration module already exists
     if (document.getElementById('pdfConfigurationModule')) {
         return;
@@ -5619,7 +5568,6 @@ function updateHiddenContainers(questionId) {
             hiddenLabelDiv.className = `label${labelCount}`;
             hiddenLabelDiv.innerHTML = `
                 <input type="text" id="label${questionId}_${labelCount}" value="${labelText}">
-                <br>
                 <label style="font-size: 0.9em; color: #666;">Node ID: </label>
                 <input type="text" id="labelNodeId${questionId}_${labelCount}" value="${nodeIdText}" style="width: 200px; margin-top: 5px;">
                 <button type="button" onclick="removeTextboxLabel(${questionId}, ${labelCount})" style="margin-top: 5px;">Remove</button>

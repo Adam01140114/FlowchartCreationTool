@@ -381,11 +381,10 @@ hiddenLogicConfigs.length = 0;
 linkedFields.length = 0;
 linkedCheckboxes.length = 0;
 logicScriptBuffer = "";
-// Check if test mode is enabled
-const isTestMode = document.getElementById('testModeCheckbox') && document.getElementById('testModeCheckbox').checked;
 // Get form name from the form name input field
 const formNameEl = document.getElementById('formNameInput');
 const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
+const skipSignInGate = !!(document.getElementById('skipSignInGateCheckbox') && document.getElementById('skipSignInGateCheckbox').checked);
   // Top HTML (head, body, header, etc.)
   let formHTML = [
     "<!DOCTYPE html>",
@@ -475,7 +474,7 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '        }',
     '        ',
     '        /* Desktop Navigation Base Styles */',
-    '        nav {',
+    '        nav.desktop-nav {',
     '            position: absolute;',
     '            left: 50%;',
     '            transform: translateX(-50%);',
@@ -483,19 +482,19 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '            gap: 38px;',
     '            z-index: 2;',
     '        }',
-    '        nav a {',
+    '        nav.desktop-nav a {',
     '            color: #fff;',
     '            text-decoration: none;',
     '            font-weight: 700;',
     '            font-size: 1.18em;',
     '            letter-spacing: 0.02em;',
     '            padding: 2px 8px;',
-    '            transition: color 0.2s, background 0.2s, box-shadow 0.2s;',
+    '            transition: color 0.2s, background 0.2s, box-shadow 0.2s, font-size 0.2s ease, letter-spacing 0.2s ease;',
     '            border-radius: 6px;',
     '            display: flex;',
     '            align-items: center;',
     '        }',
-    '        nav a:hover {',
+    '        nav.desktop-nav a:hover {',
     '            color: #ff7043;',
     '            background: rgba(255,255,255,0.08);',
     '            box-shadow: 0 2px 8px rgba(44,62,80,0.10);',
@@ -860,8 +859,34 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '            color: white;',
     '        }',
     '        ',
-    '        /* Mobile Responsive Breakpoint (@media max-width: 768px) */',
-    '        @media (max-width: 768px) {',
+    '        /* Desktop nav: progressively smaller text/gaps before hamburger layout */',
+    '        @media (max-width: 1240px) {',
+    '            nav.desktop-nav { gap: 28px; }',
+    '            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 1.08em; }',
+    '            .nav-chevron { width: 13px; height: 13px; margin-left: 5px; }',
+    '        }',
+    '        @media (max-width: 1120px) {',
+    '            nav.desktop-nav { gap: 20px; }',
+    '            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 1em; }',
+    '            .dropdown-menu { top: 36px; }',
+    '            .dropdown-menu a { font-size: 1em; padding: 10px 22px; }',
+    '        }',
+    '        @media (max-width: 1040px) {',
+    '            nav.desktop-nav { gap: 14px; }',
+    '            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.92em; letter-spacing: 0.015em; }',
+    '            .nav-chevron { width: 12px; height: 12px; margin-left: 4px; }',
+    '        }',
+    '        @media (max-width: 1000px) {',
+    '            nav.desktop-nav { gap: 9px; }',
+    '            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.85em; letter-spacing: 0.01em; padding: 2px 4px; }',
+    '            .nav-chevron { width: 11px; height: 11px; margin-left: 3px; }',
+    '            .dropdown-menu { min-width: 188px; top: 34px; }',
+    '            .dropdown-menu a { font-size: 0.94em; padding: 9px 18px; }',
+    '        }',
+    '        ',
+    '        /* Mobile layout (hamburger): switches sooner than 768px */',
+    '        /* Mobile Responsive Breakpoint — hamburger earlier */',
+    '        @media (max-width: 1200px) {',
     '            /* Show mobile menu toggle */',
     '            .mobile-menu-toggle {',
     '                display: flex !important;',
@@ -969,10 +994,25 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '                text-align: left !important;',
     '            }',
     '            ',
-    '            /* Address column - remove right padding and border */',
+    '            /* Address column - branding centered in column */',
     '            .pro-footer-col.address-col {',
     '                padding-right: 0 !important;',
     '                border-right: 1.5px solid #2c7a7d !important;',
+    '                align-items: center !important;',
+    '                text-align: center !important;',
+    '            }',
+    '            .pro-footer-col.address-col .pro-footer-logo {',
+    '                display: flex !important;',
+    '                justify-content: center !important;',
+    '                width: 100% !important;',
+    '            }',
+    '            .pro-footer-col.address-col .pro-footer-title {',
+    '                text-align: center !important;',
+    '                width: 100% !important;',
+    '            }',
+    '            .pro-footer-col.address-col .pro-footer-contact {',
+    '                align-items: center !important;',
+    '                text-align: center !important;',
     '            }',
     '            ',
     '            /* Company column - add left padding for spacing */',
@@ -1072,19 +1112,7 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '    </script>',
     "</head>",
     "<body>",
-    // Insert modal HTML right after <body> (only if not in test mode)
-    ...(isTestMode ? [] : [
-      '<div id="loginRequiredModal" class="custom-modal-overlay" style="display:none;">\n' +
-      '  <div class="custom-modal">\n' +
-      '    <h2>Account Required</h2>\n' +
-      '    <p>You must create an account to continue filling out the form.</p>\n' +
-      '    <div class="modal-buttons">\n' +
-      '      <button class="modal-back" id="modalBackBtn" type="button">Back</button>\n' +
-      '      <button class="modal-continue" id="modalContinueBtn" type="button">Continue</button>\n' +
-      '    </div>\n' +
-      '  </div>\n' +
-      '</div>'
-    ]),
+    ...(skipSignInGate ? ['<script>window.__FORM_SKIP_SIGNIN_GATE__=true;</script>'] : []),
     '<script>',
     '/*──────── mirror a dropdown → textbox and checkbox ────────*/',
     'function dropdownMirror(selectEl, baseName){',
@@ -4728,12 +4756,9 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
             );
             if (!pqEl || !paEl) continue;
             const pqVal = pqEl.value.trim();
-            // For text/currency/date questions the select is hidden; grab the hidden value
+            let paValRaw = (paEl.value || "").trim();
             const hiddenAnswerEl = document.getElementById(`hiddenAnswer${questionId}_${rowIndex}`);
-            let paValRaw = paEl.value ? paEl.value.trim() : "";
-            if (paEl.style.display === "none" && hiddenAnswerEl && hiddenAnswerEl.value) {
-              paValRaw = hiddenAnswerEl.value.trim();
-            } else if (!paValRaw && hiddenAnswerEl && hiddenAnswerEl.value) {
+            if (!paValRaw && hiddenAnswerEl && hiddenAnswerEl.value) {
               paValRaw = hiddenAnswerEl.value.trim();
             }
             const paVal = paValRaw.toLowerCase();
@@ -5170,8 +5195,13 @@ if (s > 1){
   }
   formHTML += `
   <script>
+    function formAuthAllowsProgress() {
+      if (typeof window !== 'undefined' && window.__FORM_SKIP_SIGNIN_GATE__) return true;
+      return typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn;
+    }
     // Function to show sign-in required modal
     function showSignInRequiredModal() {
+      if (typeof window !== 'undefined' && window.__FORM_SKIP_SIGNIN_GATE__) return;
       const modal = document.getElementById('signinRequiredModal');
       if (modal) {
         modal.style.display = 'flex';
@@ -5194,6 +5224,10 @@ if (s > 1){
 
     // Function to check if user is logged in before navigation
     function checkAuthBeforeNavigate(callback) {
+      if (typeof window !== 'undefined' && window.__FORM_SKIP_SIGNIN_GATE__) {
+        if (callback) callback();
+        return;
+      }
       // Check if isUserLoggedIn is defined (Firebase auth might not be loaded yet)
       if (typeof isUserLoggedIn === 'undefined') {
         // Wait a bit for Firebase auth to initialize
@@ -5852,7 +5886,7 @@ if (s > 1){
         function goToNextSection() {
 
           // Check authentication before moving to next section
-          if (typeof isUserLoggedIn === 'undefined' || !isUserLoggedIn) {
+          if (!formAuthAllowsProgress()) {
 
             if (typeof showSignInRequiredModal === 'function') {
               showSignInRequiredModal();
@@ -5973,7 +6007,7 @@ if (s > 1){
 
           if (direction > 0) {
             // Check authentication before moving forward
-            if (typeof isUserLoggedIn === 'undefined' || !isUserLoggedIn) {
+            if (!formAuthAllowsProgress()) {
 
               if (typeof showSignInRequiredModal === 'function') {
                 showSignInRequiredModal();
@@ -8928,64 +8962,13 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     return namePart;
 }
 `;
-  // 1) Firebase config and check (only if not in test mode)
-  if (!isTestMode) {
-    formHTML += `
-      if (typeof isUserLoggedIn === 'undefined') { var isUserLoggedIn = false; }
-      const firebaseConfig = {
-          apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
-          authDomain: "formwiz-3f4fd.firebaseapp.com",
-          projectId: "formwiz-3f4fd",
-          storageBucket: "formwiz-3f4fd.firebasestorage.app",
-          messagingSenderId: "404259212529",
-          appId: "1:404259212529:web:15a33bce82383b21cfed50",
-          measurementId: "G-P07YEN0HPD"
-      };
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-      const urlParams = new URLSearchParams(window.location.search);
-      const formId = urlParams.get("formId") || window.formId || 'default';
-      if (typeof userId === 'undefined') { var userId = null; }
-      firebase.auth().onAuthStateChanged(async function(user){
-          if(user){ 
-              isUserLoggedIn = true;
-              userId=user.uid;
-              // Fetch user data and display welcome message
-              try {
-                  const userDoc = await db.collection('users').doc(user.uid).get();
-                  if(userDoc.exists) {
-                      const userData = userDoc.data();
-                      document.getElementById('user_firstname').value = userData.firstName || '';
-                      document.getElementById('user_lastname').value = userData.lastName || '';
-                      document.getElementById('user_email').value = userData.email || '';
-                      document.getElementById('user_phone').value = userData.phone || '';
-                      // Update full name and address fields with 2-second delay to ensure DOM is ready
-                      setTimeout(() => {
-                      updateUserFullName();
-                      updateUserAddressFields();
-                      }, 2000);
-                      document.getElementById('user_street').value = userData.address?.street || '';
-                      document.getElementById('user_city').value = userData.address?.city || '';
-                      document.getElementById('user_state').value = userData.address?.state || '';
-                      document.getElementById('user_zip').value = userData.address?.zip || '';
-                  }
-              } catch(error) {
-              }
-          } else {
-              isUserLoggedIn = false;
-              // Do NOT redirect. Just let the user fill the form.
-          }
-      });
-    `;
-  } else {
-    // In test mode, set user as logged in by default
-    formHTML += `
+  // Form runtime: no duplicate Firebase init here (header handles auth); default logged-in for form gating
+  formHTML += `
       if (typeof isUserLoggedIn === 'undefined') { var isUserLoggedIn = true; }
       if (typeof userId === 'undefined') { var userId = null; }
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
     `;
-  }
   // Collect linked fields data from GUI
 
   if (window.linkedFieldsConfig && window.linkedFieldsConfig.length > 0) {
@@ -13466,7 +13449,7 @@ function showThankYouMessage (event) {
         event.preventDefault();
     }
     // Check authentication before submitting form
-    if (typeof isUserLoggedIn === 'undefined' || !isUserLoggedIn) {
+    if (!formAuthAllowsProgress()) {
         if (typeof showSignInRequiredModal === 'function') {
             showSignInRequiredModal();
         }
@@ -14993,11 +14976,17 @@ document.addEventListener('DOMContentLoaded', function() {
 if (typeof handleNext === 'function') {
   var originalHandleNext = handleNext;
   window.handleNext = function(currentSection) {
-    if (!isUserLoggedIn) {
+    var blockNav = false;
+    if (typeof formAuthAllowsProgress === 'function') {
+      blockNav = !formAuthAllowsProgress();
+    } else {
+      blockNav = !isUserLoggedIn;
+    }
+    if (blockNav) {
       var loginModal = document.getElementById('loginRequiredModal');
       if (loginModal && typeof showLoginRequiredModal === 'function') {
-      showLoginRequiredModal();
-      return;
+        showLoginRequiredModal();
+        return;
       }
     }
     originalHandleNext(currentSection);
@@ -18747,8 +18736,12 @@ document.addEventListener('DOMContentLoaded', function() {
     return urlParams.get(name);
   }
   </script>`;
-  // Close out the HTML document
-  formHTML += `
+  // Close out the HTML document (optional sign-in modal when not exporting with skip gate)
+  formHTML += skipSignInGate
+    ? `</body>
+</html>
+`
+    : `
   <!-- Sign-in Required Modal -->
   <div id="signinRequiredModal" class="signin-modal-overlay">
     <div class="signin-modal">

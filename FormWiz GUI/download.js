@@ -66,6 +66,13 @@ function generateAndDownloadForm() {
         alert('Error generating form: ' + error.message);
     }
 }
+function applyPreviewToFrames(formHTML) {
+    const modalFrame = document.getElementById('previewFrame');
+    const inlineFrame = document.getElementById('previewFrameInline');
+    if (modalFrame) modalFrame.srcdoc = formHTML;
+    if (inlineFrame) inlineFrame.srcdoc = formHTML;
+}
+
 function showPreview() {
 
     // Check if the getFormHTML function exists
@@ -124,7 +131,7 @@ function showPreview() {
         return;
     }
 
-    previewFrame.srcdoc = formHTML;
+    applyPreviewToFrames(formHTML);
     previewModal.style.display = 'flex';
     previewModal.style.zIndex = '9999';
 
@@ -191,6 +198,17 @@ function loadFormData(formData) {
             stripePriceIdInput.value = formData.stripePriceId;
         }
     }
+    const pdfContainerEl = document.getElementById('pdfContainer');
+    if (pdfContainerEl) {
+        const hasPdfSettings =
+            !!formData.defaultPDFName ||
+            !!formData.pdfOutputName ||
+            !!formData.stripePriceId ||
+            (formData.additionalPDFs && formData.additionalPDFs.length > 0);
+        if (hasPdfSettings) {
+            pdfContainerEl.removeAttribute('hidden');
+        }
+    }
     // 3.1) Load additional PDFs if present
     if (formData.additionalPDFs && formData.additionalPDFs.length > 0) {
         // Clear existing additional PDF inputs first (except the main one)
@@ -243,7 +261,8 @@ function loadFormData(formData) {
                 }
                 const questionTypeSelect = questionBlock.querySelector(`#questionType${question.questionId}`);
                 if (questionTypeSelect) {
-                    questionTypeSelect.value = question.type;
+                    const migratedType = question.type === 'radio' ? 'dropdown' : question.type;
+                    questionTypeSelect.value = migratedType;
                     toggleOptions(question.questionId);
                 }
                 // -- Restore subtitle if present --
@@ -297,7 +316,7 @@ function loadFormData(formData) {
                         }
                         regularOptions.forEach((optData, idx) => {
                             const optionDiv = document.createElement('div');
-                            optionDiv.className = `option${idx + 1}`;
+                            optionDiv.className = `option${idx + 1} fw-option-card`;
                             optionDiv.innerHTML = `
                                 <label>Option ${idx + 1} Text:</label>
                                 <input type="text" id="checkboxOptionText${question.questionId}_${idx + 1}"
@@ -471,14 +490,14 @@ function loadFormData(formData) {
                         }
                     }
                 }
-                else if (question.type === 'dropdown') {
-                    // Rebuild dropdown options
+                else if (question.type === 'dropdown' || question.type === 'radio') {
+                    // Rebuild dropdown options (legacy JSON may use type "radio" for Yes/No)
                     const dropdownOptionsDiv = questionBlock.querySelector(`#dropdownOptions${question.questionId}`);
                     if (dropdownOptionsDiv) {
                         dropdownOptionsDiv.innerHTML = '';
                         (question.options || []).forEach((optText, idx) => {
                             const optionDiv = document.createElement('div');
-                            optionDiv.className = `option${idx + 1}`;
+                            optionDiv.className = `option${idx + 1} fw-option-card`;
                             const optionId = `option${question.questionId}_${idx + 1}`;
                             optionDiv.innerHTML = `
                                 <input type="text" id="${optionId}" value="${optText}" placeholder="Option ${idx + 1}">
@@ -494,6 +513,9 @@ function loadFormData(formData) {
                                 updateJumpOptions(question.questionId);
                             });
                         });
+                        if (dropdownOptionsDiv.children.length === 0 && typeof ensureDropdownDefaultYesNo === 'function') {
+                            ensureDropdownDefaultYesNo(question.questionId);
+                        }
                         updateJumpOptions(question.questionId);
                         // Update checklist logic dropdowns after dropdown options are loaded
                         if (typeof updateAllChecklistLogicDropdowns === 'function') {
@@ -912,13 +934,13 @@ function loadFormData(formData) {
                                         // Add dropdown options
                                         if (field.options && field.options.length > 0) {
 
-                                            if (typeof addDropdownOption !== 'function') {
+                                            if (typeof addUnifiedDropdownOption !== 'function') {
 
                                             } else {
                                                 field.options.forEach((option, optionIndex) => {
 
                                                     // Add the dropdown option (this will create option with number = current count + 1)
-                                                    addDropdownOption(question.questionId, fieldOrder);
+                                                    addUnifiedDropdownOption(question.questionId, fieldOrder);
                                                     // Get the actual option number that was just created
                                                     // The option number is based on the container's children length
                                                     const optionsContainer = document.getElementById('dropdownOptions' + question.questionId + '_' + fieldOrder);
@@ -1772,11 +1794,11 @@ function loadFormData(formData) {
 
                                         field.options.forEach((option, optionIndex) => {
 
-                                        if (typeof addDropdownOption !== 'function') {
+                                        if (typeof addUnifiedDropdownOption !== 'function') {
 
                                                 return;
                                             }
-                                        addDropdownOption(question.questionId, fieldOrder);
+                                        addUnifiedDropdownOption(question.questionId, fieldOrder);
                                             // Set the option values
                                             const optionTextEl = document.getElementById('dropdownOptionText' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
                                             const optionNodeIdEl = document.getElementById('dropdownOptionNodeId' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
@@ -2324,7 +2346,6 @@ function loadFormData(formData) {
                 else if (
                     // Text-like question types
                     question.type === 'text' ||
-                    question.type === 'radio' ||
                     question.type === 'money' ||
                     question.type === 'currency' ||
                     question.type === 'date' ||
@@ -2375,19 +2396,11 @@ function loadFormData(formData) {
                         addLogicCondition(question.questionId);
                         const rowId = idx + 1;
                         const pq = questionBlock.querySelector(`#prevQuestion${question.questionId}_${rowId}`);
-                        const pa = questionBlock.querySelector(`#prevAnswer${question.questionId}_${rowId}`);
-                        if (pq) pq.value = cond.prevQuestion;
+                        if (pq) pq.value = String(cond.prevQuestion);
                         updateLogicAnswersForRow(question.questionId, rowId);
-                        // Handle text questions with hidden inputs
-                        if (pa && pa.style.display === 'none') {
-                            // For text questions, set the hidden input value
-                            const hiddenInput = document.getElementById(`hiddenAnswer${question.questionId}_${rowId}`);
-                            if (hiddenInput) {
-                                hiddenInput.value = cond.prevAnswer || "Any Text";
-                            }
-                        } else if (pa) {
-                            // For other question types, set the select value
-                            pa.value = cond.prevAnswer;
+                        const pa = questionBlock.querySelector(`#prevAnswer${question.questionId}_${rowId}`);
+                        if (pa) {
+                            pa.value = cond.prevAnswer != null && cond.prevAnswer !== undefined ? cond.prevAnswer : '';
                         }
                     });
                 }
@@ -2412,10 +2425,8 @@ function loadFormData(formData) {
                         // Update options for the dropdown based on question type (skip for textbox and date questions)
                         const isTextboxQuestion = question.type === 'text' || question.type === 'bigParagraph' || question.type === 'money' || question.type === 'currency' || question.type === 'date' || question.type === 'dateRange';
                         if (!isTextboxQuestion) {
-                            if (question.type === 'dropdown') {
+                            if (question.type === 'dropdown' || question.type === 'radio') {
                                 updateJumpOptions(question.questionId, conditionId);
-                            } else if (question.type === 'radio') {
-                                updateJumpOptionsForRadio(question.questionId, conditionId);
                             } else if (question.type === 'checkbox') {
                                 updateJumpOptionsForCheckbox(question.questionId, conditionId);
                             } else if (question.type === 'numberedDropdown') {
@@ -3016,16 +3027,10 @@ function exportForm() {
                 logicRows.forEach((row, idx) => {
                     const rowIndex = idx + 1;
                     const pqVal = row.querySelector(`#prevQuestion${questionId}_${rowIndex}`)?.value.trim() || "";
-                    // Check if this is a text question (answer select is hidden)
-                    const answerSelect = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`);
+                    const answerEl = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`);
                     let paVal = "";
-                    if (answerSelect && answerSelect.style.display === 'none') {
-                        // For text questions, get the value from the hidden input
-                        const hiddenInput = document.getElementById(`hiddenAnswer${questionId}_${rowIndex}`);
-                        paVal = hiddenInput ? hiddenInput.value.trim() : "Any Text";
-                    } else {
-                        // For other question types, get the value from the select dropdown
-                        paVal = answerSelect?.value.trim() || "";
+                    if (answerEl && (answerEl.tagName === 'SELECT' || answerEl.tagName === 'INPUT')) {
+                        paVal = (answerEl.value || '').trim();
                     }
                     if (pqVal && paVal) {
                         conditionsArray.push({ prevQuestion: pqVal, prevAnswer: paVal });
@@ -4693,7 +4698,6 @@ function exportForm() {
             }
             else if (
                 questionType === 'text' ||
-                questionType === 'radio' ||
                 questionType === 'money' ||
                 questionType === 'currency' ||
                 questionType === 'date' ||
@@ -5211,6 +5215,12 @@ function updateFormAfterImport() {
     if (typeof updateAllPdfLogicDropdowns === 'function') {
         // Run this with a slight delay to ensure DOM is ready
         setTimeout(updateAllPdfLogicDropdowns, 100);
+    }
+    if (typeof updateGlobalQuestionLabels === 'function') {
+        updateGlobalQuestionLabels();
+    }
+    if (typeof window.fwSchedulePreviewSync === 'function') {
+        window.fwSchedulePreviewSync();
     }
 }
 function updateConditionAnswers(hiddenFieldId, condId) {

@@ -1,0 +1,1515 @@
+/* FormWiz GUI — layout + theme aligned with Request/form-builder (intake-inspired) */
+:root {
+  --isd-header: #213d7d;
+  --isd-active: #4a6cb1;
+  --bg-page: #f0f2f5;
+  --bg-card: #ffffff;
+  --bg-sidebar: #f8f8f8;
+  --border: #e0e0e0;
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a5568;
+  --radius: 8px;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --font-ui: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+html {
+  height: 100%;
+}
+
+body.gui-app {
+  margin: 0;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+body.gui-app * {
+  transition: none;
+}
+
+/* Banner (matches intake isd-header) */
+body.gui-app .isd-header {
+  background: var(--isd-header);
+  color: #fff;
+  padding: 12px 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+body.gui-app .isd-header__brand {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+
+body.gui-app .isd-header__titles {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+body.gui-app .isd-header .isd-logo {
+  height: 64px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+body.gui-app .isd-header h1 {
+  margin: 0 0 2px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+body.gui-app .isd-header .sub {
+  margin: 0;
+  font-size: 15px;
+  opacity: 0.92;
+}
+
+/* Secondary nav row (override form.css `nav { position: absolute; ... }`) */
+body.gui-app nav.nav-bar {
+  position: static;
+  left: auto;
+  transform: none;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  justify-content: flex-start;
+}
+
+body.gui-app nav.nav-bar .fw-nav-toolbar {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  width: 100%;
+}
+
+body.gui-app .fw-nav-skip-signin {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 6px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+body.gui-app .fw-nav-skip-signin input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--isd-header);
+}
+
+body.gui-app .nav-bar a {
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+body.gui-app .nav-bar a:hover {
+  background: var(--bg-sidebar);
+  border-color: var(--isd-active);
+}
+
+body.gui-app .nav-bar .nav-spacer {
+  flex: 1;
+}
+
+/* Main split layout */
+body.gui-app .gui-main-content {
+  flex: 1;
+  padding: 20px 16px 40px;
+  max-width: 1680px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+body.gui-app .fw-split {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+}
+
+body.gui-app .fw-editor-pane {
+  flex: 1 1 50%;
+  min-width: 280px;
+  max-width: 88%;
+  box-sizing: border-box;
+  /* Inset from divider + outer edge so cards are not flush against the resizer */
+  padding: 0 28px 0 12px;
+}
+
+/* Center the builder stack within the left column (air on both sides when wide) */
+body.gui-app .fw-editor-pane > .fw-card {
+  max-width: 920px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+body.gui-app .fw-split-resizer {
+  flex: 0 0 12px;
+  width: 12px;
+  cursor: col-resize;
+  align-self: stretch;
+  min-height: 160px;
+  border-radius: 6px;
+  touch-action: none;
+  background: linear-gradient(
+    90deg,
+    rgba(241, 245, 249, 0.6) 0%,
+    rgba(203, 213, 225, 0.75) 42%,
+    rgba(203, 213, 225, 0.75) 58%,
+    rgba(241, 245, 249, 0.6) 100%
+  );
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.gui-app .fw-split-resizer:hover {
+  background: rgba(74, 108, 177, 0.35);
+}
+
+body.gui-app .fw-split-resizer.is-tracking {
+  background: rgba(74, 108, 177, 0.55);
+  box-shadow: 0 0 0 1px rgba(74, 108, 177, 0.4);
+}
+
+body.gui-app.fw-split-resizer-active {
+  cursor: col-resize !important;
+  user-select: none;
+}
+
+body.gui-app.fw-split-resizer-active button,
+body.gui-app.fw-split-resizer-active a {
+  cursor: col-resize !important;
+}
+
+@media (max-width: 1100px) {
+  body.gui-app .fw-split {
+    flex-direction: column;
+  }
+
+  body.gui-app .fw-split-resizer {
+    display: none;
+  }
+
+  body.gui-app .fw-editor-pane,
+  body.gui-app .fw-preview-pane {
+    flex: 1 1 auto !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  body.gui-app .fw-preview-pane {
+    position: static !important;
+    max-height: none !important;
+  }
+}
+
+body.gui-app .fw-preview-pane {
+  flex: 1 1 50%;
+  min-width: 260px;
+  position: sticky;
+  top: 12px;
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 0 8px 0 28px;
+}
+
+body.gui-app .fw-preview-pane .fw-preview-card-inner {
+  max-width: min(1400px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin-bottom: 0;
+}
+
+/* White cards */
+body.gui-app .fw-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+
+body.gui-app .fw-card h2,
+body.gui-app .fw-card h3 {
+  margin-top: 0;
+}
+
+body.gui-app .forms-accent-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--isd-header), var(--isd-active));
+  margin-bottom: 14px;
+}
+
+body.gui-app .fw-preview-head h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+body.gui-app .fw-preview-head .fw-hint {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+body.gui-app .fw-preview-placeholder {
+  min-height: 120px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: #fafbfc;
+}
+
+body.gui-app kbd {
+  font-family: inherit;
+  font-size: 0.9em;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #f4f6f8;
+}
+
+/* ---------- Buttons: one look (matches former .fw-toolbar; overrides form.css) ---------- */
+body.gui-app button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  line-height: 1.2;
+  border-radius: var(--radius);
+  background: var(--isd-active);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: none;
+  transform: none;
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+body.gui-app button:hover {
+  filter: brightness(0.95);
+  transform: none;
+}
+
+body.gui-app button:active {
+  transform: scale(0.98);
+}
+
+body.gui-app .fw-btn--danger {
+  background: #c53030 !important;
+  color: #fff !important;
+}
+
+body.gui-app .fw-btn--danger:hover {
+  filter: brightness(0.92);
+}
+
+body.gui-app .fw-btn--muted {
+  background: #6c757d !important;
+  color: #fff !important;
+}
+
+body.gui-app .fw-btn--teal {
+  background: #17a2b8 !important;
+  color: #fff !important;
+}
+
+body.gui-app .fw-btn--success {
+  background: #28a745 !important;
+  color: #fff !important;
+}
+
+body.gui-app .fw-btn--block {
+  display: flex;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+body.gui-app #confirmPasteJsonBtn {
+  font-size: 1.05rem;
+  padding: 12px 16px;
+}
+
+@media (max-width: 768px) {
+  body.gui-app button {
+    max-width: none;
+  }
+}
+
+body.gui-app .fw-btn--flex {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Toolbar: buttons in a row */
+body.gui-app .fw-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 12px 0;
+}
+
+/* PDF fields (Form Settings modal) */
+body.gui-app #formSettingsModal #pdfContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  margin-top: 8px;
+}
+
+body.gui-app #pdfContainer:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+/* PDF / optional rows */
+body.gui-app #pdfContainer .pdf-input-group {
+  text-align: left;
+  align-items: stretch;
+  max-width: 100%;
+}
+
+body.gui-app #pdfContainer .pdf-input-group button {
+  align-self: flex-start;
+}
+
+body.gui-app #pdfContainer .pdf-input-group input {
+  width: 100%;
+  max-width: 520px;
+  margin-left: 0;
+}
+
+body.gui-app .fw-intro .container,
+body.gui-app .fw-builder-card .container {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+body.gui-app .fw-card.fw-intro {
+  text-align: left;
+}
+
+body.gui-app .fw-card.fw-intro .pdf-input-group label {
+  text-align: left;
+}
+
+body.gui-app .fw-intro .container:hover,
+body.gui-app .fw-builder-card .container:hover {
+  box-shadow: none;
+}
+
+/* Form builder area: left-align blocks inside card */
+body.gui-app #formBuilder {
+  text-align: left;
+}
+
+body.gui-app #formBuilder .section-block,
+body.gui-app #formBuilder .question-block {
+  text-align: left;
+}
+
+body.gui-app #formBuilder .question-block label,
+body.gui-app #formBuilder .question-block input,
+body.gui-app #formBuilder .question-block select {
+  text-align: left;
+}
+
+body.gui-app footer {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 16px 20px;
+  background: var(--isd-header);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+}
+
+/* Modals unchanged functionally — subtle polish */
+body.gui-app .modal-content {
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+body.gui-app .fw-form-settings-content {
+  max-width: 560px;
+  width: 92vw;
+  text-align: left;
+  align-items: stretch !important;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+body.gui-app .fw-form-settings-title {
+  margin: 0 0 16px;
+  font-size: 1.35rem;
+  color: var(--isd-header);
+}
+
+body.gui-app .fw-settings-section {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+body.gui-app .fw-settings-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+body.gui-app .fw-settings-heading {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  color: var(--isd-header);
+}
+
+body.gui-app .fw-settings-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
+
+body.gui-app .fw-settings-input {
+  width: 100%;
+  max-width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+}
+
+body.gui-app .fw-settings-hint {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+body.gui-app #formBuilder .dropdown-options,
+body.gui-app #formBuilder .checkbox-options {
+  margin-top: 8px;
+}
+
+body.gui-app #formBuilder .dropdown-options > div[class^="option"],
+body.gui-app #formBuilder .checkbox-options > div[class^="option"] {
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: #fafbfc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+/* ---------- Single “Add Section” row ---------- */
+body.gui-app .fw-add-section-row {
+  text-align: center;
+}
+
+body.gui-app .fw-add-section-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 0;
+}
+
+body.gui-app .fw-btn-primary {
+  background: var(--isd-active) !important;
+  color: #fff !important;
+  border: 1px solid transparent !important;
+}
+
+body.gui-app .fw-btn-primary:hover {
+  filter: brightness(0.95);
+}
+
+body.gui-app .fw-btn-secondary {
+  background: #fff !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+body.gui-app .fw-btn-secondary:hover {
+  background: var(--bg-sidebar) !important;
+  border-color: var(--isd-active) !important;
+}
+
+/* ---------- Live preview iframe ---------- */
+body.gui-app .fw-preview-frame-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #e8ecf1;
+  flex: 1 1 auto;
+  min-height: min(62vh, 720px);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+body.gui-app .fw-preview-iframe {
+  display: block;
+  width: 100%;
+  min-height: min(88vh, 1200px);
+  height: 88vh;
+  max-height: 1400px;
+  border: none;
+  background: #fff;
+}
+
+@media (max-width: 1100px) {
+  body.gui-app .fw-preview-iframe {
+    min-height: 520px;
+    height: 68vh;
+  }
+}
+
+/* ---------- Form builder: sections & questions (major density + alignment) ---------- */
+body.gui-app .fw-form-builder-root,
+body.gui-app #formBuilder {
+  max-width: 100%;
+}
+
+body.gui-app #formBuilder .section-block {
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+body.gui-app #formBuilder .fw-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+body.gui-app #formBuilder .fw-section-head h2 {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-size: 1.15rem;
+  color: var(--isd-header);
+}
+
+body.gui-app #formBuilder .fw-section-body > label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 8px 0 4px;
+}
+
+body.gui-app #formBuilder .fw-section-body > input[type="text"] {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 0 10px 0 !important;
+}
+
+body.gui-app #formBuilder .fw-section-body.fw-section-body--collapsed {
+  display: none;
+}
+
+body.gui-app #formBuilder .section-block hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 14px 0;
+}
+
+body.gui-app #formBuilder .section-block .fw-section-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+body.gui-app #formBuilder .section-block .fw-section-add-question {
+  max-width: 420px;
+  width: 100%;
+}
+
+body.gui-app #formBuilder .section-block .fw-section-actions-wrap {
+  width: 100%;
+  margin-top: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+body.gui-app #formBuilder .section-block .fw-section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+}
+
+body.gui-app #formBuilder .section-block .fw-section-actions-close {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+body.gui-app #formBuilder .fw-section-close-btn {
+  min-width: 120px;
+}
+
+body.gui-app #formBuilder .section-block:has(.fw-section-body.fw-section-body--collapsed) .fw-section-actions-close {
+  display: none;
+}
+
+body.gui-app #formBuilder .question-block {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+
+body.gui-app #formBuilder .linking-options {
+  padding: 10px 12px;
+  margin: 10px 0;
+  background: #fafbfc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+body.gui-app #formBuilder .linking-options label:not(.fw-toggle-line) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 8px;
+}
+
+body.gui-app #formBuilder .question-header {
+  justify-content: flex-start;
+  text-align: left;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+body.gui-app #formBuilder .question-block label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #334155;
+}
+
+body.gui-app #formBuilder .fw-question-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex: 0 1 auto;
+  min-width: 0;
+  line-height: 1.3;
+  text-align: center;
+}
+
+body.gui-app #formBuilder .fw-question-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+body.gui-app #formBuilder .fw-question-collapse-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #f8fafc;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+body.gui-app #formBuilder .fw-question-collapse-btn:hover {
+  background: #eef2f7;
+  color: var(--text-primary);
+}
+
+body.gui-app #formBuilder .fw-question-collapse-btn .fw-chevron {
+  transition: transform 0.15s ease;
+}
+
+body.gui-app #formBuilder .fw-question-collapse-btn.is-collapsed .fw-chevron {
+  transform: rotate(-90deg);
+}
+
+body.gui-app #formBuilder .fw-question-body.fw-question-body--collapsed {
+  display: none;
+}
+
+body.gui-app #formBuilder .question-block:has(.fw-question-body.fw-question-body--collapsed) .fw-question-actions-close {
+  display: none;
+}
+
+/* Dropdown / checkbox option groups */
+body.gui-app #formBuilder .fw-options-panel {
+  margin: 12px 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fafbfc;
+  overflow: hidden;
+}
+
+body.gui-app #formBuilder .fw-options-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: linear-gradient(165deg, #f1f5f9 0%, #e8eef5 100%);
+  border-bottom: 1px solid var(--border);
+}
+
+body.gui-app #formBuilder .fw-options-panel-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+body.gui-app #formBuilder .fw-options-panel-body {
+  padding: 12px 12px 14px;
+}
+
+body.gui-app #formBuilder .fw-options-panel-body.fw-options-panel-body--collapsed {
+  display: none;
+}
+
+body.gui-app #formBuilder .fw-options-list {
+  margin-bottom: 10px;
+}
+
+body.gui-app #formBuilder .fw-option-card {
+  margin-bottom: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+body.gui-app #formBuilder .fw-option-card:last-child {
+  margin-bottom: 0;
+}
+
+body.gui-app #formBuilder .dropdown-options .fw-option-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+body.gui-app #formBuilder .dropdown-options .fw-option-card > input[type="text"] {
+  flex: 1 1 160px;
+  min-width: 0;
+  margin: 0 !important;
+  max-width: none !important;
+}
+
+body.gui-app #formBuilder .dropdown-options .fw-option-card > button {
+  flex-shrink: 0;
+  margin: 0 !important;
+}
+
+/* ----- Add-on panels (same shell as Options: bordered + header band) ----- */
+body.gui-app #formBuilder .fw-addon-panel {
+  margin: 12px 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fafbfc;
+  overflow: hidden;
+}
+
+/* Field builder sections (numbered dropdown / multiple textboxes) */
+body.gui-app #formBuilder .fw-field-section {
+  margin: 12px 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fafbfc;
+  overflow: hidden;
+}
+
+body.gui-app #formBuilder .fw-field-section > .fw-nested-block {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(203, 213, 225, 0.75);
+}
+
+body.gui-app #formBuilder .fw-field-section > .fw-field-toolbar {
+  border-bottom: none;
+}
+
+body.gui-app #formBuilder .fw-field-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 14px;
+  background: #fff;
+  border-top: 1px solid rgba(203, 213, 225, 0.75);
+}
+
+body.gui-app #formBuilder .fw-field-toolbar button {
+  margin: 0 !important;
+}
+
+/* Nested content blocks inside toggles / questions */
+body.gui-app #formBuilder .fw-nested-block {
+  padding: 12px 14px;
+  margin: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+body.gui-app #formBuilder .fw-question-toggles .fw-nested-block {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+body.gui-app #formBuilder .fw-unified-fields-wrap {
+  margin-top: 10px;
+}
+
+body.gui-app #formBuilder .fw-unified-fields-wrap.fw-unified-fields-wrap--active {
+  min-height: 50px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fafafa;
+  margin: 10px 0;
+  width: 100%;
+  display: block;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Top-of-form checklist (Add Checklist) */
+body.gui-app #formBuilder #checklistContainer.fw-checklist-shell {
+  margin-bottom: 16px;
+}
+
+body.gui-app #formBuilder .fw-checklist-items .checklist-item.fw-addon-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+body.gui-app #formBuilder .fw-checklist-items .checklist-item.fw-addon-card input[type='text'] {
+  flex: 1 1 200px;
+  min-width: 0;
+  margin-right: 0;
+}
+
+body.gui-app #formBuilder .fw-mini-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+body.gui-app #formBuilder .fw-field-toolbar.fw-field-toolbar--flush {
+  border-top: none;
+}
+
+body.gui-app #formBuilder .fw-unified-field-meta {
+  font-size: 13px;
+  color: #64748b;
+  text-align: center;
+  margin: 12px 0 4px;
+}
+
+body.gui-app #formBuilder .fw-unified-dropdown-card .fw-options-panel-body > .fw-options-panel {
+  margin: 12px 0;
+}
+
+body.gui-app #formBuilder .fw-unified-conditional-panel > .fw-options-panel-head {
+  background: linear-gradient(165deg, #eff6ff 0%, #e0edfb 100%);
+}
+
+body.gui-app #formBuilder .fw-trigger-fields-panel {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+body.gui-app #formBuilder .fw-trigger-sequence > .fw-options-panel-head {
+  background: linear-gradient(165deg, #e8f5e9 0%, #d8eedb 100%);
+  border-bottom: 1px solid rgba(76, 175, 80, 0.35);
+}
+
+body.gui-app #formBuilder .fw-addon-card.fw-trigger-field {
+  box-shadow: inset 4px 0 0 0 var(--fw-trigger-accent, #94a3b8), 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+body.gui-app #formBuilder .fw-trigger-field--label {
+  --fw-trigger-accent: #007bff;
+}
+
+body.gui-app #formBuilder .fw-trigger-field--checkbox {
+  --fw-trigger-accent: #9c27b0;
+}
+
+body.gui-app #formBuilder .fw-trigger-field--dropdown {
+  --fw-trigger-accent: #17a2b8;
+}
+
+body.gui-app #formBuilder .fw-trigger-field--date {
+  --fw-trigger-accent: #ff9800;
+}
+
+body.gui-app #formBuilder .fw-trigger-field--location {
+  --fw-trigger-accent: #28a745;
+}
+
+body.gui-app #formBuilder .fw-trigger-field--pdf {
+  --fw-trigger-accent: #dc3545;
+}
+
+/* Rows created by “Add OR condition”, “Add jump”, hidden logic, etc. */
+body.gui-app #formBuilder .fw-addon-card {
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+body.gui-app #formBuilder .fw-addon-card:last-child {
+  margin-bottom: 0;
+}
+
+body.gui-app #formBuilder .fw-addon-card hr {
+  display: none;
+}
+
+body.gui-app #formBuilder .jump-condition.fw-addon-card label,
+body.gui-app #formBuilder .logic-condition-row.fw-addon-card label,
+body.gui-app #formBuilder .pdf-logic-condition-row.fw-addon-card label {
+  display: inline-block;
+  margin-top: 6px;
+}
+
+/* PDF logic detail groups */
+body.gui-app #formBuilder .pdf-detail-group {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin: 12px 0;
+  background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+body.gui-app #formBuilder .pdf-detail-group h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--isd-header);
+}
+
+body.gui-app #formBuilder .pdf-detail-group__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(203, 213, 225, 0.75);
+}
+
+body.gui-app #formBuilder .extra-pdf-inputs {
+  border: 1px dashed rgba(40, 167, 69, 0.55) !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  margin: 10px 0 !important;
+  background: #f8fff9 !important;
+}
+
+/* Logic / jump stacks */
+body.gui-app #formBuilder .fw-logic-stack {
+  margin-top: 8px;
+}
+
+body.gui-app #formBuilder .fw-logic-stack .fw-logic-intro {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+body.gui-app #formBuilder .fw-logic-rows {
+  margin-bottom: 10px;
+}
+
+body.gui-app #formBuilder .fw-logic-actions {
+  margin-top: 4px;
+}
+
+body.gui-app #formBuilder .logic-condition-row .fw-logic-prev-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 6px 0 4px;
+}
+
+body.gui-app #formBuilder .logic-condition-row .fw-logic-answer-slot {
+  margin-top: 8px;
+}
+
+body.gui-app #formBuilder .logic-condition-row .fw-logic-answer-hint {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+/* Text, number, email — full width, left aligned (override form.css centering) */
+body.gui-app #formBuilder input[type="text"],
+body.gui-app #formBuilder input[type="email"],
+body.gui-app #formBuilder input[type="number"],
+body.gui-app #formBuilder input[type="tel"],
+body.gui-app #formBuilder textarea {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  margin: 4px 0 10px 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 2px solid #c5cad4;
+  border-radius: var(--radius);
+  box-sizing: border-box;
+  text-align: left;
+  box-shadow: none;
+}
+
+body.gui-app #formBuilder input:focus,
+body.gui-app #formBuilder textarea:focus,
+body.gui-app #formBuilder select:focus {
+  outline: none;
+  border-color: var(--isd-active);
+  box-shadow: 0 0 0 3px rgba(74, 108, 177, 0.25);
+}
+
+body.gui-app #formBuilder select {
+  display: block;
+  width: 100% !important;
+  max-width: 520px;
+  margin: 4px 0 10px 0 !important;
+  padding: 10px 12px;
+  font-size: 15px;
+  text-align: left;
+  border: 2px solid #c5cad4;
+  border-radius: var(--radius);
+}
+
+/* ----- Option toggles panel (grid: each row = label.fw-toggle-line) ----- */
+body.gui-app #formBuilder .fw-question-toggles {
+  display: flex;
+  flex-direction: column;
+  margin: 12px 0 16px;
+  padding: 0;
+  background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 55%, #eef2f7 100%);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  overflow: hidden;
+}
+
+body.gui-app #formBuilder .fw-question-toggles label.fw-toggle-line,
+body.gui-app #formBuilder .question-block label.fw-toggle-line {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 10px 14px 10px 14px;
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.01em;
+  color: #334155;
+  border-bottom: 1px solid rgba(203, 213, 225, 0.65);
+  line-height: 1.35;
+  cursor: pointer;
+  user-select: none;
+}
+
+body.gui-app #formBuilder .fw-question-toggles label.fw-toggle-line .fw-toggle-line__text,
+body.gui-app #formBuilder .question-block label.fw-toggle-line .fw-toggle-line__text {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+  pointer-events: none;
+}
+
+body.gui-app #formBuilder .fw-question-toggles label.fw-toggle-line input[type="checkbox"],
+body.gui-app #formBuilder .question-block label.fw-toggle-line input[type="checkbox"] {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px;
+  margin: 0 !important;
+  padding: 0;
+  cursor: pointer;
+  accent-color: var(--isd-header);
+  border-radius: 4px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+body.gui-app #formBuilder .fw-question-toggles label.fw-toggle-line input[type="checkbox"]:hover,
+body.gui-app #formBuilder .question-block label.fw-toggle-line input[type="checkbox"]:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 3px rgba(33, 61, 125, 0.15);
+}
+
+body.gui-app #formBuilder .fw-question-toggles label.fw-toggle-line input[type="checkbox"]:focus-visible,
+body.gui-app #formBuilder .question-block label.fw-toggle-line input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 108, 177, 0.45);
+}
+
+body.gui-app #formBuilder .fw-question-toggles > div:not(.fw-nested-block):not(.fw-logic-stack):not(.fw-toggle-group) {
+  margin-top: 4px !important;
+  margin-bottom: 10px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding: 12px 14px !important;
+  background: #fff !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+}
+
+/* Wrapper for linking / conditional PDF / hidden — same rows as other toggles, no extra “card” */
+body.gui-app #formBuilder .fw-question-toggles .fw-toggle-group {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.gui-app #formBuilder .fw-question-toggles #jumpBlock {
+  margin-top: 0 !important;
+}
+
+/* Nested option blocks (legacy selectors still apply outside toggles if any) */
+body.gui-app #formBuilder .question-block > div[id^="logicBlock"],
+body.gui-app #formBuilder .question-block > div[id^="pdfPreviewBlock"],
+body.gui-app #formBuilder .question-block > div[id^="latexPreviewBlock"],
+body.gui-app #formBuilder .question-block > div[id^="subtitleBlock"],
+body.gui-app #formBuilder .question-block > div[id^="statusBlock"],
+body.gui-app #formBuilder .question-block > div[id^="hardAlertBlock"] {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+body.gui-app #formBuilder .fw-question-toggles #conditionalAlertLogic label:not(.fw-toggle-line) {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 8px;
+}
+
+/* Question row action buttons + optional Close under icons */
+body.gui-app #formBuilder .fw-question-actions-wrap {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+body.gui-app #formBuilder .fw-question-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+body.gui-app #formBuilder .fw-question-actions-close {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+body.gui-app #formBuilder .fw-question-close-btn {
+  min-width: 120px;
+}
+
+body.gui-app #formBuilder .fw-question-actions button {
+  margin: 0 !important;
+}
+
+body.gui-app #formBuilder .question-block .fw-icon-btn {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: 0;
+  background: #fff !important;
+  color: var(--isd-header) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+body.gui-app #formBuilder .question-block .fw-icon-btn:hover {
+  filter: none !important;
+  background: #eef2f7 !important;
+  border-color: var(--isd-active) !important;
+}
+
+body.gui-app #formBuilder .question-block .fw-icon-btn:active {
+  transform: scale(0.96) !important;
+}
+
+body.gui-app #formBuilder .question-block .fw-icon-btn .fw-icon {
+  display: block;
+}
+
+body.gui-app #formBuilder .pdf-detail-group {
+  margin-top: 10px !important;
+}
+
+/* Buttons inside builder — match main toolbar (Paste Json, etc.); icon + collapse chevron excluded */
+body.gui-app #formBuilder .section-block button:not(.fw-icon-btn),
+body.gui-app #formBuilder .question-block button:not(.fw-icon-btn):not(.fw-question-collapse-btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  max-width: none !important;
+  margin: 6px 8px 6px 0 !important;
+  padding: 10px 16px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius);
+  background: var(--isd-active) !important;
+  color: #fff !important;
+  border: none !important;
+  transform: none !important;
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+body.gui-app #formBuilder .section-block button:not(.fw-icon-btn):hover,
+body.gui-app #formBuilder .question-block button:not(.fw-icon-btn):not(.fw-question-collapse-btn):hover {
+  transform: none !important;
+  filter: brightness(0.95);
+}
+
+body.gui-app #formBuilder .question-block button.fw-btn--danger {
+  background: #c53030 !important;
+}
+
+body.gui-app #formBuilder .question-block button.fw-btn--danger:hover {
+  filter: brightness(0.92);
+}
+
+body.gui-app #formBuilder .section-block .fw-icon-btn {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: 0;
+  background: #fff !important;
+  color: var(--isd-header) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+body.gui-app #formBuilder .section-block .fw-icon-btn:hover {
+  filter: none !important;
+  background: #eef2f7 !important;
+  border-color: var(--isd-active) !important;
+}
+
+body.gui-app #formBuilder .section-block .fw-icon-btn:active {
+  transform: scale(0.96) !important;
+}
+
+body.gui-app #formBuilder .section-block .fw-icon-btn .fw-icon {
+  display: block;
+}
+
+/* Checklist module */
+body.gui-app #formBuilder #checklistContainer {
+  background: #fff;
+  border: 1px dashed var(--isd-active);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+body.gui-app #formBuilder #checklistContainer h3 {
+  margin-top: 0;
+  font-size: 1rem;
+  color: var(--isd-header);
+}
+
+body.gui-app #formBuilder .checklist-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+body.gui-app #formBuilder .checklist-item input[type="text"] {
+  flex: 1 1 200px;
+  margin: 0 !important;
+}
+
+body.gui-app #formBuilder .checklist-item button {
+  margin: 0 !important;
+}
+
+body.gui-app #formBuilder .checklist-logic-condition-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+body.gui-app #formBuilder .checklist-logic-condition-row > span:first-of-type {
+  font-weight: 600;
+  font-size: 13px;
+  color: #334155;
+}
+
+body.gui-app #formBuilder .alert-logic-condition-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+body.gui-app #formBuilder .alert-logic-condition-row > span:first-of-type {
+  font-weight: 600;
+  font-size: 13px;
+  color: #334155;
+}
+
+/* Form name / PDF modules if present */
+body.gui-app #formBuilder #formNameContainer,
+body.gui-app #formBuilder #pdfConfigurationModule {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+/* Legacy <center> around dropdowns — left-align to match brand layout */
+body.gui-app #formBuilder center {
+  display: block;
+  text-align: left !important;
+  margin: 4px 0 8px;
+}
+
+body.gui-app #formBuilder .question-block > div[style*="display: flex"] {
+  margin-bottom: 8px;
+}

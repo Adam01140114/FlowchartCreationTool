@@ -301,9 +301,6 @@ hiddenLogicConfigs.length = 0;
 linkedFields.length = 0;
 logicScriptBuffer = "";
 
-// Check if test mode is enabled
-const isTestMode = document.getElementById('testModeCheckbox') && document.getElementById('testModeCheckbox').checked;
-
 // Get form name from the form name input field
 const formNameEl = document.getElementById('formNameInput');
 const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
@@ -332,19 +329,6 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '    </style>',
     "</head>",
     "<body>",
-    // Insert modal HTML right after <body> (only if not in test mode)
-    ...(isTestMode ? [] : [
-      '<div id="loginRequiredModal" class="custom-modal-overlay" style="display:none;">\n' +
-      '  <div class="custom-modal">\n' +
-      '    <h2>Account Required</h2>\n' +
-      '    <p>You must create an account to continue filling out the form.</p>\n' +
-      '    <div class="modal-buttons">\n' +
-      '      <button class="modal-back" id="modalBackBtn" type="button">Back</button>\n' +
-      '      <button class="modal-continue" id="modalContinueBtn" type="button">Continue</button>\n' +
-      '    </div>\n' +
-      '  </div>\n' +
-      '</div>'
-    ]),
     "<header>",
     '    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href=\'index.html\';">',
     "    <nav>",
@@ -2251,66 +2235,12 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 }
 `;
 
-  // 1) Firebase config and check (only if not in test mode)
-  if (!isTestMode) {
-    formHTML += `
-      let isUserLoggedIn = false;
-      const firebaseConfig = {
-          apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
-          authDomain: "formwiz-3f4fd.firebaseapp.com",
-          projectId: "formwiz-3f4fd",
-          storageBucket: "formwiz-3f4fd.firebasestorage.app",
-          messagingSenderId: "404259212529",
-          appId: "1:404259212529:web:15a33bce82383b21cfed50",
-          measurementId: "G-P07YEN0HPD"
-      };
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-      const urlParams = new URLSearchParams(window.location.search);
-      const formId = urlParams.get("formId") || window.formId || 'default';
-      let userId = null;
-      firebase.auth().onAuthStateChanged(async function(user){
-          if(user){ 
-              isUserLoggedIn = true;
-              userId=user.uid;
-              // Fetch user data and display welcome message
-              try {
-                  const userDoc = await db.collection('users').doc(user.uid).get();
-                  if(userDoc.exists) {
-                      const userData = userDoc.data();
-                      document.getElementById('user_firstname').value = userData.firstName || '';
-                      document.getElementById('user_lastname').value = userData.lastName || '';
-                      document.getElementById('user_email').value = userData.email || '';
-                      document.getElementById('user_phone').value = userData.phone || '';
-
-                      // Update full name and address fields with 2-second delay to ensure DOM is ready
-                      setTimeout(() => {
-                      updateUserFullName();
-                      updateUserAddressFields();
-                      }, 2000);
-                      document.getElementById('user_street').value = userData.address?.street || '';
-                      document.getElementById('user_city').value = userData.address?.city || '';
-                      document.getElementById('user_state').value = userData.address?.state || '';
-                      document.getElementById('user_zip').value = userData.address?.zip || '';
-                  }
-              } catch(error) {
-
-              }
-          } else {
-              isUserLoggedIn = false;
-              // Do NOT redirect. Just let the user fill the form.
-          }
-      });
-    `;
-  } else {
-    // In test mode, set user as logged in by default
-    formHTML += `
-      let isUserLoggedIn = false;
-      let userId = null;
+  formHTML += `
+      if (typeof isUserLoggedIn === 'undefined') { var isUserLoggedIn = true; }
+      if (typeof userId === 'undefined') { var userId = null; }
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
     `;
-  }
 
   // Collect linked fields data from GUI
   if (window.linkedFieldsConfig && window.linkedFieldsConfig.length > 0) {

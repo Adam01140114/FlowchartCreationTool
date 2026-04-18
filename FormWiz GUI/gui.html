@@ -5,15 +5,10 @@
     <title>Custom Form Builder</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="form.css">
+    <link rel="stylesheet" href="gui-theme.css">
     <style>
         .container {
             text-align: center;
-        }
-        #pdfContainer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
         }
         .pdf-input-group {
             margin-bottom: 10px;
@@ -99,62 +94,70 @@
             margin-bottom: 16px;
             box-sizing: border-box;
         }
-        #confirmPasteJsonBtn {
-            width: 100%;
-            padding: 12px 0;
-            font-size: 1.1rem;
-            background: #0056b3;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        #confirmPasteJsonBtn:hover {
-            background: #003d80;
-        }
     </style>
 </head>
-<body>
-    <header>
-        <img src="logo.png" alt="Logo" width="130" height="80" onclick="location.href='index.html';">
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="forms.html">Forms</a>
-            <a href="contact.html">Contact Us</a>
-        </nav>
-    </header>
-    <section>
-        <div class="container">
-            <h2>FormWiz Developer GUI</h2>
-            <div id="pdfContainer" style="display: none;">
-                <div class="pdf-input-group" id="pdfGroup_0">
-                    <label>Choose Form PDF:</label>
-                    <input type="text" id="formPDFName" placeholder="Enter PDF form name (e.g., sc100.pdf)">
-                    <label for="pdfOutputName">Choose your PDF Name:</label>
-                    <input type="text" id="pdfOutputName" placeholder="Enter output file name (e.g., adam.html)">
-                    <label for="stripePriceId">Choose your Price ID:</label>
-                    <input type="text" id="stripePriceId" placeholder="Enter Stripe Price ID (e.g., price_12345)">
-                </div>
+<body class="gui-app">
+    <header class="isd-header">
+        <div class="isd-header__brand">
+            <img src="logo.png" alt="FormWiz" class="isd-logo" onclick="location.href='index.html';">
+            <div class="isd-header__titles">
+                <h1>FormWiz Developer GUI</h1>
+                <p class="sub">Custom form builder — design, preview, and export</p>
             </div>
-            <button type="button" id="pasteJsonBtn">Paste Json</button><br><br>
-            
+        </div>
+    </header>
+    <nav class="nav-bar" aria-label="Main actions">
+        <div class="fw-toolbar fw-nav-toolbar">
+            <button type="button" id="pasteJsonBtn">Paste Json</button>
             <button type="button" onclick="addPdfInput()">Add PDF</button>
-            <button onclick="generateAndDownloadForm()">Export HTML</button>
+            <button type="button" onclick="generateAndDownloadForm()">Export HTML</button>
             <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
-            <button onclick="document.getElementById('importFileInput').click();">Import JSON</button>
-            <button onclick="exportForm()">Export JSON</button>
+            <button type="button" onclick="document.getElementById('importFileInput').click();">Import JSON</button>
+            <button type="button" onclick="exportForm()">Export JSON</button>
             <button type="button" id="loadJsonBtn">Load JSON</button>
             <button type="button" id="previewButton" onclick="setTimeout(() => showPreview(), 100);">Preview</button>
-            <div style="margin-top: 10px;">
-                <label style="display: inline-flex; align-items: center; cursor: pointer;">
-                    <input type="checkbox" id="testModeCheckbox" style="margin-right: 8px;" checked>
-                    Test Mode
-                </label>
-            </div>
+            <button type="button" id="formSettingsBtn">Form Settings</button>
+            <label class="fw-nav-skip-signin" title="Exported form will not block progress or submit when not signed in">
+                <input type="checkbox" id="skipSignInGateCheckbox" checked>
+                Skip sign-in gate (test)
+            </label>
+        </div>
+    </nav>
+
+    <main class="gui-main-content">
+        <div class="fw-split">
+            <div class="fw-editor-pane">
             <div id="previewModal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <span class="close" onclick="closePreview()">&times;</span>
                     <iframe id="previewFrame"></iframe>
+                </div>
+            </div>
+            <!-- Form name + PDF settings -->
+            <div id="formSettingsModal" class="modal" style="display: none;">
+                <div class="modal-content fw-form-settings-content">
+                    <span class="close" onclick="closeFormSettingsModal()" role="button" tabindex="0">&times;</span>
+                    <h3 class="fw-form-settings-title">Form Settings</h3>
+                    <section class="fw-settings-section">
+                        <h4 class="fw-settings-heading">Form Name</h4>
+                        <label class="fw-settings-label" for="formNameInput">Form Name:</label>
+                        <input type="text" id="formNameInput" name="formNameInput" class="fw-settings-input" value="Example Form" placeholder="Example Form">
+                        <p class="fw-settings-hint">This name will appear in the browser title and be used for the default checkbox.</p>
+                    </section>
+                    <section class="fw-settings-section">
+                        <h4 class="fw-settings-heading">PDF Configuration</h4>
+                        <p class="fw-settings-hint">Configure the PDF form name, output file name, and Stripe price ID for your form.</p>
+                        <div id="pdfContainer">
+                            <div class="pdf-input-group" id="pdfGroup_0">
+                                <label>Choose Form PDF:</label>
+                                <input type="text" id="formPDFName" placeholder="Enter PDF form name (e.g., sc100.pdf)">
+                                <label for="pdfOutputName">Choose your PDF Name:</label>
+                                <input type="text" id="pdfOutputName" placeholder="Enter output file name (e.g., adam.html)">
+                                <label for="stripePriceId">Choose your Price ID:</label>
+                                <input type="text" id="stripePriceId" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
             <!-- Modal for pasting JSON -->
@@ -162,8 +165,8 @@
                 <div class="modal-content" style="max-width:500px;">
                     <span class="close" onclick="document.getElementById('pasteJsonModal').style.display='none'">&times;</span>
                     <h3>Paste GUI JSON</h3>
-                    <textarea id="pasteJsonTextarea" style="width:100%;height:200px;"></textarea><br>
-                    <button id="confirmPasteJsonBtn">Import</button>
+                    <textarea id="pasteJsonTextarea" style="width:100%;height:200px;"></textarea>
+                    <button type="button" id="confirmPasteJsonBtn" class="fw-btn--block">Import</button>
                 </div>
             </div>
             <!-- Modal for JSON Library -->
@@ -189,20 +192,20 @@
                                 <input type="password" id="jsonLibrarySignInPassword" style="width: 100%; padding: 15px; border: 2px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1.1rem;">
                             </div>
                             <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                                <button type="button" id="jsonLibrarySignInBtn" style="flex: 1; padding: 15px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                <button type="button" id="jsonLibrarySignInBtn" class="fw-btn--flex">
                                     Sign In
                                 </button>
-                                <button type="button" id="jsonLibrarySignUpBtn" style="flex: 1; padding: 15px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                <button type="button" id="jsonLibrarySignUpBtn" class="fw-btn--success fw-btn--flex">
                                     Sign Up
                                 </button>
                             </div>
-                            <button type="button" id="jsonLibraryCancelSignInBtn" style="width: 100%; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem;">
+                            <button type="button" id="jsonLibraryCancelSignInBtn" class="fw-btn--muted fw-btn--block">
                                 Cancel
                             </button>
                         </div>
                     </div>
                     <div style="border-top: 2px solid #eee; padding-top: 20px; margin-top: 20px;">
-                        <button type="button" id="addJsonToLibraryBtn" style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; margin-bottom: 15px;">
+                        <button type="button" id="addJsonToLibraryBtn" class="fw-btn--success fw-btn--block" style="margin-bottom: 15px;">
                             Add JSON to Library
                         </button>
                         <div id="addJsonForm" style="display:none;">
@@ -211,14 +214,14 @@
                             <label style="display:block; margin-bottom: 8px; font-weight: bold;">JSON Content:</label>
                             <textarea id="jsonContentTextarea" placeholder="Paste JSON here..." style="width: 100%; min-height: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: monospace; box-sizing: border-box; resize: vertical;"></textarea>
                             <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
-                            <button type="button" id="uploadJsonFileBtn" style="width: 100%; padding: 10px; background: #17a2b8; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; margin-top: 10px;">
+                            <button type="button" id="uploadJsonFileBtn" class="fw-btn--teal fw-btn--block" style="margin-top: 10px;">
                                 Upload JSON File
                             </button>
                             <div style="margin-top: 15px; display: flex; gap: 10px;">
-                                <button type="button" id="saveJsonBtn" style="flex: 1; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem;">
+                                <button type="button" id="saveJsonBtn" class="fw-btn--flex">
                                     Save JSON
                                 </button>
-                                <button type="button" id="cancelAddJsonBtn" style="flex: 1; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem;">
+                                <button type="button" id="cancelAddJsonBtn" class="fw-btn--muted fw-btn--flex">
                                     Cancel
                                 </button>
                             </div>
@@ -226,17 +229,37 @@
                     </div>
                 </div>
             </div>
+
+                <div class="fw-card fw-builder-card">
+                    <div class="forms-accent-bar" aria-hidden="true"></div>
+                    <h2 style="text-align: left; margin-top: 0;">Form structure</h2>
+                    <p style="color: var(--text-secondary); margin-top: 0; text-align: left;">Sections, questions, and options appear below. The preview panel uses the same HTML as the Preview button.</p>
+                    <div id="formBuilder" class="fw-form-builder-root"></div>
+                </div>
+
+                <div class="fw-card fw-add-section-row">
+                    <div class="fw-add-section-inner">
+                        <button type="button" class="fw-btn-primary fw-btn--block" onclick="addSection()">Add Section</button>
+                    </div>
+                </div>
+                </div>
+
+            <div class="fw-split-resizer" id="fwSplitResizer" role="separator" aria-orientation="vertical" aria-label="Drag to resize editor and preview panels" tabindex="0"></div>
+
+            <aside class="fw-preview-pane" aria-label="Preview">
+                <div class="fw-card fw-preview-card-inner">
+                    <div class="fw-preview-head">
+                        <h3>Live preview</h3>
+                        <p class="fw-hint">Same generated HTML as <strong>Preview</strong> / the modal. Refreshes a few hundred ms after you type or change the form. Drag the vertical divider to resize the panels.</p>
+                    </div>
+                    <div class="fw-preview-frame-wrap">
+                        <iframe id="previewFrameInline" class="fw-preview-iframe" title="Generated form preview"></iframe>
+                    </div>
+                </div>
+            </aside>
         </div>
-    </section>
-    <section>
-        <div class="container">
-            <div id="formBuilder"></div>
-            <button onclick="addChecklist()">Add Checklist</button>
-            <button onclick="addSection()">Add Section</button>
-            <br>
-        </div>
-    </section>
-    <br>
+    </main>
+
     <footer>
         &copy; 2024 Custom Form Builder. All rights reserved.
     </footer>
@@ -250,6 +273,7 @@
     <script src="generate.js"></script>
     <script src="download.js"></script>
     <script src="hidden.js"></script>
+    <script src="gui-preview-sync.js"></script>
     <script>
         // --- BEGIN: Global Address Helpers for Preview ---
         (function injectAddressHelpersOnce() {
@@ -473,6 +497,11 @@
             // Try to load from URL first
             const loadedFromUrl = checkForPreviewJson();
             
+            var formSettingsBtn = document.getElementById('formSettingsBtn');
+            if (formSettingsBtn) {
+                formSettingsBtn.addEventListener('click', openFormSettingsModal);
+            }
+
             if (pasteBtn && modal && textarea && confirmBtn) {
                 pasteBtn.addEventListener('click', function() {
                     // Try to read from clipboard and import instantly
@@ -519,9 +548,21 @@
             }
         });
 
+        function openFormSettingsModal() {
+            var m = document.getElementById('formSettingsModal');
+            if (m) m.style.display = 'flex';
+        }
+        function closeFormSettingsModal() {
+            var m = document.getElementById('formSettingsModal');
+            if (m) m.style.display = 'none';
+        }
+
         // Functions for adding/removing PDF inputs
         function addPdfInput() {
             const pdfContainer = document.getElementById('pdfContainer');
+            if (!pdfContainer) return;
+            openFormSettingsModal();
+            pdfContainer.removeAttribute('hidden');
             const pdfCount = pdfContainer.querySelectorAll('.pdf-input-group').length;
             const newPdfId = pdfCount;
             
@@ -561,7 +602,9 @@
         }
 
         function updatePdfInputIds() {
-            const pdfGroups = document.querySelectorAll('.pdf-input-group');
+            const pdfContainer = document.getElementById('pdfContainer');
+            if (!pdfContainer) return;
+            const pdfGroups = pdfContainer.querySelectorAll('.pdf-input-group');
             pdfGroups.forEach((group, index) => {
                 if (index > 0) { // Skip the main PDF input
                     group.id = `pdfGroup_${index}`;
@@ -662,13 +705,13 @@
                         html += `
                             <div style="border: 1px solid #ddd; border-radius: 6px; padding: 15px; background: #f9f9f9;">
                                 <h4 style="margin: 0 0 10px 0; color: #333;">${data.name || 'Unnamed JSON'}</h4>
-                                <button onclick="deleteJsonFromLibrary('${doc.id}')" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; margin-bottom: 10px;">
+                                <button type="button" class="fw-btn--danger" onclick="deleteJsonFromLibrary('${doc.id}')" style="margin-bottom: 10px;">
                                     Delete
                                 </button>
                                 <p style="margin: 5px 0; color: #666; font-size: 0.9rem;">
                                     Created: ${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleString() : 'Unknown'}
                                 </p>
-                                <button onclick="loadJsonFromLibrary('${doc.id}')" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; margin-top: 10px;">
+                                <button type="button" class="fw-btn--block" onclick="loadJsonFromLibrary('${doc.id}')" style="margin-top: 10px;">
                                     Load This JSON
                                 </button>
                             </div>
@@ -963,7 +1006,110 @@
                     hideSignInModal();
                 });
             }
+
+            var formSettingsModal = document.getElementById('formSettingsModal');
+            if (formSettingsModal) {
+                formSettingsModal.addEventListener('click', function(event) {
+                    if (event.target === formSettingsModal) closeFormSettingsModal();
+                });
+            }
         });
+
+        (function initFwSplitResizer() {
+            var SPLIT_KEY = 'fwGuiEditorWidthPct';
+            var split = document.querySelector('.fw-split');
+            var editor = document.querySelector('.fw-editor-pane');
+            var preview = document.querySelector('.fw-preview-pane');
+            var resizer = document.getElementById('fwSplitResizer');
+            var previewIframe = document.getElementById('previewFrameInline');
+            if (!split || !editor || !preview || !resizer) return;
+
+            function applyPct(pct) {
+                var p = Math.min(88, Math.max(22, pct));
+                editor.style.flex = '0 0 ' + p + '%';
+                preview.style.flex = '1 1 auto';
+                preview.style.minWidth = '0';
+                try { localStorage.setItem(SPLIT_KEY, String(p)); } catch (e) {}
+            }
+
+            var saved = parseFloat(localStorage.getItem(SPLIT_KEY), 10);
+            if (!isNaN(saved)) applyPct(saved);
+
+            var dragging = false;
+
+            function stopDrag() {
+                if (!dragging) return;
+                dragging = false;
+                resizer.setAttribute('aria-pressed', 'false');
+                resizer.classList.remove('is-tracking');
+                document.body.classList.remove('fw-split-resizer-active');
+                document.body.style.userSelect = '';
+                if (previewIframe) previewIframe.style.pointerEvents = '';
+                window.removeEventListener('mousemove', onPointerMove);
+                window.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchmove', onTouchMove, { passive: false });
+                document.removeEventListener('touchend', stopDrag);
+            }
+
+            function onPointerMove(ev) {
+                if (!dragging) return;
+                var r = split.getBoundingClientRect();
+                var w = r.width;
+                if (w < 1) return;
+                var pct = ((ev.clientX - r.left) / w) * 100;
+                applyPct(pct);
+            }
+
+            function onTouchMove(ev) {
+                if (!dragging || !ev.touches || !ev.touches[0]) return;
+                ev.preventDefault();
+                var fe = ev.touches[0];
+                var r = split.getBoundingClientRect();
+                var w = r.width;
+                if (w < 1) return;
+                var pct = ((fe.clientX - r.left) / w) * 100;
+                applyPct(pct);
+            }
+
+            resizer.addEventListener('mousedown', function (e) {
+                if (e.button !== 0) return;
+                e.preventDefault();
+                dragging = true;
+                resizer.setAttribute('aria-pressed', 'true');
+                resizer.classList.add('is-tracking');
+                document.body.classList.add('fw-split-resizer-active');
+                document.body.style.userSelect = 'none';
+                if (previewIframe) previewIframe.style.pointerEvents = 'none';
+                window.addEventListener('mousemove', onPointerMove);
+                window.addEventListener('mouseup', stopDrag);
+            });
+
+            resizer.addEventListener('touchstart', function (e) {
+                if (!e.touches || !e.touches[0]) return;
+                e.preventDefault();
+                dragging = true;
+                resizer.setAttribute('aria-pressed', 'true');
+                resizer.classList.add('is-tracking');
+                document.body.classList.add('fw-split-resizer-active');
+                document.body.style.userSelect = 'none';
+                if (previewIframe) previewIframe.style.pointerEvents = 'none';
+                document.addEventListener('touchmove', onTouchMove, { passive: false });
+                document.addEventListener('touchend', stopDrag);
+            }, { passive: false });
+
+            document.addEventListener('keydown', function (ev) {
+                if (ev.key !== 'Escape' || !dragging) return;
+                ev.preventDefault();
+                stopDrag();
+            });
+
+            resizer.addEventListener('keydown', function (e) {
+                var cur = parseFloat(localStorage.getItem(SPLIT_KEY), 10);
+                if (isNaN(cur)) cur = 50;
+                if (e.key === 'ArrowLeft') { e.preventDefault(); applyPct(cur - 2); }
+                if (e.key === 'ArrowRight') { e.preventDefault(); applyPct(cur + 2); }
+            });
+        })();
     </script>
 </body>
 </html>
