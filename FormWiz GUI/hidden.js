@@ -6,7 +6,7 @@
  ************************************************/
 /**
  * Initializes the hidden PDF fields module on page load.
- * Inserts the "Add Hidden Field" button so user can do so from scratch.
+ * Inserts the Calculation Fields panel with "Add Calculation Field".
  */
 document.addEventListener('DOMContentLoaded', function() {
     initializeHiddenPDFFieldsModule();
@@ -22,38 +22,121 @@ function initializeHiddenPDFFieldsModule() {
     /* Empty shells only — groups/hidden fields are created when loading JSON or via code paths */
     hiddenFieldsModule.innerHTML = `
         <div id="groupsContainer"></div>
-        <div id="hiddenFieldsContainer"></div>
+        <div id="hiddenFieldsPanel" class="hidden-fields-panel">
+            <div class="hidden-fields-panel__header fw-collapsible-module-head" onclick="if(!event.target.closest('button')) toggleHiddenFieldsContainerCollapse(event)">
+                <h3 class="hidden-fields-panel__title">Calculation Fields</h3>
+                <button type="button" id="hiddenFieldsCollapseBtn" class="hidden-fields-panel__toggle" aria-expanded="true" onclick="event.stopPropagation(); toggleHiddenFieldsContainerCollapse(event)">
+                    Collapse
+                </button>
+            </div>
+            <div id="hiddenFieldsContainer" class="hidden-fields-panel__body">
+                <div id="hiddenFieldsList" class="hidden-fields-list"></div>
+                <div class="hidden-fields-panel__toolbar">
+                    <button type="button" class="hf-btn hf-btn--add-calculation" onclick="addHiddenField()">Add Calculation Field</button>
+                </div>
+            </div>
+        </div>
     `;
     formBuilder.appendChild(hiddenFieldsModule);
+    syncHiddenFieldsPanelVisibility();
+    if (typeof ensureLinkedFieldsPanel === 'function') {
+        try {
+            ensureLinkedFieldsPanel();
+        } catch (e) { /* gui.js may not be loaded in some test contexts */ }
+    }
+}
+/**
+ * Sync panel chrome when the list of calculation field blocks changes.
+ */
+function syncHiddenFieldsPanelVisibility() {
+    var panel = document.getElementById('hiddenFieldsPanel');
+    var body = document.getElementById('hiddenFieldsContainer');
+    var btn = document.getElementById('hiddenFieldsCollapseBtn');
+    var list = document.getElementById('hiddenFieldsList');
+    if (!panel || !body) return;
+    var count = list
+        ? list.querySelectorAll('.hidden-field-block').length
+        : body.querySelectorAll('.hidden-field-block').length;
+    if (count === 0) {
+        panel.classList.add('hidden-fields-panel--empty');
+        panel.removeAttribute('aria-hidden');
+    } else {
+        panel.classList.remove('hidden-fields-panel--empty');
+        panel.removeAttribute('aria-hidden');
+    }
+    if (btn) {
+        if (panel.classList.contains('is-collapsed')) {
+            btn.textContent = 'Expand';
+            btn.setAttribute('aria-expanded', 'false');
+        } else {
+            btn.textContent = 'Collapse';
+            btn.setAttribute('aria-expanded', 'true');
+        }
+    }
+}
+function toggleHiddenFieldsContainerCollapse(ev) {
+    if (ev) ev.preventDefault();
+    var panel = document.getElementById('hiddenFieldsPanel');
+    var btn = document.getElementById('hiddenFieldsCollapseBtn');
+    if (!panel || !btn) return;
+    var collapsed = panel.classList.toggle('is-collapsed');
+    btn.textContent = collapsed ? 'Expand' : 'Collapse';
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+}
+function setHiddenFieldsContainerCollapsed(collapsed) {
+    var panel = document.getElementById('hiddenFieldsPanel');
+    var btn = document.getElementById('hiddenFieldsCollapseBtn');
+    if (!panel || !btn) return;
+    var list = document.getElementById('hiddenFieldsList');
+    var count = list
+        ? list.querySelectorAll('.hidden-field-block').length
+        : panel.querySelectorAll('.hidden-field-block').length;
+    if (!count) return;
+    panel.classList.toggle('is-collapsed', !!collapsed);
+    btn.textContent = collapsed ? 'Expand' : 'Collapse';
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
 }
 var hiddenFieldCounter = 1; // track globally
 var groupCounter = 1; // track groups globally
 /**
- * Adds a new empty hidden field block
+ * Adds a new empty calculation field block
  */
 function addHiddenField() {
+    var hiddenFieldsList = document.getElementById('hiddenFieldsList');
     var hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
-    if(!hiddenFieldsContainer) return;
+    var appendTarget = hiddenFieldsList || hiddenFieldsContainer;
+    if (!appendTarget) return;
     var currentHiddenFieldId = hiddenFieldCounter++;
     var block = document.createElement('div');
     block.className = 'hidden-field-block';
     block.id = 'hiddenFieldBlock' + currentHiddenFieldId;
     block.innerHTML = `
-        <label>Hidden Field ${currentHiddenFieldId}: </label>
-        <select id="hiddenFieldType${currentHiddenFieldId}" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
-            <option value="text">Textbox</option>
-            <option value="checkbox">Checkbox</option>
-        </select><br><br>
-        <div id="hiddenFieldOptions${currentHiddenFieldId}">
-            <!-- Options will be populated based on the type -->
+        <button type="button" class="hf-block-summary" id="hfHiddenFieldSummaryBtn${currentHiddenFieldId}" onclick="toggleHiddenFieldBlockCollapse(${currentHiddenFieldId}, event)" aria-expanded="true" aria-controls="hfHiddenFieldBody${currentHiddenFieldId}">
+            <span class="hf-block-summary__chevron" aria-hidden="true">▼</span>
+            <span class="hf-block-summary__text" id="hfHiddenFieldSummaryText${currentHiddenFieldId}">Calculation field ${currentHiddenFieldId} (unnamed)</span>
+        </button>
+        <div class="hf-block-body" id="hfHiddenFieldBody${currentHiddenFieldId}">
+            <div class="hf-block-meta">
+                <div class="hf-field">
+                    <label class="hf-label" for="hiddenFieldType${currentHiddenFieldId}">Type</label>
+                    <select id="hiddenFieldType${currentHiddenFieldId}" class="hf-select" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
+                        <option value="text">Textbox</option>
+                        <option value="checkbox">Checkbox</option>
+                    </select>
+                </div>
+            </div>
+            <div id="hiddenFieldOptions${currentHiddenFieldId}" class="hf-options"></div>
+            <div class="hf-footer-actions">
+                <button type="button" class="hf-btn hf-btn--danger" onclick="removeHiddenField(${currentHiddenFieldId})">Remove calculation field</button>
+            </div>
         </div>
-        <button type="button" onclick="removeHiddenField(${currentHiddenFieldId})">Remove Hidden Field</button>
-        <hr>
     `;
-    hiddenFieldsContainer.appendChild(block);
+    appendTarget.appendChild(block);
     toggleHiddenFieldOptions(currentHiddenFieldId);
+    updateHiddenFieldBlockSummary(currentHiddenFieldId);
     // After adding a new hidden field, update all calculation dropdowns
     setTimeout(updateAllCalculationDropdowns, 100);
+    syncHiddenFieldsPanelVisibility();
 }
 /**
  * Removes a hidden field block by ID
@@ -61,6 +144,7 @@ function addHiddenField() {
 function removeHiddenField(hiddenFieldId) {
     var block = document.getElementById('hiddenFieldBlock' + hiddenFieldId);
     if(block) block.remove();
+    syncHiddenFieldsPanelVisibility();
 }
 // ============================================
 // ===========  GROUP FUNCTIONS  ==============
@@ -464,57 +548,146 @@ function toggleHiddenFieldOptions(hiddenFieldId) {
     optsDiv.innerHTML = '';
     if(fieldType === 'text') {
         optsDiv.innerHTML = `
-            <label>Name/ID:</label>
-            <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
-            <!-- Multi-term Calculation for text fields -->
-            <button type="button" onclick="addCalculationForText(${hiddenFieldId})">Add Calculation</button>
-            <div id="textCalculationBlock${hiddenFieldId}"></div><br>
-            <label>Conditional Autofill Logic:</label><br>
-            <div id="conditionalAutofill${hiddenFieldId}"></div>
-            <button type="button" onclick="addConditionalAutofill(${hiddenFieldId})">Add Conditional Logic</button><br><br>
+            <div class="hf-stack">
+                <div class="hf-field">
+                    <label class="hf-label" for="hiddenFieldName${hiddenFieldId}">Name / ID</label>
+                    <input type="text" id="hiddenFieldName${hiddenFieldId}" class="hf-input" placeholder="Enter field name" oninput="updateHiddenFieldBlockSummary(${hiddenFieldId})">
+                </div>
+                <div class="hf-toolbar">
+                    <button type="button" class="hf-btn hf-btn--primary" onclick="addCalculationForText(${hiddenFieldId})">Add calculation</button>
+                </div>
+                <div id="textCalculationBlock${hiddenFieldId}" class="hf-calc-list"></div>
+                <div class="hf-subsection" role="region" aria-labelledby="hfCondHead${hiddenFieldId}">
+                    <div class="hf-subsection__head">
+                        <h4 class="hf-subsection__title" id="hfCondHead${hiddenFieldId}">Conditional autofill</h4>
+                    </div>
+                    <div id="conditionalAutofill${hiddenFieldId}" class="hf-conditions"></div>
+                    <div class="hf-subsection__actions">
+                        <button type="button" class="hf-btn hf-btn--secondary" onclick="addConditionalAutofill(${hiddenFieldId})">Add conditional logic</button>
+                    </div>
+                </div>
+            </div>
         `;
     }
     else if(fieldType === 'checkbox') {
         optsDiv.innerHTML = `
-            <label>Name/ID:</label>
-            <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
-            <button type="button" onclick="addCalculationForCheckbox(${hiddenFieldId})">Add Calculation</button>
-            <div id="calculationBlock${hiddenFieldId}"></div><br>
-            <label>Checked by default:</label>
-            <input type="checkbox" id="hiddenFieldChecked${hiddenFieldId}"><br><br>
-            <label>Conditional Autofill Logic:</label><br>
-            <div id="conditionalAutofillForCheckbox${hiddenFieldId}"></div>
-            <button type="button" onclick="addConditionalAutofillForCheckbox(${hiddenFieldId})">Add Conditional Logic</button><br><br>
+            <div class="hf-stack">
+                <div class="hf-field">
+                    <label class="hf-label" for="hiddenFieldName${hiddenFieldId}">Name / ID</label>
+                    <input type="text" id="hiddenFieldName${hiddenFieldId}" class="hf-input" placeholder="Enter field name" oninput="updateHiddenFieldBlockSummary(${hiddenFieldId})">
+                </div>
+                <div class="hf-toolbar">
+                    <button type="button" class="hf-btn hf-btn--primary" onclick="addCalculationForCheckbox(${hiddenFieldId})">Add calculation</button>
+                </div>
+                <div id="calculationBlock${hiddenFieldId}" class="hf-calc-list"></div>
+                <div class="hf-check-row">
+                    <input type="checkbox" id="hiddenFieldChecked${hiddenFieldId}" class="hf-checkbox">
+                    <label class="hf-check-row__label" for="hiddenFieldChecked${hiddenFieldId}">Checked by default</label>
+                </div>
+                <div class="hf-subsection" role="region" aria-labelledby="hfCondCbHead${hiddenFieldId}">
+                    <div class="hf-subsection__head">
+                        <h4 class="hf-subsection__title" id="hfCondCbHead${hiddenFieldId}">Conditional autofill</h4>
+                    </div>
+                    <div id="conditionalAutofillForCheckbox${hiddenFieldId}" class="hf-conditions"></div>
+                    <div class="hf-subsection__actions">
+                        <button type="button" class="hf-btn hf-btn--secondary" onclick="addConditionalAutofillForCheckbox(${hiddenFieldId})">Add conditional logic</button>
+                    </div>
+                </div>
+            </div>
         `;
     }
     // Update all calculation dropdowns whenever we toggle options
     setTimeout(updateAllCalculationDropdowns, 100);
+    updateHiddenFieldBlockSummary(hiddenFieldId);
+}
+/** Throttle rapid summary clicks (global transition * {} makes fast toggles expensive). */
+var hfToggleLastAt = {};
+var HF_TOGGLE_MS = 140;
+/**
+ * Collapse / expand a single hidden field block (accordion row).
+ */
+function toggleHiddenFieldBlockCollapse(hiddenFieldId, ev) {
+    if (ev) ev.preventDefault();
+    var now = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
+    var last = hfToggleLastAt[hiddenFieldId] || 0;
+    if (now - last < HF_TOGGLE_MS) return;
+    hfToggleLastAt[hiddenFieldId] = now;
+    var body = document.getElementById('hfHiddenFieldBody' + hiddenFieldId);
+    var btn = document.getElementById('hfHiddenFieldSummaryBtn' + hiddenFieldId);
+    if (!body || !btn) return;
+    var collapsed = body.classList.toggle('hf-block-body--collapsed');
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    var ch = btn.querySelector('.hf-block-summary__chevron');
+    if (ch) ch.textContent = collapsed ? '▶' : '▼';
+}
+/**
+ * Summary line: "Calculation field N (name_id)".
+ */
+function updateHiddenFieldBlockSummary(hiddenFieldId) {
+    var nameEl = document.getElementById('hiddenFieldName' + hiddenFieldId);
+    var textEl = document.getElementById('hfHiddenFieldSummaryText' + hiddenFieldId);
+    if (!textEl) return;
+    var name = nameEl && nameEl.value ? String(nameEl.value).trim() : '';
+    textEl.textContent = 'Calculation field ' + hiddenFieldId + ' (' + (name || 'unnamed') + ')';
+}
+/**
+ * After JSON import: collapse each hidden field block and refresh summaries.
+ */
+function collapseAllHiddenFieldBlocksAfterImport() {
+    document.querySelectorAll('#hiddenFieldsContainer .hidden-field-block').forEach(function (block) {
+        var idMatch = /^hiddenFieldBlock(\d+)$/.exec(block.id);
+        if (!idMatch) return;
+        var hid = idMatch[1];
+        var body = document.getElementById('hfHiddenFieldBody' + hid);
+        var btn = document.getElementById('hfHiddenFieldSummaryBtn' + hid);
+        if (body) body.classList.add('hf-block-body--collapsed');
+        if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+            var ch = btn.querySelector('.hf-block-summary__chevron');
+            if (ch) ch.textContent = '▶';
+        }
+        updateHiddenFieldBlockSummary(hid);
+    });
 }
 /**
  * When loading from JSON, we call addHiddenFieldWithData
  */
 function addHiddenFieldWithData(hiddenField) {
+    var hiddenFieldsList = document.getElementById('hiddenFieldsList');
     var hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
+    var appendTarget = hiddenFieldsList || hiddenFieldsContainer;
+    if (!appendTarget) return;
     var currentHiddenFieldId = hiddenField.hiddenFieldId;
     var block = document.createElement('div');
     block.className = 'hidden-field-block';
     block.id = 'hiddenFieldBlock' + currentHiddenFieldId;
     block.innerHTML = `
-        <label>Hidden Field ${currentHiddenFieldId}: </label>
-        <select id="hiddenFieldType${currentHiddenFieldId}" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
-            <option value="text" ${hiddenField.type==='text'?'selected':''}>Textbox</option>
-            <option value="checkbox" ${hiddenField.type==='checkbox'?'selected':''}>Checkbox</option>
-        </select><br><br>
-        <div id="hiddenFieldOptions${currentHiddenFieldId}">
+        <button type="button" class="hf-block-summary" id="hfHiddenFieldSummaryBtn${currentHiddenFieldId}" onclick="toggleHiddenFieldBlockCollapse(${currentHiddenFieldId}, event)" aria-expanded="true" aria-controls="hfHiddenFieldBody${currentHiddenFieldId}">
+            <span class="hf-block-summary__chevron" aria-hidden="true">▼</span>
+            <span class="hf-block-summary__text" id="hfHiddenFieldSummaryText${currentHiddenFieldId}">Calculation field ${currentHiddenFieldId} (unnamed)</span>
+        </button>
+        <div class="hf-block-body" id="hfHiddenFieldBody${currentHiddenFieldId}">
+            <div class="hf-block-meta">
+                <div class="hf-field">
+                    <label class="hf-label" for="hiddenFieldType${currentHiddenFieldId}">Type</label>
+                    <select id="hiddenFieldType${currentHiddenFieldId}" class="hf-select" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
+                        <option value="text" ${hiddenField.type==='text'?'selected':''}>Textbox</option>
+                        <option value="checkbox" ${hiddenField.type==='checkbox'?'selected':''}>Checkbox</option>
+                    </select>
+                </div>
+            </div>
+            <div id="hiddenFieldOptions${currentHiddenFieldId}" class="hf-options"></div>
+            <div class="hf-footer-actions">
+                <button type="button" class="hf-btn hf-btn--danger" onclick="removeHiddenField(${currentHiddenFieldId})">Remove calculation field</button>
+            </div>
         </div>
-        <button type="button" onclick="removeHiddenField(${currentHiddenFieldId})">Remove Hidden Field</button>
-        <hr>
     `;
-    hiddenFieldsContainer.appendChild(block);
+    appendTarget.appendChild(block);
     toggleHiddenFieldOptions(currentHiddenFieldId);
     // Fill name
     var nm = document.getElementById('hiddenFieldName' + currentHiddenFieldId);
     if(nm) nm.value = hiddenField.name || '';
+    updateHiddenFieldBlockSummary(currentHiddenFieldId);
     if(hiddenField.type==='checkbox'){
         var chkDef = document.getElementById('hiddenFieldChecked' + currentHiddenFieldId);
         if(chkDef) chkDef.checked = !!hiddenField.checked;
@@ -638,7 +811,10 @@ function addHiddenFieldWithData(hiddenField) {
         }
     }
     // Ensure dropdowns include newly added hidden fields before applying pending selections
-    setTimeout(updateAllCalculationDropdowns, 0);
+    setTimeout(function() {
+        updateAllCalculationDropdowns();
+        syncHiddenFieldsPanelVisibility();
+    }, 0);
 }
 /***************************************************
  * Conditional Autofill for text / checkbox fields
@@ -647,23 +823,30 @@ function addConditionalAutofill(hiddenFieldId) {
     var parentDiv = document.getElementById('conditionalAutofill'+hiddenFieldId);
     var condId = parentDiv.children.length+1;
     var condDiv = document.createElement('div');
-    condDiv.className='condition';
+    condDiv.className='condition hf-condition-card';
     condDiv.id='condition'+hiddenFieldId+'_'+condId;
     condDiv.innerHTML=`
-        <label>Condition ${condId}:</label><br>
-        <label>Question:</label>
-        <select id="conditionQuestion${hiddenFieldId}_${condId}" onchange="updateConditionAnswers(${hiddenFieldId}, ${condId})" style="width:300px;">
-            <option value="">-- Select a question --</option>
-            ${generateAllQuestionOptions()}
-        </select><br>
-        <label>Answer:</label>
-        <select id="conditionAnswer${hiddenFieldId}_${condId}" style="width:300px;">
-            <option value="">-- Select an answer --</option>
-        </select><br>
-        <label>Value to Autofill:</label>
-        <input type="text" id="conditionValue${hiddenFieldId}_${condId}" placeholder="Enter value"><br>
-        <button type="button" onclick="removeConditionalAutofill(${hiddenFieldId}, ${condId})">Remove Condition</button>
-        <hr>
+        <div class="hf-condition-card__head">Condition ${condId}</div>
+        <div class="hf-field">
+            <label class="hf-label" for="conditionQuestion${hiddenFieldId}_${condId}">Question</label>
+            <select id="conditionQuestion${hiddenFieldId}_${condId}" class="hf-select" onchange="updateConditionAnswers(${hiddenFieldId}, ${condId})">
+                <option value="">-- Select a question --</option>
+                ${generateAllQuestionOptions()}
+            </select>
+        </div>
+        <div class="hf-field">
+            <label class="hf-label" for="conditionAnswer${hiddenFieldId}_${condId}">Answer</label>
+            <select id="conditionAnswer${hiddenFieldId}_${condId}" class="hf-select">
+                <option value="">-- Select an answer --</option>
+            </select>
+        </div>
+        <div class="hf-field">
+            <label class="hf-label" for="conditionValue${hiddenFieldId}_${condId}">Value to autofill</label>
+            <input type="text" id="conditionValue${hiddenFieldId}_${condId}" class="hf-input" placeholder="Enter value">
+        </div>
+        <div class="hf-condition-card__actions">
+            <button type="button" class="hf-btn hf-btn--ghost" onclick="removeConditionalAutofill(${hiddenFieldId}, ${condId})">Remove condition</button>
+        </div>
     `;
     parentDiv.appendChild(condDiv);
 }
@@ -675,26 +858,33 @@ function addConditionalAutofillForCheckbox(hiddenFieldId) {
     var parentDiv = document.getElementById('conditionalAutofillForCheckbox'+hiddenFieldId);
     var condId = parentDiv.children.length+1;
     var condDiv = document.createElement('div');
-    condDiv.className='condition'+condId;
+    condDiv.className='condition hf-condition-card';
     condDiv.id='condition'+hiddenFieldId+'_'+condId;
     condDiv.innerHTML=`
-        <label>Condition ${condId}:</label><br>
-        <label>Question:</label>
-        <select id="conditionQuestion${hiddenFieldId}_${condId}" onchange="updateConditionAnswers(${hiddenFieldId}, ${condId})" style="width:300px;">
-            <option value="">-- Select a question --</option>
-            ${generateAllQuestionOptions()}
-        </select><br>
-        <label>Answer:</label>
-        <select id="conditionAnswer${hiddenFieldId}_${condId}" style="width:300px;">
-            <option value="">-- Select an answer --</option>
-        </select><br>
-        <label>Value:</label>
-        <select id="conditionValue${hiddenFieldId}_${condId}" style="width:300px;">
-            <option value="checked">Checked</option>
-            <option value="unchecked">Unchecked</option>
-        </select><br>
-        <button type="button" onclick="removeConditionalAutofill(${hiddenFieldId}, ${condId})">Remove Condition</button>
-        <hr>
+        <div class="hf-condition-card__head">Condition ${condId}</div>
+        <div class="hf-field">
+            <label class="hf-label" for="conditionQuestion${hiddenFieldId}_${condId}">Question</label>
+            <select id="conditionQuestion${hiddenFieldId}_${condId}" class="hf-select" onchange="updateConditionAnswers(${hiddenFieldId}, ${condId})">
+                <option value="">-- Select a question --</option>
+                ${generateAllQuestionOptions()}
+            </select>
+        </div>
+        <div class="hf-field">
+            <label class="hf-label" for="conditionAnswer${hiddenFieldId}_${condId}">Answer</label>
+            <select id="conditionAnswer${hiddenFieldId}_${condId}" class="hf-select">
+                <option value="">-- Select an answer --</option>
+            </select>
+        </div>
+        <div class="hf-field">
+            <label class="hf-label" for="conditionValue${hiddenFieldId}_${condId}">Value</label>
+            <select id="conditionValue${hiddenFieldId}_${condId}" class="hf-select">
+                <option value="checked">Checked</option>
+                <option value="unchecked">Unchecked</option>
+            </select>
+        </div>
+        <div class="hf-condition-card__actions">
+            <button type="button" class="hf-btn hf-btn--ghost" onclick="removeConditionalAutofill(${hiddenFieldId}, ${condId})">Remove condition</button>
+        </div>
     `;
     parentDiv.appendChild(condDiv);
 }
@@ -769,26 +959,28 @@ function addCalculationForCheckbox(hiddenFieldId) {
     var calcBlock = document.getElementById('calculationBlock'+hiddenFieldId);
     var calcIndex = calcBlock.children.length+1;
     var row = document.createElement('div');
-    row.className='calculation'+calcIndex;
+    row.className='hf-calc-card calculation'+calcIndex;
     row.id='calculationRow'+hiddenFieldId+'_'+calcIndex;
     row.innerHTML=`
-        <label>Calculation ${calcIndex}:</label><br>
-        <div id="equationContainer${hiddenFieldId}_${calcIndex}"></div>
-        <button type="button" onclick="addEquationTermCheckbox(${hiddenFieldId}, ${calcIndex})">Add Another Term</button>
-        <br><br>
-        <select id="calcCompareOperator${hiddenFieldId}_${calcIndex}">
-            <option value="=">=</option>
-            <option value="<"><</option>
-            <option value=">">></option>
-        </select>
-        <input type="number" id="calcThreshold${hiddenFieldId}_${calcIndex}" placeholder="Enter number" style="width:80px;">
-        <label> then </label>
-        <select id="calcResult${hiddenFieldId}_${calcIndex}">
-            <option value="checked">Checked</option>
-            <option value="unchecked">Unchecked</option>
-        </select>
-        <button type="button" onclick="removeCalculationForCheckbox(${hiddenFieldId}, ${calcIndex})">Remove</button>
-        <hr>
+        <span class="hf-calc-card__title">Calculation ${calcIndex}</span>
+        <div id="equationContainer${hiddenFieldId}_${calcIndex}" class="hf-equation-terms"></div>
+        <div class="hf-toolbar">
+            <button type="button" class="hf-btn hf-btn--secondary" onclick="addEquationTermCheckbox(${hiddenFieldId}, ${calcIndex})">Add another term</button>
+        </div>
+        <div class="hf-result-row" role="group" aria-label="Comparison and result">
+            <select id="calcCompareOperator${hiddenFieldId}_${calcIndex}" class="hf-select hf-select--narrow" title="Compare">
+                <option value="=">=</option>
+                <option value="<"><</option>
+                <option value=">">></option>
+            </select>
+            <input type="number" id="calcThreshold${hiddenFieldId}_${calcIndex}" class="hf-input hf-input--narrow" placeholder="Number" title="Threshold">
+            <span class="hf-result-row__then">then</span>
+            <select id="calcResult${hiddenFieldId}_${calcIndex}" class="hf-select hf-select--medium" title="Result">
+                <option value="checked">Checked</option>
+                <option value="unchecked">Unchecked</option>
+            </select>
+            <button type="button" class="hf-btn hf-btn--ghost" onclick="removeCalculationForCheckbox(${hiddenFieldId}, ${calcIndex})">Remove</button>
+        </div>
     `;
     calcBlock.appendChild(row);
     // Add the first term by default
@@ -803,12 +995,12 @@ function addEquationTermCheckbox(hiddenFieldId, calcIndex) {
     var existingTermCount = eqContainer.querySelectorAll('.equation-term-cb').length;
     var termNumber = existingTermCount+1;
     var div = document.createElement('div');
-    div.className='equation-term-cb';
+    div.className='equation-term-cb hf-equation-term';
     div.id='equationTermCb'+hiddenFieldId+'_'+calcIndex+'_'+termNumber;
     var operatorHTML='';
     if(termNumber>1){
         operatorHTML=`
-            <select id="calcTermOperator${hiddenFieldId}_${calcIndex}_${termNumber}">
+            <select id="calcTermOperator${hiddenFieldId}_${calcIndex}_${termNumber}" class="hf-select hf-select--narrow" title="Operator">
                 <option value="+">+</option>
                 <option value="-">-</option>
                 <option value="x">x</option>
@@ -818,10 +1010,10 @@ function addEquationTermCheckbox(hiddenFieldId, calcIndex) {
     }
     div.innerHTML=`
         ${operatorHTML}
-        <select id="calcTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}" style="width:200px;">
+        <select id="calcTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}" class="hf-select hf-select--grow">
             <option value="">-- Select money question --</option>
             ${generateMoneyQuestionOptions()}
-        </select><br><br>
+        </select>
     `;
     eqContainer.appendChild(div);
 }
@@ -837,11 +1029,15 @@ function removeCalculationForCheckbox(hiddenFieldId, calcIndex) {
     for(var i=0;i<rows.length;i++){
         var r= rows[i];
         var newIndex=i+1;
-        r.className='calculation'+newIndex;
+        r.className='hf-calc-card calculation'+newIndex;
         var oldId = r.id; 
         r.id='calculationRow'+hiddenFieldId+'_'+newIndex;
-        var label= r.querySelector('label');
-        if(label) label.textContent='Calculation '+newIndex+':';
+        var titleEl = r.querySelector('.hf-calc-card__title');
+        if (titleEl) titleEl.textContent = 'Calculation ' + newIndex;
+        else {
+            var label = r.querySelector('label');
+            if (label) label.textContent = 'Calculation ' + newIndex + ':';
+        }
         var eqCont= r.querySelector('[id^="equationContainer"]');
         if(eqCont) eqCont.id= 'equationContainer'+hiddenFieldId+'_'+newIndex;
         var addBtn= r.querySelector('button[onclick^="addEquationTermCheckbox"]');
@@ -913,23 +1109,25 @@ function addCalculationForText(hiddenFieldId) {
     var textCalcBlock = document.getElementById('textCalculationBlock'+hiddenFieldId);
     var calcIndex = textCalcBlock.children.length+1;
     var row= document.createElement('div');
-    row.className='text-calc'+calcIndex;
+    row.className='hf-calc-card text-calc'+calcIndex;
     row.id='textCalculationRow'+hiddenFieldId+'_'+calcIndex;
     row.innerHTML=`
-        <label>Calculation ${calcIndex} (Text):</label><br>
-        <div id="textEquationContainer${hiddenFieldId}_${calcIndex}"></div>
-        <button type="button" onclick="addEquationTermText(${hiddenFieldId}, ${calcIndex})">Add Another Term</button>
-        <br><br>
-        <select id="textCompareOperator${hiddenFieldId}_${calcIndex}">
-            <option value="=">=</option>
-            <option value="<"><</option>
-            <option value=">">></option>
-        </select>
-        <input type="number" id="textThreshold${hiddenFieldId}_${calcIndex}" placeholder="Enter number" style="width:80px;">
-        <label> then fill with: </label>
-        <input type="text" id="textFillValue${hiddenFieldId}_${calcIndex}" placeholder="Enter value or use ##FIELDNAME## to reference a field" style="width:230px;">
-        <button type="button" onclick="removeCalculationForText(${hiddenFieldId}, ${calcIndex})">Remove</button>
-        <hr>
+        <span class="hf-calc-card__title">Calculation ${calcIndex} (text)</span>
+        <div id="textEquationContainer${hiddenFieldId}_${calcIndex}" class="hf-equation-terms"></div>
+        <div class="hf-toolbar">
+            <button type="button" class="hf-btn hf-btn--secondary" onclick="addEquationTermText(${hiddenFieldId}, ${calcIndex})">Add another term</button>
+        </div>
+        <div class="hf-result-row" role="group" aria-label="Comparison and fill value">
+            <select id="textCompareOperator${hiddenFieldId}_${calcIndex}" class="hf-select hf-select--narrow" title="Compare">
+                <option value="=">=</option>
+                <option value="<"><</option>
+                <option value=">">></option>
+            </select>
+            <input type="number" id="textThreshold${hiddenFieldId}_${calcIndex}" class="hf-input hf-input--narrow" placeholder="Number" title="Threshold">
+            <span class="hf-result-row__then">then fill with</span>
+            <input type="text" id="textFillValue${hiddenFieldId}_${calcIndex}" class="hf-input hf-input--fill" placeholder="Value or ##FIELDNAME##">
+            <button type="button" class="hf-btn hf-btn--ghost" onclick="removeCalculationForText(${hiddenFieldId}, ${calcIndex})">Remove</button>
+        </div>
     `;
     textCalcBlock.appendChild(row);
     // Add the first term
@@ -946,12 +1144,12 @@ function addEquationTermText(hiddenFieldId, calcIndex) {
     var existingTerms = eqContainer.querySelectorAll('.equation-term-text').length;
     var termNumber = existingTerms + 1;
     var div = document.createElement('div');
-    div.className = 'equation-term-text';
+    div.className = 'equation-term-text hf-equation-term';
     div.id = 'equationTermText'+hiddenFieldId+'_'+calcIndex+'_'+termNumber;
     var operatorHTML = '';
     if(termNumber > 1) {
         operatorHTML = `
-            <select id="textTermOperator${hiddenFieldId}_${calcIndex}_${termNumber}">
+            <select id="textTermOperator${hiddenFieldId}_${calcIndex}_${termNumber}" class="hf-select hf-select--narrow" title="Operator">
                 <option value="+">+</option>
                 <option value="-">-</option>
                 <option value="x">x</option>
@@ -972,11 +1170,11 @@ function addEquationTermText(hiddenFieldId, calcIndex) {
     div.innerHTML = `
         ${operatorHTML}
         <select id="textTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}" 
-                onchange="updateAmountFieldIndex(this, ${JSON.stringify(checkboxQuestions).replace(/"/g, '&quot;')})" 
-                style="width:200px;">
+                class="hf-select hf-select--grow"
+                onchange="updateAmountFieldIndex(this, ${JSON.stringify(checkboxQuestions).replace(/"/g, '&quot;')})">
             <option value="">-- Select money question --</option>
             ${generateMoneyQuestionOptions()}
-        </select><br><br>
+        </select>
     `;
     eqContainer.appendChild(div);
     // Force update all dropdowns to ensure consistent options
@@ -1009,11 +1207,15 @@ function removeCalculationForText(hiddenFieldId, calcIndex) {
     for(var i=0;i<rows.length;i++){
         var r= rows[i];
         var newIndex=i+1;
-        r.className='text-calc'+newIndex;
+        r.className='hf-calc-card text-calc'+newIndex;
         var oldId= r.id;
         r.id='textCalculationRow'+hiddenFieldId+'_'+newIndex;
-        var label= r.querySelector('label');
-        if(label) label.textContent='Calculation '+newIndex+' (Text):';
+        var titleEl = r.querySelector('.hf-calc-card__title');
+        if (titleEl) titleEl.textContent = 'Calculation ' + newIndex + ' (text)';
+        else {
+            var label = r.querySelector('label');
+            if (label) label.textContent = 'Calculation ' + newIndex + ' (Text):';
+        }
         var eqCont= r.querySelector('[id^="textEquationContainer"]');
         if(eqCont) eqCont.id='textEquationContainer'+hiddenFieldId+'_'+newIndex;
         var addBtn = r.querySelector('button[onclick^="addEquationTermText"]');

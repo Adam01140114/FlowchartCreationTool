@@ -1,0 +1,217 @@
+FormWiz / Big Form Builder — CSS & layout makeover playbook
+=============================================================
+
+Use this checklist when restyling any builder section (hidden fields, linked
+fields, question toggles, modals, etc.) so fixes stay consistent and survive
+global styles from form.css.
+
+---------------------------------------------------------------------------
+1) Find what is breaking the layout (before writing CSS)
+---------------------------------------------------------------------------
+
+A) Global stylesheet conflicts (common in this project)
+   - form.css applies broad rules: `section { display:flex; ... }`, `select`,
+     `input`, `button`, `input[type="checkbox"]` (centered, fixed widths).
+   - Those rules affect ANY markup inside #formBuilder unless overridden.
+   - Fix: either avoid the problematic element (e.g. use <div> instead of
+     <section>), or scope overrides under a stable wrapper id/class.
+
+B) Flex / grid mistakes
+   - Putting a long title and a wide form in one flex ROW squeezes the title
+     and can look like “vertical text”.
+   - Fix: column stack (`flex-direction: column`) or separate rows (header row,
+     body row, actions row).
+
+C) Legacy inline styles
+   - Inline `style="..."` on generated HTML fights the theme and is hard to
+     grep. Prefer semantic class names + gui-theme.css.
+
+---------------------------------------------------------------------------
+2) Structure pattern we use for “module panels” (Calculation Fields, Linked Fields)
+---------------------------------------------------------------------------
+
+Markup shape:
+  #<name>Panel.panel-root
+    .<name>-panel__header   → title + Collapse/Expand toggle
+    .<name>-panel__body     → scrollable / padded content
+
+Behaviors:
+  - Panel hidden when empty: add `--empty` class + `display: none` when
+    there are zero child blocks; show when first item is added.
+  - After JSON import: call `set<Name>PanelCollapsed(true)` so body starts
+    collapsed (match Calculation Fields UX).
+
+JavaScript:
+  - One `ensure<Name>Panel()` that creates the shell once and returns the body
+    container where items are appended.
+  - One `sync<Name>PanelAfterRemoval()` to remove the whole panel when the
+    last item is deleted (or toggle `--empty` if you prefer keeping DOM).
+
+CSS location:
+  - Put panel rules in gui-theme.css under
+    `body.gui-app #formBuilder #<name>Panel...` for specificity over form.css.
+
+---------------------------------------------------------------------------
+3) Scoped “reset” pattern for any editor sub-panel
+---------------------------------------------------------------------------
+
+When a subtree must NOT inherit form.css button/input/select behavior, add a
+small reset block scoped to the wrapper, e.g.:
+
+  body.gui-app #formBuilder #myPanel select,
+  body.gui-app #formBuilder #myPanel input[type="text"] { ... }
+
+Rules of thumb:
+  - Do NOT use a blanket `select { width:100% }` for the entire panel if you
+    also need compact inline rows (e.g. compare operators). Scope full width
+    to `.my-panel .hf-field select` only.
+  - Checkboxes in a horizontal row need:
+    `display: inline-block !important; margin: 0 !important` on the checkbox.
+  - Buttons in toolbars need:
+    `display: inline-flex !important; width: auto !important; margin: 0 !important`
+    (see hidden panel `button.hf-btn` pattern).
+
+---------------------------------------------------------------------------
+4) Internal form layout (hf-* style system)
+---------------------------------------------------------------------------
+
+For dense forms inside a card:
+  - Use a vertical stack wrapper (e.g. `.hf-stack`) with consistent `gap`.
+  - One field = label + control in `.hf-field` (column, gap 6–8px).
+  - Section titles: small caps / letter-spacing OK, but keep `text-align:
+    left` and enough horizontal space (never squeeze a heading in a flex row
+    with siblings unless you give it `min-width: 0` + `flex: 1` intentionally).
+
+Centering actions:
+  - Put destructive/secondary actions in a dedicated row
+    (e.g. `.hf-condition-card__actions`, `.hf-footer-actions`) and use
+    `display: flex; justify-content: center; flex-wrap: wrap; gap: ...`.
+
+---------------------------------------------------------------------------
+5) Import-time defaults (collapse noise)
+---------------------------------------------------------------------------
+
+In download.js `updateFormAfterImport()` (runs after `loadFormData`):
+  - Collapse all questions: `collapseImportedQuestionsByDefault()`
+  - Collapse all sections: `collapseImportedSectionsByDefault()`
+  - Collapse module panels: `setHiddenFieldsContainerCollapsed(true)`,
+    `setLinkedFieldsPanelCollapsed(true)` when those helpers exist.
+
+Keep preview-import guard (`window.__isPreviewImport`) AFTER these UI tweaks if
+you still want to skip heavy dropdown refresh work — collapsing is cheap and
+usually still desired for preview.
+
+---------------------------------------------------------------------------
+6) Checklist before merging
+---------------------------------------------------------------------------
+
+[ ] No raw `<section>` inside #formBuilder unless you override form.css section
+    flex, or use a class that resets display/block.
+[ ] No unscoped `select` / `input` / `button` fixes — always under #myPanel or
+    similar.
+[ ] Primary flow is columnar; horizontal rows only for short control groups.
+[ ] Empty state for list panels is explicit (remove panel or `--empty` class).
+[ ] Import path updates panel collapsed state for new modules you add.
+
+---------------------------------------------------------------------------
+7) Files touched in the “hidden + linked” makeover (reference)
+---------------------------------------------------------------------------
+
+- gui-theme.css — panel chrome, hf-* layout, scoped resets, linked panel.
+- hidden.js — hidden field DOM, empty panel sync, avoid `<section>` for
+  conditional blocks.
+- gui.js — `ensureLinkedFieldsPanel`, collapse toggle, append targets.
+- download.js — import collapse (sections + questions + panels).
+
+---------------------------------------------------------------------------
+8) Form Settings — checkbox in a “Mark only one” style panel
+---------------------------------------------------------------------------
+
+Problem: a bare checkbox + label in the Form Settings modal inherits global
+form.css flex/center rules and looks disconnected from its label.
+
+Pattern (match builder checkbox flags):
+  - Wrap the control in `#formSettingsModal .fw-settings-checkbox-panel`
+    (outer tinted box, same idea as `#formBuilder .fw-cb-question-flags`).
+  - Inside: `.fw-cb-question-flag` > `label.fw-cb-question-flag__row` >
+    `input` + `span.fw-cb-question-flag__text`.
+
+CSS lives in gui-theme.css under `#formSettingsModal .fw-settings-checkbox-panel`
+(mirror padding, border, background, and `.fw-cb-question-flag__row` row styles
+from `#formBuilder .fw-cb-question-flag__*`).
+
+Preview sync: ignore input/change bubbling from `.fw-settings-checkbox-panel`
+in gui-preview-sync.js so toggling auto-refresh does not trigger iframe rebuilds.
+
+---------------------------------------------------------------------------
+9) Section “Add Question” lives inside the collapsible body
+---------------------------------------------------------------------------
+
+The “Add Question to Section” button must sit inside `.fw-section-body` (after
+`#questionsSection*`) so it hides when `.fw-section-body--collapsed` is applied.
+
+Markup: optional wrapper `.fw-section-add-question-wrap` for spacing
+(`gui.js` addSection template).
+
+---------------------------------------------------------------------------
+10) Collapsible affordance — hover ring + click-to-toggle on headers
+---------------------------------------------------------------------------
+
+Goal: match Calculation Fields / hf-block UX — when a block is collapsed, the user
+sees a hover affordance and can click the header row (not only the chevron) to
+expand.
+
+CSS (gui-theme.css, scoped under `#formBuilder`):
+  - For `.section-block:has(.fw-section-body--collapsed)` and
+    `.question-block:has(.fw-question-body--collapsed)`: subtle
+    `box-shadow` ring on `:hover`; `cursor: pointer` on
+    `.fw-section-head.fw-collapsible-head` / `.fw-question-head.fw-collapsible-head`.
+  - For `.fw-options-panel:has(.fw-options-panel-body--collapsed)`: darken
+    `.fw-options-panel-head` on panel `:hover`.
+  - For `.fw-cb-opt:has(.fw-cb-opt__body--collapsed)`: soft ring on `:hover`.
+  - For `#hiddenFieldsPanel.is-collapsed` / `#linkedFieldsPanel.is-collapsed`:
+    panel ring on `:hover`; `cursor: pointer` on
+    `.hidden-fields-panel__header.fw-collapsible-module-head` /
+    `.linked-fields-panel__header.fw-collapsible-module-head`.
+  - For `.hidden-field-block:has(.hf-block-body--collapsed)`: soft ring on `:hover`.
+
+JavaScript:
+  - Section: `.fw-section-head.fw-collapsible-head` `onclick`:
+    `if (!event.target.closest('button')) toggleSectionCollapse(...)`; chevron
+    button: `event.stopPropagation(); toggleSectionCollapse(...)`.
+  - Question: same pattern with `toggleQuestionCollapse`.
+  - Dropdown / checkbox options: `.fw-options-panel-head.fw-options-panel-head--toggle`
+    with `toggleDropdownOptionsCollapse` / `toggleCheckboxOptionsCollapse`; chevron
+    `stopPropagation`.
+  - Calculation Fields module: `hidden.js` — header `fw-collapsible-module-head` + same
+    button stopPropagation; `toggleHiddenFieldsContainerCollapse`.
+  - Linked Fields panel: `ensureLinkedFieldsPanel()` in gui.js — same pattern;
+    `toggleLinkedFieldsPanelCollapse`.
+
+When adding new collapsible regions, reuse this head class + stopPropagation
+pattern and add a matching `:has(...--collapsed):hover` rule in gui-theme.css.
+
+---------------------------------------------------------------------------
+11) Module panels — “Add …” row below entries, centered
+---------------------------------------------------------------------------
+
+For top-level builder modules that list items then offer a primary add action
+(Calculation Fields, Linked Fields, and similar):
+
+Markup order inside `.hidden-fields-panel__body` / `.linked-fields-panel__body`:
+  1) `#hiddenFieldsList` / `#linkedFieldsList` (append rows here only)
+  2) `.hidden-fields-panel__toolbar` / `.linked-fields-panel__toolbar` with the
+     single add button (`Add Calculation Field`, `Add Linked Field`, …)
+
+Do NOT place the add button above the list — users scan entries first, then act.
+
+CSS (gui-theme.css, scoped under `#formBuilder`):
+  - Toolbar: `display: flex; justify-content: center; align-items: center;`
+  - Separate list from actions: `border-top` on the toolbar (or padding gap),
+    generous vertical padding on the toolbar row.
+  - List wrapper gets horizontal padding + top padding; keep append target ids
+    (`#hiddenFieldsList`, `#linkedFieldsList`) stable for JS.
+
+Reference: `hidden.js` (calculation panel shell), `gui.js` `ensureLinkedFieldsPanel()`.
+
+End of playbook.

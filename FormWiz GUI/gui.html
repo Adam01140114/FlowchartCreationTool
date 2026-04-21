@@ -82,6 +82,56 @@
             justify-content: center;
             width: 100%;
         }
+        #fwResumeDraftModal.fw-resume-draft-modal-wrap .modal-content.fw-resume-draft-modal {
+            max-width: 440px;
+            width: 92%;
+            padding: 28px 24px 24px;
+            text-align: left;
+            align-items: stretch;
+        }
+        #fwResumeDraftModal .fw-resume-draft-modal__title {
+            margin: 0 0 10px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        #fwResumeDraftModal .fw-resume-draft-modal__text {
+            margin: 0 0 22px;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #475569;
+        }
+        #fwResumeDraftModal .fw-resume-draft-modal__actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        #fwResumeDraftModal .fw-resume-draft-modal__btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+        }
+        #fwResumeDraftModal .fw-resume-draft-modal__btn--primary {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff;
+        }
+        #fwResumeDraftModal .fw-resume-draft-modal__btn--primary:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+        #fwResumeDraftModal .fw-resume-draft-modal__btn--ghost {
+            background: #fff;
+            color: #334155;
+        }
+        #fwResumeDraftModal .fw-resume-draft-modal__btn--ghost:hover {
+            background: #f1f5f9;
+        }
+
         #pasteJsonTextarea {
             width: 100%;
             min-height: 120px;
@@ -97,6 +147,12 @@
     </style>
 </head>
 <body class="gui-app">
+    <div id="fwBuilderImportLoading" class="fw-builder-import-loading" aria-hidden="true" aria-busy="false" role="status">
+        <div class="fw-builder-import-loading__card">
+            <div class="fw-builder-import-loading__spinner" aria-hidden="true"></div>
+            <p class="fw-builder-import-loading__text">Loading form…</p>
+        </div>
+    </div>
     <header class="isd-header">
         <div class="isd-header__brand">
             <img src="logo.png" alt="FormWiz" class="isd-logo" onclick="location.href='index.html';">
@@ -139,21 +195,32 @@
                     <span class="close" onclick="closeFormSettingsModal()" role="button" tabindex="0">&times;</span>
                     <h3 class="fw-form-settings-title">Form Settings</h3>
                     <section class="fw-settings-section">
-                        <h4 class="fw-settings-heading">Form Name</h4>
-                        <label class="fw-settings-label" for="formNameInput">Form Name:</label>
-                        <input type="text" id="formNameInput" name="formNameInput" class="fw-settings-input" value="Example Form" placeholder="Example Form">
+                        <h4 class="fw-settings-heading" id="fwFormNameHeading">Form name</h4>
+                        <input type="text" id="formNameInput" name="formNameInput" class="fw-settings-input" value="Example Form" placeholder="Example Form" aria-labelledby="fwFormNameHeading">
                         <p class="fw-settings-hint">This name will appear in the browser title and be used for the default checkbox.</p>
+                    </section>
+                    <section class="fw-settings-section">
+                        <h4 class="fw-settings-heading">Live preview</h4>
+                        <div class="fw-settings-checkbox-panel">
+                            <div class="fw-cb-question-flag">
+                                <label class="fw-cb-question-flag__row" for="fwPreviewAutoRefreshToggle">
+                                    <input type="checkbox" id="fwPreviewAutoRefreshToggle" checked>
+                                    <span class="fw-cb-question-flag__text">Auto-refresh preview when the form changes</span>
+                                </label>
+                            </div>
+                        </div>
+                        <p class="fw-settings-hint">When off, the preview does not reload on every edit (less lag). Use the <strong>Refresh</strong> button in the preview panel to update.</p>
                     </section>
                     <section class="fw-settings-section">
                         <h4 class="fw-settings-heading">PDF Configuration</h4>
                         <p class="fw-settings-hint">Configure the PDF form name, output file name, and Stripe price ID for your form.</p>
                         <div id="pdfContainer">
                             <div class="pdf-input-group" id="pdfGroup_0">
-                                <label>Choose Form PDF:</label>
+                                <label class="fw-settings-label" for="formPDFName">Form PDF file name</label>
                                 <input type="text" id="formPDFName" placeholder="Enter PDF form name (e.g., sc100.pdf)">
-                                <label for="pdfOutputName">Choose your PDF Name:</label>
+                                <label class="fw-settings-label" for="pdfOutputName">Output file name</label>
                                 <input type="text" id="pdfOutputName" placeholder="Enter output file name (e.g., adam.html)">
-                                <label for="stripePriceId">Choose your Price ID:</label>
+                                <label class="fw-settings-label" for="stripePriceId">Stripe price ID</label>
                                 <input type="text" id="stripePriceId" placeholder="Enter Stripe Price ID (e.g., price_12345)">
                             </div>
                         </div>
@@ -167,6 +234,16 @@
                     <h3>Paste GUI JSON</h3>
                     <textarea id="pasteJsonTextarea" style="width:100%;height:200px;"></textarea>
                     <button type="button" id="confirmPasteJsonBtn" class="fw-btn--block">Import</button>
+                </div>
+            </div>
+            <div id="fwResumeDraftModal" class="modal fw-resume-draft-modal-wrap" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="fwResumeDraftTitle" aria-hidden="true">
+                <div class="modal-content fw-resume-draft-modal">
+                    <h3 id="fwResumeDraftTitle" class="fw-resume-draft-modal__title">Resume where you left off?</h3>
+                    <p class="fw-resume-draft-modal__text">A saved copy of your form from this browser was found. Load it now, or discard it and continue with the page as loaded.</p>
+                    <div class="fw-resume-draft-modal__actions">
+                        <button type="button" id="fwResumeDraftNo" class="fw-resume-draft-modal__btn fw-resume-draft-modal__btn--ghost">No, discard</button>
+                        <button type="button" id="fwResumeDraftYes" class="fw-resume-draft-modal__btn fw-resume-draft-modal__btn--primary">Yes, load draft</button>
+                    </div>
                 </div>
             </div>
             <!-- Modal for JSON Library -->
@@ -249,7 +326,10 @@
             <aside class="fw-preview-pane" aria-label="Preview">
                 <div class="fw-card fw-preview-card-inner">
                     <div class="fw-preview-head">
-                        <h3>Live preview</h3>
+                        <div class="fw-preview-head__row">
+                            <h3>Live preview</h3>
+                            <button type="button" id="fwPreviewManualRefreshBtn" class="fw-preview-refresh-btn" style="display: none;">Refresh</button>
+                        </div>
                         <p class="fw-hint">Same generated HTML as <strong>Preview</strong> / the modal. Refreshes a few hundred ms after you type or change the form. Drag the vertical divider to resize the panels.</p>
                     </div>
                     <div class="fw-preview-frame-wrap">
@@ -274,6 +354,123 @@
     <script src="download.js"></script>
     <script src="hidden.js"></script>
     <script src="gui-preview-sync.js"></script>
+    <script>
+        (function () {
+            var FW_DRAFT_KEY = 'fw_builder_draft_json';
+
+            function hideResumeDraftModal() {
+                var m = document.getElementById('fwResumeDraftModal');
+                if (!m) return;
+                m.style.display = 'none';
+                m.setAttribute('aria-hidden', 'true');
+            }
+
+            /**
+             * @param {function(): void} onConfirm
+             * @param {function(): void} onDecline
+             */
+            function showResumeDraftModal(onConfirm, onDecline) {
+                var m = document.getElementById('fwResumeDraftModal');
+                var yes = document.getElementById('fwResumeDraftYes');
+                var no = document.getElementById('fwResumeDraftNo');
+                if (!m || !yes || !no) {
+                    if (typeof onDecline === 'function') onDecline();
+                    return;
+                }
+                var cleaned = false;
+                function cleanup() {
+                    if (cleaned) return;
+                    cleaned = true;
+                    yes.removeEventListener('click', onYesClick);
+                    no.removeEventListener('click', onNoClick);
+                    m.removeEventListener('click', onBackdrop);
+                    document.removeEventListener('keydown', onEscape);
+                }
+                function onYesClick() {
+                    cleanup();
+                    hideResumeDraftModal();
+                    if (typeof onConfirm === 'function') onConfirm();
+                }
+                function onNoClick() {
+                    cleanup();
+                    hideResumeDraftModal();
+                    if (typeof onDecline === 'function') onDecline();
+                }
+                function onBackdrop(ev) {
+                    if (ev.target === m) onNoClick();
+                }
+                function onEscape(ev) {
+                    if (ev.key === 'Escape') onNoClick();
+                }
+                yes.addEventListener('click', onYesClick);
+                no.addEventListener('click', onNoClick);
+                m.addEventListener('click', onBackdrop);
+                document.addEventListener('keydown', onEscape);
+                m.style.display = 'flex';
+                m.setAttribute('aria-hidden', 'false');
+                try {
+                    yes.focus();
+                } catch (f) { /* ignore */ }
+            }
+
+            window.addEventListener('DOMContentLoaded', function () {
+                if (window.__isPreviewImport) return;
+                var raw = null;
+                try {
+                    raw = localStorage.getItem(FW_DRAFT_KEY);
+                } catch (e) {
+                    return;
+                }
+                if (!raw || !String(raw).trim()) return;
+
+                var data;
+                try {
+                    data = JSON.parse(raw);
+                } catch (err) {
+                    try {
+                        localStorage.removeItem(FW_DRAFT_KEY);
+                    } catch (e3) { /* ignore */ }
+                    return;
+                }
+                if (!data || typeof data !== 'object') {
+                    try {
+                        localStorage.removeItem(FW_DRAFT_KEY);
+                    } catch (e4) { /* ignore */ }
+                    return;
+                }
+
+                showResumeDraftModal(
+                    function () {
+                        window.__fwResumeDraftSkipSave = true;
+                        try {
+                            if (typeof loadFormData === 'function') {
+                                loadFormData(data);
+                            }
+                        } catch (loadErr) {
+                            console.error('Resume draft failed:', loadErr);
+                            window.__fwResumeDraftSkipSave = false;
+                            return;
+                        }
+                        window.__fwResumeDraftSkipSave = false;
+                        // Keep draft for the next visit (import path skips save while skip flag is set)
+                        try {
+                            if (typeof exportForm === 'function') {
+                                var snapshot = exportForm({ silent: true });
+                                if (snapshot) {
+                                    localStorage.setItem(FW_DRAFT_KEY, JSON.stringify(snapshot));
+                                }
+                            }
+                        } catch (eSave) { /* ignore */ }
+                    },
+                    function () {
+                        try {
+                            localStorage.removeItem(FW_DRAFT_KEY);
+                        } catch (e2) { /* ignore */ }
+                    }
+                );
+            });
+        })();
+    </script>
     <script>
         // --- BEGIN: Global Address Helpers for Preview ---
         (function injectAddressHelpersOnce() {
@@ -551,6 +748,9 @@
         function openFormSettingsModal() {
             var m = document.getElementById('formSettingsModal');
             if (m) m.style.display = 'flex';
+            if (typeof window.fwSyncPreviewAutoRefreshToggleFromStorage === 'function') {
+                window.fwSyncPreviewAutoRefreshToggleFromStorage();
+            }
         }
         function closeFormSettingsModal() {
             var m = document.getElementById('formSettingsModal');

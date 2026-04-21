@@ -27,9 +27,9 @@ function addSection(sectionId = null) {
     sectionBlock.className = 'section-block';
     sectionBlock.id = `sectionBlock${currentSectionId}`;
     sectionBlock.innerHTML = `
-        <div class="fw-section-head">
+        <div class="fw-section-head fw-collapsible-head" onclick="if(!event.target.closest('button')) toggleSectionCollapse(${currentSectionId}, event)">
             <h2 id="sectionLabel${currentSectionId}">Section ${currentSectionId}</h2>
-            <button type="button" class="fw-question-collapse-btn" id="fwSectionCollapseBtn${currentSectionId}" aria-expanded="true" aria-controls="fwSectionCollapseBody${currentSectionId}" aria-label="Collapse or expand section" onclick="toggleSectionCollapse(${currentSectionId}, event)">
+            <button type="button" class="fw-question-collapse-btn" id="fwSectionCollapseBtn${currentSectionId}" aria-expanded="true" aria-controls="fwSectionCollapseBody${currentSectionId}" aria-label="Collapse or expand section" onclick="event.stopPropagation(); toggleSectionCollapse(${currentSectionId}, event)">
                 <svg class="fw-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
         </div>
@@ -38,9 +38,11 @@ function addSection(sectionId = null) {
         <input type="text" id="sectionName${currentSectionId}" placeholder="Enter section name"
                value="Section ${currentSectionId}" oninput="updateSectionName(${currentSectionId})">
         <div id="questionsSection${currentSectionId}"></div>
+        <div class="fw-section-add-question-wrap">
+            <button type="button" class="fw-btn-primary fw-btn--block fw-section-add-question" onclick="addQuestion(${currentSectionId})">Add Question to Section</button>
+        </div>
         </div>
         <div class="fw-section-footer">
-            <button type="button" class="fw-btn-primary fw-btn--block fw-section-add-question" onclick="addQuestion(${currentSectionId})">Add Question to Section</button>
             <div class="fw-section-actions-wrap">
             <div class="fw-section-actions" role="group" aria-label="Section order and removal">
                 <button type="button" class="fw-icon-btn" onclick="removeSection(${currentSectionId})" title="Remove section" aria-label="Remove section">
@@ -65,6 +67,7 @@ function addSection(sectionId = null) {
     if (!sectionId) {
         sectionCounter++;
     }
+    updateSectionName(currentSectionId);
     // Update group section dropdowns when a new section is added
     if (typeof updateGroupSectionDropdowns === 'function') {
         updateGroupSectionDropdowns();
@@ -343,11 +346,28 @@ function updateAllPdfLogicDropdowns() {
         });
     });
 }
+function formatSectionHeadingText(ordinal, rawName) {
+    const t = (rawName || '').trim();
+    const base = `Section ${ordinal}`;
+    if (!t || t === base) return base;
+    const display = t.length > 60 ? `${t.slice(0, 57)}…` : t;
+    return `${base} (${display})`;
+}
+
+function getSectionDisplayOrdinal(sectionId) {
+    const blocks = document.querySelectorAll('.section-block');
+    for (let i = 0; i < blocks.length; i++) {
+        if (blocks[i].id === `sectionBlock${sectionId}`) return i + 1;
+    }
+    return parseInt(sectionId, 10) || 1;
+}
+
 function updateSectionName(sectionId) {
     const sectionNameInput = document.getElementById(`sectionName${sectionId}`);
     const sectionLabel = document.getElementById(`sectionLabel${sectionId}`);
     if (sectionLabel && sectionNameInput) {
-        sectionLabel.textContent = sectionNameInput.value;
+        const ord = getSectionDisplayOrdinal(sectionId);
+        sectionLabel.textContent = formatSectionHeadingText(ord, sectionNameInput.value);
     }
     // Update group section dropdowns when section name changes
     if (typeof updateGroupSectionDropdowns === 'function') {
@@ -365,13 +385,15 @@ function updateSectionName(sectionId) {
 function updateSectionLabels() {
     const sections = document.querySelectorAll('.section-block');
     sections.forEach((block, index) => {
-        // Only update the heading text to "Section X" 
-        const h2Label = block.querySelector('h2');
-        if (h2Label) {
-            h2Label.textContent = `Section ${index + 1}`;
+        const idMatch = /^sectionBlock(\d+)$/.exec(block.id);
+        if (!idMatch) return;
+        const sid = idMatch[1];
+        const h2Label = document.getElementById(`sectionLabel${sid}`) || block.querySelector('h2');
+        const nameInput = document.getElementById(`sectionName${sid}`);
+        if (h2Label && nameInput) {
+            h2Label.textContent = formatSectionHeadingText(index + 1, nameInput.value);
         }
-        // Optionally also update the "Section Name" input's .value
-        // but do NOT rename block.id or button onClick attributes
+        // Do NOT rename block.id or button onClick attributes
     });
     // Also fix question display text
     updateGlobalQuestionLabels();
@@ -690,9 +712,9 @@ function addQuestion(sectionId, questionId = null) {
     questionBlock.className = 'question-block';
     questionBlock.id = `questionBlock${currentQuestionId}`;
     questionBlock.innerHTML = `
-        <div class="fw-question-head">
+        <div class="fw-question-head fw-collapsible-head" onclick="if(!event.target.closest('button')) toggleQuestionCollapse(${currentQuestionId}, event)">
             <span class="fw-question-title" id="fwQuestionTitleText${currentQuestionId}">Question</span>
-            <button type="button" class="fw-question-collapse-btn" id="fwQuestionCollapseBtn${currentQuestionId}" aria-expanded="true" aria-controls="fwQuestionCollapseBody${currentQuestionId}" aria-label="Collapse or expand question" onclick="toggleQuestionCollapse(${currentQuestionId}, event)">
+            <button type="button" class="fw-question-collapse-btn" id="fwQuestionCollapseBtn${currentQuestionId}" aria-expanded="true" aria-controls="fwQuestionCollapseBody${currentQuestionId}" aria-label="Collapse or expand question" onclick="event.stopPropagation(); toggleQuestionCollapse(${currentQuestionId}, event)">
                 <svg class="fw-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
         </div>
@@ -756,9 +778,9 @@ function addQuestion(sectionId, questionId = null) {
             <div id="unifiedFields${currentQuestionId}"></div>
         </div>        <!-- Dropdown Options -->
         <div id="optionsBlock${currentQuestionId}" class="dropdown-options fw-options-panel" style="display: none;">
-            <div class="fw-options-panel-head">
+            <div class="fw-options-panel-head fw-options-panel-head--toggle" onclick="if(!event.target.closest('button')) toggleDropdownOptionsCollapse(${currentQuestionId}, event)">
                 <span class="fw-options-panel-title">Options</span>
-                <button type="button" class="fw-question-collapse-btn fw-options-collapse-btn" id="fwDropdownOptsCollapseBtn${currentQuestionId}" aria-expanded="true" aria-controls="fwDropdownOptsBody${currentQuestionId}" aria-label="Collapse or expand options" onclick="toggleDropdownOptionsCollapse(${currentQuestionId}, event)">
+                <button type="button" class="fw-question-collapse-btn fw-options-collapse-btn" id="fwDropdownOptsCollapseBtn${currentQuestionId}" aria-expanded="true" aria-controls="fwDropdownOptsBody${currentQuestionId}" aria-label="Collapse or expand options" onclick="event.stopPropagation(); toggleDropdownOptionsCollapse(${currentQuestionId}, event)">
                     <svg class="fw-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
             </div>
@@ -779,24 +801,37 @@ function addQuestion(sectionId, questionId = null) {
             </div>
         </div>        <!-- Dropdown Options -->
         <div id="checkboxOptionsBlock${currentQuestionId}" class="checkbox-options fw-options-panel" style="display: none;">
-            <div class="fw-options-panel-head">
+            <div class="fw-options-panel-head fw-options-panel-head--toggle" onclick="if(!event.target.closest('button')) toggleCheckboxOptionsCollapse(${currentQuestionId}, event)">
                 <span class="fw-options-panel-title">Options</span>
-                <button type="button" class="fw-question-collapse-btn fw-options-collapse-btn" id="fwCheckboxOptsCollapseBtn${currentQuestionId}" aria-expanded="true" aria-controls="fwCheckboxOptsBody${currentQuestionId}" aria-label="Collapse or expand options" onclick="toggleCheckboxOptionsCollapse(${currentQuestionId}, event)">
+                <button type="button" class="fw-question-collapse-btn fw-options-collapse-btn" id="fwCheckboxOptsCollapseBtn${currentQuestionId}" aria-expanded="true" aria-controls="fwCheckboxOptsBody${currentQuestionId}" aria-label="Collapse or expand options" onclick="event.stopPropagation(); toggleCheckboxOptionsCollapse(${currentQuestionId}, event)">
                     <svg class="fw-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
             </div>
             <div class="fw-options-panel-body" id="fwCheckboxOptsBody${currentQuestionId}">
                 <div id="checkboxOptions${currentQuestionId}" class="fw-options-list"></div>
-                <button type="button" onclick="addCheckboxOption(${currentQuestionId})">Add Option</button>
+                <div class="fw-checkbox-options-toolbar">
+                    <button type="button" class="fw-btn-add-checkbox-option" onclick="addCheckboxOption(${currentQuestionId})">Add Option</button>
+                </div>
             </div>
-            <div id="noneOfTheAboveContainer${currentQuestionId}" style="margin-top:10px; margin-bottom:10px;">
-                <label><input type="checkbox" id="noneOfTheAbove${currentQuestionId}">Include "None of the above" option</label>
-            </div>
-            <div id="markOnlyOneContainer${currentQuestionId}" style="margin-top:10px; margin-bottom:10px;">
-                <label><input type="checkbox" id="markOnlyOne${currentQuestionId}">Mark only one</label>
-            </div>
-            <div id="allAreRequiredContainer${currentQuestionId}" style="margin-top:10px; margin-bottom:10px;">
-                <label><input type="checkbox" id="allAreRequired${currentQuestionId}">All are required</label>
+            <div class="fw-cb-question-flags">
+                <div id="noneOfTheAboveContainer${currentQuestionId}" class="fw-cb-question-flag">
+                    <label class="fw-cb-question-flag__row" for="noneOfTheAbove${currentQuestionId}">
+                        <input type="checkbox" id="noneOfTheAbove${currentQuestionId}">
+                        <span class="fw-cb-question-flag__text">Include &quot;None of the above&quot; option</span>
+                    </label>
+                </div>
+                <div id="markOnlyOneContainer${currentQuestionId}" class="fw-cb-question-flag">
+                    <label class="fw-cb-question-flag__row" for="markOnlyOne${currentQuestionId}">
+                        <input type="checkbox" id="markOnlyOne${currentQuestionId}">
+                        <span class="fw-cb-question-flag__text">Mark only one</span>
+                    </label>
+                </div>
+                <div id="allAreRequiredContainer${currentQuestionId}" class="fw-cb-question-flag">
+                    <label class="fw-cb-question-flag__row" for="allAreRequired${currentQuestionId}">
+                        <input type="checkbox" id="allAreRequired${currentQuestionId}">
+                        <span class="fw-cb-question-flag__text">All are required</span>
+                    </label>
+                </div>
             </div>
         </div>        <!-- Multiple Textboxes Options -->
         <div id="multipleTextboxesOptionsBlock${currentQuestionId}" class="multiple-textboxes-options fw-field-section" style="display: none;">
@@ -2442,36 +2477,90 @@ function removeDropdownOption(questionId, optionNumber) {
     // Update LaTeX preview trigger options
     updateLatexPreviewTriggerOptions(questionId);
 }
+var fwCbOptToggleLast = {};
+var FW_CB_OPT_TOGGLE_MS = 120;
+function toggleCheckboxOptionCollapse(questionId, optionNum, ev) {
+    if (ev) ev.preventDefault();
+    const tKey = `${questionId}_${optionNum}`;
+    const now = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
+    if (now - (fwCbOptToggleLast[tKey] || 0) < FW_CB_OPT_TOGGLE_MS) return;
+    fwCbOptToggleLast[tKey] = now;
+    const body = document.getElementById(`fwCbOptBody_${questionId}_${optionNum}`);
+    const btn = document.getElementById(`fwCbOptSumBtn_${questionId}_${optionNum}`);
+    if (!body || !btn) return;
+    const collapsed = body.classList.toggle('fw-cb-opt__body--collapsed');
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+}
+function updateCheckboxOptionSummary(questionId, optionNum) {
+    const nameEl = document.getElementById(`checkboxOptionName${questionId}_${optionNum}`);
+    const textEl = document.getElementById(`checkboxOptionText${questionId}_${optionNum}`);
+    const sumEl = document.getElementById(`fwCbOptSumText_${questionId}_${optionNum}`);
+    if (!sumEl) return;
+    const name = nameEl && nameEl.value ? nameEl.value.trim() : '';
+    const txt = textEl && textEl.value ? textEl.value.trim() : '';
+    const slug = name || (txt ? txt : 'unnamed');
+    sumEl.textContent = `Option ${optionNum} (${slug})`;
+}
+function collapseAllCheckboxOptionsAfterImport() {
+    document.querySelectorAll('.fw-cb-opt__body').forEach((body) => {
+        const m = /^fwCbOptBody_(\d+)_(\d+)$/.exec(body.id);
+        if (!m) return;
+        const qId = parseInt(m[1], 10);
+        const optNum = parseInt(m[2], 10);
+        body.classList.add('fw-cb-opt__body--collapsed');
+        const btn = document.getElementById(`fwCbOptSumBtn_${qId}_${optNum}`);
+        if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+        }
+        updateCheckboxOptionSummary(qId, optNum);
+    });
+}
 function addCheckboxOption(questionId) {
     const checkboxOptionsDiv = document.getElementById(`checkboxOptions${questionId}`);
     const optionCount = checkboxOptionsDiv.children.length + 1;
     const optionDiv = document.createElement('div');
-    optionDiv.className = `option${optionCount} fw-option-card`;
+    optionDiv.className = `option${optionCount} fw-option-card fw-cb-opt`;
     optionDiv.innerHTML = `
-        <label>Option ${optionCount} Text:</label>
-        <input type="text" id="checkboxOptionText${questionId}_${optionCount}" placeholder="Enter option text">        <label>Name/ID:</label>
-        <input type="text" id="checkboxOptionName${questionId}_${optionCount}" placeholder="Enter Name/ID">        <label>Value (optional):</label>
-        <input type="text" id="checkboxOptionValue${questionId}_${optionCount}" placeholder="Enter Value">        <label>
-            <input type="checkbox" id="checkboxOptionHasAmount${questionId}_${optionCount}" 
-                   onchange="toggleAmountPlaceholder(${questionId}, ${optionCount})">
-            Enable amount field
-        </label>
-        <div id="checkboxOptionAmountDetails${questionId}_${optionCount}" 
-             style="display: none; margin-top: 8px;">
-            <label>Amount Field Name:</label>
-            <input type="text" id="checkboxOptionAmountName${questionId}_${optionCount}"
-                   placeholder="Enter amount field name">            <label>Amount Placeholder:</label>
-            <input type="text" id="checkboxOptionAmountPlaceholder${questionId}_${optionCount}"
-                   placeholder="Enter amount placeholder">        </div>
-        <button type="button" onclick="removeCheckboxOption(${questionId}, ${optionCount})">Remove</button>
-        <hr>
+        <button type="button" class="fw-cb-opt__summary" id="fwCbOptSumBtn_${questionId}_${optionCount}" onclick="toggleCheckboxOptionCollapse(${questionId}, ${optionCount}, event)" aria-expanded="true" aria-controls="fwCbOptBody_${questionId}_${optionCount}">
+            <span class="fw-cb-opt__summary-handle" aria-hidden="true">
+                <svg class="fw-cb-opt__summary-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+            <span class="fw-cb-opt__summary-text" id="fwCbOptSumText_${questionId}_${optionCount}">Option ${optionCount} (unnamed)</span>
+        </button>
+        <div class="fw-cb-opt__body" id="fwCbOptBody_${questionId}_${optionCount}">
+            <div class="fw-cb-opt__grid">
+                <label class="fw-cb-opt__label">Option ${optionCount} Text:</label>
+                <input type="text" class="fw-cb-opt__input" id="checkboxOptionText${questionId}_${optionCount}" placeholder="Enter option text">
+                <label class="fw-cb-opt__label">Name/ID:</label>
+                <input type="text" class="fw-cb-opt__input fw-cb-opt__input--mono" id="checkboxOptionName${questionId}_${optionCount}" placeholder="Enter Name/ID" oninput="updateCheckboxOptionSummary(${questionId}, ${optionCount})">
+                <label class="fw-cb-opt__label">Value (optional):</label>
+                <input type="text" class="fw-cb-opt__input" id="checkboxOptionValue${questionId}_${optionCount}" placeholder="Enter Value">
+            </div>
+            <label class="fw-cb-opt__toggle-row">
+                <input type="checkbox" id="checkboxOptionHasAmount${questionId}_${optionCount}" onchange="toggleAmountPlaceholder(${questionId}, ${optionCount})">
+                <span>Enable amount field</span>
+            </label>
+            <div id="checkboxOptionAmountDetails${questionId}_${optionCount}" class="fw-cb-opt__amount-details" style="display: none;">
+                <div class="fw-cb-opt__grid">
+                    <label class="fw-cb-opt__label">Amount Field Name:</label>
+                    <input type="text" class="fw-cb-opt__input" id="checkboxOptionAmountName${questionId}_${optionCount}" placeholder="Enter amount field name">
+                    <label class="fw-cb-opt__label">Amount Placeholder:</label>
+                    <input type="text" class="fw-cb-opt__input" id="checkboxOptionAmountPlaceholder${questionId}_${optionCount}" placeholder="Enter amount placeholder">
+                </div>
+            </div>
+            <div class="fw-cb-opt__footer">
+                <button type="button" class="fw-cb-opt__remove" onclick="removeCheckboxOption(${questionId}, ${optionCount})">Remove</button>
+            </div>
+        </div>
     `;
     checkboxOptionsDiv.appendChild(optionDiv);
+    updateCheckboxOptionSummary(questionId, optionCount);
     // Add input listeners
     // 1. For jump conditions
     const optionTextInput = optionDiv.querySelector(`#checkboxOptionText${questionId}_${optionCount}`);
     if (optionTextInput) {
         optionTextInput.addEventListener('input', () => {
+            updateCheckboxOptionSummary(questionId, optionCount);
             updateJumpOptionsForCheckbox(questionId);
             // Also update calculation dropdowns if available
             if (typeof updateAllCalculationDropdowns === 'function') {
@@ -2516,16 +2605,42 @@ function removeCheckboxOption(questionId, optionNumber) {
         const options = document.querySelectorAll(`#checkboxOptions${questionId} > div`);
         options.forEach((option, index) => {
             const newOptionNumber = index + 1;
-            option.className = `option${newOptionNumber} fw-option-card`;
-            option.querySelector('label').innerText = `Option ${newOptionNumber} Text:`;
-            option.querySelector(`input[id^="checkboxOptionText"]`).id = `checkboxOptionText${questionId}_${newOptionNumber}`;
-            option.querySelector(`input[id^="checkboxOptionName"]`).id = `checkboxOptionName${questionId}_${newOptionNumber}`;
-            option.querySelector(`input[id^="checkboxOptionValue"]`).id = `checkboxOptionValue${questionId}_${newOptionNumber}`;
-            option.querySelector(`input[id^="checkboxOptionHasAmount"]`).id = `checkboxOptionHasAmount${questionId}_${newOptionNumber}`;
-            option.querySelector(`div[id^="checkboxOptionAmountDetails"]`).id = `checkboxOptionAmountDetails${questionId}_${newOptionNumber}`;
-            option.querySelector(`input[id^="checkboxOptionAmountName"]`).id = `checkboxOptionAmountName${questionId}_${newOptionNumber}`;
-            option.querySelector(`input[id^="checkboxOptionAmountPlaceholder"]`).id = `checkboxOptionAmountPlaceholder${questionId}_${newOptionNumber}`;
-            option.querySelector('button').setAttribute('onclick', `removeCheckboxOption(${questionId}, ${newOptionNumber})`);
+            option.className = `option${newOptionNumber} fw-option-card fw-cb-opt`;
+            const labels = option.querySelectorAll('.fw-cb-opt__label');
+            if (labels[0]) labels[0].innerText = `Option ${newOptionNumber} Text:`;
+            const textIn = option.querySelector(`input[id^="checkboxOptionText"]`);
+            if (textIn) textIn.id = `checkboxOptionText${questionId}_${newOptionNumber}`;
+            const nameIn = option.querySelector(`input[id^="checkboxOptionName"]`);
+            if (nameIn) {
+                nameIn.id = `checkboxOptionName${questionId}_${newOptionNumber}`;
+                nameIn.setAttribute('oninput', `updateCheckboxOptionSummary(${questionId}, ${newOptionNumber})`);
+            }
+            const valIn = option.querySelector(`input[id^="checkboxOptionValue"]`);
+            if (valIn) valIn.id = `checkboxOptionValue${questionId}_${newOptionNumber}`;
+            const hasAmt = option.querySelector(`input[id^="checkboxOptionHasAmount"]`);
+            if (hasAmt) {
+                hasAmt.id = `checkboxOptionHasAmount${questionId}_${newOptionNumber}`;
+                hasAmt.setAttribute('onchange', `toggleAmountPlaceholder(${questionId}, ${newOptionNumber})`);
+            }
+            const amtDet = option.querySelector(`div[id^="checkboxOptionAmountDetails"]`);
+            if (amtDet) amtDet.id = `checkboxOptionAmountDetails${questionId}_${newOptionNumber}`;
+            const amtName = option.querySelector(`input[id^="checkboxOptionAmountName"]`);
+            if (amtName) amtName.id = `checkboxOptionAmountName${questionId}_${newOptionNumber}`;
+            const amtPh = option.querySelector(`input[id^="checkboxOptionAmountPlaceholder"]`);
+            if (amtPh) amtPh.id = `checkboxOptionAmountPlaceholder${questionId}_${newOptionNumber}`;
+            const sumBtn = option.querySelector('.fw-cb-opt__summary');
+            if (sumBtn) {
+                sumBtn.id = `fwCbOptSumBtn_${questionId}_${newOptionNumber}`;
+                sumBtn.setAttribute('onclick', `toggleCheckboxOptionCollapse(${questionId}, ${newOptionNumber}, event)`);
+                sumBtn.setAttribute('aria-controls', `fwCbOptBody_${questionId}_${newOptionNumber}`);
+            }
+            const sumText = option.querySelector('.fw-cb-opt__summary-text');
+            if (sumText) sumText.id = `fwCbOptSumText_${questionId}_${newOptionNumber}`;
+            const body = option.querySelector('.fw-cb-opt__body');
+            if (body) body.id = `fwCbOptBody_${questionId}_${newOptionNumber}`;
+            const removeBtn = option.querySelector('.fw-cb-opt__remove');
+            if (removeBtn) removeBtn.setAttribute('onclick', `removeCheckboxOption(${questionId}, ${newOptionNumber})`);
+            updateCheckboxOptionSummary(questionId, newOptionNumber);
         });
     }
     updateConditionalPDFAnswersForCheckbox(questionId);
@@ -5653,71 +5768,87 @@ let inverseCheckboxCounter = 0;
 window.inverseCheckboxCounter = inverseCheckboxCounter;
 let currentInverseCheckboxConfig = null;
 let currentLinkedCheckboxConfig = [];
+
+/** Top-of-form panel listing linked fields / linked checkboxes / inverse checkboxes (mirrors Hidden Fields panel). */
+function ensureLinkedFieldsPanel() {
+    var list = document.getElementById('linkedFieldsList');
+    if (list && document.getElementById('linkedFieldsPanel')) {
+        return list;
+    }
+    var formBuilder = document.getElementById('formBuilder');
+    if (!formBuilder) return null;
+    var panel = document.createElement('div');
+    panel.id = 'linkedFieldsPanel';
+    panel.className = 'linked-fields-panel';
+    panel.innerHTML =
+        '<div class="linked-fields-panel__header fw-collapsible-module-head" onclick="if(!event.target.closest(\'button\')) toggleLinkedFieldsPanelCollapse(event)">' +
+            '<h3 class="linked-fields-panel__title">Linked Fields</h3>' +
+            '<button type="button" id="linkedFieldsPanelCollapseBtn" class="linked-fields-panel__toggle" aria-expanded="true" aria-controls="linkedFieldsContainer" onclick="event.stopPropagation(); toggleLinkedFieldsPanelCollapse(event)">Collapse</button>' +
+        '</div>' +
+        '<div id="linkedFieldsContainer" class="linked-fields-panel__body">' +
+            '<div id="linkedFieldsList" class="linked-fields-list"></div>' +
+            '<div class="linked-fields-panel__toolbar">' +
+                '<button type="button" class="linked-fields-panel__add-btn" onclick="openLinkedFieldModal()">Add Linked Field</button>' +
+                '<button type="button" class="linked-fields-panel__add-btn" onclick="openLinkedCheckboxModal()">Add Linked Checkbox</button>' +
+            '</div>' +
+        '</div>';
+    formBuilder.insertBefore(panel, formBuilder.firstChild);
+    return document.getElementById('linkedFieldsList');
+}
+function toggleLinkedFieldsPanelCollapse(ev) {
+    if (ev) ev.preventDefault();
+    var panel = document.getElementById('linkedFieldsPanel');
+    var btn = document.getElementById('linkedFieldsPanelCollapseBtn');
+    if (!panel || !btn) return;
+    var collapsed = panel.classList.toggle('is-collapsed');
+    btn.textContent = collapsed ? 'Expand' : 'Collapse';
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+}
+function setLinkedFieldsPanelCollapsed(collapsed) {
+    var panel = document.getElementById('linkedFieldsPanel');
+    var btn = document.getElementById('linkedFieldsPanelCollapseBtn');
+    var list = document.getElementById('linkedFieldsList');
+    if (!panel || !btn || !list || list.children.length === 0) return;
+    panel.classList.toggle('is-collapsed', !!collapsed);
+    btn.textContent = collapsed ? 'Expand' : 'Collapse';
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+}
+function syncLinkedFieldsPanelAfterRemoval() {
+    /* Keep #linkedFieldsPanel in the DOM so "Add Linked Field" stays available when the list is empty. */
+}
+function removeLinkedCheckboxRow(displayId) {
+    var el = document.getElementById(displayId);
+    if (el) el.remove();
+    removeLinkedCheckboxConfig(displayId);
+    syncLinkedFieldsPanelAfterRemoval();
+}
+function removeInverseCheckboxRow(displayId) {
+    var el = document.getElementById(displayId);
+    if (el) el.remove();
+    removeInverseCheckboxConfig(displayId);
+    syncLinkedFieldsPanelAfterRemoval();
+}
+
 // Open the linked field modal
 function openLinkedFieldModal() {
+    window.editingLinkedFieldId = null;
+    window.lastLinkedFieldConfig = null;
 
-    // Create modal if it doesn't exist
     if (!document.getElementById('linkedFieldModal')) {
-
         createLinkedFieldModal();
     }
-    // Reset current configuration
     currentLinkedFieldConfig = [];
-    // Show modal
-    document.getElementById('linkedFieldModal').style.display = 'block';
-
-    // Check if we have a stored configuration to restore
-    if (window.lastLinkedFieldConfig && !window.editingLinkedFieldId) {
-
-        // Restore the linked field ID
-        const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
-        if (linkedFieldIdInput) {
-            linkedFieldIdInput.value = window.lastLinkedFieldConfig.linkedFieldId || '';
-        }
-        // Create dropdowns for each stored field
-        window.lastLinkedFieldConfig.selectedFields.forEach(fieldId => {
-            addLinkedFieldDropdown();
-            const dropdownIndex = currentLinkedFieldConfig.length - 1;
-            const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
-            const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
-            const customInput = document.getElementById(`linkedFieldCustom${dropdownIndex}`);
-            if (select) {
-                const selectedOption = select.querySelector(`option[value="${fieldId}"]`);
-                // Check if the fieldId exists in the dropdown options
-                if (selectedOption) {
-                    // Field exists in dropdown, use dropdown selection
-                    select.value = fieldId;
-                    currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
-                    // Update the search input field with the selected option text
-                    if (searchInput) {
-                        searchInput.value = selectedOption.textContent;
-                    }
-                    // Clear custom input
-                    if (customInput) {
-                        customInput.value = '';
-                    }
-                } else {
-                    // Field doesn't exist in dropdown, use custom input
-                    if (customInput) {
-                        customInput.value = fieldId;
-                        currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
-                    }
-                    // Clear dropdown selection
-                    if (select) {
-                        select.value = '';
-                    }
-                    // Clear search input
-                    if (searchInput) {
-                        searchInput.value = '';
-                    }
-                }
-            }
-        });
-    } else {
-        // Initialize with two dropdowns (default behavior)
-        addLinkedFieldDropdown();
-        addLinkedFieldDropdown();
+    const dropdownsContainer = document.getElementById('linkedFieldDropdowns');
+    if (dropdownsContainer) {
+        dropdownsContainer.innerHTML = '';
     }
+    const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
+    if (linkedFieldIdInput) {
+        linkedFieldIdInput.value = '';
+    }
+    addLinkedFieldDropdown();
+    addLinkedFieldDropdown();
+    document.getElementById('linkedFieldModal').style.display = 'block';
 }
 // Create the linked field modal
 function createLinkedFieldModal() {
@@ -5758,10 +5889,7 @@ function createLinkedFieldModal() {
                     Link Another
                 </button>
                 <button type="button" onclick="finalizeLinkedField()" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                    Done
-                </button>
-                <button type="button" onclick="closeLinkedFieldModal()" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                    Cancel
+                    Close
                 </button>
             </div>
         </div>
@@ -5774,7 +5902,7 @@ function createLinkedFieldModal() {
             closeLinkedFieldModal();
         }
     });
-    // Note: Enter key functionality removed - users should click "Done" button to finalize
+    // Note: Enter key functionality removed - users should click "Close" button to finalize
     // Enter key still works for selecting dropdown options via the search input handler
 }
 // ============================================
@@ -5802,7 +5930,11 @@ function createLinkedCheckboxModal() {
     const modal = document.createElement('div');
     modal.id = 'linkedCheckboxModal';
     modal.style.cssText = 'display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5)';
-    modal.addEventListener('click', () => modal.style.display = 'none');
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            closeLinkedCheckboxModal();
+        }
+    });
     modal.innerHTML = `
       <div style="background:#fff;margin:5% auto;padding:20px;border-radius:10px;width:90%;max-width:1200px;max-height:80vh;overflow:auto;" onclick="event.stopPropagation()">
         <h3 style="text-align:center;margin-bottom:20px;color:#2c3e50;">Configure Linked Checkbox</h3>
@@ -5813,8 +5945,7 @@ function createLinkedCheckboxModal() {
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
           <button type="button" onclick="addLinkedCheckboxDropdown()" style="background:#3498db;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Link Another</button>
-          <button type="button" onclick="finalizeLinkedCheckbox()" style="background:#27ae60;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Done</button>
-          <button type="button" onclick="closeLinkedCheckboxModal()" style="background:#e74c3c;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Cancel</button>
+          <button type="button" onclick="finalizeLinkedCheckbox()" style="background:#27ae60;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Close</button>
         </div>
       </div>`;
     document.body.appendChild(modal);
@@ -6258,26 +6389,8 @@ function editLinkedCheckboxDisplay(displayId) {
 function createLinkedCheckboxDisplay(selectedOptions, linkedId){
     const displayId = `linkedCheckbox${linkedCheckboxCounter++}`;
     window.linkedCheckboxCounter = linkedCheckboxCounter;
-    // Create container for linked fields/checkboxes if it doesn't exist
-    let linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
-    if (!linkedFieldsContainer) {
-        linkedFieldsContainer = document.createElement('div');
-        linkedFieldsContainer.id = 'linkedFieldsContainer';
-        linkedFieldsContainer.style.cssText = `
-            background: #fff;
-            border: 2px solid #27ae60;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 600px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        `;
-        // Insert before the Form Editor section
-        const formBuilder = document.getElementById('formBuilder');
-        if (formBuilder) {
-            formBuilder.insertBefore(linkedFieldsContainer, formBuilder.firstChild);
-        }
-    }
+    const linkedFieldsContainer = ensureLinkedFieldsPanel();
+    if (!linkedFieldsContainer) return;
     const div = document.createElement('div');
     div.id = displayId;
     div.style.cssText = 'border:1px solid #ddd;border-radius:8px;padding:10px;margin:10px 0;background:#f9f9f9;transition: all 0.3s ease;';
@@ -6300,10 +6413,10 @@ function createLinkedCheckboxDisplay(selectedOptions, linkedId){
     });
     const names = selectedOptions.map(s=>s.selectedValue).join(' ↔ ');
     div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;">
-        <div onclick="editLinkedCheckboxDisplay('${displayId}')" style="flex:1;cursor:pointer;"><h4 style="margin:0 0 5px 0;color:#2c3e50;">Linked Checkbox (${linkedId})</h4><p style="margin:0;color:#666;font-size:.9em;">${names}</p></div>
+        <div onclick="editLinkedCheckboxDisplay('${displayId}')" style="flex:1;cursor:pointer;min-width:0;overflow:hidden;margin-right:12px;"><h4 style="margin:0 0 5px 0;color:#2c3e50;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="Linked Checkbox (${linkedId})">Linked Checkbox (${linkedId})</h4><p style="margin:0;color:#666;font-size:.9em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${names}">${names}</p></div>
         <div style="display:flex;flex-direction:column;gap:5px;">
           <button type="button" onclick="editLinkedCheckboxDisplay('${displayId}')" style="background:#3498db;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Edit</button>
-          <button type="button" onclick="document.getElementById('${displayId}').remove(); removeLinkedCheckboxConfig('${displayId}')" style="background:#e74c3c;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Remove</button>
+          <button type="button" onclick="removeLinkedCheckboxRow('${displayId}')" style="background:#e74c3c;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Remove</button>
         </div>
       </div>`;
     linkedFieldsContainer.appendChild(div);
@@ -6314,26 +6427,8 @@ function createLinkedCheckboxDisplayFromImport(linkedCheckboxData) {
     const displayId = `linkedCheckbox${linkedCheckboxCounter++}`;
     window.linkedCheckboxCounter = linkedCheckboxCounter;
     const linkedCheckboxId = linkedCheckboxData.linkedCheckboxId || linkedCheckboxData.id;
-    // Create container for linked fields/checkboxes if it doesn't exist
-    let linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
-    if (!linkedFieldsContainer) {
-        linkedFieldsContainer = document.createElement('div');
-        linkedFieldsContainer.id = 'linkedFieldsContainer';
-        linkedFieldsContainer.style.cssText = `
-            background: #fff;
-            border: 2px solid #27ae60;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 600px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        `;
-        // Insert before the Form Editor section
-        const formBuilder = document.getElementById('formBuilder');
-        if (formBuilder) {
-            formBuilder.insertBefore(linkedFieldsContainer, formBuilder.firstChild);
-        }
-    }
+    const linkedFieldsContainer = ensureLinkedFieldsPanel();
+    if (!linkedFieldsContainer) return;
     const linkedCheckboxDiv = document.createElement('div');
     linkedCheckboxDiv.id = displayId;
     linkedCheckboxDiv.style.cssText = 'border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin: 10px 0; background: #f9f9f9; transition: all 0.3s ease;';
@@ -6356,13 +6451,13 @@ function createLinkedCheckboxDisplayFromImport(linkedCheckboxData) {
     const checkboxNames = linkedCheckboxData.checkboxes.join(' ↔ ');
     linkedCheckboxDiv.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div onclick="editLinkedCheckboxDisplay('${displayId}')" style="flex: 1; cursor: pointer;">
-                <h4 style="margin: 0 0 5px 0; color: #2c3e50;">Linked Checkbox (${linkedCheckboxId})</h4>
-                <p style="margin: 0; color: #666; font-size: 0.9em;">${checkboxNames}</p>
+            <div onclick="editLinkedCheckboxDisplay('${displayId}')" style="flex: 1; min-width: 0; overflow: hidden; margin-right: 12px; cursor: pointer;">
+                <h4 style="margin: 0 0 5px 0; color: #2c3e50; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="Linked Checkbox (${linkedCheckboxId})">Linked Checkbox (${linkedCheckboxId})</h4>
+                <p style="margin: 0; color: #666; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${checkboxNames}">${checkboxNames}</p>
             </div>
             <div style="display:flex;flex-direction:column;gap:5px;">
               <button type="button" onclick="editLinkedCheckboxDisplay('${displayId}')" style="background:#3498db;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Edit</button>
-              <button type="button" onclick="document.getElementById('${displayId}').remove(); removeLinkedCheckboxConfig('${displayId}')" style="background:#e74c3c;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Remove</button>
+              <button type="button" onclick="removeLinkedCheckboxRow('${displayId}')" style="background:#e74c3c;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Remove</button>
             </div>
         </div>
     `;
@@ -6932,24 +7027,8 @@ function closeInverseCheckboxModal() {
 function createInverseCheckboxDisplay(targetCheckboxId, inverseCheckboxId) {
     const displayId = `inverseCheckbox${inverseCheckboxCounter++}`;
     window.inverseCheckboxCounter = inverseCheckboxCounter;
-    let linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
-    if (!linkedFieldsContainer) {
-        linkedFieldsContainer = document.createElement('div');
-        linkedFieldsContainer.id = 'linkedFieldsContainer';
-        linkedFieldsContainer.style.cssText = `
-            background: #fff;
-            border: 2px solid #27ae60;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 600px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        `;
-        const formBuilder = document.getElementById('formBuilder');
-        if (formBuilder) {
-            formBuilder.insertBefore(linkedFieldsContainer, formBuilder.firstChild);
-        }
-    }
+    const linkedFieldsContainer = ensureLinkedFieldsPanel();
+    if (!linkedFieldsContainer) return;
     const inverseCheckboxDiv = document.createElement('div');
     inverseCheckboxDiv.id = displayId;
     inverseCheckboxDiv.style.cssText = `
@@ -6983,7 +7062,7 @@ function createInverseCheckboxDisplay(targetCheckboxId, inverseCheckboxId) {
             </div>
             <div style="display:flex;flex-direction:column;gap:5px;">
               <button type="button" onclick="editInverseCheckboxDisplay('${displayId}')" style="background:#3498db;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Edit</button>
-              <button type="button" onclick="document.getElementById('${displayId}').remove(); removeInverseCheckboxConfig('${displayId}')" style="background:#e74c3c;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Remove</button>
+              <button type="button" onclick="removeInverseCheckboxRow('${displayId}')" style="background:#e74c3c;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Remove</button>
             </div>
         </div>
     `;
@@ -7421,63 +7500,27 @@ function finalizeLinkedField() {
         }
     });
 
-    // Validate that at least 2 fields are selected
-    if (selectedFields.length < 2) {
-        alert('Please select at least 2 text questions to link.');
-        return;
-    }
-    // Get the linked field ID
     const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
-    const linkedFieldId = linkedFieldIdInput ? linkedFieldIdInput.value.trim() : '';
-    if (!linkedFieldId) {
-        alert('Please enter a Linked Field ID.');
+    const trimmedId = linkedFieldIdInput ? linkedFieldIdInput.value.trim() : '';
+    if (!trimmedId && selectedFields.length === 0) {
+        closeLinkedFieldModal();
         return;
     }
-    // Check if we're editing an existing linked field
+    const linkedFieldId =
+        trimmedId ||
+        'linked_field_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
     if (window.editingLinkedFieldId) {
-
-        // Remove the old display
         removeLinkedFieldDisplay(window.editingLinkedFieldId);
-        // Create the new linked field display
-        createLinkedFieldDisplay(selectedFields, linkedFieldId);
-        // Clear the editing flag
         window.editingLinkedFieldId = null;
-    } else {
-
-        // Create the linked field display
-        createLinkedFieldDisplay(selectedFields, linkedFieldId);
     }
-    // Store the configuration for future autofill
-    window.lastLinkedFieldConfig = {
-        linkedFieldId: linkedFieldId,
-        selectedFields: selectedFields.map(field => field.selectedValue)
-    };
-    // Close modal
+    createLinkedFieldDisplay(selectedFields, linkedFieldId);
     closeLinkedFieldModal();
 }
 // Create the linked field display
 function createLinkedFieldDisplay(selectedFields, linkedFieldId) {
     const displayId = `linkedField${linkedFieldCounter++}`;
-    // Create container for linked fields if it doesn't exist
-    let linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
-    if (!linkedFieldsContainer) {
-        linkedFieldsContainer = document.createElement('div');
-        linkedFieldsContainer.id = 'linkedFieldsContainer';
-        linkedFieldsContainer.style.cssText = `
-            background: #fff;
-            border: 2px solid #27ae60;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 600px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        `;
-        // Insert before the Form Editor section
-        const formBuilder = document.getElementById('formBuilder');
-        if (formBuilder) {
-            formBuilder.insertBefore(linkedFieldsContainer, formBuilder.firstChild);
-        }
-    }
+    const linkedFieldsContainer = ensureLinkedFieldsPanel();
+    if (!linkedFieldsContainer) return;
     // Create linked field display
     const linkedFieldDiv = document.createElement('div');
     linkedFieldDiv.id = displayId;
@@ -7502,16 +7545,19 @@ function createLinkedFieldDisplay(selectedFields, linkedFieldId) {
         this.style.transform = 'translateY(0)';
         this.style.boxShadow = 'none';
     });
-    const fieldNames = selectedFields.map(config => config.selectedValue).join(' ↔ ');
+    const fieldNames = selectedFields.length
+        ? selectedFields.map(config => config.selectedValue).join(' ↔ ')
+        : '(No questions linked yet)';
     linkedFieldDiv.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div onclick="editLinkedFieldDisplay('${displayId}')" style="cursor: pointer; flex: 1;">
-                <h4 style="margin: 0 0 5px 0; color: #2c3e50;">Linked Fields (${linkedFieldId})</h4>
-                <p style="margin: 0; color: #666; font-size: 0.9em;">${fieldNames}</p>
+            <div onclick="editLinkedFieldDisplay('${displayId}')" style="cursor: pointer; flex: 1; min-width: 0; overflow: hidden; margin-right: 12px;">
+                <h4 style="margin: 0 0 5px 0; color: #2c3e50; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="Linked Fields (${linkedFieldId})">Linked Fields (${linkedFieldId})</h4>
+                <p style="margin: 0; color: #666; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${fieldNames}</p>
             </div>
-            <button type="button" onclick="removeLinkedFieldDisplay('${displayId}')" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
-                Remove
-            </button>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <button type="button" onclick="editLinkedFieldDisplay('${displayId}')" style="background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Edit</button>
+                <button type="button" onclick="removeLinkedFieldDisplay('${displayId}')" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Remove</button>
+            </div>
         </div>
     `;
     linkedFieldsContainer.appendChild(linkedFieldDiv);
@@ -7532,11 +7578,7 @@ function removeLinkedFieldDisplay(linkedFieldId) {
         if (window.linkedFieldsConfig) {
             window.linkedFieldsConfig = window.linkedFieldsConfig.filter(config => config.id !== linkedFieldId);
         }
-        // If no more linked fields, remove the container
-        const linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
-        if (linkedFieldsContainer && linkedFieldsContainer.children.length === 0) {
-            linkedFieldsContainer.remove();
-        }
+        syncLinkedFieldsPanelAfterRemoval();
     }
 }
 // Edit a linked field display
@@ -7566,7 +7608,7 @@ function editLinkedFieldDisplay(displayId) {
         linkedFieldIdInput.value = config.linkedFieldId || '';
     }
     // Create dropdowns for each field
-    config.fields.forEach(fieldId => {
+    (config.fields || []).forEach(fieldId => {
         addLinkedFieldDropdown();
         const dropdownIndex = currentLinkedFieldConfig.length - 1;
         const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
@@ -7604,13 +7646,17 @@ function editLinkedFieldDisplay(displayId) {
             }
         }
     });
-    // Show modal
+    const pad = Math.max(0, 2 - (config.fields || []).length);
+    for (let p = 0; p < pad; p++) {
+        addLinkedFieldDropdown();
+    }
     document.getElementById('linkedFieldModal').style.display = 'block';
 
 }
 // Close the linked field modal
 function closeLinkedFieldModal() {
-    document.getElementById('linkedFieldModal').style.display = 'none';
+    const modal = document.getElementById('linkedFieldModal');
+    if (modal) modal.style.display = 'none';
     // Clear current configuration
     currentLinkedFieldConfig = [];
     // Clear dropdowns
@@ -7623,33 +7669,15 @@ function closeLinkedFieldModal() {
     if (linkedFieldIdInput) {
         linkedFieldIdInput.value = '';
     }
-    // Clear the editing flag
     window.editingLinkedFieldId = null;
+    window.lastLinkedFieldConfig = null;
 }
 // Create linked field display from import data
 function createLinkedFieldDisplayFromImport(linkedFieldData) {
     const displayId = `linkedField${linkedFieldCounter++}`;
     const linkedFieldId = linkedFieldData.linkedFieldId || 'Unknown';
-    // Create container for linked fields if it doesn't exist
-    let linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
-    if (!linkedFieldsContainer) {
-        linkedFieldsContainer = document.createElement('div');
-        linkedFieldsContainer.id = 'linkedFieldsContainer';
-        linkedFieldsContainer.style.cssText = `
-            background: #fff;
-            border: 2px solid #27ae60;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 600px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        `;
-        // Insert before the Form Editor section
-        const formBuilder = document.getElementById('formBuilder');
-        if (formBuilder) {
-            formBuilder.insertBefore(linkedFieldsContainer, formBuilder.firstChild);
-        }
-    }
+    const linkedFieldsContainer = ensureLinkedFieldsPanel();
+    if (!linkedFieldsContainer) return;
     // Create linked field display
     const linkedFieldDiv = document.createElement('div');
     linkedFieldDiv.id = displayId;
@@ -7674,16 +7702,18 @@ function createLinkedFieldDisplayFromImport(linkedFieldData) {
         this.style.transform = 'translateY(0)';
         this.style.boxShadow = 'none';
     });
-    const fieldNames = linkedFieldData.fields.join(' ↔ ');
+    const fieldsArr = Array.isArray(linkedFieldData.fields) ? linkedFieldData.fields : [];
+    const fieldNames = fieldsArr.length ? fieldsArr.join(' ↔ ') : '(No questions linked yet)';
     linkedFieldDiv.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div onclick="editLinkedFieldDisplay('${displayId}')" style="cursor: pointer; flex: 1;">
-                <h4 style="margin: 0 0 5px 0; color: #2c3e50;">Linked Fields (${linkedFieldId})</h4>
-                <p style="margin: 0; color: #666; font-size: 0.9em;">${fieldNames}</p>
+            <div onclick="editLinkedFieldDisplay('${displayId}')" style="cursor: pointer; flex: 1; min-width: 0; overflow: hidden; margin-right: 12px;">
+                <h4 style="margin: 0 0 5px 0; color: #2c3e50; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="Linked Fields (${linkedFieldId})">Linked Fields (${linkedFieldId})</h4>
+                <p style="margin: 0; color: #666; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${fieldNames}</p>
             </div>
-            <button type="button" onclick="removeLinkedFieldDisplay('${displayId}')" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
-                Remove
-            </button>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <button type="button" onclick="editLinkedFieldDisplay('${displayId}')" style="background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Edit</button>
+                <button type="button" onclick="removeLinkedFieldDisplay('${displayId}')" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Remove</button>
+            </div>
         </div>
     `;
     linkedFieldsContainer.appendChild(linkedFieldDiv);
@@ -7692,7 +7722,7 @@ function createLinkedFieldDisplayFromImport(linkedFieldData) {
     window.linkedFieldsConfig.push({
         id: displayId,
         linkedFieldId: linkedFieldId,
-        fields: linkedFieldData.fields
+        fields: fieldsArr
     });
 }
 // Search functionality for linked field dropdowns

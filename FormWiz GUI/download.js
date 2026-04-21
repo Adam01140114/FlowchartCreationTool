@@ -150,7 +150,34 @@ function downloadHTML(content, filename) {
 // ============================================
 // ===========  IMPORT / EXPORT  =============
 // ============================================
+function showFormBuilderImportLoading() {
+    var el = document.getElementById('fwBuilderImportLoading');
+    if (!el) return;
+    el.classList.add('is-visible');
+    el.setAttribute('aria-busy', 'true');
+    el.setAttribute('aria-hidden', 'false');
+}
+function hideFormBuilderImportLoadingDeferred() {
+    requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+            setTimeout(function () {
+                var el = document.getElementById('fwBuilderImportLoading');
+                if (el) {
+                    el.classList.remove('is-visible');
+                    el.setAttribute('aria-busy', 'false');
+                    el.setAttribute('aria-hidden', 'true');
+                }
+            }, 100);
+        });
+    });
+}
 function loadFormData(formData) {
+    if (typeof showFormBuilderImportLoading === 'function') {
+        try {
+            showFormBuilderImportLoading();
+        } catch (e0) { /* ignore */ }
+    }
+    try {
     // 1) Clear the entire "formBuilder" container
     document.getElementById('formBuilder').innerHTML = '';
     // 2) Reset counters based on what's stored in the JSON
@@ -316,43 +343,62 @@ function loadFormData(formData) {
                         }
                         regularOptions.forEach((optData, idx) => {
                             const optionDiv = document.createElement('div');
-                            optionDiv.className = `option${idx + 1} fw-option-card`;
+                            const qid = question.questionId;
+                            const on = idx + 1;
+                            optionDiv.className = `option${on} fw-option-card fw-cb-opt`;
                             optionDiv.innerHTML = `
-                                <label>Option ${idx + 1} Text:</label>
-                                <input type="text" id="checkboxOptionText${question.questionId}_${idx + 1}"
-                                       value="${optData.label}" placeholder="Enter option text"><br><br>
-                                <label>Name/ID:</label>
-                                <input type="text" id="checkboxOptionName${question.questionId}_${idx + 1}"
-                                       value="${optData.nameId}" placeholder="Enter Name/ID"><br><br>
-                                <label>Value (optional):</label>
-                                <input type="text" id="checkboxOptionValue${question.questionId}_${idx + 1}"
-                                       value="${optData.value || ''}" placeholder="Enter Value"><br><br>
-                                <label>
-                                    <input type="checkbox" id="checkboxOptionHasAmount${question.questionId}_${idx + 1}" 
-                                           ${optData.hasAmount ? 'checked' : ''}
-                                           onchange="toggleAmountPlaceholder(${question.questionId}, ${idx + 1})">
-                                    Enable amount field
-                                </label>
-                                <div id="checkboxOptionAmountDetails${question.questionId}_${idx + 1}" 
-                                     style="display:${optData.hasAmount ? 'block' : 'none'}; margin-top:8px;">
-                                    <label>Amount Field Name:</label>
-                                    <input type="text" id="checkboxOptionAmountName${question.questionId}_${idx + 1}"
-                                           value="${optData.amountName || ''}" placeholder="Enter amount field name"><br><br>
-                                    <label>Amount Placeholder:</label>
-                                    <input type="text" id="checkboxOptionAmountPlaceholder${question.questionId}_${idx + 1}"
-                                           value="${optData.amountPlaceholder || ''}" placeholder="Enter amount placeholder"><br>
-                                </div>
-                                <button type="button"
-                                        onclick="removeCheckboxOption(${question.questionId}, ${idx + 1})">
-                                    Remove
+                                <button type="button" class="fw-cb-opt__summary" id="fwCbOptSumBtn_${qid}_${on}" onclick="toggleCheckboxOptionCollapse(${qid}, ${on}, event)" aria-expanded="true" aria-controls="fwCbOptBody_${qid}_${on}">
+                                    <span class="fw-cb-opt__summary-handle" aria-hidden="true">
+                                        <svg class="fw-cb-opt__summary-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </span>
+                                    <span class="fw-cb-opt__summary-text" id="fwCbOptSumText_${qid}_${on}">Option ${on} (unnamed)</span>
                                 </button>
-                                <hr>
+                                <div class="fw-cb-opt__body" id="fwCbOptBody_${qid}_${on}">
+                                    <div class="fw-cb-opt__grid">
+                                        <label class="fw-cb-opt__label">Option ${on} Text:</label>
+                                        <input type="text" class="fw-cb-opt__input" id="checkboxOptionText${qid}_${on}"
+                                               value="${optData.label}" placeholder="Enter option text">
+                                        <label class="fw-cb-opt__label">Name/ID:</label>
+                                        <input type="text" class="fw-cb-opt__input fw-cb-opt__input--mono" id="checkboxOptionName${qid}_${on}"
+                                               value="${optData.nameId}" placeholder="Enter Name/ID" oninput="updateCheckboxOptionSummary(${qid}, ${on})">
+                                        <label class="fw-cb-opt__label">Value (optional):</label>
+                                        <input type="text" class="fw-cb-opt__input" id="checkboxOptionValue${qid}_${on}"
+                                               value="${optData.value || ''}" placeholder="Enter Value">
+                                    </div>
+                                    <label class="fw-cb-opt__toggle-row">
+                                        <input type="checkbox" id="checkboxOptionHasAmount${qid}_${on}"
+                                               ${optData.hasAmount ? 'checked' : ''}
+                                               onchange="toggleAmountPlaceholder(${qid}, ${on})">
+                                        <span>Enable amount field</span>
+                                    </label>
+                                    <div id="checkboxOptionAmountDetails${qid}_${on}" class="fw-cb-opt__amount-details"
+                                         style="display:${optData.hasAmount ? 'block' : 'none'};">
+                                        <div class="fw-cb-opt__grid">
+                                            <label class="fw-cb-opt__label">Amount Field Name:</label>
+                                            <input type="text" class="fw-cb-opt__input" id="checkboxOptionAmountName${qid}_${on}"
+                                                   value="${optData.amountName || ''}" placeholder="Enter amount field name">
+                                            <label class="fw-cb-opt__label">Amount Placeholder:</label>
+                                            <input type="text" class="fw-cb-opt__input" id="checkboxOptionAmountPlaceholder${qid}_${on}"
+                                                   value="${optData.amountPlaceholder || ''}" placeholder="Enter amount placeholder">
+                                        </div>
+                                    </div>
+                                    <div class="fw-cb-opt__footer">
+                                        <button type="button" class="fw-cb-opt__remove"
+                                                onclick="removeCheckboxOption(${qid}, ${on})">Remove</button>
+                                    </div>
+                                </div>
                             `;
                             checkboxOptionsDiv.appendChild(optionDiv);
+                            if (typeof updateCheckboxOptionSummary === 'function') {
+                                updateCheckboxOptionSummary(qid, on);
+                            }
                             // Add event listeners to option text inputs to update hard alert trigger dropdown
-                            const optionTextInput = optionDiv.querySelector(`#checkboxOptionText${question.questionId}_${idx + 1}`);
+                            const optionTextInput = optionDiv.querySelector(`#checkboxOptionText${qid}_${on}`);
                             if (optionTextInput) {
                                 optionTextInput.addEventListener('input', () => {
+                                    if (typeof updateCheckboxOptionSummary === 'function') {
+                                        updateCheckboxOptionSummary(qid, on);
+                                    }
                                     if (typeof updateHardAlertTriggerOptions === 'function') {
                                         updateHardAlertTriggerOptions(question.questionId);
                                     }
@@ -367,22 +413,25 @@ function loadFormData(formData) {
                         }
                         // Add the "None of the above" checkbox if it exists in the data
                         if (hasNoneOption) {
-                            // Find the container for the "None of the above" option
-                            let noneContainer = document.createElement('div');
-                            noneContainer.id = `noneOfTheAboveContainer${question.questionId}`;
-                            noneContainer.style.marginTop = '10px';
-                            noneContainer.style.marginBottom = '10px';
-                            noneContainer.innerHTML = `
-                                <label>
+                            let noneContainer = document.getElementById(`noneOfTheAboveContainer${question.questionId}`);
+                            const noneInner = `
+                                <label class="fw-cb-question-flag__row" for="noneOfTheAbove${question.questionId}">
                                     <input type="checkbox" id="noneOfTheAbove${question.questionId}" checked>
-                                    Include "None of the above" option
-                                </label>
-                            `;
-                            // Add it right after the options div
-                            if (checkboxOptionsDiv.nextSibling) {
-                                checkboxOptionsDiv.parentNode.insertBefore(noneContainer, checkboxOptionsDiv.nextSibling);
+                                    <span class="fw-cb-question-flag__text">Include &quot;None of the above&quot; option</span>
+                                </label>`;
+                            if (noneContainer) {
+                                noneContainer.innerHTML = noneInner;
                             } else {
-                                checkboxOptionsDiv.parentNode.appendChild(noneContainer);
+                                noneContainer = document.createElement('div');
+                                noneContainer.id = `noneOfTheAboveContainer${question.questionId}`;
+                                noneContainer.className = 'fw-cb-question-flag';
+                                noneContainer.innerHTML = noneInner;
+                                const flagsHost = questionBlock.querySelector('.fw-cb-question-flags');
+                                if (flagsHost) {
+                                    flagsHost.insertBefore(noneContainer, flagsHost.firstChild);
+                                } else if (checkboxOptionsDiv.parentNode) {
+                                    checkboxOptionsDiv.parentNode.insertBefore(noneContainer, checkboxOptionsDiv.nextSibling);
+                                }
                             }
                         }
                         // Set the "Mark only one" checkbox state
@@ -394,28 +443,29 @@ function loadFormData(formData) {
                             if (markOnlyOneCheckbox) {
                                 markOnlyOneCheckbox.checked = question.markOnlyOne || false;
                             }
-                        } else {
-                            // Container doesn't exist, create it
-                        if (question.markOnlyOne) {
-                                markOnlyOneContainer = document.createElement('div');
+                        } else if (question.markOnlyOne) {
+                            markOnlyOneContainer = document.createElement('div');
                             markOnlyOneContainer.id = `markOnlyOneContainer${question.questionId}`;
-                            markOnlyOneContainer.style.marginTop = '10px';
-                            markOnlyOneContainer.style.marginBottom = '10px';
+                            markOnlyOneContainer.className = 'fw-cb-question-flag';
                             markOnlyOneContainer.innerHTML = `
-                                <label>
+                                <label class="fw-cb-question-flag__row" for="markOnlyOne${question.questionId}">
                                     <input type="checkbox" id="markOnlyOne${question.questionId}" checked>
-                                    Mark only one
-                                </label>
-                            `;
-                            // Add it right after the options div (or after the "None of the above" container if it exists)
-                            const insertAfter = hasNoneOption ? 
-                                document.getElementById(`noneOfTheAboveContainer${question.questionId}`) :
-                                checkboxOptionsDiv;
-                                if (insertAfter && insertAfter.nextSibling) {
-                                insertAfter.parentNode.insertBefore(markOnlyOneContainer, insertAfter.nextSibling);
-                                } else if (insertAfter) {
-                                insertAfter.parentNode.appendChild(markOnlyOneContainer);
+                                    <span class="fw-cb-question-flag__text">Mark only one</span>
+                                </label>`;
+                            const flagsHost = questionBlock.querySelector('.fw-cb-question-flags');
+                            const insertAfter = hasNoneOption
+                                ? document.getElementById(`noneOfTheAboveContainer${question.questionId}`)
+                                : null;
+                            if (flagsHost) {
+                                if (insertAfter && insertAfter.parentNode === flagsHost) {
+                                    flagsHost.insertBefore(markOnlyOneContainer, insertAfter.nextSibling);
+                                } else {
+                                    flagsHost.appendChild(markOnlyOneContainer);
                                 }
+                            } else if (insertAfter && insertAfter.nextSibling) {
+                                insertAfter.parentNode.insertBefore(markOnlyOneContainer, insertAfter.nextSibling);
+                            } else if (checkboxOptionsDiv.parentNode) {
+                                checkboxOptionsDiv.parentNode.appendChild(markOnlyOneContainer);
                             }
                         }
                         // Set the "All are required" checkbox state
@@ -427,30 +477,31 @@ function loadFormData(formData) {
                             if (allAreRequiredCheckbox) {
                                 allAreRequiredCheckbox.checked = question.allAreRequired || false;
                             }
-                        } else {
-                            // Container doesn't exist, create it
-                            if (question.allAreRequired) {
-                                allAreRequiredContainer = document.createElement('div');
-                                allAreRequiredContainer.id = `allAreRequiredContainer${question.questionId}`;
-                                allAreRequiredContainer.style.marginTop = '10px';
-                                allAreRequiredContainer.style.marginBottom = '10px';
-                                allAreRequiredContainer.innerHTML = `
-                                    <label>
-                                        <input type="checkbox" id="allAreRequired${question.questionId}" checked>
-                                        All are required
-                                    </label>
-                                `;
-                                // Add it right after the "Mark only one" container (or after the "None of the above" container if it exists)
-                                const insertAfter = question.markOnlyOne ? 
-                                    document.getElementById(`markOnlyOneContainer${question.questionId}`) :
-                                    (hasNoneOption ? 
-                                        document.getElementById(`noneOfTheAboveContainer${question.questionId}`) :
-                                        checkboxOptionsDiv);
-                                if (insertAfter && insertAfter.nextSibling) {
-                                    insertAfter.parentNode.insertBefore(allAreRequiredContainer, insertAfter.nextSibling);
-                                } else if (insertAfter) {
-                                    insertAfter.parentNode.appendChild(allAreRequiredContainer);
+                        } else if (question.allAreRequired) {
+                            allAreRequiredContainer = document.createElement('div');
+                            allAreRequiredContainer.id = `allAreRequiredContainer${question.questionId}`;
+                            allAreRequiredContainer.className = 'fw-cb-question-flag';
+                            allAreRequiredContainer.innerHTML = `
+                                <label class="fw-cb-question-flag__row" for="allAreRequired${question.questionId}">
+                                    <input type="checkbox" id="allAreRequired${question.questionId}" checked>
+                                    <span class="fw-cb-question-flag__text">All are required</span>
+                                </label>`;
+                            const flagsHost = questionBlock.querySelector('.fw-cb-question-flags');
+                            const insertAfter = question.markOnlyOne
+                                ? document.getElementById(`markOnlyOneContainer${question.questionId}`)
+                                : (hasNoneOption
+                                    ? document.getElementById(`noneOfTheAboveContainer${question.questionId}`)
+                                    : null);
+                            if (flagsHost) {
+                                if (insertAfter && insertAfter.parentNode === flagsHost) {
+                                    flagsHost.insertBefore(allAreRequiredContainer, insertAfter.nextSibling);
+                                } else {
+                                    flagsHost.appendChild(allAreRequiredContainer);
                                 }
+                            } else if (insertAfter && insertAfter.nextSibling) {
+                                insertAfter.parentNode.insertBefore(allAreRequiredContainer, insertAfter.nextSibling);
+                            } else if (checkboxOptionsDiv.parentNode) {
+                                checkboxOptionsDiv.parentNode.appendChild(allAreRequiredContainer);
                             }
                         }
                         // Update conditional PDF answers for checkbox
@@ -2922,10 +2973,48 @@ function loadFormData(formData) {
             addHiddenFieldWithData(hiddenField);
         });
     }
+    // Sync panel empty state before import UI pass (async sync inside addHiddenFieldWithData runs too late)
+    if (typeof syncHiddenFieldsPanelVisibility === 'function') {
+        syncHiddenFieldsPanelVisibility();
+    }
     // 9) Finally, re-run references (e.g. auto-fill dropdowns in hidden fields)
     updateFormAfterImport();
+    // Persist last loaded form for "resume" on next visit (localStorage; skipped for preview / resume load)
+    try {
+        if (!window.__isPreviewImport && !window.__fwResumeDraftSkipSave && typeof exportForm === 'function') {
+            const persistDraft = function () {
+                try {
+                    const draftPayload = exportForm({ silent: true });
+                    if (draftPayload) {
+                        localStorage.setItem('fw_builder_draft_json', JSON.stringify(draftPayload));
+                    }
+                } catch (persistErr) {
+                    try {
+                        localStorage.removeItem('fw_builder_draft_json');
+                    } catch (e2) { /* ignore */ }
+                }
+            };
+            if (typeof requestIdleCallback === 'function') {
+                requestIdleCallback(persistDraft, { timeout: 4000 });
+            } else {
+                setTimeout(persistDraft, 1);
+            }
+        }
+    } catch (e) {
+        try {
+            localStorage.removeItem('fw_builder_draft_json');
+        } catch (e2) { /* ignore */ }
+    }
+    } finally {
+        if (typeof hideFormBuilderImportLoadingDeferred === 'function') {
+            try {
+                hideFormBuilderImportLoadingDeferred();
+            } catch (eHide) { /* ignore */ }
+        }
+    }
 }
-function exportForm() {
+function exportForm(options) {
+    const silent = options && options.silent === true;
     const formData = {
         sections: [],
         groups: [],
@@ -4948,25 +5037,28 @@ function exportForm() {
         });
     }
     const jsonString = JSON.stringify(formData, null, 2);
-    downloadJSON(jsonString, "form_data.json");
-    // Also copy to clipboard
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(jsonString).then(() => {
-            // Show a brief notification that it was copied
-            const exportButton = document.querySelector('button[onclick="exportForm()"]');
-            if (exportButton) {
-                const originalText = exportButton.textContent;
-                exportButton.textContent = 'Copied to clipboard!';
-                exportButton.style.backgroundColor = '#28a745';
-                setTimeout(() => {
-                    exportButton.textContent = originalText;
-                    exportButton.style.backgroundColor = '';
-                }, 2000);
-            }
-        }).catch(err => {
+    if (!silent) {
+        downloadJSON(jsonString, "form_data.json");
+        // Also copy to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(jsonString).then(() => {
+                // Show a brief notification that it was copied
+                const exportButton = document.querySelector('button[onclick="exportForm()"]');
+                if (exportButton) {
+                    const originalText = exportButton.textContent;
+                    exportButton.textContent = 'Copied to clipboard!';
+                    exportButton.style.backgroundColor = '#28a745';
+                    setTimeout(() => {
+                        exportButton.textContent = originalText;
+                        exportButton.style.backgroundColor = '';
+                    }, 2000);
+                }
+            }).catch(err => {
 
-        });
+            });
+        }
     }
+    return formData;
 }
 function downloadJSON(content, filename) {
     const blob = new Blob([content], { type: "application/json" });
@@ -4990,170 +5082,7 @@ function importForm(event) {
         reader.readAsText(file);
     }
 }
-/**
- * If your GUI supports adding hidden fields,
- * we use this to create them from loaded JSON
- */
-function addHiddenFieldWithData(hiddenField) {
-    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
-    const hiddenFieldBlock = document.createElement('div');
-    const currentHiddenFieldId = hiddenField.hiddenFieldId;
-    hiddenFieldBlock.className = 'hidden-field-block';
-    hiddenFieldBlock.id = `hiddenFieldBlock${currentHiddenFieldId}`;
-    hiddenFieldBlock.innerHTML = `
-        <label>Hidden Field ${currentHiddenFieldId}: </label>
-        <select id="hiddenFieldType${currentHiddenFieldId}" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
-            <option value="text" ${hiddenField.type === 'text' ? 'selected' : ''}>Textbox</option>
-            <option value="checkbox" ${hiddenField.type === 'checkbox' ? 'selected' : ''}>Checkbox</option>
-        </select><br><br>
-        <div id="hiddenFieldOptions${currentHiddenFieldId}">
-            <!-- Options will be populated based on the type -->
-        </div>
-        <button type="button" onclick="removeHiddenField(${currentHiddenFieldId})">Remove Hidden Field</button>
-        <hr>
-    `;
-    hiddenFieldsContainer.appendChild(hiddenFieldBlock);
-    // Toggle the correct suboptions
-    toggleHiddenFieldOptions(currentHiddenFieldId);
-    // Fill the name
-    document.getElementById(`hiddenFieldName${currentHiddenFieldId}`).value = hiddenField.name || '';
-    if (hiddenField.type === 'checkbox') {
-        document.getElementById(`hiddenFieldChecked${currentHiddenFieldId}`).checked = !!hiddenField.checked;
-        // Rebuild conditions
-        if (hiddenField.conditions && hiddenField.conditions.length > 0) {
-            hiddenField.conditions.forEach((condition, index) => {
-                addConditionalAutofillForCheckbox(currentHiddenFieldId);
-                const condRow = index + 1;
-                document.getElementById(`conditionQuestion${currentHiddenFieldId}_${condRow}`).value = condition.questionId;
-                updateConditionAnswers(currentHiddenFieldId, condRow);
-                document.getElementById(`conditionAnswer${currentHiddenFieldId}_${condRow}`).value = condition.answerValue;
-                document.getElementById(`conditionValue${currentHiddenFieldId}_${condRow}`).value = condition.autofillValue;
-            });
-        }
-        // Rebuild multi-term calculations (like "If eq => checked/unchecked")
-        if (hiddenField.calculations && hiddenField.calculations.length > 0) {
-            hiddenField.calculations.forEach((calcObj, index) => {
-                addCalculationForCheckbox(currentHiddenFieldId);
-                const calcIndex = index + 1;
-                // remove default single term
-                const eqContainer = document.getElementById(`equationContainer${currentHiddenFieldId}_${calcIndex}`);
-                eqContainer.innerHTML = '';
-                calcObj.terms.forEach((termObj, tindex) => {
-                    addEquationTermCheckbox(currentHiddenFieldId, calcIndex);
-                    const termNumber = tindex + 1;
-                    if (termNumber>1) {
-                        const opSel = document.getElementById(`calcTermOperator${currentHiddenFieldId}_${calcIndex}_${termNumber}`);
-                        if (opSel) opSel.value = termObj.operator || '';
-                    }
-                    const qSel = document.getElementById(`calcTermQuestion${currentHiddenFieldId}_${calcIndex}_${termNumber}`);
-                    if (qSel) {
-                        // Check if this is a direct checkbox reference rather than an amount field
-                        // We need to handle both formats - direct checkbox references or amount field references
-                        let questionNameId = termObj.questionNameId || '';
-                        // If it looks like a direct checkbox reference (not starting with "amount_")
-                        if (questionNameId && !questionNameId.startsWith('amount_') && !questionNameId.match(/^amount\d+_/)) {
-                            // Try to select it directly if it exists in the dropdown
-                            qSel.value = questionNameId;
-                            // If direct selection fails, search for a matching amount field to convert
-                            if (qSel.value !== questionNameId) {
-                                // This is a direct checkbox reference, but we need to find its corresponding amount field
-                                // for backward compatibility with the dropdown which may show amount fields
-                                const options = Array.from(qSel.options);
-                                // Look for any amount field option that contains this checkbox name
-                                for (const option of options) {
-                                    if (option.value.includes(questionNameId) || 
-                                        (option.text && option.text.toLowerCase().includes(questionNameId.replace(/_/g, ' ')))) {
-                                        qSel.value = option.value;
-                                        break;
-                                    }
-                                }
-                            }
-                        } else {
-                            // Standard amount field reference
-                            qSel.value = questionNameId;
-                        }
-                    }
-                });
-                const cmpSel = document.getElementById(`calcCompareOperator${currentHiddenFieldId}_${calcIndex}`);
-                if (cmpSel) cmpSel.value = calcObj.compareOperator || '=';
-                const thrEl = document.getElementById(`calcThreshold${currentHiddenFieldId}_${calcIndex}`);
-                if (thrEl) thrEl.value = calcObj.threshold || '0';
-                const resEl = document.getElementById(`calcResult${currentHiddenFieldId}_${calcIndex}`);
-                if (resEl) resEl.value = calcObj.result || 'checked';
-            });
-        }
-    }
-    else if (hiddenField.type === 'text') {
-        // If we had an 'autofillQuestionId', we set it here if needed
-        if (hiddenField.autofillQuestionId) {
-            const autofillSelect = document.getElementById(`hiddenFieldAutofill${currentHiddenFieldId}`);
-            if (autofillSelect) autofillSelect.value = hiddenField.autofillQuestionId;
-        }
-        // Rebuild conditions (like "If question X => autofill = ...")
-        if (hiddenField.conditions && hiddenField.conditions.length > 0) {
-            hiddenField.conditions.forEach((condition, index) => {
-                addConditionalAutofill(currentHiddenFieldId);
-                const condRow = index + 1;
-                document.getElementById(`conditionQuestion${currentHiddenFieldId}_${condRow}`).value = condition.questionId;
-                updateConditionAnswers(currentHiddenFieldId, condRow);
-                document.getElementById(`conditionAnswer${currentHiddenFieldId}_${condRow}`).value = condition.answerValue;
-                document.getElementById(`conditionValue${currentHiddenFieldId}_${condRow}`).value = condition.autofillValue;
-            });
-        }
-        // Rebuild multi-term calculations for text (like "If eq => fillValue")
-        if (hiddenField.calculations && hiddenField.calculations.length > 0) {
-            hiddenField.calculations.forEach((calcObj, index) => {
-                addCalculationForText(currentHiddenFieldId);
-                const calcIndex = index + 1;
-                // remove default single term
-                const eqCont = document.getElementById(`textEquationContainer${currentHiddenFieldId}_${calcIndex}`);
-                eqCont.innerHTML='';
-                calcObj.terms.forEach((termObj, tindex) => {
-                    addEquationTermText(currentHiddenFieldId, calcIndex);
-                    const termNumber = tindex + 1;
-                    if (termNumber>1) {
-                        const opSel = document.getElementById(`textTermOperator${currentHiddenFieldId}_${calcIndex}_${termNumber}`);
-                        if (opSel) opSel.value = termObj.operator || '';
-                    }
-                    const qSel = document.getElementById(`textTermQuestion${currentHiddenFieldId}_${calcIndex}_${termNumber}`);
-                    if (qSel) {
-                        // Check if this is a direct checkbox reference rather than an amount field
-                        // We need to handle both formats - direct checkbox references or amount field references
-                        let questionNameId = termObj.questionNameId || '';
-                        // If it looks like a direct checkbox reference (not starting with "amount_")
-                        if (questionNameId && !questionNameId.startsWith('amount_') && !questionNameId.match(/^amount\d+_/)) {
-                            // Try to select it directly if it exists in the dropdown
-                            qSel.value = questionNameId;
-                            // If direct selection fails, search for a matching amount field to convert
-                            if (qSel.value !== questionNameId) {
-                                // This is a direct checkbox reference, but we need to find its corresponding amount field
-                                // for backward compatibility with the dropdown which may show amount fields
-                                const options = Array.from(qSel.options);
-                                // Look for any amount field option that contains this checkbox name
-                                for (const option of options) {
-                                    if (option.value.includes(questionNameId) || 
-                                        (option.text && option.text.toLowerCase().includes(questionNameId.replace(/_/g, ' ')))) {
-                                        qSel.value = option.value;
-                                        break;
-                                    }
-                                }
-                            }
-                        } else {
-                            // Standard amount field reference
-                            qSel.value = questionNameId;
-                        }
-                    }
-                });
-                const cmpSel = document.getElementById(`textCompareOperator${currentHiddenFieldId}_${calcIndex}`);
-                if (cmpSel) cmpSel.value = calcObj.compareOperator || '=';
-                const thrEl = document.getElementById(`textThreshold${currentHiddenFieldId}_${calcIndex}`);
-                if (thrEl) thrEl.value = calcObj.threshold || '0';
-                const fillValEl = document.getElementById(`textFillValue${currentHiddenFieldId}_${calcIndex}`);
-                if (fillValEl) fillValEl.value = calcObj.fillValue || '';
-            });
-        }
-    }
-}
+/* addHiddenFieldWithData: implemented in hidden.js (single source of truth) */
 /**
  * Update trigger condition options for a dropdown field
  */
@@ -5178,6 +5107,20 @@ function updateTriggerConditionOptions(questionId, fieldCount, sequenceCount) {
     });
 }
 function updateFormAfterImport() {
+    collapseImportedQuestionsByDefault();
+    collapseImportedSectionsByDefault();
+    if (typeof setHiddenFieldsContainerCollapsed === 'function') {
+        setHiddenFieldsContainerCollapsed(true);
+    }
+    if (typeof setLinkedFieldsPanelCollapsed === 'function') {
+        setLinkedFieldsPanelCollapsed(true);
+    }
+    if (typeof collapseAllHiddenFieldBlocksAfterImport === 'function') {
+        collapseAllHiddenFieldBlocksAfterImport();
+    }
+    if (typeof collapseAllCheckboxOptionsAfterImport === 'function') {
+        collapseAllCheckboxOptionsAfterImport();
+    }
     // If we're in preview-import mode, skip heavy GUI-only updates
     if (window.__isPreviewImport) {
         return;
@@ -5219,9 +5162,37 @@ function updateFormAfterImport() {
     if (typeof updateGlobalQuestionLabels === 'function') {
         updateGlobalQuestionLabels();
     }
-    if (typeof window.fwSchedulePreviewSync === 'function') {
+    if (typeof window.fwRefreshInlinePreview === 'function') {
+        window.fwRefreshInlinePreview();
+    } else if (typeof window.fwSchedulePreviewSync === 'function') {
         window.fwSchedulePreviewSync();
     }
+}
+function collapseImportedQuestionsByDefault() {
+    const questionBodies = document.querySelectorAll('#formBuilder .fw-question-body');
+    questionBodies.forEach((body) => {
+        if (!body.id || body.classList.contains('fw-question-body--collapsed')) return;
+        body.classList.add('fw-question-body--collapsed');
+        const questionId = body.id.replace('fwQuestionCollapseBody', '');
+        const btn = document.getElementById(`fwQuestionCollapseBtn${questionId}`);
+        if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+            btn.classList.add('is-collapsed');
+        }
+    });
+}
+function collapseImportedSectionsByDefault() {
+    const sectionBodies = document.querySelectorAll('#formBuilder .fw-section-body');
+    sectionBodies.forEach((body) => {
+        if (!body.id || body.classList.contains('fw-section-body--collapsed')) return;
+        body.classList.add('fw-section-body--collapsed');
+        const sectionId = body.id.replace('fwSectionCollapseBody', '');
+        const btn = document.getElementById(`fwSectionCollapseBtn${sectionId}`);
+        if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+            btn.classList.add('is-collapsed');
+        }
+    });
 }
 function updateConditionAnswers(hiddenFieldId, condId) {
     const questionSelect = document.getElementById(`conditionQuestion${hiddenFieldId}_${condId}`);

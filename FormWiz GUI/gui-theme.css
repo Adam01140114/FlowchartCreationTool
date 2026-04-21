@@ -34,6 +34,66 @@ body.gui-app * {
   transition: none;
 }
 
+/* Full-screen shield while JSON import rebuilds the builder (avoids interaction during layout thrash) */
+.fw-builder-import-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 24px;
+  box-sizing: border-box;
+  background: rgba(240, 242, 245, 0.94);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease, visibility 0.12s ease;
+}
+
+.fw-builder-import-loading.is-visible {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}
+
+.fw-builder-import-loading__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 28px 36px;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  max-width: min(360px, 100%);
+  text-align: center;
+}
+
+.fw-builder-import-loading__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: var(--isd-active);
+  border-radius: 50%;
+  animation: fw-builder-import-spin 0.75s linear infinite;
+}
+
+@keyframes fw-builder-import-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fw-builder-import-loading__text {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 /* Banner (matches intake isd-header) */
 body.gui-app .isd-header {
   background: var(--isd-header);
@@ -500,8 +560,27 @@ body.gui-app .fw-form-settings-content {
   width: 92vw;
   text-align: left;
   align-items: stretch !important;
+  justify-content: flex-start;
+  flex-direction: column;
   max-height: 90vh;
   overflow-y: auto;
+}
+
+/* Form Settings modal: override global form.css `section { display:flex; ... center }` inside modal */
+body.gui-app #formSettingsModal .modal-content.fw-form-settings-content {
+  align-items: stretch !important;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+body.gui-app #formSettingsModal section.fw-settings-section {
+  display: block;
+  flex: none;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  align-items: stretch;
+  justify-content: flex-start;
 }
 
 body.gui-app .fw-form-settings-title {
@@ -550,6 +629,117 @@ body.gui-app .fw-settings-hint {
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.45;
+}
+
+body.gui-app #formSettingsModal #pdfContainer .pdf-input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+body.gui-app #formSettingsModal #pdfContainer .pdf-input-group label.fw-settings-label {
+  margin-bottom: 0;
+}
+
+body.gui-app #formSettingsModal #pdfContainer .pdf-input-group input {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+}
+
+/* Form Settings — single checkbox in same “card” pattern as #formBuilder .fw-cb-question-flag (Mark only one) */
+body.gui-app #formSettingsModal .fw-settings-checkbox-panel {
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fafbfc;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+body.gui-app #formSettingsModal .fw-settings-checkbox-panel .fw-cb-question-flag {
+  margin: 0;
+}
+
+body.gui-app #formSettingsModal .fw-settings-checkbox-panel .fw-cb-question-flag__row {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0 !important;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: #334155;
+  box-sizing: border-box;
+  text-align: left !important;
+}
+
+body.gui-app #formSettingsModal .fw-settings-checkbox-panel .fw-cb-question-flag__row:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+body.gui-app #formSettingsModal .fw-settings-checkbox-panel .fw-cb-question-flag__row input[type='checkbox'] {
+  margin: 0 !important;
+  flex-shrink: 0;
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+body.gui-app #formSettingsModal .fw-settings-checkbox-panel .fw-cb-question-flag__text {
+  flex: 1;
+  min-width: 0;
+  text-align: left !important;
+  line-height: 1.35;
+}
+
+body.gui-app .fw-preview-head__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+body.gui-app .fw-preview-head__row h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+body.gui-app .fw-preview-refresh-btn {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text-primary);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+body.gui-app .fw-preview-refresh-btn:hover {
+  border-color: var(--isd-active);
+  color: var(--isd-header);
 }
 
 body.gui-app #formBuilder .dropdown-options,
@@ -696,7 +886,8 @@ body.gui-app #formBuilder .section-block .fw-section-footer {
 
 body.gui-app #formBuilder .section-block .fw-section-add-question {
   max-width: 420px;
-  width: 100%;
+  width: min(100%, 420px);
+  box-sizing: border-box;
 }
 
 body.gui-app #formBuilder .section-block .fw-section-actions-wrap {
@@ -729,6 +920,98 @@ body.gui-app #formBuilder .section-block:has(.fw-section-body.fw-section-body--c
   display: none;
 }
 
+body.gui-app #formBuilder .fw-section-body .fw-section-add-question-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 14px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 520px;
+}
+
+/* Collapsed blocks: soft hover ring + whole header row toggles expand/collapse (gui.js / hidden.js) */
+body.gui-app #formBuilder .section-block:has(.fw-section-body.fw-section-body--collapsed) {
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+body.gui-app #formBuilder .section-block:has(.fw-section-body.fw-section-body--collapsed):hover {
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.22);
+  border-color: #94a3b8;
+}
+
+body.gui-app #formBuilder .section-block:has(.fw-section-body.fw-section-body--collapsed) .fw-section-head.fw-collapsible-head {
+  cursor: pointer;
+}
+
+body.gui-app #formBuilder .question-block:has(.fw-question-body.fw-question-body--collapsed) {
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+body.gui-app #formBuilder .question-block:has(.fw-question-body.fw-question-body--collapsed):hover {
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.22);
+  border-color: #94a3b8;
+}
+
+body.gui-app #formBuilder .question-block:has(.fw-question-body.fw-question-body--collapsed) .fw-question-head.fw-collapsible-head {
+  cursor: pointer;
+}
+
+body.gui-app #formBuilder .fw-options-panel-head.fw-options-panel-head--toggle {
+  cursor: pointer;
+}
+
+body.gui-app #formBuilder .fw-options-panel:has(.fw-options-panel-body.fw-options-panel-body--collapsed) .fw-options-panel-head {
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+body.gui-app #formBuilder .fw-options-panel:has(.fw-options-panel-body.fw-options-panel-body--collapsed):hover .fw-options-panel-head {
+  background: linear-gradient(165deg, #e2e8f0 0%, #dbe4ee 100%);
+  border-bottom-color: #cbd5e1;
+}
+
+body.gui-app #formBuilder .fw-cb-opt:has(.fw-cb-opt__body.fw-cb-opt__body--collapsed) {
+  transition: box-shadow 0.15s ease;
+}
+
+body.gui-app #formBuilder .fw-cb-opt:has(.fw-cb-opt__body.fw-cb-opt__body--collapsed):hover {
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.14);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel.hidden-fields-panel.is-collapsed {
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel.hidden-fields-panel.is-collapsed:hover {
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  border-color: #9db3dc;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel.hidden-fields-panel.is-collapsed .hidden-fields-panel__header.fw-collapsible-module-head {
+  cursor: pointer;
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel.linked-fields-panel.is-collapsed {
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel.linked-fields-panel.is-collapsed:hover {
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel.linked-fields-panel.is-collapsed .linked-fields-panel__header.fw-collapsible-module-head {
+  cursor: pointer;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-field-block:has(.hf-block-body.hf-block-body--collapsed) {
+  transition: box-shadow 0.15s ease;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-field-block:has(.hf-block-body.hf-block-body--collapsed):hover {
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+
 body.gui-app #formBuilder .question-block {
   background: #fff;
   border: 1px solid var(--border);
@@ -736,6 +1019,7 @@ body.gui-app #formBuilder .question-block {
   padding: 14px 16px 16px;
   margin-bottom: 14px;
   box-shadow: var(--shadow);
+  min-width: 0;
 }
 
 body.gui-app #formBuilder .linking-options {
@@ -860,6 +1144,10 @@ body.gui-app #formBuilder .fw-options-panel-body.fw-options-panel-body--collapse
 
 body.gui-app #formBuilder .fw-options-list {
   margin-bottom: 10px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body.gui-app #formBuilder .fw-option-card {
@@ -873,6 +1161,272 @@ body.gui-app #formBuilder .fw-option-card {
 
 body.gui-app #formBuilder .fw-option-card:last-child {
   margin-bottom: 0;
+}
+
+/* Checkbox question options (collapsible rows + aligned “Enable amount field”) */
+body.gui-app #formBuilder .fw-option-card.fw-cb-opt,
+body.gui-app #formBuilder .fw-cb-opt {
+  padding: 0;
+  overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Kill form.css `* { transition: all }` cost on every expand/collapse */
+body.gui-app #formBuilder .fw-cb-opt,
+body.gui-app #formBuilder .fw-cb-opt * {
+  transition: none !important;
+}
+
+body.gui-app #formBuilder .checkbox-options.fw-options-panel {
+  min-width: 0;
+  max-width: 100%;
+}
+
+body.gui-app #formBuilder .checkbox-options .fw-options-panel-body {
+  min-width: 0;
+}
+
+body.gui-app #formBuilder .fw-checkbox-options-toolbar {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+  padding-top: 4px;
+}
+
+body.gui-app #formBuilder .fw-checkbox-options-toolbar .fw-btn-add-checkbox-option {
+  width: auto !important;
+  max-width: 220px;
+  margin: 0 auto !important;
+  margin-top: 0 !important;
+  display: inline-block !important;
+}
+
+body.gui-app #formBuilder .fw-cb-question-flags {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fafbfc;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+body.gui-app #formBuilder .fw-cb-question-flag {
+  margin: 0;
+}
+
+body.gui-app #formBuilder .fw-cb-question-flag__row {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0 !important;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: #334155;
+  box-sizing: border-box;
+  text-align: left !important;
+}
+
+body.gui-app #formBuilder .fw-cb-question-flag__row:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+body.gui-app #formBuilder .fw-cb-question-flag__row input[type="checkbox"] {
+  margin: 0 !important;
+  flex-shrink: 0;
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+body.gui-app #formBuilder .fw-cb-question-flag__text {
+  flex: 1;
+  min-width: 0;
+  text-align: left !important;
+  line-height: 1.35;
+}
+
+/* Option summary row: NOT the global blue <button> — neutral “accordion” strip */
+body.gui-app #formBuilder .question-block button.fw-cb-opt__summary,
+body.gui-app #formBuilder button.fw-cb-opt__summary {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 10px;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 8px 10px !important;
+  box-sizing: border-box !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px 8px 0 0 !important;
+  background: #f8fafc !important;
+  background-image: none !important;
+  color: #0f172a !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  text-align: left !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  transform: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+body.gui-app #formBuilder .question-block button.fw-cb-opt__summary:hover,
+body.gui-app #formBuilder button.fw-cb-opt__summary:hover {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  transform: none !important;
+}
+
+body.gui-app #formBuilder button.fw-cb-opt__summary:focus-visible {
+  outline: 2px solid var(--isd-active);
+  outline-offset: 2px;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__summary-handle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #475569;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__summary-chevron {
+  display: block;
+  transform: rotate(0deg);
+}
+
+body.gui-app #formBuilder .fw-cb-opt__summary[aria-expanded="false"] .fw-cb-opt__summary-chevron {
+  transform: rotate(-90deg);
+}
+
+body.gui-app #formBuilder .fw-cb-opt__summary-text {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left !important;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__body {
+  padding: 10px 12px 12px;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  background: #fff;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__body--collapsed {
+  display: none;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__grid {
+  display: grid;
+  grid-template-columns: minmax(96px, 130px) 1fr;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__label {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text-primary);
+}
+
+body.gui-app #formBuilder .fw-cb-opt__input--mono {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 12px;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__toggle-row input[type="checkbox"] {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__amount-details {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+
+body.gui-app #formBuilder .fw-cb-opt__footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #edf2f7;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__remove {
+  margin: 0;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #9db3dc;
+  background: #fff;
+  color: var(--isd-active);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+body.gui-app #formBuilder .fw-cb-opt__remove:hover {
+  border-color: var(--isd-active);
+  background: #f8fafc;
 }
 
 body.gui-app #formBuilder .dropdown-options .fw-option-card {
@@ -1289,6 +1843,665 @@ body.gui-app #formBuilder .fw-question-toggles .fw-toggle-group {
   box-shadow: none;
 }
 
+/* Hidden logic entries need dedicated cards for readability */
+body.gui-app #formBuilder .fw-question-toggles [id^="hiddenLogic"] > div:not(.fw-toggle-line) {
+  margin-top: 8px !important;
+  margin-bottom: 10px !important;
+  padding: 12px 14px !important;
+  background: #fff !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+}
+
+/* Hidden fields: undo global form.css (centered inputs/selects, narrow widths, etc.) */
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-field select,
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-condition-card select,
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-equation-term select {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  display: block !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-input,
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-field input[type="text"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  display: block !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-result-row select,
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-result-row input[type="number"] {
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  display: inline-block !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+  vertical-align: middle;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel input[type="checkbox"] {
+  display: inline-block !important;
+  margin: 0 !important;
+  appearance: auto !important;
+  box-shadow: none !important;
+  vertical-align: middle;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-check-row input[type="checkbox"] {
+  flex-shrink: 0;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel button.hf-btn {
+  display: inline-flex !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
+  box-sizing: border-box;
+}
+
+/* Calculation fields module (DOM ids remain hiddenFields* for compatibility) */
+body.gui-app #formBuilder #hiddenFieldsPanel.hidden-fields-panel {
+  margin: 16px 0;
+  border: 1px solid #cfd8ea;
+  border-radius: 10px;
+  background: #f4f8ff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel.hidden-fields-panel--empty {
+  /* Panel stays visible with toolbar so users can add the first calculation field. */
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-fields-panel__toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px 14px 16px;
+  margin: 0;
+  background: #fff;
+  border-top: 1px solid #edf2f7;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-fields-panel__toolbar .hf-btn--add-calculation {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #9db3dc;
+  background: #fff;
+  color: var(--isd-header);
+  cursor: pointer;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-fields-panel__toolbar .hf-btn--add-calculation:hover {
+  border-color: var(--isd-active);
+  color: var(--isd-active);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-fields-list {
+  padding: 12px 14px 0;
+  min-height: 0;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel.is-collapsed .hidden-fields-panel__body {
+  display: none;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-fields-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  background: linear-gradient(180deg, #e8f0ff 0%, #dfe8fb 100%);
+  border-bottom: 1px solid #cfd8ea;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-fields-panel__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--isd-header);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-fields-panel__toggle {
+  border: 1px solid #9db3dc;
+  background: #fff;
+  color: var(--isd-header);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-fields-panel__toggle:hover {
+  border-color: var(--isd-active);
+  color: var(--isd-active);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-fields-panel__body {
+  padding: 0;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-field-block {
+  border: 1px solid #b8c8e7;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  padding: 0;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hidden-fields-list .hidden-field-block:last-child {
+  margin-bottom: 12px;
+}
+
+/* —— Hidden field block layout (hf-*) —— */
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-block-summary {
+  display: flex !important;
+  width: 100% !important;
+  max-width: none !important;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px !important;
+  margin: 0 !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  border-radius: 0 !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  cursor: pointer;
+  font: inherit !important;
+  text-align: left;
+  box-sizing: border-box;
+  transform: none !important;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-block-summary:hover {
+  background: #eef2f7 !important;
+  transform: none !important;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-block-summary__chevron {
+  flex-shrink: 0;
+  width: 1.25rem;
+  font-size: 12px;
+  color: var(--isd-active);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-block-summary__text {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-block-body--collapsed {
+  display: none;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-block-meta {
+  padding: 12px 16px 4px;
+  border-bottom: 1px solid #edf2f7;
+  background: #fafbfd;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-block-meta .hf-field {
+  flex: none;
+  width: 100%;
+  max-width: 100%;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 200px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-stack > .hf-field,
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-condition-card .hf-field {
+  flex: none;
+  width: 100%;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-field--inline {
+  flex: 0 1 220px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-input,
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--text-primary);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-input:focus,
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-select:focus {
+  outline: none;
+  border-color: var(--isd-active);
+  box-shadow: 0 0 0 3px rgba(74, 108, 177, 0.2);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-input--narrow {
+  max-width: 100px;
+  width: 100%;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-select--narrow {
+  max-width: 72px;
+  width: 100%;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-select--medium {
+  max-width: 140px;
+  width: 100%;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-select--grow {
+  flex: 1 1 160px;
+  min-width: 0;
+  width: 100%;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-input--fill {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-options {
+  padding: 16px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* Avoid form.css `* { transition: all }` jank when toggling hidden-field rows quickly */
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-block-summary,
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-block-summary *,
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-block-body {
+  transition: none !important;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: inherit;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-btn--primary {
+  background: var(--isd-active);
+  color: #fff;
+  border-color: var(--isd-header);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-btn--primary:hover {
+  filter: brightness(1.05);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-btn--secondary {
+  background: #fff;
+  color: var(--isd-header);
+  border-color: #9db3dc;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-btn--secondary:hover {
+  border-color: var(--isd-active);
+  color: var(--isd-active);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-btn--danger {
+  background: #fff;
+  color: #c0392b;
+  border-color: #e6b8b4;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-btn--danger:hover {
+  background: #fdf2f2;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-btn--ghost:hover {
+  border-color: var(--isd-active);
+  color: var(--isd-header);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-footer-actions {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: #fafbfd;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-calc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-calc-card {
+  padding: 16px;
+  border: 1px solid #b8c8e7;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-left: 4px solid var(--isd-active);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-calc-card__title {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--isd-header);
+  margin-bottom: 10px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-equation-terms {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-calc-card .hf-toolbar {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-equation-term {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-result-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid #cbd5e9;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-result-row__then {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: lowercase;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-check-row {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-checkbox {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--isd-header);
+  cursor: pointer;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-check-row__label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-subsection {
+  display: block !important;
+  flex: none !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #cbd5e9;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-subsection__head {
+  margin-bottom: 12px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-subsection__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--isd-header);
+  text-align: left;
+  line-height: 1.35;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-subsection__actions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-conditions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-condition-card {
+  padding: 16px 18px;
+  border: 1px solid #dce3ed;
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-condition-card .hf-label {
+  text-align: left;
+  display: block;
+  width: 100%;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-condition-card__head {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--isd-header);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-condition-card .hf-field + .hf-field {
+  margin-top: 10px;
+}
+
+body.gui-app #formBuilder #hiddenFieldsPanel .hf-condition-card__actions {
+  margin-top: 12px;
+  padding-top: 4px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Linked fields / linked checkboxes panel (top of form builder) */
+body.gui-app #formBuilder #linkedFieldsPanel.linked-fields-panel {
+  margin: 16px 0;
+  border: 1px solid #cfd8ea;
+  border-radius: 10px;
+  background: #f4f8ff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel.is-collapsed .linked-fields-panel__body {
+  display: none;
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel .linked-fields-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  background: linear-gradient(180deg, #e8f0ff 0%, #dfe8fb 100%);
+  border-bottom: 1px solid #cfd8ea;
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel .linked-fields-panel__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--isd-header);
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel .linked-fields-panel__toggle {
+  border: 1px solid #9db3dc;
+  background: #fff;
+  color: var(--isd-header);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel .linked-fields-panel__toggle:hover {
+  border-color: var(--isd-active);
+  color: var(--isd-active);
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel .linked-fields-panel__body {
+  padding: 0;
+  background: #fff;
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel .linked-fields-list {
+  padding: 12px 14px 0;
+  min-height: 0;
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel .linked-fields-panel__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 14px 16px;
+  margin: 0;
+  border-top: 1px solid #edf2f7;
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel .linked-fields-panel__add-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #9db3dc;
+  background: #fff;
+  color: var(--isd-header);
+  cursor: pointer;
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel .linked-fields-panel__add-btn:hover {
+  border-color: var(--isd-active);
+  color: var(--isd-active);
+}
+
+body.gui-app #formBuilder #linkedFieldsList > div {
+  margin-bottom: 12px;
+}
+
+body.gui-app #formBuilder #linkedFieldsList > div:last-child {
+  margin-bottom: 12px;
+}
+
+body.gui-app #formBuilder #linkedFieldsPanel button {
+  display: inline-block !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
+}
+
 body.gui-app #formBuilder .fw-question-toggles #jumpBlock {
   margin-top: 0 !important;
 }
@@ -1374,9 +2587,9 @@ body.gui-app #formBuilder .pdf-detail-group {
   margin-top: 10px !important;
 }
 
-/* Buttons inside builder — match main toolbar (Paste Json, etc.); icon + collapse chevron excluded */
-body.gui-app #formBuilder .section-block button:not(.fw-icon-btn),
-body.gui-app #formBuilder .question-block button:not(.fw-icon-btn):not(.fw-question-collapse-btn) {
+/* Buttons inside builder — match main toolbar (Paste Json, etc.); icon + collapse + checkbox option header excluded */
+body.gui-app #formBuilder .section-block button:not(.fw-icon-btn):not(.fw-cb-opt__summary),
+body.gui-app #formBuilder .question-block button:not(.fw-icon-btn):not(.fw-question-collapse-btn):not(.fw-cb-opt__summary) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1394,8 +2607,8 @@ body.gui-app #formBuilder .question-block button:not(.fw-icon-btn):not(.fw-quest
   transition: filter 0.15s ease, transform 0.1s ease;
 }
 
-body.gui-app #formBuilder .section-block button:not(.fw-icon-btn):hover,
-body.gui-app #formBuilder .question-block button:not(.fw-icon-btn):not(.fw-question-collapse-btn):hover {
+body.gui-app #formBuilder .section-block button:not(.fw-icon-btn):not(.fw-cb-opt__summary):hover,
+body.gui-app #formBuilder .question-block button:not(.fw-icon-btn):not(.fw-question-collapse-btn):not(.fw-cb-opt__summary):hover {
   transform: none !important;
   filter: brightness(0.95);
 }
@@ -1512,4 +2725,15 @@ body.gui-app #formBuilder center {
 
 body.gui-app #formBuilder .question-block > div[style*="display: flex"] {
   margin-bottom: 8px;
+}
+
+/*
+ * form.css sets `* { transition: all 0.3s }` on the whole document. After a large import the
+ * builder DOM is huge; animating every property on every node makes collapse/expand and scrolling
+ * feel sluggish. Disable transitions only under #formBuilder (more specific rules elsewhere
+ * can still set transitions on individual controls if needed).
+ */
+body.gui-app #formBuilder,
+body.gui-app #formBuilder * {
+  transition: none !important;
 }

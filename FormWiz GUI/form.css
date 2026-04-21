@@ -198,6 +198,32 @@ button:hover {
     transform: translateY(-2px);
 }
 
+/* Custom Form Builder: checkbox option accordion headers live inside #formBuilder and must
+   not inherit the global blue primary <button> look or max-width:220px from rules above. */
+#formBuilder button.fw-cb-opt__summary {
+    display: flex !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    margin-top: 0 !important;
+    background-color: #f8fafc !important;
+    background-image: none !important;
+    color: #0f172a !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px 8px 0 0 !important;
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+#formBuilder button.fw-cb-opt__summary:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+    transform: none !important;
+}
+
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
     .container {
