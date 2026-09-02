@@ -1499,6 +1499,7 @@ window.exportGuiJson = function(download = true) {
     const outgoingEdges = getLogicalOutgoingEdges(cell);
     const jumpConditions = [];
     let endOption = null;
+    const hiddenLogicConfigs = [];
     // Check for direct connections to END nodes or other questions (for text-based questions)
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
@@ -1571,6 +1572,20 @@ window.exportGuiJson = function(download = true) {
           const option = {
             text: optionText
           };
+          if (targetCell._nameId && String(targetCell._nameId).trim()) {
+            option.nameId = String(targetCell._nameId).trim();
+            const alreadyMapped = hiddenLogicConfigs.some(
+              (c) => c.trigger === optionText.trim() && c.nodeId === option.nameId
+            );
+            if (!alreadyMapped) {
+              hiddenLogicConfigs.push({
+                trigger: optionText.trim(),
+                type: 'checkbox',
+                nodeId: option.nameId,
+                textboxText: ''
+              });
+            }
+          }
           // Check if this option leads to an end node (directly or through multipleDropdownType/multipleTextboxes)
           const optionOutgoingEdges = getLogicalOutgoingEdges(targetCell);
           if (optionOutgoingEdges) {
@@ -1639,7 +1654,6 @@ window.exportGuiJson = function(download = true) {
       }
     }
     // Check for hidden logic - look for hidden checkbox/textbox nodes connected to options
-    const hiddenLogicConfigs = [];
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
         const targetCell = edge.target;
@@ -4632,6 +4646,22 @@ window.correctNodeIdsAfterImport = function() {
  * Format: [pdf name if associated]-[parent node text]-[current node text]
  */
 function generateCorrectNodeId(cell) {
+  // Preserve explicit PDF field names from flowchart design (e.g. taxpayer_name on W-9)
+  if (cell._nameId && String(cell._nameId).trim()) {
+    const nameId = String(cell._nameId).trim();
+    if (nameId !== 'unnamed_node' && nameId !== 'new_question' && !nameId.startsWith('Option_')) {
+      return nameId;
+    }
+  }
+  if (cell.style) {
+    const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+    if (styleMatch) {
+      const existing = decodeURIComponent(styleMatch[1]).trim();
+      if (existing && existing !== 'unnamed_node' && existing !== 'new_question' && !existing.startsWith('Option_')) {
+        return existing;
+      }
+    }
+  }
   // Get PDF name if associated with this node
   const pdfName = getPdfNameForNode(cell);
   // Check if PDF name should be added to node ID based on user setting

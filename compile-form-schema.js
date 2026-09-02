@@ -257,6 +257,11 @@ function compile(schema) {
   }
 
   function addVertex(cell) {
+    if (cell.vertex) {
+      cell._pdfName = cell._pdfName ?? '';
+      cell._pdfFile = cell._pdfFile ?? '';
+      cell._pdfPrice = cell._pdfPrice ?? '';
+    }
     cells.push(cell);
     return cell;
   }
@@ -454,7 +459,7 @@ function compile(schema) {
   const foreignJoin = addHub(CENTER_X, below(...llcOpts, otherClass), 'foreign_partners_join');
   const foreignPartners = addQuestion({
     text: 'Does this entity have foreign partners, owners, or beneficiaries?',
-    type: 'checkbox',
+    type: 'dropdown',
     nameId: 'foreign_partners_checkbox',
     section: 2,
     y: foreignJoin.geometry.y + foreignJoin.geometry.height + JOIN_TRUNK
@@ -462,15 +467,15 @@ function compile(schema) {
   const foreignOpts = addOptions(foreignPartners, [
     { label: 'Yes', nameId: 'yes' },
     { label: 'No', nameId: 'no' }
-  ], 'checkbox', 2);
+  ], 'dropdown', 2);
   funnelInto([taxOpts[3], taxOpts[4], llcOpts[2]], foreignJoin);
   addEdge(foreignJoin.id, foreignPartners.id, 'trunk');
 
   const mergeHub = addHub(CENTER_X, below(...foreignOpts), 'exempt_merge_hub');
-  const exemptPayee = addQuestion({
-    text: 'What is your exempt payee code, if any?',
-    type: 'text',
-    nameId: 'exempt_payee_code',
+  const exemptGate = addQuestion({
+    text: 'Do you have an exempt payee code?',
+    type: 'dropdown',
+    nameId: 'exempt_payee_provided',
     section: 3,
     y: mergeHub.geometry.y + mergeHub.geometry.height + MERGE_TRUNK
   });
@@ -483,19 +488,47 @@ function compile(schema) {
     otherClass,
     ...foreignOpts
   ], mergeHub);
-  addEdge(mergeHub.id, exemptPayee.id, 'trunk');
+  addEdge(mergeHub.id, exemptGate.id, 'trunk');
+  const exemptGateOpts = addOptions(exemptGate, [
+    { label: 'Yes', nameId: 'yes' },
+    { label: 'No', nameId: 'no' }
+  ], 'dropdown', 3);
 
-  y = below(exemptPayee);
+  const exemptPayee = addQuestion({
+    text: 'What is your exempt payee code?',
+    type: 'text',
+    nameId: 'exempt_payee_code',
+    section: 3,
+    x: centerUnder(exemptGateOpts[0], Q_W),
+    y: below(...exemptGateOpts)
+  });
+  addEdge(exemptGateOpts[0].id, exemptPayee.id);
+
+  const fatcaGate = addQuestion({
+    text: 'Do you have a FATCA exemption code?',
+    type: 'dropdown',
+    nameId: 'fatca_provided',
+    section: 3,
+    y: below(exemptPayee, exemptGateOpts[1])
+  });
+  addEdge(exemptGateOpts[1].id, fatcaGate.id);
+  addEdge(exemptPayee.id, fatcaGate.id);
+  const fatcaGateOpts = addOptions(fatcaGate, [
+    { label: 'Yes', nameId: 'yes' },
+    { label: 'No', nameId: 'no' }
+  ], 'dropdown', 3);
+
   const fatca = addQuestion({
-    text: 'What is your FATCA exemption code, if any?',
+    text: 'What is your FATCA exemption code?',
     type: 'text',
     nameId: 'fatca_code',
     section: 3,
-    y
+    x: centerUnder(fatcaGateOpts[0], Q_W),
+    y: below(...fatcaGateOpts)
   });
-  addEdge(exemptPayee.id, fatca.id);
+  addEdge(fatcaGateOpts[0].id, fatca.id);
 
-  y = below(fatca);
+  y = below(fatca, fatcaGateOpts[1]);
   const address = addQuestion({
     text: 'What is your street address?',
     type: 'text',
@@ -503,6 +536,7 @@ function compile(schema) {
     section: 4,
     y
   });
+  addEdge(fatcaGateOpts[1].id, address.id);
   addEdge(fatca.id, address.id);
 
   y = below(address);
@@ -655,12 +689,19 @@ function compile(schema) {
 
   routeCircuitBoard(cells, pendingEdges);
 
+  const defaultPdfProperties = {
+    pdfName: schema.defaultPdfProperties?.pdfName || schema.pdfDisplayName || 'W-9 Form',
+    pdfFile: schema.defaultPdfProperties?.pdfFile || schema.pdfFile || 'W9.pdf',
+    pdfPrice: String(schema.defaultPdfProperties?.pdfPrice ?? schema.pdfPrice ?? '0')
+  };
+
   return {
     formName: schema.formTitle || 'Form',
     edgeStyle: 'curved',
     cells,
     sectionPrefs,
-    groups: {}
+    groups: [],
+    defaultPdfProperties
   };
 }
 

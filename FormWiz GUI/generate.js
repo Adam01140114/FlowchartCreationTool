@@ -56,6 +56,12 @@ function getFormQuestionStyle() {
     if (raw === 'section' || raw === 'all' || raw === 'question') return raw;
     return 'question';
 }
+function getFormDeploymentStyle() {
+    const raw = (typeof window !== 'undefined' && window.__FORM_DEPLOYMENT_STYLE__)
+        ? String(window.__FORM_DEPLOYMENT_STYLE__).toLowerCase().trim()
+        : 'production';
+    return raw === 'test' ? 'test' : 'production';
+}
 function getLogicConditionFromRow(questionId, row, rowIndex) {
     const pqEl = row.querySelector("#prevQuestion" + questionId + "_" + rowIndex);
     const paEl = row.querySelector("#prevAnswer" + questionId + "_" + rowIndex);
@@ -464,6 +470,9 @@ const formNameEl = document.getElementById('formNameInput');
 const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
 const skipSignInGate = !!(document.getElementById('skipSignInGateCheckbox') && document.getElementById('skipSignInGateCheckbox').checked);
 const formQuestionStyle = getFormQuestionStyle();
+const formDeploymentStyle = getFormDeploymentStyle();
+const showPdfDevTools = formDeploymentStyle === 'test';
+const showProductionCheckout = formDeploymentStyle !== 'test';
   // Top HTML (head, body, header, etc.)
   let formHTML = [
     "<!DOCTYPE html>",
@@ -1205,6 +1214,7 @@ const formQuestionStyle = getFormQuestionStyle();
     "</head>",
     `<body class="form-style-${formQuestionStyle}">`,
     `<script>window.__FORM_QUESTION_STYLE__=${JSON.stringify(formQuestionStyle)};</script>`,
+    `<script>window.__FORM_DEPLOYMENT_STYLE__=${JSON.stringify(formDeploymentStyle)};</script>`,
     ...(skipSignInGate ? ['<script>window.__FORM_SKIP_SIGNIN_GATE__=true;</script>'] : []),
     '<script>',
     '/*──────── mirror a dropdown → textbox and checkbox ────────*/',
@@ -1253,6 +1263,13 @@ const formQuestionStyle = getFormQuestionStyle();
     '    }',
     '    const existingCheckboxes = wrap.querySelectorAll("div");',
     '    existingCheckboxes.forEach(div => div.remove());',
+    '    if (typeof updateHiddenLogic === "function") {',
+    '        updateHiddenLogic(baseName, val);',
+    '    }',
+    '    var hlConfigs = (typeof hiddenLogicConfigs !== "undefined" && hiddenLogicConfigs) ? hiddenLogicConfigs : (window.hiddenLogicConfigs || []);',
+    '    if (hlConfigs.some(function(c) { return c.questionNameId === baseName && c.trigger === val && c.nodeId; })) {',
+    '        return;',
+    '    }',
     '    // Sanitize option value: replace all non-word characters (including spaces) with underscores',
     '    const idSuffix = val.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, \'\');',
     '    // Check if baseName ends with an entry number (for numbered dropdowns or trigger sequence dropdowns)',
@@ -1598,7 +1615,10 @@ const formQuestionStyle = getFormQuestionStyle();
     .replace(/"/g, '\\"');
   // Get the desired output file name
   const pdfOutputNameInputEl = document.getElementById("pdfOutputName");
-  const pdfOutputName = pdfOutputNameInputEl && pdfOutputNameInputEl.value.trim() ? pdfOutputNameInputEl.value.trim() : "example.html";
+  let pdfOutputName = pdfOutputNameInputEl && pdfOutputNameInputEl.value.trim() ? pdfOutputNameInputEl.value.trim() : "";
+  if (!pdfOutputName) {
+    pdfOutputName = /\.pdf$/i.test(pdfFormName) ? pdfFormName : "W9.pdf";
+  }
   const escapedPdfOutputName = pdfOutputName.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, '\\"');
   // Set window.formId to use the PDF name (without .pdf extension) for cart and form identification
   window.formId = pdfFormName.replace(/\.pdf$/i, '');
@@ -6629,7 +6649,7 @@ if (s > 1){
   // Close the form & add the thank-you message
   formHTML += [
     "</form>",
-    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><span style="font-size: 0.75em; color: #666;">Your paperwork is now ready, please proceed to checkout</span><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Checkout</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href=\'/Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button><br><button id="debugDownloadPdfBtn" onclick="downloadAllPdfs()" style="font-size: 1.2em; display: none;">Download PDF</button><br id="debugDownloadPdfBr" style="display: none;"><br id="debugPreviewPdfsBr" style="display: none;"><button id="debugPreviewPdfsBtn" onclick="showPreviewPdfsModal()" style="font-size: 1.2em; display: none;">Preview PDFs</button><br></div>',
+    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><span style="font-size: 0.75em; color: #666;">Your paperwork is now ready, please proceed to checkout</span><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><div id="pdfDevTools" style="display: ' + (showPdfDevTools ? 'block' : 'none') + ';"><button id="downloadPdfBtn" onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDFs</button><br><br><button id="previewPdfsBtn" onclick="showPreviewPdfsModal()" style="font-size: 1.2em;">Preview PDFs</button><br><br><button id="downloadPayloadBtn" onclick="downloadTestPayload()" style="font-size: 1.2em;">Download Payload</button><br><br></div><div id="productionCheckoutTools" style="display: ' + (showProductionCheckout ? 'block' : 'none') + ';"><button onclick="showCartModal()" style="font-size: 1.2em;">Checkout</button><br><br><button onclick="window.location.href=\'/Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div></div>',
     "</div>",
     "</section>",
     "</div>",
@@ -7303,39 +7323,6 @@ if (s > 1){
         subtree: true,
         childList: true
       });
-    }
-  });
-  
-  // Debug mode toggle for thank you message buttons
-  let debugModeEnabled = false;
-  document.addEventListener('keydown', function(e) {
-    // Check for Ctrl+Shift (Windows/Linux) or Cmd+Shift (Mac)
-    const isModifierPressed = (e.ctrlKey || e.metaKey) && e.shiftKey;
-    
-    if (isModifierPressed) {
-      debugModeEnabled = !debugModeEnabled;
-      
-      // Toggle visibility of debug buttons
-      const downloadBtn = document.getElementById('debugDownloadPdfBtn');
-      const previewBtn = document.getElementById('debugPreviewPdfsBtn');
-      const downloadBr = document.getElementById('debugDownloadPdfBr');
-      const previewBr = document.getElementById('debugPreviewPdfsBr');
-      
-      if (downloadBtn && previewBtn && downloadBr && previewBr) {
-        if (debugModeEnabled) {
-          downloadBtn.style.display = 'inline-block';
-          previewBtn.style.display = 'inline-block';
-          downloadBr.style.display = 'block';
-          previewBr.style.display = 'block';
-          console.log('Debug mode enabled - PDF buttons visible');
-        } else {
-          downloadBtn.style.display = 'none';
-          previewBtn.style.display = 'none';
-          downloadBr.style.display = 'none';
-          previewBr.style.display = 'none';
-          console.log('Debug mode disabled - PDF buttons hidden');
-        }
-      }
     }
   });
   `;
@@ -12984,6 +12971,13 @@ function dropdownMirror(selectEl, baseName){
     }
     const existingCheckboxes = wrap.querySelectorAll("div");
     existingCheckboxes.forEach(div => div.remove());
+    if (typeof updateHiddenLogic === 'function') {
+        updateHiddenLogic(baseName, val);
+    }
+    const hlConfigs = (typeof hiddenLogicConfigs !== 'undefined' && hiddenLogicConfigs) ? hiddenLogicConfigs : (window.hiddenLogicConfigs || []);
+    if (hlConfigs.some(function(c) { return c.questionNameId === baseName && c.trigger === val && c.nodeId; })) {
+        return;
+    }
     // Sanitize option value: replace all non-word characters (including spaces) with underscores
     // Use character class [^A-Za-z0-9_] instead of \W to avoid backslash escaping issues in template literals
     const idSuffix = val.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
@@ -14462,15 +14456,18 @@ async function previewPdf(baseName, isUploaded, isLatex, isPdfPreview, questionI
         });
 
         if (!res.ok) {
-            throw new Error("HTTP error! status: " + res.status);
-        }
-
-        const blob = await res.blob();
-        if (blob.size === 0) {
-            throw new Error("Received empty PDF blob from server");
-        }
-
+            if (res.status === 405 || res.status === 404) {
+                throw new Error('PDF fill server unavailable (HTTP ' + res.status + '). Start the dev server with npm start from FlowchartCreationTool.');
+            } else {
+                throw new Error("HTTP error! status: " + res.status);
+            }
+        } else {
+            const blob = await res.blob();
+            if (blob.size === 0) {
+                throw new Error("Received empty PDF blob from server");
+            }
             url = URL.createObjectURL(blob);
+        }
         }
 
         iframe.src = url;
@@ -14518,6 +14515,101 @@ function goBackToForm() {
     // Scroll back to the top of the form
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+function getPayloadFolderName() {
+    const raw = (typeof pdfFileName !== 'undefined' && pdfFileName) ? pdfFileName
+        : (window.pdfFileName || 'Form');
+    return String(raw).replace(/\.pdf$/i, '').replace(/[<>:"/\\|?*]+/g, '_').trim() || 'Form';
+}
+function collectPayloadPdfFiles() {
+    const pdfs = new Set();
+    const addPdf = function(name) {
+        if (!name) return;
+        let base = String(name).replace(/^.*[\\/]/, '').trim();
+        if (!base) return;
+        if (!/\.pdf$/i.test(base)) base += '.pdf';
+        pdfs.add(base);
+    };
+    if (typeof pdfOutputFileName !== 'undefined') addPdf(pdfOutputFileName);
+    if (typeof allPdfFileNames !== 'undefined' && Array.isArray(allPdfFileNames)) {
+        allPdfFileNames.forEach(addPdf);
+    }
+    if (!pdfs.size) addPdf('W9.pdf');
+    return Array.from(pdfs);
+}
+function preparePayloadHtml(html) {
+    let out = String(html || '');
+    out = out.replace(/<script src="https:\\/\\/js\\.stripe\\.com[^>]*><\\/script>\\s*/gi, '');
+    out = out.replace(/<script src="https:\\/\\/www\\.gstatic\\.com\\/firebasejs[^>]*><\\/script>\\s*/gi, '');
+    out = out.replace(/<script src="cart\\.js"><\\/script>\\s*/gi, '');
+    out = out.replace(/<script src="\\.\\.\\/\\.\\.\\/CountyLookup\\/[^"]+"><\\/script>\\s*/gi, '');
+    out = out.replace(/window\\.__FORM_DEPLOYMENT_STYLE__\\s*=\\s*["'][^"']*["']/g, 'window.__FORM_DEPLOYMENT_STYLE__="test"');
+    out = out.replace(/id="pdfDevTools" style="display:\\s*none"/g, 'id="pdfDevTools" style="display: block"');
+    out = out.replace(/id="productionCheckoutTools" style="display:\\s*block"/g, 'id="productionCheckoutTools" style="display: none"');
+    out = out.replace(/href="\\.\\.\\/\\.\\.\\/[^"]*"/g, 'href="#"');
+    out = out.replace(/onclick="location\\.href='(?:\\.\\.\\/)+[^']*'[^"]*"/g, 'onclick="return false"');
+    return out;
+}
+async function downloadTestPayload() {
+    if ((window.__FORM_DEPLOYMENT_STYLE__ || 'production') !== 'test') {
+        alert('Download Payload is only available in test deployment mode.');
+        return;
+    }
+    const btn = document.getElementById('downloadPayloadBtn');
+    const originalText = btn ? btn.textContent : '';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Building zip...';
+    }
+    try {
+        let html = null;
+        try {
+            if (window.parent && window.parent !== window && typeof window.parent.getFormHTML === 'function') {
+                html = window.parent.getFormHTML();
+            }
+        } catch (parentErr) { /* ignore cross-origin */ }
+        if (!html && typeof getFormHTML === 'function') {
+            html = getFormHTML();
+        }
+        if (!html) {
+            html = '<!DOCTYPE html>\\n' + document.documentElement.outerHTML;
+        }
+        html = preparePayloadHtml(html);
+        const folderName = getPayloadFolderName();
+        const pdfs = collectPayloadPdfFiles();
+        const res = await fetch('/api/test-payload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ folderName: folderName, html: html, pdfs: pdfs })
+        });
+        if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(errText || ('HTTP ' + res.status));
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = folderName + '.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        if (btn) btn.textContent = 'Downloaded!';
+    } catch (error) {
+        console.error('Download Payload failed', error);
+        alert('Download Payload failed: ' + error.message);
+        if (btn) btn.textContent = originalText;
+    } finally {
+        if (btn) {
+            setTimeout(function() {
+                btn.disabled = false;
+                if (btn.textContent === 'Downloaded!' || btn.textContent === 'Building zip...') {
+                    btn.textContent = originalText || 'Download Payload';
+                }
+            }, 2400);
+        }
+    }
+}
 // Manual PDF download function (called when user clicks "Download PDF" button)
 async function downloadAllPdfs() {
 
@@ -14533,14 +14625,14 @@ async function downloadAllPdfs() {
 
         // Reset button
         if (downloadButton) {
-            downloadButton.textContent = 'Download PDF';
+            downloadButton.textContent = 'Download PDFs';
             downloadButton.disabled = false;
         }
     } catch (error) {
         // Reset button on error
         const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
         if (downloadButton) {
-            downloadButton.textContent = 'Download PDF';
+            downloadButton.textContent = 'Download PDFs';
             downloadButton.disabled = false;
         }
     }
@@ -17523,6 +17615,12 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
           checkboxId = baseName + "_" + idSuffix;
           checkboxName = checkboxId;
       }
+      // Handle custom hidden logic for this dropdown
+      updateHiddenLogic(baseName, selectedValue);
+      const hlConfigs = (typeof hiddenLogicConfigs !== 'undefined' && hiddenLogicConfigs) ? hiddenLogicConfigs : (window.hiddenLogicConfigs || []);
+      if (hlConfigs.some(function(c) { return c.questionNameId === baseName && c.trigger === selectedValue && c.nodeId; })) {
+        return;
+      }
       // Clear any existing hidden checkboxes for this dropdown to prevent stale checks
       const wrap = document.getElementById("dropdowntext_" + baseName);
       if (wrap) {
@@ -17534,8 +17632,7 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
         createHiddenCheckbox(checkboxId, checkboxName, baseName);
       } else {
       }
-      // Handle custom hidden logic for this dropdown
-      updateHiddenLogic(baseName, selectedValue);
+      // Handle custom hidden logic for this dropdown (already called above)
     }
   });
 }
@@ -18011,11 +18108,14 @@ function isDebugFillEligible(el) {
   if (!el.id && !el.name) return false;
   if (el.id === 'debugSearch' || el.id === 'debugTypeFilter' || (el.id && el.id.indexOf('debug') === 0)) return false;
   if (el.closest('#debugMenu')) return false;
+  const maxFill = !!window.__MAX_FILL_IN_PROGRESS__;
   let node = el;
   while (node && node !== document.body) {
     const style = window.getComputedStyle(node);
-    if (style.display === 'none' || style.visibility === 'hidden') return false;
     if (node.classList && node.classList.contains('hidden')) return false;
+    const isInactiveSection = maxFill && node.classList && node.classList.contains('section')
+      && !node.classList.contains('active');
+    if (!isInactiveSection && (style.display === 'none' || style.visibility === 'hidden')) return false;
     node = node.parentElement;
   }
   return true;
@@ -18116,10 +18216,39 @@ function getSampleFillValue(el) {
   return 'Test Value';
 }
 function revealAllForMaxFill() {
-  document.querySelectorAll('.section').forEach(function(sec) { sec.classList.add('active'); });
-  document.querySelectorAll('.question-container.question-item').forEach(function(q) {
-    if (!q.classList.contains('hidden')) q.classList.remove('question-step-hidden');
+  const style = (typeof window !== 'undefined' && window.__FORM_QUESTION_STYLE__)
+    ? String(window.__FORM_QUESTION_STYLE__).toLowerCase().trim()
+    : 'question';
+  if (style === 'all') {
+    document.querySelectorAll('.section').forEach(function(sec) { sec.classList.add('active'); });
+    document.querySelectorAll('.question-container.question-item').forEach(function(q) {
+      if (!q.classList.contains('hidden')) q.classList.remove('question-step-hidden');
+    });
+  }
+}
+function saveSectionViewState() {
+  return {
+    style: (typeof window !== 'undefined' && window.__FORM_QUESTION_STYLE__)
+      ? String(window.__FORM_QUESTION_STYLE__).toLowerCase().trim()
+      : 'question',
+    currentSection: typeof currentSectionNumber !== 'undefined' ? currentSectionNumber : 1
+  };
+}
+function restoreSectionViewState(state) {
+  if (!state || state.style === 'all') return;
+  document.querySelectorAll('.section').forEach(function(sec) {
+    sec.classList.remove('active');
   });
+  const secNum = state.currentSection;
+  const target = document.getElementById('section' + secNum);
+  if (target) target.classList.add('active');
+  if (typeof currentSectionNumber !== 'undefined') {
+    currentSectionNumber = secNum;
+  }
+  if (window.questionNavControllers && target && window.questionNavControllers[target.id]) {
+    window.questionNavControllers[target.id]();
+  }
+  document.dispatchEvent(new CustomEvent('questionVisibilityChanged', { detail: { sectionId: target ? target.id : null } }));
 }
 function getSelectOptions(select) {
   return Array.from(select.options).filter(function(o) {
@@ -18232,6 +18361,32 @@ function fillVisibleCheckboxesAndRadios() {
     const container = cb.closest('.question-container');
     const isMarkOnlyOne = container && container.querySelector('input[type="radio"]');
     if (isMarkOnlyOne) return;
+    const containerKey = container
+      ? (container.getAttribute('data-question-id') || container.id || '')
+      : '';
+    const siblingBoxes = container
+      ? Array.from(container.querySelectorAll('input[type="checkbox"]'))
+      : [cb];
+    if (containerKey && siblingBoxes.length > 1) {
+      if (siblingBoxes.some(function(s) { return s.checked; })) return;
+      let best = siblingBoxes[siblingBoxes.length - 1];
+      let bestScore = -1;
+      siblingBoxes.forEach(function(s) {
+        if (wouldOptionJumpToEnd(s, s.value)) return;
+        s.checked = true;
+        triggerFieldChange(s);
+        const score = countExportableFields();
+        if (score > bestScore) {
+          bestScore = score;
+          best = s;
+        }
+        s.checked = false;
+      });
+      siblingBoxes.forEach(function(s) { s.checked = false; });
+      best.checked = true;
+      triggerFieldChange(best);
+      return;
+    }
     if (!cb.checked) {
       cb.checked = true;
       triggerFieldChange(cb);
@@ -18268,6 +18423,8 @@ async function fillMaximumPath() {
     btn.textContent = '⏳ Filling...';
   }
   window.isInitialAutofill = true;
+  window.__MAX_FILL_IN_PROGRESS__ = true;
+  const viewState = saveSectionViewState();
   try {
     for (let pass = 0; pass < 8; pass++) {
       fillMaximumPathPass();
@@ -18301,6 +18458,8 @@ async function fillMaximumPath() {
       }, 2200);
     }
   } finally {
+    window.__MAX_FILL_IN_PROGRESS__ = false;
+    restoreSectionViewState(viewState);
     window.isInitialAutofill = false;
   }
 }

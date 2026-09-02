@@ -1,5 +1,10 @@
 {
   "formTitle": "IRS Form W-9 (Request for Taxpayer Identification Number and Certification)",
+  "defaultPdfProperties": {
+    "pdfName": "W-9 Form",
+    "pdfFile": "W9.pdf",
+    "pdfPrice": "0"
+  },
   "fields": [
     {
       "id": "taxpayer_name",
@@ -65,7 +70,11 @@
       "id": "exempt_payee_code",
       "newName": "exempt_payee_code",
       "type": "text",
-      "label": "Exempt Payee Code"
+      "label": "Exempt Payee Code",
+      "conditional": {
+        "onlyWhen": "exempt_payee_provided",
+        "gateQuestion": "Do you have an exempt payee code?"
+      }
     },
     {
       "id": "tax_classification_code",
@@ -77,7 +86,11 @@
       "id": "fatca_code",
       "newName": "fatca_code",
       "type": "text",
-      "label": "FATCA Code"
+      "label": "FATCA Code",
+      "conditional": {
+        "onlyWhen": "fatca_provided",
+        "gateQuestion": "Do you have a FATCA exemption code?"
+      }
     },
     {
       "id": "foreign_partners_checkbox",

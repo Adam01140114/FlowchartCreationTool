@@ -624,9 +624,12 @@
                 const previewKey = urlParams.get('previewKey');
                 const previewJson = urlParams.get('preview'); // Fallback for old URL format
                 const questionStyleParam = urlParams.get('questionStyle');
+                const deploymentStyleParam = urlParams.get('deploymentStyle');
                 if (previewKey || previewJson) {
                     const allowedStyles = { question: true, section: true, all: true };
                     window.__FORM_QUESTION_STYLE__ = allowedStyles[questionStyleParam] ? questionStyleParam : 'section';
+                    const allowedDeployments = { production: true, test: true };
+                    window.__FORM_DEPLOYMENT_STYLE__ = allowedDeployments[deploymentStyleParam] ? deploymentStyleParam : 'test';
                 }
                 
                 let jsonData = null;

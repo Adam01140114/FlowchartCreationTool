@@ -69,6 +69,15 @@ A. Mutually exclusive checkboxes become ONE dropdown.
    Right: one question "What is your federal tax classification?" with seven
    option nodes.
 
+A2. Yes/No and other contradictory choices are dropdowns, never checkboxes.
+   If the user must pick exactly one answer (Yes or No, or any pair of
+   opposites), use questionType dropdown with two option nodes — not checkbox.
+   Checkbox options allow selecting both answers at once, which is invalid.
+   Wrong: "Does this entity have foreign partners?" as checkbox Yes + No.
+   Right: same question as dropdown with Yes and No options (like business-name
+   and requester gates). Use checkboxes only when multiple selections are valid
+   ("select all that apply").
+
 B. Follow-ups hang under the option that enables them, not under every path.
    - LLC -> "What is the LLC tax classification code?" (C / S / P)
    - Other -> text "What is the other tax classification?"
@@ -78,6 +87,13 @@ B. Follow-ups hang under the option that enables them, not under every path.
 C. Optional paper fields become explicit gates.
    If a field is skippable, ask Yes/No first. "Yes" goes to the data question.
    "No" skips around it and merges.
+
+C2. Never ask optional values in a single "if any" text question.
+   Wrong: "What is your exempt payee code, if any?" as one text field — the user
+   must guess whether to leave it blank.
+   Right: "Do you have an exempt payee code?" (dropdown Yes/No) -> Yes ->
+   "What is your exempt payee code?" (text). Apply the same split to FATCA and
+   any optional code or number the PDF marks as skippable or "if any".
 
 D. Exclusive alternatives become a choice, then two columns.
    SSN vs EIN: one dropdown, then the matching TIN question under each option,
@@ -110,7 +126,12 @@ Top-level object:
   "sectionPrefs": {
     "1": { "borderColor": "hsl(0, 100%, 80%)", "name": "Identification" }
   },
-  "groups": {}
+  "groups": [],
+  "defaultPdfProperties": {
+    "pdfName": "W-9 Form",
+    "pdfFile": "W9.pdf",
+    "pdfPrice": "0"
+  }
 }
 
 edgeStyle MUST be "curved". That selects orthogonal connectors with rounded
@@ -152,6 +173,29 @@ from edgeGeometry.points (library.js). Without waypoints, mxGraph draws a
 default orthogonal line that WILL cut through other nodes.
 
 Cell ids are unique strings, usually consecutive integers starting at "2".
+
+3.5 PDF binding (simple forms)
+Every vertex cell carries blank PDF slots that inherit the form default at export:
+
+  "_pdfName": "",
+  "_pdfFile": "",
+  "_pdfPrice": ""
+
+Top-level defaultPdfProperties names the PDF template for the whole form:
+
+  "defaultPdfProperties": {
+    "pdfName": "W-9 Form",
+    "pdfFile": "W9.pdf",
+    "pdfPrice": "0"
+  }
+
+pdfName = display title shown to the user. pdfFile = filename of the fillable
+PDF on the server (must match the uploaded PDF). pdfPrice = Stripe price id, or
+"0" when the form is free. For simple forms, leave per-node _pdf* empty and set
+only defaultPdfProperties. The GUI export passes these through as defaultPDFName,
+pdfOutputName, and stripePriceId so Preview Form can fill and download the PDF.
+Put defaultPdfProperties in field_config.txt; the compiler copies it into the
+flowchart JSON.
 
 
 4. LAYOUT
@@ -357,8 +401,9 @@ Logical fields (abridged):
   tax_classification_* (7 checkboxes) -> ONE dropdown + 7 options
   tax_classification_code (text)      -> only if LLC; as C/S/P dropdown
   tax_classification_other (text)     -> only if Other
-  foreign_partners_checkbox           -> Partnership, Trust, LLC-P
-  exempt_payee_code, fatca_code       -> all paths merge here
+  foreign_partners (dropdown Yes/No)  -> Partnership, Trust, LLC-P
+  exempt_payee_code                   -> gate: Do you have an exempt payee code?
+  fatca_code                          -> gate: Do you have a FATCA exemption code?
   address, city_state_zip
   optional_requester_name             -> gate question
   account_number                      -> gate question
@@ -375,8 +420,9 @@ Interview order:
          Individual / C / S --------------\
          Partnership / Trust --------------\
          LLC -> C/S/P                       \
-              P -> foreign partners          -> Exempt payee code -> FATCA
+              P -> foreign partners          -> Exempt payee gate -> maybe code
          Other -> other classification -----/
+                                              -> FATCA gate -> maybe code
     -> Address -> City/State/ZIP
     -> Requester gate -> maybe requester name
     -> Account gate -> maybe account number
@@ -387,6 +433,10 @@ Interview order:
 -----------------------------------
 [ ] Every schema field appears as a nodeId / _nameId (or a gate you added).
 [ ] Mutually exclusive PDF checkboxes are one dropdown, not a checkbox list.
+[ ] Yes/No and other contradictory choices are dropdowns, not checkbox pairs.
+[ ] Optional "if any" fields are split: Yes/No gate, then value question on Yes.
+[ ] defaultPdfProperties is set (pdfName, pdfFile, pdfPrice); every vertex has
+    _pdfName, _pdfFile, _pdfPrice (empty strings when inheriting the default).
 [ ] Conditionals are real branches with skip edges around the follow-up.
 [ ] Options sit under their question; follow-ups sit under the triggering option.
 [ ] No two node rectangles overlap. Same-row follow-ups use packRow with NODE_GAP

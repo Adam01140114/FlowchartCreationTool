@@ -546,12 +546,13 @@ function loadFormData(formData) {
                     const dropdownOptionsDiv = questionBlock.querySelector(`#dropdownOptions${question.questionId}`);
                     if (dropdownOptionsDiv) {
                         dropdownOptionsDiv.innerHTML = '';
-                        (question.options || []).forEach((optText, idx) => {
+                        (question.options || []).forEach((opt, idx) => {
+                            const optText = (typeof opt === 'string') ? opt : ((opt && opt.text) ? opt.text : '');
                             const optionDiv = document.createElement('div');
                             optionDiv.className = `option${idx + 1} fw-option-card`;
                             const optionId = `option${question.questionId}_${idx + 1}`;
                             optionDiv.innerHTML = `
-                                <input type="text" id="${optionId}" value="${optText}" placeholder="Option ${idx + 1}">
+                                <input type="text" id="${optionId}" value="${String(optText).replace(/"/g, '&quot;')}" placeholder="Option ${idx + 1}">
                                 <button type="button"
                                         onclick="removeDropdownOption(${question.questionId}, ${idx + 1})">
                                     Remove

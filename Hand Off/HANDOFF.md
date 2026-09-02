@@ -50,13 +50,20 @@ npm start
 
 Opens **http://127.0.0.1:8080** → flowchart editor (`index.html`).
 
-FormWiz GUI (form preview/builder):
+**Important:** Use `npm start` (runs `dev-server.js`), **not** plain `http-server`. Only the dev server implements:
+
+- `POST /edit_pdf?pdf=W9.pdf` — fill PDF AcroForm fields from form data (Preview/Download PDF)
+- `POST /api/test-payload` — build downloadable zip for test deployment
+
+`npm run start:static` and `npm run start:gui` return **405** on `/edit_pdf` and filled PDF preview will fail or show blank templates.
+
+FormWiz GUI only (no PDF fill):
 
 ```powershell
 npm run start:gui
 ```
 
-Or via main app: **Preview Form** opens `FormWiz GUI/gui.html?previewKey=...` in a new tab.
+Or via main app: **Preview Form** → modal picks **Question style** + **Deployment style** (default: **Test**) → opens `FormWiz GUI/gui.html?previewKey=...&questionStyle=...&deploymentStyle=test` in a new tab.
 
 **Compile W-9 reference flowchart from schema:**
 
@@ -82,6 +89,8 @@ Defaults:
 | `library.js` | **Export GUI JSON**, merge/split hub edge walking, section consolidation (min 2 questions/section), `exportGuiJson()` |
 | `context-menus.js` | Node menus; `isEndNode` only checks `nodeType=end` (not hardcoded ids) |
 | `compile-form-schema.js` | Schema → W-9 flowchart JSON (layout + routing + audit) |
+| `dev-server.js` | **Default `npm start` server** — static files + `/edit_pdf` + `/api/test-payload` |
+| `payload-html.js` | Sanitizes HTML for test-payload zip folders |
 | `flowchart_ai_trainer_doc.txt` | AI trainer spec (duplicate in `Hand Off/`) |
 | `w9-flowchart.json` | Latest compiled W-9 flowchart |
 | `_w9_payload/` | W-9 logical schema (`field_config.txt`) |
@@ -91,9 +100,10 @@ Defaults:
 | File | Purpose |
 |------|---------|
 | `FormWiz GUI/gui.html` | Loads preview JSON; sets `window.__FORM_QUESTION_STYLE__` |
-| `FormWiz GUI/generate.js` | **Form HTML generator** — question styles, section cards, debug menu, nav |
+| `FormWiz GUI/generate.js` | **Form HTML generator** — question styles, section cards, debug menu, nav, test/prod deployment UI, PDF fill helpers |
 | `FormWiz GUI/generate.css` / `generate2.css` | Form + stepper styles |
-| `FormWiz GUI/download.js` | `showPreview()`, import/export |
+| `FormWiz GUI/download.js` | `showPreview()`, import/export; supports option `{ text, nameId }` |
+| `FormWiz GUI/W9.pdf` | W-9 AcroForm template used by `/edit_pdf` |
 
 ---
 
@@ -127,16 +137,47 @@ Defaults:
 
 - **Fill maximum path** — fills form for worst-case PDF coverage: avoids jump-to-end and hard alerts, maxes numbered dropdowns, prefers branches that reveal more fields, 8 passes with hidden checkbox sync.
 
+### Test deployment mode & dev server (September 2026 session)
+
+- **`npm start` → `dev-server.js`** — Express on port 8080; required for filled PDF preview/download.
+- **Preview Form modal** — **Deployment style** radio: **Production** vs **Test** (default: **Test**). Passed as `deploymentStyle=test|production` in preview URL.
+- **Test mode thank-you screen** — shows **Download PDFs**, **Preview PDFs**, **Download Payload**; hides Checkout / Exit Survey.
+- **Download Payload** — POST `/api/test-payload` builds a zip (`index.html`, CSS, logo, PDFs, README) for offline test folders under `FormWiz GUI/<FormName>/`.
+- **`window.__FORM_DEPLOYMENT_STYLE__`** — set from preview URL / GUI; test mode sets `__FORM_SKIP_SIGNIN_GATE__` where configured.
+
+### Generated HTML & preview fixes
+
+- **Template-literal escaping** in `getFormHTML()` — `downloadTestPayload()` / `preparePayloadHtml()` backslashes must be doubled in generator source or embedded JS breaks (section nav, debug menu, entire main script block fails to parse).
+- **Section-mode preview** — fixed by above; Ctrl+Shift debug menu works in separate script block once main script parses.
+
+### PDF fill / field mapping fixes
+
+- **`resetAllNodeIds()` before preview** was overwriting PDF field names (`taxpayer_name`) with text-derived ids (`what_is_your_name`). **`generateCorrectNodeId()`** now prefers `cell._nameId` and existing `nodeId=` in style before text-based generation.
+- **Dropdown → PDF checkbox mapping** — flowchart option cells carry `_nameId` (e.g. `tax_classification_individual`). Export now:
+  - includes `option.nameId` in GUI JSON;
+  - auto-builds `hiddenLogic.configs` from option `_nameId`s;
+  - `dropdownMirror` / `createHiddenCheckboxesForAutofilledDropdowns` skip label-suffix mirror checkboxes when hidden logic handles the PDF field.
+- **`pdfOutputFileName` default** — falls back to `W9.pdf` when unset (was `example.html`).
+- **Preview PDF** — no silent fallback to unfilled static PDF on 404/405; shows explicit error to run `npm start`.
+- **`hiddenLogicConfigs` TDZ bug** — declare array before option loop in `exportGuiJson()` (fix for preview crash).
+
 ---
 
 ## 6. Critical workflows
 
 ### Preview Form
 
-1. User clicks **Preview Form** → chooses question style.
-2. `script.js` → `exportGuiJson()` → localStorage → `FormWiz GUI/gui.html?previewKey=...&questionStyle=section|question|all`.
-3. `gui.html` sets `window.__FORM_QUESTION_STYLE__`, loads JSON, auto-runs `showPreview()`.
-4. `generate.js` `getFormHTML()` reads style and generates HTML + nav behavior.
+1. User clicks **Preview Form** → chooses **question style** + **deployment style** (default: **Test**, **One section at a time**).
+2. `script.js` → `resetAllPdfInheritance()` + `resetAllNodeIds()` → `exportGuiJson()` → localStorage → `FormWiz GUI/gui.html?previewKey=...&questionStyle=...&deploymentStyle=test`.
+3. `gui.html` sets `window.__FORM_QUESTION_STYLE__`, `window.__FORM_DEPLOYMENT_STYLE__`, loads JSON, auto-runs `showPreview()`.
+4. `generate.js` `getFormHTML()` reads style/deployment and generates HTML + nav behavior.
+5. On completion (test mode): **Download Payload** / **Preview PDFs** require dev server (`npm start`).
+
+### Test payload workflow
+
+1. Complete form in test preview → **Download Payload** on thank-you screen.
+2. Unzip to `FormWiz GUI/<FormName>/` (folder name = main PDF basename).
+3. Serve via `npm start` → open `http://127.0.0.1:8080/FormWiz%20GUI/<FormName>/index.html` for PDF preview/download.
 
 ### Export / audit checklist
 
@@ -144,8 +185,9 @@ Before calling a form done:
 
 1. Import flowchart JSON in editor — edges clean, no overlap.
 2. **Preview Form** — every dropdown shows flowchart options (not Yes/No unless the question is Yes/No).
-3. Run **Ctrl+Shift** → **Fill maximum path** → export PDF / inspect field coverage.
-4. Compiler `auditForm()` output if using `compile-form-schema.js`.
+3. Run **Ctrl+Shift** → **Fill maximum path** → **Preview PDFs** or **Download PDFs** (dev server must be running).
+4. In DevTools Network, confirm `POST /edit_pdf?pdf=W9.pdf` body includes keys matching PDF AcroForm names (`taxpayer_name`, `tax_classification_individual`, etc.).
+5. Compiler `auditForm()` output if using `compile-form-schema.js`.
 
 ---
 
@@ -154,20 +196,25 @@ Before calling a form done:
 1. **Cell ids vs End nodes** — Never treat numeric ids as End; only `nodeType=end`.
 2. **Export through hubs** — `getLogicalOutgoingEdges` / `getLogicalIncomingEdges` in `library.js` must walk merge/split hubs or options export empty.
 3. **Question style is preview-only** — passed via URL param + global; default in GUI import path is `section` when previewing from flowchart.
-4. **Section consolidation** runs at GUI JSON export time, not in the mxGraph file itself — re-export after flowchart edits.
-5. **Mutually exclusive PDF fields** (e.g. W-9 SSN *or* EIN) — “Fill maximum path” picks one branch; it does not fill both columns by design.
-6. **Firebase / auth** — `auth.js` has substantial changes; preview uses `__FORM_SKIP_SIGNIN_GATE__` when configured.
-7. Desktop copies — compiler also writes `Desktop/w9-flowchart.json`; user may edit outside repo.
+4. **Deployment style** — default **Test** in preview modal; production shows checkout on thank-you screen.
+5. **Section consolidation** runs at GUI JSON export time, not in the mxGraph file itself — re-export after flowchart edits.
+6. **Mutually exclusive PDF fields** (e.g. W-9 SSN *or* EIN) — “Fill maximum path” picks one branch; it does not fill both columns by design.
+7. **PDF fill requires dev server** — `http-server` alone cannot POST `/edit_pdf`; preview may error or PDFs stay blank.
+8. **Node IDs must match PDF field names** — `_nameId` on flowchart cells (e.g. `taxpayer_name`) must survive export; do not rely on text-derived ids after `resetAllNodeIds`.
+9. **Dropdown options need `_nameId`** for PDF checkboxes — export auto-creates hidden logic; without `_nameId`, mirror checkboxes use label suffixes that do not match AcroForm names.
+10. **Firebase / auth** — `auth.js` has substantial changes; preview uses `__FORM_SKIP_SIGNIN_GATE__` in test mode when configured.
+11. Desktop copies — compiler also writes `Desktop/w9-flowchart.json`; user may edit outside repo.
 
 ---
 
 ## 8. Suggested next steps for the new agent
 
-1. Re-read [`flowchart_ai_trainer_doc.txt`](./flowchart_ai_trainer_doc.txt) and run through W-9 Preview + PDF export after pull.
-2. Extend `compile-form-schema.js` beyond W-9 when new schemas arrive (reuse generic router).
-3. Optionally persist **question style** in exported GUI JSON (not only preview URL).
-4. Add automated test or script that runs Fill maximum path + counts exportable fields vs PDF field list.
-5. Keep **form audit** in the loop — any flowchart change should be validated in Preview Form.
+1. Re-read [`flowchart_ai_trainer_doc.txt`](./flowchart_ai_trainer_doc.txt) and run through W-9 Preview + PDF export after pull (**must use `npm start`**).
+2. Verify test payload zip → unzip → localhost preview workflow end-to-end.
+3. Extend `compile-form-schema.js` beyond W-9 when new schemas arrive (reuse generic router).
+4. Optionally persist **question style** and **deployment style** in exported GUI JSON (not only preview URL).
+5. Add automated test: Fill maximum path → POST `/edit_pdf` → assert PDF field values match exportable HTML field names.
+6. Keep **form audit** in the loop — any flowchart change should be validated in Preview Form.
 
 ---
 

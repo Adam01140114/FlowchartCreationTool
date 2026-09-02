@@ -743,6 +743,18 @@ app.post('/edit_pdf', async (req, res) => {
       const formsRoot = path.join(__dirname, 'public', 'Forms');
       const targetLower = targetFile.toLowerCase();
 
+      // Local dev: PDFs in FormWiz GUI root (e.g. W9.pdf)
+      try {
+        const localEntries = fs.readdirSync(__dirname, { withFileTypes: true });
+        for (const entry of localEntries) {
+          if (entry.isFile() && entry.name.toLowerCase() === targetLower) {
+            return path.join(__dirname, entry.name);
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+
       // If we know the calling form folder, search ONLY that folder.
       if (preferredFolder) {
         const preferredPath = path.join(formsRoot, preferredFolder);

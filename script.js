@@ -4849,24 +4849,31 @@ function showPreviewFormStyleModal() {
   }
   const sectionRadio = modal.querySelector('input[name="previewQuestionStyle"][value="section"]');
   if (sectionRadio) sectionRadio.checked = true;
+  const testRadio = modal.querySelector('input[name="previewDeploymentStyle"][value="test"]');
+  if (testRadio) testRadio.checked = true;
   modal.style.display = 'flex';
 }
 
 function confirmPreviewFormStyle() {
   const selected = document.querySelector('input[name="previewQuestionStyle"]:checked');
   const style = selected && selected.value ? selected.value : 'section';
+  const deploymentSelected = document.querySelector('input[name="previewDeploymentStyle"]:checked');
+  const deploymentStyle = deploymentSelected && deploymentSelected.value ? deploymentSelected.value : 'test';
   hidePreviewFormStyleModal();
-  startPreviewForm(style);
+  startPreviewForm(style, deploymentStyle);
 }
 
 function previewForm() {
   showPreviewFormStyleModal();
 }
 
-function startPreviewForm(questionStyle) {
+function startPreviewForm(questionStyle, deploymentStyle) {
   const normalizedStyle = (questionStyle === 'question' || questionStyle === 'section' || questionStyle === 'all')
     ? questionStyle
     : 'section';
+  const normalizedDeployment = (deploymentStyle === 'test' || deploymentStyle === 'production')
+    ? deploymentStyle
+    : 'test';
   // Automatically reset PDF inheritance and Node IDs before previewing
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
   // Reset PDF inheritance for all nodes FIRST
@@ -4901,7 +4908,7 @@ function startPreviewForm(questionStyle) {
         console.error('Error storing preview data in localStorage:', e);
         // Fallback to URL method if localStorage fails (though it may still have size limits)
       const encodedJson = encodeURIComponent(guiJsonStr);
-        const guiUrl = `FormWiz GUI/gui.html?preview=${encodedJson}&questionStyle=${encodeURIComponent(normalizedStyle)}`;
+        const guiUrl = `FormWiz GUI/gui.html?preview=${encodedJson}&questionStyle=${encodeURIComponent(normalizedStyle)}&deploymentStyle=${encodeURIComponent(normalizedDeployment)}`;
         window.open(guiUrl, '_blank');
         return;
       }
@@ -4912,7 +4919,7 @@ function startPreviewForm(questionStyle) {
     });
       
       // Open the GUI preview in a new tab with the preview key in the URL
-      const guiUrl = `FormWiz GUI/gui.html?previewKey=${encodeURIComponent(previewKey)}&questionStyle=${encodeURIComponent(normalizedStyle)}`;
+      const guiUrl = `FormWiz GUI/gui.html?previewKey=${encodeURIComponent(previewKey)}&questionStyle=${encodeURIComponent(normalizedStyle)}&deploymentStyle=${encodeURIComponent(normalizedDeployment)}`;
       window.open(guiUrl, '_blank');
     } else {
       // Fallback to regular GUI if no JSON generated

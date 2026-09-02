@@ -528,6 +528,23 @@
           </span>
         </label>
       </fieldset>
+      <fieldset class="preview-style-options">
+        <legend>Deployment style</legend>
+        <label class="preview-style-option">
+          <input type="radio" name="previewDeploymentStyle" value="production">
+          <span>
+            <strong>Production</strong>
+            <small>End users see checkout only. Download and preview PDF buttons are hidden.</small>
+          </span>
+        </label>
+        <label class="preview-style-option">
+          <input type="radio" name="previewDeploymentStyle" value="test" checked>
+          <span>
+            <strong>Test</strong>
+            <small>Shows Download PDFs and Preview PDFs on the completion screen for QA.</small>
+          </span>
+        </label>
+      </fieldset>
       <div class="import-flowchart-actions">
         <button type="button" id="confirmPreviewFormStyleBtn" class="import-flowchart-primary" onclick="confirmPreviewFormStyle()">Preview</button>
         <button type="button" id="cancelPreviewFormStyleBtn" onclick="hidePreviewFormStyleModal()">Cancel</button>
