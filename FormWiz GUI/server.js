@@ -4,25 +4,21 @@ const dotenv        = require('dotenv');
 const fetch         = require('node-fetch');
 dotenv.config();
 
-// WARNING: Using LIVE keys for local development is not recommended and will likely fail.
+// Optional services: flowchart editing and FormWiz form display work without these.
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-if (!stripeSecretKey) {
-  throw new Error('STRIPE_SECRET_KEY is not set in the environment. Please add it to your .env file.');
-}
-
-// AI Configuration
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-if (!OPENAI_API_KEY) {
-  throw new Error('OPENAI_API_KEY is not set in the environment. Please add it to your .env file.');
-}
-
-// Admin Configuration
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+if (!stripeSecretKey) {
+  console.warn('STRIPE_SECRET_KEY is not set. Checkout is disabled; the form builder still works.');
+}
+if (!OPENAI_API_KEY) {
+  console.warn('OPENAI_API_KEY is not set. AI chat is disabled; the form builder still works.');
+}
 if (!ADMIN_PASSWORD) {
-  throw new Error('ADMIN_PASSWORD is not set in the environment. Please add it to your .env file.');
+  console.warn('ADMIN_PASSWORD is not set. Admin login is disabled; the form builder still works.');
 }
 
-// Firebase Configuration
 const requiredFirebaseEnvVars = [
   'FIREBASE_PROJECT_ID',
   'FIREBASE_PRIVATE_KEY_ID', 
@@ -30,14 +26,19 @@ const requiredFirebaseEnvVars = [
   'FIREBASE_CLIENT_EMAIL',
   'FIREBASE_CLIENT_ID'
 ];
-
-for (const envVar of requiredFirebaseEnvVars) {
-  if (!process.env[envVar]) {
-    throw new Error(`${envVar} is not set in the environment. Please add it to your .env file.`);
-  }
+const missingFirebaseEnvVars = requiredFirebaseEnvVars.filter((envVar) => !process.env[envVar]);
+if (missingFirebaseEnvVars.length) {
+  console.warn('Firebase Admin is not fully configured (' + missingFirebaseEnvVars.join(', ') + '). Admin form APIs are disabled; the form builder still works.');
 }
-const stripe = require('stripe')(stripeSecretKey);
-const admin         = require('firebase-admin');
+
+let stripe = null;
+if (stripeSecretKey) {
+  stripe = require('stripe')(stripeSecretKey);
+}
+let admin = null;
+if (!missingFirebaseEnvVars.length) {
+  admin = require('firebase-admin');
+}
 const bodyParser    = require('body-parser');
 const fileUpload    = require('express-fileupload');
 const path          = require('path');
@@ -87,29 +88,37 @@ const serviceAccount = {
   client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${process.env.FIREBASE_CLIENT_EMAIL}`
 };
 
-// Initialize Firebase Admin (handle case where app might already be initialized)
-let db;
-try {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
-  });
-  db = admin.firestore();
-  console.log('Firebase Admin initialized successfully');
-} catch (error) {
-  // If app already exists, use the existing app
-  if (error.code === 'app/already-exists') {
-    console.log('Firebase Admin app already initialized, using existing instance');
+// Initialize Firebase Admin when credentials are present
+let db = null;
+if (!missingFirebaseEnvVars.length) {
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
+    });
     db = admin.firestore();
-  } else {
-    console.error('Error initializing Firebase Admin:', error);
-    throw error;
+    console.log('Firebase Admin initialized successfully');
+  } catch (error) {
+    // If app already exists, use the existing app
+    if (error.code === 'app/already-exists') {
+      console.log('Firebase Admin app already initialized, using existing instance');
+      db = admin.firestore();
+    } else {
+      console.warn('Firebase Admin is unavailable; the form builder still works.', error.message);
+    }
   }
 }
 
 // ────────────────────────────────────────────────────────────
-// Static files
+// Static files (form builder lives in this directory)
 // ────────────────────────────────────────────────────────────
+app.use((req, res, next) => {
+  if (req.path === '/.env' || req.path.endsWith('.env')) {
+    return res.status(404).end();
+  }
+  next();
+});
+app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ────────────────────────────────────────────────────────────
@@ -539,6 +548,12 @@ app.post('/api/transfer-forms', async (req, res) => {
 // ────────────────────────────────────────────────────────────
 app.post('/api/chat', async (req, res) => {
   try {
+    if (!OPENAI_API_KEY) {
+      return res.status(503).json({
+        error: 'AI chat is unavailable because no OpenAI API key is configured. The form builder still works without it.'
+      });
+    }
+
     const { message, conversationHistory = [] } = req.body;
     
     if (!message) {
@@ -1211,8 +1226,15 @@ app.post('/latex_to_pdf', async (req, res) => {
   }
 });
 
+function stripeUnavailable(res) {
+  if (stripe) return false;
+  res.status(503).json({ error: 'Stripe is not configured. Checkout is unavailable; the form builder still works.' });
+  return true;
+}
+
 // Add a new route for creating a Stripe Checkout Session
 app.post('/create-checkout-session', async (req, res) => {
+    if (stripeUnavailable(res)) return;
     const { priceId, formId } = req.body;
     // Get the domain dynamically from the request
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
@@ -1243,6 +1265,7 @@ app.post('/create-checkout-session', async (req, res) => {
 
 // Add a new route for creating a Cart Checkout Session
 app.post('/create-cart-checkout-session', async (req, res) => {
+    if (stripeUnavailable(res)) return;
     console.log('Cart checkout session requested');
     console.log('Request body:', req.body);
     
@@ -1285,6 +1308,7 @@ app.post('/create-cart-checkout-session', async (req, res) => {
 
 // List all Stripe prices (for debugging)
 app.get('/stripe-prices', async (req, res) => {
+    if (stripeUnavailable(res)) return;
     try {
         console.log('Listing all Stripe prices...');
         const prices = await stripe.prices.list({ limit: 10, active: true });
@@ -1305,6 +1329,7 @@ app.get('/stripe-prices', async (req, res) => {
 
 // Fetch Stripe price info by Price ID
 app.get('/stripe-price/:priceId', async (req, res) => {
+    if (stripeUnavailable(res)) return;
     try {
         console.log(`Fetching Stripe price: ${req.params.priceId}`);
         const price = await stripe.prices.retrieve(req.params.priceId, { expand: ['product'] });

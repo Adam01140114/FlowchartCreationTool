@@ -1,11 +1,21 @@
 // AI Features - Upload Flowchart Details and Upload Document PDF
 // This file handles all AI-related functionality
+const AI_UNAVAILABLE_MESSAGE = 'AI features are optional and are not configured. You can still create flowcharts by dragging nodes onto the canvas, and preview them in the FormWiz GUI.';
+function getOpenAIApiKey() {
+  const apiKey = (window.OPENAI_API_KEY || '').trim();
+  if (!apiKey || apiKey === 'YOUR_API_KEY_HERE') {
+    return null;
+  }
+  return apiKey;
+}
+function isOpenAIConfigured() {
+  return !!getOpenAIApiKey();
+}
 // Load AI config - using embedded config to avoid CORS issues
 function loadAIConfig() {
-  // Try to get API key from environment or use fallback
-  const apiKey = window.OPENAI_API_KEY || 'YOUR_API_KEY_HERE';
-  if (apiKey === 'YOUR_API_KEY_HERE') {
-    throw new Error('OpenAI API key not configured. Please set window.OPENAI_API_KEY or update the config.');
+  const apiKey = getOpenAIApiKey();
+  if (!apiKey) {
+    return null;
   }
   return {
     apiKey: apiKey,
@@ -14,10 +24,17 @@ function loadAIConfig() {
     temperature: 0.3
   };
 }
+function requireAIConfig() {
+  const config = loadAIConfig();
+  if (!config) {
+    throw new Error(AI_UNAVAILABLE_MESSAGE);
+  }
+  return config;
+}
 // Generate flowchart from description using ChatGPT
 async function generateFlowchartFromDescription(description) {
   try {
-    const aiConfig = loadAIConfig();
+    const aiConfig = requireAIConfig();
     const systemPrompt = `You are a flowchart generator. Based on the user's description, generate a valid flowchart JSON that can be imported into a flowchart creation tool.
 CRITICAL: You must generate EXACTLY the correct JSON structure with ALL required nodes and connections. Here's the precise format:
 {
@@ -300,6 +317,16 @@ function hideDocumentPdfModal() {
 }
 // Process PDF file
 async function processPdfFile() {
+  if (!isOpenAIConfigured()) {
+    const statusDiv = document.getElementById('pdfProcessingStatus');
+    if (statusDiv) {
+      statusDiv.style.display = 'block';
+      statusDiv.innerHTML = `<p style="color: red;">${AI_UNAVAILABLE_MESSAGE}</p>`;
+    } else {
+      alert(AI_UNAVAILABLE_MESSAGE);
+    }
+    return;
+  }
   const fileInput = document.getElementById('pdfFileInput');
   if (!fileInput.files[0]) {
     fileInput.click(); // Trigger file input if no file selected
@@ -402,7 +429,7 @@ async function combineImages(imageDataUrls) {
 }
 // Analyze PDF with ChatGPT (vision model)
 async function analyzePdfWithChatGPT(imageDataUrl) {
-  const aiConfig = loadAIConfig();
+  const aiConfig = requireAIConfig();
   const systemPrompt = `You are an expert at analyzing forms and documents to extract their structure. 
 Your task is to analyze the provided document image and break it down into a structured format that can be used to create a flowchart.
 For each section you identify, provide:
@@ -512,7 +539,7 @@ Be thorough and identify all form elements, fields, and interactive components i
 }
 // Convert analysis text to structured JSON using ChatGPT
 async function convertAnalysisToJSON(analysisText) {
-  const aiConfig = loadAIConfig();
+  const aiConfig = requireAIConfig();
   const systemPrompt = `You are a data conversion expert. Your task is to convert the provided form analysis text into a structured JSON format.
 Convert the analysis text into this EXACT JSON structure:
 {
@@ -728,6 +755,10 @@ function initializeAIFeatures() {
   const generateBtn = document.getElementById('generateFlowchartBtn');
   if (generateBtn) {
     generateBtn.addEventListener('click', async () => {
+    if (!isOpenAIConfigured()) {
+      alert(AI_UNAVAILABLE_MESSAGE);
+      return;
+    }
     const descriptionInput = document.getElementById('flowchartDetailsInput');
     if (!descriptionInput) {
       return;
@@ -823,3 +854,8 @@ if (document.readyState === 'loading') {
 } else {
   initializeAIFeatures();
 }
+window.AI_UNAVAILABLE_MESSAGE = AI_UNAVAILABLE_MESSAGE;
+window.getOpenAIApiKey = getOpenAIApiKey;
+window.isOpenAIConfigured = isOpenAIConfigured;
+window.loadAIConfig = loadAIConfig;
+window.requireAIConfig = requireAIConfig;

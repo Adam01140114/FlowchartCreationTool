@@ -9,6 +9,59 @@ function isPdfNode(cell) {
 function isOptions(cell) {
   return cell && cell.style && cell.style.includes("nodeType=options");
 }
+function isMergeHub(cell) {
+  return !!(cell && cell.style && cell.style.includes("nodeType=mergeHub"));
+}
+function getMxOutgoing(cell) {
+  return (window.graph && cell) ? (window.graph.getOutgoingEdges(cell) || []) : [];
+}
+function getMxIncoming(cell) {
+  return (window.graph && cell) ? (window.graph.getIncomingEdges(cell) || []) : [];
+}
+function getLogicalOutgoingEdges(cell) {
+  if (!cell) return [];
+  const fake = [];
+  const seenHubs = new Set();
+  const queue = [cell];
+  while (queue.length) {
+    const current = queue.shift();
+    getMxOutgoing(current).forEach((edge) => {
+      const target = edge.target;
+      if (!target) return;
+      if (isMergeHub(target)) {
+        if (!seenHubs.has(target.id)) {
+          seenHubs.add(target.id);
+          queue.push(target);
+        }
+        return;
+      }
+      fake.push({ source: cell, target: target });
+    });
+  }
+  return fake;
+}
+function getLogicalIncomingEdges(cell) {
+  if (!cell) return [];
+  const fake = [];
+  const seenHubs = new Set();
+  const queue = [cell];
+  while (queue.length) {
+    const current = queue.shift();
+    getMxIncoming(current).forEach((edge) => {
+      const source = edge.source;
+      if (!source) return;
+      if (isMergeHub(source)) {
+        if (!seenHubs.has(source.id)) {
+          seenHubs.add(source.id);
+          queue.push(source);
+        }
+        return;
+      }
+      fake.push({ source: source, target: cell });
+    });
+  }
+  return fake;
+}
 // Helper function to check if a cell is an alert node
 function isAlertNode(cell) {
   return cell && cell.style && cell.style.includes("questionType=alertNode");
@@ -23,50 +76,122 @@ function isStatusNode(cell) {
 // Download utility moved to export.js module
 // Export functions moved to export.js module
 // Import a flowchart JSON file
+function showImportFlowchartModal() {
+  const modal = document.getElementById('importFlowchartModal');
+  const input = document.getElementById('importFlowchartJsonInput');
+  const error = document.getElementById('importFlowchartError');
+  const fileName = document.getElementById('importFlowchartFileName');
+  if (error) error.textContent = '';
+  if (fileName) fileName.textContent = '';
+  if (input) input.value = '';
+  if (modal) {
+    modal.style.display = 'flex';
+    if (input) {
+      setTimeout(() => input.focus(), 0);
+    }
+  }
+}
+function hideImportFlowchartModal() {
+  const modal = document.getElementById('importFlowchartModal');
+  if (modal) modal.style.display = 'none';
+  const fileInput = document.getElementById('importFlowchartFile');
+  if (fileInput) fileInput.value = '';
+}
+function setImportFlowchartError(message) {
+  const error = document.getElementById('importFlowchartError');
+  if (error) {
+    error.textContent = message || '';
+  } else if (message) {
+    alert(message);
+  }
+}
+function applyImportedFlowchartJson(jsonString) {
+  if (!jsonString || !String(jsonString).trim()) {
+    throw new Error('Paste flowchart JSON or choose a file.');
+  }
+  jsonString = String(jsonString).trim();
+  if (jsonString.startsWith('"') && jsonString.endsWith('"')) {
+    jsonString = jsonString.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+  }
+  let jsonData;
+  try {
+    jsonData = JSON.parse(jsonString);
+  } catch (parseError) {
+    throw new Error('Invalid JSON: ' + parseError.message);
+  }
+  if (jsonData.sections && Array.isArray(jsonData.sections) && !jsonData.cells) {
+    throw new Error("This looks like GUI JSON. Import a flowchart JSON that has a 'cells' property.");
+  }
+  if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
+    throw new Error('Invalid flowchart data: missing cells array');
+  }
+  loadFlowchartData(jsonData);
+  currentFlowchartName = null;
+  hideImportFlowchartModal();
+}
 function importFlowchartJson(event) {
-  const file = event.target.files[0];
-  if (file) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const fileName = document.getElementById('importFlowchartFileName');
+  if (fileName) fileName.textContent = 'Selected: ' + file.name;
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
-      let jsonString = e.target.result;
-      if (jsonString.startsWith('"') && jsonString.endsWith('"')) {
-        jsonString = jsonString.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-      }
-      let jsonData;
-      try { jsonData = JSON.parse(jsonString); }
-      catch { jsonData = JSON.parse(JSON.stringify(eval("(" + jsonString + ")"))); }
-      if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
-        throw new Error("Invalid flowchart data: missing cells array");
-      }
-      loadFlowchartData(jsonData);
-      currentFlowchartName = null;
+      applyImportedFlowchartJson(e.target.result);
     } catch (error) {
-      alert("Error importing flowchart: " + error.message);
+      setImportFlowchartError('Error importing flowchart: ' + error.message);
     }
   };
+  reader.onerror = function() {
+    setImportFlowchartError('Could not read that file.');
+  };
   reader.readAsText(file);
-  }
 }
+window.showImportFlowchartModal = showImportFlowchartModal;
+window.hideImportFlowchartModal = hideImportFlowchartModal;
+window.setImportFlowchartError = setImportFlowchartError;
+window.applyImportedFlowchartJson = applyImportedFlowchartJson;
 window.importFlowchartJson = importFlowchartJson;
-// Direct import from pasted JSON string
 window.importFlowchartJsonDirectly = function(jsonString) {
   try {
-    if (jsonString.startsWith('"') && jsonString.endsWith('"')) {
-      jsonString = jsonString.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-    }
-    let jsonData;
-    try { jsonData = JSON.parse(jsonString); }
-    catch { jsonData = JSON.parse(JSON.stringify(eval("(" + jsonString + ")"))); }
-    if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
-      throw new Error('Import a flowchart JSON (with cells) not GUI JSON');
-    }
-    loadFlowchartData(jsonData);
-    currentFlowchartName = null;
+    applyImportedFlowchartJson(jsonString);
+    return true;
   } catch (error) {
-    alert("Error importing flowchart: " + error.message);
+    setImportFlowchartError('Error importing flowchart: ' + error.message);
+    return false;
   }
 };
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('importFlowchartModal');
+  const pasteBtn = document.getElementById('importFlowchartPasteBtn');
+  const chooseBtn = document.getElementById('importFlowchartChooseFileBtn');
+  const cancelBtn = document.getElementById('cancelImportFlowchartBtn');
+  const closeBtn = document.getElementById('closeImportFlowchartModal');
+  const fileInput = document.getElementById('importFlowchartFile');
+  const jsonInput = document.getElementById('importFlowchartJsonInput');
+  if (pasteBtn) {
+    pasteBtn.addEventListener('click', function() {
+      window.importFlowchartJsonDirectly(jsonInput ? jsonInput.value : '');
+    });
+  }
+  if (chooseBtn && fileInput) {
+    chooseBtn.addEventListener('click', function() {
+      fileInput.click();
+    });
+  }
+  if (cancelBtn) cancelBtn.addEventListener('click', hideImportFlowchartModal);
+  if (closeBtn) closeBtn.addEventListener('click', hideImportFlowchartModal);
+  if (modal) {
+    modal.addEventListener('click', function(event) {
+      if (event.target === modal) hideImportFlowchartModal();
+    });
+  }
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && modal && modal.style.display === 'flex') {
+      hideImportFlowchartModal();
+    }
+  });
+});
 // Export GUI JSON (sections + hidden fields)
 function isJumpNode(cell) {
   const style = cell.style || "";
@@ -79,6 +204,58 @@ function findAllUpstreamOptions(questionCell) {
 function detectSectionJumps(cell, questionCellMap, questionIdMap) {
   // Section jump detection (existing code)
 }
+/** Merge sections that have fewer than minQuestions into an adjacent section. */
+function consolidateSectionsMinQuestions(sections, minQuestions = 2) {
+  if (!Array.isArray(sections) || sections.length <= 1) {
+    return { sections: sections || [], sectionIdMap: {} };
+  }
+  const working = sections.map(function(s) {
+    return {
+      sectionId: s.sectionId,
+      sectionName: s.sectionName,
+      questions: (s.questions || []).slice()
+    };
+  }).sort(function(a, b) { return a.sectionId - b.sectionId; });
+
+  let i = 0;
+  while (i < working.length) {
+    if (working[i].questions.length >= minQuestions || working.length === 1) {
+      i++;
+      continue;
+    }
+    if (i === 0) {
+      working[1].questions = working[0].questions.concat(working[1].questions);
+      working.splice(0, 1);
+    } else {
+      working[i - 1].questions = working[i - 1].questions.concat(working[i].questions);
+      working.splice(i, 1);
+      i--;
+    }
+  }
+
+  const sectionIdMap = {};
+  working.forEach(function(s, idx) {
+    const newId = idx + 1;
+    sectionIdMap[String(s.sectionId)] = newId;
+    s.sectionId = newId;
+  });
+
+  working.forEach(function(section) {
+    (section.questions || []).forEach(function(q) {
+      if (!q.jump || !q.jump.enabled || !Array.isArray(q.jump.conditions)) return;
+      q.jump.conditions.forEach(function(cond) {
+        if (!cond || !cond.to || cond.to === 'end') return;
+        const asNum = parseInt(cond.to, 10);
+        if (!isNaN(asNum) && sectionIdMap[String(asNum)] !== undefined) {
+          cond.to = String(sectionIdMap[String(asNum)]);
+        }
+      });
+    });
+  });
+
+  return { sections: working, sectionIdMap: sectionIdMap };
+}
+
 window.exportGuiJson = function(download = true) {
   // Automatically reset PDF inheritance and Node IDs before export
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
@@ -1319,7 +1496,7 @@ window.exportGuiJson = function(download = true) {
       };
     }
     // Handle outgoing edges to option nodes
-    const outgoingEdges = graph.getOutgoingEdges(cell);
+    const outgoingEdges = getLogicalOutgoingEdges(cell);
     const jumpConditions = [];
     let endOption = null;
     // Check for direct connections to END nodes or other questions (for text-based questions)
@@ -1395,7 +1572,7 @@ window.exportGuiJson = function(download = true) {
             text: optionText
           };
           // Check if this option leads to an end node (directly or through multipleDropdownType/multipleTextboxes)
-          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
+          const optionOutgoingEdges = getLogicalOutgoingEdges(targetCell);
           if (optionOutgoingEdges) {
             for (const optionEdge of optionOutgoingEdges) {
               const optionTarget = optionEdge.target;
@@ -1480,7 +1657,7 @@ window.exportGuiJson = function(download = true) {
             optionText = cleanedText;
           }
           // Check if this option connects to hidden nodes
-          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
+          const optionOutgoingEdges = getLogicalOutgoingEdges(targetCell);
           if (optionOutgoingEdges) {
             for (const optionEdge of optionOutgoingEdges) {
               const hiddenNode = optionEdge.target;
@@ -1554,7 +1731,7 @@ window.exportGuiJson = function(download = true) {
     }
     // Check if numberedDropdown connects directly to end node and add jump conditions for each option
     if (exportType === "multipleDropdownType") {
-      const questionOutgoingEdges = graph.getOutgoingEdges(cell);
+      const questionOutgoingEdges = getLogicalOutgoingEdges(cell);
       if (questionOutgoingEdges) {
         for (const edge of questionOutgoingEdges) {
           const targetCell = edge.target;
@@ -2449,7 +2626,7 @@ window.exportGuiJson = function(download = true) {
     }
     // --- PATCH: Add comprehensive parent conditional logic ---
     function findDirectParentCondition(cell) {
-      const incomingEdges = graph.getIncomingEdges(cell) || [];
+      const incomingEdges = getLogicalIncomingEdges(cell) || [];
       const conditions = [];
       // For conditional logic, we need to check if the source and target are in the same logical flow
       // Since we're processing questions in order, we can determine this by position
@@ -2458,7 +2635,7 @@ window.exportGuiJson = function(download = true) {
         const sourceCell = edge.source;
         if (sourceCell && isOptions(sourceCell)) {
           // Find the parent question of this option node
-          const optionIncoming = graph.getIncomingEdges(sourceCell) || [];
+          const optionIncoming = getLogicalIncomingEdges(sourceCell) || [];
           for (const optEdge of optionIncoming) {
             const parentQ = optEdge.source;
             if (parentQ && isQuestion(parentQ)) {
@@ -2595,7 +2772,7 @@ window.exportGuiJson = function(download = true) {
         // Check for connection through options
         if (targetCell && isOptions(targetCell)) {
           // Check if this option leads to a PDF node
-          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
+          const optionOutgoingEdges = getLogicalOutgoingEdges(targetCell);
           if (optionOutgoingEdges) {
             for (const optionEdge of optionOutgoingEdges) {
               const pdfCell = optionEdge.target;
@@ -2643,7 +2820,7 @@ window.exportGuiJson = function(download = true) {
         const optionCell = edge.target;
         if (optionCell && isOptions(optionCell)) {
           // Check if this option leads to a PDF preview node
-          const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
+          const optionOutgoingEdges = getLogicalOutgoingEdges(optionCell);
           if (optionOutgoingEdges) {
             for (const optionEdge of optionOutgoingEdges) {
               const pdfPreviewCell = optionEdge.target;
@@ -2728,7 +2905,7 @@ window.exportGuiJson = function(download = true) {
         const optionCell = edge.target;
         if (optionCell && isOptions(optionCell)) {
           // Check if this option leads to an alert node
-          const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
+          const optionOutgoingEdges = getLogicalOutgoingEdges(optionCell);
           if (optionOutgoingEdges) {
             for (const optionEdge of optionOutgoingEdges) {
               const targetCell = optionEdge.target;
@@ -2822,7 +2999,7 @@ window.exportGuiJson = function(download = true) {
         const optionCell = edge.target;
         if (optionCell && isOptions(optionCell)) {
           // Check if this option leads to a status node
-          const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
+          const optionOutgoingEdges = getLogicalOutgoingEdges(optionCell);
           if (optionOutgoingEdges) {
             for (const optionEdge of optionOutgoingEdges) {
               const targetCell = optionEdge.target;
@@ -2874,7 +3051,7 @@ window.exportGuiJson = function(download = true) {
       visited.add(optionCell.id);
       
       // Check if this option directly leads to a hard alert node
-      const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
+      const optionOutgoingEdges = getLogicalOutgoingEdges(optionCell);
       if (optionOutgoingEdges) {
         for (const optionEdge of optionOutgoingEdges) {
           const targetCell = optionEdge.target;
@@ -2891,7 +3068,7 @@ window.exportGuiJson = function(download = true) {
             // If it's another option (maybe leading to a hard alert), check that
             // But only go one level deep to avoid false positives
             if (isOptions(targetCell) && !visited.has(targetCell.id)) {
-              const nextOutgoingEdges = graph.getOutgoingEdges(targetCell);
+              const nextOutgoingEdges = getLogicalOutgoingEdges(targetCell);
               if (nextOutgoingEdges) {
                 for (const nextEdge of nextOutgoingEdges) {
                   const nextTarget = nextEdge.target;
@@ -2997,7 +3174,7 @@ window.exportGuiJson = function(download = true) {
         // Check for connection through options
         if (targetCell && isOptions(targetCell)) {
           // Check if this option leads to a subtitle node
-          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
+          const optionOutgoingEdges = getLogicalOutgoingEdges(targetCell);
           if (optionOutgoingEdges) {
             for (const optionEdge of optionOutgoingEdges) {
               const subtitleCell = optionEdge.target;
@@ -3037,12 +3214,12 @@ window.exportGuiJson = function(download = true) {
   // Collect all file nodes that are connected through options
   const fileNodeMap = new Map(); // Map of fileNode -> { sourceQuestion, sourceOption, fileNode }
   for (const cell of questions) {
-    const outgoingEdges = graph.getOutgoingEdges(cell);
+    const outgoingEdges = getLogicalOutgoingEdges(cell);
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
         const optionCell = edge.target;
         if (optionCell && isOptions(optionCell)) {
-          const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
+          const optionOutgoingEdges = getLogicalOutgoingEdges(optionCell);
           if (optionOutgoingEdges) {
             for (const optionEdge of optionOutgoingEdges) {
               const fileNode = optionEdge.target;
@@ -3303,6 +3480,10 @@ window.exportGuiJson = function(download = true) {
     sections.push(sectionMap[secNum]);
   }
   sections.sort((a, b) => a.sectionId - b.sectionId);
+  const consolidated = consolidateSectionsMinQuestions(sections, 2);
+  sections.length = 0;
+  consolidated.sections.forEach(function(s) { sections.push(s); });
+  sectionCounter = Math.max(sectionCounter, sections.length + 1);
   // Calculate the maximum question ID found
   let maxQuestionId = 0;
   for (const section of sections) {
@@ -3494,6 +3675,59 @@ window.exportGuiJson = function(download = true) {
   }
   return jsonStr;
 };
+
+window.showExportGuiJsonModal = function() {
+  const modal = document.getElementById('exportGuiJsonModal');
+  const output = document.getElementById('exportGuiJsonOutput');
+  if (!modal || !output) return;
+  let jsonStr = '';
+  try {
+    jsonStr = window.exportGuiJson(false);
+    if (typeof jsonStr !== 'string') {
+      jsonStr = JSON.stringify(jsonStr, null, 2);
+    }
+  } catch (err) {
+    jsonStr = '';
+    console.error('Export GUI JSON failed', err);
+    alert('Could not export GUI JSON: ' + (err && err.message ? err.message : err));
+    return;
+  }
+  output.value = jsonStr || '';
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    output.focus();
+    output.select();
+  }, 0);
+};
+
+function hideExportGuiJsonModal() {
+  const modal = document.getElementById('exportGuiJsonModal');
+  if (modal) modal.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('exportGuiJsonModal');
+  const closeX = document.getElementById('closeExportGuiJsonModal');
+  const closeBtn = document.getElementById('closeExportGuiJsonBtn');
+  const downloadBtn = document.getElementById('downloadExportGuiJsonBtn');
+  const output = document.getElementById('exportGuiJsonOutput');
+  if (closeX) closeX.addEventListener('click', hideExportGuiJsonModal);
+  if (closeBtn) closeBtn.addEventListener('click', hideExportGuiJsonModal);
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) hideExportGuiJsonModal();
+    });
+  }
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', () => {
+      const text = output ? output.value : '';
+      if (!text) return;
+      if (typeof downloadJson === 'function') {
+        downloadJson(text, 'gui.json');
+      }
+    });
+  }
+});
 // Export both flowchart and GUI JSON in a combined format
 window.exportBothJson = function() {
   try {
@@ -3697,8 +3931,18 @@ window.fixCapitalizationInJumps = function() {
 };
 window.fixCapitalizationInJumps();
 // Save flowchart to Firebase
+function persistFlowchartRecord(flowchartName, cleanedData) {
+  const payload = {
+    flowchart: cleanedData,
+    lastUsed: Date.now()
+  };
+  if (window.isGuestUser && window.isGuestUser()) {
+    return window.guestStorage.saveFlowchart(flowchartName, payload);
+  }
+  return db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set(payload);
+}
 window.saveFlowchart = function() {
-  if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to save flowcharts. Guest users cannot save."); return;}  
+  if (!window.currentUser) { alert("Please log in to save flowcharts."); return;}  
   // Automatically reset PDF inheritance and Node IDs before saving
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
   // Check Linked Logic properties BEFORE reset
@@ -3852,10 +4096,7 @@ window.saveFlowchart = function() {
   data.edgeStyle = currentEdgeStyle;
   // Remove undefined values before saving to Firebase (Firebase doesn't accept undefined)
   const cleanedData = removeUndefinedValues(data);
-  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
-    flowchart: cleanedData,
-    lastUsed: Date.now()
-  })
+  persistFlowchartRecord(flowchartName, cleanedData)
     .then(()=>{
       alert("Flowchart saved as: " + flowchartName);
       // Set the library flowchart name for autosave protocol
@@ -3870,8 +4111,8 @@ window.saveFlowchart = function() {
 };
 // Save flowchart as a new flowchart (Save As functionality)
 window.saveAsFlowchart = function() {
-  if (!window.currentUser || window.currentUser.isGuest) { 
-    alert("Please log in with a real account to save flowcharts. Guest users cannot save."); 
+  if (!window.currentUser) { 
+    alert("Please log in to save flowcharts."); 
     return;
   }  
   // Automatically reset PDF inheritance and Node IDs before saving
@@ -3997,10 +4238,7 @@ window.saveAsFlowchart = function() {
   data.edgeStyle = currentEdgeStyle;
   // Remove undefined values before saving to Firebase (Firebase doesn't accept undefined)
   const cleanedData = removeUndefinedValues(data);
-  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
-    flowchart: cleanedData,
-    lastUsed: Date.now()
-  })
+  persistFlowchartRecord(flowchartName, cleanedData)
     .then(()=>{
       alert("Flowchart saved as: " + flowchartName);
       // Set the library flowchart name for autosave protocol
@@ -4013,42 +4251,45 @@ window.saveAsFlowchart = function() {
     })
     .catch(err=>alert("Error saving: " + err));
 };
+function loadSavedFlowchartList(flowcharts) {
+  flowcharts.sort((a, b) => b.lastUsed - a.lastUsed);
+  window.currentFlowcharts = flowcharts;
+  displayFlowcharts(flowcharts);
+  const searchInput = document.getElementById("flowchartSearchInput");
+  if (searchInput) {
+    searchInput.value = "";
+    searchInput.oninput = function() {
+      const searchTerm = this.value.toLowerCase();
+      const filteredFlowcharts = flowcharts.filter(fc => 
+        fc.name.toLowerCase().includes(searchTerm)
+      );
+      displayFlowcharts(filteredFlowcharts);
+    };
+  }
+  document.getElementById("flowchartListOverlay").style.display = "flex";
+}
 // View saved flowcharts
 window.viewSavedFlowcharts = function() {
-  if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to view saved flowcharts. Guest users cannot load."); return; }
-  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").get()
-    .then(snapshot=>{
-      let flowcharts = [];
-      snapshot.forEach(doc=>{
-        const name = doc.id;
-        const data = doc.data();
-        const lastUsed = data.lastUsed || 0;
-        flowcharts.push({
-          name: name,
-          lastUsed: lastUsed,
-          data: data
+  if (!window.currentUser) { alert("Please log in to view saved flowcharts."); return; }
+  const listPromise = (window.isGuestUser && window.isGuestUser())
+    ? window.guestStorage.listFlowcharts()
+    : db.collection("users").doc(window.currentUser.uid).collection("flowcharts").get()
+      .then(snapshot=>{
+        let flowcharts = [];
+        snapshot.forEach(doc=>{
+          const name = doc.id;
+          const data = doc.data();
+          const lastUsed = data.lastUsed || 0;
+          flowcharts.push({
+            name: name,
+            lastUsed: lastUsed,
+            data: data
+          });
         });
+        return flowcharts;
       });
-      // Sort by recently used (most recent first)
-      flowcharts.sort((a, b) => b.lastUsed - a.lastUsed);
-      // Store flowcharts for search functionality
-      window.currentFlowcharts = flowcharts;
-      // Display flowcharts
-      displayFlowcharts(flowcharts);
-      // Set up search functionality
-      const searchInput = document.getElementById("flowchartSearchInput");
-      if (searchInput) {
-        searchInput.value = "";
-        searchInput.oninput = function() {
-          const searchTerm = this.value.toLowerCase();
-          const filteredFlowcharts = flowcharts.filter(fc => 
-            fc.name.toLowerCase().includes(searchTerm)
-          );
-          displayFlowcharts(filteredFlowcharts);
-        };
-      }
-      document.getElementById("flowchartListOverlay").style.display = "flex";
-    })
+  listPromise
+    .then(loadSavedFlowchartList)
     .catch(err=>alert("Error fetching: " + err));
 };
 // Display flowcharts in the list
@@ -4070,55 +4311,83 @@ function displayFlowcharts(flowcharts) {
   document.getElementById("flowchartList").innerHTML = html;
 }
 window.openSavedFlowchart = function(name, onCompleteCallback) {
-  if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to open saved flowcharts. Guest users cannot load."); return; }
-  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
-    .get().then(docSnap=>{
-      if (!docSnap.exists) { alert("No flowchart named " + name); return; }
-      currentFlowchartName = name;
-      window.currentFlowchartName = name;
-      loadFlowchartData(docSnap.data().flowchart, name, onCompleteCallback);
-      // Update last used timestamp
-      db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
-        .update({ lastUsed: Date.now() })
-        .catch(err => {
-          console.error("Error updating lastUsed timestamp:", err);
-        });
-      document.getElementById("flowchartListOverlay").style.display = "none";
-    }).catch(err=>alert("Error loading: " + err));
+  if (!window.currentUser) { alert("Please log in to open saved flowcharts."); return; }
+  const loadPromise = (window.isGuestUser && window.isGuestUser())
+    ? window.guestStorage.getFlowchart(name).then(payload => {
+        if (!payload) { alert("No flowchart named " + name); return; }
+        currentFlowchartName = name;
+        window.currentFlowchartName = name;
+        loadFlowchartData(payload.flowchart, name, onCompleteCallback);
+        window.guestStorage.updateLastUsed(name);
+        document.getElementById("flowchartListOverlay").style.display = "none";
+      })
+    : db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
+      .get().then(docSnap=>{
+        if (!docSnap.exists) { alert("No flowchart named " + name); return; }
+        currentFlowchartName = name;
+        window.currentFlowchartName = name;
+        loadFlowchartData(docSnap.data().flowchart, name, onCompleteCallback);
+        db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
+          .update({ lastUsed: Date.now() })
+          .catch(err => {
+            console.error("Error updating lastUsed timestamp:", err);
+          });
+        document.getElementById("flowchartListOverlay").style.display = "none";
+      });
+  loadPromise.catch(err=>alert("Error loading: " + err));
 };
 window.renameFlowchart = function(oldName, element) {
-  if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to rename flowcharts. Guest users cannot rename."); return; }
+  if (!window.currentUser) { alert("Please log in to rename flowcharts."); return; }
   let newName = prompt("New name:", oldName);
   if (!newName||!newName.trim()||newName===oldName) return;
+  const finishRename = () => {
+    element.textContent=newName;
+    if(currentFlowchartName===oldName) {
+      currentFlowchartName=newName;
+      window.currentFlowchartName=newName;
+    }
+    alert("Renamed to: " + newName);
+    if (typeof autosaveFlowchartToLocalStorage === 'function') {
+      autosaveFlowchartToLocalStorage();
+    }
+  };
+  if (window.isGuestUser && window.isGuestUser()) {
+    window.guestStorage.renameFlowchart(oldName, newName)
+      .then(finishRename)
+      .catch(err=>alert("Error renaming: " + err));
+    return;
+  }
   const docRef = db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(oldName);
   docRef.get().then(docSnap=>{
     if (docSnap.exists) {
       db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(newName).set(docSnap.data())
-        .then(()=>{ 
-          docRef.delete(); 
-          element.textContent=newName; 
-          if(currentFlowchartName===oldName) {
-            currentFlowchartName=newName;
-            window.currentFlowchartName=newName;
-          } 
-          alert("Renamed to: " + newName);
-          // Trigger autosave to update the library flowchart name
-          if (typeof autosaveFlowchartToLocalStorage === 'function') {
-            autosaveFlowchartToLocalStorage();
-          }
+        .then(()=>{
+          docRef.delete();
+          finishRename();
         })
         .catch(err=>alert("Error renaming: " + err));
     }
   });
 };
 window.deleteSavedFlowchart = function(name) {
-  if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to delete flowcharts. Guest users cannot delete."); return; }
+  if (!window.currentUser) { alert("Please log in to delete flowcharts."); return; }
   if (!confirm("Delete '"+name+"'?")) return;
-  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name).delete()
-    .then(()=>{ alert("Deleted: " + name); if(currentFlowchartName===name) {
+  const afterDelete = () => {
+    alert("Deleted: " + name);
+    if(currentFlowchartName===name) {
       currentFlowchartName=null;
       window.currentFlowchartName=null;
-    } window.viewSavedFlowcharts(); })
+    }
+    window.viewSavedFlowcharts();
+  };
+  if (window.isGuestUser && window.isGuestUser()) {
+    window.guestStorage.deleteFlowchart(name)
+      .then(afterDelete)
+      .catch(err=>alert("Error deleting: " + err));
+    return;
+  }
+  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name).delete()
+    .then(afterDelete)
     .catch(err=>alert("Error deleting: " + err));
 };
 /**************************************************
@@ -4167,7 +4436,7 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
     const graph = window.graph;
     if (!graph) return;
     // Get all outgoing edges from the start cell
-    const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
+    const outgoingEdges = getLogicalOutgoingEdges(startCell) || [];
     // Fallback: If getOutgoingEdges doesn't work, manually find edges
     if (outgoingEdges.length === 0) {
       const modelEdges = graph.getModel().getEdges();
@@ -4469,7 +4738,7 @@ window.resetPdfInheritance = function(cell) {
       return currentCell;
     }
     // Check outgoing edges for direct PDF node connections
-    const outgoingEdges = graph.getOutgoingEdges(currentCell) || [];
+    const outgoingEdges = getLogicalOutgoingEdges(currentCell) || [];
     for (const edge of outgoingEdges) {
       const target = edge.target;
       if (target && typeof window.isPdfNode === 'function' && window.isPdfNode(target)) {
@@ -4477,7 +4746,7 @@ window.resetPdfInheritance = function(cell) {
       }
     }
     // Check incoming edges for PDF nodes or nodes with PDF inheritance
-    const incomingEdges = graph.getIncomingEdges(currentCell) || [];
+    const incomingEdges = getLogicalIncomingEdges(currentCell) || [];
     for (const edge of incomingEdges) {
       const source = edge.source;
       if (source) {
@@ -4630,7 +4899,7 @@ function getPdfNameForNode(cell) {
       return null;
     };
     // Check incoming edges for PDF nodes and PDF inheritance (downstream flow)
-    const incomingEdges = graph.getIncomingEdges(cell) || [];
+    const incomingEdges = getLogicalIncomingEdges(cell) || [];
     for (const edge of incomingEdges) {
       const source = edge.source;
       if (source) {
@@ -4650,7 +4919,7 @@ function getPdfNameForNode(cell) {
       }
     }
     // Check outgoing edges for PDF nodes (upstream flow - when this node points to a PDF node)
-    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+    const outgoingEdges = getLogicalOutgoingEdges(cell) || [];
     for (const edge of outgoingEdges) {
       const target = edge.target;
       if (target) {
@@ -4671,7 +4940,7 @@ function getParentNodeText(cell) {
   const graph = window.graph;
   if (!graph) return null;
   // Check if this is an option node by looking for incoming edges from question nodes
-  const incomingEdges = graph.getIncomingEdges(cell) || [];
+  const incomingEdges = getLogicalIncomingEdges(cell) || [];
   for (const edge of incomingEdges) {
     const source = edge.source;
     if (source && (typeof window.isQuestion === 'function' && window.isQuestion(source))) {

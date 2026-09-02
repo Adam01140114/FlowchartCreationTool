@@ -348,8 +348,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="gui.js"></script>
-    <script src="../CountyLookup/zipData.js"></script>
-    <script src="../CountyLookup/courtData.js"></script>
+    <script src="CountyLookup/zipData.js"></script>
+    <script src="CountyLookup/courtData.js"></script>
     <script src="generate.js"></script>
     <script src="download.js"></script>
     <script src="hidden.js"></script>
@@ -623,6 +623,11 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const previewKey = urlParams.get('previewKey');
                 const previewJson = urlParams.get('preview'); // Fallback for old URL format
+                const questionStyleParam = urlParams.get('questionStyle');
+                if (previewKey || previewJson) {
+                    const allowedStyles = { question: true, section: true, all: true };
+                    window.__FORM_QUESTION_STYLE__ = allowedStyles[questionStyleParam] ? questionStyleParam : 'section';
+                }
                 
                 let jsonData = null;
                 

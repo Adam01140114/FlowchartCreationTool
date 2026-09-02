@@ -77,9 +77,7 @@ function getNodeType(cell) {
   return "unknown";
 }
 function isEndNode(cell) {
-  return (cell && cell.style && cell.style.includes("nodeType=end")) || 
-         (cell && cell.id === "1") || 
-         (cell && cell.id === "19");
+  return !!(cell && cell.style && cell.style.includes("nodeType=end"));
 }
 // Helper function to get node ID - REMOVED
 // This function was causing conflicts with the global window.getNodeId function

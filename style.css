@@ -59,6 +59,37 @@ html, body {
   background: #e0e0e0;
 }
 
+.custom-ui-elements {
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  padding: 0 8px 8px;
+}
+.custom-ui-elements summary {
+  cursor: pointer;
+  font-weight: bold;
+  list-style: none;
+  padding: 10px 4px;
+  user-select: none;
+}
+.custom-ui-elements summary::-webkit-details-marker {
+  display: none;
+}
+.custom-ui-elements summary::before {
+  content: "▸ ";
+  display: inline-block;
+  width: 1em;
+}
+.custom-ui-elements[open] summary::before {
+  content: "▾ ";
+}
+.custom-ui-elements-hint {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: #666;
+}
+
 /* BUTTONS */
 .button-bar {
   margin-top: 15px;
@@ -553,6 +584,34 @@ input[type="file"] {
   color: red;
   margin-bottom: 8px;
 }
+#loginForm button {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.guest-login-divider {
+  text-align: center;
+  color: #888;
+  font-size: 12px;
+  margin: 6px 0 10px;
+}
+#guestLoginBtn {
+  background: #455a64;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+#guestLoginBtn:hover {
+  background: #37474f;
+}
+.guest-login-hint {
+  margin: 0;
+  color: #666;
+  font-size: 12px;
+  line-height: 1.4;
+}
 
 /* FLOWCHART LIST OVERLAY */
 #flowchartListOverlay {
@@ -983,6 +1042,100 @@ body.ctrl-pressed::after {
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+.import-flowchart-modal {
+  max-width: 640px;
+  width: 90%;
+  margin: 6vh auto;
+}
+.import-flowchart-modal textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13px;
+  user-select: text;
+}
+.import-flowchart-actions {
+  margin-top: 12px;
+}
+.import-flowchart-actions button {
+  width: 100%;
+  padding: 9px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.import-flowchart-primary {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+.import-flowchart-primary:hover {
+  background: #1565c0;
+}
+.import-flowchart-error {
+  color: #c62828;
+  min-height: 1.2em;
+  margin-top: 8px;
+  font-size: 13px;
+}
+.import-flowchart-filename {
+  margin: 0;
+  color: #555;
+  font-size: 12px;
+}
+
+.preview-form-style-modal {
+  max-width: 520px;
+}
+.preview-style-options {
+  border: 1px solid #c5d9f7;
+  border-radius: 10px;
+  padding: 12px 14px 6px;
+  margin: 0 0 16px;
+  background: #f7fbff;
+}
+.preview-style-options legend {
+  font-weight: 700;
+  color: #1f3a60;
+  padding: 0 6px;
+}
+.preview-style-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 8px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.preview-style-option:hover {
+  background: #eaf3ff;
+}
+.preview-style-option input {
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.preview-style-option span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.preview-style-option strong {
+  color: #12325c;
+  font-size: 15px;
+}
+.preview-style-option small {
+  color: #5a6c7d;
+  font-size: 13px;
+  line-height: 1.35;
 }
 
 /* Location IDs Popup Styles */

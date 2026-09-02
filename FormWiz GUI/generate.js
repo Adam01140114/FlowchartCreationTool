@@ -49,6 +49,84 @@ function sanitizeQuestionText (str){
                       .replace(/\W+/g, "_")
                       .replace(/^_+|_+$/g, "");
 }
+function getFormQuestionStyle() {
+    const raw = (typeof window !== 'undefined' && window.__FORM_QUESTION_STYLE__)
+        ? String(window.__FORM_QUESTION_STYLE__).toLowerCase().trim()
+        : 'question';
+    if (raw === 'section' || raw === 'all' || raw === 'question') return raw;
+    return 'question';
+}
+function getLogicConditionFromRow(questionId, row, rowIndex) {
+    const pqEl = row.querySelector("#prevQuestion" + questionId + "_" + rowIndex);
+    const paEl = row.querySelector("#prevAnswer" + questionId + "_" + rowIndex);
+    if (!pqEl || !paEl) return null;
+    const pqVal = pqEl.value.trim();
+    let paValRaw = (paEl.value || "").trim();
+    const hiddenAnswerEl = document.getElementById("hiddenAnswer" + questionId + "_" + rowIndex);
+    if (!paValRaw && hiddenAnswerEl && hiddenAnswerEl.value) {
+        paValRaw = hiddenAnswerEl.value.trim();
+    }
+    if (!pqVal || !paValRaw) return null;
+    return { prevQuestion: pqVal, prevAnswer: paValRaw };
+}
+function getDiscreteAnswersForQuestion(prevQuestionId) {
+    const qBlock = document.getElementById("questionBlock" + prevQuestionId);
+    if (!qBlock) return [];
+    const typeEl = qBlock.querySelector("#questionType" + prevQuestionId);
+    const questionType = typeEl ? typeEl.value : "";
+    const answers = [];
+    if (questionType === "dropdown" || questionType === "radio") {
+        qBlock.querySelectorAll("#dropdownOptions" + prevQuestionId + " input").forEach(function(opt) {
+            const val = (opt.value || "").trim();
+            if (val) answers.push(val);
+        });
+    } else if (questionType === "checkbox") {
+        qBlock.querySelectorAll("#checkboxOptions" + prevQuestionId + " [id^='checkboxOptionText']").forEach(function(optInput) {
+            const val = (optInput.value || "").trim();
+            if (val) answers.push(val);
+        });
+        const noneOfAbove = qBlock.querySelector("#noneOfTheAbove" + prevQuestionId);
+        if (noneOfAbove && noneOfAbove.checked) answers.push("None of the above");
+    } else if (questionType === "numberedDropdown") {
+        const rangeStartEl = qBlock.querySelector("#numberRangeStart" + prevQuestionId);
+        const rangeEndEl = qBlock.querySelector("#numberRangeEnd" + prevQuestionId);
+        if (rangeStartEl && rangeEndEl) {
+            const min = parseInt(rangeStartEl.value, 10) || 1;
+            const max = parseInt(rangeEndEl.value, 10) || min;
+            for (let i = min; i <= max; i++) answers.push(String(i));
+        }
+    }
+    return answers;
+}
+function logicAlwaysVisibleInStackedMode(formQuestionStyle, questionId, logicRows) {
+    if (formQuestionStyle !== "section" && formQuestionStyle !== "all") return false;
+    if (!logicRows || !logicRows.length) return false;
+    const ANY_VALUE = /^(any text|any amount|any date)$/i;
+    const byPrev = {};
+    for (let lr = 0; lr < logicRows.length; lr++) {
+        const condition = getLogicConditionFromRow(questionId, logicRows[lr], lr + 1);
+        if (!condition) continue;
+        if (!byPrev[condition.prevQuestion]) byPrev[condition.prevQuestion] = [];
+        byPrev[condition.prevQuestion].push(condition.prevAnswer);
+    }
+    const prevIds = Object.keys(byPrev);
+    if (!prevIds.length) return false;
+    const allAnswers = prevIds.reduce(function(acc, id) { return acc.concat(byPrev[id]); }, []);
+    if (allAnswers.length && allAnswers.every(function(ans) { return ANY_VALUE.test(ans); })) {
+        return true;
+    }
+    if (prevIds.length !== 1) return false;
+    const listed = byPrev[prevIds[0]].map(function(ans) { return String(ans).toLowerCase(); });
+    if (listed.some(function(ans) { return ANY_VALUE.test(ans); })) return true;
+    const qBlock = document.getElementById("questionBlock" + prevIds[0]);
+    const typeEl = qBlock ? qBlock.querySelector("#questionType" + prevIds[0]) : null;
+    const questionType = typeEl ? typeEl.value : "";
+    if (questionType === "checkbox" || questionType === "fileUpload") return false;
+    const allOptions = getDiscreteAnswersForQuestion(prevIds[0]).map(function(ans) { return String(ans).toLowerCase(); });
+    if (!allOptions.length) return false;
+    const listedSet = new Set(listed);
+    return allOptions.every(function(opt) { return listedSet.has(opt); });
+}
 // Phone formatter: formats to (123)-456-7890 as user types
 window.updatePhoneSplitFields = function(inputEl) {
     if (!inputEl) return;
@@ -385,6 +463,7 @@ logicScriptBuffer = "";
 const formNameEl = document.getElementById('formNameInput');
 const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
 const skipSignInGate = !!(document.getElementById('skipSignInGateCheckbox') && document.getElementById('skipSignInGateCheckbox').checked);
+const formQuestionStyle = getFormQuestionStyle();
   // Top HTML (head, body, header, etc.)
   let formHTML = [
     "<!DOCTYPE html>",
@@ -411,6 +490,19 @@ const skipSignInGate = !!(document.getElementById('skipSignInGateCheckbox') && d
     '        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; pointer-events: auto !important; }',
     '        .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }',
     '        .question-step-hidden { display: none !important; }',
+    '        .section-form-card { background: linear-gradient(180deg, #f7fbff 0%, #eef5ff 100%); border: 1px solid #c5d9f7; border-radius: 24px; padding: 12px 12px 32px; max-width: 800px; margin: 0 auto 36px; box-shadow: 0 12px 32px rgba(30,73,150,0.10); }',
+    '        .section-form-card .section-title { margin: 18px 12px 10px; }',
+    '        body.form-style-all .section { display: block !important; }',
+    '        body.form-style-all .section .question-nav { display: none; }',
+    '        body.form-style-all .section.form-style-all-nav .question-nav { display: flex; }',
+    '        body.form-style-section .stepper-progress-bar { margin-bottom: 32px; }',
+    '        body.form-style-section .question-nav { margin: 28px auto 8px; }',
+    '        body.form-style-section .section-form-card { margin-bottom: 20px; padding-bottom: 12px; }',
+    '        .stepper-progress-bar { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center; margin: 12px auto 8px; width: 100%; max-width: none; gap: 8px 0; padding: 0 12px; box-sizing: border-box; }',
+    '        .stepper-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; flex: 0 1 auto; min-width: max-content; padding: 0 10px; }',
+    '        .stepper-label { margin-top: 8px; font-size: 14px; font-weight: 600; text-align: center; white-space: nowrap; width: max-content; min-width: 0; line-height: 1.25; }',
+    '        .stepper-line { flex: 1 1 16px; min-width: 12px; max-width: 40px; height: 4px; margin: 14px 0 0; }',
+    '        @media (max-width: 640px) { .stepper-label { white-space: normal; max-width: 160px; } }',
     '        #box { padding-top: 100px; margin: 50px; }',
     '        @media (max-width: 600px) {',
     '            body { padding: 0 !important; }',
@@ -1111,7 +1203,8 @@ const skipSignInGate = !!(document.getElementById('skipSignInGateCheckbox') && d
     '      };',
     '    </script>',
     "</head>",
-    "<body>",
+    `<body class="form-style-${formQuestionStyle}">`,
+    `<script>window.__FORM_QUESTION_STYLE__=${JSON.stringify(formQuestionStyle)};</script>`,
     ...(skipSignInGate ? ['<script>window.__FORM_SKIP_SIGNIN_GATE__=true;</script>'] : []),
     '<script>',
     '/*──────── mirror a dropdown → textbox and checkbox ────────*/',
@@ -1600,7 +1693,11 @@ const skipSignInGate = !!(document.getElementById('skipSignInGateCheckbox') && d
     const sectionNameEl = sectionBlock.querySelector("#sectionName" + s);
     const sectionName = sectionNameEl ? sectionNameEl.value : "Section " + s;
     // Start the section
-    formHTML += `<div id="section${s}" class="section${s === 1 ? " active" : ""}">`;
+    const useSectionCard = formQuestionStyle === 'section' || formQuestionStyle === 'all';
+    formHTML += `<div id="section${s}" class="section${(s === 1 || formQuestionStyle === 'all') ? " active" : ""}">`;
+    if (useSectionCard) {
+      formHTML += `<div class="section-form-card">`;
+    }
     // Only add the section title, not the stepper
     formHTML += `<center><h1 class="section-title">${sectionName}</h1>`;
     // Grab all questions in this section
@@ -1622,6 +1719,8 @@ questionSlugMap[questionId] = slug;
       // logic
       const logicCheckbox = qBlock.querySelector("#logic" + questionId);
       const logicEnabled = logicCheckbox && logicCheckbox.checked;
+      const logicRows = logicEnabled ? qBlock.querySelectorAll(".logic-condition-row") : [];
+      const alwaysVisibleStacked = logicAlwaysVisibleInStackedMode(formQuestionStyle, questionId, logicRows);
 
       // jump logic (multi-condition version)
       const jumpEnabledEl = qBlock.querySelector("#enableJump" + questionId);
@@ -1695,9 +1794,9 @@ questionSlugMap[questionId] = slug;
       // The updateVisibility() function will then show it if the conditions are met
       // This prevents questions from appearing prematurely before their dependencies are resolved
       // Even if it's the first question in a section, if it has conditional logic, it must wait for conditions
-      const shouldBeHidden = logicEnabled; // Always hide if logic is enabled
+      const shouldBeHidden = logicEnabled && !alwaysVisibleStacked;
       const hiddenClass = shouldBeHidden ? ' hidden' : "";
-      const stepHiddenClass = qIdx === 0 ? "" : " question-step-hidden";
+      const stepHiddenClass = (formQuestionStyle === 'question' && qIdx !== 0) ? " question-step-hidden" : "";
 
       formHTML += `<div id="question-container-${questionId}" data-question-id="${questionId}" class="question-container question-item${hiddenClass}${stepHiddenClass}" data-section="${s}" data-question-index="${qIdx + 1}"${questionTypeAttr}>`;
       // Check if info box is enabled
@@ -4739,8 +4838,7 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
       // end question container
       formHTML += "</div>";
       // If logic is enabled, gather "multiple-OR" conditions
-      if (logicEnabled) {
-        const logicRows = qBlock.querySelectorAll(".logic-condition-row");
+      if (logicEnabled && !alwaysVisibleStacked) {
         if (logicRows.length > 0) {
           logicScriptBuffer += `\n(function(){\n`;
           logicScriptBuffer += ` var thisQ=document.getElementById("question-container-${questionId}");\n`;
@@ -5191,6 +5289,9 @@ if (s > 1){
       formHTML += `<button type="submit" class="next-button">Submit</button>`;
     }
     formHTML += "</div>";
+    if (useSectionCard) {
+      formHTML += "</div>"; // section-form-card
+    }
     formHTML += "</div>"; // end this section
   }
   formHTML += `
@@ -5248,6 +5349,13 @@ if (s > 1){
     document.addEventListener('DOMContentLoaded', function() {
       console.groupCollapsed('[NAV DEBUG] form boot');
       const qtMap = (typeof questionTypesMap !== 'undefined') ? questionTypesMap : (window.questionTypesMap || {});
+      const formQuestionStyle = window.__FORM_QUESTION_STYLE__ || 'question';
+      if (formQuestionStyle === 'all') {
+        document.body.classList.add('form-style-all');
+        document.querySelectorAll('.section').forEach(function(sec) {
+          sec.classList.add('active');
+        });
+      }
 
       console.groupEnd();
       const sectionNodeList = document.querySelectorAll('[id^="section"]');
@@ -5271,6 +5379,11 @@ if (s > 1){
         const nextBtn = navWrapper.querySelector('.question-next');
         const progressCurrent = navWrapper.querySelector('.question-current');
         const progressTotal = navWrapper.querySelector('.question-total');
+        if (formQuestionStyle === 'all') {
+          if (sectionIdx === sectionElements.length - 1) {
+            sectionEl.classList.add('form-style-all-nav');
+          }
+        }
         function getVisibleIndices() {
           const indices = [];
           questionItems.forEach(function(item, idx) {
@@ -5598,6 +5711,40 @@ if (s > 1){
 
           return answered;
         }
+        function areSectionQuestionsAnswered() {
+          const visibleIndices = getVisibleIndices();
+          for (let i = 0; i < visibleIndices.length; i++) {
+            if (!isQuestionAnswered(questionItems[visibleIndices[i]])) {
+              return false;
+            }
+          }
+          return true;
+        }
+        function areAllVisibleFormQuestionsAnswered() {
+          const items = document.querySelectorAll('.question-container.question-item:not(.hidden)');
+          for (let i = 0; i < items.length; i++) {
+            if (!isQuestionAnswered(items[i])) {
+              return false;
+            }
+          }
+          return true;
+        }
+        function getFirstUnansweredVisibleQuestion() {
+          if (formQuestionStyle === 'question') {
+            if (activeIndex >= 0 && questionItems[activeIndex] && !questionItems[activeIndex].classList.contains('hidden')) {
+              return questionItems[activeIndex];
+            }
+            return sectionEl.querySelector('.question-item:not(.question-step-hidden)');
+          }
+          const visibleIndices = getVisibleIndices();
+          for (let i = 0; i < visibleIndices.length; i++) {
+            const item = questionItems[visibleIndices[i]];
+            if (item && !isQuestionAnswered(item)) {
+              return item;
+            }
+          }
+          return visibleIndices.length ? questionItems[visibleIndices[0]] : null;
+        }
         function answerTriggersEnd(container) {
           // Ensure jumpLogics is defined (it might not be initialized yet)
           const jumpLogicsArray = (typeof jumpLogics !== 'undefined' && Array.isArray(jumpLogics)) ? jumpLogics : (window.jumpLogics || []);
@@ -5676,6 +5823,12 @@ if (s > 1){
               if (container.contains(target)) {
 
                 refreshNav(containerIdx);
+                if (formQuestionStyle === 'all') {
+                  const lastSection = sectionElements[sectionElements.length - 1];
+                  if (lastSection && lastSection.id !== sectionId && window.questionNavControllers && typeof window.questionNavControllers[lastSection.id] === 'function') {
+                    window.questionNavControllers[lastSection.id]();
+                  }
+                }
               } else {
 
               }
@@ -5692,6 +5845,12 @@ if (s > 1){
               if (container.contains(target)) {
 
                 refreshNav(containerIdx);
+                if (formQuestionStyle === 'all') {
+                  const lastSection = sectionElements[sectionElements.length - 1];
+                  if (lastSection && lastSection.id !== sectionId && window.questionNavControllers && typeof window.questionNavControllers[lastSection.id] === 'function') {
+                    window.questionNavControllers[lastSection.id]();
+                  }
+                }
               } else {
 
               }
@@ -5828,19 +5987,26 @@ if (s > 1){
             targetIdx = visibleIndices[0];
           }
 
-          questionItems.forEach(function(item, idx) {
-            const questionId = item.getAttribute('data-question-id') || item.id || 'unknown';
-            const hasHiddenClass = item.classList.contains('hidden');
-            if (idx === targetIdx && !hasHiddenClass) {
-
-              item.classList.remove('question-step-hidden');
-            } else {
-              if (idx === targetIdx && hasHiddenClass) {
-
+          const isSteppedQuestions = formQuestionStyle === 'question';
+          if (isSteppedQuestions) {
+            questionItems.forEach(function(item, idx) {
+              const hasHiddenClass = item.classList.contains('hidden');
+              if (idx === targetIdx && !hasHiddenClass) {
+                item.classList.remove('question-step-hidden');
+              } else {
+                item.classList.add('question-step-hidden');
               }
-              item.classList.add('question-step-hidden');
-            }
-          });
+            });
+          } else {
+            questionItems.forEach(function(item) {
+              if (item.classList.contains('hidden')) {
+                item.classList.add('question-step-hidden');
+              } else {
+                item.classList.remove('question-step-hidden');
+              }
+            });
+            targetIdx = visibleIndices[visibleIndices.length - 1];
+          }
           const currentPos = visibleIndices.indexOf(targetIdx);
           const position = currentPos + 1;
           const visibleTotal = visibleIndices.length;
@@ -5855,17 +6021,37 @@ if (s > 1){
           const activeQuestionId = activeContainer ? (activeContainer.getAttribute('data-question-id') || activeContainer.id || 'unknown') : 'unknown';
           const activeQuestionTextEl = activeContainer ? activeContainer.querySelector('.question-text') : null;
           const activeQuestionText = activeQuestionTextEl ? activeQuestionTextEl.textContent.trim() : '';
-          attachSubmitModeListeners(activeContainer, targetIdx);
-          const shouldSubmit = answerTriggersEnd(activeContainer);
-          const isAnswered = isQuestionAnswered(activeContainer);
-          const hasPrevQuestion = currentPos > 0;
+          if (isSteppedQuestions) {
+            attachSubmitModeListeners(activeContainer, targetIdx);
+          } else {
+            questionItems.forEach(function(item, idx) {
+              if (!item.classList.contains('hidden')) {
+                attachSubmitModeListeners(item, idx);
+              }
+            });
+          }
+          let shouldSubmit = answerTriggersEnd(activeContainer);
+          let isAnswered = isQuestionAnswered(activeContainer);
+          let hasPrevQuestion = currentPos > 0;
+          if (!isSteppedQuestions) {
+            isAnswered = formQuestionStyle === 'all'
+              ? areAllVisibleFormQuestionsAnswered()
+              : areSectionQuestionsAnswered();
+            shouldSubmit = visibleIndices.some(function(idx) {
+              return answerTriggersEnd(questionItems[idx]);
+            });
+            if (!findNextSectionWithVisibleQuestions()) {
+              shouldSubmit = true;
+            }
+            hasPrevQuestion = false;
+          }
 
           cachedNextSectionInfo = shouldSubmit ? null : findNextSectionWithVisibleQuestions();
-          cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
+          cachedPrevSectionInfo = formQuestionStyle === 'all' ? null : findPrevSectionWithVisibleQuestions();
 
           const canAdvanceAcrossSection = shouldSubmit ? false : !!cachedNextSectionInfo;
           // Allow advancing within section if there's a next question in the current section
-          const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
+          const canAdvanceWithinSection = isSteppedQuestions && isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
 
           // If we're on the last question and can't advance within section, but can advance across sections, log it for debugging
           if (isAnswered && !shouldSubmit && currentPos === visibleTotal - 1 && !canAdvanceWithinSection) {
@@ -5901,8 +6087,14 @@ if (s > 1){
           const targetSectionId = cachedNextSectionInfo.sectionId;
           const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
           const targetFirstVisibleIndex = cachedNextSectionInfo.firstVisibleIndex;
+          const fromSectionNumber = sectionNumbers[sectionIdx] || (sectionIdx + 1);
 
           const triggerNavigation = () => {
+            if (typeof sectionStack !== 'undefined' && Array.isArray(sectionStack)) {
+              if (sectionStack[sectionStack.length - 1] !== fromSectionNumber) {
+                sectionStack.push(fromSectionNumber);
+              }
+            }
 
             if (typeof validateAndProceed === 'function') {
 
@@ -5949,44 +6141,23 @@ if (s > 1){
           const targetSectionId = cachedPrevSectionInfo.sectionId;
           const targetSectionNumber = cachedPrevSectionInfo.sectionNumber;
           const targetQuestionIndex = cachedPrevSectionInfo.lastVisibleIndex;
-          // Use goBack() if we have navigation history (stack), otherwise use direct navigation
-          // This ensures jumps are properly handled when going back
-          const triggerNavigation = () => {
-            // Check if we have a stack entry - if so, use goBack() to respect jump history
-            if (typeof sectionStack !== 'undefined' && Array.isArray(sectionStack) && sectionStack.length > 0) {
-              if (typeof goBack === 'function') {
-                goBack();
-                // After going back, update the target navigation if needed
-                setTimeout(() => {
-                  const activeSection = document.querySelector('.section.active');
-                  if (activeSection && activeSection.id === targetSectionId) {
-                    if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
-                      window.questionNavControllers[targetSectionId](targetQuestionIndex);
-                    }
-                  }
-                }, 100);
+          if (typeof navigateSection === 'function') {
+            navigateSection(targetSectionNumber, true);
+          }
+          setTimeout(function() {
+            const activeSection = document.querySelector('.section.active');
+            if (activeSection && activeSection.id === targetSectionId) {
+              if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                window.questionNavControllers[targetSectionId](targetQuestionIndex);
               }
-            } else {
-              // No stack history, use direct navigation
-              if (typeof navigateSection === 'function') {
-                navigateSection(targetSectionNumber);
-              } else if (typeof validateAndProceed === 'function') {
-                navigateSection(targetSectionNumber);
-              }
-              const updateTargetNav = () => {
-                const activeSection = document.querySelector('.section.active');
-                if (activeSection && activeSection.id === targetSectionId) {
-                  if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
-                    window.questionNavControllers[targetSectionId](targetQuestionIndex);
-                  }
-                }
-              };
-              setTimeout(updateTargetNav, 0);
             }
-          };
-          triggerNavigation();
+          }, 0);
         }
         function shiftQuestion(direction) {
+          if (direction < 0 && formQuestionStyle === 'section' && cachedPrevSectionInfo) {
+            goToPrevSection();
+            return;
+          }
 
           const visibleIndices = getVisibleIndices();
 
@@ -6142,7 +6313,7 @@ if (s > 1){
             e.stopPropagation();
             
             // Find the current active question item - use .question-item class (not .question-step-item)
-            const activeQuestionItem = sectionEl.querySelector('.question-item:not(.question-step-hidden)');
+            const activeQuestionItem = getFirstUnansweredVisibleQuestion();
             console.log('[DISABLED NEXT BTN] Active question item:', activeQuestionItem);
             console.log('[DISABLED NEXT BTN] Section element:', sectionEl);
             
@@ -6361,7 +6532,9 @@ if (s > 1){
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && e.shiftKey) {
           e.preventDefault();
-          const activeSection = document.querySelector('.section.active');
+          const activeSection = (formQuestionStyle === 'all')
+            ? document.querySelector('.section.form-style-all-nav') || document.querySelector('.section.active:last-of-type')
+            : document.querySelector('.section.active');
           const nextBtn = activeSection ? activeSection.querySelector('.question-next') : null;
 
           if (nextBtn) {
@@ -13327,6 +13500,18 @@ function navigateSection(sectionNumber, isBackNavigation = false){
     const sections  = document.querySelectorAll('.section');
     const form      = document.getElementById('customForm');
     const thankYou  = document.getElementById('thankYouMessage');
+    if (window.__FORM_QUESTION_STYLE__ === 'all' && sectionNumber !== 'end') {
+        if (thankYou) thankYou.style.display = 'none';
+        if (form) form.style.display = 'block';
+        sections.forEach(function(sec) { sec.classList.add('active'); });
+        currentSectionNumber = sectionNumber;
+        if (typeof updateProgressBar === 'function') updateProgressBar();
+        const target = document.getElementById('section' + sectionNumber);
+        if (target && typeof target.scrollIntoView === 'function') {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return;
+    }
     /* hide everything first */
     sections.forEach(sec => sec.classList.remove('active'));
     thankYou.style.display = 'none';
@@ -17197,9 +17382,12 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
             <option value="hidden">🔒 Hidden Fields</option>
           </select>
         </div>
-        <div style="flex-shrink: 0;">
+        <div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; min-width: 180px;">
         <button id="exportNamesIdsBtn" style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);">
           📋 Export Names/IDs
+        </button>
+        <button id="fillMaximumPathBtn" style="background: linear-gradient(90deg, #ff8c42 0%, #ff5e62 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(255, 94, 98, 0.35);">
+          🔥 Fill maximum path
         </button>
         </div>
       </div>
@@ -17817,6 +18005,306 @@ function fallbackCopyToClipboard(text) {
   }
   document.body.removeChild(textArea);
 }
+// --- Fill maximum path (worst-case PDF field coverage) ---
+function isDebugFillEligible(el) {
+  if (!el || el.disabled || el.type === 'hidden') return false;
+  if (!el.id && !el.name) return false;
+  if (el.id === 'debugSearch' || el.id === 'debugTypeFilter' || (el.id && el.id.indexOf('debug') === 0)) return false;
+  if (el.closest('#debugMenu')) return false;
+  let node = el;
+  while (node && node !== document.body) {
+    const style = window.getComputedStyle(node);
+    if (style.display === 'none' || style.visibility === 'hidden') return false;
+    if (node.classList && node.classList.contains('hidden')) return false;
+    node = node.parentElement;
+  }
+  return true;
+}
+function countExportableFields() {
+  let count = 0;
+  document.querySelectorAll('input, select, textarea').forEach(function(el) {
+    if (!isDebugFillEligible(el)) return;
+    if (el.type === 'checkbox' || el.type === 'radio') {
+      if (el.checked) count++;
+    } else if (el.tagName === 'SELECT') {
+      if ((el.value || '').trim()) count++;
+    } else if ((el.value || '').trim()) {
+      count++;
+    }
+  });
+  return count;
+}
+function getQuestionIdForFillElement(element) {
+  if (!element) return null;
+  let questionId = element.getAttribute('data-question-id');
+  if (questionId) return questionId;
+  const container = element.closest('.question-container');
+  if (container) return container.getAttribute('data-question-id');
+  const nameIds = (typeof questionNameIds !== 'undefined') ? questionNameIds : (window.questionNameIds || {});
+  for (const qId in nameIds) {
+    if (element.name === nameIds[qId] || element.id === nameIds[qId]) return qId;
+  }
+  return null;
+}
+function wouldOptionJumpToEnd(element, answerValue) {
+  const jumpLogicsArray = (typeof jumpLogics !== 'undefined' && Array.isArray(jumpLogics)) ? jumpLogics : (window.jumpLogics || []);
+  if (!jumpLogicsArray.length) return false;
+  const questionId = getQuestionIdForFillElement(element);
+  if (!questionId) return false;
+  const valLower = String(answerValue).trim().toLowerCase();
+  return jumpLogicsArray.some(function(jl) {
+    return String(jl.questionId) === String(questionId)
+      && String(jl.jumpTo).toLowerCase() === 'end'
+      && String(jl.jumpOption).trim().toLowerCase() === valLower;
+  });
+}
+function wouldTriggerHardAlertOnSelect(select, value) {
+  const trigger = select.getAttribute('data-hard-alert-trigger');
+  if (trigger && String(value).trim().toLowerCase() === String(trigger).trim().toLowerCase()) return true;
+  const hardAlertInfo = select.getAttribute('data-hard-alert-info');
+  if (hardAlertInfo) {
+    try {
+      const info = JSON.parse(hardAlertInfo);
+      if (info && info.trigger && String(value).trim().toLowerCase() === String(info.trigger).trim().toLowerCase()) return true;
+    } catch (e) { /* ignore */ }
+  }
+  return false;
+}
+function triggerFieldChange(el) {
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  el.dispatchEvent(new Event('change', { bubbles: true }));
+  if (typeof el.onchange === 'function') {
+    try { el.onchange.call(el); } catch (e) { /* ignore */ }
+  }
+  if (typeof el.oninput === 'function') {
+    try { el.oninput.call(el); } catch (e) { /* ignore */ }
+  }
+}
+function triggerSelectSideEffects(select) {
+  if (typeof dropdownMirror === 'function' && select.id) {
+    try { dropdownMirror(select, select.id); } catch (e) { /* ignore */ }
+  }
+  const qId = select.getAttribute('data-question-id');
+  if (qId && typeof showTextboxLabels === 'function' && select.value) {
+    try { showTextboxLabels(parseInt(qId, 10), select.value); } catch (e) { /* ignore */ }
+  }
+  if (qId && typeof updateHiddenCheckboxes === 'function' && select.value) {
+    try { updateHiddenCheckboxes(parseInt(qId, 10), parseInt(select.value, 10) || select.value); } catch (e) { /* ignore */ }
+  }
+  if (typeof updateHiddenLogic === 'function' && select.id) {
+    try { updateHiddenLogic(select.id, select.value); } catch (e) { /* ignore */ }
+  }
+}
+function getSampleFillValue(el) {
+  const id = (el.id || el.name || '').toLowerCase();
+  if (el.type === 'email' || id.indexOf('email') !== -1) return 'test@example.com';
+  if (el.type === 'tel' || id.indexOf('phone') !== -1 || id.indexOf('tel') !== -1) return '(555) 555-5555';
+  if (el.type === 'date' || id.indexOf('date') !== -1) return '2024-06-15';
+  if (el.type === 'number' || el.inputMode === 'decimal' || id.indexOf('amount') !== -1 || id.indexOf('money') !== -1) return '100';
+  if (id.indexOf('zip') !== -1) return '90210';
+  if (id.indexOf('ssn') !== -1 || id.indexOf('social') !== -1) return '123-45-6789';
+  if (id.indexOf('ein') !== -1 || id.indexOf('employer') !== -1) return '12-3456789';
+  if (id.indexOf('state') !== -1 && el.tagName === 'SELECT') return 'California';
+  if (id.indexOf('firstname') !== -1 || (id.indexOf('first') !== -1 && id.indexOf('name') !== -1)) return 'Test';
+  if (id.indexOf('lastname') !== -1 || (id.indexOf('last') !== -1 && id.indexOf('name') !== -1)) return 'User';
+  if (id.indexOf('name') !== -1) return 'Test User';
+  if (id.indexOf('street') !== -1 || id.indexOf('address') !== -1) return '123 Test Street';
+  if (id.indexOf('city') !== -1) return 'Los Angeles';
+  if (id.indexOf('exempt') !== -1) return '1';
+  if (id.indexOf('fatca') !== -1) return 'A';
+  if (el.tagName === 'TEXTAREA') return 'Maximum path test content for PDF export coverage.';
+  return 'Test Value';
+}
+function revealAllForMaxFill() {
+  document.querySelectorAll('.section').forEach(function(sec) { sec.classList.add('active'); });
+  document.querySelectorAll('.question-container.question-item').forEach(function(q) {
+    if (!q.classList.contains('hidden')) q.classList.remove('question-step-hidden');
+  });
+}
+function getSelectOptions(select) {
+  return Array.from(select.options).filter(function(o) {
+    const val = (o.value || '').trim();
+    return val && !o.disabled && val.toLowerCase() !== 'select an option';
+  });
+}
+function isNumberedDropdownSelect(select) {
+  return !!select.getAttribute('data-question-id')
+    && !!select.querySelector('option[value="1"]')
+    && !!select.querySelector('option[value="2"]');
+}
+function pickBestSelectValue(select) {
+  let options = getSelectOptions(select).filter(function(o) {
+    return !wouldOptionJumpToEnd(select, o.value) && !wouldTriggerHardAlertOnSelect(select, o.value);
+  });
+  if (!options.length) options = getSelectOptions(select);
+  if (!options.length) return null;
+
+  if (isNumberedDropdownSelect(select)) {
+    const best = options.reduce(function(a, b) {
+      return (parseInt(b.value, 10) || 0) > (parseInt(a.value, 10) || 0) ? b : a;
+    });
+    if (select.value !== best.value) {
+      select.value = best.value;
+      triggerFieldChange(select);
+      triggerSelectSideEffects(select);
+    }
+    return best.value;
+  }
+
+  const preferred = ['yes', 'llc', 'limited liability company', 'partnership', 'trust/estate', 'trust', 'other', 's corporation', 'c corporation', 'individual/sole proprietor', 'individual'];
+  for (let i = 0; i < preferred.length; i++) {
+    const pref = preferred[i];
+    const match = options.find(function(o) {
+      const v = o.value.trim().toLowerCase();
+      const t = (o.textContent || '').trim().toLowerCase();
+      return v === pref || t === pref || t.indexOf(pref) !== -1;
+    });
+    if (match) {
+      if (select.value !== match.value) {
+        select.value = match.value;
+        triggerFieldChange(select);
+        triggerSelectSideEffects(select);
+      }
+      return match.value;
+    }
+  }
+
+  let bestValue = select.value || options[options.length - 1].value;
+  let bestScore = countExportableFields();
+  options.forEach(function(opt) {
+    select.value = opt.value;
+    triggerFieldChange(select);
+    triggerSelectSideEffects(select);
+    const score = countExportableFields();
+    if (score >= bestScore) {
+      bestScore = score;
+      bestValue = opt.value;
+    }
+  });
+  if (select.value !== bestValue) {
+    select.value = bestValue;
+    triggerFieldChange(select);
+    triggerSelectSideEffects(select);
+  }
+  return bestValue;
+}
+function fillVisibleTextFields() {
+  document.querySelectorAll('input, textarea').forEach(function(el) {
+    if (!isDebugFillEligible(el)) return;
+    const type = (el.type || '').toLowerCase();
+    if (type === 'checkbox' || type === 'radio' || type === 'file') return;
+    if (!(el.value || '').trim()) {
+      el.value = getSampleFillValue(el);
+      triggerFieldChange(el);
+    }
+  });
+}
+function fillVisibleCheckboxesAndRadios() {
+  const radioNames = {};
+  document.querySelectorAll('input[type="radio"]').forEach(function(r) {
+    if (!isDebugFillEligible(r) || !r.name) return;
+    if (!radioNames[r.name]) radioNames[r.name] = [];
+    radioNames[r.name].push(r);
+  });
+  Object.keys(radioNames).forEach(function(name) {
+    const radios = radioNames[name];
+    if (radios.some(function(r) { return r.checked; })) return;
+    let best = radios[radios.length - 1];
+    let bestScore = -1;
+    radios.forEach(function(r) {
+      if (wouldOptionJumpToEnd(r, r.value)) return;
+      r.checked = true;
+      triggerFieldChange(r);
+      const score = countExportableFields();
+      if (score > bestScore) {
+        bestScore = score;
+        best = r;
+      }
+      r.checked = false;
+    });
+    radios.forEach(function(r) { r.checked = false; });
+    best.checked = true;
+    triggerFieldChange(best);
+  });
+
+  document.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+    if (!isDebugFillEligible(cb)) return;
+    const container = cb.closest('.question-container');
+    const isMarkOnlyOne = container && container.querySelector('input[type="radio"]');
+    if (isMarkOnlyOne) return;
+    if (!cb.checked) {
+      cb.checked = true;
+      triggerFieldChange(cb);
+    }
+  });
+}
+function fillMaximumPathPass() {
+  revealAllForMaxFill();
+  document.querySelectorAll('select').forEach(function(select) {
+    if (!isDebugFillEligible(select)) return;
+    pickBestSelectValue(select);
+  });
+  fillVisibleCheckboxesAndRadios();
+  fillVisibleTextFields();
+  if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
+    createHiddenCheckboxesForAutofilledDropdowns();
+  }
+  if (typeof updateAllHiddenAddressFields === 'function') {
+    try { updateAllHiddenAddressFields(); } catch (e) { /* ignore */ }
+  }
+  if (typeof updateLinkedCheckboxes === 'function') {
+    try { updateLinkedCheckboxes(); } catch (e) { /* ignore */ }
+  }
+  if (typeof updateInverseCheckboxes === 'function') {
+    try { updateInverseCheckboxes(); } catch (e) { /* ignore */ }
+  }
+  document.dispatchEvent(new CustomEvent('questionVisibilityChanged', { detail: { sectionId: null } }));
+}
+async function fillMaximumPath() {
+  const btn = document.getElementById('fillMaximumPathBtn');
+  const originalText = btn ? btn.textContent : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Filling...';
+  }
+  window.isInitialAutofill = true;
+  try {
+    for (let pass = 0; pass < 8; pass++) {
+      fillMaximumPathPass();
+      await new Promise(function(resolve) { setTimeout(resolve, 180); });
+    }
+    if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
+      createHiddenCheckboxesForAutofilledDropdowns();
+    }
+    if (typeof runAllHiddenCheckboxCalculations === 'function') {
+      runAllHiddenCheckboxCalculations();
+    }
+    if (typeof runAllHiddenTextCalculations === 'function') {
+      runAllHiddenTextCalculations();
+    }
+    const filledCount = countExportableFields();
+    if (btn) {
+      btn.textContent = '✅ ' + filledCount + ' fields filled';
+      setTimeout(function() {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }, 2800);
+    }
+    if (debugMenuVisible) populateDebugContent();
+  } catch (err) {
+    console.error('Fill maximum path failed', err);
+    if (btn) {
+      btn.textContent = '❌ Fill failed';
+      setTimeout(function() {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }, 2200);
+    }
+  } finally {
+    window.isInitialAutofill = false;
+  }
+}
+
 // Export Names/IDs function
 function exportNamesAndIds() {
   // Get form name from the form name input field
@@ -17874,6 +18362,9 @@ document.getElementById('debugSearch').addEventListener('input', debouncedPopula
 document.getElementById('debugTypeFilter').addEventListener('change', debouncedPopulateDebugContent);
 // Export Names/IDs functionality
 document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNamesAndIds);
+document.getElementById('fillMaximumPathBtn').addEventListener('click', function() {
+  fillMaximumPath();
+});
 // Function to create Form Name input field (to be called from the form editor interface)
 function createFormNameInput() {
   const formNameContainer = document.createElement('div');

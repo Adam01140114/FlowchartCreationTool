@@ -663,13 +663,16 @@
       /* Stepper Progress Bar Styles */
       .stepper-progress-bar {
         display: flex;
-        align-items: center;
+        flex-wrap: wrap;
+        align-items: flex-start;
         justify-content: center;
-        margin: 12px auto 0 auto;
+        margin: 12px auto 8px auto;
         width: 100%;
-        max-width: 700px;
+        max-width: none;
         background: none;
-        gap: 0;
+        gap: 8px 0;
+        padding: 0 12px;
+        box-sizing: border-box;
       }
       .stepper-step {
         display: flex;
@@ -677,7 +680,9 @@
         align-items: center;
         position: relative;
         z-index: 2;
-        min-width: 90px;
+        flex: 0 1 auto;
+        min-width: max-content;
+        padding: 0 10px;
       }
       .stepper-circle {
         width: 32px;
@@ -701,11 +706,14 @@
       }
       .stepper-label {
         margin-top: 8px;
-        font-size: 15px;
+        font-size: 14px;
         color: #2c3e50;
         font-weight: 600;
         text-align: center;
-        min-width: 80px;
+        white-space: nowrap;
+        width: max-content;
+        min-width: 0;
+        line-height: 1.25;
       }
       .stepper-step.completed .stepper-label {
         color: #38d39f;
@@ -714,16 +722,34 @@
         color: #4f8cff;
       }
       .stepper-line {
-        flex: 1;
+        flex: 1 1 16px;
+        min-width: 12px;
+        max-width: 40px;
         height: 4px;
         background: #e0e7ef;
-        margin: 0 0px;
+        margin: 14px 0 0;
         position: relative;
         z-index: 1;
         transition: background 0.5s cubic-bezier(.4,1.4,.6,1);
       }
       .stepper-line.filled {
         background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
+      }
+      body.form-style-section .stepper-progress-bar {
+        margin-bottom: 32px;
+      }
+      body.form-style-section .question-nav {
+        margin: 28px auto 8px;
+      }
+      body.form-style-section .section-form-card {
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+      }
+      @media (max-width: 640px) {
+        .stepper-label {
+          white-space: normal;
+          max-width: 160px;
+        }
       }
   
       /* Custom Modal Styles */

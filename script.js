@@ -1087,6 +1087,23 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
   // Load zoom sensitivity from Firebase after page loads
   setTimeout(async () => {
     try {
+      if (window.isGuestUser && window.isGuestUser() && window.guestStorage) {
+        const data = await window.guestStorage.loadSettings();
+        if (data && data.zoomSensitivity !== undefined) {
+          if (window.userSettings) {
+            window.userSettings.zoomSensitivity = data.zoomSensitivity;
+          }
+          const input = document.getElementById('zoomSensitivityInput');
+          const displaySpan = document.getElementById('zoomSensitivityValue');
+          if (input) {
+            input.value = data.zoomSensitivity;
+          }
+          if (displaySpan) {
+            displaySpan.textContent = data.zoomSensitivity;
+          }
+        }
+        return;
+      }
       if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
         const user = firebase.auth().currentUser;
         const db = firebase.firestore();
@@ -3373,33 +3390,43 @@ function createYesNoOptions(parentCell) {
 }
 // Add a function to directly import a JSON string
 window.importFlowchartJsonDirectly = function(jsonString) {
+  if (typeof applyImportedFlowchartJson === 'function') {
+    try {
+      applyImportedFlowchartJson(jsonString);
+      return true;
+    } catch (error) {
+      if (typeof setImportFlowchartError === 'function') {
+        setImportFlowchartError('Error importing flowchart: ' + error.message);
+      } else {
+        alert("Error importing flowchart: " + error.message);
+      }
+      return false;
+    }
+  }
   try {
     if (!jsonString) {
       throw new Error("No data provided");
     }
-    // Check if the string starts and ends with quotes
     if (jsonString.startsWith('"') && jsonString.endsWith('"')) {
       jsonString = jsonString.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
     }
-    // Try to parse the JSON
     let jsonData;
     try {
       jsonData = JSON.parse(jsonString);
     } catch (parseError) {
-      // Fallback approach for handling complex cases
-      jsonData = JSON.parse(JSON.stringify(eval("(" + jsonString + ")")));
+      throw new Error('Invalid JSON: ' + parseError.message);
     }
-    // Check if this is a GUI JSON instead of a flowchart JSON
     if (jsonData.sections && Array.isArray(jsonData.sections) && !jsonData.cells) {
       throw new Error("You are trying to import a GUI JSON. Please import a flowchart JSON that has a 'cells' property.");
     }
-    // Validate the JSON data
     if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
       throw new Error("Invalid flowchart data: missing cells array");
     }
-    // Debug: Log the sectionPrefs before passing to loadFlowchartData
     loadFlowchartData(jsonData);
     currentFlowchartName = null;
+    if (typeof hideImportFlowchartModal === 'function') {
+      hideImportFlowchartModal();
+    }
     return true;
   } catch (error) {
     alert("Error importing flowchart: " + error.message);
@@ -4809,7 +4836,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+function hidePreviewFormStyleModal() {
+  const modal = document.getElementById('previewFormStyleModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function showPreviewFormStyleModal() {
+  const modal = document.getElementById('previewFormStyleModal');
+  if (!modal) {
+    startPreviewForm('section');
+    return;
+  }
+  const sectionRadio = modal.querySelector('input[name="previewQuestionStyle"][value="section"]');
+  if (sectionRadio) sectionRadio.checked = true;
+  modal.style.display = 'flex';
+}
+
+function confirmPreviewFormStyle() {
+  const selected = document.querySelector('input[name="previewQuestionStyle"]:checked');
+  const style = selected && selected.value ? selected.value : 'section';
+  hidePreviewFormStyleModal();
+  startPreviewForm(style);
+}
+
 function previewForm() {
+  showPreviewFormStyleModal();
+}
+
+function startPreviewForm(questionStyle) {
+  const normalizedStyle = (questionStyle === 'question' || questionStyle === 'section' || questionStyle === 'all')
+    ? questionStyle
+    : 'section';
   // Automatically reset PDF inheritance and Node IDs before previewing
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
   // Reset PDF inheritance for all nodes FIRST
@@ -4844,7 +4901,7 @@ function previewForm() {
         console.error('Error storing preview data in localStorage:', e);
         // Fallback to URL method if localStorage fails (though it may still have size limits)
       const encodedJson = encodeURIComponent(guiJsonStr);
-        const guiUrl = `FormWiz GUI/gui.html?preview=${encodedJson}`;
+        const guiUrl = `FormWiz GUI/gui.html?preview=${encodedJson}&questionStyle=${encodeURIComponent(normalizedStyle)}`;
         window.open(guiUrl, '_blank');
         return;
       }
@@ -4855,13 +4912,29 @@ function previewForm() {
     });
       
       // Open the GUI preview in a new tab with the preview key in the URL
-      const guiUrl = `FormWiz GUI/gui.html?previewKey=${encodeURIComponent(previewKey)}`;
+      const guiUrl = `FormWiz GUI/gui.html?previewKey=${encodeURIComponent(previewKey)}&questionStyle=${encodeURIComponent(normalizedStyle)}`;
       window.open(guiUrl, '_blank');
     } else {
       // Fallback to regular GUI if no JSON generated
       window.open('FormWiz GUI/gui.html', '_blank');
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const previewStyleModal = document.getElementById('previewFormStyleModal');
+  if (previewStyleModal) {
+    previewStyleModal.addEventListener('click', (e) => {
+      if (e.target === previewStyleModal) hidePreviewFormStyleModal();
+    });
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  const modal = document.getElementById('previewFormStyleModal');
+  if (modal && modal.style.display === 'flex') {
+    hidePreviewFormStyleModal();
+  }
+});
 // AUTOSAVE FLOWCHART TO COOKIES FEATURE
 // --- AUTOSAVE CONSTANTS ---
   // AUTOSAVE_KEY moved to config.js module

@@ -1,0 +1,409 @@
+FLOWCHART AI TRAINER
+====================
+Import this document into any AI that will act as the Flowchart Bot.
+
+ROLE SPLIT
+----------
+The human always provides a LOGICAL FORM SCHEMA payload. That payload describes
+what the form MEANS: sections, questions, types, options, and conditions.
+
+The Flowchart Bot does everything else:
+  1. Interpret form semantics (do not copy PDF widgets 1:1).
+  2. Design the interview flowchart (gates, follow-ups, skip paths, merge points).
+  3. Place nodes on a top-to-bottom canvas.
+  4. Route edges like a circuit board: orthogonal, rounded corners, each wire
+     in its own lane, never through a node, overlapping other wires as little
+     as possible.
+  5. Emit Flowchart Creation Tool JSON the editor can Import.
+
+Do not ask the human to write mxGraph styles, geometry, or waypoints. Those
+are compiler output.
+
+
+1. INPUT: LOGICAL FORM SCHEMA
+-----------------------------
+Typical payload (JSON or field_config.txt):
+
+{
+  "formTitle": "IRS Form W-9 (...)",
+  "fields": [
+    {
+      "id": "taxpayer_name",
+      "newName": "taxpayer_name",
+      "type": "text",
+      "label": "Name"
+    },
+    {
+      "id": "account_number",
+      "type": "text",
+      "label": "Account Number",
+      "conditional": {
+        "onlyWhen": "account_number_provided",
+        "gateQuestion": "Do you want to provide an account number?"
+      }
+    }
+  ]
+}
+
+Field types you will see: text, checkbox, dropdown, date, number, ssn, ein,
+radio, and similar. Treat unknown types as text unless the label clearly
+implies a choice.
+
+`conditional.onlyWhen` means the field is skipped unless a gate is true.
+If the schema names a missing gate (`account_number_provided`), CREATE that
+gate as a Yes/No dropdown. The schema describes meaning, not the full
+interview.
+
+A payload may also include a PDF and page images. Use those to understand
+grouping, mutual exclusion, and follow-up fields. The schema still wins for
+ids and types.
+
+
+2. SEMANTIC COMPILE RULES (DO NOT FLATTEN THE PDF)
+--------------------------------------------------
+A PDF is a paper layout. The flowchart is an interview. Translate:
+
+A. Mutually exclusive checkboxes become ONE dropdown.
+   W-9 line 3 has seven tax-class checkboxes. The taxpayer picks exactly one.
+   Wrong: seven independent checkbox questions.
+   Right: one question "What is your federal tax classification?" with seven
+   option nodes.
+
+B. Follow-ups hang under the option that enables them, not under every path.
+   - LLC -> "What is the LLC tax classification code?" (C / S / P)
+   - Other -> text "What is the other tax classification?"
+   - Partnership, Trust/estate, and LLC-P -> foreign partners question
+   - Individual / C / S / LLC-C / LLC-S / Other skip that follow-up
+
+C. Optional paper fields become explicit gates.
+   If a field is skippable, ask Yes/No first. "Yes" goes to the data question.
+   "No" skips around it and merges.
+
+D. Exclusive alternatives become a choice, then two columns.
+   SSN vs EIN: one dropdown, then the matching TIN question under each option,
+   then matching name-for-SSN / name-for-EIN questions, then a merge.
+
+E. Linear required fields stay a vertical spine.
+   Name -> address -> city/state/ZIP stay stacked on the center line.
+
+F. Skip paths must go AROUND follow-up clusters.
+   If Individual does not need LLC or foreign-partner questions, the edge from
+   Individual to the next shared question (exemptions) must route around those
+   nodes, not through them.
+
+G. Every path must reach End.
+   After the last merge, add an End node.
+
+H. Question text is conversational, not the PDF caption.
+   PDF: "Name (as shown on your income tax return)"
+   Flow: "What is your name?"
+
+
+3. OUTPUT: FLOWCHART CREATION TOOL JSON
+---------------------------------------
+Top-level object:
+
+{
+  "formName": "<from schema.formTitle>",
+  "edgeStyle": "curved",
+  "cells": [ ...vertices first, then edges... ],
+  "sectionPrefs": {
+    "1": { "borderColor": "hsl(0, 100%, 80%)", "name": "Identification" }
+  },
+  "groups": {}
+}
+
+edgeStyle MUST be "curved". That selects orthogonal connectors with rounded
+corners in the editor (orthogonalEdgeStyle + rounded=1).
+
+3.1 Vertex (question)
+  nodeType=question
+  questionType=text|dropdown|checkbox|...
+  nodeId=<stable field id from the schema>
+  section=<integer>
+  fillColor=#80bfff
+  Typical geometry: width 300, min height 96, then grow height to fit the
+  wrapped label plus extra padding (see 4.3).
+
+3.2 Vertex (option)
+  nodeType=options
+  questionType matches the parent question
+  fillColor=#ffffff
+  Minimum geometry: width 168, height 80. Long labels get a wider/taller box
+  so every word sits inside the rectangle with leftover padding. Spacing=16.
+  _nameId = slug of the option or the schema checkbox id
+
+3.3 Vertex (end)
+  nodeType=end
+  fillColor=#CCCCCC
+  width 120, height 60, value "End"
+
+3.4 Edge
+  "edge": true, "vertex": false
+  "source": "<id>", "target": "<id>"
+  "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;"
+  "edgeGeometry": { "points": [ { "x": 760, "y": 864 }, { "x": 244, "y": 864 } ] }
+
+exitX=0.5;exitY=1 means leave the bottom center of the source.
+entryX=0.5;entryY=0 means enter the top center of the target.
+
+Waypoints are extra corners BETWEEN those two ports. The editor restores them
+from edgeGeometry.points (library.js). Without waypoints, mxGraph draws a
+default orthogonal line that WILL cut through other nodes.
+
+Cell ids are unique strings, usually consecutive integers starting at "2".
+
+
+4. LAYOUT
+---------
+Canvas grows downward. Center spine at x = 760 for 300px-wide questions
+(question left = 610).
+
+Spacing that leaves room for wires AND for node bodies:
+  question -> its options: 80px (BUS)
+  option row -> next question: 120px (BRANCH_GAP)
+  stacked text questions with no options: 170px (TEXT_GAP)
+  option-to-option gap: 22px
+  node-to-node clearance: 56px (NODE_GAP) on every side
+
+Options are centered under their parent:
+  total = n * 150 + (n - 1) * 22
+  startX = parentCenterX - total / 2
+
+Follow-up questions hang under the triggering option, not the page center.
+
+4.1 Nodes must never overlap
+  This is a hard rule, separate from wire routing. Routing "0 wire/node
+  collisions" does NOT mean boxes are clear of each other.
+
+  A 300px question centered under a 150px option will overlap its neighbor
+  if those options are only 172px apart (150 + 22). Side-by-side follow-ups
+  (LLC code vs Other; SSN vs EIN; name-for-SSN vs name-for-EIN) MUST be
+  packed, not naively centerUnder(option, 300).
+
+  packRow(preferredXs, widths, NODE_GAP):
+    1. Walk left to right. If a box would sit closer than NODE_GAP to the
+       previous box, slide it right.
+    2. Shift the whole row so its midpoint stays on the preferred midpoint
+       (still under the parent options, just wider).
+    3. Child columns copy the packed x (name-for-SSN uses tin_ssn.x).
+
+  After every vertex is placed, run separateOverlappingNodes:
+    - Same-row overlaps: push the right box right until NODE_GAP is met.
+    - Same-column overlaps: push the lower box down until NODE_GAP is met.
+    - Repeat until stable.
+  Then route wires. Never route before boxes are separated.
+
+  Reject the layout if any pair still has AABB overlap (gap 0) after that.
+
+Skip-merge questions (the next field every branch must answer) sit on the
+center spine below the lowest follow-up on that branch.
+
+4.2 High in-degree merges AND high out-degree splits
+  Same rule both ways: never dock a nest of wires on one port of a question.
+
+  IN (3+ incoming, or 2 from different columns like tax classification):
+    1. Tiny merge hub above the question.
+    2. Every source -> hub (kind=funnel, endArrow=none, shared collector Y).
+    3. One trunk hub -> question.
+    4. Move the question down so the bus never crosses its text.
+
+  OUT (3+ options, e.g. 7 tax classes or 3 LLC codes):
+    1. Tiny split hub just below the question.
+    2. One trunk question -> hub. One line leaves the question.
+    3. Hub -> each option (kind=fanout) on a SHARED bus Y, then drop.
+    4. Options sit below that bus (SPLIT_TRUNK + hub + SPLIT_BUS).
+
+  Do not run A* from the question bottom to every option. That sprays
+  horizontals across the question face (the tax-class "classification?"
+  overlap). Fan-out waypoints stay in the gap under the hub.
+
+  GUI export ignores mergeHub as a form field (it is not nodeType=question).
+  Form export MUST walk through hubs: a question's options are the option
+  nodes reachable through the split hub, not only immediate neighbors.
+  If export only looks at the question's first outgoing edge, a split hub
+  makes options=[] and Preview Form fills Yes/No. That is a form bug.
+
+4.3 Text must fit inside the node
+  Never use a fixed 62px option height. Size every question and option from
+  its label:
+    - fontSize 16, spacing 16, extra pad ~44px horizontal and ~48px vertical
+    - wrap on word boundaries; longest word sets a minimum width
+    - prefer growing width (options up to 260px) before wrapping past 2 lines
+    - height = max(minHeight, padY + lineCount * 24)
+    - option rows share the tallest height in that row
+    - leave leftover padding so text is not flush with the border and never
+      clipped by the bottom edge or covered by the outgoing wire
+
+  "Employer Identification Number" in a 150x62 box wraps to 3 lines and
+  clips. Fit it to ~180-260px wide and ~120px tall instead.
+
+Section colors rotate:
+  hsl(0/30/120/180/240/280/320, 100%, 80%)
+Name sections from the form (Identification, Federal tax classification,
+Exemptions, Address, Optional information, Taxpayer identification number).
+
+
+5. CIRCUIT-BOARD ROUTING
+------------------------
+Goal: traces on a PCB. Wires do not run across chips. Each net has its own
+track. Corners are rounded 90-degree turns (editor curved orthogonal style).
+
+5.1 What went wrong without this
+  Default Manhattan routing draws one shared bus through the option row.
+  Skip edges from Individual/C/S to later questions cut through LLC, Other,
+  and Foreign partners. Nodes look "covered" by arrows.
+
+5.2 Rules
+  - Orthogonal only (horizontal and vertical segments).
+  - Leave source at bottom center, enter target at top center.
+  - Never intersect another node's rectangle (keep ~6px clearance).
+  - Do not share a pixel corridor with another wire UNLESS they are a
+    merge funnel. Offset by 8-16px. Funnel joins are the exception: they
+    MUST share one collector bus, then one trunk into the target.
+  - Fan-out from a question to its options uses the BUS channel BETWEEN the
+    question bottom and the option tops. Each child gets its own horizontal
+    track in that channel (slightly different Y), then drops into the option.
+  - Long skip edges that later merge: drop in a free column to the shared
+    collector Y, then ride the one bus into the merge hub. Never aim every
+    skip at the question's top-center port.
+  - Prefer a few long segments over stair-steps. Smooth to an L or U after
+    pathfinding.
+
+5.3 Algorithm (reference: compile-form-schema.js)
+  1. Place all vertices. Do not emit edges yet.
+  2. Build an occupancy grid (8px). Mark node rectangles + padding as blocked.
+     Keep option-to-option gaps walkable (padding must be smaller than 22px).
+  3. Sort edges shortest-first so local parent->option wires claim the nearby
+     bus before long skips take outer channels.
+  4. A* with 4-way moves.
+       cost = grid step
+             + wireHeat * penalty      (other traces already used this cell)
+             + turn penalty            (prefer straight runs)
+             + near-node penalty       (prefer alleys, not hugging labels)
+             + up-move penalty         (flowcharts mostly go down)
+  5. Convert the grid path to corner waypoints only.
+  6. Orthogonal string-pull: replace a chain of jogs with a 2-bend HV or VH
+     path when that shortcut still misses nodes and hot wire cells.
+  7. Rasterize the smoothed path back onto the grid and add wireHeat so the
+     next net takes a parallel lane.
+  8. If A* fails, fall back to a dedicated left/right side channel.
+  9. Validate: no edge segment may intersect any foreign node rectangle.
+
+5.4 JSON for a skip around a cluster (example shape)
+  Individual option bottom -> exempt payee top:
+
+  points: [
+    { "x": 244, "y": 1000 },
+    { "x": 244, "y": 1768 },
+    { "x": 768, "y": 1768 },
+    { "x": 768, "y": 1792 },
+    { "x": 760, "y": 1792 }
+  ]
+
+  Down the free column, across under the follow-ups, into the merge node.
+  A neighboring skip uses y=1784 or y=1808, not the same y=1768.
+
+5.5 JSON for fan-out (example shape)
+  Tax classification -> Individual:
+
+  points: [
+    { "x": 760, "y": 864 },
+    { "x": 752, "y": 864 },
+    { "x": 752, "y": 880 },
+    { "x": 244, "y": 880 },
+    { "x": 244, "y": 928 }
+  ]
+
+  Sibling options use other Y tracks (848, 856, 864, 880) in the same BUS.
+
+
+6. HOW TO RUN THE REFERENCE COMPILER
+------------------------------------
+From FlowchartCreationTool:
+
+  node compile-form-schema.js
+  node compile-form-schema.js path/to/field_config.txt out.json
+
+Default input:
+  _w9_payload/IRS_Form_W-9_Request_for_Taxpayer_Identification_Number_and_Cert/field_config.txt
+
+Default outputs:
+  FlowchartCreationTool/w9-flowchart.json
+  Desktop/w9-flowchart.json
+
+The compile() function currently encodes W-9 interview structure. Routing
+(routeCircuitBoard) is generic and should be reused for every form. When you
+support a new form, add layout/interview logic, then call the same router.
+
+
+7. IMPORTING INTO THE EDITOR
+----------------------------
+1. Open Flowchart Creation Tool.
+2. Import Flowchart.
+3. Paste the JSON or choose the .json file.
+4. Confirm edgeStyle is "curved" and edges show rounded 90-degree corners.
+5. Zoom out. Wires should sit in alleys, not across node faces.
+
+If arrows still cut through nodes, waypoints were dropped. Confirm each edge
+has edgeGeometry.points and the loader maps them to mxGeometry.points.
+
+
+8. WORKED EXAMPLE: W-9
+----------------------
+Logical fields (abridged):
+  taxpayer_name (text)
+  business_name (text)                -> gate: is business name different?
+  tax_classification_* (7 checkboxes) -> ONE dropdown + 7 options
+  tax_classification_code (text)      -> only if LLC; as C/S/P dropdown
+  tax_classification_other (text)     -> only if Other
+  foreign_partners_checkbox           -> Partnership, Trust, LLC-P
+  exempt_payee_code, fatca_code       -> all paths merge here
+  address, city_state_zip
+  optional_requester_name             -> gate question
+  account_number                      -> gate question
+  tin_ssn / tin_ein                   -> SSN or EIN choice
+  name_for_ssn / name_for_ein
+  additional_name_info
+  End
+
+Interview order:
+  Name
+    -> Has different business name? Yes -> Business name
+                                    No  -> skip
+    -> both merge to Federal tax classification
+         Individual / C / S --------------\
+         Partnership / Trust --------------\
+         LLC -> C/S/P                       \
+              P -> foreign partners          -> Exempt payee code -> FATCA
+         Other -> other classification -----/
+    -> Address -> City/State/ZIP
+    -> Requester gate -> maybe requester name
+    -> Account gate -> maybe account number
+    -> TIN type -> SSN column or EIN column -> extra name -> End
+
+
+9. CHECKLIST BEFORE YOU RETURN JSON
+-----------------------------------
+[ ] Every schema field appears as a nodeId / _nameId (or a gate you added).
+[ ] Mutually exclusive PDF checkboxes are one dropdown, not a checkbox list.
+[ ] Conditionals are real branches with skip edges around the follow-up.
+[ ] Options sit under their question; follow-ups sit under the triggering option.
+[ ] No two node rectangles overlap. Same-row follow-ups use packRow with NODE_GAP
+    (56px). Never centerUnder a 300px question on adjacent 150px options.
+[ ] Every label is fully inside its box with leftover padding. Option height
+    is never a fixed 62px; use fitBox from the text.
+[ ] 3+ incoming edges funnel through a merge hub into one trunk.
+[ ] 3+ outgoing options leave through a split hub onto one shared bus, then
+    drop to each option. Never spray A* from the question bottom.
+[ ] edgeStyle is "curved"; every edge uses orthogonalEdgeStyle;rounded=1.
+[ ] Edges that would otherwise clip a node have edgeGeometry.points.
+[ ] No waypoint segment intersects a foreign node.
+[ ] Parallel wires are offset (about 8-16px), not stacked on one line.
+[ ] All paths reach End.
+[ ] Preview Form: every dropdown/checkbox lists the flowchart's option labels.
+    Empty dropdowns must not silently become Yes/No. Walk merge/split hubs.
+[ ] formName, sectionPrefs, and groups are present.
+
+When in doubt, prefer a longer U-shaped detour in empty space over a short
+line that crosses a node. That is the circuit-board look.

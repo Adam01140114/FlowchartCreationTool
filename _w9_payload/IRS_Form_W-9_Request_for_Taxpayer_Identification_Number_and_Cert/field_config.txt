@@ -1,0 +1,151 @@
+{
+  "formTitle": "IRS Form W-9 (Request for Taxpayer Identification Number and Certification)",
+  "fields": [
+    {
+      "id": "taxpayer_name",
+      "newName": "taxpayer_name",
+      "type": "text",
+      "label": "Name"
+    },
+    {
+      "id": "business_name",
+      "newName": "business_name",
+      "type": "text",
+      "label": "Business Name"
+    },
+    {
+      "id": "tax_classification_individual",
+      "newName": "tax_classification_individual",
+      "type": "checkbox",
+      "label": "Individual/sole proprietor"
+    },
+    {
+      "id": "tax_classification_corporation",
+      "newName": "tax_classification_corporation",
+      "type": "checkbox",
+      "label": "C corporation"
+    },
+    {
+      "id": "tax_classification_s_corporation",
+      "newName": "tax_classification_s_corporation",
+      "type": "checkbox",
+      "label": "S corporation"
+    },
+    {
+      "id": "tax_classification_partnership",
+      "newName": "tax_classification_partnership",
+      "type": "checkbox",
+      "label": "Partnership"
+    },
+    {
+      "id": "tax_classification_trust_estate",
+      "newName": "tax_classification_trust_estate",
+      "type": "checkbox",
+      "label": "Trust/estate"
+    },
+    {
+      "id": "tax_classification_llc",
+      "newName": "tax_classification_llc",
+      "type": "checkbox",
+      "label": "LLC"
+    },
+    {
+      "id": "tax_classification_other_checkbox",
+      "newName": "tax_classification_other_checkbox",
+      "type": "checkbox",
+      "label": "Other"
+    },
+    {
+      "id": "tax_classification_other",
+      "newName": "tax_classification_other",
+      "type": "text",
+      "label": "Other Tax Classification"
+    },
+    {
+      "id": "exempt_payee_code",
+      "newName": "exempt_payee_code",
+      "type": "text",
+      "label": "Exempt Payee Code"
+    },
+    {
+      "id": "tax_classification_code",
+      "newName": "tax_classification_code",
+      "type": "text",
+      "label": "LLC Tax Classification Code"
+    },
+    {
+      "id": "fatca_code",
+      "newName": "fatca_code",
+      "type": "text",
+      "label": "FATCA Code"
+    },
+    {
+      "id": "foreign_partners_checkbox",
+      "newName": "foreign_partners_checkbox",
+      "type": "checkbox",
+      "label": "Foreign Partners/Owners/Beneficiaries"
+    },
+    {
+      "id": "address",
+      "newName": "address",
+      "type": "text",
+      "label": "Address"
+    },
+    {
+      "id": "city_state_zip",
+      "newName": "city_state_zip",
+      "type": "text",
+      "label": "City, State, and ZIP Code"
+    },
+    {
+      "id": "optional_requester_name",
+      "newName": "optional_requester_name",
+      "type": "text",
+      "label": "Requester Name",
+      "conditional": {
+        "onlyWhen": "requester_name_provided",
+        "gateQuestion": "Do you want to provide the requester's name and address?"
+      }
+    },
+    {
+      "id": "account_number",
+      "newName": "account_number",
+      "type": "text",
+      "label": "Account Number",
+      "conditional": {
+        "onlyWhen": "account_number_provided",
+        "gateQuestion": "Do you want to provide an account number?"
+      }
+    },
+    {
+      "id": "tin_ssn",
+      "newName": "tin_ssn",
+      "type": "text",
+      "label": "Social Security Number"
+    },
+    {
+      "id": "tin_ein",
+      "newName": "tin_ein",
+      "type": "text",
+      "label": "Employer Identification Number"
+    },
+    {
+      "id": "name_for_ein",
+      "newName": "name_for_ein",
+      "type": "text",
+      "label": "Name for EIN"
+    },
+    {
+      "id": "name_for_ssn",
+      "newName": "name_for_ssn",
+      "type": "text",
+      "label": "Name for SSN"
+    },
+    {
+      "id": "additional_name_info",
+      "newName": "additional_name_info",
+      "type": "text",
+      "label": "Additional Name Information"
+    }
+  ]
+}

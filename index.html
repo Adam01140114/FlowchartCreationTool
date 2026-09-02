@@ -26,6 +26,9 @@
     <input type="password" id="loginPassword" placeholder="Password" /><br/>
     <button id="loginButton">Login</button>
     <button id="signupButton">Sign Up</button>
+    <div class="guest-login-divider">or</div>
+    <button id="guestLoginBtn" type="button">Guest Login</button>
+    <p class="guest-login-hint">Guest mode saves flowcharts, colors, and settings in this browser's cookies instead of Firebase.</p>
   </div>
 </div>
 
@@ -42,7 +45,9 @@
 </div>
 
 <div class="toolbar">
-  <h3>Drag And Drop Elements Below</h3>
+  <details class="custom-ui-elements">
+    <summary>Select Nodes</summary>
+    <p class="custom-ui-elements-hint">Drag and drop elements below</p>
   <div
     class="shape"
     data-type="question"
@@ -178,18 +183,20 @@
   >
     Inverse Checkbox
   </div>
+  </details>
 
   <div class="button-bar">
     <button onclick="previewForm()">Preview Form</button><br>
-    <button onclick="document.getElementById('importFlowchartFile').click()">Import Flowchart</button>
+    <button onclick="showImportFlowchartModal()">Import Flowchart</button>
     <input
       type="file"
       id="importFlowchartFile"
-      accept=".json"
+      accept=".json,application/json"
       onchange="importFlowchartJson(event)"
+      style="display:none;"
     />
     <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
-    <button onclick="exportGuiJson(true)">Export GUI JSON</button><br>
+    <button onclick="showExportGuiJsonModal()">Export GUI JSON</button><br>
     <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save</button>
     <button id="saveAsFlowchartBtn" onclick="saveAsFlowchart()">Save As</button>
     <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
@@ -487,6 +494,89 @@
 <input type="color" id="colorPickerTextColor" style="display:none;" />
 <!-- Hidden color picker for section border colors -->
 <input type="color" id="sectionColorPicker" style="display:none;" />
+
+<!-- Preview Form Question Style Modal -->
+<div id="previewFormStyleModal" class="modal">
+  <div class="modal-content import-flowchart-modal preview-form-style-modal">
+    <div class="modal-header">
+      <h3>Preview Form</h3>
+      <button id="closePreviewFormStyleModal" class="close-btn" type="button" onclick="hidePreviewFormStyleModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Choose how questions should appear in the generated form.</p>
+      <fieldset class="preview-style-options">
+        <legend>Question style</legend>
+        <label class="preview-style-option">
+          <input type="radio" name="previewQuestionStyle" value="question">
+          <span>
+            <strong>One question at a time</strong>
+            <small>Each question is shown by itself. Next advances one question.</small>
+          </span>
+        </label>
+        <label class="preview-style-option">
+          <input type="radio" name="previewQuestionStyle" value="section" checked>
+          <span>
+            <strong>One section at a time</strong>
+            <small>All questions in a section appear together. Next goes to the next section.</small>
+          </span>
+        </label>
+        <label class="preview-style-option">
+          <input type="radio" name="previewQuestionStyle" value="all">
+          <span>
+            <strong>Whole form at once</strong>
+            <small>Every section is stacked on the same page.</small>
+          </span>
+        </label>
+      </fieldset>
+      <div class="import-flowchart-actions">
+        <button type="button" id="confirmPreviewFormStyleBtn" class="import-flowchart-primary" onclick="confirmPreviewFormStyle()">Preview</button>
+        <button type="button" id="cancelPreviewFormStyleBtn" onclick="hidePreviewFormStyleModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Export GUI JSON Modal -->
+<div id="exportGuiJsonModal" class="modal">
+  <div class="modal-content import-flowchart-modal">
+    <div class="modal-header">
+      <h3>Export GUI JSON</h3>
+      <button id="closeExportGuiJsonModal" class="close-btn" type="button">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Copy the GUI JSON below, or download it as a file.</p>
+      <textarea id="exportGuiJsonOutput" rows="14" readonly></textarea>
+      <div class="import-flowchart-actions">
+        <button type="button" id="downloadExportGuiJsonBtn" class="import-flowchart-primary">Download</button>
+        <button type="button" id="closeExportGuiJsonBtn">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Import Flowchart Modal -->
+<div id="importFlowchartModal" class="modal">
+  <div class="modal-content import-flowchart-modal">
+    <div class="modal-header">
+      <h3>Import Flowchart</h3>
+      <button id="closeImportFlowchartModal" class="close-btn" type="button">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Paste flowchart JSON, or choose a <code>.json</code> file from your computer.</p>
+      <textarea id="importFlowchartJsonInput" placeholder='{"cells": [...], "sectionPrefs": {...}}' rows="10"></textarea>
+      <div id="importFlowchartError" class="import-flowchart-error"></div>
+      <div class="import-flowchart-actions">
+        <button type="button" id="importFlowchartPasteBtn" class="import-flowchart-primary">Import Pasted JSON</button>
+        <div class="guest-login-divider">or</div>
+        <button type="button" id="importFlowchartChooseFileBtn">Choose JSON File</button>
+        <p id="importFlowchartFileName" class="import-flowchart-filename"></p>
+      </div>
+      <div class="import-flowchart-actions" style="margin-top: 12px;">
+        <button type="button" id="cancelImportFlowchartBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Flowchart Details Modal -->
 <div id="flowchartDetailsModal" class="modal">

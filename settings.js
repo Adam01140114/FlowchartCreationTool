@@ -140,6 +140,10 @@ window.updateZoomSensitivity = function(value) {
  */
 window.saveZoomSensitivityToFirebase = async function(value) {
   try {
+    if (window.isGuestUser && window.isGuestUser() && window.guestStorage) {
+      await window.guestStorage.saveSettings({ zoomSensitivity: parseFloat(value) });
+      return;
+    }
     if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
       const user = firebase.auth().currentUser;
       const db = firebase.firestore();
@@ -156,6 +160,22 @@ window.saveZoomSensitivityToFirebase = async function(value) {
  */
 window.loadZoomSensitivityFromFirebase = async function() {
   try {
+    if (window.isGuestUser && window.isGuestUser() && window.guestStorage) {
+      const data = await window.guestStorage.loadSettings();
+      if (data && data.zoomSensitivity !== undefined) {
+        userSettings.zoomSensitivity = data.zoomSensitivity;
+        const input = document.getElementById('zoomSensitivityInput');
+        const displaySpan = document.getElementById('zoomSensitivityValue');
+        if (input) {
+          input.value = data.zoomSensitivity;
+        }
+        if (displaySpan) {
+          displaySpan.textContent = data.zoomSensitivity;
+        }
+        applyZoomSensitivity();
+      }
+      return;
+    }
     if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
       const user = firebase.auth().currentUser;
       const db = firebase.firestore();
@@ -227,6 +247,10 @@ window.updateWasdSpeed = function(value) {
  */
 window.saveWasdSpeedToFirebase = async function(value) {
   try {
+    if (window.isGuestUser && window.isGuestUser() && window.guestStorage) {
+      await window.guestStorage.saveSettings({ wasdSpeed: parseFloat(value) });
+      return;
+    }
     if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
       const user = firebase.auth().currentUser;
       const db = firebase.firestore();
@@ -243,6 +267,25 @@ window.saveWasdSpeedToFirebase = async function(value) {
  */
 window.loadWasdSpeedFromFirebase = async function() {
   try {
+    if (window.isGuestUser && window.isGuestUser() && window.guestStorage) {
+      const data = await window.guestStorage.loadSettings();
+      if (data && data.wasdSpeed !== undefined) {
+        userSettings.wasdSpeed = data.wasdSpeed;
+        const input = document.getElementById('wasdSpeedInput');
+        const displaySpan = document.getElementById('wasdSpeedValue');
+        if (input) {
+          input.value = data.wasdSpeed;
+        }
+        if (displaySpan) {
+          displaySpan.textContent = data.wasdSpeed;
+        }
+        applyWasdSpeed();
+        if (window.userSettings) {
+          window.userSettings.wasdSpeed = userSettings.wasdSpeed;
+        }
+      }
+      return;
+    }
     if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
       const user = firebase.auth().currentUser;
       const db = firebase.firestore();
@@ -302,6 +345,10 @@ window.updateAddPdfNameToNodeId = function(value) {
  */
 window.saveAddPdfNameToNodeIdToFirebase = async function(value) {
   try {
+    if (window.isGuestUser && window.isGuestUser() && window.guestStorage) {
+      await window.guestStorage.saveSettings({ addPdfNameToNodeId: value });
+      return;
+    }
     if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
       const user = firebase.auth().currentUser;
       const db = firebase.firestore();
@@ -318,6 +365,20 @@ window.saveAddPdfNameToNodeIdToFirebase = async function(value) {
  */
 window.loadAddPdfNameToNodeIdFromFirebase = async function() {
   try {
+    if (window.isGuestUser && window.isGuestUser() && window.guestStorage) {
+      const data = await window.guestStorage.loadSettings();
+      if (data && data.addPdfNameToNodeId !== undefined) {
+        userSettings.addPdfNameToNodeId = data.addPdfNameToNodeId;
+        const toggle = document.getElementById('addPdfNameToNodeIdToggle');
+        if (toggle) {
+          toggle.checked = data.addPdfNameToNodeId === true;
+        }
+        if (window.userSettings) {
+          window.userSettings.addPdfNameToNodeId = data.addPdfNameToNodeId;
+        }
+      }
+      return;
+    }
     if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
       const user = firebase.auth().currentUser;
       const db = firebase.firestore();

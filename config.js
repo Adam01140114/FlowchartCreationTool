@@ -129,7 +129,27 @@ function updateLegendColors() {
  * Load user color preferences from Firebase
  */
 function loadUserColorPrefs() {
-  if (!window.currentUser || window.currentUser.isGuest) return;
+  if (!window.currentUser) return;
+  if (window.currentUser.isGuest) {
+    if (window.guestStorage && typeof window.guestStorage.loadColors === 'function') {
+      window.guestStorage.loadColors().then(data => {
+        if (data) {
+          for (let key in defaultColors) {
+            if (data[key] !== undefined) {
+              colorPreferences[key] = data[key];
+            } else {
+              colorPreferences[key] = defaultColors[key];
+            }
+          }
+          updateLegendColors();
+          if (typeof refreshAllCells === 'function') {
+            refreshAllCells();
+          }
+        }
+      });
+    }
+    return;
+  }
   db.collection("users")
     .doc(window.currentUser.uid)
     .collection("preferences")
@@ -159,7 +179,13 @@ function loadUserColorPrefs() {
  * Save user color preferences to Firebase
  */
 function saveUserColorPrefs() {
-  if (!window.currentUser || window.currentUser.isGuest) return Promise.resolve();
+  if (!window.currentUser) return Promise.resolve();
+  if (window.currentUser.isGuest) {
+    if (window.guestStorage && typeof window.guestStorage.saveColors === 'function') {
+      return window.guestStorage.saveColors(colorPreferences);
+    }
+    return Promise.resolve();
+  }
   return db.collection("users")
     .doc(window.currentUser.uid)
     .collection("preferences")
