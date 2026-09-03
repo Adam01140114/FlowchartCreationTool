@@ -1,0 +1,3615 @@
+{
+  "formTitle": "Employment Eligibility Verification (Form I-9)",
+  "formName": "Form I-9 Employment Eligibility Verification",
+  "formId": "i9",
+  "formDescription": "Verifies identity and employment authorization for individuals hired for employment in the United States.",
+  "formFolderName": "I-9",
+  "defendant": "N/A",
+  "displayMode": "all_at_once",
+  "sections": [
+    {
+      "sectionId": 1,
+      "sectionName": "Employee",
+      "questions": [
+        {
+          "questionId": 1,
+          "text": "What is your last name (family name)?",
+          "needsExplanation": true,
+          "explanation": "Enter your legal last name as it appears on official documents.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employee_last_name",
+          "placeholder": "Last name",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "last_name",
+            "profileDescription": "User's legal last name",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 2,
+          "text": "What is your first name (given name)?",
+          "needsExplanation": true,
+          "explanation": "Enter your legal first name as it appears on official documents.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employee_first_name",
+          "placeholder": "First name",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "first_name",
+            "profileDescription": "User's legal first name",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 3,
+          "text": "What is your middle initial?",
+          "needsExplanation": true,
+          "explanation": "Enter your middle initial if you have one. Leave blank if not applicable.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employee_middle_initial",
+          "placeholder": "Middle initial",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "middle_initial",
+            "profileDescription": "User's middle initial",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 4,
+          "text": "Have you used any other last names?",
+          "needsExplanation": true,
+          "explanation": "Choose Yes if you have used any other last names, such as a maiden name or previous legal name.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 5,
+          "text": "What other last names have you used?",
+          "needsExplanation": true,
+          "explanation": "Enter any other last names you have used, such as a maiden name or previous legal name.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "4",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employee_other_last_names",
+          "placeholder": "Other last names",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "other_last_names",
+            "profileDescription": "Other last names used by the user",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 6,
+          "text": "What is your home address?",
+          "needsExplanation": true,
+          "explanation": "Enter your current home address, including street, apartment number (if any), city, state, and ZIP code.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "Street Number and Name",
+              "nameId": "employee_street_address",
+              "placeholder": "Street address",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "street_address",
+                "profileDescription": "User's home street address",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Apt. Number (if any)",
+              "nameId": "employee_apartment_number",
+              "placeholder": "Apt. number",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "apartment_number",
+                "profileDescription": "User's apartment number",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "City or Town",
+              "nameId": "employee_city",
+              "placeholder": "City or town",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "city",
+                "profileDescription": "User's city or town",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "State",
+              "nameId": "employee_state",
+              "placeholder": "State",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "state",
+                "profileDescription": "User's state of residence",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "ZIP Code",
+              "nameId": "employee_zip_code",
+              "placeholder": "ZIP Code",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "zip_code",
+                "profileDescription": "User's ZIP code",
+                "availableInProfile": false
+              }
+            }
+          ]
+        },
+        {
+          "questionId": 7,
+          "text": "What is your date of birth?",
+          "needsExplanation": true,
+          "explanation": "Enter your date of birth in the format mm/dd/yyyy.",
+          "type": "date",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employee_date_of_birth",
+          "placeholder": "mm/dd/yyyy",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "date_of_birth",
+            "profileDescription": "User's date of birth",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 8,
+          "text": "What is your U.S. Social Security number?",
+          "needsExplanation": true,
+          "explanation": "Enter your nine-digit U.S. Social Security number.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employee_social_security_number",
+          "placeholder": "Social Security number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "social_security_number",
+            "profileDescription": "User's Social Security number",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 9,
+          "text": "What is your email address?",
+          "needsExplanation": true,
+          "explanation": "Enter your current email address.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employee_email_address",
+          "placeholder": "Email address",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "email_address",
+            "profileDescription": "User's email address",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 10,
+          "text": "What is your telephone number?",
+          "needsExplanation": true,
+          "explanation": "Enter your current telephone number, including area code.",
+          "type": "phone",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employee_telephone_number",
+          "placeholder": "Telephone number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "telephone_number",
+            "profileDescription": "User's telephone number",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 11,
+          "text": "Please select your citizenship or immigration status",
+          "needsExplanation": true,
+          "explanation": "Select the option that best describes your current citizenship or immigration status. Only one option may be selected.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "single",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "A citizen of the United States",
+              "nameId": "citizenship_status_us_citizen",
+              "value": "A citizen of the United States"
+            },
+            {
+              "label": "A noncitizen national of the United States",
+              "nameId": "citizenship_status_noncitizen_national",
+              "value": "A noncitizen national of the United States"
+            },
+            {
+              "label": "A lawful permanent resident",
+              "nameId": "citizenship_status_lawful_permanent_resident",
+              "value": "A lawful permanent resident"
+            },
+            {
+              "label": "An alien authorized to work",
+              "nameId": "citizenship_status_alien_authorized_to_work",
+              "value": "An alien authorized to work"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 12,
+          "text": "If you are a lawful permanent resident, what is your USCIS or A-Number?",
+          "needsExplanation": true,
+          "explanation": "Enter your USCIS number or A-Number if you selected 'A lawful permanent resident' as your status.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "11",
+            "prevAnswer": "A lawful permanent resident"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "lawful_permanent_resident_number",
+          "placeholder": "USCIS or A-Number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "uscis_a_number",
+            "profileDescription": "User's USCIS or A-Number",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 13,
+          "text": "If you are an alien authorized to work, what is your expiration date (if any)?",
+          "needsExplanation": true,
+          "explanation": "Enter the expiration date of your work authorization if you selected 'An alien authorized to work.' Leave blank if not applicable.",
+          "type": "date",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "11",
+            "prevAnswer": "An alien authorized to work"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "alien_authorized_expiration_date",
+          "placeholder": "Expiration date",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "work_authorization_expiration_date",
+            "profileDescription": "Expiration date of user's work authorization",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 14,
+          "text": "If you are an alien authorized to work, provide one of the following numbers",
+          "needsExplanation": true,
+          "explanation": "Enter your USCIS A-Number, Form I-94 Admission Number, or Foreign Passport Number and Country of Issuance if you selected 'An alien authorized to work.'",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "11",
+            "prevAnswer": "An alien authorized to work"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "USCIS A-Number",
+              "nameId": "alien_uscis_a_number",
+              "placeholder": "USCIS A-Number",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "uscis_a_number",
+                "profileDescription": "User's USCIS A-Number",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Form I-94 Admission Number",
+              "nameId": "alien_form_i94_admission_number",
+              "placeholder": "Form I-94 Admission Number",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "form_i94_admission_number",
+                "profileDescription": "User's Form I-94 Admission Number",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Foreign Passport Number and Country of Issuance",
+              "nameId": "alien_foreign_passport_number_and_country",
+              "placeholder": "Passport Number and Country",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "foreign_passport_number_and_country",
+                "profileDescription": "User's foreign passport number and country of issuance",
+                "availableInProfile": false
+              }
+            }
+          ]
+        },
+        {
+          "questionId": 15,
+          "text": "Please sign to certify the information above is correct",
+          "needsExplanation": true,
+          "explanation": "Sign your name to certify that the information you provided is true and correct.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employee_signature",
+          "placeholder": "Signature",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employee_signature",
+            "profileDescription": "Signature of Employee",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 16,
+          "text": "What is the date of the employee's signature?",
+          "needsExplanation": true,
+          "explanation": "This field will be automatically filled with today's date.",
+          "type": "date",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employee_signature_date",
+          "placeholder": "Today's date",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": true,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employee_signature_date",
+            "profileDescription": "Today's Date (mm/dd/yyyy)",
+            "availableInProfile": false
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": 2,
+      "sectionName": "Employer",
+      "questions": [
+        {
+          "questionId": 17,
+          "text": "What List A identity and employment authorization document(s) are you presenting?",
+          "needsExplanation": true,
+          "explanation": "List A documents establish both identity and employment authorization (for example a U.S. passport or permanent resident card). Enter the document title, issuing authority, number, and expiration for each document you present. Leave unused rows blank.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "Document Title 1",
+              "nameId": "list_a_document_title_1",
+              "placeholder": "Document Title 1"
+            },
+            {
+              "label": "Issuing Authority",
+              "nameId": "list_a_issuing_authority_1",
+              "placeholder": "Issuing Authority"
+            },
+            {
+              "label": "Document Number (if any)",
+              "nameId": "list_a_document_number_1",
+              "placeholder": "Document Number"
+            },
+            {
+              "label": "Expiration Date (if any)",
+              "nameId": "list_a_expiration_date_1",
+              "placeholder": "Expiration Date"
+            },
+            {
+              "label": "Document Title 2 (if any)",
+              "nameId": "list_a_document_title_2",
+              "placeholder": "Document Title 2",
+              "linkedToNameId": "list_a_document_title_1"
+            },
+            {
+              "label": "Issuing Authority",
+              "nameId": "list_a_issuing_authority_2",
+              "placeholder": "Issuing Authority",
+              "linkedToNameId": "list_a_issuing_authority_1"
+            },
+            {
+              "label": "Document Number (if any)",
+              "nameId": "list_a_document_number_2",
+              "placeholder": "Document Number",
+              "linkedToNameId": "list_a_document_number_1"
+            },
+            {
+              "label": "Expiration Date (if any)",
+              "nameId": "list_a_expiration_date_2",
+              "placeholder": "Expiration Date",
+              "linkedToNameId": "list_a_expiration_date_1"
+            },
+            {
+              "label": "Document Title 3 (if any)",
+              "nameId": "list_a_document_title_3",
+              "placeholder": "Document Title 3",
+              "linkedToNameId": "list_a_document_title_1"
+            },
+            {
+              "label": "Issuing Authority",
+              "nameId": "list_a_issuing_authority_3",
+              "placeholder": "Issuing Authority",
+              "linkedToNameId": "list_a_issuing_authority_1"
+            },
+            {
+              "label": "Document Number (if any)",
+              "nameId": "list_a_document_number_3",
+              "placeholder": "Document Number",
+              "linkedToNameId": "list_a_document_number_1"
+            },
+            {
+              "label": "Expiration Date (if any)",
+              "nameId": "list_a_expiration_date_3",
+              "placeholder": "Expiration Date",
+              "linkedToNameId": "list_a_expiration_date_1"
+            }
+          ]
+        },
+        {
+          "questionId": 18,
+          "text": "What List B identity document are you presenting?",
+          "needsExplanation": true,
+          "explanation": "List B documents establish identity only (for example a driver's license). Enter the document title, issuing authority, number, and expiration. Use List B together with a List C document when you are not presenting a List A document.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "List B Document Title",
+              "nameId": "list_b_document_title_1",
+              "placeholder": "Document Title"
+            },
+            {
+              "label": "List B Issuing Authority",
+              "nameId": "list_b_issuing_authority_1",
+              "placeholder": "Issuing Authority"
+            },
+            {
+              "label": "List B Document Number",
+              "nameId": "list_b_document_number_1",
+              "placeholder": "Document Number"
+            },
+            {
+              "label": "List B Expiration Date",
+              "nameId": "list_b_expiration_date_1",
+              "placeholder": "Expiration Date"
+            }
+          ]
+        },
+        {
+          "questionId": 19,
+          "text": "What List C employment authorization document are you presenting?",
+          "needsExplanation": true,
+          "explanation": "List C documents establish employment authorization only (for example a Social Security card). Enter the document title, issuing authority, number, and expiration. Use List C together with a List B document when you are not presenting a List A document.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "List C Document Title",
+              "nameId": "list_c_document_title_1",
+              "placeholder": "Document Title"
+            },
+            {
+              "label": "List C Issuing Authority",
+              "nameId": "list_c_issuing_authority_1",
+              "placeholder": "Issuing Authority"
+            },
+            {
+              "label": "List C Document Number",
+              "nameId": "list_c_document_number_1",
+              "placeholder": "Document Number"
+            },
+            {
+              "label": "List C Expiration Date",
+              "nameId": "list_c_expiration_date_1",
+              "placeholder": "Expiration Date"
+            }
+          ]
+        },
+        {
+          "questionId": 20,
+          "text": "Is there any additional information the employer should record about the documents examined?",
+          "needsExplanation": true,
+          "explanation": "Use this for notes the employer needs to keep with Section 2, such as additional document details or clarifications. Leave blank if none.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "section2_additional_information",
+          "placeholder": "Additional information",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 21,
+          "text": "Did you use an alternative procedure authorized by DHS to examine documents?",
+          "needsExplanation": true,
+          "explanation": "Check this box if you used an alternative procedure authorized by the Department of Homeland Security to examine documents.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "single",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Alternative procedure authorized by DHS",
+              "nameId": "section2_alternative_procedure_used",
+              "value": "Alternative procedure authorized by DHS"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 22,
+          "text": "What is the employee's first day of employment?",
+          "needsExplanation": true,
+          "explanation": "Enter the employee's first day of employment in the format mm/dd/yyyy.",
+          "type": "date",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "first_day_employed",
+          "placeholder": "mm/dd/yyyy",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "first_day_employed",
+            "profileDescription": "First Day of Employment (mm/dd/yyyy)",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 23,
+          "text": "What is the name and title of the employer or authorized representative?",
+          "needsExplanation": true,
+          "explanation": "Enter the last name, first name, and title of the employer or authorized representative completing this section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_representative_name_and_title",
+          "placeholder": "Name and title",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_representative_name_and_title",
+            "profileDescription": "Last Name, First Name and Title of Employer or Authorized Representative",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 24,
+          "text": "Signature of employer or authorized representative",
+          "needsExplanation": true,
+          "explanation": "Sign to certify that you have reviewed the employee's documents and completed this section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_representative_signature",
+          "placeholder": "Signature",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_representative_signature",
+            "profileDescription": "Signature of Employer or Authorized Representative",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 25,
+          "text": "What is the date of the employer's signature?",
+          "needsExplanation": true,
+          "explanation": "This field will be automatically filled with today's date.",
+          "type": "date",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_signature_date",
+          "placeholder": "Today's date",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": true,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_signature_date",
+            "profileDescription": "Today's Date (mm/dd/yyyy)",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 26,
+          "text": "What is the business or organization name?",
+          "needsExplanation": true,
+          "explanation": "Enter the full name of the employer's business or organization.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_business_name",
+          "placeholder": "Business or organization name",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_business_name",
+            "profileDescription": "Business or Organization Name",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 27,
+          "text": "What is the business or organization address?",
+          "needsExplanation": true,
+          "explanation": "Enter the complete address, including city, state, and ZIP code, of the employer's business or organization.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_business_address",
+          "placeholder": "Business or organization address",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_business_address",
+            "profileDescription": "Business or Organization Address, City or Town, State, ZIP Code",
+            "availableInProfile": false
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": 3,
+      "sectionName": "Preparer/Translator",
+      "questions": [
+        {
+          "questionId": 28,
+          "text": "Did a preparer or translator assist you in completing Section 1?",
+          "needsExplanation": true,
+          "explanation": "Choose Yes if someone helped you complete Section 1. If Yes, provide their information below.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 29,
+          "text": "What is the employee's name as shown in Section 1 for the preparer or translator certification?",
+          "needsExplanation": true,
+          "explanation": "Provide the employee's last name, first name, and middle initial as shown in Section 1.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "28",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "Last Name (Family Name) from Section 1",
+              "nameId": "preparer_employee_last_name",
+              "placeholder": "Last name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_employee_last_name",
+                "profileDescription": "Last Name (Family Name) from Section 1",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "First Name (Given Name) from Section 1",
+              "nameId": "preparer_employee_first_name",
+              "placeholder": "First name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_employee_first_name",
+                "profileDescription": "First Name (Given Name) from Section 1",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Middle Initial (if any) from Section 1",
+              "nameId": "preparer_employee_middle_initial",
+              "placeholder": "Middle initial"
+            }
+          ]
+        },
+        {
+          "questionId": 30,
+          "text": "Who helped prepare or translate Section 1 for the employee?",
+          "needsExplanation": true,
+          "explanation": "If a preparer and/or translator assisted with Section 1, enter their name, address, and signature information. You may record up to four preparers or translators. Skip this if the employee completed Section 1 alone.",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "28",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 31,
+          "text": "What is the first preparer or translator's information?",
+          "needsExplanation": true,
+          "explanation": "Enter the name, address, and signature for the first preparer or translator.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "28",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "Signature of Preparer or Translator",
+              "nameId": "preparer_signature_0",
+              "placeholder": "Signature",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_signature_0",
+                "profileDescription": "Signature of Preparer or Translator",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Date (mm/dd/yyyy)",
+              "nameId": "preparer_signature_date_0",
+              "placeholder": "Date",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_signature_date_0",
+                "profileDescription": "Date (mm/dd/yyyy)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Last Name (Family Name)",
+              "nameId": "preparer_last_name_0",
+              "placeholder": "Last name",
+              "linkedToNameId": "preparer_employee_last_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_last_name_0",
+                "profileDescription": "Last Name (Family Name)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "First Name (Given Name)",
+              "nameId": "preparer_first_name_0",
+              "placeholder": "First name",
+              "linkedToNameId": "preparer_employee_first_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_first_name_0",
+                "profileDescription": "First Name (Given Name)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Middle Initial (if any)",
+              "nameId": "preparer_middle_initial_0",
+              "placeholder": "Middle initial"
+            },
+            {
+              "label": "Address (Street Number and Name)",
+              "nameId": "preparer_address_0",
+              "placeholder": "Street address"
+            },
+            {
+              "label": "City or Town",
+              "nameId": "preparer_city_0",
+              "placeholder": "City or town",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_city_0",
+                "profileDescription": "City or Town",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "State",
+              "nameId": "preparer_state_0",
+              "placeholder": "State",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_state_0",
+                "profileDescription": "State",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "ZIP Code",
+              "nameId": "preparer_zip_code_0",
+              "placeholder": "ZIP Code",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_zip_code_0",
+                "profileDescription": "ZIP Code",
+                "availableInProfile": false
+              }
+            }
+          ]
+        },
+        {
+          "questionId": 32,
+          "text": "What is the second preparer or translator's information?",
+          "needsExplanation": true,
+          "explanation": "Enter the name, address, and signature for the second preparer or translator, if applicable.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "28",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "mirror",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "Signature of Preparer or Translator",
+              "nameId": "preparer_signature_1",
+              "placeholder": "Signature",
+              "linkedToNameId": "preparer_signature_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_signature_1",
+                "profileDescription": "Signature of Preparer or Translator",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Date (mm/dd/yyyy)",
+              "nameId": "preparer_signature_date_1",
+              "placeholder": "Date",
+              "linkedToNameId": "preparer_signature_date_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_signature_date_1",
+                "profileDescription": "Date (mm/dd/yyyy)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Last Name (Family Name)",
+              "nameId": "preparer_last_name_1",
+              "placeholder": "Last name",
+              "linkedToNameId": "preparer_employee_last_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_last_name_1",
+                "profileDescription": "Last Name (Family Name)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Middle Initial (if any)",
+              "nameId": "preparer_middle_initial_1",
+              "placeholder": "Middle initial",
+              "linkedToNameId": "preparer_middle_initial_0"
+            },
+            {
+              "label": "Address (Street Number and Name)",
+              "nameId": "preparer_address_1",
+              "placeholder": "Street address",
+              "linkedToNameId": "preparer_address_0"
+            },
+            {
+              "label": "City or Town",
+              "nameId": "preparer_city_1",
+              "placeholder": "City or town",
+              "linkedToNameId": "preparer_city_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_city_1",
+                "profileDescription": "City or Town",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "State",
+              "nameId": "preparer_state_1",
+              "placeholder": "State",
+              "linkedToNameId": "preparer_state_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_state_1",
+                "profileDescription": "State",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "ZIP Code",
+              "nameId": "preparer_zip_code_1",
+              "placeholder": "ZIP Code",
+              "linkedToNameId": "preparer_zip_code_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_zip_code_1",
+                "profileDescription": "ZIP Code",
+                "availableInProfile": false
+              }
+            }
+          ]
+        },
+        {
+          "questionId": 33,
+          "text": "What is the third preparer or translator's information?",
+          "needsExplanation": true,
+          "explanation": "Enter the name, address, and signature for the third preparer or translator, if applicable.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "28",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "mirror",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "Signature of Preparer or Translator",
+              "nameId": "preparer_signature_2",
+              "placeholder": "Signature",
+              "linkedToNameId": "preparer_signature_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_signature_2",
+                "profileDescription": "Signature of Preparer or Translator",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Date (mm/dd/yyyy)",
+              "nameId": "preparer_signature_date_2",
+              "placeholder": "Date",
+              "linkedToNameId": "preparer_signature_date_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_signature_date_2",
+                "profileDescription": "Date (mm/dd/yyyy)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Last Name (Family Name)",
+              "nameId": "preparer_last_name_2",
+              "placeholder": "Last name",
+              "linkedToNameId": "preparer_employee_last_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_last_name_2",
+                "profileDescription": "Last Name (Family Name)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "First Name (Given Name)",
+              "nameId": "preparer_first_name_2",
+              "placeholder": "First name",
+              "linkedToNameId": "preparer_employee_first_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_first_name_2",
+                "profileDescription": "First Name (Given Name)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Middle Initial (if any)",
+              "nameId": "preparer_middle_initial_2",
+              "placeholder": "Middle initial",
+              "linkedToNameId": "preparer_middle_initial_0"
+            },
+            {
+              "label": "Address (Street Number and Name)",
+              "nameId": "preparer_address_2",
+              "placeholder": "Street address",
+              "linkedToNameId": "preparer_address_0"
+            },
+            {
+              "label": "City or Town",
+              "nameId": "preparer_city_2",
+              "placeholder": "City or town",
+              "linkedToNameId": "preparer_city_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_city_2",
+                "profileDescription": "City or Town",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "State",
+              "nameId": "preparer_state_2",
+              "placeholder": "State",
+              "linkedToNameId": "preparer_state_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_state_2",
+                "profileDescription": "State",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "ZIP Code",
+              "nameId": "preparer_zip_code_2",
+              "placeholder": "ZIP Code",
+              "linkedToNameId": "preparer_zip_code_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_zip_code_2",
+                "profileDescription": "ZIP Code",
+                "availableInProfile": false
+              }
+            }
+          ]
+        },
+        {
+          "questionId": 34,
+          "text": "What is the fourth preparer or translator's information?",
+          "needsExplanation": true,
+          "explanation": "Enter the name, address, and signature for the fourth preparer or translator, if applicable.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "28",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "mirror",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "Signature of Preparer or Translator",
+              "nameId": "preparer_signature_3",
+              "placeholder": "Signature",
+              "linkedToNameId": "preparer_signature_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_signature_3",
+                "profileDescription": "Signature of Preparer or Translator",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Date (mm/dd/yyyy)",
+              "nameId": "preparer_signature_date_3",
+              "placeholder": "Date",
+              "linkedToNameId": "preparer_signature_date_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_signature_date_3",
+                "profileDescription": "Date (mm/dd/yyyy)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Last Name (Family Name)",
+              "nameId": "preparer_last_name_3",
+              "placeholder": "Last name",
+              "linkedToNameId": "preparer_employee_last_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_last_name_3",
+                "profileDescription": "Last Name (Family Name)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "First Name (Given Name)",
+              "nameId": "preparer_first_name_3",
+              "placeholder": "First name",
+              "linkedToNameId": "preparer_employee_first_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_first_name_3",
+                "profileDescription": "First Name (Given Name)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Middle Initial (if any)",
+              "nameId": "preparer_middle_initial_3",
+              "placeholder": "Middle initial",
+              "linkedToNameId": "preparer_middle_initial_0"
+            },
+            {
+              "label": "Address (Street Number and Name)",
+              "nameId": "preparer_address_3",
+              "placeholder": "Street address",
+              "linkedToNameId": "preparer_address_0"
+            },
+            {
+              "label": "City or Town",
+              "nameId": "preparer_city_3",
+              "placeholder": "City or town",
+              "linkedToNameId": "preparer_city_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_city_3",
+                "profileDescription": "City or Town",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "State",
+              "nameId": "preparer_state_3",
+              "placeholder": "State",
+              "linkedToNameId": "preparer_state_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_state_3",
+                "profileDescription": "State",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "ZIP Code",
+              "nameId": "preparer_zip_code_3",
+              "placeholder": "ZIP Code",
+              "linkedToNameId": "preparer_zip_code_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "preparer_zip_code_3",
+                "profileDescription": "ZIP Code",
+                "availableInProfile": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": 4,
+      "sectionName": "Reverification & Rehire",
+      "questions": [
+        {
+          "questionId": 35,
+          "text": "What is the employee's name as shown in Section 1 for Supplement B?",
+          "needsExplanation": true,
+          "explanation": "Provide the employee's last name, first name, and middle initial as shown in Section 1.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "Last Name (Family Name) from Section 1",
+              "nameId": "supplementb_employee_last_name",
+              "placeholder": "Last name",
+              "linkedToNameId": "preparer_employee_last_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_employee_last_name",
+                "profileDescription": "Last Name (Family Name) from Section 1",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "First Name (Given Name) from Section 1",
+              "nameId": "supplementb_employee_first_name",
+              "placeholder": "First name",
+              "linkedToNameId": "preparer_employee_first_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_employee_first_name",
+                "profileDescription": "First Name (Given Name) from Section 1",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Middle Initial (if any) from Section 1",
+              "nameId": "supplementb_employee_middle_initial",
+              "placeholder": "Middle initial"
+            }
+          ]
+        },
+        {
+          "questionId": 36,
+          "text": "What are the details for the first reverification or rehire?",
+          "needsExplanation": true,
+          "explanation": "Complete this section if the employee is being rehired or requires reverification. Enter the date of rehire, new name (if applicable), and document information.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "Date of Rehire (if applicable)",
+              "nameId": "supplementb_date_of_rehire_0",
+              "placeholder": "Date of rehire"
+            },
+            {
+              "label": "New Last Name (if applicable)",
+              "nameId": "supplementb_new_last_name_0",
+              "placeholder": "New last name",
+              "linkedToNameId": "preparer_employee_last_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_new_last_name_0",
+                "profileDescription": "New Last Name (if applicable)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "New First Name (if applicable)",
+              "nameId": "supplementb_new_first_name_0",
+              "placeholder": "New first name",
+              "linkedToNameId": "preparer_employee_first_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_new_first_name_0",
+                "profileDescription": "New First Name (if applicable)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "New Middle Initial (if applicable)",
+              "nameId": "supplementb_new_middle_initial_0",
+              "placeholder": "New middle initial"
+            },
+            {
+              "label": "Document Title",
+              "nameId": "supplementb_document_title_0",
+              "placeholder": "Document title"
+            },
+            {
+              "label": "Document Number (if any)",
+              "nameId": "supplementb_document_number_0",
+              "placeholder": "Document number"
+            },
+            {
+              "label": "Expiration Date (if any)",
+              "nameId": "supplementb_expiration_date_0",
+              "placeholder": "Expiration date"
+            },
+            {
+              "label": "Name of Employer or Authorized Representative",
+              "nameId": "supplementb_employer_representative_name_0",
+              "placeholder": "Name of employer or representative",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_employer_representative_name_0",
+                "profileDescription": "Name of Employer or Authorized Representative",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Signature of Employer or Authorized Representative",
+              "nameId": "supplementb_employer_representative_signature_0",
+              "placeholder": "Signature",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_employer_representative_signature_0",
+                "profileDescription": "Signature of Employer or Authorized Representative",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Today's Date",
+              "nameId": "supplementb_signature_date_0",
+              "placeholder": "Today's date",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_signature_date_0",
+                "profileDescription": "Today's Date",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Additional Information",
+              "nameId": "supplementb_additional_information_0",
+              "placeholder": "Additional information"
+            }
+          ]
+        },
+        {
+          "questionId": 37,
+          "text": "For the first Supplement B entry, did you use an alternative procedure authorized by DHS?",
+          "needsExplanation": true,
+          "explanation": "Check this box if you used an alternative procedure authorized by the Department of Homeland Security to examine documents for this reverification or rehire.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "single",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Alternative procedure authorized by DHS",
+              "nameId": "supplementb_alternative_procedure_used_0",
+              "value": "Alternative procedure authorized by DHS"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 38,
+          "text": "What are the details for the second reverification or rehire?",
+          "needsExplanation": true,
+          "explanation": "Complete this section if the employee is being rehired or requires reverification. Enter the date of rehire, new name (if applicable), and document information.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "mirror",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "Date of Rehire (if applicable)",
+              "nameId": "supplementb_date_of_rehire_1",
+              "placeholder": "Date of rehire",
+              "linkedToNameId": "supplementb_date_of_rehire_0"
+            },
+            {
+              "label": "New Last Name (if applicable)",
+              "nameId": "supplementb_new_last_name_1",
+              "placeholder": "New last name",
+              "linkedToNameId": "preparer_employee_last_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_new_last_name_1",
+                "profileDescription": "New Last Name (if applicable)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "New First Name (if applicable)",
+              "nameId": "supplementb_new_first_name_1",
+              "placeholder": "New first name",
+              "linkedToNameId": "preparer_employee_first_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_new_first_name_1",
+                "profileDescription": "New First Name (if applicable)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "New Middle Initial (if applicable)",
+              "nameId": "supplementb_new_middle_initial_1",
+              "placeholder": "New middle initial",
+              "linkedToNameId": "supplementb_new_middle_initial_0"
+            },
+            {
+              "label": "Document Number (if any)",
+              "nameId": "supplementb_document_number_1",
+              "placeholder": "Document number",
+              "linkedToNameId": "supplementb_document_number_0"
+            },
+            {
+              "label": "Expiration Date (if any)",
+              "nameId": "supplementb_expiration_date_1",
+              "placeholder": "Expiration date",
+              "linkedToNameId": "supplementb_expiration_date_0"
+            },
+            {
+              "label": "Name of Employer or Authorized Representative",
+              "nameId": "supplementb_employer_representative_name_1",
+              "placeholder": "Name of employer or representative",
+              "linkedToNameId": "supplementb_employer_representative_name_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_employer_representative_name_1",
+                "profileDescription": "Name of Employer or Authorized Representative",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Signature of Employer or Authorized Representative",
+              "nameId": "supplementb_employer_representative_signature_1",
+              "placeholder": "Signature",
+              "linkedToNameId": "supplementb_employer_representative_signature_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_employer_representative_signature_1",
+                "profileDescription": "Signature of Employer or Authorized Representative",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Today's Date",
+              "nameId": "supplementb_signature_date_1",
+              "placeholder": "Today's date",
+              "linkedToNameId": "supplementb_signature_date_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_signature_date_1",
+                "profileDescription": "Today's Date",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Additional Information",
+              "nameId": "supplementb_additional_information_1",
+              "placeholder": "Additional information",
+              "linkedToNameId": "supplementb_additional_information_0"
+            }
+          ]
+        },
+        {
+          "questionId": 39,
+          "text": "For the second Supplement B entry, did you use an alternative procedure authorized by DHS?",
+          "needsExplanation": true,
+          "explanation": "Check this box if you used an alternative procedure authorized by the Department of Homeland Security to examine documents for this reverification or rehire.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "single",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Alternative procedure authorized by DHS",
+              "nameId": "supplementb_alternative_procedure_used_1",
+              "value": "Alternative procedure authorized by DHS",
+              "linkedToNameId": "supplementb_alternative_procedure_used_0"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": "supplementb_alternative_procedure_used_0",
+          "linkedFieldRole": "mirror",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 40,
+          "text": "What are the details for the third reverification or rehire?",
+          "needsExplanation": true,
+          "explanation": "Complete this section if the employee is being rehired or requires reverification. Enter the date of rehire, new name (if applicable), and document information.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "mirror",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          },
+          "textboxes": [
+            {
+              "label": "Date of Rehire (if applicable)",
+              "nameId": "supplementb_date_of_rehire_2",
+              "placeholder": "Date of rehire",
+              "linkedToNameId": "supplementb_date_of_rehire_0"
+            },
+            {
+              "label": "New Last Name (if applicable)",
+              "nameId": "supplementb_new_last_name_2",
+              "placeholder": "New last name",
+              "linkedToNameId": "preparer_employee_last_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_new_last_name_2",
+                "profileDescription": "New Last Name (if applicable)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "New First Name (if applicable)",
+              "nameId": "supplementb_new_first_name_2",
+              "placeholder": "New first name",
+              "linkedToNameId": "preparer_employee_first_name",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_new_first_name_2",
+                "profileDescription": "New First Name (if applicable)",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "New Middle Initial (if applicable)",
+              "nameId": "supplementb_new_middle_initial_2",
+              "placeholder": "New middle initial",
+              "linkedToNameId": "supplementb_new_middle_initial_0"
+            },
+            {
+              "label": "Document Title",
+              "nameId": "supplementb_document_title_2",
+              "placeholder": "Document title",
+              "linkedToNameId": "supplementb_document_title_0"
+            },
+            {
+              "label": "Document Number (if any)",
+              "nameId": "supplementb_document_number_2",
+              "placeholder": "Document number",
+              "linkedToNameId": "supplementb_document_number_0"
+            },
+            {
+              "label": "Expiration Date (if any)",
+              "nameId": "supplementb_expiration_date_2",
+              "placeholder": "Expiration date",
+              "linkedToNameId": "supplementb_expiration_date_0"
+            },
+            {
+              "label": "Name of Employer or Authorized Representative",
+              "nameId": "supplementb_employer_representative_name_2",
+              "placeholder": "Name of employer or representative",
+              "linkedToNameId": "supplementb_employer_representative_name_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_employer_representative_name_2",
+                "profileDescription": "Name of Employer or Authorized Representative",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Signature of Employer or Authorized Representative",
+              "nameId": "supplementb_employer_representative_signature_2",
+              "placeholder": "Signature",
+              "linkedToNameId": "supplementb_employer_representative_signature_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_employer_representative_signature_2",
+                "profileDescription": "Signature of Employer or Authorized Representative",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Today's Date",
+              "nameId": "supplementb_signature_date_2",
+              "placeholder": "Today's date",
+              "linkedToNameId": "supplementb_signature_date_0",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "supplementb_signature_date_2",
+                "profileDescription": "Today's Date",
+                "availableInProfile": false
+              }
+            },
+            {
+              "label": "Additional Information",
+              "nameId": "supplementb_additional_information_2",
+              "placeholder": "Additional information",
+              "linkedToNameId": "supplementb_additional_information_0"
+            }
+          ]
+        },
+        {
+          "questionId": 41,
+          "text": "For the third Supplement B entry, did you use an alternative procedure authorized by DHS?",
+          "needsExplanation": true,
+          "explanation": "Check this box if you used an alternative procedure authorized by the Department of Homeland Security to examine documents for this reverification or rehire.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "single",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Alternative procedure authorized by DHS",
+              "nameId": "supplementb_alternative_procedure_used_2",
+              "value": "Alternative procedure authorized by DHS",
+              "linkedToNameId": "supplementb_alternative_procedure_used_0"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": "supplementb_alternative_procedure_used_0",
+          "linkedFieldRole": "mirror",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        }
+      ]
+    }
+  ],
+  "hiddenFields": [],
+  "linkedFieldGroups": [
+    {
+      "groupKey": "general:nameid:list_a_document_title",
+      "primaryNameId": "list_a_document_title_1",
+      "primaryQuestionId": 17,
+      "mirrorNameIds": [
+        "list_a_document_title_2",
+        "list_a_document_title_3"
+      ]
+    },
+    {
+      "groupKey": "agency:nameid:list_a_issuing_authority",
+      "primaryNameId": "list_a_issuing_authority_1",
+      "primaryQuestionId": 17,
+      "mirrorNameIds": [
+        "list_a_issuing_authority_2",
+        "list_a_issuing_authority_3"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:list_a_document_number",
+      "primaryNameId": "list_a_document_number_1",
+      "primaryQuestionId": 17,
+      "mirrorNameIds": [
+        "list_a_document_number_2",
+        "list_a_document_number_3"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:list_a_expiration_date",
+      "primaryNameId": "list_a_expiration_date_1",
+      "primaryQuestionId": 17,
+      "mirrorNameIds": [
+        "list_a_expiration_date_2",
+        "list_a_expiration_date_3"
+      ]
+    },
+    {
+      "groupKey": "general:semantic:last_name",
+      "primaryNameId": "preparer_employee_last_name",
+      "primaryQuestionId": 29,
+      "mirrorNameIds": [
+        "preparer_last_name_0",
+        "preparer_last_name_1",
+        "preparer_last_name_2",
+        "preparer_last_name_3",
+        "supplementb_employee_last_name",
+        "supplementb_new_last_name_0",
+        "supplementb_new_last_name_1",
+        "supplementb_new_last_name_2"
+      ]
+    },
+    {
+      "groupKey": "general:semantic:first_name",
+      "primaryNameId": "preparer_employee_first_name",
+      "primaryQuestionId": 29,
+      "mirrorNameIds": [
+        "preparer_first_name_0",
+        "preparer_first_name_2",
+        "preparer_first_name_3",
+        "supplementb_employee_first_name",
+        "supplementb_new_first_name_0",
+        "supplementb_new_first_name_1",
+        "supplementb_new_first_name_2"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:preparer_signature",
+      "primaryNameId": "preparer_signature_0",
+      "primaryQuestionId": 31,
+      "mirrorNameIds": [
+        "preparer_signature_1",
+        "preparer_signature_2",
+        "preparer_signature_3"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:preparer_signature_date",
+      "primaryNameId": "preparer_signature_date_0",
+      "primaryQuestionId": 31,
+      "mirrorNameIds": [
+        "preparer_signature_date_1",
+        "preparer_signature_date_2",
+        "preparer_signature_date_3"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:preparer_middle_initial",
+      "primaryNameId": "preparer_middle_initial_0",
+      "primaryQuestionId": 31,
+      "mirrorNameIds": [
+        "preparer_middle_initial_1",
+        "preparer_middle_initial_2",
+        "preparer_middle_initial_3"
+      ]
+    },
+    {
+      "groupKey": "general:semantic:street",
+      "primaryNameId": "preparer_address_0",
+      "primaryQuestionId": 31,
+      "mirrorNameIds": [
+        "preparer_address_1",
+        "preparer_address_2",
+        "preparer_address_3"
+      ]
+    },
+    {
+      "groupKey": "general:semantic:city",
+      "primaryNameId": "preparer_city_0",
+      "primaryQuestionId": 31,
+      "mirrorNameIds": [
+        "preparer_city_1",
+        "preparer_city_2",
+        "preparer_city_3"
+      ]
+    },
+    {
+      "groupKey": "general:semantic:state",
+      "primaryNameId": "preparer_state_0",
+      "primaryQuestionId": 31,
+      "mirrorNameIds": [
+        "preparer_state_1",
+        "preparer_state_2",
+        "preparer_state_3"
+      ]
+    },
+    {
+      "groupKey": "general:semantic:zip",
+      "primaryNameId": "preparer_zip_code_0",
+      "primaryQuestionId": 31,
+      "mirrorNameIds": [
+        "preparer_zip_code_1",
+        "preparer_zip_code_2",
+        "preparer_zip_code_3"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:supplementb_date_of_rehire",
+      "primaryNameId": "supplementb_date_of_rehire_0",
+      "primaryQuestionId": 36,
+      "mirrorNameIds": [
+        "supplementb_date_of_rehire_1",
+        "supplementb_date_of_rehire_2"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:supplementb_new_middle_initial",
+      "primaryNameId": "supplementb_new_middle_initial_0",
+      "primaryQuestionId": 36,
+      "mirrorNameIds": [
+        "supplementb_new_middle_initial_1",
+        "supplementb_new_middle_initial_2"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:supplementb_document_title",
+      "primaryNameId": "supplementb_document_title_0",
+      "primaryQuestionId": 36,
+      "mirrorNameIds": [
+        "supplementb_document_title_2"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:supplementb_document_number",
+      "primaryNameId": "supplementb_document_number_0",
+      "primaryQuestionId": 36,
+      "mirrorNameIds": [
+        "supplementb_document_number_1",
+        "supplementb_document_number_2"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:supplementb_expiration_date",
+      "primaryNameId": "supplementb_expiration_date_0",
+      "primaryQuestionId": 36,
+      "mirrorNameIds": [
+        "supplementb_expiration_date_1",
+        "supplementb_expiration_date_2"
+      ]
+    },
+    {
+      "groupKey": "employer:nameid:supplementb_employer_representative_name",
+      "primaryNameId": "supplementb_employer_representative_name_0",
+      "primaryQuestionId": 36,
+      "mirrorNameIds": [
+        "supplementb_employer_representative_name_1",
+        "supplementb_employer_representative_name_2"
+      ]
+    },
+    {
+      "groupKey": "employer:nameid:supplementb_employer_representative_signature",
+      "primaryNameId": "supplementb_employer_representative_signature_0",
+      "primaryQuestionId": 36,
+      "mirrorNameIds": [
+        "supplementb_employer_representative_signature_1",
+        "supplementb_employer_representative_signature_2"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:supplementb_signature_date",
+      "primaryNameId": "supplementb_signature_date_0",
+      "primaryQuestionId": 36,
+      "mirrorNameIds": [
+        "supplementb_signature_date_1",
+        "supplementb_signature_date_2"
+      ]
+    },
+    {
+      "groupKey": "general:nameid:supplementb_additional_information",
+      "primaryNameId": "supplementb_additional_information_0",
+      "primaryQuestionId": 36,
+      "mirrorNameIds": [
+        "supplementb_additional_information_1",
+        "supplementb_additional_information_2"
+      ]
+    },
+    {
+      "groupKey": "agency:nameid:supplementb_alternative_procedure_used",
+      "primaryNameId": "supplementb_alternative_procedure_used_0",
+      "primaryQuestionId": 37,
+      "mirrorNameIds": [
+        "supplementb_alternative_procedure_used_1",
+        "supplementb_alternative_procedure_used_2"
+      ]
+    }
+  ],
+  "sectionCounter": 5,
+  "questionCounter": 42,
+  "htmlMode": "normal",
+  "autopopulateFields": [
+    {
+      "questionText": "What is your last name (family name)?",
+      "nameId": "employee_last_name",
+      "profileKey": "last_name",
+      "profileDescription": "User's legal last name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your first name (given name)?",
+      "nameId": "employee_first_name",
+      "profileKey": "first_name",
+      "profileDescription": "User's legal first name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your middle initial?",
+      "nameId": "employee_middle_initial",
+      "profileKey": "middle_initial",
+      "profileDescription": "User's middle initial",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What other last names have you used?",
+      "nameId": "employee_other_last_names",
+      "profileKey": "other_last_names",
+      "profileDescription": "Other last names used by the user",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home address? — Street Number and Name",
+      "nameId": "employee_street_address",
+      "profileKey": "street_address",
+      "profileDescription": "User's home street address",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home address? — Apt. Number (if any)",
+      "nameId": "employee_apartment_number",
+      "profileKey": "apartment_number",
+      "profileDescription": "User's apartment number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home address? — City or Town",
+      "nameId": "employee_city",
+      "profileKey": "city",
+      "profileDescription": "User's city or town",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home address? — State",
+      "nameId": "employee_state",
+      "profileKey": "state",
+      "profileDescription": "User's state of residence",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home address? — ZIP Code",
+      "nameId": "employee_zip_code",
+      "profileKey": "zip_code",
+      "profileDescription": "User's ZIP code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your date of birth?",
+      "nameId": "employee_date_of_birth",
+      "profileKey": "date_of_birth",
+      "profileDescription": "User's date of birth",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your U.S. Social Security number?",
+      "nameId": "employee_social_security_number",
+      "profileKey": "social_security_number",
+      "profileDescription": "User's Social Security number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your email address?",
+      "nameId": "employee_email_address",
+      "profileKey": "email_address",
+      "profileDescription": "User's email address",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your telephone number?",
+      "nameId": "employee_telephone_number",
+      "profileKey": "telephone_number",
+      "profileDescription": "User's telephone number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "If you are a lawful permanent resident, what is your USCIS or A-Number?",
+      "nameId": "lawful_permanent_resident_number",
+      "profileKey": "uscis_a_number",
+      "profileDescription": "User's USCIS or A-Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "If you are an alien authorized to work, what is your expiration date (if any)?",
+      "nameId": "alien_authorized_expiration_date",
+      "profileKey": "work_authorization_expiration_date",
+      "profileDescription": "Expiration date of user's work authorization",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "If you are an alien authorized to work, provide one of the following numbers — USCIS A-Number",
+      "nameId": "alien_uscis_a_number",
+      "profileKey": "uscis_a_number",
+      "profileDescription": "User's USCIS A-Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "If you are an alien authorized to work, provide one of the following numbers — Form I-94 Admission Number",
+      "nameId": "alien_form_i94_admission_number",
+      "profileKey": "form_i94_admission_number",
+      "profileDescription": "User's Form I-94 Admission Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "If you are an alien authorized to work, provide one of the following numbers — Foreign Passport Number and Country of Issuance",
+      "nameId": "alien_foreign_passport_number_and_country",
+      "profileKey": "foreign_passport_number_and_country",
+      "profileDescription": "User's foreign passport number and country of issuance",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Please sign to certify the information above is correct",
+      "nameId": "employee_signature",
+      "profileKey": "employee_signature",
+      "profileDescription": "Signature of Employee",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is today's date?",
+      "nameId": "employee_signature_date",
+      "profileKey": "employee_signature_date",
+      "profileDescription": "Today's Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is the employee's first day of employment?",
+      "nameId": "first_day_employed",
+      "profileKey": "first_day_employed",
+      "profileDescription": "First Day of Employment (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is the name and title of the employer or authorized representative?",
+      "nameId": "employer_representative_name_and_title",
+      "profileKey": "employer_representative_name_and_title",
+      "profileDescription": "Last Name, First Name and Title of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Signature of employer or authorized representative",
+      "nameId": "employer_representative_signature",
+      "profileKey": "employer_representative_signature",
+      "profileDescription": "Signature of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is today's date?",
+      "nameId": "employer_signature_date",
+      "profileKey": "employer_signature_date",
+      "profileDescription": "Today's Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is the business or organization name?",
+      "nameId": "employer_business_name",
+      "profileKey": "employer_business_name",
+      "profileDescription": "Business or Organization Name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is the business or organization address?",
+      "nameId": "employer_business_address",
+      "profileKey": "employer_business_address",
+      "profileDescription": "Business or Organization Address, City or Town, State, ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Enter the employee's name as shown in Section 1 — Last Name (Family Name) from Section 1",
+      "nameId": "preparer_employee_last_name",
+      "profileKey": "preparer_employee_last_name",
+      "profileDescription": "Last Name (Family Name) from Section 1",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Enter the employee's name as shown in Section 1 — First Name (Given Name) from Section 1",
+      "nameId": "preparer_employee_first_name",
+      "profileKey": "preparer_employee_first_name",
+      "profileDescription": "First Name (Given Name) from Section 1",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — Signature of Preparer or Translator",
+      "nameId": "preparer_signature_0",
+      "profileKey": "preparer_signature_0",
+      "profileDescription": "Signature of Preparer or Translator",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_0",
+      "profileKey": "preparer_signature_date_0",
+      "profileDescription": "Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — Last Name (Family Name)",
+      "nameId": "preparer_last_name_0",
+      "profileKey": "preparer_last_name_0",
+      "profileDescription": "Last Name (Family Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — First Name (Given Name)",
+      "nameId": "preparer_first_name_0",
+      "profileKey": "preparer_first_name_0",
+      "profileDescription": "First Name (Given Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — City or Town",
+      "nameId": "preparer_city_0",
+      "profileKey": "preparer_city_0",
+      "profileDescription": "City or Town",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — State",
+      "nameId": "preparer_state_0",
+      "profileKey": "preparer_state_0",
+      "profileDescription": "State",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — ZIP Code",
+      "nameId": "preparer_zip_code_0",
+      "profileKey": "preparer_zip_code_0",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — Signature of Preparer or Translator",
+      "nameId": "preparer_signature_1",
+      "profileKey": "preparer_signature_1",
+      "profileDescription": "Signature of Preparer or Translator",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_1",
+      "profileKey": "preparer_signature_date_1",
+      "profileDescription": "Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — Last Name (Family Name)",
+      "nameId": "preparer_last_name_1",
+      "profileKey": "preparer_last_name_1",
+      "profileDescription": "Last Name (Family Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — City or Town",
+      "nameId": "preparer_city_1",
+      "profileKey": "preparer_city_1",
+      "profileDescription": "City or Town",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — State",
+      "nameId": "preparer_state_1",
+      "profileKey": "preparer_state_1",
+      "profileDescription": "State",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — ZIP Code",
+      "nameId": "preparer_zip_code_1",
+      "profileKey": "preparer_zip_code_1",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — Signature of Preparer or Translator",
+      "nameId": "preparer_signature_2",
+      "profileKey": "preparer_signature_2",
+      "profileDescription": "Signature of Preparer or Translator",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_2",
+      "profileKey": "preparer_signature_date_2",
+      "profileDescription": "Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — Last Name (Family Name)",
+      "nameId": "preparer_last_name_2",
+      "profileKey": "preparer_last_name_2",
+      "profileDescription": "Last Name (Family Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — First Name (Given Name)",
+      "nameId": "preparer_first_name_2",
+      "profileKey": "preparer_first_name_2",
+      "profileDescription": "First Name (Given Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — City or Town",
+      "nameId": "preparer_city_2",
+      "profileKey": "preparer_city_2",
+      "profileDescription": "City or Town",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — State",
+      "nameId": "preparer_state_2",
+      "profileKey": "preparer_state_2",
+      "profileDescription": "State",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — ZIP Code",
+      "nameId": "preparer_zip_code_2",
+      "profileKey": "preparer_zip_code_2",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — Signature of Preparer or Translator",
+      "nameId": "preparer_signature_3",
+      "profileKey": "preparer_signature_3",
+      "profileDescription": "Signature of Preparer or Translator",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_3",
+      "profileKey": "preparer_signature_date_3",
+      "profileDescription": "Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — Last Name (Family Name)",
+      "nameId": "preparer_last_name_3",
+      "profileKey": "preparer_last_name_3",
+      "profileDescription": "Last Name (Family Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — First Name (Given Name)",
+      "nameId": "preparer_first_name_3",
+      "profileKey": "preparer_first_name_3",
+      "profileDescription": "First Name (Given Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — City or Town",
+      "nameId": "preparer_city_3",
+      "profileKey": "preparer_city_3",
+      "profileDescription": "City or Town",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — State",
+      "nameId": "preparer_state_3",
+      "profileKey": "preparer_state_3",
+      "profileDescription": "State",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — ZIP Code",
+      "nameId": "preparer_zip_code_3",
+      "profileKey": "preparer_zip_code_3",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Enter the employee's name as shown in Section 1 — Last Name (Family Name) from Section 1",
+      "nameId": "supplementb_employee_last_name",
+      "profileKey": "supplementb_employee_last_name",
+      "profileDescription": "Last Name (Family Name) from Section 1",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Enter the employee's name as shown in Section 1 — First Name (Given Name) from Section 1",
+      "nameId": "supplementb_employee_first_name",
+      "profileKey": "supplementb_employee_first_name",
+      "profileDescription": "First Name (Given Name) from Section 1",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #1 — New Last Name (if applicable)",
+      "nameId": "supplementb_new_last_name_0",
+      "profileKey": "supplementb_new_last_name_0",
+      "profileDescription": "New Last Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #1 — New First Name (if applicable)",
+      "nameId": "supplementb_new_first_name_0",
+      "profileKey": "supplementb_new_first_name_0",
+      "profileDescription": "New First Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #1 — Name of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_name_0",
+      "profileKey": "supplementb_employer_representative_name_0",
+      "profileDescription": "Name of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #1 — Signature of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_signature_0",
+      "profileKey": "supplementb_employer_representative_signature_0",
+      "profileDescription": "Signature of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #1 — Today's Date",
+      "nameId": "supplementb_signature_date_0",
+      "profileKey": "supplementb_signature_date_0",
+      "profileDescription": "Today's Date",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #2 — New Last Name (if applicable)",
+      "nameId": "supplementb_new_last_name_1",
+      "profileKey": "supplementb_new_last_name_1",
+      "profileDescription": "New Last Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #2 — New First Name (if applicable)",
+      "nameId": "supplementb_new_first_name_1",
+      "profileKey": "supplementb_new_first_name_1",
+      "profileDescription": "New First Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #2 — Name of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_name_1",
+      "profileKey": "supplementb_employer_representative_name_1",
+      "profileDescription": "Name of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #2 — Signature of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_signature_1",
+      "profileKey": "supplementb_employer_representative_signature_1",
+      "profileDescription": "Signature of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #2 — Today's Date",
+      "nameId": "supplementb_signature_date_1",
+      "profileKey": "supplementb_signature_date_1",
+      "profileDescription": "Today's Date",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #3 — New Last Name (if applicable)",
+      "nameId": "supplementb_new_last_name_2",
+      "profileKey": "supplementb_new_last_name_2",
+      "profileDescription": "New Last Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #3 — New First Name (if applicable)",
+      "nameId": "supplementb_new_first_name_2",
+      "profileKey": "supplementb_new_first_name_2",
+      "profileDescription": "New First Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #3 — Name of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_name_2",
+      "profileKey": "supplementb_employer_representative_name_2",
+      "profileDescription": "Name of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #3 — Signature of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_signature_2",
+      "profileKey": "supplementb_employer_representative_signature_2",
+      "profileDescription": "Signature of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #3 — Today's Date",
+      "nameId": "supplementb_signature_date_2",
+      "profileKey": "supplementb_signature_date_2",
+      "profileDescription": "Today's Date",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    }
+  ],
+  "autopopulateAvailable": [],
+  "autopopulateMissing": [
+    {
+      "questionText": "What is your last name (family name)?",
+      "nameId": "employee_last_name",
+      "profileKey": "last_name",
+      "profileDescription": "User's legal last name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your first name (given name)?",
+      "nameId": "employee_first_name",
+      "profileKey": "first_name",
+      "profileDescription": "User's legal first name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your middle initial?",
+      "nameId": "employee_middle_initial",
+      "profileKey": "middle_initial",
+      "profileDescription": "User's middle initial",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What other last names have you used?",
+      "nameId": "employee_other_last_names",
+      "profileKey": "other_last_names",
+      "profileDescription": "Other last names used by the user",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home address? — Street Number and Name",
+      "nameId": "employee_street_address",
+      "profileKey": "street_address",
+      "profileDescription": "User's home street address",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home address? — Apt. Number (if any)",
+      "nameId": "employee_apartment_number",
+      "profileKey": "apartment_number",
+      "profileDescription": "User's apartment number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home address? — City or Town",
+      "nameId": "employee_city",
+      "profileKey": "city",
+      "profileDescription": "User's city or town",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home address? — State",
+      "nameId": "employee_state",
+      "profileKey": "state",
+      "profileDescription": "User's state of residence",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home address? — ZIP Code",
+      "nameId": "employee_zip_code",
+      "profileKey": "zip_code",
+      "profileDescription": "User's ZIP code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your date of birth?",
+      "nameId": "employee_date_of_birth",
+      "profileKey": "date_of_birth",
+      "profileDescription": "User's date of birth",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your U.S. Social Security number?",
+      "nameId": "employee_social_security_number",
+      "profileKey": "social_security_number",
+      "profileDescription": "User's Social Security number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your email address?",
+      "nameId": "employee_email_address",
+      "profileKey": "email_address",
+      "profileDescription": "User's email address",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your telephone number?",
+      "nameId": "employee_telephone_number",
+      "profileKey": "telephone_number",
+      "profileDescription": "User's telephone number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "If you are a lawful permanent resident, what is your USCIS or A-Number?",
+      "nameId": "lawful_permanent_resident_number",
+      "profileKey": "uscis_a_number",
+      "profileDescription": "User's USCIS or A-Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "If you are an alien authorized to work, what is your expiration date (if any)?",
+      "nameId": "alien_authorized_expiration_date",
+      "profileKey": "work_authorization_expiration_date",
+      "profileDescription": "Expiration date of user's work authorization",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "If you are an alien authorized to work, provide one of the following numbers — USCIS A-Number",
+      "nameId": "alien_uscis_a_number",
+      "profileKey": "uscis_a_number",
+      "profileDescription": "User's USCIS A-Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "If you are an alien authorized to work, provide one of the following numbers — Form I-94 Admission Number",
+      "nameId": "alien_form_i94_admission_number",
+      "profileKey": "form_i94_admission_number",
+      "profileDescription": "User's Form I-94 Admission Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "If you are an alien authorized to work, provide one of the following numbers — Foreign Passport Number and Country of Issuance",
+      "nameId": "alien_foreign_passport_number_and_country",
+      "profileKey": "foreign_passport_number_and_country",
+      "profileDescription": "User's foreign passport number and country of issuance",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Please sign to certify the information above is correct",
+      "nameId": "employee_signature",
+      "profileKey": "employee_signature",
+      "profileDescription": "Signature of Employee",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is today's date?",
+      "nameId": "employee_signature_date",
+      "profileKey": "employee_signature_date",
+      "profileDescription": "Today's Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is the employee's first day of employment?",
+      "nameId": "first_day_employed",
+      "profileKey": "first_day_employed",
+      "profileDescription": "First Day of Employment (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is the name and title of the employer or authorized representative?",
+      "nameId": "employer_representative_name_and_title",
+      "profileKey": "employer_representative_name_and_title",
+      "profileDescription": "Last Name, First Name and Title of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Signature of employer or authorized representative",
+      "nameId": "employer_representative_signature",
+      "profileKey": "employer_representative_signature",
+      "profileDescription": "Signature of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is today's date?",
+      "nameId": "employer_signature_date",
+      "profileKey": "employer_signature_date",
+      "profileDescription": "Today's Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is the business or organization name?",
+      "nameId": "employer_business_name",
+      "profileKey": "employer_business_name",
+      "profileDescription": "Business or Organization Name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is the business or organization address?",
+      "nameId": "employer_business_address",
+      "profileKey": "employer_business_address",
+      "profileDescription": "Business or Organization Address, City or Town, State, ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Enter the employee's name as shown in Section 1 — Last Name (Family Name) from Section 1",
+      "nameId": "preparer_employee_last_name",
+      "profileKey": "preparer_employee_last_name",
+      "profileDescription": "Last Name (Family Name) from Section 1",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Enter the employee's name as shown in Section 1 — First Name (Given Name) from Section 1",
+      "nameId": "preparer_employee_first_name",
+      "profileKey": "preparer_employee_first_name",
+      "profileDescription": "First Name (Given Name) from Section 1",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — Signature of Preparer or Translator",
+      "nameId": "preparer_signature_0",
+      "profileKey": "preparer_signature_0",
+      "profileDescription": "Signature of Preparer or Translator",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_0",
+      "profileKey": "preparer_signature_date_0",
+      "profileDescription": "Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — Last Name (Family Name)",
+      "nameId": "preparer_last_name_0",
+      "profileKey": "preparer_last_name_0",
+      "profileDescription": "Last Name (Family Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — First Name (Given Name)",
+      "nameId": "preparer_first_name_0",
+      "profileKey": "preparer_first_name_0",
+      "profileDescription": "First Name (Given Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — City or Town",
+      "nameId": "preparer_city_0",
+      "profileKey": "preparer_city_0",
+      "profileDescription": "City or Town",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — State",
+      "nameId": "preparer_state_0",
+      "profileKey": "preparer_state_0",
+      "profileDescription": "State",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #1 information — ZIP Code",
+      "nameId": "preparer_zip_code_0",
+      "profileKey": "preparer_zip_code_0",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — Signature of Preparer or Translator",
+      "nameId": "preparer_signature_1",
+      "profileKey": "preparer_signature_1",
+      "profileDescription": "Signature of Preparer or Translator",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_1",
+      "profileKey": "preparer_signature_date_1",
+      "profileDescription": "Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — Last Name (Family Name)",
+      "nameId": "preparer_last_name_1",
+      "profileKey": "preparer_last_name_1",
+      "profileDescription": "Last Name (Family Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — City or Town",
+      "nameId": "preparer_city_1",
+      "profileKey": "preparer_city_1",
+      "profileDescription": "City or Town",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — State",
+      "nameId": "preparer_state_1",
+      "profileKey": "preparer_state_1",
+      "profileDescription": "State",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #2 information — ZIP Code",
+      "nameId": "preparer_zip_code_1",
+      "profileKey": "preparer_zip_code_1",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — Signature of Preparer or Translator",
+      "nameId": "preparer_signature_2",
+      "profileKey": "preparer_signature_2",
+      "profileDescription": "Signature of Preparer or Translator",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_2",
+      "profileKey": "preparer_signature_date_2",
+      "profileDescription": "Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — Last Name (Family Name)",
+      "nameId": "preparer_last_name_2",
+      "profileKey": "preparer_last_name_2",
+      "profileDescription": "Last Name (Family Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — First Name (Given Name)",
+      "nameId": "preparer_first_name_2",
+      "profileKey": "preparer_first_name_2",
+      "profileDescription": "First Name (Given Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — City or Town",
+      "nameId": "preparer_city_2",
+      "profileKey": "preparer_city_2",
+      "profileDescription": "City or Town",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — State",
+      "nameId": "preparer_state_2",
+      "profileKey": "preparer_state_2",
+      "profileDescription": "State",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #3 information — ZIP Code",
+      "nameId": "preparer_zip_code_2",
+      "profileKey": "preparer_zip_code_2",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — Signature of Preparer or Translator",
+      "nameId": "preparer_signature_3",
+      "profileKey": "preparer_signature_3",
+      "profileDescription": "Signature of Preparer or Translator",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_3",
+      "profileKey": "preparer_signature_date_3",
+      "profileDescription": "Date (mm/dd/yyyy)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — Last Name (Family Name)",
+      "nameId": "preparer_last_name_3",
+      "profileKey": "preparer_last_name_3",
+      "profileDescription": "Last Name (Family Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — First Name (Given Name)",
+      "nameId": "preparer_first_name_3",
+      "profileKey": "preparer_first_name_3",
+      "profileDescription": "First Name (Given Name)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — City or Town",
+      "nameId": "preparer_city_3",
+      "profileKey": "preparer_city_3",
+      "profileDescription": "City or Town",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — State",
+      "nameId": "preparer_state_3",
+      "profileKey": "preparer_state_3",
+      "profileDescription": "State",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Preparer or translator #4 information — ZIP Code",
+      "nameId": "preparer_zip_code_3",
+      "profileKey": "preparer_zip_code_3",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Enter the employee's name as shown in Section 1 — Last Name (Family Name) from Section 1",
+      "nameId": "supplementb_employee_last_name",
+      "profileKey": "supplementb_employee_last_name",
+      "profileDescription": "Last Name (Family Name) from Section 1",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Enter the employee's name as shown in Section 1 — First Name (Given Name) from Section 1",
+      "nameId": "supplementb_employee_first_name",
+      "profileKey": "supplementb_employee_first_name",
+      "profileDescription": "First Name (Given Name) from Section 1",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #1 — New Last Name (if applicable)",
+      "nameId": "supplementb_new_last_name_0",
+      "profileKey": "supplementb_new_last_name_0",
+      "profileDescription": "New Last Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #1 — New First Name (if applicable)",
+      "nameId": "supplementb_new_first_name_0",
+      "profileKey": "supplementb_new_first_name_0",
+      "profileDescription": "New First Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #1 — Name of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_name_0",
+      "profileKey": "supplementb_employer_representative_name_0",
+      "profileDescription": "Name of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #1 — Signature of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_signature_0",
+      "profileKey": "supplementb_employer_representative_signature_0",
+      "profileDescription": "Signature of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #1 — Today's Date",
+      "nameId": "supplementb_signature_date_0",
+      "profileKey": "supplementb_signature_date_0",
+      "profileDescription": "Today's Date",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #2 — New Last Name (if applicable)",
+      "nameId": "supplementb_new_last_name_1",
+      "profileKey": "supplementb_new_last_name_1",
+      "profileDescription": "New Last Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #2 — New First Name (if applicable)",
+      "nameId": "supplementb_new_first_name_1",
+      "profileKey": "supplementb_new_first_name_1",
+      "profileDescription": "New First Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #2 — Name of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_name_1",
+      "profileKey": "supplementb_employer_representative_name_1",
+      "profileDescription": "Name of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #2 — Signature of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_signature_1",
+      "profileKey": "supplementb_employer_representative_signature_1",
+      "profileDescription": "Signature of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #2 — Today's Date",
+      "nameId": "supplementb_signature_date_1",
+      "profileKey": "supplementb_signature_date_1",
+      "profileDescription": "Today's Date",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #3 — New Last Name (if applicable)",
+      "nameId": "supplementb_new_last_name_2",
+      "profileKey": "supplementb_new_last_name_2",
+      "profileDescription": "New Last Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #3 — New First Name (if applicable)",
+      "nameId": "supplementb_new_first_name_2",
+      "profileKey": "supplementb_new_first_name_2",
+      "profileDescription": "New First Name (if applicable)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #3 — Name of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_name_2",
+      "profileKey": "supplementb_employer_representative_name_2",
+      "profileDescription": "Name of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #3 — Signature of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_signature_2",
+      "profileKey": "supplementb_employer_representative_signature_2",
+      "profileDescription": "Signature of Employer or Authorized Representative",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Reverification or rehire #3 — Today's Date",
+      "nameId": "supplementb_signature_date_2",
+      "profileKey": "supplementb_signature_date_2",
+      "profileDescription": "Today's Date",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    }
+  ],
+  "pdfToken": "4d26a649-33ec-47db-8e12-3796e92b1d52"
+}

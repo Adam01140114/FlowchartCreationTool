@@ -8,11 +8,14 @@
     "start:formwiz-server": "node \"FormWiz GUI/server.js\""
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.100",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^4.21.2",
     "express-fileupload": "^1.5.1",
     "jszip": "^3.10.1",
-    "pdf-lib": "^1.17.1"
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.10.38"
   }
 }

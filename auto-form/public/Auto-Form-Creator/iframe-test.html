@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form HTML Test — Auto-Form Creator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #2c3e50;
+            --blue: #1e4996;
+            --border: #dbeafe;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            height: 100%;
+            font-family: 'Montserrat', sans-serif;
+            background: #eaf1f8;
+            color: var(--navy);
+        }
+
+        body.fullscreen-mode {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        body.fullscreen-mode #editor-panel {
+            display: none;
+        }
+
+        body.fullscreen-mode #preview-frame {
+            display: block;
+            flex: 1;
+            min-height: 0;
+            height: auto;
+        }
+
+        body.fullscreen-mode #fullscreen-bar {
+            display: flex;
+            flex-shrink: 0;
+        }
+
+        #editor-panel {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 28px 20px 48px;
+        }
+
+        .page-header {
+            background: var(--navy);
+            color: #fff;
+            width: 100%;
+            margin-bottom: 28px;
+        }
+
+        .page-header-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .page-header p {
+            margin: 6px 0 0;
+            opacity: 0.85;
+            font-size: 0.9rem;
+        }
+
+        .header-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 8px 18px;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .header-link:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        .editor-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(44,62,80,0.08);
+        }
+
+        .editor-card h2 {
+            margin: 0 0 8px;
+            font-size: 1.15rem;
+        }
+
+        .editor-card .hint {
+            margin: 0 0 16px;
+            color: #546e7a;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        #html-input {
+            width: 100%;
+            min-height: 320px;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            resize: vertical;
+        }
+
+        #html-input:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+
+        .editor-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 11px 22px;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #163a78;
+        }
+
+        .btn-secondary {
+            background: #eef2f7;
+            color: var(--navy);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .error-msg {
+            margin-top: 12px;
+            color: #b91c1c;
+            font-size: 0.88rem;
+        }
+
+        body.fullscreen-mode .page-header {
+            display: none;
+        }
+
+        #preview-frame {
+            display: none;
+            width: 100%;
+            border: none;
+            background: #fff;
+        }
+
+        #fullscreen-bar {
+            display: none;
+            background: rgba(44, 62, 80, 0.95);
+            color: #fff;
+            padding: 10px 16px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+
+        #fullscreen-bar span {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        #fullscreen-bar .bar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        #fullscreen-bar .btn {
+            padding: 7px 14px;
+            font-size: 0.82rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <div class="page-header-inner">
+            <div>
+                <h1>Form HTML Test</h1>
+                <p>Paste generated form HTML to test standalone autofill</p>
+            </div>
+            <a href="demo.html" class="header-link">← Back to Demo</a>
+        </div>
+    </header>
+
+    <div id="editor-panel">
+        <div class="editor-card">
+            <h2>Paste Form HTML</h2>
+            <p class="hint">
+                Opens <code>Current Data/generated-form.html</code> automatically when available.
+                You can also paste HTML from Step 8, then click <strong>Render Full Screen</strong>.
+            </p>
+            <textarea id="html-input" placeholder="Paste your full generated HTML document here…"></textarea>
+            <div class="editor-actions">
+                <button type="button" class="btn btn-primary" id="render-btn">Render Full Screen</button>
+                <button type="button" class="btn btn-secondary" id="load-session-btn">Load Last Generated</button>
+                <button type="button" class="btn btn-secondary" id="load-current-data-btn">Reload Current Data</button>
+                <button type="button" class="btn btn-secondary" id="clear-btn">Clear</button>
+            </div>
+            <div class="error-msg" id="error-msg"></div>
+        </div>
+    </div>
+
+    <div id="fullscreen-bar">
+        <span>Standalone form preview</span>
+        <div class="bar-actions">
+            <button type="button" class="btn btn-secondary" id="edit-btn">Edit HTML</button>
+            <button type="button" class="btn btn-primary" id="reload-btn">Reload</button>
+        </div>
+    </div>
+
+    <iframe id="preview-frame" title="Form preview"></iframe>
+
+    <script>
+        const STORAGE_KEY = 'formstarPreviewHtml';
+        const PREVIEW_SHELL = '/Auto-Form-Creator/form-preview-shell.html';
+        const CURRENT_DATA_ALL_AT_ONCE_URL = '/Auto-Form-Creator/Current%20Data/all-at-once-generated-form.html';
+        const CURRENT_DATA_ONE_AT_A_TIME_URL = '/Auto-Form-Creator/Current%20Data/one-at-a-time-generated-form.html';
+        const CURRENT_DATA_FORM_URL = CURRENT_DATA_ALL_AT_ONCE_URL;
+        const htmlInput = document.getElementById('html-input');
+        const renderBtn = document.getElementById('render-btn');
+        const loadSessionBtn = document.getElementById('load-session-btn');
+        const loadCurrentDataBtn = document.getElementById('load-current-data-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const errorMsg = document.getElementById('error-msg');
+        const previewFrame = document.getElementById('preview-frame');
+        const editBtn = document.getElementById('edit-btn');
+        const reloadBtn = document.getElementById('reload-btn');
+
+        function setError(message) {
+            errorMsg.textContent = message || '';
+        }
+
+        let previewBlobUrl = null;
+
+        function revokePreviewBlobUrl() {
+            if (previewBlobUrl) {
+                URL.revokeObjectURL(previewBlobUrl);
+                previewBlobUrl = null;
+            }
+        }
+
+        function renderHtml(html) {
+            const trimmed = (html || '').trim();
+            if (!trimmed) {
+                setError('Paste HTML before rendering.');
+                return;
+            }
+            if (!/<html[\s>]/i.test(trimmed)) {
+                setError('HTML should be a complete document (starting with <!DOCTYPE html> or <html>).');
+                return;
+            }
+
+            setError('');
+            revokePreviewBlobUrl();
+            previewFrame.removeAttribute('srcdoc');
+            sessionStorage.setItem(STORAGE_KEY, trimmed);
+            previewFrame.src = PREVIEW_SHELL + '?t=' + Date.now();
+
+            document.body.classList.add('fullscreen-mode');
+        }
+
+        function exitFullscreen() {
+            document.body.classList.remove('fullscreen-mode');
+        }
+
+        renderBtn.addEventListener('click', () => {
+            renderHtml(htmlInput.value);
+        });
+
+        loadSessionBtn.addEventListener('click', () => {
+            const stored = sessionStorage.getItem(STORAGE_KEY);
+            if (!stored) {
+                setError('No generated HTML found in session. Run Step 8 in the demo or use Reload Current Data.');
+                return;
+            }
+            htmlInput.value = stored;
+            setError('');
+            renderHtml(stored);
+        });
+
+        async function loadCurrentDataForm(autoRender) {
+            try {
+                const res = await fetch(CURRENT_DATA_FORM_URL, { cache: 'no-store' });
+                if (!res.ok) {
+                    throw new Error('No generated-form.html in Current Data yet. Complete Step 8 in the demo first.');
+                }
+                const html = await res.text();
+                if (!html.trim() || !/<html[\s>]/i.test(html)) {
+                    throw new Error('Current Data/generated-form.html is empty or invalid.');
+                }
+                htmlInput.value = html;
+                setError('');
+                if (autoRender) renderHtml(html);
+                return true;
+            } catch (err) {
+                if (!autoRender) setError(err.message || 'Failed to load Current Data form.');
+                return false;
+            }
+        }
+
+        loadCurrentDataBtn.addEventListener('click', () => {
+            loadCurrentDataForm(true);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            htmlInput.value = '';
+            setError('');
+            exitFullscreen();
+        });
+
+        editBtn.addEventListener('click', exitFullscreen);
+
+        reloadBtn.addEventListener('click', () => {
+            renderHtml(htmlInput.value);
+        });
+
+        const storedOnLoad = sessionStorage.getItem(STORAGE_KEY);
+        if (storedOnLoad) {
+            htmlInput.value = storedOnLoad;
+        }
+
+        loadCurrentDataForm(true).then((loaded) => {
+            if (!loaded && storedOnLoad) {
+                renderHtml(storedOnLoad);
+            }
+        });
+    </script>
+</body>
+</html>

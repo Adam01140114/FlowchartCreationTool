@@ -12,6 +12,8 @@ const path = require('path');
 const JSZip = require('jszip');
 const { PDFDocument, StandardFonts } = require('pdf-lib');
 const { preparePayloadHtml, sanitizePayloadFolderName } = require('./payload-html');
+require('dotenv').config();
+const { registerAutoFormRoutes } = require('./auto-form/routes');
 
 const ROOT = __dirname;
 const FORM_WIZ_DIR = path.join(ROOT, 'FormWiz GUI');
@@ -257,6 +259,10 @@ app.post('/api/test-payload', express.json({ limit: '50mb' }), async (req, res) 
   }
 });
 
+// Auto Form Creator (ported from FormWiz) — mounts /Auto-Form-Creator + its API.
+// Registered before the repo-wide static handler so its routes take precedence.
+const autoFormStatus = registerAutoFormRoutes(app);
+
 app.use(express.static(ROOT));
 
 app.get('/', (_req, res) => {
@@ -267,6 +273,14 @@ app.listen(PORT, () => {
   console.log(`Flowchart dev server running at http://127.0.0.1:${PORT}`);
   console.log('PDF fill endpoint: POST /edit_pdf?pdf=W9.pdf');
   console.log(`Looking for PDFs in: ${FORM_WIZ_DIR}`);
+  console.log(`Auto Form Creator: http://127.0.0.1:${PORT}/Auto-Form-Creator/demo.html`);
+  if (!autoFormStatus.openAi || !autoFormStatus.anthropic) {
+    const missing = [
+      !autoFormStatus.openAi ? 'OPENAI_API_KEY' : null,
+      !autoFormStatus.anthropic ? 'ANTHROPIC_API_KEY' : null
+    ].filter(Boolean).join(', ');
+    console.log(`  (AI generation disabled - missing ${missing} in .env)`);
+  }
 }).on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
     console.error(`Port ${PORT} is already in use (likely an old http-server).`);

@@ -1,0 +1,1067 @@
+{
+  "formTitle": "REQUEST FOR LIVE SCAN SERVICE",
+  "formName": "Live Scan Service Request",
+  "formId": "live_scan_service_request",
+  "formDescription": "Form to request live scan service for background checks.",
+  "formFolderName": "LiveScanService",
+  "defendant": "N/A",
+  "displayMode": "all_at_once",
+  "sections": [
+    {
+      "sectionId": 1,
+      "sectionName": "Agency Information",
+      "questions": [
+        {
+          "questionId": 1,
+          "text": "What is your ORI code?",
+          "needsExplanation": true,
+          "explanation": "Enter the ORI code assigned by the Department of Justice.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "agency_ori",
+          "placeholder": "ORI code",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 2,
+          "text": "What is the authorized applicant type?",
+          "needsExplanation": true,
+          "explanation": "Specify the type of applicant authorized by the agency.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "agency_authorized_applicant_type",
+          "placeholder": "Authorized applicant type",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 3,
+          "text": "What is the type of license, certification, or permit?",
+          "needsExplanation": true,
+          "explanation": "Enter the type of license, certification, or permit, or working title.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "agency_type_of_license",
+          "placeholder": "Type of license/certification/permit",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 4,
+          "text": "Which agency is authorized to receive criminal record information?",
+          "needsExplanation": true,
+          "explanation": "Provide the name of the agency authorized to receive criminal record information.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "agency_authorized_to_receive_criminal_record_info",
+          "placeholder": "Authorized agency",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 5,
+          "text": "What is your agency's mail code?",
+          "needsExplanation": true,
+          "explanation": "Enter the five-digit mail code assigned by the DOJ.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "agency_mail_code",
+          "placeholder": "Mail code",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 6,
+          "text": "What is your agency's address?",
+          "needsExplanation": true,
+          "explanation": "Enter the complete address of the agency including street, city, state, and ZIP code.",
+          "type": "multipleTextboxes",
+          "textboxes": [
+            {
+              "label": "Street Address or P.O. Box",
+              "nameId": "agency_street_address",
+              "placeholder": "Street address"
+            },
+            {
+              "label": "City",
+              "nameId": "agency_city",
+              "placeholder": "City"
+            },
+            {
+              "label": "State",
+              "placeholder": "State",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "state",
+                "profileDescription": "Agency's state"
+              },
+              "pdfCombineInto": "agency_zip_code"
+            },
+            {
+              "label": "ZIP Code",
+              "nameId": "agency_zip_code",
+              "placeholder": "ZIP Code"
+            }
+          ],
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false
+        },
+        {
+          "questionId": 7,
+          "text": "Who is the contact person at your agency?",
+          "needsExplanation": true,
+          "explanation": "Provide the name of the contact person at the agency.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "agency_contact_name",
+          "placeholder": "Contact name",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 8,
+          "text": "What is the contact telephone number for your agency?",
+          "needsExplanation": true,
+          "explanation": "Enter the telephone number for the agency's contact person.",
+          "type": "phone",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "agency_contact_telephone_number",
+          "placeholder": "Contact telephone number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": 2,
+      "sectionName": "Applicant Information",
+      "questions": [
+        {
+          "questionId": 9,
+          "text": "What is your first name?",
+          "needsExplanation": true,
+          "explanation": "Enter your legal first name as it appears on official documents.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_first_name",
+          "placeholder": "First name",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "first_name",
+            "profileDescription": "User's legal first name"
+          }
+        },
+        {
+          "questionId": 10,
+          "text": "What is your middle initial?",
+          "needsExplanation": true,
+          "explanation": "Enter your middle initial if applicable.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_middle_initial",
+          "placeholder": "Middle initial",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 11,
+          "text": "What is your last name?",
+          "needsExplanation": true,
+          "explanation": "Enter your legal last name as it appears on official documents.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_last_name",
+          "placeholder": "Last name",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "last_name",
+            "profileDescription": "User's legal last name"
+          }
+        },
+        {
+          "questionId": 12,
+          "text": "Do you have an alias?",
+          "needsExplanation": true,
+          "explanation": "Choose Yes if you have used another name or alias.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "nameId": null
+        },
+        {
+          "questionId": 13,
+          "text": "What is your alias or other name?",
+          "needsExplanation": true,
+          "explanation": "Enter your alias or other name if different from your legal name.",
+          "type": "multipleTextboxes",
+          "textboxes": [
+            {
+              "label": "First Name",
+              "nameId": "other_name_first",
+              "placeholder": "Alias first name"
+            },
+            {
+              "label": "Last Name",
+              "nameId": "other_name_last",
+              "placeholder": "Alias last name"
+            },
+            {
+              "label": "Suffix",
+              "nameId": "other_name_suffix",
+              "placeholder": "Alias suffix"
+            }
+          ],
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "12",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false
+        },
+        {
+          "questionId": 14,
+          "text": "What is your date of birth?",
+          "needsExplanation": true,
+          "explanation": "Enter your date of birth as it appears on official documents.",
+          "type": "date",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_date_of_birth",
+          "placeholder": "Date of birth",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "date_of_birth",
+            "profileDescription": "User's date of birth"
+          }
+        },
+        {
+          "questionId": 15,
+          "text": "Please select your sex",
+          "needsExplanation": true,
+          "explanation": "Select the option that best describes your sex as required on the official form.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "single",
+          "options": [
+            {
+              "label": "Male",
+              "nameId": "applicant_sex_male",
+              "value": "Male"
+            },
+            {
+              "label": "Female",
+              "nameId": "applicant_sex_female",
+              "value": "Female"
+            },
+            {
+              "label": "Nonbinary/Unspecified",
+              "nameId": "applicant_sex_nonbinary",
+              "value": "Nonbinary/Unspecified"
+            }
+          ],
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false
+        },
+        {
+          "questionId": 16,
+          "text": "What is your driver's license number?",
+          "needsExplanation": true,
+          "explanation": "Enter your driver's license number as it appears on your license.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_drivers_license_number",
+          "placeholder": "Driver's license number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 17,
+          "text": "What is your height?",
+          "needsExplanation": true,
+          "explanation": "Enter your height in feet and inches.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_height",
+          "placeholder": "Height",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 18,
+          "text": "What is your weight?",
+          "needsExplanation": true,
+          "explanation": "Enter your weight in pounds.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_weight",
+          "placeholder": "Weight",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 19,
+          "text": "What is your eye color?",
+          "needsExplanation": true,
+          "explanation": "Enter your eye color as it appears on official documents.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_eye_color",
+          "placeholder": "Eye color",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 20,
+          "text": "What is your hair color?",
+          "needsExplanation": true,
+          "explanation": "Enter your hair color as it appears on official documents.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_hair_color",
+          "placeholder": "Hair color",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 21,
+          "text": "What is your billing number?",
+          "needsExplanation": true,
+          "explanation": "Enter the agency billing number if applicable.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_billing_number",
+          "placeholder": "Billing number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 22,
+          "text": "What is your place of birth?",
+          "needsExplanation": true,
+          "explanation": "Enter the state or country where you were born.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_place_of_birth",
+          "placeholder": "Place of birth",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 23,
+          "text": "What is your Social Security Number?",
+          "needsExplanation": true,
+          "explanation": "Enter your Social Security Number as it appears on official documents.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_social_security_number",
+          "placeholder": "Social Security Number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 24,
+          "text": "What is your miscellaneous number?",
+          "needsExplanation": true,
+          "explanation": "Enter any other identification number if applicable.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_misc_number",
+          "placeholder": "Miscellaneous number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 25,
+          "text": "What is your home address?",
+          "needsExplanation": true,
+          "explanation": "Enter your complete home address including street, city, state, and ZIP code.",
+          "type": "multipleTextboxes",
+          "textboxes": [
+            {
+              "label": "Street Address or P.O. Box",
+              "nameId": "applicant_home_address",
+              "placeholder": "Street address"
+            },
+            {
+              "label": "City",
+              "nameId": "applicant_home_city",
+              "placeholder": "City"
+            },
+            {
+              "label": "State",
+              "placeholder": "State",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "state",
+                "profileDescription": "User's home state"
+              },
+              "pdfCombineInto": "applicant_home_zip_code"
+            },
+            {
+              "label": "ZIP Code",
+              "nameId": "applicant_home_zip_code",
+              "placeholder": "ZIP Code"
+            }
+          ],
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false
+        },
+        {
+          "questionId": 26,
+          "text": "What is your applicant signature date?",
+          "needsExplanation": true,
+          "explanation": "This date will be automatically filled with today's date.",
+          "type": "date",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_signature_date",
+          "placeholder": "Signature date",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": true,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 27,
+          "text": "What is your number?",
+          "needsExplanation": true,
+          "explanation": "Enter your unique identifying number if applicable.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_your_number",
+          "placeholder": "Your number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 28,
+          "text": "Is this a resubmission?",
+          "needsExplanation": true,
+          "explanation": "Choose Yes if you are resubmitting a prior live scan and need to provide the original ATI number.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "nameId": null
+        },
+        {
+          "questionId": 29,
+          "text": "What is your original ATI number?",
+          "needsExplanation": true,
+          "explanation": "Enter the ATI number from your original submission if you are resubmitting a live scan.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "28",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "original_ati_number",
+          "placeholder": "Original ATI number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": 3,
+      "sectionName": "Employer Information",
+      "questions": [
+        {
+          "questionId": 30,
+          "text": "What is your employer's name?",
+          "needsExplanation": true,
+          "explanation": "Enter the name of your employer.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_name",
+          "placeholder": "Employer name",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 31,
+          "text": "What is your employer's address?",
+          "needsExplanation": true,
+          "explanation": "Enter the complete address of your employer including street, city, state, and ZIP code.",
+          "type": "multipleTextboxes",
+          "textboxes": [
+            {
+              "label": "Street Address or P.O. Box",
+              "nameId": "employer_street_address",
+              "placeholder": "Street address"
+            },
+            {
+              "label": "City",
+              "nameId": "employer_city",
+              "placeholder": "City"
+            },
+            {
+              "label": "State",
+              "placeholder": "State",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "state",
+                "profileDescription": "Employer's state"
+              },
+              "pdfCombineInto": "employer_zip_code"
+            },
+            {
+              "label": "ZIP Code",
+              "nameId": "employer_zip_code",
+              "placeholder": "ZIP Code"
+            }
+          ],
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false
+        },
+        {
+          "questionId": 32,
+          "text": "What is your employer's telephone number?",
+          "needsExplanation": true,
+          "explanation": "Enter the telephone number for your employer.",
+          "type": "phone",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_phone_number",
+          "placeholder": "Employer telephone number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 33,
+          "text": "What is your employer's mail code?",
+          "needsExplanation": true,
+          "explanation": "Enter the five-digit mail code assigned by the DOJ for your employer.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_mail_code",
+          "placeholder": "Employer mail code",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 34,
+          "text": "Please select your level of service",
+          "needsExplanation": true,
+          "explanation": "Select all applicable levels of service required for your background check.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "multiple",
+          "options": [
+            {
+              "label": "DOJ",
+              "nameId": "level_of_service_doj",
+              "value": "DOJ"
+            },
+            {
+              "label": "FBI",
+              "nameId": "level_of_service_fbi",
+              "value": "FBI"
+            }
+          ],
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false
+        }
+      ]
+    }
+  ],
+  "hiddenFields": [],
+  "linkedFieldGroups": [
+    {
+      "groupKey": "semantic:first_name",
+      "primaryNameId": "applicant_first_name",
+      "primaryQuestionId": 9,
+      "mirrorNameIds": []
+    },
+    {
+      "groupKey": "semantic:last_name",
+      "primaryNameId": "applicant_last_name",
+      "primaryQuestionId": 11,
+      "mirrorNameIds": []
+    },
+    {
+      "groupKey": "semantic:state",
+      "primaryNameId": null,
+      "primaryQuestionId": null,
+      "mirrorNameIds": []
+    }
+  ],
+  "sectionCounter": 4,
+  "questionCounter": 35,
+  "pdfToken": "15f220c6-0d7b-4144-957c-a893abd6d2a7",
+  "htmlMode": "normal"
+}

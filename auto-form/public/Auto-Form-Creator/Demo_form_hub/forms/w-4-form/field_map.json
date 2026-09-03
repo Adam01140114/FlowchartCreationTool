@@ -1,0 +1,1208 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-17T06:59:41.131Z",
+  "byNameId": {
+    "first_name_and_middle_initial": {
+      "pdfId": "first_name_and_middle_initial",
+      "page": 1,
+      "rect": [
+        94.6,
+        683.97,
+        272.85,
+        697.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].Step1a[0].f1_01[0]",
+      "label": "First Name and Middle Initial",
+      "nameId": "first_name_and_middle_initial"
+    },
+    "last_name": {
+      "pdfId": "last_name",
+      "page": 1,
+      "rect": [
+        274.6,
+        683.97,
+        474.45,
+        697.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].Step1a[0].f1_02[0]",
+      "label": "Last Name",
+      "nameId": "last_name"
+    },
+    "social_security_number": {
+      "pdfId": "social_security_number",
+      "page": 1,
+      "rect": [
+        476.2,
+        683.97,
+        576,
+        697.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_05[0]",
+      "label": "Social Security Number",
+      "nameId": "social_security_number"
+    },
+    "street_address": {
+      "pdfId": "street_address",
+      "page": 1,
+      "rect": [
+        94.6,
+        659.97,
+        474.45,
+        673.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].Step1a[0].f1_03[0]",
+      "label": "Street Address",
+      "nameId": "street_address"
+    },
+    "city_state_zip_code": {
+      "pdfId": "city_state_zip_code",
+      "page": 1,
+      "rect": [
+        94.6,
+        635.97,
+        474.45,
+        649.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].Step1a[0].f1_04[0]",
+      "label": "City or Town, State, and ZIP Code",
+      "nameId": "city_state_zip_code"
+    },
+    "filing_status_single_or_married_separately": {
+      "pdfId": "filing_status_single_or_married_separately",
+      "page": 1,
+      "rect": [
+        115.2,
+        625.97,
+        123.2,
+        633.97
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].c1_1[0]",
+      "label": "Single or Married filing separately",
+      "nameId": "filing_status_single_or_married_separately"
+    },
+    "filing_status_married_jointly_or_surviving_spouse": {
+      "pdfId": "filing_status_married_jointly_or_surviving_spouse",
+      "page": 1,
+      "rect": [
+        115.2,
+        613.97,
+        123.2,
+        621.97
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].c1_1[1]",
+      "label": "Married filing jointly or Qualifying surviving spouse",
+      "nameId": "filing_status_married_jointly_or_surviving_spouse"
+    },
+    "filing_status_head_of_household": {
+      "pdfId": "filing_status_head_of_household",
+      "page": 1,
+      "rect": [
+        115.2,
+        602.22,
+        123.2,
+        610.22
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].c1_1[2]",
+      "label": "Head of household",
+      "nameId": "filing_status_head_of_household"
+    },
+    "multiple_jobs_or_spouse_works": {
+      "pdfId": "multiple_jobs_or_spouse_works",
+      "page": 1,
+      "rect": [
+        564,
+        379.97,
+        572,
+        387.97
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].c1_2[0]",
+      "label": "Multiple jobs or spouse works",
+      "nameId": "multiple_jobs_or_spouse_works"
+    },
+    "qualifying_children_amount": {
+      "pdfId": "qualifying_children_amount",
+      "page": 1,
+      "rect": [
+        417.6,
+        299.97,
+        481.65,
+        311.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_06[0]",
+      "label": "Qualifying Children Amount",
+      "nameId": "qualifying_children_amount"
+    },
+    "other_dependents_amount": {
+      "pdfId": "other_dependents_amount",
+      "page": 1,
+      "rect": [
+        417.6,
+        287.97,
+        481.65,
+        299.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_07[0]",
+      "label": "Other Dependents Amount",
+      "nameId": "other_dependents_amount"
+    },
+    "total_credits_amount": {
+      "pdfId": "total_credits_amount",
+      "page": 1,
+      "rect": [
+        511.2,
+        263.97,
+        576,
+        275.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_08[0]",
+      "label": "Total Credits Amount",
+      "nameId": "total_credits_amount"
+    },
+    "other_income_amount": {
+      "pdfId": "other_income_amount",
+      "page": 1,
+      "rect": [
+        511.2,
+        227.97,
+        576,
+        239.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_09[0]",
+      "label": "Other Income Amount",
+      "nameId": "other_income_amount"
+    },
+    "deductions_amount": {
+      "pdfId": "deductions_amount",
+      "page": 1,
+      "rect": [
+        511.2,
+        191.97,
+        576,
+        203.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_10[0]",
+      "label": "Deductions Amount",
+      "nameId": "deductions_amount"
+    },
+    "extra_withholding_amount": {
+      "pdfId": "extra_withholding_amount",
+      "page": 1,
+      "rect": [
+        511.2,
+        173.97,
+        576,
+        185.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_11[0]",
+      "label": "Extra Withholding Amount",
+      "nameId": "extra_withholding_amount"
+    },
+    "exempt_from_withholding": {
+      "pdfId": "exempt_from_withholding",
+      "page": 1,
+      "rect": [
+        564,
+        129.47,
+        572,
+        137.47
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].c1_3[0]",
+      "label": "Exempt from withholding",
+      "nameId": "exempt_from_withholding"
+    },
+    "employer_name_and_address": {
+      "pdfId": "employer_name_and_address",
+      "page": 1,
+      "rect": [
+        94.6,
+        35.97,
+        388.05,
+        65.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_12[0]",
+      "label": "Employer Name and Address",
+      "nameId": "employer_name_and_address"
+    },
+    "first_date_of_employment": {
+      "pdfId": "first_date_of_employment",
+      "page": 1,
+      "rect": [
+        389.8,
+        35.97,
+        467.25,
+        47.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_13[0]",
+      "label": "First Date of Employment",
+      "nameId": "first_date_of_employment"
+    },
+    "employer_identification_number": {
+      "pdfId": "employer_identification_number",
+      "page": 1,
+      "rect": [
+        469,
+        35.97,
+        576,
+        47.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_14[0]",
+      "label": "Employer Identification Number (EIN)",
+      "nameId": "employer_identification_number"
+    },
+    "multiple_jobs_line_1_amount": {
+      "pdfId": "multiple_jobs_line_1_amount",
+      "page": 3,
+      "rect": [
+        511.2,
+        587.97,
+        576,
+        599.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page3[0].f3_01[0]",
+      "label": "Multiple Jobs Worksheet Line 1 Amount",
+      "nameId": "multiple_jobs_line_1_amount"
+    },
+    "multiple_jobs_line_2a_amount": {
+      "pdfId": "multiple_jobs_line_2a_amount",
+      "page": 3,
+      "rect": [
+        511.2,
+        497.97,
+        576,
+        509.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page3[0].f3_02[0]",
+      "label": "Multiple Jobs Worksheet Line 2a Amount",
+      "nameId": "multiple_jobs_line_2a_amount"
+    },
+    "multiple_jobs_line_2b_amount": {
+      "pdfId": "multiple_jobs_line_2b_amount",
+      "page": 3,
+      "rect": [
+        511.2,
+        437.97,
+        576,
+        449.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page3[0].f3_03[0]",
+      "label": "Multiple Jobs Worksheet Line 2b Amount",
+      "nameId": "multiple_jobs_line_2b_amount"
+    },
+    "multiple_jobs_line_2c_amount": {
+      "pdfId": "multiple_jobs_line_2c_amount",
+      "page": 3,
+      "rect": [
+        511.2,
+        413.97,
+        576,
+        425.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page3[0].f3_04[0]",
+      "label": "Multiple Jobs Worksheet Line 2c Amount",
+      "nameId": "multiple_jobs_line_2c_amount"
+    },
+    "multiple_jobs_pay_periods_per_year": {
+      "pdfId": "multiple_jobs_pay_periods_per_year",
+      "page": 3,
+      "rect": [
+        504,
+        377.97,
+        576,
+        389.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page3[0].f3_05[0]",
+      "label": "Pay Periods Per Year",
+      "nameId": "multiple_jobs_pay_periods_per_year"
+    },
+    "multiple_jobs_line_4_amount": {
+      "pdfId": "multiple_jobs_line_4_amount",
+      "page": 3,
+      "rect": [
+        511.2,
+        329.97,
+        576,
+        341.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page3[0].f3_06[0]",
+      "label": "Multiple Jobs Worksheet Line 4 Amount",
+      "nameId": "multiple_jobs_line_4_amount"
+    },
+    "qualified_tips_amount": {
+      "pdfId": "qualified_tips_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        659.97,
+        576,
+        671.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_01[0]",
+      "label": "Qualified Tips Amount",
+      "nameId": "qualified_tips_amount"
+    },
+    "qualified_overtime_compensation_amount": {
+      "pdfId": "qualified_overtime_compensation_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        623.97,
+        576,
+        635.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_02[0]",
+      "label": "Qualified Overtime Compensation Amount",
+      "nameId": "qualified_overtime_compensation_amount"
+    },
+    "qualified_passenger_vehicle_loan_interest_amount": {
+      "pdfId": "qualified_passenger_vehicle_loan_interest_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        599.97,
+        576,
+        611.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_03[0]",
+      "label": "Qualified Passenger Vehicle Loan Interest Amount",
+      "nameId": "qualified_passenger_vehicle_loan_interest_amount"
+    },
+    "deductions_line_2_total": {
+      "pdfId": "deductions_line_2_total",
+      "page": 4,
+      "rect": [
+        511.2,
+        587.97,
+        576,
+        599.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_04[0]",
+      "label": "Deductions Worksheet Line 2 Total",
+      "nameId": "deductions_line_2_total"
+    },
+    "senior_self_amount": {
+      "pdfId": "senior_self_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        563.97,
+        576,
+        575.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_05[0]",
+      "label": "Senior (Self) Amount",
+      "nameId": "senior_self_amount"
+    },
+    "senior_spouse_amount": {
+      "pdfId": "senior_spouse_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        539.97,
+        576,
+        551.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_06[0]",
+      "label": "Senior (Spouse) Amount",
+      "nameId": "senior_spouse_amount"
+    },
+    "senior_total_amount": {
+      "pdfId": "senior_total_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        527.97,
+        576,
+        539.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_07[0]",
+      "label": "Senior Total Amount",
+      "nameId": "senior_total_amount"
+    },
+    "other_adjustments_amount": {
+      "pdfId": "other_adjustments_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        491.97,
+        576,
+        503.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_08[0]",
+      "label": "Other Adjustments Amount",
+      "nameId": "other_adjustments_amount"
+    },
+    "medical_and_dental_expenses_amount": {
+      "pdfId": "medical_and_dental_expenses_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        455.97,
+        576,
+        467.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_09[0]",
+      "label": "Medical and Dental Expenses Amount",
+      "nameId": "medical_and_dental_expenses_amount"
+    },
+    "state_and_local_taxes_amount": {
+      "pdfId": "state_and_local_taxes_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        431.97,
+        576,
+        443.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_10[0]",
+      "label": "State and Local Taxes Amount",
+      "nameId": "state_and_local_taxes_amount"
+    },
+    "home_mortgage_interest_amount": {
+      "pdfId": "home_mortgage_interest_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        395.97,
+        576,
+        407.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_11[0]",
+      "label": "Home Mortgage Interest Amount",
+      "nameId": "home_mortgage_interest_amount"
+    },
+    "charitable_gifts_amount": {
+      "pdfId": "charitable_gifts_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        383.97,
+        576,
+        395.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_12[0]",
+      "label": "Charitable Gifts Amount",
+      "nameId": "charitable_gifts_amount"
+    },
+    "other_itemized_deductions_amount": {
+      "pdfId": "other_itemized_deductions_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        371.97,
+        576,
+        383.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_13[0]",
+      "label": "Other Itemized Deductions Amount",
+      "nameId": "other_itemized_deductions_amount"
+    },
+    "itemized_deductions_total": {
+      "pdfId": "itemized_deductions_total",
+      "page": 4,
+      "rect": [
+        511.2,
+        359.97,
+        576,
+        371.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_14[0]",
+      "label": "Itemized Deductions Total",
+      "nameId": "itemized_deductions_total"
+    },
+    "total_income_amount": {
+      "pdfId": "total_income_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        335.97,
+        576,
+        347.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_15[0]",
+      "label": "Total Income Amount",
+      "nameId": "total_income_amount"
+    },
+    "income_minus_senior_total": {
+      "pdfId": "income_minus_senior_total",
+      "page": 4,
+      "rect": [
+        511.2,
+        323.97,
+        576,
+        335.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_16[0]",
+      "label": "Income Minus Senior Total",
+      "nameId": "income_minus_senior_total"
+    },
+    "itemized_deductions_limit": {
+      "pdfId": "itemized_deductions_limit",
+      "page": 4,
+      "rect": [
+        511.2,
+        299.97,
+        576,
+        311.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_17[0]",
+      "label": "Itemized Deductions Limit",
+      "nameId": "itemized_deductions_limit"
+    },
+    "adjusted_itemized_deductions": {
+      "pdfId": "adjusted_itemized_deductions",
+      "page": 4,
+      "rect": [
+        511.2,
+        263.97,
+        576,
+        275.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_18[0]",
+      "label": "Adjusted Itemized Deductions",
+      "nameId": "adjusted_itemized_deductions"
+    },
+    "standard_deduction_amount": {
+      "pdfId": "standard_deduction_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        227.97,
+        576,
+        239.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_19[0]",
+      "label": "Standard Deduction Amount",
+      "nameId": "standard_deduction_amount"
+    },
+    "cash_gifts_to_charities_amount": {
+      "pdfId": "cash_gifts_to_charities_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        191.97,
+        576,
+        203.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_20[0]",
+      "label": "Cash Gifts to Charities Amount",
+      "nameId": "cash_gifts_to_charities_amount"
+    },
+    "standard_deduction_plus_cash_gifts": {
+      "pdfId": "standard_deduction_plus_cash_gifts",
+      "page": 4,
+      "rect": [
+        511.2,
+        179.97,
+        576,
+        191.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_21[0]",
+      "label": "Standard Deduction Plus Cash Gifts",
+      "nameId": "standard_deduction_plus_cash_gifts"
+    },
+    "deductions_line_14_amount": {
+      "pdfId": "deductions_line_14_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        155.97,
+        576,
+        167.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_22[0]",
+      "label": "Deductions Worksheet Line 14 Amount",
+      "nameId": "deductions_line_14_amount"
+    },
+    "deductions_worksheet_total": {
+      "pdfId": "deductions_worksheet_total",
+      "page": 4,
+      "rect": [
+        511.2,
+        143.97,
+        576,
+        155.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page4[0].f4_23[0]",
+      "label": "Deductions Worksheet Total",
+      "nameId": "deductions_worksheet_total"
+    }
+  },
+  "byPdfId": {
+    "first_name_and_middle_initial": {
+      "pdfId": "first_name_and_middle_initial",
+      "page": 1,
+      "rect": [
+        94.6,
+        683.97,
+        272.85,
+        697.97
+      ],
+      "type": "text"
+    },
+    "last_name": {
+      "pdfId": "last_name",
+      "page": 1,
+      "rect": [
+        274.6,
+        683.97,
+        474.45,
+        697.97
+      ],
+      "type": "text"
+    },
+    "street_address": {
+      "pdfId": "street_address",
+      "page": 1,
+      "rect": [
+        94.6,
+        659.97,
+        474.45,
+        673.97
+      ],
+      "type": "text"
+    },
+    "city_state_zip_code": {
+      "pdfId": "city_state_zip_code",
+      "page": 1,
+      "rect": [
+        94.6,
+        635.97,
+        474.45,
+        649.97
+      ],
+      "type": "text"
+    },
+    "social_security_number": {
+      "pdfId": "social_security_number",
+      "page": 1,
+      "rect": [
+        476.2,
+        683.97,
+        576,
+        697.97
+      ],
+      "type": "text"
+    },
+    "filing_status_single_or_married_separately": {
+      "pdfId": "filing_status_single_or_married_separately",
+      "page": 1,
+      "rect": [
+        115.2,
+        625.97,
+        123.2,
+        633.97
+      ],
+      "type": "checkbox"
+    },
+    "filing_status_married_jointly_or_surviving_spouse": {
+      "pdfId": "filing_status_married_jointly_or_surviving_spouse",
+      "page": 1,
+      "rect": [
+        115.2,
+        613.97,
+        123.2,
+        621.97
+      ],
+      "type": "checkbox"
+    },
+    "filing_status_head_of_household": {
+      "pdfId": "filing_status_head_of_household",
+      "page": 1,
+      "rect": [
+        115.2,
+        602.22,
+        123.2,
+        610.22
+      ],
+      "type": "checkbox"
+    },
+    "multiple_jobs_or_spouse_works": {
+      "pdfId": "multiple_jobs_or_spouse_works",
+      "page": 1,
+      "rect": [
+        564,
+        379.97,
+        572,
+        387.97
+      ],
+      "type": "checkbox"
+    },
+    "qualifying_children_amount": {
+      "pdfId": "qualifying_children_amount",
+      "page": 1,
+      "rect": [
+        417.6,
+        299.97,
+        481.65,
+        311.97
+      ],
+      "type": "text"
+    },
+    "other_dependents_amount": {
+      "pdfId": "other_dependents_amount",
+      "page": 1,
+      "rect": [
+        417.6,
+        287.97,
+        481.65,
+        299.97
+      ],
+      "type": "text"
+    },
+    "total_credits_amount": {
+      "pdfId": "total_credits_amount",
+      "page": 1,
+      "rect": [
+        511.2,
+        263.97,
+        576,
+        275.97
+      ],
+      "type": "text"
+    },
+    "other_income_amount": {
+      "pdfId": "other_income_amount",
+      "page": 1,
+      "rect": [
+        511.2,
+        227.97,
+        576,
+        239.97
+      ],
+      "type": "text"
+    },
+    "deductions_amount": {
+      "pdfId": "deductions_amount",
+      "page": 1,
+      "rect": [
+        511.2,
+        191.97,
+        576,
+        203.97
+      ],
+      "type": "text"
+    },
+    "extra_withholding_amount": {
+      "pdfId": "extra_withholding_amount",
+      "page": 1,
+      "rect": [
+        511.2,
+        173.97,
+        576,
+        185.97
+      ],
+      "type": "text"
+    },
+    "exempt_from_withholding": {
+      "pdfId": "exempt_from_withholding",
+      "page": 1,
+      "rect": [
+        564,
+        129.47,
+        572,
+        137.47
+      ],
+      "type": "checkbox"
+    },
+    "employer_name_and_address": {
+      "pdfId": "employer_name_and_address",
+      "page": 1,
+      "rect": [
+        94.6,
+        35.97,
+        388.05,
+        65.97
+      ],
+      "type": "text"
+    },
+    "first_date_of_employment": {
+      "pdfId": "first_date_of_employment",
+      "page": 1,
+      "rect": [
+        389.8,
+        35.97,
+        467.25,
+        47.97
+      ],
+      "type": "text"
+    },
+    "employer_identification_number": {
+      "pdfId": "employer_identification_number",
+      "page": 1,
+      "rect": [
+        469,
+        35.97,
+        576,
+        47.97
+      ],
+      "type": "text"
+    },
+    "multiple_jobs_line_1_amount": {
+      "pdfId": "multiple_jobs_line_1_amount",
+      "page": 3,
+      "rect": [
+        511.2,
+        587.97,
+        576,
+        599.97
+      ],
+      "type": "text"
+    },
+    "multiple_jobs_line_2a_amount": {
+      "pdfId": "multiple_jobs_line_2a_amount",
+      "page": 3,
+      "rect": [
+        511.2,
+        497.97,
+        576,
+        509.97
+      ],
+      "type": "text"
+    },
+    "multiple_jobs_line_2b_amount": {
+      "pdfId": "multiple_jobs_line_2b_amount",
+      "page": 3,
+      "rect": [
+        511.2,
+        437.97,
+        576,
+        449.97
+      ],
+      "type": "text"
+    },
+    "multiple_jobs_line_2c_amount": {
+      "pdfId": "multiple_jobs_line_2c_amount",
+      "page": 3,
+      "rect": [
+        511.2,
+        413.97,
+        576,
+        425.97
+      ],
+      "type": "text"
+    },
+    "multiple_jobs_pay_periods_per_year": {
+      "pdfId": "multiple_jobs_pay_periods_per_year",
+      "page": 3,
+      "rect": [
+        504,
+        377.97,
+        576,
+        389.97
+      ],
+      "type": "text"
+    },
+    "multiple_jobs_line_4_amount": {
+      "pdfId": "multiple_jobs_line_4_amount",
+      "page": 3,
+      "rect": [
+        511.2,
+        329.97,
+        576,
+        341.97
+      ],
+      "type": "text"
+    },
+    "qualified_tips_amount": {
+      "pdfId": "qualified_tips_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        659.97,
+        576,
+        671.97
+      ],
+      "type": "text"
+    },
+    "qualified_overtime_compensation_amount": {
+      "pdfId": "qualified_overtime_compensation_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        623.97,
+        576,
+        635.97
+      ],
+      "type": "text"
+    },
+    "qualified_passenger_vehicle_loan_interest_amount": {
+      "pdfId": "qualified_passenger_vehicle_loan_interest_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        599.97,
+        576,
+        611.97
+      ],
+      "type": "text"
+    },
+    "deductions_line_2_total": {
+      "pdfId": "deductions_line_2_total",
+      "page": 4,
+      "rect": [
+        511.2,
+        587.97,
+        576,
+        599.97
+      ],
+      "type": "text"
+    },
+    "senior_self_amount": {
+      "pdfId": "senior_self_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        563.97,
+        576,
+        575.97
+      ],
+      "type": "text"
+    },
+    "senior_spouse_amount": {
+      "pdfId": "senior_spouse_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        539.97,
+        576,
+        551.97
+      ],
+      "type": "text"
+    },
+    "senior_total_amount": {
+      "pdfId": "senior_total_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        527.97,
+        576,
+        539.97
+      ],
+      "type": "text"
+    },
+    "other_adjustments_amount": {
+      "pdfId": "other_adjustments_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        491.97,
+        576,
+        503.97
+      ],
+      "type": "text"
+    },
+    "medical_and_dental_expenses_amount": {
+      "pdfId": "medical_and_dental_expenses_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        455.97,
+        576,
+        467.97
+      ],
+      "type": "text"
+    },
+    "state_and_local_taxes_amount": {
+      "pdfId": "state_and_local_taxes_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        431.97,
+        576,
+        443.97
+      ],
+      "type": "text"
+    },
+    "home_mortgage_interest_amount": {
+      "pdfId": "home_mortgage_interest_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        395.97,
+        576,
+        407.97
+      ],
+      "type": "text"
+    },
+    "charitable_gifts_amount": {
+      "pdfId": "charitable_gifts_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        383.97,
+        576,
+        395.97
+      ],
+      "type": "text"
+    },
+    "other_itemized_deductions_amount": {
+      "pdfId": "other_itemized_deductions_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        371.97,
+        576,
+        383.97
+      ],
+      "type": "text"
+    },
+    "itemized_deductions_total": {
+      "pdfId": "itemized_deductions_total",
+      "page": 4,
+      "rect": [
+        511.2,
+        359.97,
+        576,
+        371.97
+      ],
+      "type": "text"
+    },
+    "total_income_amount": {
+      "pdfId": "total_income_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        335.97,
+        576,
+        347.97
+      ],
+      "type": "text"
+    },
+    "income_minus_senior_total": {
+      "pdfId": "income_minus_senior_total",
+      "page": 4,
+      "rect": [
+        511.2,
+        323.97,
+        576,
+        335.97
+      ],
+      "type": "text"
+    },
+    "itemized_deductions_limit": {
+      "pdfId": "itemized_deductions_limit",
+      "page": 4,
+      "rect": [
+        511.2,
+        299.97,
+        576,
+        311.97
+      ],
+      "type": "text"
+    },
+    "adjusted_itemized_deductions": {
+      "pdfId": "adjusted_itemized_deductions",
+      "page": 4,
+      "rect": [
+        511.2,
+        263.97,
+        576,
+        275.97
+      ],
+      "type": "text"
+    },
+    "standard_deduction_amount": {
+      "pdfId": "standard_deduction_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        227.97,
+        576,
+        239.97
+      ],
+      "type": "text"
+    },
+    "cash_gifts_to_charities_amount": {
+      "pdfId": "cash_gifts_to_charities_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        191.97,
+        576,
+        203.97
+      ],
+      "type": "text"
+    },
+    "standard_deduction_plus_cash_gifts": {
+      "pdfId": "standard_deduction_plus_cash_gifts",
+      "page": 4,
+      "rect": [
+        511.2,
+        179.97,
+        576,
+        191.97
+      ],
+      "type": "text"
+    },
+    "deductions_line_14_amount": {
+      "pdfId": "deductions_line_14_amount",
+      "page": 4,
+      "rect": [
+        511.2,
+        155.97,
+        576,
+        167.97
+      ],
+      "type": "text"
+    },
+    "deductions_worksheet_total": {
+      "pdfId": "deductions_worksheet_total",
+      "page": 4,
+      "rect": [
+        511.2,
+        143.97,
+        576,
+        155.97
+      ],
+      "type": "text"
+    }
+  }
+}

@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Form Hub — Stamp-Approved AI Forms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #142033;
+      --ink-soft: #3d4f6a;
+      --paper: #f4f6f9;
+      --card: #ffffff;
+      --line: #d7dee8;
+      --accent: #1f6feb;
+      --accent-soft: #e8f0fe;
+      --stamp: #0f7a4c;
+      --stamp-soft: #e6f5ee;
+      --shadow: 0 10px 30px rgba(20, 32, 51, 0.08);
+      --hl: #ffb020;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "DM Sans", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #dce8fb 0%, transparent 55%),
+        radial-gradient(900px 400px at 100% 0%, #dff3ea 0%, transparent 50%),
+        var(--paper);
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .shell {
+      max-width: none;
+      margin: 0 auto;
+      padding: 28px 16px 72px;
+    }
+
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px 24px;
+      align-items: end;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.7rem, 3vw, 2.3rem);
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 46rem;
+      color: var(--ink-soft);
+      font-size: 1.02rem;
+      line-height: 1.5;
+    }
+
+    .stamp-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--stamp-soft);
+      color: var(--stamp);
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .stamp-pill::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--stamp);
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 28px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      padding: 12px 0;
+      background: color-mix(in srgb, var(--paper) 88%, transparent);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 1px 0 rgba(20, 32, 51, 0.04);
+    }
+
+    .nav a:hover {
+      border-color: #b8c7de;
+      background: var(--accent-soft);
+      text-decoration: none;
+    }
+
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 36px;
+    }
+
+    .form-header {
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      gap: 10px;
+      background: linear-gradient(180deg, #fbfcfe 0%, #ffffff 100%);
+    }
+
+    .form-header h2 {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #eef2f7;
+      color: var(--ink-soft);
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    .chip.approved {
+      background: var(--stamp-soft);
+      color: var(--stamp);
+    }
+
+    .chip.live {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .panel {
+      padding: 18px 24px 22px;
+    }
+
+    .hint {
+      margin: 0 0 14px;
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .hint strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .preview-split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .preview-pane {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .panel-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .panel-label h3 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .panel-label .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .view-toggle {
+      display: inline-flex;
+      padding: 3px;
+      gap: 3px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #eef2f7;
+    }
+
+    .view-toggle .toggle-btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: transparent;
+      text-decoration: none;
+      transition: background 120ms ease, color 120ms ease;
+    }
+
+    .view-toggle .toggle-btn:hover {
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .view-toggle .toggle-btn.active {
+      background: var(--card);
+      color: var(--accent);
+      box-shadow: 0 1px 3px rgba(20, 32, 51, 0.12);
+    }
+
+    .live-status {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    .live-status.updating { color: var(--accent); }
+    .live-status.error { color: #9b1c1c; }
+
+    .frame-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #e9eef5;
+      flex: 1;
+      min-height: min(72vh, 880px);
+      height: min(72vh, 880px);
+    }
+
+    .frame-wrap.pdf {
+      background: #525659;
+      overflow: auto;
+      position: relative;
+    }
+
+    .frame-wrap.html {
+      background: #fff;
+    }
+
+    .pdf-pages {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      min-height: 100%;
+    }
+
+    .pdf-page {
+      position: relative;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.28);
+      line-height: 0;
+    }
+
+    .pdf-page canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .pdf-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .pdf-field-hl {
+      position: absolute;
+      border: 2px solid transparent;
+      border-radius: 3px;
+      background: transparent;
+      transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .pdf-field-hl.active {
+      border-color: #e67700;
+      background: rgba(255, 176, 32, 0.38);
+      box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.35);
+      z-index: 2;
+    }
+
+    .pdf-loading, .pdf-error {
+      color: #f0f3f7;
+      padding: 28px;
+      font-size: 0.95rem;
+    }
+
+    .pdf-error { color: #ffb4b4; }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #fff;
+    }
+
+    .empty, .error {
+      padding: 28px;
+      color: var(--ink-soft);
+    }
+
+    .error { color: #9b1c1c; }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--card);
+      color: var(--ink);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover { background: var(--accent-soft); border-color: #b8c7de; text-decoration: none; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn.primary:hover { filter: brightness(1.05); background: var(--accent); }
+    .btn.danger { color: #9b1c1c; border-color: #f0c2c2; background: #fff5f5; }
+    .btn.danger:hover { background: #ffe8e8; }
+    .btn.ghost { background: transparent; }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .form-header-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .hub-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .hub-modal[hidden] { display: none !important; }
+
+    .hub-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.48);
+    }
+
+    .hub-modal-panel {
+      position: relative;
+      width: min(560px, 100%);
+      max-height: min(92vh, 820px);
+      overflow: auto;
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+      padding: 22px 22px 18px;
+    }
+
+    .hub-modal-panel h2 {
+      margin: 0 0 6px;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hub-modal-panel .modal-sub {
+      margin: 0 0 18px;
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .hub-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .hub-form label {
+      display: grid;
+      gap: 6px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .hub-form label span.req { color: #b42318; }
+
+    .hub-form input[type="text"],
+    .hub-form textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 400;
+      background: #fff;
+    }
+
+    .hub-form textarea { min-height: 72px; resize: vertical; }
+
+    .hub-form input[type="file"] {
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 400;
+    }
+
+    .file-hint {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+    }
+
+    .file-hint.present { color: var(--stamp); }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+
+    .modal-error {
+      margin: 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #fff5f5;
+      color: #9b1c1c;
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    .modal-error[hidden] { display: none !important; }
+
+    @media (max-width: 980px) {
+      .preview-split {
+        grid-template-columns: 1fr;
+      }
+      .frame-wrap {
+        min-height: 52vh;
+        height: 52vh;
+      }
+      .shell { padding: 18px 14px 48px; }
+      .form-header, .panel { padding-left: 16px; padding-right: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div>
+        <h1>Demo Form Hub</h1>
+        <p>
+          Stamp-approved AI pipeline outputs. Fill the HTML form and watch the PDF update live —
+          focus a field to highlight the matching widget.
+        </p>
+      </div>
+      <div class="hero-actions">
+        <button type="button" class="btn primary" id="addFormBtn">Add form</button>
+        <a class="btn" href="/Auto-Form-Creator/demo.html">Demo</a>
+        <a class="btn" href="/Forms/Example/example.html">Example</a>
+        <div class="stamp-pill" id="stampMeta">Approved forms</div>
+      </div>
+    </header>
+
+    <nav class="nav" id="nav" aria-label="Forms"></nav>
+    <main id="forms"></main>
+  </div>
+
+  <div class="hub-modal" id="entryModal" hidden>
+    <div class="hub-modal-backdrop" data-close-modal></div>
+    <div class="hub-modal-panel" role="dialog" aria-modal="true" aria-labelledby="entryModalTitle">
+      <h2 id="entryModalTitle">Add form</h2>
+      <p class="modal-sub" id="entryModalSub">
+        Upload a PDF plus at least one HTML version (all-at-once and/or one-at-a-time).
+      </p>
+      <form class="hub-form" id="entryForm">
+        <input type="hidden" id="entryMode" value="create">
+        <input type="hidden" id="entrySlug" value="">
+        <label>
+          Title <span class="req">*</span>
+          <input type="text" id="entryTitle" name="title" required placeholder="e.g. Form I-9">
+        </label>
+        <label>
+          Description
+          <textarea id="entryDescription" name="description" placeholder="Short summary (optional)"></textarea>
+        </label>
+        <label>
+          PDF form <span class="req" id="pdfRequiredMark">*</span>
+          <input type="file" id="entryPdf" name="pdf" accept=".pdf,application/pdf">
+          <span class="file-hint" id="pdfHint">Required for new entries</span>
+        </label>
+        <label>
+          HTML — all at once
+          <input type="file" id="entryHtmlAll" name="htmlAll" accept=".html,.htm,text/html">
+          <span class="file-hint" id="htmlAllHint">Optional if one-at-a-time is uploaded</span>
+        </label>
+        <label>
+          HTML — one at a time
+          <input type="file" id="entryHtmlOne" name="htmlOne" accept=".html,.htm,text/html">
+          <span class="file-hint" id="htmlOneHint">Optional if all-at-once is uploaded</span>
+        </label>
+        <p class="modal-error" id="entryError" hidden></p>
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" data-close-modal>Cancel</button>
+          <button type="submit" class="btn primary" id="entrySubmitBtn">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as pdfjsLib from '/vendor/pdfjs/pdf.min.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/pdfjs/pdf.worker.min.mjs';
+
+    let hubManifest = null;
+
+    function openEntryModal(mode, form = null) {
+      const modal = document.getElementById('entryModal');
+      const titleEl = document.getElementById('entryModalTitle');
+      const subEl = document.getElementById('entryModalSub');
+      const formEl = document.getElementById('entryForm');
+      const errorEl = document.getElementById('entryError');
+      formEl.reset();
+      errorEl.hidden = true;
+      errorEl.textContent = '';
+      document.getElementById('entryMode').value = mode;
+      document.getElementById('entrySlug').value = form?.id || '';
+      document.getElementById('entryTitle').value = form?.title || '';
+      document.getElementById('entryDescription').value = form?.description || '';
+
+      const pdfRequired = document.getElementById('pdfRequiredMark');
+      const pdfHint = document.getElementById('pdfHint');
+      const htmlAllHint = document.getElementById('htmlAllHint');
+      const htmlOneHint = document.getElementById('htmlOneHint');
+
+      if (mode === 'edit' && form) {
+        titleEl.textContent = 'Edit form';
+        subEl.textContent = 'Replace any file you want to change. Leave a file blank to keep the current one.';
+        pdfRequired.hidden = true;
+        pdfHint.textContent = form.sourcePdf
+          ? `Current: ${form.sourcePdf.split('/').pop()} — upload to replace`
+          : 'No PDF on file — upload required';
+        pdfHint.classList.toggle('present', Boolean(form.sourcePdf));
+        htmlAllHint.textContent = form.formHtml
+          ? `Current: ${form.formHtml.split('/').pop()} — upload to replace`
+          : 'Not set — upload to add';
+        htmlAllHint.classList.toggle('present', Boolean(form.formHtml));
+        htmlOneHint.textContent = form.formHtmlOneAtATime
+          ? `Current: ${form.formHtmlOneAtATime.split('/').pop()} — upload to replace`
+          : 'Not set — upload to add';
+        htmlOneHint.classList.toggle('present', Boolean(form.formHtmlOneAtATime));
+        document.getElementById('entrySubmitBtn').textContent = 'Save changes';
+      } else {
+        titleEl.textContent = 'Add form';
+        subEl.textContent = 'Upload a PDF plus at least one HTML version (all-at-once and/or one-at-a-time).';
+        pdfRequired.hidden = false;
+        pdfHint.textContent = 'Required for new entries';
+        pdfHint.classList.remove('present');
+        htmlAllHint.textContent = 'Optional if one-at-a-time is uploaded';
+        htmlAllHint.classList.remove('present');
+        htmlOneHint.textContent = 'Optional if all-at-once is uploaded';
+        htmlOneHint.classList.remove('present');
+        document.getElementById('entrySubmitBtn').textContent = 'Add form';
+      }
+      modal.hidden = false;
+      document.getElementById('entryTitle').focus();
+    }
+
+    function closeEntryModal() {
+      document.getElementById('entryModal').hidden = true;
+    }
+
+    function wireAdminUi() {
+      document.getElementById('addFormBtn')?.addEventListener('click', () => openEntryModal('create'));
+      document.querySelectorAll('[data-close-modal]').forEach((el) => {
+        el.addEventListener('click', closeEntryModal);
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !document.getElementById('entryModal').hidden) {
+          closeEntryModal();
+        }
+      });
+
+      document.getElementById('entryForm')?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const errorEl = document.getElementById('entryError');
+        const submitBtn = document.getElementById('entrySubmitBtn');
+        errorEl.hidden = true;
+        errorEl.textContent = '';
+
+        const mode = document.getElementById('entryMode').value;
+        const slug = document.getElementById('entrySlug').value;
+        const title = document.getElementById('entryTitle').value.trim();
+        const description = document.getElementById('entryDescription').value.trim();
+        const pdfFile = document.getElementById('entryPdf').files[0];
+        const htmlAllFile = document.getElementById('entryHtmlAll').files[0];
+        const htmlOneFile = document.getElementById('entryHtmlOne').files[0];
+
+        if (!title) {
+          errorEl.textContent = 'Title is required.';
+          errorEl.hidden = false;
+          return;
+        }
+        if (mode === 'create') {
+          if (!pdfFile) {
+            errorEl.textContent = 'PDF upload is required.';
+            errorEl.hidden = false;
+            return;
+          }
+          if (!htmlAllFile && !htmlOneFile) {
+            errorEl.textContent = 'Upload at least one HTML file (all-at-once and/or one-at-a-time).';
+            errorEl.hidden = false;
+            return;
+          }
+        }
+
+        const body = new FormData();
+        body.append('title', title);
+        body.append('description', description);
+        if (pdfFile) body.append('pdf', pdfFile);
+        if (htmlAllFile) body.append('htmlAll', htmlAllFile);
+        if (htmlOneFile) body.append('htmlOne', htmlOneFile);
+
+        submitBtn.disabled = true;
+        const prevLabel = submitBtn.textContent;
+        submitBtn.textContent = 'Saving…';
+        try {
+          const url = mode === 'edit'
+            ? `/api/demo-hub/entries/${encodeURIComponent(slug)}`
+            : '/api/demo-hub/entries';
+          const res = await fetch(url, {
+            method: mode === 'edit' ? 'PUT' : 'POST',
+            body,
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || `Save failed (${res.status})`);
+          }
+          closeEntryModal();
+          await loadHub();
+          if (data.entry?.id) {
+            location.hash = data.entry.id;
+          }
+        } catch (err) {
+          errorEl.textContent = err.message || String(err);
+          errorEl.hidden = false;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = prevLabel;
+        }
+      });
+    }
+
+    async function deleteEntry(form) {
+      if (!form?.id) return;
+      const ok = window.confirm(`Delete "${form.title}" from the hub? This cannot be undone.`);
+      if (!ok) return;
+      const res = await fetch(`/api/demo-hub/entries/${encodeURIComponent(form.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        window.alert(data.error || `Delete failed (${res.status})`);
+        return;
+      }
+      await loadHub();
+    }
+
+    async function loadHub() {
+      const formsEl = document.getElementById('forms');
+      const navEl = document.getElementById('nav');
+      const stampMeta = document.getElementById('stampMeta');
+
+      try {
+        const res = await fetch('./manifest.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Could not load manifest.json');
+        const manifest = await res.json();
+        hubManifest = manifest;
+        const forms = manifest.forms || [];
+
+        stampMeta.textContent = `${forms.length} stamp-approved form${forms.length === 1 ? '' : 's'}`;
+        if (!forms.length) {
+          navEl.innerHTML = '';
+          formsEl.innerHTML = '<div class="empty">No approved forms in the hub yet. Click <strong>Add form</strong> to upload one.</div>';
+          return;
+        }
+
+        navEl.innerHTML = forms.map((form) => (
+          `<a href="#${escapeAttr(form.id)}">${escapeHtml(shortTitle(form.title))}</a>`
+        )).join('');
+
+        formsEl.innerHTML = forms.map((form) => {
+          const pdfUrl = form.sourcePdf ? encodeURI(form.sourcePdf) : '';
+          const htmlUrl = form.formHtml ? encodeURI(form.formHtml) : '';
+          const oneUrl = form.formHtmlOneAtATime ? encodeURI(form.formHtmlOneAtATime) : '';
+          const defaultHtml = htmlUrl || oneUrl;
+          const fieldMapUrl = form.fieldMap ? encodeURI(form.fieldMap) : '';
+          const canLiveFill = Boolean(form.sourcePdf && form.fieldMap);
+          return `
+            <article class="form-card" id="${escapeAttr(form.id)}" data-form-id="${escapeAttr(form.id)}">
+              <header class="form-header">
+                <div class="form-header-top">
+                  <h2>${escapeHtml(form.title)}</h2>
+                  <div class="card-actions">
+                    <button type="button" class="btn" data-edit-form="${escapeAttr(form.id)}">Edit</button>
+                    <button type="button" class="btn danger" data-delete-form="${escapeAttr(form.id)}">Delete</button>
+                  </div>
+                </div>
+                <div class="meta">
+                  <span class="chip approved">Stamp approved</span>
+                  ${canLiveFill ? '<span class="chip live">Live PDF fill</span>' : '<span class="chip">Preview only</span>'}
+                  <span class="chip">${escapeHtml(String(form.sections || 0))} sections</span>
+                  <span class="chip">${escapeHtml(String(form.questions || 0))} questions</span>
+                  <span class="chip">${escapeHtml(form.approvedAt || '—')}</span>
+                </div>
+              </header>
+
+              <section class="panel">
+                <p class="hint">
+                  Side-by-side preview: type in the form on the right and the PDF on the left
+                  <strong>fills live</strong> when field mapping is available. Focus a field to highlight its PDF widget.
+                </p>
+                <div class="preview-split">
+                  <div class="preview-pane">
+                    <div class="panel-label">
+                      <h3>Source PDF</h3>
+                      <div class="links">
+                        <span class="live-status" data-live-status>Ready</span>
+                        ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" rel="noopener">Open PDF</a>` : '<span class="live-status error">No PDF</span>'}
+                      </div>
+                    </div>
+                    <div
+                      class="frame-wrap pdf"
+                      data-pdf-viewer
+                      data-pdf-url="${pdfUrl}"
+                      data-field-map="${fieldMapUrl}"
+                      data-form-slug="${escapeAttr(form.id)}"
+                    >
+                      <div class="pdf-loading">${pdfUrl ? 'Loading PDF…' : 'No PDF uploaded'}</div>
+                    </div>
+                  </div>
+                  <div class="preview-pane">
+                    <div class="panel-label">
+                      <h3>Generated HTML form</h3>
+                      <div class="view-toggle" role="group" aria-label="Form view">
+                        ${htmlUrl ? `<a class="toggle-btn${!oneUrl || defaultHtml === htmlUrl ? ' active' : ''}" href="${htmlUrl}" data-view-src="${htmlUrl}" rel="noopener">All-at-once</a>` : ''}
+                        ${oneUrl ? `<a class="toggle-btn${!htmlUrl || defaultHtml === oneUrl ? ' active' : ''}" href="${oneUrl}" data-view-src="${oneUrl}" rel="noopener">One-at-a-time</a>` : ''}
+                      </div>
+                    </div>
+                    <div class="frame-wrap html">
+                      ${defaultHtml
+                        ? `<iframe class="form-iframe" title="${escapeAttr(form.title)} HTML form" src="${defaultHtml}" loading="lazy"></iframe>`
+                        : '<div class="empty">No HTML uploaded</div>'}
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </article>
+          `;
+        }).join('');
+
+        formsEl.querySelectorAll('[data-edit-form]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-edit-form');
+            const form = forms.find((f) => f.id === id);
+            if (form) openEntryModal('edit', form);
+          });
+        });
+        formsEl.querySelectorAll('[data-delete-form]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-delete-form');
+            const form = forms.find((f) => f.id === id);
+            if (form) deleteEntry(form);
+          });
+        });
+
+        await Promise.all(
+          [...formsEl.querySelectorAll('.form-card')].map((card) => initFormCard(card))
+        );
+      } catch (err) {
+        formsEl.innerHTML = `<div class="error">${escapeHtml(err.message || String(err))}</div>`;
+      }
+    }
+
+    async function initFormCard(card) {
+      const viewerEl = card.querySelector('[data-pdf-viewer]');
+      const iframe = card.querySelector('.form-iframe');
+      const statusEl = card.querySelector('[data-live-status]');
+      if (!viewerEl) return;
+
+      const pdfUrl = viewerEl.getAttribute('data-pdf-url');
+      const fieldMapUrl = viewerEl.getAttribute('data-field-map');
+      const formSlug = viewerEl.getAttribute('data-form-slug');
+      let fieldMap = { byNameId: {} };
+      if (fieldMapUrl) {
+        try {
+          const res = await fetch(fieldMapUrl, { cache: 'no-store' });
+          if (res.ok) fieldMap = await res.json();
+        } catch (_) { /* highlight optional */ }
+      }
+
+      const controller = createPdfViewer(viewerEl, fieldMap);
+      if (pdfUrl) await controller.load(pdfUrl);
+      if (iframe) {
+        wireFormFocus(iframe, controller);
+        if (pdfUrl) wireLiveFill(iframe, controller, formSlug, statusEl);
+        wireViewToggle(card, iframe);
+      }
+    }
+
+    function wireViewToggle(card, iframe) {
+      const buttons = [...card.querySelectorAll('.view-toggle .toggle-btn')];
+      if (!buttons.length || !iframe) return;
+
+      buttons.forEach((btn) => {
+        // Left-click switches the iframe in place; right-click keeps the
+        // native anchor context menu ("Open Link in New Tab").
+        btn.addEventListener('click', (event) => {
+          if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
+          event.preventDefault();
+          const src = btn.getAttribute('data-view-src');
+          if (!src) return;
+          if (iframe.getAttribute('src') !== src) iframe.setAttribute('src', src);
+          buttons.forEach((b) => b.classList.toggle('active', b === btn));
+        });
+      });
+    }
+
+    function createPdfViewer(container, fieldMap) {
+      let highlightEls = new Map();
+      let activeNameIds = [];
+      let objectUrl = null;
+      let renderToken = 0;
+
+      function setStatusActive(nameIds) {
+        activeNameIds = [...new Set((nameIds || []).filter(Boolean))];
+        container.querySelectorAll('.pdf-field-hl.active').forEach((el) => el.classList.remove('active'));
+        let firstPage = null;
+        activeNameIds.forEach((id) => {
+          (highlightEls.get(id) || []).forEach(({ el, pageEl }) => {
+            el.classList.add('active');
+            if (!firstPage) firstPage = pageEl;
+          });
+        });
+        if (firstPage) {
+          container.scrollTo({ top: Math.max(0, firstPage.offsetTop - 12), behavior: 'smooth' });
+        }
+      }
+
+      async function load(src) {
+        const token = ++renderToken;
+        const scrollTop = container.scrollTop;
+        container.innerHTML = '<div class="pdf-loading">Updating PDF…</div>';
+        try {
+          const loadingTask = pdfjsLib.getDocument(src);
+          const pdf = await loadingTask.promise;
+          if (token !== renderToken) return;
+
+          const pagesEl = document.createElement('div');
+          pagesEl.className = 'pdf-pages';
+          container.innerHTML = '';
+          container.appendChild(pagesEl);
+
+          highlightEls = new Map();
+          const width = Math.max(280, container.clientWidth - 32);
+
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
+            if (token !== renderToken) return;
+            const page = await pdf.getPage(pageNum);
+            const unscaled = page.getViewport({ scale: 1 });
+            const scale = width / unscaled.width;
+            const viewport = page.getViewport({ scale });
+
+            const pageEl = document.createElement('div');
+            pageEl.className = 'pdf-page';
+            pageEl.dataset.page = String(pageNum);
+            pageEl.style.width = `${viewport.width}px`;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.floor(viewport.width);
+            canvas.height = Math.floor(viewport.height);
+            const ctx = canvas.getContext('2d');
+            await page.render({ canvasContext: ctx, viewport }).promise;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'pdf-overlay';
+
+            pageEl.appendChild(canvas);
+            pageEl.appendChild(overlay);
+            pagesEl.appendChild(pageEl);
+
+            Object.values(fieldMap.byNameId || {}).forEach((field) => {
+              if (field.page !== pageNum || !Array.isArray(field.rect)) return;
+              const [vx1, vy1, vx2, vy2] = viewport.convertToViewportRectangle(field.rect);
+              const left = Math.min(vx1, vx2);
+              const top = Math.min(vy1, vy2);
+              const w = Math.abs(vx2 - vx1);
+              const h = Math.abs(vy2 - vy1);
+              const hl = document.createElement('div');
+              hl.className = 'pdf-field-hl';
+              hl.dataset.nameId = field.nameId;
+              hl.style.left = `${left}px`;
+              hl.style.top = `${top}px`;
+              hl.style.width = `${Math.max(w, 8)}px`;
+              hl.style.height = `${Math.max(h, 8)}px`;
+              overlay.appendChild(hl);
+              if (!highlightEls.has(field.nameId)) highlightEls.set(field.nameId, []);
+              highlightEls.get(field.nameId).push({ el: hl, pageEl });
+            });
+          }
+
+          container.scrollTop = scrollTop;
+          if (activeNameIds.length) setStatusActive(activeNameIds);
+        } catch (err) {
+          if (token !== renderToken) return;
+          container.innerHTML = `<div class="pdf-error">Could not render PDF: ${escapeHtml(err.message || String(err))}</div>`;
+        }
+      }
+
+      return {
+        async load(src) {
+          await load(src);
+        },
+        async loadBlob(blob) {
+          if (objectUrl) URL.revokeObjectURL(objectUrl);
+          objectUrl = URL.createObjectURL(blob);
+          await load(objectUrl);
+        },
+        highlight(nameIds) {
+          setStatusActive(nameIds);
+        },
+        clear() {
+          activeNameIds = [];
+          container.querySelectorAll('.pdf-field-hl.active').forEach((el) => el.classList.remove('active'));
+        },
+      };
+    }
+
+    function resolveNameIds(el) {
+      if (!el || !el.getAttribute) return [];
+      const combine = el.getAttribute('data-pdf-combine-into');
+      if (combine) return [combine];
+      const name = el.getAttribute('name') || el.id;
+      return name ? [name] : [];
+    }
+
+    function fieldValue(el) {
+      if (!el) return '';
+      if (el.type === 'checkbox') return el.checked ? 'on' : '';
+      if (el.type === 'radio') return el.checked ? el.value : '';
+      return el.value || '';
+    }
+
+    function collectIframeFormData(doc) {
+      const form = doc.getElementById('customForm') || doc.querySelector('form');
+      const values = {};
+      if (!form) return values;
+
+      form.querySelectorAll('input, textarea, select').forEach((el) => {
+        if (el.disabled || el.type === 'file') return;
+        if (el.type === 'checkbox') {
+          if (el.checked && el.name) values[el.name] = 'on';
+          return;
+        }
+        if (el.type === 'radio') {
+          if (el.checked && el.name) values[el.name] = el.value;
+          return;
+        }
+        if (!el.name) return;
+        values[el.name] = el.value;
+      });
+
+      const combineGroups = {};
+      form.querySelectorAll('[data-pdf-combine-into]').forEach((el) => {
+        const target = el.getAttribute('data-pdf-combine-into');
+        if (!target) return;
+        if (!combineGroups[target]) combineGroups[target] = [];
+        combineGroups[target].push({
+          value: fieldValue(el),
+          order: parseInt(el.getAttribute('data-combine-order') || '0', 10) || 0,
+          ownsTarget: el.name === target,
+        });
+      });
+
+      Object.keys(combineGroups).forEach((target) => {
+        const parts = combineGroups[target]
+          .sort((a, b) => a.order - b.order)
+          .map((item) => String(item.value || '').trim())
+          .filter(Boolean);
+        if (!parts.length) return;
+        values[target] = parts.join(' ').replace(/\s+/g, ' ').trim();
+      });
+
+      return values;
+    }
+
+    function wireFormFocus(iframe, controller) {
+      if (!iframe || !controller) return;
+
+      const attach = () => {
+        let doc;
+        try {
+          doc = iframe.contentDocument || iframe.contentWindow?.document;
+        } catch (_) {
+          return;
+        }
+        if (!doc || doc._hubFocusWired) return;
+        doc._hubFocusWired = true;
+
+        doc.addEventListener('focusin', (event) => {
+          const target = event.target;
+          if (!target || !['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
+          if (target.type === 'hidden') return;
+          controller.highlight(resolveNameIds(target));
+        }, true);
+
+        doc.addEventListener('focusout', () => {
+          setTimeout(() => {
+            const active = doc.activeElement;
+            if (!active || !['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName) || active.type === 'hidden') {
+              controller.clear();
+            }
+          }, 0);
+        }, true);
+      };
+
+      iframe.addEventListener('load', attach);
+      if (iframe.contentDocument?.readyState === 'complete') attach();
+    }
+
+    function wireLiveFill(iframe, controller, formSlug, statusEl) {
+      if (!iframe || !controller || !formSlug) return;
+
+      let debounceTimer = null;
+      let abortController = null;
+      let lastPayload = '';
+
+      const setStatus = (text, className = '') => {
+        if (!statusEl) return;
+        statusEl.textContent = text;
+        statusEl.className = `live-status${className ? ` ${className}` : ''}`;
+      };
+
+      const refreshPdf = async () => {
+        let doc;
+        try {
+          doc = iframe.contentDocument || iframe.contentWindow?.document;
+        } catch (_) {
+          return;
+        }
+        if (!doc) return;
+
+        const values = collectIframeFormData(doc);
+        const payloadKey = JSON.stringify(values);
+        if (payloadKey === lastPayload) return;
+        lastPayload = payloadKey;
+
+        if (abortController) abortController.abort();
+        abortController = new AbortController();
+        setStatus('Updating…', 'updating');
+
+        try {
+          const body = new URLSearchParams();
+          Object.entries(values).forEach(([key, value]) => {
+            if (value == null || String(value).trim() === '') return;
+            body.append(key, String(value));
+          });
+
+          const res = await fetch(`/api/demo-hub/fill-pdf/${encodeURIComponent(formSlug)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body,
+            signal: abortController.signal,
+            credentials: 'include',
+          });
+          if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(errText || `HTTP ${res.status}`);
+          }
+          const blob = await res.blob();
+          await controller.loadBlob(blob);
+          setStatus('Live');
+        } catch (err) {
+          if (err?.name === 'AbortError') return;
+          console.error('[hub live fill]', err);
+          setStatus('Fill error', 'error');
+          lastPayload = '';
+        }
+      };
+
+      const scheduleRefresh = () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(refreshPdf, 320);
+      };
+
+      const attach = () => {
+        let doc;
+        try {
+          doc = iframe.contentDocument || iframe.contentWindow?.document;
+        } catch (_) {
+          return;
+        }
+        if (!doc || doc._hubLiveFillWired) return;
+        doc._hubLiveFillWired = true;
+
+        doc.addEventListener('input', scheduleRefresh, true);
+        doc.addEventListener('change', scheduleRefresh, true);
+      };
+
+      iframe.addEventListener('load', attach);
+      if (iframe.contentDocument?.readyState === 'complete') attach();
+    }
+
+    function shortTitle(title) {
+      const t = String(title || '');
+      if (/live scan/i.test(t)) return 'Live Scan';
+      if (/\bw-9\b/i.test(t)) return 'W-9';
+      if (/\bw-4\b/i.test(t)) return 'W-4';
+      return t.length > 28 ? `${t.slice(0, 28)}…` : t;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/'/g, '&#39;');
+    }
+
+    wireAdminUi();
+    loadHub();
+  </script>
+</body>
+</html>

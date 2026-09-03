@@ -1,0 +1,95 @@
+{
+  "formTitle": "MC-031 Attached Declaration",
+  "fields": [
+    {
+      "id": "NoticeHeader1",
+      "newName": "form_number",
+      "type": "text",
+      "label": "Form Number"
+    },
+    {
+      "id": "user_fullname",
+      "newName": "declarant_name",
+      "type": "text",
+      "label": "Name"
+    },
+    {
+      "id": "text",
+      "newName": "declaration_text",
+      "type": "text",
+      "label": "Declaration"
+    },
+    {
+      "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_1",
+      "newName": "defendant_name_1",
+      "type": "text",
+      "label": "Defendant Name 1"
+    },
+    {
+      "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_2",
+      "newName": "defendant_name_2",
+      "type": "text",
+      "label": "Defendant Name 2"
+    },
+    {
+      "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_3",
+      "newName": "defendant_name_3",
+      "type": "text",
+      "label": "Defendant Name 3"
+    },
+    {
+      "id": "current_date",
+      "newName": "declaration_date",
+      "type": "text",
+      "label": "Date"
+    },
+    {
+      "id": "FillText13",
+      "newName": "other_role_specify",
+      "type": "text",
+      "label": "Other (Specify)"
+    },
+    {
+      "id": "NoticeFooter1",
+      "newName": "form_footer",
+      "type": "text",
+      "label": "Form Footer"
+    },
+    {
+      "id": "CheckBox61",
+      "newName": "attorney_for",
+      "type": "checkbox",
+      "label": "Attorney for"
+    },
+    {
+      "id": "CheckBox6",
+      "newName": "role_plaintiff",
+      "type": "checkbox",
+      "label": "Plaintiff"
+    },
+    {
+      "id": "CheckBx6",
+      "newName": "role_petitioner",
+      "type": "checkbox",
+      "label": "Petitioner"
+    },
+    {
+      "id": "ChckBox6",
+      "newName": "role_defendant",
+      "type": "checkbox",
+      "label": "Defendant"
+    },
+    {
+      "id": "Chck6",
+      "newName": "role_respondent",
+      "type": "checkbox",
+      "label": "Respondent"
+    },
+    {
+      "id": "Ck6",
+      "newName": "role_other",
+      "type": "checkbox",
+      "label": "Other"
+    }
+  ]
+}

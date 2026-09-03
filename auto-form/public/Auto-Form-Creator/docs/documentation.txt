@@ -1,0 +1,525 @@
+Auto-Form Creator — Project Documentation
+=========================================
+Last updated: June 2026
+Primary demo URL: http://localhost:3000/Auto-Form-Creator/demo.html
+
+This document is a handoff guide. A new developer or AI agent should be able to read
+this file, explore the referenced source files, and continue work without prior chat
+context.
+
+
+TABLE OF CONTENTS
+-----------------
+1. Purpose and intended goal
+2. High-level architecture
+3. The 8-step demo pipeline
+4. Data artifacts and how they connect
+5. Autofill / user profile system
+6. Generated HTML forms
+7. PDF submit and filled-PDF preview
+8. UI pages
+9. Server API routes (Auto-Form specific)
+10. Key source files
+11. Environment and running locally
+12. Known issues and workarounds
+13. Design decisions and gotchas
+14. Suggested next steps
+
+
+================================================================================
+1. PURPOSE AND INTENDED GOAL
+================================================================================
+
+FormStar is a product that turns government PDF forms into friendly HTML surveys,
+fills the original PDF from user answers, and reuses personal data across forms.
+
+The **Auto-Form Creator** is a shareholder/demo pipeline that automates the hardest
+part of that workflow:
+
+  Government XFA PDF  →  unlocked AcroForm PDF  →  semantic field names
+       →  AI-generated field mapping  →  AI-generated survey config
+       →  HTML form with autofill  →  filled PDF preview
+
+**Intended goal (production vision):**
+  - Upload any government PDF form
+  - Automatically produce a FormStar-quality HTML form wired to the PDF
+  - User profile data (name, address, DOB, etc.) autofills across forms
+  - Submitting the HTML form fills the source PDF correctly
+
+**Current scope (demo):**
+  - Interactive walkthrough at demo.html (Steps 1–8)
+  - Uses OpenAI (gpt-4o-mini) for Steps 4 and 6
+  - Uses Firebase Auth + Firestore for user profile
+  - Test form: public/Auto-Form-Creator/xfa-test.pdf (BCIA 8016-style; ~43 text + 5 checkbox fields after prepare)
+
+This demo lives inside the larger FormStar repo (server.js, public/Forms/*, etc.).
+Production forms like SC-100 use the same PDF-filling model documented in
+pdf-filling-documentation.txt at the repo root.
+
+
+================================================================================
+2. HIGH-LEVEL ARCHITECTURE
+================================================================================
+
+  Browser (demo.html)
+      │
+      ├── Firebase Auth ──► Firestore users/{uid}  (user profile JSON)
+      │
+      ├── pdf.js (client) ──► extract fields from PDF
+      │
+      └── fetch() ──► Node server (server.js, port 3000)
+                          │
+                          ├── unlock-pdf-handler.js      (XFA → AcroForm)
+                          ├── pdf-field-deduplicator.js  (radio → unique checkboxes)
+                          ├── pdf-field-sanitizer.js     (rename fields, flatten hierarchy)
+                          ├── field-config-generator.js  (OpenAI → field_config.json)
+                          ├── form-config-generator.js   (OpenAI → form_config.json)
+                          ├── form-autopopulate.js       (profile ↔ form config enrichment)
+                          ├── auto-form-pdf-handler.js   (store/fill sanitized PDF)
+                          ├── pdf-form-filler.js         (pdf-lib fill logic)
+                          └── openai-fetch.js            (OpenAI HTTP with IPv4 + retries)
+
+  Client-side HTML generation:
+      form-html-renderer.js builds standalone HTML from form_config.json + profile
+
+
+Critical invariant (same as production FormStar):
+  HTML input `name` attribute  ===  PDF field name after sanitization (field.newName)
+  This is how /edit_pdf and /api/auto-form/fill-pdf know which widget to fill.
+
+
+================================================================================
+3. THE 8-STEP DEMO PIPELINE
+================================================================================
+
+Step 1 — Sign In
+  - Firebase email/password auth
+  - Loads Firestore document users/{uid} into lastUserProfile
+  - Shows profile JSON + editable "User Profile Entries" grid (2 columns)
+  - Entries can be added, edited (key locked), or deleted (uid is not deletable)
+
+Step 2 — Unlock PDF
+  - Upload XFA PDF
+  - POST /api/unlock-pdf strips XFA, produces AcroForm PDF
+  - Download unlocked PDF
+
+Step 3 — Extract Fields
+  - Upload prepared/unlocked PDF
+  - Client pdf-extractor.js extracts:
+      [[field_name]] for text fields
+      {{field_name}} for checkboxes
+      structuredFields[] per-field: page, nearestLabel, sectionHint, position
+  - extractedDocumentContent with --- PAGE N --- breaks (cleaner AI context)
+  - Also extracts document layout text for AI context
+  - POST /api/prepare-pdf-fields deduplicates radio groups into unique checkboxes
+
+Step 4 — Generate field_config.json
+  - ChatGPT via POST /api/generate-field-config (~60s progress bar)
+  - Prompt: public/Auto-Form-Creator/field_config.txt
+  - Uses structuredFields.nearestLabel for accurate labels
+  - Server enrichFieldConfig() fixes vague labels, adds conditionals, renames your_number→oca_number
+  - Output maps every PDF field id → semantic newName, type, label
+  - Example: form1[0].#subform[0].city[0] → applicant_home_city
+
+Step 5 — Sanitize PDF
+  - POST /api/sanitize-pdf renames PDF fields to semantic newName values
+  - Promotes fields to top-level AcroForm (removes form1[0] hierarchy)
+  - Fixes checkbox widget Parent/Annots issues (MorF sex checkboxes must survive)
+  - POST /api/auto-form/store-pdf registers sanitized PDF server-side → pdfToken
+  - pdfToken is stored in lastFormConfig.pdfToken for HTML generation
+
+Step 6 — Generate form_config.json
+  - POST /api/generate-form-config (~120s progress bar)
+  - Pipeline (deterministic + AI polish):
+      1. buildFormConfigSkeleton() — sections, address blocks, checkbox groups, gates
+      2. Optional vision section hints (pdfBase64 → gpt-4o-mini page images)
+      3. gpt-4o polishes question text + explanations per section (structure unchanged)
+      4. postProcessFormConfig() — validation, linked fields, autopopulate
+  - Legacy prompt file: public/Auto-Form-Creator/form_config.txt (reference / few-shot)
+  - Retry + injectMissingFieldQuestions fallback if fields omitted
+  - enrichFormConfigAutopopulate() adds autopopulateAvailable/Missing arrays
+
+Step 7 — User Info Fields (autopopulate analysis)
+  - Shows which fields can autofill from profile vs missing
+  - POST /api/enrich-autopopulate refreshes after profile edits
+  - Yellow "Not in profile yet" pills; green "Available" pills
+
+Step 8 — Generate Form HTML
+  - FormHtmlRenderer.build(formConfig, userProfile, options)
+  - Buttons: Generate Form HTML | View HTML | Download HTML
+  - View HTML toggles inline HTML source (with copy icon on code toolbar)
+  - Live preview in iframe (same-origin document.write, not blob URL)
+  - Generated HTML includes Submit → filled PDF preview
+
+
+================================================================================
+4. DATA ARTIFACTS AND HOW THEY CONNECT
+================================================================================
+
+field_config.json
+  {
+    "formTitle": "...",
+    "fields": [
+      { "id": "raw_pdf_name", "newName": "applicant_first_name", "type": "text", "label": "..." }
+    ]
+  }
+  - id = exact PDF name before sanitize
+  - newName = semantic name used after Step 5 and in HTML name attributes
+
+form_config.json
+  {
+    "formTitle": "...",
+    "displayMode": "all_at_once" | "one_at_a_time",
+    "htmlMode": "dev" | "normal",
+    "pdfToken": "uuid-from-store-pdf",
+    "sections": [{
+      "sectionName": "...",
+      "questions": [{
+        "text": "What is your city?",
+        "type": "text",
+        "nameId": "applicant_home_city",   ← must match field_config newName
+        "autopopulate": {
+          "enabled": true,
+          "profileKey": "city",
+          "profileDescription": "User city"
+        }
+      }]
+    }],
+    "autopopulateAvailable": [...],
+    "autopopulateMissing": [...]
+  }
+
+Sanitized PDF
+  - Binary PDF with AcroForm field names = newName values
+  - Registered on server with pdfToken (in-memory, 24h TTL)
+
+Generated HTML
+  - Standalone document with embedded Firebase, profile JSON snapshot, pdfToken
+  - Input name attributes = question.nameId (or checkbox option nameId)
+
+
+Pipeline dependency chain:
+  Step 3 extraction → Step 4 field_config → Step 5 sanitized PDF + pdfToken
+  → Step 6 form_config → Step 8 HTML
+
+
+================================================================================
+5. AUTOFILL / USER PROFILE SYSTEM
+================================================================================
+
+Storage:
+  Firestore collection: users
+  Document ID: Firebase uid
+  Flat key-value profile, e.g.:
+    firstName, lastName, city, street, zip, phone, email, ...
+  Custom entries also store {key}_description for human-readable labels
+
+Profile UI (demo.html Step 1):
+  - Shows all keys except *_description companion keys
+  - 2-column card grid with Edit/Delete buttons
+  - uid entry has no delete/edit
+
+How autofill is decided (form-autopopulate.js):
+  1. ChatGPT sets autopopulate.enabled per question in form_config
+  2. ensureAutopopulateOnFormConfig() enriches/heuristically fixes flags
+  3. isLikelyAutopopulatableField() catches hair, eye, height, DL, address, etc.
+  4. NON_AUTOPOPULATE_PATTERNS excludes agency fields (ori_code, billing_number, etc.)
+  5. PROFILE_KEY_ALIASES maps profileKey ↔ existing Firestore keys (city, firstName, etc.)
+
+Step 7 display:
+  - autopopulateAvailable: field exists in profile with value
+  - autopopulateMissing: autopopulatable but not yet in profile
+
+Generated HTML autofill (form-html-renderer.js):
+  - Embeds userProfile JSON at build time
+  - Firebase Auth runs silently (normal mode) or visibly (dev mode)
+  - onAuthStateChanged loads fresh Firestore profile and applies to inputs
+  - Inputs with data-autopopulate + data-profile-key save on blur/change
+  - postMessage to parent demo: { type: 'formstar-profile-update', key, value, description }
+  - Dev mode badges: "Autofill available" / "Will save to profile"
+  - Typing in a field updates badge to "Autofill available" live
+  - Normal mode (htmlMode=normal): hides auth bar, badges, question numbers, toasts
+
+Standalone autofill requirement:
+  - HTML must be served over HTTP (localhost:3000), not file://
+  - Firebase auth persists in localStorage on same origin
+  - iframe-test.html and form-preview-shell.html use same-origin iframe document.write
+
+
+================================================================================
+6. GENERATED HTML FORMS
+================================================================================
+
+Builder: public/Auto-Form-Creator/form-html-renderer.js
+  FormHtmlRenderer.build(formConfig, userProfile, options)
+  options:
+    firebaseConfig  — embedded for standalone auth
+    htmlMode        — 'dev' | 'normal'
+    pdfToken        — for PDF submit
+
+Question types supported:
+  text, bigParagraph, date, phone, money, dropdown, checkbox, multipleTextboxes
+
+displayMode:
+  all_at_once     — all questions visible
+  one_at_a_time   — stepper with Previous/Next
+
+htmlMode:
+  dev (default)   — sign-in panel, autofill badges, numbered stepper text, toasts
+  normal          — clean production UI; Firebase still runs in background
+
+Submit section:
+  - Submit button at end of form
+  - POST /api/auto-form/fill-pdf/{pdfToken} with FormData
+  - Checkboxes send 'on' when checked (matches shouldCheck in pdf-form-filler.js)
+  - Dates converted yyyy-mm-dd → mm/dd/yyyy
+  - Response PDF shown in iframe below button
+
+
+================================================================================
+7. PDF SUBMIT AND FILLED-PDF PREVIEW
+================================================================================
+
+Auto-Form uses a separate path from production /edit_pdf:
+
+  POST /api/auto-form/store-pdf
+    Body: multipart, field name "pdf" = sanitized PDF file
+    Returns: { pdfToken, fileName }
+
+  POST /api/auto-form/fill-pdf/:pdfToken
+    Body: form field names → values (same as HTML input names)
+    Returns: filled PDF bytes (application/pdf)
+
+  pdf-form-filler.js — shared fill logic (pdf-lib):
+    PDFTextField  → setText
+    PDFCheckBox   → check/uncheck via shouldCheck (on, true, yes, 1, checked)
+    PDFRadioGroup → mapRadioValue
+    PDFDropdown   → select
+
+pdfToken storage:
+  - In-memory Map in auto-form-pdf-handler.js
+  - TTL: 24 hours
+  - Lost on server restart → user must re-run Step 5
+
+Production /edit_pdf (server.js) still used by public/Forms/*.html:
+  - Looks up PDF in public/Forms/ by filename
+  - Same field-name matching rules apply
+
+
+================================================================================
+8. UI PAGES
+================================================================================
+
+demo.html
+  Main shareholder walkthrough. Header spans full width; content is 70% width.
+  "Test" button → iframe-test.html
+
+iframe-test.html
+  Paste or load generated HTML, render full-screen in same-origin iframe.
+  "Load Last Generated" reads sessionStorage formstarPreviewHtml.
+  Toolbar: Edit HTML | Reload (flex column layout, not overlay).
+
+form-preview-shell.html
+  Reads sessionStorage formstarPreviewHtml and document.writes it.
+  Used internally for same-origin iframe preview in Step 8.
+
+Copy icons:
+  - SVG clipboard/check on all data-copyable result panels
+  - Additional copy button on Step 8 HTML source toolbar when View HTML is active
+
+
+================================================================================
+9. SERVER API ROUTES (AUTO-FORM SPECIFIC)
+================================================================================
+
+POST /api/unlock-pdf
+  Body: pdf file → unlocked PDF bytes
+
+POST /api/prepare-pdf-fields
+  Body: pdf file → deduplicated PDF + field lists
+
+POST /api/generate-field-config
+  Body: { extractedDocumentContent, textFields, checkboxFields }
+  Returns: { fieldConfig }
+
+POST /api/sanitize-pdf
+  Body: pdf file + fieldConfig JSON
+  Returns: sanitized PDF bytes, X-Renamed-Count header
+
+POST /api/generate-form-config
+  Body: { fieldConfig, extractedDocumentContent, displayMode, userProfile }
+  Returns: { formConfig }
+
+POST /api/enrich-autopopulate
+  Body: { formConfig, fieldConfig, userProfile, displayMode }
+  Returns: enriched formConfig with available/missing arrays
+
+POST /api/auto-form/store-pdf
+  Body: pdf file → { pdfToken }
+
+POST /api/auto-form/fill-pdf/:pdfToken
+  Body: form fields → filled PDF bytes
+
+POST /edit_pdf
+  Production PDF fill (public/Forms/*.pdf by filename)
+
+
+================================================================================
+10. KEY SOURCE FILES
+================================================================================
+
+Demo / client:
+  public/Auto-Form-Creator/demo.html          — full UI, all step logic
+  public/Auto-Form-Creator/form-html-renderer.js — HTML form builder
+  public/Auto-Form-Creator/pdf-extractor.js   — client PDF field extraction
+  public/Auto-Form-Creator/field_config.txt   — OpenAI prompt Step 4
+  public/Auto-Form-Creator/form_config.txt    — OpenAI prompt Step 6
+  public/Auto-Form-Creator/iframe-test.html   — standalone HTML tester
+  public/Auto-Form-Creator/form-preview-shell.html
+
+Server / pipeline:
+  server.js                                   — Express app, route registration
+  unlock-pdf-handler.js                       — XFA unlock + prepare fields
+  pdf-field-deduplicator.js                   — radio group → unique checkboxes
+  pdf-field-sanitizer.js                      — rename fields, fix checkbox widgets
+  field-config-generator.js                   — Step 4 OpenAI
+  form-config-generator.js                    — Step 6 skeleton + gpt-4o polish + post-process
+  form-config-skeleton.js                     — deterministic form_config builder
+  form-question-text.js                       — label/question/explanation helpers
+  structured-field-context.js                 — per-field context enrichment
+  pdf-section-analyzer.js                     — vision section hints
+  form-autopopulate.js                        — autofill heuristics + enrichment
+  auto-form-pdf-handler.js                    — pdfToken store/fill
+  pdf-form-filler.js                          — pdf-lib fill implementation
+  openai-fetch.js                             — OpenAI HTTP (IPv4 DNS, retries)
+
+Reference:
+  pdf-filling-documentation.txt               — production PDF fill model
+
+
+================================================================================
+11. ENVIRONMENT AND RUNNING LOCALLY
+================================================================================
+
+Requirements (.env at repo root):
+  OPENAI_API_KEY
+  STRIPE_SECRET_KEY
+  ADMIN_PASSWORD
+  FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY_ID, FIREBASE_PRIVATE_KEY,
+  FIREBASE_CLIENT_EMAIL, FIREBASE_CLIENT_ID
+
+Start server:
+  cd blue
+  node server.js
+  → http://localhost:3000
+
+Open demo:
+  http://localhost:3000/Auto-Form-Creator/demo.html
+
+Test account: use existing FormStar Firebase user (e.g. test@gmail.com)
+
+After code changes to server routes: restart node server.js
+(Multiple stale node processes on port 3000 have caused 404 on new routes.)
+
+
+================================================================================
+12. KNOWN ISSUES AND WORKAROUNDS
+================================================================================
+
+Firestore ERR_BLOCKED_BY_CLIENT
+  - Ad blocker blocking firestore.googleapis.com
+  - Fix: disable ad blocker for localhost or allow Firebase domains
+  - Not an app bug
+
+OpenAI DNS / fetch failed (ENOTFOUND api.openai.com)
+  - Intermittent on Windows/corporate networks
+  - Fixed via openai-fetch.js: explicit IPv4 HTTPS + retries
+  - server.js sets dns.setDefaultResultOrder('ipv4first')
+  - If still failing: check VPN/firewall/internet
+
+pdf.worker.min.js: Warning TT: undefined function: 21
+  - Harmless PDF.js font warning from certain PDFs; ignore
+
+pdfToken lost after server restart
+  - Re-run Step 5 (sanitize) to re-register PDF
+  - Regenerate HTML in Step 8
+
+Downloaded HTML opened as file://
+  - Firebase auth will NOT work on file://
+  - Serve over http://localhost:3000 or deploy to authorized Firebase domain
+
+ChatGPT occasionally omits fields in form_config
+  - form-config-generator.js retries once, then injectMissingFieldQuestions()
+
+Adobe vs pdf.js field name mismatch (historical)
+  - Fixed in pdf-field-sanitizer.js by promoting to top-level AcroForm
+  - Must re-run Step 5 after sanitizer fixes
+
+Step 4/6 take ~1–2 minutes
+  - Progress bars are time-based estimates, not tied to actual API completion
+
+
+================================================================================
+13. DESIGN DECISIONS AND GOTCHAS
+================================================================================
+
+Why deduplicate radio groups to checkboxes?
+  Government PDFs often have one radio group name (MorF[0]) with multiple widgets.
+  HTML forms and /edit_pdf need unique name per widget. Deduplicator splits them
+  to applicant_sex_male, applicant_sex_female, etc.
+
+Why sanitize PDF field names?
+  Raw names like form1[0].#subform[0].LastName[0] are unusable in HTML.
+  Sanitizer renames to semantic snake_case matching field_config.newName.
+
+Why pdfToken instead of embedding PDF in HTML?
+  PDFs are large; in-memory server store keeps HTML portable while enabling fill.
+  Token embedded in generated HTML and form_config.json.
+
+Why two config files (field_config + form_config)?
+  field_config = 1:1 PDF field mapping (structural)
+  form_config = user-facing survey (questions, sections, autopopulate, layout)
+  Separation lets AI focus each task and allows re-generation independently.
+
+nameId must match exactly after sanitize:
+  If form_config says nameId "city" but sanitizer renamed to "applicant_home_city",
+  PDF fill silently skips the field. Validation in form-config-generator checks this.
+
+Autopopulate profile keys:
+  Prefer stable keys reused across forms (firstName, city, zip).
+  ChatGPT assigns profileKey; heuristics and aliases reconcile with Firestore.
+
+htmlMode dev vs normal:
+  Dev = internal testing/demos with visible autofill machinery
+  Normal = what end users would see in production
+
+
+================================================================================
+14. SUGGESTED NEXT STEPS (NOT YET DONE)
+================================================================================
+
+  - Persist pdfToken / sanitized PDF to disk or cloud storage (survive restarts)
+  - Deploy generated forms to Firebase Hosting with authorized auth domains
+  - Wire generated forms into main FormStar form catalog (public/Forms/)
+  - Download filled PDF button (currently preview only in iframe)
+  - Validate all field_config fields appear in form_config automatically in UI
+  - Reduce OpenAI token usage / cache field_config for same PDF template
+  - Automated tests for sanitizer checkbox survival and PDF fill round-trip
+  - Support radio groups in HTML renderer (currently split to checkboxes in pipeline)
+
+
+QUICK START FOR A NEW AGENT
+---------------------------
+1. Read this file and pdf-filling-documentation.txt
+2. Start server: node server.js
+3. Open demo.html, sign in, upload xfa-test.pdf
+4. Walk Steps 2–8; inspect field_config.json and form_config.json in UI
+5. Generate HTML, test autofill, Submit for PDF preview
+6. Use iframe-test.html to verify standalone HTML behavior
+7. Key code to modify for new features:
+   - form-html-renderer.js (generated form behavior)
+   - form-autopopulate.js (autofill rules)
+   - demo.html (UI/steps)
+   - pdf-field-sanitizer.js (PDF field naming issues)
+
+End of documentation.

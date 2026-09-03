@@ -1,0 +1,1720 @@
+{
+  "formTitle": "Employee’s Withholding Certificate (Form W-4, 2026)",
+  "formName": "IRS Form W-4 (2026)",
+  "formId": "w4_2026",
+  "formDescription": "Complete this form to determine your federal income tax withholding for employment in 2026.",
+  "formFolderName": "W-4-2026",
+  "defendant": "N/A",
+  "displayMode": "all_at_once",
+  "sections": [
+    {
+      "sectionId": 1,
+      "sectionName": "Personal",
+      "questions": [
+        {
+          "needsExplanation": true,
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [
+            "Street Address",
+            "City or Town, State, and ZIP Code"
+          ],
+          "textboxes": [
+            {
+              "label": "Street Address",
+              "nameId": "street_address",
+              "placeholder": "Street address",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "street_address",
+                "profileDescription": "Street Address"
+              }
+            },
+            {
+              "label": "City or Town, State, and ZIP Code",
+              "nameId": "city_state_zip_code",
+              "placeholder": "City, state, and ZIP code",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "city_state_zip_code",
+                "profileDescription": "City or Town, State, and ZIP Code"
+              }
+            }
+          ],
+          "questionId": 1,
+          "text": "What is your address?",
+          "explanation": "Enter your home street address or P.O. Box as the applicant. This is your personal residence — not the agency or employer address.",
+          "nameId": null,
+          "placeholder": "",
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedFieldRole": "primary",
+          "linkedToNameId": null
+        },
+        {
+          "questionId": 2,
+          "text": "What is your social security number?",
+          "needsExplanation": true,
+          "explanation": "Enter your social security number exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "social_security_number",
+          "placeholder": "Social Security Number",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "social_security_number",
+            "profileDescription": "User's Social Security number",
+            "availableInProfile": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        }
+      ]
+    },
+    {
+      "sectionId": 2,
+      "sectionName": "Filing & Steps",
+      "questions": [
+        {
+          "questionId": 3,
+          "text": "What is your filing status?",
+          "needsExplanation": true,
+          "explanation": "Select the option or options that best apply to your situation.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "single",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Single or Married filing separately",
+              "nameId": "filing_status_single_or_married_separately",
+              "value": "Single or Married filing separately"
+            },
+            {
+              "label": "Married filing jointly or Qualifying surviving spouse",
+              "nameId": "filing_status_married_jointly_or_surviving_spouse",
+              "value": "Married filing jointly or Qualifying surviving spouse"
+            },
+            {
+              "label": "Head of household",
+              "nameId": "filing_status_head_of_household",
+              "value": "Head of household"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedFieldRole": "primary",
+          "linkedToNameId": null
+        },
+        {
+          "questionId": 4,
+          "text": "Please confirm: Multiple jobs or spouse works",
+          "needsExplanation": true,
+          "explanation": "Select this option if you have more than one job at the same time or if you are married filing jointly and your spouse also works.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "single",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Multiple jobs or spouse works",
+              "nameId": "multiple_jobs_or_spouse_works",
+              "value": "Multiple jobs or spouse works"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedFieldRole": "primary",
+          "linkedToNameId": null
+        },
+        {
+          "questionId": 5,
+          "text": "How much do you claim for qualifying children?",
+          "needsExplanation": true,
+          "explanation": "Enter your qualifying children amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "qualifying_children_amount",
+          "placeholder": "Qualifying Children Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 6,
+          "text": "How much do you claim for other dependents?",
+          "needsExplanation": true,
+          "explanation": "Enter your other dependents amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "other_dependents_amount",
+          "placeholder": "Other Dependents Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "other_dependents_amount",
+            "profileDescription": "Other Dependents Amount",
+            "availableInProfile": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 7,
+          "text": "What is your total for all credits?",
+          "needsExplanation": true,
+          "explanation": "Enter your total credits amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "total_credits_amount",
+          "placeholder": "Total Credits Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 8,
+          "text": "Do you have other income you want tax withheld for?",
+          "needsExplanation": true,
+          "explanation": "Answer Yes if you expect to receive income such as interest, dividends, or retirement income that will not have tax withheld. This is not from jobs.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 9,
+          "text": "What is your other income amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your other income amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "8",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "other_income_amount",
+          "placeholder": "Other Income Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "other_income_amount",
+            "profileDescription": "Other Income Amount",
+            "availableInProfile": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 10,
+          "text": "Do you want to claim deductions other than the standard deduction?",
+          "needsExplanation": true,
+          "explanation": "Answer Yes if you plan to claim itemized deductions or other deductions that reduce your withholding.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 11,
+          "text": "What is your deductions amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your deductions amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "10",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "deductions_amount",
+          "placeholder": "Deductions Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 12,
+          "text": "Do you want extra tax withheld from each paycheck?",
+          "needsExplanation": true,
+          "explanation": "Answer Yes if you want your employer to withhold an additional amount of tax from each pay period.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 13,
+          "text": "What is your extra withholding amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your extra withholding amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "12",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "extra_withholding_amount",
+          "placeholder": "Extra Withholding Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 14,
+          "text": "Please confirm: Exempt from withholding",
+          "needsExplanation": true,
+          "explanation": "Check this box only if you meet both conditions for exemption from withholding for 2026 as described in the instructions.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "single",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Exempt from withholding",
+              "nameId": "exempt_from_withholding",
+              "value": "Exempt from withholding"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedFieldRole": "primary",
+          "linkedToNameId": null
+        }
+      ]
+    },
+    {
+      "sectionId": 3,
+      "sectionName": "Employer & Worksheets",
+      "questions": [
+        {
+          "questionId": 15,
+          "text": "What is your employer's name and address?",
+          "needsExplanation": true,
+          "explanation": "This asks for your employer's street address or P.O. Box — not your personal home address unless you live at your workplace. See the Employer section on the PDF.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_name_and_address",
+          "placeholder": "Employer Name and Address",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_name_and_address",
+            "profileDescription": "Employer Name and Address",
+            "availableInProfile": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 16,
+          "text": "What is your first date of employment?",
+          "needsExplanation": true,
+          "explanation": "Enter your first date of employment exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "first_date_of_employment",
+          "placeholder": "First Date of Employment",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "first_date_of_employment",
+            "profileDescription": "First Date of Employment",
+            "availableInProfile": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 17,
+          "text": "What is your employer's identification number?",
+          "needsExplanation": true,
+          "explanation": "Enter the employer identification number (EIN) for the business entity, if applicable.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_identification_number",
+          "placeholder": "Employer Identification Number (EIN)",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_identification_number",
+            "profileDescription": "Employer Identification Number (EIN)",
+            "availableInProfile": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 18,
+          "text": "What is the Multiple Jobs Worksheet Line 1 amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your multiple jobs worksheet line 1 amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "multiple_jobs_line_1_amount",
+          "placeholder": "Multiple Jobs Worksheet Line 1 Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 19,
+          "text": "What is the Multiple Jobs Worksheet Line 2a amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your multiple jobs worksheet line 2a amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "multiple_jobs_line_2a_amount",
+          "placeholder": "Multiple Jobs Worksheet Line 2a Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 20,
+          "text": "What is the Multiple Jobs Worksheet Line 2b amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your multiple jobs worksheet line 2b amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "multiple_jobs_line_2b_amount",
+          "placeholder": "Multiple Jobs Worksheet Line 2b Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 21,
+          "text": "What is the Multiple Jobs Worksheet Line 2c amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your multiple jobs worksheet line 2c amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "multiple_jobs_line_2c_amount",
+          "placeholder": "Multiple Jobs Worksheet Line 2c Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 22,
+          "text": "How many pay periods per year for the highest paying job?",
+          "needsExplanation": true,
+          "explanation": "Enter your pay periods per year exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "multiple_jobs_pay_periods_per_year",
+          "placeholder": "Pay Periods Per Year",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 23,
+          "text": "What is the Multiple Jobs Worksheet Line 4 amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your multiple jobs worksheet line 4 amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "multiple_jobs_line_4_amount",
+          "placeholder": "Multiple Jobs Worksheet Line 4 Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 24,
+          "text": "What is your qualified tips amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your qualified tips amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "qualified_tips_amount",
+          "placeholder": "Qualified Tips Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 25,
+          "text": "What is your qualified overtime compensation amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your qualified overtime compensation amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "qualified_overtime_compensation_amount",
+          "placeholder": "Qualified Overtime Compensation Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 26,
+          "text": "What is your qualified passenger vehicle loan interest amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your qualified passenger vehicle loan interest amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "qualified_passenger_vehicle_loan_interest_amount",
+          "placeholder": "Qualified Passenger Vehicle Loan Interest Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 27,
+          "text": "What is your Deductions Worksheet Line 2 total?",
+          "needsExplanation": true,
+          "explanation": "Enter your deductions worksheet line 2 total exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "deductions_line_2_total",
+          "placeholder": "Deductions Worksheet Line 2 Total",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 28,
+          "text": "What is your senior amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your senior self amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "senior_self_amount",
+          "placeholder": "Senior (Self) Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 29,
+          "text": "What is your senior spouse amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your senior spouse amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "senior_spouse_amount",
+          "placeholder": "Senior (Spouse) Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 30,
+          "text": "What is your senior total amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your senior total amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "senior_total_amount",
+          "placeholder": "Senior Total Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 31,
+          "text": "What is your other adjustments amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your other adjustments amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "other_adjustments_amount",
+          "placeholder": "Other Adjustments Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "other_adjustments_amount",
+            "profileDescription": "Other Adjustments Amount",
+            "availableInProfile": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 32,
+          "text": "What are your medical and dental expenses?",
+          "needsExplanation": true,
+          "explanation": "Enter your medical and dental expenses amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "medical_and_dental_expenses_amount",
+          "placeholder": "Medical and Dental Expenses Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 33,
+          "text": "What are your state and local taxes?",
+          "needsExplanation": true,
+          "explanation": "Enter the state and ZIP for your home address as the applicant.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "state_and_local_taxes_amount",
+          "placeholder": "State and Local Taxes Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "state_and_local_taxes_amount",
+            "profileDescription": "State and Local Taxes Amount",
+            "availableInProfile": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 34,
+          "text": "What is your home mortgage interest amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your home mortgage interest amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "home_mortgage_interest_amount",
+          "placeholder": "Home Mortgage Interest Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "home_mortgage_interest_amount",
+            "profileDescription": "Home Mortgage Interest Amount",
+            "availableInProfile": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 35,
+          "text": "What are your charitable gifts?",
+          "needsExplanation": true,
+          "explanation": "Enter your charitable gifts amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "charitable_gifts_amount",
+          "placeholder": "Charitable Gifts Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 36,
+          "text": "What are your other itemized deductions?",
+          "needsExplanation": true,
+          "explanation": "Enter your other itemized deductions amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "other_itemized_deductions_amount",
+          "placeholder": "Other Itemized Deductions Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "other_itemized_deductions_amount",
+            "profileDescription": "Other Itemized Deductions Amount",
+            "availableInProfile": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 37,
+          "text": "What is your itemized deductions total?",
+          "needsExplanation": true,
+          "explanation": "Enter your itemized deductions total exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "itemized_deductions_total",
+          "placeholder": "Itemized Deductions Total",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 38,
+          "text": "What is your total income amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your total income amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "total_income_amount",
+          "placeholder": "Total Income Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 39,
+          "text": "What is your income minus senior total?",
+          "needsExplanation": true,
+          "explanation": "Enter your income minus senior total exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "income_minus_senior_total",
+          "placeholder": "Income Minus Senior Total",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 40,
+          "text": "What is your itemized deductions limit?",
+          "needsExplanation": true,
+          "explanation": "Enter your itemized deductions limit exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "itemized_deductions_limit",
+          "placeholder": "Itemized Deductions Limit",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 41,
+          "text": "What are your adjusted itemized deductions?",
+          "needsExplanation": true,
+          "explanation": "Enter your adjusted itemized deductions exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "adjusted_itemized_deductions",
+          "placeholder": "Adjusted Itemized Deductions",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 42,
+          "text": "What is your standard deduction amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your standard deduction amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "standard_deduction_amount",
+          "placeholder": "Standard Deduction Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 43,
+          "text": "What are your cash gifts to charities?",
+          "needsExplanation": true,
+          "explanation": "Enter your cash gifts to charities amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "cash_gifts_to_charities_amount",
+          "placeholder": "Cash Gifts to Charities Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 44,
+          "text": "What is your standard deduction plus cash gifts?",
+          "needsExplanation": true,
+          "explanation": "Enter your standard deduction plus cash gifts exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "standard_deduction_plus_cash_gifts",
+          "placeholder": "Standard Deduction Plus Cash Gifts",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 45,
+          "text": "What is your Deductions Worksheet Line 14 amount?",
+          "needsExplanation": true,
+          "explanation": "Enter your deductions worksheet line 14 amount exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "deductions_line_14_amount",
+          "placeholder": "Deductions Worksheet Line 14 Amount",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "questionId": 46,
+          "text": "What is your Deductions Worksheet total?",
+          "needsExplanation": true,
+          "explanation": "Enter your deductions worksheet total exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "deductions_worksheet_total",
+          "placeholder": "Deductions Worksheet Total",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "needsExplanation": true,
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "autoTodayDate": false,
+          "questionId": 47,
+          "text": "What is your first name?",
+          "explanation": "Enter your first name and middle initial exactly as it should appear on the completed form in the Applicant Information section.",
+          "nameId": "first_name_and_middle_initial",
+          "placeholder": "First Name and Middle Initial",
+          "pdfCombineInto": "first_name_and_middle_initial",
+          "combinePart": "first_name",
+          "combineOrder": 1,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "first_name",
+            "profileDescription": "User first name",
+            "availableInProfile": false
+          },
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        },
+        {
+          "needsExplanation": true,
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "autoTodayDate": false,
+          "questionId": 48,
+          "text": "What is your middle initial?",
+          "explanation": "Enter your middle initial if you have one; it will be combined with your first name on the PDF.",
+          "nameId": null,
+          "placeholder": "Middle initial",
+          "pdfCombineInto": "first_name_and_middle_initial",
+          "combinePart": "middle_initial",
+          "combineOrder": 2,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "middle_initial",
+            "profileDescription": "User middle initial",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 49,
+          "text": "What is your last name?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "placeholder": "Last Name",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "last_name",
+            "profileDescription": "Last Name",
+            "availableInProfile": false
+          },
+          "nameId": "last_name",
+          "needsExplanation": true,
+          "explanation": "Enter your last name exactly as it should appear on the completed form in the Applicant Information section.",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary"
+        }
+      ]
+    }
+  ],
+  "hiddenFields": [],
+  "sectionCounter": 4,
+  "questionCounter": 50,
+  "htmlMode": "normal",
+  "autopopulateFields": [
+    {
+      "questionText": "What is your address? — Street Address",
+      "nameId": "street_address",
+      "profileKey": "street_address",
+      "profileDescription": "Street Address",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your address? — City or Town, State, and ZIP Code",
+      "nameId": "city_state_zip_code",
+      "profileKey": "city_state_zip_code",
+      "profileDescription": "City or Town, State, and ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your social security number?",
+      "nameId": "social_security_number",
+      "profileKey": "social_security_number",
+      "profileDescription": "User's Social Security number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "How much do you claim for other dependents?",
+      "nameId": "other_dependents_amount",
+      "profileKey": "other_dependents_amount",
+      "profileDescription": "Other Dependents Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your other income amount?",
+      "nameId": "other_income_amount",
+      "profileKey": "other_income_amount",
+      "profileDescription": "Other Income Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your employer's name and address?",
+      "nameId": "employer_name_and_address",
+      "profileKey": "employer_name_and_address",
+      "profileDescription": "Employer Name and Address",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your first date of employment?",
+      "nameId": "first_date_of_employment",
+      "profileKey": "first_date_of_employment",
+      "profileDescription": "First Date of Employment",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your employer's identification number?",
+      "nameId": "employer_identification_number",
+      "profileKey": "employer_identification_number",
+      "profileDescription": "Employer Identification Number (EIN)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your other adjustments amount?",
+      "nameId": "other_adjustments_amount",
+      "profileKey": "other_adjustments_amount",
+      "profileDescription": "Other Adjustments Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What are your state and local taxes?",
+      "nameId": "state_and_local_taxes_amount",
+      "profileKey": "state_and_local_taxes_amount",
+      "profileDescription": "State and Local Taxes Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home mortgage interest amount?",
+      "nameId": "home_mortgage_interest_amount",
+      "profileKey": "home_mortgage_interest_amount",
+      "profileDescription": "Home Mortgage Interest Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What are your other itemized deductions?",
+      "nameId": "other_itemized_deductions_amount",
+      "profileKey": "other_itemized_deductions_amount",
+      "profileDescription": "Other Itemized Deductions Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your first name?",
+      "nameId": "first_name_and_middle_initial",
+      "profileKey": "first_name",
+      "profileDescription": "User first name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your middle initial?",
+      "nameId": "middle_initial",
+      "profileKey": "middle_initial",
+      "profileDescription": "User middle initial",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your last name?",
+      "nameId": "last_name",
+      "profileKey": "last_name",
+      "profileDescription": "Last Name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    }
+  ],
+  "autopopulateAvailable": [],
+  "autopopulateMissing": [
+    {
+      "questionText": "What is your address? — Street Address",
+      "nameId": "street_address",
+      "profileKey": "street_address",
+      "profileDescription": "Street Address",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your address? — City or Town, State, and ZIP Code",
+      "nameId": "city_state_zip_code",
+      "profileKey": "city_state_zip_code",
+      "profileDescription": "City or Town, State, and ZIP Code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your social security number?",
+      "nameId": "social_security_number",
+      "profileKey": "social_security_number",
+      "profileDescription": "User's Social Security number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "How much do you claim for other dependents?",
+      "nameId": "other_dependents_amount",
+      "profileKey": "other_dependents_amount",
+      "profileDescription": "Other Dependents Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your other income amount?",
+      "nameId": "other_income_amount",
+      "profileKey": "other_income_amount",
+      "profileDescription": "Other Income Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your employer's name and address?",
+      "nameId": "employer_name_and_address",
+      "profileKey": "employer_name_and_address",
+      "profileDescription": "Employer Name and Address",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your first date of employment?",
+      "nameId": "first_date_of_employment",
+      "profileKey": "first_date_of_employment",
+      "profileDescription": "First Date of Employment",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your employer's identification number?",
+      "nameId": "employer_identification_number",
+      "profileKey": "employer_identification_number",
+      "profileDescription": "Employer Identification Number (EIN)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your other adjustments amount?",
+      "nameId": "other_adjustments_amount",
+      "profileKey": "other_adjustments_amount",
+      "profileDescription": "Other Adjustments Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What are your state and local taxes?",
+      "nameId": "state_and_local_taxes_amount",
+      "profileKey": "state_and_local_taxes_amount",
+      "profileDescription": "State and Local Taxes Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home mortgage interest amount?",
+      "nameId": "home_mortgage_interest_amount",
+      "profileKey": "home_mortgage_interest_amount",
+      "profileDescription": "Home Mortgage Interest Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What are your other itemized deductions?",
+      "nameId": "other_itemized_deductions_amount",
+      "profileKey": "other_itemized_deductions_amount",
+      "profileDescription": "Other Itemized Deductions Amount",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your first name?",
+      "nameId": "first_name_and_middle_initial",
+      "profileKey": "first_name",
+      "profileDescription": "User first name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your middle initial?",
+      "nameId": "middle_initial",
+      "profileKey": "middle_initial",
+      "profileDescription": "User middle initial",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your last name?",
+      "nameId": "last_name",
+      "profileKey": "last_name",
+      "profileDescription": "Last Name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    }
+  ],
+  "pdfToken": "42f588ae-248c-4478-ad98-a0477441503c"
+}

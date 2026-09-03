@@ -1,0 +1,143 @@
+{
+  "formTitle": "W-9 Request for Taxpayer Identification Number and Certification",
+  "fields": [
+    {
+      "id": "topmostSubform[0].Page1[0].f1_01[0]",
+      "newName": "taxpayer_name",
+      "type": "text",
+      "label": "Name of entity/individual"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_02[0]",
+      "newName": "business_name",
+      "type": "text",
+      "label": "Business name/disregarded entity name"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].f1_03[0]",
+      "newName": "tax_classification_other",
+      "type": "text",
+      "label": "Other tax classification (if applicable)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_05[0]",
+      "newName": "exempt_payee_code",
+      "type": "text",
+      "label": "Exempt payee code (if any)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].f1_04[0]",
+      "newName": "tax_classification_code",
+      "type": "text",
+      "label": "Tax classification code"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_06[0]",
+      "newName": "fatca_code",
+      "type": "text",
+      "label": "FATCA reporting code (if any)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_07[0]",
+      "newName": "address",
+      "type": "text",
+      "label": "Address (number, street, and apt. or suite no.)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_09[0]",
+      "newName": "optional_requester_name",
+      "type": "text",
+      "label": "Requester’s name and address (optional)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_08[0]",
+      "newName": "city_state_zip",
+      "type": "text",
+      "label": "City, state, and ZIP code"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_10[0]",
+      "newName": "account_number",
+      "type": "text",
+      "label": "List account number(s) here (optional)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_11[0]",
+      "newName": "tin_ssn",
+      "type": "text",
+      "label": "Taxpayer Identification Number (TIN)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_12[0]",
+      "newName": "tin_ein",
+      "type": "text",
+      "label": "Employer Identification Number (EIN)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_13[0]",
+      "newName": "name_for_ein",
+      "type": "text",
+      "label": "What Name and Number To Give the Requester"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_14[0]",
+      "newName": "name_for_ssn",
+      "type": "text",
+      "label": "Name for SSN"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_15[0]",
+      "newName": "additional_name_info",
+      "type": "text",
+      "label": "Additional name information"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[0]",
+      "newName": "tax_classification_individual",
+      "type": "checkbox",
+      "label": "Individual/sole proprietor"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[1]",
+      "newName": "tax_classification_corporation",
+      "type": "checkbox",
+      "label": "C corporation"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[2]",
+      "newName": "tax_classification_s_corporation",
+      "type": "checkbox",
+      "label": "S corporation"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[3]",
+      "newName": "tax_classification_partnership",
+      "type": "checkbox",
+      "label": "Partnership"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[4]",
+      "newName": "tax_classification_trust_estate",
+      "type": "checkbox",
+      "label": "Trust/estate"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[5]",
+      "newName": "tax_classification_llc",
+      "type": "checkbox",
+      "label": "LLC"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[6]",
+      "newName": "tax_classification_other_checkbox",
+      "type": "checkbox",
+      "label": "Other (see instructions)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_2[0]",
+      "newName": "foreign_partners_checkbox",
+      "type": "checkbox",
+      "label": "Check if you have foreign partners"
+    }
+  ]
+}
