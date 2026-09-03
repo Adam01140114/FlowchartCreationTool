@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { fetchOpenAiWithRetry } = require('./openai-fetch');
+const { extractJsonFromModelResponse } = require('./model-json');
 const { saveCurrentData } = require('./auto-form-current-data');
 const {
   resolvePdfPageImages,
@@ -16,13 +17,6 @@ const FORM_HTML_PROMPT_PATH = path.join(
 
 function loadFormHtmlPrompt() {
   return fs.readFileSync(FORM_HTML_PROMPT_PATH, 'utf8');
-}
-
-function extractJsonFromModelResponse(text) {
-  const trimmed = String(text || '').trim();
-  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  const candidate = fenced ? fenced[1].trim() : trimmed;
-  return JSON.parse(candidate);
 }
 
 function extractHtmlFromModelResponse(text) {

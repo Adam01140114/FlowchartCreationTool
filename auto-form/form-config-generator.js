@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { fetchOpenAiWithRetry } = require('./openai-fetch');
+const { extractJsonFromModelResponse } = require('./model-json');
 const { enrichFormConfigAutopopulate, isLikelyAutopopulatableField } = require('./form-autopopulate');
 const { ensureFormCatalogMetadata } = require('./form-catalog-metadata');
 const { applyLinkedFields } = require('./form-linked-fields');
@@ -129,13 +130,6 @@ const FORM_CONFIG_PROMPT_PATH = path.join(
 
 function loadFormConfigPrompt() {
   return fs.readFileSync(FORM_CONFIG_PROMPT_PATH, 'utf8');
-}
-
-function extractJsonFromModelResponse(text) {
-  const trimmed = String(text || '').trim();
-  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  const candidate = fenced ? fenced[1].trim() : trimmed;
-  return JSON.parse(candidate);
 }
 
 function collectNameIdsFromQuestion(question, ids) {

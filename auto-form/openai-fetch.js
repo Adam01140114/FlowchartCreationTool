@@ -87,6 +87,15 @@ function getAnthropicModel(requestedModel) {
   return 'claude-sonnet-4-6';
 }
 
+// Sampling params (temperature/top_p/top_k) are rejected with a 400 on Claude
+// Opus 5, the Opus 4.7/4.8 family, Sonnet 5 and Fable/Mythos 5. Opus 4.6,
+// Sonnet 4.6 and older still accept them.
+const NO_SAMPLING_MODEL = /^claude-(?:fable-5|mythos-5|opus-5|opus-4-(?:7|8)|sonnet-5)/;
+
+function acceptsSamplingParams(model) {
+  return !NO_SAMPLING_MODEL.test(String(model || '').trim());
+}
+
 function parseDataUrl(url) {
   const match = String(url || '').match(/^data:([^;,]+);base64,(.+)$/s);
   if (!match) return null;
@@ -187,12 +196,16 @@ async function fetchAnthropicChatCompletions(openAiBody, retryOptions = {}) {
     systemPrompt = `${systemPrompt}\n\nReturn valid JSON only. Do not wrap the JSON in markdown fences.`.trim();
   }
 
+  const model = getAnthropicModel(openAiBody.model);
   const anthropicBody = {
-    model: getAnthropicModel(openAiBody.model),
+    model,
     max_tokens: openAiBody.max_tokens || 16384,
-    temperature: typeof openAiBody.temperature === 'number' ? openAiBody.temperature : 0.1,
     messages,
   };
+  if (acceptsSamplingParams(model)) {
+    anthropicBody.temperature =
+      typeof openAiBody.temperature === 'number' ? openAiBody.temperature : 0.1;
+  }
   if (systemPrompt) anthropicBody.system = systemPrompt;
 
   const maxAttempts = retryOptions.maxAttempts ?? 5;

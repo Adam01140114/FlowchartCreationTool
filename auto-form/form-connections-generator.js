@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { fetchOpenAiWithRetry } = require('./openai-fetch');
+const { extractJsonFromModelResponse } = require('./model-json');
 
 const PROMPT_PATH = path.join(__dirname, 'public', 'Auto-Form-Creator', 'form_connections.txt');
 const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL || process.env.FORM_CONNECTIONS_MODEL || 'claude-sonnet-4-6';
@@ -47,16 +48,10 @@ ${JSON.stringify(summarized, null, 2)}
 YOUR RESPONSE
 ================================================================================
 
-Return ONLY the form_connections.txt plain-text contents now.`;
+Return ONLY the form_connections.json object now.`;
 }
 
-function stripFence(text) {
-  const raw = String(text || '').trim();
-  const fenced = raw.match(/^```(?:\w+)?\s*([\s\S]*?)```$/);
-  return (fenced ? fenced[1] : raw).trim();
-}
-
-async function generateFormConnectionsText(payloads, apiKey) {
+async function generateFormConnections(payloads, apiKey) {
   if (!Array.isArray(payloads) || payloads.length < 2) {
     throw new Error('At least two payloads are required to generate form connections.');
   }
@@ -75,7 +70,7 @@ async function generateFormConnectionsText(payloads, apiKey) {
         { role: 'system', content: systemPrompt },
         {
           role: 'user',
-          content: `Create form_connections.txt for these payloads:\n\n${JSON.stringify(summarized, null, 2)}`,
+          content: `Create form_connections.json for these payloads:\n\n${JSON.stringify(summarized, null, 2)}`,
         },
       ],
       temperature: 0.2,
@@ -91,7 +86,10 @@ async function generateFormConnectionsText(payloads, apiKey) {
   const data = await response.json();
   const content = data.choices?.[0]?.message?.content;
   if (!content) throw new Error('AI returned an empty form_connections response');
-  return stripFence(content);
+
+  // Parsed here rather than passed through as text: a malformed object should
+  // fail now, not when something downstream tries to read it.
+  return extractJsonFromModelResponse(content);
 }
 
 function createHandleGenerateFormConnections(apiKey) {
@@ -105,11 +103,11 @@ function createHandleGenerateFormConnections(apiKey) {
         });
       }
 
-      const text = await generateFormConnectionsText(payloads, apiKey);
+      const connections = await generateFormConnections(payloads, apiKey);
       return res.json({
         success: true,
-        formConnectionsText: text,
-        fileName: 'form_connections.txt',
+        formConnections: connections,
+        fileName: 'form_connections.json',
       });
     } catch (error) {
       console.error('[generate-form-connections]', error);
@@ -134,7 +132,7 @@ function createHandleFormConnectionsPrompt() {
       return res.json({
         success: true,
         prompt: buildManualPrompt(payloads),
-        fileName: 'form_connections.txt',
+        fileName: 'form_connections.json',
       });
     } catch (error) {
       console.error('[form-connections-prompt]', error);
@@ -150,5 +148,6 @@ module.exports = {
   createHandleGenerateFormConnections,
   createHandleFormConnectionsPrompt,
   buildManualPrompt,
-  generateFormConnectionsText,
+  summarizePayload,
+  generateFormConnections,
 };

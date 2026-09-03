@@ -1677,13 +1677,26 @@
         <div class="modal-overlay" id="import-field-config-modal">
             <div class="modal-card" style="max-width:720px;">
                 <div class="modal-header">
-                    <h3>Import field_config.json</h3>
+                    <h3 id="import-field-config-title">Import field_config.json</h3>
                     <button type="button" class="modal-close" id="close-import-field-config-modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <p style="margin:0 0 14px;color:var(--gray);">
                         Paste JSON or choose a <code>field_config.json</code> file. This skips ChatGPT and loads your config directly.
                     </p>
+                    <div class="form-group">
+                        <label>Run it yourself</label>
+                        <p style="margin:0 0 8px;color:var(--gray);font-size:0.86rem;">
+                            Downloads a zip with the prompt, the rendered page images and a
+                            README. Attach the images in your chat session so it can see which
+                            checkboxes are one-of-many groups, then paste the JSON back below.
+                            Nothing is sent to any API from here.
+                        </p>
+                        <button type="button" class="btn-download" id="copy-field-config-prompt-btn">
+                            Download AI Prompt ZIP
+                        </button>
+                        <span id="copy-field-config-prompt-status" style="margin-left:10px;color:var(--gray);font-size:0.85rem;"></span>
+                    </div>
                     <div class="form-group">
                         <label for="import-field-config-file">Upload JSON file</label>
                         <input type="file" id="import-field-config-file" accept=".json,application/json">
@@ -1705,13 +1718,13 @@
         <div class="modal-overlay" id="form-connections-manual-modal">
             <div class="modal-card" style="max-width:820px;">
                 <div class="modal-header">
-                    <h3>Manual processing — form_connections.txt</h3>
+                    <h3>Manual processing — form_connections.json</h3>
                     <button type="button" class="modal-close" id="close-form-connections-manual-modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <p style="margin:0 0 14px;color:var(--gray);">
                         Copy the prompt into Claude/ChatGPT, then paste the plain-text
-                        <code>form_connections.txt</code> reply here (no tokens needed on this server).
+                        <code>form_connections.json</code> reply here (no tokens needed on this server).
                     </p>
                     <div class="form-group">
                         <label for="form-connections-prompt-text">Prompt to copy</label>
@@ -1722,11 +1735,15 @@
                     </div>
                     <div class="form-group">
                         <label for="form-connections-manual-text">Paste AI response</label>
-                        <textarea id="form-connections-manual-text" rows="12" placeholder="Paste the form_connections.txt contents here…"></textarea>
+                        <textarea id="form-connections-manual-text" rows="12" placeholder="Paste the form_connections.json contents here…"></textarea>
                     </div>
                     <div class="error-message" id="form-connections-manual-error"></div>
                     <div class="modal-actions">
-                        <button type="button" class="btn-primary" id="confirm-form-connections-manual-btn">Save form_connections.txt</button>
+                        <button type="button" class="btn-download" id="download-form-connections-prompt-zip-btn">
+                            Download AI Prompt ZIP
+                        </button>
+                        <span id="form-connections-zip-status" style="margin-left:10px;color:var(--gray);font-size:0.85rem;"></span>
+                        <button type="button" class="btn-primary" id="confirm-form-connections-manual-btn">Save form_connections.json</button>
                         <button type="button" class="btn-secondary" id="cancel-form-connections-manual">Cancel</button>
                     </div>
                 </div>
@@ -1846,34 +1863,8 @@
                         Download full payload zip file
                     </button>
                     <p class="zip-blocked-hint" id="zip-blocked-hint">
-                        Create <code>form_connections.txt</code> first (2+ payloads). Zip download unlocks after that file exists.
+                        Create <code>form_connections.json</code> first (2+ payloads). Zip download unlocks after that file exists.
                     </p>
-                    <div class="form-connections-panel" id="form-connections-panel">
-                        <h3>Create form_connections.txt</h3>
-                        <p>
-                            With multiple payloads, AI reviews each form’s fields and decides how they connect —
-                            which options must be filled so one form can attach to another.
-                        </p>
-                        <div class="form-connections-actions">
-                            <button type="button" class="btn-download" id="form-connections-auto-btn">
-                                Automatic processing
-                            </button>
-                            <button type="button" class="btn-secondary" id="form-connections-manual-btn">
-                                Manual processing
-                            </button>
-                            <button type="button" class="btn-secondary" id="download-form-connections-btn" disabled>
-                                Download form_connections.txt
-                            </button>
-                        </div>
-                        <div class="timed-progress" id="form-connections-progress">
-                            <div class="timed-progress-label" id="form-connections-progress-label">Generating form_connections.txt with Claude…</div>
-                            <div class="timed-progress-track">
-                                <div class="timed-progress-bar" id="form-connections-progress-bar"></div>
-                            </div>
-                            <div class="timed-progress-eta">Estimated time ~1–2 min</div>
-                        </div>
-                        <div class="form-connections-status" id="form-connections-status">✓ form_connections.txt ready — zip download unlocked</div>
-                    </div>
                     <!-- Legacy id kept for JS refs; drop zone replaces this button -->
                     <button type="button" id="add-payload-btn" style="display:none;" tabindex="-1" aria-hidden="true">Add payload</button>
                 </div>
@@ -1894,6 +1885,54 @@
                 <div class="unlock-success" id="unlock-success">
                     <span class="unlock-success-text">✓ PDF unlocked</span>
                     <button type="button" class="btn-download" id="download-unlocked-btn">Download Unlocked PDF</button>
+                </div>
+
+                <!-- Unlock and extraction are free. Nothing is sent to Claude
+                     until one of these buttons is clicked. -->
+                <div class="form-connections-panel" id="ai-approval-panel">
+                    <h3>Ready to generate the field config</h3>
+                    <p>
+                        Fields are extracted and nothing has been sent to Claude yet.
+                        <strong>Automatic processing calls the API and costs money.</strong>
+                        Manual processing lets you import a field_config.json instead.
+                    </p>
+                    <div class="form-connections-actions">
+                        <button type="button" class="btn-download" id="field-config-auto-btn">
+                            Automatic processing
+                        </button>
+                        <button type="button" class="btn-download" id="field-config-manual-btn">
+                            Manual processing
+                        </button>
+                    </div>
+
+                <!-- Sits after the field-config step: connections are only
+                     meaningful once each payload has a config. -->
+                <div class="form-connections-panel" id="form-connections-panel">
+                    <h3>Create form_connections.json</h3>
+                    <p>
+                        With multiple payloads, AI reviews each form’s fields and decides how they connect —
+                        which options must be filled so one form can attach to another.
+                    </p>
+                    <div class="form-connections-actions">
+                        <button type="button" class="btn-download" id="form-connections-auto-btn">
+                            Automatic processing
+                        </button>
+                        <button type="button" class="btn-download" id="form-connections-manual-btn">
+                            Manual processing
+                        </button>
+                        <button type="button" class="btn-secondary" id="download-form-connections-btn" disabled>
+                            Download form_connections.json
+                        </button>
+                    </div>
+                    <div class="timed-progress" id="form-connections-progress">
+                        <div class="timed-progress-label" id="form-connections-progress-label">Generating form_connections.json with Claude…</div>
+                        <div class="timed-progress-track">
+                            <div class="timed-progress-bar" id="form-connections-progress-bar"></div>
+                        </div>
+                        <div class="timed-progress-eta">Estimated time ~1–2 min</div>
+                    </div>
+                    <div class="form-connections-status" id="form-connections-status">✓ form_connections.json ready — zip download unlocked</div>
+                </div>
                 </div>
 
                 <div class="timed-progress" id="field-config-progress">
@@ -2410,10 +2449,16 @@
         const generateFieldConfigBtn = document.getElementById('generate-field-config-btn');
         const generateSanitizedPdfBtn = document.getElementById('generate-sanitized-pdf-btn');
         const importFieldConfigBtn = document.getElementById('import-field-config-btn');
+        const aiApprovalPanel = document.getElementById('ai-approval-panel');
+        const fieldConfigAutoBtn = document.getElementById('field-config-auto-btn');
+        const fieldConfigManualBtn = document.getElementById('field-config-manual-btn');
+        const copyFieldConfigPromptBtn = document.getElementById('copy-field-config-prompt-btn');
+        const copyFieldConfigPromptStatus = document.getElementById('copy-field-config-prompt-status');
         const toggleDocumentDataBtn = document.getElementById('toggle-document-data-btn');
         const documentDataPanels = document.getElementById('document-data-panels');
         let documentDataVisible = false;
         const importFieldConfigModal = document.getElementById('import-field-config-modal');
+        const importFieldConfigTitle = document.getElementById('import-field-config-title');
         const closeImportFieldConfigModal = document.getElementById('close-import-field-config-modal');
         const cancelImportFieldConfigBtn = document.getElementById('cancel-import-field-config');
         const confirmImportFieldConfigBtn = document.getElementById('confirm-import-field-config-btn');
@@ -2433,6 +2478,8 @@
         const formConnectionsPanel = document.getElementById('form-connections-panel');
         const formConnectionsAutoBtn = document.getElementById('form-connections-auto-btn');
         const formConnectionsManualBtn = document.getElementById('form-connections-manual-btn');
+        const downloadFormConnectionsPromptZipBtn = document.getElementById('download-form-connections-prompt-zip-btn');
+        const formConnectionsZipStatus = document.getElementById('form-connections-zip-status');
         const downloadFormConnectionsBtn = document.getElementById('download-form-connections-btn');
         const formConnectionsProgress = document.getElementById('form-connections-progress');
         const formConnectionsProgressLabel = document.getElementById('form-connections-progress-label');
@@ -2534,7 +2581,7 @@
         let payloadEntries = [];
         let editingPayloadId = null;
         let payloadIdCounter = 1;
-        let formConnectionsText = null;
+        let formConnections = null;
         let formConnectionsFingerprint = null;
         let lastPdfToken = null;
         let unlockedPdfFile = null;
@@ -2847,8 +2894,9 @@
             revokeSanitizedPdfBlobUrl();
             sanitizedPdfFile = null;
             payloadEntries = [];
+            clearStoredPayloadEntries();
             editingPayloadId = null;
-            formConnectionsText = null;
+            formConnections = null;
             formConnectionsFingerprint = null;
             revokeUnlockedBlobUrl();
             unlockedPdfFile = null;
@@ -4292,8 +4340,11 @@
                 if (fieldConfigProgressLabel && batchLabel) {
                     fieldConfigProgressLabel.textContent = `Generating field config with ChatGPT…${batchLabel}`;
                 }
-                await generateSanitizedPdfPipeline();
-                markPipelineStageDone('sanitize');
+                // Everything past this point costs money - wait for approval.
+                if (await awaitRunApproval()) {
+                    await generateSanitizedPdfPipeline();
+                    markPipelineStageDone('sanitize');
+                }
             } catch (err) {
                 console.error('PDF pipeline error:', err);
                 setPipelineStage('error');
@@ -4645,6 +4696,42 @@
             throw new Error('PDF not available on server. Re-run Step 3.');
         }
 
+        // A config built for a different form parses cleanly and then fails much
+        // later with an opaque "Failed to rename N field(s)". Catch the mismatch
+        // here, where we can still say which form the config was actually for.
+        function assertConfigMatchesLoadedPdf(config) {
+            if (!lastExtractionPayload) return;
+
+            const nameOf = (f) => (typeof f === 'string' ? f : f && f.name);
+            const known = new Set([
+                ...(lastExtractionPayload.textFields || []),
+                ...(lastExtractionPayload.checkboxFields || [])
+            ].map(nameOf).filter(Boolean));
+            if (!known.size) return;
+
+            const ids = config.fields.map((f) => f.id);
+            const unknown = ids.filter((id) => !known.has(id));
+            if (!unknown.length) return;
+
+            // "DV-110[0].Page1[0]..." -> "DV-110"
+            const formOf = (id) => String(id).split('[')[0];
+
+            if (unknown.length === ids.length) {
+                throw new Error(
+                    "None of the " + ids.length + " field ids in this config match the loaded PDF. "
+                    + "The config was built for \"" + formOf(unknown[0]) + "\" but this PDF is \""
+                    + formOf(known.values().next().value) + "\". Download a new prompt bundle for "
+                    + "this PDF and try again."
+                );
+            }
+
+            throw new Error(
+                unknown.length + " of " + ids.length + " field ids are not in this PDF, for example "
+                + "\"" + unknown.slice(0, 2).join("\", \"") + "\". Check the config was built "
+                + "for this form."
+            );
+        }
+
         function validateImportedFieldConfig(config) {
             if (!config || typeof config !== 'object') {
                 throw new Error('field_config.json must be a JSON object.');
@@ -4657,6 +4744,7 @@
                     throw new Error('Each field must include "id" and "newName".');
                 }
             }
+            assertConfigMatchesLoadedPdf(config);
             return config;
         }
 
@@ -4674,11 +4762,77 @@
             importFieldConfigError.textContent = '';
             importFieldConfigText.value = '';
             importFieldConfigFileInput.value = '';
+
+            // Name the PDF in the title. Importing a config built for a different
+            // form is the most common failure here, and nothing else on this
+            // dialog says which form is loaded. Fall back to the plain title
+            // rather than the generic "form.pdf" the payload helper would give.
+            if (importFieldConfigTitle) {
+                importFieldConfigTitle.textContent = originalUploadPdfName
+                    ? 'Import field_config.json for ' + originalUploadPdfName
+                    : 'Import field_config.json';
+            }
+
             importFieldConfigModal.classList.add('visible');
+        }
+
+        // Builds the bundle on the server (no API call) and hands it to the browser.
+        async function downloadFieldConfigPromptZip() {
+            copyFieldConfigPromptStatus.textContent = "Building bundle...";
+            if (!lastExtractionPayload) {
+                copyFieldConfigPromptStatus.textContent = "Extract a PDF first.";
+                return;
+            }
+            try {
+                const pdfToken = await ensurePdfTokenForVision();
+                const res = await fetch('/api/field-config-prompt-zip', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...lastExtractionPayload, pdfToken })
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error || 'Could not build the bundle.');
+                }
+
+                const pageCount = res.headers.get('X-Page-Count') || '0';
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'field-config-prompt.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                copyFieldConfigPromptStatus.textContent = pageCount === "0"
+                    ? "Downloaded - but with no page images, see the README."
+                    : "Downloaded with " + pageCount + " page image(s).";
+            } catch (err) {
+                copyFieldConfigPromptStatus.textContent = err.message || 'Could not build the bundle.';
+            }
         }
 
         function closeImportFieldConfigModalFn() {
             importFieldConfigModal.classList.remove('visible');
+            restoreRunApprovalPanel();
+        }
+
+        // Mirrors auto-form/model-json.js. Real PDF field names contain a
+        // backslash (DV-110 has FillText11\.yards) and a model echoing one back
+        // usually drops the second one, which JSON.parse rejects as a bad escape.
+        // Only runs after a real parse failure, so valid JSON is never rewritten.
+        function parsePastedFieldConfig(raw) {
+            const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+            const candidate = fenced ? fenced[1].trim() : raw;
+            try {
+                return JSON.parse(candidate);
+            } catch (firstError) {
+                const repaired = candidate.replace(/\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\");
+                if (repaired === candidate) throw firstError;
+                return JSON.parse(repaired);
+            }
         }
 
         async function importFieldConfigFromModal() {
@@ -4691,12 +4845,78 @@
                 if (!raw) {
                     throw new Error('Paste JSON or choose a file to import.');
                 }
-                const parsed = JSON.parse(raw);
+                const parsed = parsePastedFieldConfig(raw);
                 applyImportedFieldConfig(parsed);
+                // The config is in hand - let the parked run continue without AI.
+                settleRunApproval(false);
                 closeImportFieldConfigModalFn();
             } catch (err) {
                 importFieldConfigError.textContent = err.message || 'Failed to import field_config.json.';
             }
+        }
+
+        // --- AI approval gate ---------------------------------------------
+        // The server refuses every paid endpoint unless the request carries the
+        // token produced by an explicit "Automatic processing" click, so no code
+        // path here can reach the Claude API on its own.
+        let aiApprovalToken = null;
+        let pendingApprovalResolve = null;
+
+        async function armAiApproval(reason, maxCalls) {
+            const res = await fetch('/api/ai-approval', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason, maxCalls })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || 'Could not record your approval.');
+            }
+            aiApprovalToken = data.approval.token;
+            return aiApprovalToken;
+        }
+
+        function aiHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'X-AI-Approval': aiApprovalToken || ''
+            };
+        }
+
+        // The server dropped this arming (budget spent or expired) - forget the
+        // token so the next run asks again instead of reusing a dead one.
+        function noteAiApprovalRejected(data) {
+            if (data && (data.code === 'ai_not_armed' || data.code === 'ai_approval_mismatch')) {
+                aiApprovalToken = null;
+            }
+        }
+
+        // Resolves true once the operator approves. A batch reuses the approval
+        // granted for its first PDF rather than asking again per file.
+        function awaitRunApproval() {
+            if (aiApprovalToken) return Promise.resolve(true);
+            if (aiApprovalPanel) aiApprovalPanel.classList.add('visible');
+            return new Promise((resolve) => { pendingApprovalResolve = resolve; });
+        }
+
+        // Hide the panel without answering yet - the run stays parked so that
+        // closing the import modal can bring the choice back.
+        function hideRunApprovalPanel() {
+            if (aiApprovalPanel) aiApprovalPanel.classList.remove('visible');
+        }
+
+        // Re-offer the choice if the operator backed out of importing.
+        function restoreRunApprovalPanel() {
+            if (pendingApprovalResolve && aiApprovalPanel) {
+                aiApprovalPanel.classList.add('visible');
+            }
+        }
+
+        function settleRunApproval(approved) {
+            if (aiApprovalPanel) aiApprovalPanel.classList.remove('visible');
+            const resolve = pendingApprovalResolve;
+            pendingApprovalResolve = null;
+            if (resolve) resolve(approved);
         }
 
         async function generateFieldConfigOnly() {
@@ -4706,7 +4926,7 @@
             const pdfToken = await ensurePdfTokenForVision();
             const response = await fetch('/api/generate-field-config', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: aiHeaders(),
                 body: JSON.stringify({
                     ...lastExtractionPayload,
                     pdfToken
@@ -4714,6 +4934,7 @@
             });
             const data = await response.json();
             if (!response.ok || !data.success) {
+                noteAiApprovalRejected(data);
                 throw new Error(data.error || 'Failed to generate field config');
             }
             lastFieldConfig = data.fieldConfig;
@@ -4818,11 +5039,31 @@
             });
         }
         importFieldConfigBtn.addEventListener('click', openImportFieldConfigModal);
+        if (fieldConfigAutoBtn) {
+            fieldConfigAutoBtn.addEventListener('click', async () => {
+                try {
+                    await armAiApproval('field config pipeline', 12);
+                } catch (err) {
+                    step4Error.textContent = err.message || 'Could not record your approval.';
+                    return;
+                }
+                settleRunApproval(true);
+            });
+        }
+        if (fieldConfigManualBtn) {
+            fieldConfigManualBtn.addEventListener('click', () => {
+                hideRunApprovalPanel();
+                openImportFieldConfigModal();
+            });
+        }
         if (toggleDocumentDataBtn) {
             toggleDocumentDataBtn.addEventListener('click', () => {
                 if (toggleDocumentDataBtn.disabled) return;
                 setDocumentDataVisible(!documentDataVisible);
             });
+        }
+        if (copyFieldConfigPromptBtn) {
+            copyFieldConfigPromptBtn.addEventListener('click', downloadFieldConfigPromptZip);
         }
         confirmImportFieldConfigBtn.addEventListener('click', importFieldConfigFromModal);
         cancelImportFieldConfigBtn.addEventListener('click', closeImportFieldConfigModalFn);
@@ -5151,7 +5392,7 @@
         }
 
         function needsFormConnections() {
-            // 2+ payloads: grey out zip until form_connections.txt exists.
+            // 2+ payloads: grey out zip until form_connections.json exists.
             return payloadEntries.length >= 2;
         }
 
@@ -5174,7 +5415,7 @@
         }
 
         function clearFormConnections(reason = '') {
-            formConnectionsText = null;
+            formConnections = null;
             formConnectionsFingerprint = null;
             if (formConnectionsStatus) {
                 formConnectionsStatus.classList.remove('visible');
@@ -5183,13 +5424,30 @@
             if (downloadFormConnectionsBtn) downloadFormConnectionsBtn.disabled = true;
         }
 
-        function setFormConnectionsText(text) {
-            const cleaned = String(text || '').trim();
-            if (!cleaned) throw new Error('form_connections.txt content is empty.');
-            formConnectionsText = cleaned;
+        // Takes either a parsed object (automatic run) or pasted text (manual run).
+        // Parsing here means a malformed reply is rejected while the operator is
+        // still looking at it, rather than at zip time.
+        function setFormConnections(value) {
+            let parsed = value && typeof value === 'object' ? value : null;
+            if (!parsed) {
+                const cleaned = String(value || '').trim();
+                if (!cleaned) throw new Error('form_connections.json content is empty.');
+                try {
+                    parsed = parsePastedFieldConfig(cleaned);
+                } catch (err) {
+                    throw new Error('form_connections.json is not valid JSON: ' + err.message);
+                }
+            }
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                throw new Error('form_connections.json must be a JSON object.');
+            }
+            if (!Array.isArray(parsed.connections)) {
+                throw new Error('form_connections.json must include a "connections" array.');
+            }
+            formConnections = parsed;
             formConnectionsFingerprint = getPayloadConnectionsFingerprint();
             if (formConnectionsStatus) {
-                formConnectionsStatus.textContent = '✓ form_connections.txt ready — zip download unlocked';
+                formConnectionsStatus.textContent = '✓ form_connections.json ready — zip download unlocked';
                 formConnectionsStatus.classList.add('visible');
             }
             if (downloadFormConnectionsBtn) downloadFormConnectionsBtn.disabled = false;
@@ -5199,13 +5457,101 @@
 
         function hasValidFormConnections() {
             return Boolean(
-                formConnectionsText
+                formConnections
                 && formConnectionsFingerprint
                 && formConnectionsFingerprint === getPayloadConnectionsFingerprint()
             );
         }
 
+        // --- payload persistence -------------------------------------------
+        // Each entry carries its sanitized PDF as a Blob - megabytes of binary,
+        // which localStorage can neither hold nor store as binary at all. So the
+        // list lives in IndexedDB, which takes Blobs directly via structured
+        // clone and has a far larger quota.
+        const PAYLOAD_DB_NAME = 'auto-form-creator';
+        const PAYLOAD_DB_VERSION = 1;
+        const PAYLOAD_STORE = 'payloads';
+        const PAYLOAD_RECORD_KEY = 'payload-entries';
+
+        function openPayloadDb() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(PAYLOAD_DB_NAME, PAYLOAD_DB_VERSION);
+                request.onupgradeneeded = () => {
+                    const db = request.result;
+                    if (!db.objectStoreNames.contains(PAYLOAD_STORE)) {
+                        db.createObjectStore(PAYLOAD_STORE);
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function runPayloadTx(mode, run) {
+            return openPayloadDb().then((db) => new Promise((resolve, reject) => {
+                const tx = db.transaction(PAYLOAD_STORE, mode);
+                let result;
+                try {
+                    result = run(tx.objectStore(PAYLOAD_STORE));
+                } catch (err) {
+                    db.close();
+                    reject(err);
+                    return;
+                }
+                tx.oncomplete = () => {
+                    db.close();
+                    resolve(result && result.result !== undefined ? result.result : undefined);
+                };
+                tx.onerror = () => { db.close(); reject(tx.error); };
+                tx.onabort = () => { db.close(); reject(tx.error); };
+            }));
+        }
+
+        // Persistence is a convenience - a failure here must never take the
+        // session down, so every path warns and carries on.
+        async function savePayloadEntries() {
+            try {
+                await runPayloadTx('readwrite', (store) => {
+                    store.put(payloadEntries, PAYLOAD_RECORD_KEY);
+                });
+            } catch (err) {
+                console.warn('[payloads] Could not save:', err && err.message);
+            }
+        }
+
+        async function clearStoredPayloadEntries() {
+            try {
+                await runPayloadTx('readwrite', (store) => {
+                    store.delete(PAYLOAD_RECORD_KEY);
+                });
+            } catch (err) {
+                console.warn('[payloads] Could not clear:', err && err.message);
+            }
+        }
+
+        async function restorePayloadEntries() {
+            if (payloadEntries.length) return;
+            let stored;
+            try {
+                stored = await runPayloadTx('readonly', (store) => store.get(PAYLOAD_RECORD_KEY));
+            } catch (err) {
+                console.warn('[payloads] Could not load:', err && err.message);
+                return;
+            }
+            if (!Array.isArray(stored) || !stored.length) return;
+
+            payloadEntries = stored;
+            // Keep generated ids clear of the restored ones.
+            payloadIdCounter = Math.max(payloadIdCounter, stored.length + 1);
+            console.log('[payloads] Restored ' + stored.length + ' payload entry(ies)');
+            updatePayloadUi();
+        }
+
         function updatePayloadUi() {
+            // Every mutation funnels through here, so this is the one place that
+            // needs to write the list back to storage.
+            savePayloadEntries();
+
             const hasEntries = payloadEntries.length > 0;
             const stepLocked = step2.classList.contains('step-locked');
             const multiPayload = needsFormConnections();
@@ -5226,7 +5572,7 @@
                 const zipAllowed = hasEntries && (!multiPayload || connectionsReady);
                 downloadPayloadBtn.disabled = !zipAllowed;
                 downloadPayloadBtn.title = multiPayload && !connectionsReady
-                    ? 'Create form_connections.txt before downloading the full payload zip'
+                    ? 'Create form_connections.json before downloading the full payload zip'
                     : '';
             }
             if (downloadFormConnectionsBtn) {
@@ -5582,7 +5928,7 @@
             if (needsFormConnections() && !hasValidFormConnections()) {
                 if (step5PayloadError) {
                     step5PayloadError.textContent =
-                        'Create form_connections.txt first (Automatic or Manual processing), then download the zip.';
+                        'Create form_connections.json first (Automatic or Manual processing), then download the zip.';
                 }
                 updatePayloadUi();
                 return;
@@ -5604,7 +5950,7 @@
                     totalPages += await addEntryToZip(zip, entry);
                 }
                 if (hasValidFormConnections()) {
-                    zip.file('form_connections.txt', formConnectionsText);
+                    zip.file('form_connections.json', JSON.stringify(formConnections, null, 2));
                 }
 
                 const zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -5625,7 +5971,7 @@
                 step5Status.setAttribute('aria-label', 'Step 5 complete');
                 if (downloadPayloadSuccess) downloadPayloadSuccess.classList.add('visible');
                 if (downloadPayloadSuccessText) {
-                    const connectionsNote = hasValidFormConnections() ? ' + form_connections.txt' : '';
+                    const connectionsNote = hasValidFormConnections() ? ' + form_connections.json' : '';
                     downloadPayloadSuccessText.textContent =
                         `✓ Downloaded ${payloadEntries.length} payload${payloadEntries.length === 1 ? '' : 's'} (${totalPages} page image${totalPages === 1 ? '' : 's'})${connectionsNote}`;
                 }
@@ -5646,6 +5992,7 @@
         }
 
         async function runAutomaticFormConnections() {
+            await armAiApproval('form_connections (automatic processing)', 4);
             if (!needsFormConnections()) {
                 if (step5PayloadError) step5PayloadError.textContent = 'Add at least two payloads before creating connections.';
                 return;
@@ -5657,7 +6004,7 @@
                 formConnectionsProgress,
                 formConnectionsProgressBar,
                 formConnectionsProgressLabel,
-                'Generating form_connections.txt with Claude…',
+                'Generating form_connections.json with Claude…',
                 CHATGPT_PROGRESS_MS
             );
             if (formConnectionsAutoBtn) formConnectionsAutoBtn.disabled = true;
@@ -5666,18 +6013,18 @@
             try {
                 const response = await fetch('/api/generate-form-connections', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: aiHeaders(),
                     body: JSON.stringify({ payloads: buildPayloadsForConnectionsApi() }),
                 });
                 const data = await response.json().catch(() => ({}));
                 if (!response.ok || !data.success) {
                     throw new Error(data.error || `Form connections failed (${response.status})`);
                 }
-                setFormConnectionsText(data.formConnectionsText);
+                setFormConnections(data.formConnections);
                 await progress.finish();
             } catch (err) {
                 console.error('Form connections error:', err);
-                if (step5PayloadError) step5PayloadError.textContent = err.message || 'Failed to generate form_connections.txt';
+                if (step5PayloadError) step5PayloadError.textContent = err.message || 'Failed to generate form_connections.json';
                 await progress.finish?.();
                 if (formConnectionsProgress) formConnectionsProgress.classList.remove('visible');
             } finally {
@@ -5698,7 +6045,11 @@
             }
             if (formConnectionsManualError) formConnectionsManualError.textContent = '';
             if (formConnectionsPromptText) formConnectionsPromptText.value = 'Building prompt…';
-            if (formConnectionsManualText) formConnectionsManualText.value = formConnectionsText || '';
+            if (formConnectionsManualText) {
+                formConnectionsManualText.value = formConnections
+                    ? JSON.stringify(formConnections, null, 2)
+                    : '';
+            }
             formConnectionsManualModal?.classList.add('visible');
 
             try {
@@ -5739,22 +6090,56 @@
         function confirmFormConnectionsManual() {
             try {
                 if (formConnectionsManualError) formConnectionsManualError.textContent = '';
-                setFormConnectionsText(formConnectionsManualText?.value || '');
+                setFormConnections(formConnectionsManualText?.value || '');
                 closeFormConnectionsManualModalFn();
             } catch (err) {
                 if (formConnectionsManualError) {
-                    formConnectionsManualError.textContent = err.message || 'Could not save form_connections.txt';
+                    formConnectionsManualError.textContent = err.message || 'Could not save form_connections.json';
+                }
+            }
+        }
+
+        // Server-built bundle; no API call, so nothing is charged for it.
+        async function downloadFormConnectionsPromptZip() {
+            if (formConnectionsZipStatus) formConnectionsZipStatus.textContent = "Building bundle...";
+            try {
+                const res = await fetch('/api/form-connections-prompt-zip', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ payloads: buildPayloadsForConnectionsApi() })
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error || 'Could not build the bundle.');
+                }
+                const formCount = res.headers.get('X-Form-Count') || '0';
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'form-connections-prompt.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                if (formConnectionsZipStatus) {
+                    formConnectionsZipStatus.textContent = 'Downloaded - ' + formCount + ' form(s).';
+                }
+            } catch (err) {
+                if (formConnectionsZipStatus) {
+                    formConnectionsZipStatus.textContent = err.message || 'Could not build the bundle.';
                 }
             }
         }
 
         function downloadFormConnectionsFile() {
             if (!hasValidFormConnections()) return;
-            const blob = new Blob([formConnectionsText], { type: 'text/plain;charset=utf-8' });
+            const blob = new Blob([JSON.stringify(formConnections, null, 2)],
+                { type: 'application/json;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'form_connections.txt';
+            link.download = 'form_connections.json';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -5769,6 +6154,9 @@
         }
         if (downloadFormConnectionsBtn) {
             downloadFormConnectionsBtn.addEventListener('click', downloadFormConnectionsFile);
+        }
+        if (downloadFormConnectionsPromptZipBtn) {
+            downloadFormConnectionsPromptZipBtn.addEventListener('click', downloadFormConnectionsPromptZip);
         }
         if (confirmFormConnectionsManualBtn) {
             confirmFormConnectionsManualBtn.addEventListener('click', confirmFormConnectionsManual);
@@ -5880,6 +6268,7 @@
         }
 
         async function generateFormConfigJson() {
+            await armAiApproval('form config generation', 6);
             if (!lastFieldConfig || !lastExtractionPayload) {
                 step6Error.textContent = 'Field config and extraction data are required. Complete Steps 3–5 first.';
                 return;
@@ -5906,7 +6295,7 @@
                 const pdfToken = await ensurePdfTokenForVision();
                 const response = await fetch('/api/generate-form-config', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: aiHeaders(),
                     body: JSON.stringify({
                         fieldConfig: lastFieldConfig,
                         extractedDocumentContent: lastExtractionPayload.extractedDocumentContent,
@@ -6056,6 +6445,10 @@
         });
 
         document.getElementById('hard-reset-btn')?.addEventListener('click', hardResetDemo);
+
+        // Bring back the payload list from a previous visit. Independent of
+        // sign-in: the entries live in this browser, not in the account.
+        restorePayloadEntries();
 
         auth.onAuthStateChanged(async (user) => {
             loginBtn.disabled = false;

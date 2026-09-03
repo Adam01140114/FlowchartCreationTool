@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { fetchOpenAiWithRetry } = require('./openai-fetch');
+const { extractJsonFromModelResponse } = require('./model-json');
 const { saveCurrentData } = require('./auto-form-current-data');
 const {
   resolvePdfPageImages,
@@ -16,13 +17,6 @@ const FIELD_CONFIG_PROMPT_PATH = path.join(
 
 function loadFieldConfigPrompt() {
   return fs.readFileSync(FIELD_CONFIG_PROMPT_PATH, 'utf8');
-}
-
-function extractJsonFromModelResponse(text) {
-  const trimmed = String(text || '').trim();
-  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  const candidate = fenced ? fenced[1].trim() : trimmed;
-  return JSON.parse(candidate);
 }
 
 function dedupeFieldsByName(fields) {
@@ -146,7 +140,14 @@ async function callOpenAiForFieldConfig(openAiApiKey, extractionPayload, pageIma
   return extractJsonFromModelResponse(content);
 }
 
-async function generateFieldConfig(extractionPayload, openAiApiKey) {
+/**
+ * Shape an extraction into the payload the model is asked about.
+ *
+ * Shared by the API path and the copy-the-prompt path, so a prompt carried to
+ * a chat window by hand asks for exactly what an automatic run would ask for.
+ */
+function buildFieldConfigPromptPayload(extractionPayload) {
+
   // Widgets that share an AcroForm name are the same fill target — ask the model once.
   const textFields = dedupeFieldsByName(extractionPayload.textFields || []);
   const checkboxFields = dedupeFieldsByName(extractionPayload.checkboxFields || []);
@@ -176,6 +177,12 @@ async function generateFieldConfig(extractionPayload, openAiApiKey) {
       'If the PDF shows the same AcroForm field name more than once, include it only once. ' +
       'All widgets with that name are filled with the same value.',
   };
+
+  return { promptPayload, inputFieldIds };
+}
+
+async function generateFieldConfig(extractionPayload, openAiApiKey) {
+  const { promptPayload, inputFieldIds } = buildFieldConfigPromptPayload(extractionPayload);
 
   const pageImages = await resolvePdfPageImages(
     {
@@ -241,8 +248,53 @@ function createHandleGenerateFieldConfig(openAiApiKey) {
   };
 }
 
+/**
+ * The whole prompt as plain text, for pasting into a chat session by hand.
+ *
+ * The automatic run also uploads rendered page images the model can look at;
+ * a pasted prompt is text only, so the answer is built from field names and
+ * extracted text alone.
+ */
+function buildFieldConfigPrompt(extractionPayload) {
+  const { promptPayload } = buildFieldConfigPromptPayload(extractionPayload);
+
+  return [
+    loadFieldConfigPrompt().trim(),
+    "",
+    "--- FORM DATA ---",
+    JSON.stringify(promptPayload, null, 2),
+    "",
+    "Reply with the field_config JSON object only - no commentary, no markdown fences.",
+    "Copy every id exactly as written above. Some ids contain a backslash and",
+    "appear in the data as FillText11\\\\.yards - write them back the same way,",
+    "as \\\\, so the JSON stays valid.",
+  ].join("\n");
+}
+
+// Builds the prompt only. Nothing here contacts an API, so it needs no
+// approval and costs nothing.
+function createHandleFieldConfigPrompt() {
+  return function handleFieldConfigPrompt(req, res) {
+    try {
+      return res.json({
+        success: true,
+        prompt: buildFieldConfigPrompt(req.body || {}),
+        fileName: "field_config.json",
+      });
+    } catch (error) {
+      console.error("[field-config-prompt]", error);
+      return res.status(400).json({
+        success: false,
+        error: error.message || "Failed to build the field config prompt",
+      });
+    }
+  };
+}
+
 module.exports = {
   generateFieldConfig,
+  buildFieldConfigPrompt,
+  createHandleFieldConfigPrompt,
   createHandleGenerateFieldConfig,
   validateFieldConfig,
 };

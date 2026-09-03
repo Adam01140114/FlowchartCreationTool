@@ -18,10 +18,16 @@ const { registerAutoFormRoutes } = require('./auto-form/routes');
 const ROOT = __dirname;
 const FORM_WIZ_DIR = path.join(ROOT, 'FormWiz GUI');
 const PORT = process.env.PORT || 8080;
+// Matches BODY_LIMIT in auto-form/routes.js; see the parser note below.
+const BODY_LIMIT = process.env.BODY_LIMIT || '50mb';
 
 const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// The auto-form endpoints post base64 PDFs and whole field dumps, well past
+// body-parser's 100kb default. These global parsers are registered before the
+// per-route limits in auto-form/routes.js, so they consume the body first and
+// have to allow the same size or those per-route limits never apply.
+app.use(bodyParser.json({ limit: BODY_LIMIT }));
+app.use(bodyParser.urlencoded({ extended: true, limit: BODY_LIMIT }));
 app.use(fileUpload());
 app.use(cors());
 
@@ -274,12 +280,14 @@ app.listen(PORT, () => {
   console.log('PDF fill endpoint: POST /edit_pdf?pdf=W9.pdf');
   console.log(`Looking for PDFs in: ${FORM_WIZ_DIR}`);
   console.log(`Auto Form Creator: http://127.0.0.1:${PORT}/Auto-Form-Creator/demo.html`);
-  if (!autoFormStatus.openAi || !autoFormStatus.anthropic) {
-    const missing = [
-      !autoFormStatus.openAi ? 'OPENAI_API_KEY' : null,
-      !autoFormStatus.anthropic ? 'ANTHROPIC_API_KEY' : null
-    ].filter(Boolean).join(', ');
-    console.log(`  (AI generation disabled - missing ${missing} in .env)`);
+  // Either key enables AI generation - openai-fetch prefers Claude when both
+  // are present, so only report a problem when neither is configured.
+  if (autoFormStatus.anthropic) {
+    console.log(`AI generation: Claude (${process.env.ANTHROPIC_MODEL || 'default model'})`);
+  } else if (autoFormStatus.openAi) {
+    console.log('AI generation: OpenAI');
+  } else {
+    console.log('  (AI generation disabled - add ANTHROPIC_API_KEY or OPENAI_API_KEY to .env)');
   }
 }).on('error', (err) => {
   if (err.code === 'EADDRINUSE') {

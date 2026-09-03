@@ -1,7 +1,6 @@
 let canvasModulePromise = null;
 let pdfjsLibPromise = null;
 
-const path = require('path');
 const { pathToFileURL } = require('url');
 
 function toUint8Array(bytes) {
@@ -31,14 +30,10 @@ function loadCanvasModule() {
 }
 
 function configurePdfJsWorker(pdfjsLib) {
-  const workerPath = path.join(
-    __dirname,
-    'node_modules',
-    'pdfjs-dist',
-    'legacy',
-    'build',
-    'pdf.worker.min.mjs'
-  );
+  // Resolve through Node rather than joining onto __dirname: node_modules sits
+  // at the repo root, not beside this file, so a hand-built path breaks as soon
+  // as the module is not at the root itself.
+  const workerPath = require.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs');
   pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href;
   return pdfjsLib;
 }

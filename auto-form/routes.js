@@ -12,6 +12,9 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
+const {
+  requireAiApproval, handleArm, handleDisarm, handleStatus
+} = require('./ai-approval');
 
 const BODY_LIMIT = '50mb';
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -38,7 +41,13 @@ function registerAutoFormRoutes(app, options = {}) {
   const {
     handleUnlockPdf, handlePreparePdfFields
   } = require('./unlock-pdf-handler');
-  const { createHandleGenerateFieldConfig } = require('./field-config-generator');
+  const {
+    createHandleGenerateFieldConfig, createHandleFieldConfigPrompt
+  } = require('./field-config-generator');
+  const { createHandleFieldConfigPromptZip } = require('./field-config-prompt-zip');
+  const {
+    createHandleFormConnectionsPromptZip
+  } = require('./form-connections-prompt-zip');
   const { handleSanitizePdf } = require('./pdf-field-sanitizer');
   const { createHandleGenerateFormConfig } = require('./form-config-generator');
   const { createHandleGenerateFormHtml } = require('./form-html-generator');
@@ -54,30 +63,44 @@ function registerAutoFormRoutes(app, options = {}) {
     createHandleGenerateFormConnections, createHandleFormConnectionsPrompt
   } = require('./form-connections-generator');
 
+  // openai-fetch sends every chat completion to Claude whenever ANTHROPIC_API_KEY
+  // is set, ignoring the OpenAI URL and auth header, so either key satisfies
+  // these routes. Prefer the Claude key when both are present.
+  const aiKey = anthropicKey || openAiKey;
+
   // An AI route with no key must fail loudly on call, not crash the server on boot.
-  const requiresKey = (name, keyValue) => (_req, res) => res.status(503).json({
+  const requiresKey = (name) => (_req, res) => res.status(503).json({
     success: false,
-    error: `${name} needs ${keyValue} in .env. Copy it from the FormWiz project, then restart npm start.`
+    error: `${name} needs ANTHROPIC_API_KEY (or OPENAI_API_KEY) in .env, then restart npm start.`
   });
-  const ai = (name, keyValue, key, factory) => (key ? factory(key) : requiresKey(name, keyValue));
+  const ai = (name, factory) => (aiKey ? factory(aiKey) : requiresKey(name));
 
   // --- PDF pipeline (no API key needed) --------------------------------
   app.post('/api/unlock-pdf', handleUnlockPdf);
   app.post('/api/prepare-pdf-fields', handlePreparePdfFields);
   app.post('/api/sanitize-pdf', handleSanitizePdf);
 
+  // --- approval gate ----------------------------------------------------
+  // Nothing below spends money until the operator arms a run from the UI.
+  app.post('/api/ai-approval', handleArm);
+  app.delete('/api/ai-approval', handleDisarm);
+  app.get('/api/ai-approval', handleStatus);
+
   // --- AI generation ----------------------------------------------------
-  app.post('/api/generate-field-config',
-    ai('generate-field-config', 'OPENAI_API_KEY', openAiKey, createHandleGenerateFieldConfig));
-  app.post('/api/generate-form-config',
-    ai('generate-form-config', 'OPENAI_API_KEY', openAiKey, createHandleGenerateFormConfig));
-  app.post('/api/generate-form-html',
-    ai('generate-form-html', 'OPENAI_API_KEY', openAiKey, createHandleGenerateFormHtml));
-  app.post('/api/generate-form-connections',
-    ai('generate-form-connections', 'OPENAI_API_KEY', openAiKey, createHandleGenerateFormConnections));
+  app.post('/api/generate-field-config', requireAiApproval,
+    ai('generate-field-config', createHandleGenerateFieldConfig));
+  app.post('/api/generate-form-config', requireAiApproval,
+    ai('generate-form-config', createHandleGenerateFormConfig));
+  app.post('/api/generate-form-html', requireAiApproval,
+    ai('generate-form-html', createHandleGenerateFormHtml));
+  app.post('/api/generate-form-connections', requireAiApproval,
+    ai('generate-form-connections', createHandleGenerateFormConnections));
+  app.post('/api/field-config-prompt', createHandleFieldConfigPrompt());
+  app.post('/api/field-config-prompt-zip', createHandleFieldConfigPromptZip());
   app.post('/api/form-connections-prompt', createHandleFormConnectionsPrompt());
-  app.post('/api/auto-form/help-answer',
-    ai('help-answer', 'OPENAI_API_KEY', openAiKey, createHandleHelpAnswer));
+  app.post('/api/form-connections-prompt-zip', createHandleFormConnectionsPromptZip());
+  app.post('/api/auto-form/help-answer', requireAiApproval,
+    ai('help-answer', createHandleHelpAnswer));
 
   app.post('/api/enrich-autopopulate', (req, res) => {
     try {
