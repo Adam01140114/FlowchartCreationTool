@@ -4171,6 +4171,7 @@
                 processingPayloadQueue = false;
                 payloadBatchTotal = 0;
                 payloadBatchIndex = 0;
+                updatePayloadUi();
             }
         }
 
@@ -5563,8 +5564,12 @@
             }
 
             if (payloadEmptyEl) payloadEmptyEl.hidden = hasEntries || stepLocked;
+            // A PDF part-way through the pipeline is not a finished payload yet,
+            // and neither is one parked on the approval choice, so keep the
+            // connections step out of the way until the queue is fully drained.
+            const midUpload = processingPayloadQueue || Boolean(pendingApprovalResolve);
             if (formConnectionsPanel) {
-                formConnectionsPanel.classList.toggle('visible', multiPayload && !stepLocked);
+                formConnectionsPanel.classList.toggle('visible', multiPayload && !stepLocked && !midUpload);
             }
             if (zipBlockedHint) {
                 zipBlockedHint.classList.toggle('visible', multiPayload && !connectionsReady && !stepLocked);
