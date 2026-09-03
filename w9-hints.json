@@ -1,0 +1,76 @@
+{
+  "_comment": "Interview knowledge the W-9 field_config cannot express: which options gate which follow-ups, invented choice questions, and section names. Same shape may be embedded in a schema as an \"interview\" block.",
+  "groups": [
+    {
+      "nameId": "tax_classification",
+      "question": "What is your federal tax classification?",
+      "members": [
+        "tax_classification_individual",
+        "tax_classification_corporation",
+        "tax_classification_s_corporation",
+        "tax_classification_partnership",
+        "tax_classification_trust_estate",
+        "tax_classification_llc",
+        "tax_classification_other_checkbox"
+      ]
+    }
+  ],
+  "questions": {
+    "business_name": {
+      "conditional": { "onlyWhen": "has_business_name" }
+    },
+    "tax_classification_other": {
+      "text": "What is the other tax classification?",
+      "conditional": { "onlyWhen": "tax_classification_other_checkbox" }
+    },
+    "tax_classification_code": {
+      "text": "What is the LLC tax classification code?",
+      "type": "dropdown",
+      "options": [
+        { "label": "C (C corporation)", "nameId": "llc_c" },
+        { "label": "S (S corporation)", "nameId": "llc_s" },
+        { "label": "P (Partnership)", "nameId": "llc_p" }
+      ],
+      "conditional": { "onlyWhen": "tax_classification_llc" }
+    },
+    "foreign_partners_checkbox": {
+      "text": "Does this entity have foreign partners, owners, or beneficiaries?",
+      "conditional": {
+        "onlyWhen": [
+          "tax_classification_partnership",
+          "tax_classification_trust_estate",
+          "llc_p"
+        ]
+      }
+    },
+    "tin_ssn": { "conditional": { "onlyWhen": "ssn" } },
+    "tin_ein": { "conditional": { "onlyWhen": "ein" } },
+    "name_for_ssn": { "conditional": { "onlyWhen": "ssn" } },
+    "name_for_ein": { "conditional": { "onlyWhen": "ein" } }
+  },
+  "gates": {
+    "business_name": {
+      "nameId": "has_business_name",
+      "question": "Is your business name different from the name above?"
+    }
+  },
+  "choices": [
+    {
+      "nameId": "tin_type",
+      "before": "tin_ssn",
+      "question": "Will you provide a Social Security Number or an Employer Identification Number?",
+      "options": [
+        { "label": "Social Security Number", "nameId": "ssn" },
+        { "label": "Employer Identification Number", "nameId": "ein" }
+      ]
+    }
+  ],
+  "sections": [
+    { "name": "Identification", "fields": ["taxpayer_name"] },
+    { "name": "Federal tax classification", "fields": ["tax_classification"] },
+    { "name": "Exemptions", "fields": ["exempt_payee_provided"] },
+    { "name": "Address", "fields": ["address"] },
+    { "name": "Optional information", "fields": ["requester_name_provided"] },
+    { "name": "Taxpayer identification number", "fields": ["tin_type"] }
+  ]
+}
