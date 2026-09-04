@@ -12,8 +12,9 @@ html, body {
 
 /* MAIN TOOLBAR */
 .toolbar {
-  width: 220px;
-  min-width: 150px;
+  /* Doubled from 220px: the form panel packs a lot into this column. */
+  width: 440px;
+  min-width: 300px;
   background: #f9f9f9;
   border-right: 1px solid #ccc;
   float: left;
@@ -27,7 +28,8 @@ html, body {
 /* GRAPH AREA */
 #graphContainer {
   position: fixed;
-  left: 220px;
+  /* Must track .toolbar width. */
+  left: 440px;
   right: 0;
   top: 0;
   bottom: 0;
