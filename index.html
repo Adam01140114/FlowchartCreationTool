@@ -14,6 +14,28 @@
   <!-- PDF.js for PDF processing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <link rel="stylesheet" href="style.css">
+<style>
+  /* The form panel groups everything belonging to the open form, so it reads
+     as one unit rather than a run of unrelated boxes. */
+  .form-panel {
+    border: 1px solid #c9d3df;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0 6px;
+    background: #fbfcfe;
+  }
+  .form-panel > :first-child { margin-top: 0; }
+  .form-nav { margin: 0 0 14px; text-align: center; }
+  .form-nav #addFormBtn { width: 100%; margin-bottom: 6px; }
+  .form-nav-row { display: flex; gap: 6px; }
+  .form-nav-row button { flex: 1; }
+  .form-nav-row button[disabled] { opacity: 0.5; cursor: default; }
+  .form-nav-label {
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: #555;
+  }
+</style>
 </head>
 <body>
 
@@ -197,11 +219,24 @@
     />
     <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
     <button onclick="showExportGuiJsonModal()">Export GUI JSON</button><br>
+    <button onclick="exportProjectJson()">Export Project JSON</button>
+    <button onclick="document.getElementById('importProjectFile').click()">Import Project JSON</button>
+    <input
+      type="file"
+      id="importProjectFile"
+      accept=".json,application/json"
+      onchange="importProjectJson(event)"
+      style="display:none;"
+    /><br>
     <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save</button>
     <button id="saveAsFlowchartBtn" onclick="saveAsFlowchart()">Save As</button>
     <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
     <button id="settingsBtn" onclick="showSettingsMenu()">Settings</button><br>
   </div>
+
+  <!-- Everything from here to the end of the PDF defaults belongs to the form
+       currently open, and is swapped wholesale when switching forms. -->
+  <div id="formPanel" class="form-panel">
 
   <!-- Form Name -->
   <div class="form-name-container">
@@ -291,6 +326,18 @@
       <input type="text" id="defaultPdfPriceInput" placeholder="Enter default PDF price" 
              value="" oninput="updateDefaultPdfProperties()">
     </div>
+  </div>
+
+  </div><!-- /#formPanel -->
+
+  <!-- Form navigator: one project, several flowcharts, switched like sheets -->
+  <div class="form-nav">
+    <button type="button" id="addFormBtn" onclick="addProjectForm()">Add Form</button>
+    <div class="form-nav-row">
+      <button type="button" id="prevFormBtn" onclick="prevProjectForm()">Back</button>
+      <button type="button" id="nextFormBtn" onclick="nextProjectForm()">Next</button>
+    </div>
+    <div id="formNavLabel" class="form-nav-label">Form 1 of 1</div>
   </div>
 
   <!-- Below the legends -->
@@ -682,5 +729,7 @@
 <script src="ui.js"></script>
 <!-- Main script - loaded last -->
 <script src="script.js"></script>
+<!-- Multi-form projects - loaded last so the editor API exists -->
+<script src="project-forms.js"></script>
 </body>
 </html>
