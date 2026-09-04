@@ -1300,6 +1300,18 @@
             align-self: flex-start;
         }
 
+        .payload-zip-cta {
+            margin: 18px 0 4px;
+            text-align: center;
+        }
+        .payload-zip-cta .payload-zip-btn {
+            font-size: 1.05rem;
+            padding: 14px 30px;
+        }
+        .payload-zip-cta .zip-blocked-hint {
+            margin-top: 10px;
+        }
+
         .form-connections-panel {
             display: none;
             margin: 8px 0 4px;
@@ -1723,15 +1735,15 @@
                 </div>
                 <div class="modal-body">
                     <p style="margin:0 0 14px;color:var(--gray);">
-                        Copy the prompt into Claude/ChatGPT, then paste the plain-text
-                        <code>form_connections.json</code> reply here (no tokens needed on this server).
+                        Download the bundle, run it in your own chat session, then paste the
+                        <code>form_connections.json</code> reply here. Nothing is sent to any API from here.
                     </p>
                     <div class="form-group">
-                        <label for="form-connections-prompt-text">Prompt to copy</label>
-                        <textarea id="form-connections-prompt-text" rows="10" readonly placeholder="Building prompt…"></textarea>
-                        <div style="margin-top:8px;">
-                            <button type="button" class="btn-secondary" id="copy-form-connections-prompt-btn" style="margin-left:0;">Copy prompt</button>
-                        </div>
+                        <label>Run it yourself</label>
+                        <button type="button" class="btn-download" id="download-form-connections-prompt-zip-btn">
+                            Download AI Prompt ZIP
+                        </button>
+                        <span id="form-connections-zip-status" style="margin-left:10px;color:var(--gray);font-size:0.85rem;"></span>
                     </div>
                     <div class="form-group">
                         <label for="form-connections-manual-text">Paste AI response</label>
@@ -1739,10 +1751,6 @@
                     </div>
                     <div class="error-message" id="form-connections-manual-error"></div>
                     <div class="modal-actions">
-                        <button type="button" class="btn-download" id="download-form-connections-prompt-zip-btn">
-                            Download AI Prompt ZIP
-                        </button>
-                        <span id="form-connections-zip-status" style="margin-left:10px;color:var(--gray);font-size:0.85rem;"></span>
                         <button type="button" class="btn-primary" id="confirm-form-connections-manual-btn">Save form_connections.json</button>
                         <button type="button" class="btn-secondary" id="cancel-form-connections-manual">Cancel</button>
                     </div>
@@ -1859,12 +1867,6 @@
                     </div>
                     <div class="file-chip" id="xfa-file-chip" style="display:none;"></div>
 
-                    <button type="button" class="btn-download" id="download-payload-btn" disabled>
-                        Download full payload zip file
-                    </button>
-                    <p class="zip-blocked-hint" id="zip-blocked-hint">
-                        Create <code>form_connections.json</code> first (2+ payloads). Zip download unlocks after that file exists.
-                    </p>
                     <!-- Legacy id kept for JS refs; drop zone replaces this button -->
                     <button type="button" id="add-payload-btn" style="display:none;" tabindex="-1" aria-hidden="true">Add payload</button>
                 </div>
@@ -1934,6 +1936,17 @@
                         <div class="timed-progress-eta">Estimated time ~1–2 min</div>
                     </div>
                     <div class="form-connections-status" id="form-connections-status">✓ form_connections.json ready — zip download unlocked</div>
+                </div>
+
+                <!-- Last step in this section: the zip is what the whole page builds towards.
+                     Sits under the connections step because it depends on that file. -->
+                <div class="payload-zip-cta">
+                    <button type="button" class="btn-download payload-zip-btn" id="download-payload-btn" disabled>
+                        Download full payload zip file
+                    </button>
+                    <p class="zip-blocked-hint" id="zip-blocked-hint">
+                        Create <code>form_connections.json</code> first (2+ payloads). Zip download unlocks after that file exists.
+                    </p>
                 </div>
 
                 <div class="timed-progress" id="field-config-progress">
@@ -2490,8 +2503,6 @@
         const closeFormConnectionsManualModal = document.getElementById('close-form-connections-manual-modal');
         const cancelFormConnectionsManual = document.getElementById('cancel-form-connections-manual');
         const confirmFormConnectionsManualBtn = document.getElementById('confirm-form-connections-manual-btn');
-        const copyFormConnectionsPromptBtn = document.getElementById('copy-form-connections-prompt-btn');
-        const formConnectionsPromptText = document.getElementById('form-connections-prompt-text');
         const formConnectionsManualText = document.getElementById('form-connections-manual-text');
         const formConnectionsManualError = document.getElementById('form-connections-manual-error');
         const downloadPayloadLoading = document.getElementById('download-payload-loading');
@@ -5569,7 +5580,10 @@
             // connections step out of the way until the queue is fully drained.
             const midUpload = processingPayloadQueue || Boolean(pendingApprovalResolve);
             if (formConnectionsPanel) {
-                formConnectionsPanel.classList.toggle('visible', multiPayload && !stepLocked && !midUpload);
+                // Saved connections mean this step is finished; the panel would only
+                // be restating a done job, so retire it.
+                formConnectionsPanel.classList.toggle('visible',
+                    multiPayload && !stepLocked && !midUpload && !connectionsReady);
             }
             if (zipBlockedHint) {
                 zipBlockedHint.classList.toggle('visible', multiPayload && !connectionsReady && !stepLocked);
@@ -6050,47 +6064,12 @@
                 return;
             }
             if (formConnectionsManualError) formConnectionsManualError.textContent = '';
-            if (formConnectionsPromptText) formConnectionsPromptText.value = 'Building prompt…';
             if (formConnectionsManualText) {
                 formConnectionsManualText.value = formConnections
                     ? JSON.stringify(formConnections, null, 2)
                     : '';
             }
             formConnectionsManualModal?.classList.add('visible');
-
-            try {
-                const response = await fetch('/api/form-connections-prompt', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ payloads: buildPayloadsForConnectionsApi() }),
-                });
-                const data = await response.json().catch(() => ({}));
-                if (!response.ok || !data.success) {
-                    throw new Error(data.error || `Failed to build prompt (${response.status})`);
-                }
-                if (formConnectionsPromptText) formConnectionsPromptText.value = data.prompt || '';
-            } catch (err) {
-                if (formConnectionsManualError) {
-                    formConnectionsManualError.textContent = err.message || 'Failed to build manual prompt.';
-                }
-                if (formConnectionsPromptText) formConnectionsPromptText.value = '';
-            }
-        }
-
-        async function copyFormConnectionsPrompt() {
-            const text = formConnectionsPromptText?.value || '';
-            if (!text) return;
-            try {
-                await navigator.clipboard.writeText(text);
-                if (copyFormConnectionsPromptBtn) {
-                    const prev = copyFormConnectionsPromptBtn.textContent;
-                    copyFormConnectionsPromptBtn.textContent = 'Copied';
-                    setTimeout(() => { copyFormConnectionsPromptBtn.textContent = prev; }, 1200);
-                }
-            } catch {
-                formConnectionsPromptText.focus();
-                formConnectionsPromptText.select();
-            }
         }
 
         function confirmFormConnectionsManual() {
@@ -6172,9 +6151,6 @@
         }
         if (closeFormConnectionsManualModal) {
             closeFormConnectionsManualModal.addEventListener('click', closeFormConnectionsManualModalFn);
-        }
-        if (copyFormConnectionsPromptBtn) {
-            copyFormConnectionsPromptBtn.addEventListener('click', copyFormConnectionsPrompt);
         }
         if (formConnectionsManualModal) {
             formConnectionsManualModal.addEventListener('click', (e) => {
