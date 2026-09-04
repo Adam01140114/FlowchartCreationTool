@@ -666,7 +666,21 @@ function routeCircuitBoard(cells, pendingEdges) {
       }
       return false;
     });
-    if (hits) failed += 1;
+    if (hits) {
+      // Funnel and fanout elbows are computed from geometry alone, so a wire
+      // that has to bypass a tall branch can cut straight through it. The
+      // colliding route used to be kept as-is; hand it to the router that
+      // actually knows where the nodes are before giving up on it.
+      const retry = (kind === 'funnel' || kind === 'fanout')
+        ? astar(sx, sy + GRID, tx, ty - GRID, ignore)
+        : null;
+      if (retry) {
+        points = retry.points;
+        markWire(retry.cellsPath);
+      } else {
+        failed += 1;
+      }
+    }
 
     results[orderOf.get(pending)] = {
       id: '',
