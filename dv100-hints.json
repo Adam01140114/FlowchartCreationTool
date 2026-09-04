@@ -1,0 +1,731 @@
+{
+  "_comment": "Interview knowledge the DV-100 field_config cannot express. DV-100 is the primary form of the packet, so the nameIds chosen here are canonical - DV-109 and DV-110 mirror them for the values shared across the packet (case number, party names, court address, hearing date/time). Nineteen conditionals named gates with no matching field; the eleven with a real counterpart are retargeted below, and the remaining eight are genuine gates the form implies but never stores.",
+  "mirrors": [
+    {
+      "nameId": "case_number",
+      "question": "What is the case number?",
+      "label": "Case Number",
+      "members": [
+        "case_number_page_01",
+        "case_number_page_02",
+        "case_number_page_03",
+        "case_number_page_04",
+        "case_number_page_05",
+        "case_number_page_06",
+        "case_number_page_07",
+        "case_number_page_08",
+        "case_number_page_09",
+        "case_number_page_10",
+        "case_number_page_11",
+        "case_number_page_12",
+        "case_number_page_13"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "nameId": "person_to_restrain_gender",
+      "members": [
+        "person_to_restrain_gender_male",
+        "person_to_restrain_gender_female",
+        "person_to_restrain_gender_nonbinary"
+      ],
+      "question": "What is the gender of the person you want protection from?"
+    },
+    {
+      "nameId": "relationship_lived_together_as_family",
+      "members": [
+        "relationship_lived_together_as_family_yes",
+        "relationship_lived_together_as_family_no"
+      ],
+      "question": "Did you live together as more than roommates?"
+    },
+    {
+      "nameId": "recent_restraining_orders",
+      "members": [
+        "recent_restraining_orders_no",
+        "recent_restraining_orders_yes"
+      ],
+      "question": "Are there restraining orders in place now, or that expired in the last six months?"
+    },
+    {
+      "nameId": "other_court_case_involvement",
+      "members": [
+        "other_court_case_involvement_no",
+        "other_court_case_involvement_yes"
+      ],
+      "question": "Are you involved in any other court case with this person?"
+    },
+    {
+      "nameId": "most_recent_abuse_witnesses",
+      "members": [
+        "most_recent_abuse_witnesses_unknown",
+        "most_recent_abuse_witnesses_no",
+        "most_recent_abuse_witnesses_yes"
+      ],
+      "question": "Did anyone else see or hear the most recent abuse?"
+    },
+    {
+      "nameId": "most_recent_abuse_weapon",
+      "members": [
+        "most_recent_abuse_weapon_no",
+        "most_recent_abuse_weapon_yes"
+      ],
+      "question": "Did the person use or threaten to use a weapon?"
+    },
+    {
+      "nameId": "most_recent_abuse_harm",
+      "members": [
+        "most_recent_abuse_harm_no",
+        "most_recent_abuse_harm_yes"
+      ],
+      "question": "Did the person cause you emotional or physical harm?"
+    },
+    {
+      "nameId": "most_recent_abuse_police",
+      "members": [
+        "most_recent_abuse_police_unknown",
+        "most_recent_abuse_police_no",
+        "most_recent_abuse_police_yes"
+      ],
+      "question": "Did the police come?"
+    },
+    {
+      "nameId": "most_recent_abuse_frequency",
+      "members": [
+        "most_recent_abuse_frequency_once",
+        "most_recent_abuse_frequency_two_to_five",
+        "most_recent_abuse_frequency_weekly",
+        "most_recent_abuse_frequency_other"
+      ],
+      "question": "How often has this abuse happened?"
+    },
+    {
+      "nameId": "different_abuse_incident_witnesses",
+      "members": [
+        "different_abuse_incident_witnesses_unknown",
+        "different_abuse_incident_witnesses_no",
+        "different_abuse_incident_witnesses_yes"
+      ],
+      "question": "Did anyone else see or hear this earlier abuse?"
+    },
+    {
+      "nameId": "different_abuse_incident_weapon",
+      "members": [
+        "different_abuse_incident_weapon_no",
+        "different_abuse_incident_weapon_yes"
+      ],
+      "question": "Did the person use or threaten to use a weapon that time?"
+    },
+    {
+      "nameId": "different_abuse_incident_harm",
+      "members": [
+        "different_abuse_incident_harm_no",
+        "different_abuse_incident_harm_yes"
+      ],
+      "question": "Did the person cause you emotional or physical harm that time?"
+    },
+    {
+      "nameId": "different_abuse_incident_police",
+      "members": [
+        "different_abuse_incident_police_unknown",
+        "different_abuse_incident_police_no",
+        "different_abuse_incident_police_yes"
+      ],
+      "question": "Did the police come that time?"
+    },
+    {
+      "nameId": "other_abuse_incident_witnesses",
+      "members": [
+        "other_abuse_incident_witnesses_unknown",
+        "other_abuse_incident_witnesses_no",
+        "other_abuse_incident_witnesses_yes"
+      ],
+      "question": "Did anyone else see or hear this other abuse?"
+    },
+    {
+      "nameId": "other_abuse_incident_weapon",
+      "members": [
+        "other_abuse_incident_weapon_no",
+        "other_abuse_incident_weapon_yes"
+      ],
+      "question": "Did the person use or threaten to use a weapon then?"
+    },
+    {
+      "nameId": "other_abuse_incident_harm",
+      "members": [
+        "other_abuse_incident_harm_no",
+        "other_abuse_incident_harm_yes"
+      ],
+      "question": "Did the person cause you emotional or physical harm then?"
+    },
+    {
+      "nameId": "other_abuse_incident_police",
+      "members": [
+        "other_abuse_incident_police_unknown",
+        "other_abuse_incident_police_no",
+        "other_abuse_incident_police_yes"
+      ],
+      "question": "Did the police come then?"
+    },
+    {
+      "nameId": "other_abuse_incident_frequency",
+      "members": [
+        "other_abuse_incident_frequency_once",
+        "other_abuse_incident_frequency_two_to_five",
+        "other_abuse_incident_frequency_weekly",
+        "other_abuse_incident_frequency_other"
+      ],
+      "question": "How often has this other abuse happened?"
+    },
+    {
+      "nameId": "other_protected_person_1_lives_with_you",
+      "members": [
+        "other_protected_person_1_lives_with_you_yes",
+        "other_protected_person_1_lives_with_you_no"
+      ],
+      "question": "Does the first additional protected person live with you?"
+    },
+    {
+      "nameId": "other_protected_person_2_lives_with_you",
+      "members": [
+        "other_protected_person_2_lives_with_you_yes",
+        "other_protected_person_2_lives_with_you_no"
+      ],
+      "question": "Does the second additional protected person live with you?"
+    },
+    {
+      "nameId": "other_protected_person_3_lives_with_you",
+      "members": [
+        "other_protected_person_3_lives_with_you_yes",
+        "other_protected_person_3_lives_with_you_no"
+      ],
+      "question": "Does the third additional protected person live with you?"
+    },
+    {
+      "nameId": "other_protected_person_4_lives_with_you",
+      "members": [
+        "other_protected_person_4_lives_with_you_yes",
+        "other_protected_person_4_lives_with_you_no"
+      ],
+      "question": "Does the fourth additional protected person live with you?"
+    },
+    {
+      "nameId": "same_workplace_or_school",
+      "members": [
+        "same_workplace_or_school_no",
+        "same_workplace_or_school_yes"
+      ],
+      "question": "Do you and the person share a workplace or school?"
+    },
+    {
+      "nameId": "animal_stay_away_distance",
+      "members": [
+        "animal_stay_away_distance_100_yards",
+        "animal_stay_away_distance_other"
+      ],
+      "question": "How far must the person stay away from the animals?"
+    },
+    {
+      "nameId": "property_debt_how_made_known",
+      "members": [
+        "property_debt_how_made_known_no",
+        "property_debt_how_made_known_yes"
+      ],
+      "question": "Do you know how the person made these debts?"
+    },
+    {
+      "nameId": "wireless_transfer_phone_1_is",
+      "members": [
+        "wireless_transfer_phone_1_is_my_number",
+        "wireless_transfer_phone_1_is_child_number"
+      ],
+      "question": "Whose number is the first phone line?"
+    },
+    {
+      "nameId": "wireless_transfer_phone_2_is",
+      "members": [
+        "wireless_transfer_phone_2_is_my_number",
+        "wireless_transfer_phone_2_is_child_number"
+      ],
+      "question": "Whose number is the second phone line?"
+    },
+    {
+      "nameId": "wireless_transfer_phone_3_is",
+      "members": [
+        "wireless_transfer_phone_3_is_my_number",
+        "wireless_transfer_phone_3_is_child_number"
+      ],
+      "question": "Whose number is the third phone line?"
+    },
+    {
+      "nameId": "wireless_transfer_phone_4_is",
+      "members": [
+        "wireless_transfer_phone_4_is_my_number",
+        "wireless_transfer_phone_4_is_child_number"
+      ],
+      "question": "Whose number is the fourth phone line?"
+    },
+    {
+      "nameId": "relationship_to_person_to_restrain",
+      "question": "What is your relationship to the person you want protection from?",
+      "multiSelect": true,
+      "members": [
+        "relationship_have_children_together",
+        "relationship_current_spouses_or_domestic_partners",
+        "relationship_former_spouses_or_domestic_partners",
+        "relationship_dating_or_formerly_dated",
+        "relationship_engaged_or_formerly_engaged",
+        "relationship_related",
+        "relationship_live_or_lived_together"
+      ]
+    },
+    {
+      "nameId": "relationship_relative_kind",
+      "question": "How are you related?",
+      "members": [
+        "relationship_relative_parent_stepparent_parent_in_law",
+        "relationship_relative_sibling_stepsibling_sibling_in_law",
+        "relationship_relative_child_stepchild_adopted_child",
+        "relationship_relative_grandparent",
+        "relationship_relative_child_spouse",
+        "relationship_relative_grandchild"
+      ]
+    },
+    {
+      "nameId": "other_court_case_kinds",
+      "question": "What kind of court case is it?",
+      "multiSelect": true,
+      "members": [
+        "other_court_case_custody_selected",
+        "other_court_case_divorce_selected",
+        "other_court_case_juvenile_selected",
+        "other_court_case_guardianship_selected",
+        "other_court_case_criminal_selected",
+        "other_court_case_other_selected"
+      ]
+    },
+    {
+      "nameId": "orders_requested",
+      "question": "Which orders are you asking for?",
+      "multiSelect": true,
+      "members": [
+        "order_not_to_abuse_requested",
+        "no_contact_order_requested",
+        "stay_away_order_requested",
+        "move_out_order_requested",
+        "other_orders_requested",
+        "child_custody_and_visitation_order_requested",
+        "protect_animals_order_requested",
+        "control_of_property_order_requested",
+        "health_and_other_insurance_order_requested",
+        "record_communications_order_requested",
+        "property_restraint_order_requested",
+        "pay_property_debts_order_requested",
+        "pay_expenses_caused_by_abuse_order_requested",
+        "child_support_order_requested",
+        "spousal_support_order_requested",
+        "lawyers_fees_and_costs_order_requested",
+        "batterer_intervention_program_order_requested",
+        "wireless_phone_account_transfer_order_requested",
+        "extend_service_deadline_requested"
+      ]
+    },
+    {
+      "nameId": "stay_away_targets",
+      "question": "What must the person stay away from?",
+      "multiSelect": true,
+      "members": [
+        "stay_away_from_me",
+        "stay_away_from_my_home",
+        "stay_away_from_my_school",
+        "stay_away_from_my_workplace",
+        "stay_away_from_my_vehicle",
+        "stay_away_from_other_protected_people",
+        "stay_away_from_childrens_school_or_childcare",
+        "stay_away_from_other_place"
+      ]
+    },
+    {
+      "nameId": "stay_away_distance",
+      "question": "How far must the person stay away?",
+      "members": [
+        "stay_away_distance_100_yards",
+        "stay_away_distance_other"
+      ]
+    },
+    {
+      "nameId": "living_arrangement",
+      "question": "How close do you live to each other?",
+      "members": [
+        "living_arrangement_live_together",
+        "living_arrangement_same_building",
+        "living_arrangement_same_neighborhood",
+        "living_arrangement_other"
+      ]
+    },
+    {
+      "nameId": "move_out_right_to_live",
+      "question": "Why do you have the right to live there?",
+      "multiSelect": true,
+      "members": [
+        "move_out_right_to_live_owner",
+        "move_out_right_to_live_length_of_residence",
+        "move_out_right_to_live_on_lease",
+        "move_out_right_to_live_pay_rent_or_mortgage",
+        "move_out_right_to_live_with_children",
+        "move_out_right_to_live_other"
+      ]
+    },
+    {
+      "nameId": "animal_sole_possession_reasons",
+      "question": "Why should you have sole possession of the animals?",
+      "multiSelect": true,
+      "members": [
+        "animal_sole_possession_reason_person_abuses_animals",
+        "animal_sole_possession_reason_i_care_for_animals",
+        "animal_sole_possession_reason_i_purchased_animals",
+        "animal_sole_possession_reason_other"
+      ]
+    },
+    {
+      "nameId": "child_support_situation",
+      "question": "What is your child support situation?",
+      "members": [
+        "child_support_no_existing_order_want_one",
+        "child_support_existing_order_want_changed",
+        "child_support_receive_or_applied_tanf_welfare_calworks"
+      ]
+    },
+    {
+      "nameId": "property_debt_special_finding",
+      "question": "Do you want a special finding that the abuse caused these debts?",
+      "members": [
+        "property_debt_special_finding_no",
+        "property_debt_special_finding_yes"
+      ]
+    },
+    {
+      "nameId": "property_debt_special_finding_debts",
+      "question": "Which debts were caused by the abuse?",
+      "multiSelect": true,
+      "members": [
+        "property_debt_special_finding_debt_1",
+        "property_debt_special_finding_debt_2",
+        "property_debt_special_finding_debt_3"
+      ]
+    },
+    {
+      "nameId": "same_workplace_or_school_kind",
+      "question": "What do you share?",
+      "multiSelect": true,
+      "members": [
+        "same_workplace_selected",
+        "same_school_selected",
+        "same_workplace_or_school_other"
+      ]
+    }
+  ],
+  "questions": {
+    "relationship_children_names_line_1": {
+      "conditional": {
+        "onlyWhen": "relationship_have_children_together"
+      }
+    },
+    "relationship_children_names_line_2": {
+      "conditional": {
+        "onlyWhen": "relationship_have_children_together"
+      }
+    },
+    "relationship_relative_parent_stepparent_parent_in_law": {
+      "conditional": {
+        "onlyWhen": "relationship_related"
+      }
+    },
+    "relationship_relative_sibling_stepsibling_sibling_in_law": {
+      "conditional": {
+        "onlyWhen": "relationship_related"
+      }
+    },
+    "relationship_relative_child_stepchild_adopted_child": {
+      "conditional": {
+        "onlyWhen": "relationship_related"
+      }
+    },
+    "relationship_relative_grandparent": {
+      "conditional": {
+        "onlyWhen": "relationship_related"
+      }
+    },
+    "relationship_relative_child_spouse": {
+      "conditional": {
+        "onlyWhen": "relationship_related"
+      }
+    },
+    "relationship_relative_grandchild": {
+      "conditional": {
+        "onlyWhen": "relationship_related"
+      }
+    },
+    "relationship_lived_together_as_family_yes": {
+      "conditional": {
+        "onlyWhen": "relationship_live_or_lived_together"
+      }
+    },
+    "relationship_lived_together_as_family_no": {
+      "conditional": {
+        "onlyWhen": "relationship_live_or_lived_together"
+      }
+    },
+    "other_court_case_custody_selected": {
+      "conditional": {
+        "onlyWhen": "other_court_case_involvement_yes"
+      }
+    },
+    "other_court_case_custody_details": {
+      "conditional": {
+        "onlyWhen": "other_court_case_custody_selected"
+      }
+    },
+    "other_court_case_divorce_selected": {
+      "conditional": {
+        "onlyWhen": "other_court_case_involvement_yes"
+      }
+    },
+    "other_court_case_divorce_details": {
+      "conditional": {
+        "onlyWhen": "other_court_case_divorce_selected"
+      }
+    },
+    "other_court_case_juvenile_selected": {
+      "conditional": {
+        "onlyWhen": "other_court_case_involvement_yes"
+      }
+    },
+    "other_court_case_juvenile_details": {
+      "conditional": {
+        "onlyWhen": "other_court_case_juvenile_selected"
+      }
+    },
+    "other_court_case_guardianship_selected": {
+      "conditional": {
+        "onlyWhen": "other_court_case_involvement_yes"
+      }
+    },
+    "other_court_case_guardianship_details": {
+      "conditional": {
+        "onlyWhen": "other_court_case_guardianship_selected"
+      }
+    },
+    "other_court_case_criminal_selected": {
+      "conditional": {
+        "onlyWhen": "other_court_case_involvement_yes"
+      }
+    },
+    "other_court_case_criminal_details": {
+      "conditional": {
+        "onlyWhen": "other_court_case_criminal_selected"
+      }
+    },
+    "other_court_case_other_selected": {
+      "conditional": {
+        "onlyWhen": "other_court_case_involvement_yes"
+      }
+    },
+    "other_court_case_other_details": {
+      "conditional": {
+        "onlyWhen": "other_court_case_other_selected"
+      }
+    },
+    "property_restraint_order_requested": {
+      "conditional": {
+        "onlyWhen": "relationship_current_spouses_or_domestic_partners"
+      }
+    },
+    "spousal_support_order_requested": {
+      "conditional": {
+        "onlyWhen": "relationship_current_spouses_or_domestic_partners"
+      }
+    },
+    "person_asking_protection_name": {
+      "text": "What is your name?"
+    },
+    "person_asking_protection_age": {
+      "text": "How old are you?"
+    },
+    "person_to_restrain_full_name": {
+      "text": "Who do you want protection from?"
+    },
+    "court_name_and_street_address": {
+      "text": "What is the court's name and street address?"
+    },
+    "person_asking_protection_mailing_address": {
+      "text": "Where can the court send you papers?"
+    },
+    "most_recent_abuse_date": {
+      "text": "When did the most recent abuse happen?"
+    },
+    "most_recent_abuse_details": {
+      "text": "What happened?"
+    },
+    "most_recent_abuse_other_dates": {
+      "text": "On what other dates did it happen?"
+    },
+    "different_abuse_incident_date": {
+      "text": "When did that earlier abuse happen?"
+    },
+    "different_abuse_incident_details": {
+      "text": "What happened that time?"
+    },
+    "other_abuse_incident_date": {
+      "text": "When did the other abuse happen?"
+    },
+    "other_abuse_incident_details": {
+      "text": "What happened then?"
+    },
+    "move_out_home_address": {
+      "text": "Which home must the person move out of?"
+    },
+    "other_orders_description": {
+      "text": "What other orders do you want?"
+    },
+    "control_of_property_description": {
+      "text": "Which property do you want control of?"
+    },
+    "control_of_property_reason": {
+      "text": "Why do you want control of that property?"
+    },
+    "extend_service_deadline_reason": {
+      "text": "Why do you need more time to serve the person?"
+    },
+    "property_debts_payment_reason": {
+      "text": "Why should the person pay these debts?"
+    },
+    "person_asking_protection_signature_date": {
+      "text": "What date are you signing?"
+    },
+    "person_asking_protection_signature_printed_name": {
+      "text": "Print your name."
+    },
+    "additional_pages_count": {
+      "text": "How many extra pages are attached?"
+    }
+  },
+  "sections": [
+    {
+      "name": "About You",
+      "fields": [
+        "person_asking_protection_name",
+        "person_asking_protection_age",
+        "person_asking_protection_mailing_address",
+        "person_asking_protection_mailing_city",
+        "person_asking_protection_mailing_state",
+        "person_asking_protection_mailing_zip_code",
+        "person_asking_protection_telephone",
+        "person_asking_protection_fax",
+        "person_asking_protection_email",
+        "person_asking_protection_lawyer_name",
+        "person_asking_protection_lawyer_state_bar_number",
+        "person_asking_protection_lawyer_firm_name",
+        "court_name_and_street_address",
+        "case_number"
+      ]
+    },
+    {
+      "name": "The Person to Restrain",
+      "fields": [
+        "person_to_restrain_full_name",
+        "person_to_restrain_age",
+        "person_to_restrain_date_of_birth",
+        "person_to_restrain_gender",
+        "person_to_restrain_race"
+      ]
+    },
+    {
+      "name": "Your Relationship",
+      "fields": [
+        "relationship_to_person_to_restrain",
+        "relationship_relative_kind",
+        "relationship_children_names_line_1",
+        "relationship_children_names_line_2",
+        "relationship_lived_together_as_family"
+      ]
+    },
+    {
+      "name": "Other Court Cases",
+      "fields": [
+        "recent_restraining_orders",
+        "other_court_case_involvement",
+        "other_court_case_kinds"
+      ]
+    },
+    {
+      "name": "The Abuse",
+      "fields": [
+        "most_recent_abuse_date",
+        "most_recent_abuse_witnesses",
+        "most_recent_abuse_weapon",
+        "most_recent_abuse_harm",
+        "most_recent_abuse_police",
+        "most_recent_abuse_details",
+        "most_recent_abuse_frequency",
+        "different_abuse_incident_date",
+        "other_abuse_incident_date"
+      ]
+    },
+    {
+      "name": "Other Protected People",
+      "fields": [
+        "other_protected_people_no",
+        "other_protected_people_yes",
+        "other_protected_person_1_full_name",
+        "other_protected_person_2_full_name",
+        "other_protected_person_3_full_name",
+        "other_protected_person_4_full_name",
+        "other_protected_people_reason_for_protection"
+      ]
+    },
+    {
+      "name": "Firearms",
+      "fields": [
+        "person_to_restrain_firearms_unknown",
+        "person_to_restrain_firearms_no",
+        "person_to_restrain_firearms_yes",
+        "firearm_item_1_description"
+      ]
+    },
+    {
+      "name": "Orders You Want",
+      "fields": [
+        "orders_requested",
+        "stay_away_targets",
+        "stay_away_distance",
+        "living_arrangement",
+        "same_workplace_or_school",
+        "move_out_home_address",
+        "move_out_right_to_live",
+        "other_orders_description"
+      ]
+    },
+    {
+      "name": "Animals, Property and Support",
+      "fields": [
+        "animal_sole_possession_reasons",
+        "animal_stay_away_distance",
+        "control_of_property_description",
+        "property_debt_special_finding",
+        "child_support_situation"
+      ]
+    },
+    {
+      "name": "Signatures",
+      "fields": [
+        "additional_pages_count",
+        "person_asking_protection_signature_date",
+        "person_asking_protection_signature_printed_name",
+        "lawyer_signature_date",
+        "lawyer_signature_printed_name"
+      ]
+    }
+  ]
+}

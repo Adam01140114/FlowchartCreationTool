@@ -189,8 +189,66 @@ Before calling a form done:
 4. In DevTools Network, confirm `POST /edit_pdf?pdf=W9.pdf` body includes keys matching PDF AcroForm names (`taxpayer_name`, `tax_classification_individual`, etc.).
 5. Compiler `auditForm()` output if using `compile-form-schema.js`.
 
----
+### Compiling a form to a flowchart
 
+Per form, using `compile-form.js` (generic) rather than `compile-form-schema.js`
+(W-9 only):
+
+1. **Baseline first.** `node compile-form.js <field_config.txt> out.json` with no
+   hints. The audit reports overlaps, edge/node crossings, unreachable nodes and
+   missing fields. A clean audit here only means the *geometry* is sound - it says
+   nothing about whether the interview reads well.
+2. **Diagnose the interview.** Three faults recur, none of which the audit catches:
+   - **Raw-PDF-path group names.** An inferred exclusive group is named from the
+     shared PDF path (`DV-110[0].Page1[0].OrigAmen`) instead of something readable.
+   - **Repeated fields.** One value printed on every page (case number) becomes one
+     question per page.
+   - **Invented gates.** A `conditional.onlyWhen` naming something that is not a real
+     field makes the compiler manufacture a question, usually duplicating a real one
+     nearly word for word. Find them by checking every `onlyWhen` against the set of
+     `newName`s.
+3. **Author `<form>-hints.json`** - `groups` (name and word each exclusive set),
+   `mirrors` (collapse repeated fields), `questions` (readable wording, and
+   `conditional` retargeted at a real field to kill invented gates), `sections`.
+4. **Recompile with `--hints` and require a clean audit.** Question count should drop
+   noticeably; DV-109 went 33 -> 25, DV-110 168 -> 147.
+
+### Multi-form packets: compile in packet order, primary first
+
+**Establish packet order before compiling anything.** Read `form_connections.json`
+(`forms[].role` and `connections[]`) and compile the primary form first, then each
+attached form in dependency order. For the DV packet that is:
+
+```
+DV-100  primary, always included
+DV-109  attached to DV-100, always included (no triggering field)
+DV-110  attached to DV-109, gated on serve_form_dv_110 = checked
+```
+
+The reason is shared fields, not aesthetics. The DV packet shares **25** case-number
+fields across the three forms, plus the protected/restrained person names, court
+address, hearing date and time, and four blocks of other-protected-person details.
+Whichever form is compiled first fixes the `nameId` every other form has to mirror.
+Compile a leaf form first and the primary form later either inherits a vocabulary
+chosen from a lesser form, or you rename across every hints file already written.
+
+Practical sequence:
+
+1. Read `form_connections.json`; note `sharedFields` and the packet order.
+2. Compile the **primary** form. Its hints define the canonical `nameId` for every
+   shared value (`case_number`, `protected_person_name`, ...).
+3. Compile each attached form, reusing those exact names in its `mirrors` and
+   `questions` hints.
+4. Cross-check that each `sharedFields` entry resolves to the same `nameId` in every
+   form that carries it.
+
+`form_connections.json` is written by a chat session and is a **claim, not ground
+truth** - validate every field it references against the real `newName`s before
+relying on it, and read its `openQuestions`, which is where it admits what it guessed.
+On the DV packet only one connection had an actual triggering field
+(`serve_form_dv_110`); the DV-100 -> DV-109 link was inferred from form roles alone.
+
+---
 ## 7. Known constraints & pitfalls
 
 1. **Cell ids vs End nodes** — Never treat numeric ids as End; only `nodeType=end`.
@@ -204,6 +262,11 @@ Before calling a form done:
 9. **Dropdown options need `_nameId`** for PDF checkboxes — export auto-creates hidden logic; without `_nameId`, mirror checkboxes use label suffixes that do not match AcroForm names.
 10. **Firebase / auth** — `auth.js` has substantial changes; preview uses `__FORM_SKIP_SIGNIN_GATE__` in test mode when configured.
 11. Desktop copies — compiler also writes `Desktop/w9-flowchart.json`; user may edit outside repo.
+12. **`hints.gates` does not merge questions** — it renames a gate the compiler
+    invented, but will not make it reuse an existing question. To collapse a
+    duplicate, retarget the field's `conditional.onlyWhen` at the real field instead.
+13. **A clean audit is not a good interview** — `auditForm()` checks geometry and
+    reachability only. Read the question list before calling a form done.
 
 ---
 
@@ -212,6 +275,11 @@ Before calling a form done:
 1. Re-read [`flowchart_ai_trainer_doc.txt`](./flowchart_ai_trainer_doc.txt) and run through W-9 Preview + PDF export after pull (**must use `npm start`**).
 2. Verify test payload zip → unzip → localhost preview workflow end-to-end.
 3. Extend `compile-form-schema.js` beyond W-9 when new schemas arrive (reuse generic router).
+5. **Packet-level mirroring is not built yet.** `mirrors` collapses repeated fields
+   within one form; the DV case number is 25 fields *across* three. Extending
+   `mirrors` across forms would collapse those to one question.
+6. **Nothing consumes `_mirrorTargets` yet.** The compiler records every PDF field a
+   mirrored answer must reach; the filler still has to be taught to write them.
 4. Optionally persist **question style** and **deployment style** in exported GUI JSON (not only preview URL).
 5. Add automated test: Fill maximum path → POST `/edit_pdf` → assert PDF field values match exportable HTML field names.
 6. Keep **form audit** in the loop — any flowchart change should be validated in Preview Form.
