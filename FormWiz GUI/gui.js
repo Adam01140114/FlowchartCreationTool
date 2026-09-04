@@ -2026,24 +2026,45 @@ function toggleHiddenLogicOptions(questionId, configIndex = 0) {
 }
 // Update hidden logic trigger options from dropdown question options
 function updateHiddenLogicTriggerOptions(questionId) {
-    // Update all trigger selects for this question
+    // The answers a hidden-logic rule can key on. A checkbox question keeps its
+    // options in its own container, and reading only the dropdown one left the
+    // trigger list empty: importing then set trigger values that did not exist
+    // as options, the assignment was silently dropped, and at generation time
+    // every checkbox question's hidden logic was thrown away with it - so the
+    // PDF field behind each option was never ticked.
+    const optionLabels = [];
+    const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
+    if (dropdownOptionsDiv) {
+        dropdownOptionsDiv.querySelectorAll('input[type="text"]').forEach(input => {
+            const val = input.value.trim();
+            if (val) optionLabels.push(val);
+        });
+    }
+    const checkboxOptionsDiv = document.getElementById(`checkboxOptions${questionId}`);
+    if (checkboxOptionsDiv) {
+        // Only the label input; the siblings hold the name/id, value and amount.
+        checkboxOptionsDiv
+            .querySelectorAll(`input[id^="checkboxOptionText${questionId}_"]`)
+            .forEach(input => {
+                const val = input.value.trim();
+                if (val) optionLabels.push(val);
+            });
+    }
+    if (!optionLabels.length) return;
+
     const triggerSelects = document.querySelectorAll(`[id^="hiddenLogicTrigger${questionId}_"]`);
     triggerSelects.forEach(triggerSelect => {
-        // Clear existing options except the first one
+        // Rebuilding the list clears the selection, and this runs once more
+        // after a bulk import, so put the chosen trigger back afterwards.
+        const previous = triggerSelect.value;
         triggerSelect.innerHTML = '<option value="">Select Trigger</option>';
-        // Get dropdown options from the question
-        const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
-        if (!dropdownOptionsDiv) return;
-        const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
-        optionInputs.forEach(optionInput => {
-            const val = optionInput.value.trim();
-            if (val) {
-                const opt = document.createElement('option');
-                opt.value = val;
-                opt.text = val;
-                triggerSelect.appendChild(opt);
-            }
+        optionLabels.forEach(val => {
+            const opt = document.createElement('option');
+            opt.value = val;
+            opt.text = val;
+            triggerSelect.appendChild(opt);
         });
+        if (previous) triggerSelect.value = previous;
     });
 }
 // Update hidden logic trigger options for numbered dropdown questions

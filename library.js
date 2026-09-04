@@ -271,19 +271,20 @@ function consolidateSectionsMinQuestions(sections, minQuestions = 2) {
  * The qualified form is <question nameId>_<option nameId>, which is the shape
  * form activations already look for.
  */
+const GENERIC_OPTION_NAME_IDS = new Set([
+  'yes', 'no', 'true', 'false', 'none', 'other', 'unknown', 'n_a', 'na'
+]);
+
 function qualifyOptionNameId(questionNameId, optionNameId) {
   const q = String(questionNameId || '').trim();
   const o = String(optionNameId || '').trim();
   if (!q || !o) return o;
   if (o === q || o.indexOf(q + '_') === 0) return o;
-  // Already speaks the question's language: share at least the first two
-  // tokens, e.g. question "denial_reason" and option
-  // "denial_reason_no_reasonable_proof_of_abuse".
-  const qt = q.split('_').filter(Boolean);
-  const ot = o.split('_').filter(Boolean);
-  let shared = 0;
-  while (shared < qt.length && shared < ot.length && qt[shared] === ot[shared]) shared++;
-  if (shared >= 2) return o;
+  // Only a name that says nothing on its own gets the question's prefix.
+  // Anything descriptive is already unique and is the name the PDF field was
+  // mapped under, so rewriting it would break the mapping instead of fixing a
+  // collision.
+  if (!GENERIC_OPTION_NAME_IDS.has(o.toLowerCase())) return o;
   return q + '_' + o;
 }
 

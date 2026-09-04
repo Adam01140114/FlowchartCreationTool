@@ -68,6 +68,35 @@ function getFormDeploymentStyle() {
  * loadFormData parks it on these globals because the builder DOM has nowhere
  * to put it - it describes the whole packet, not any one question.
  */
+/**
+ * Read a question's hidden-logic rows out of the builder.
+ *
+ * Shared by the dropdown and checkbox branches: both map an answer onto a
+ * hidden field that carries the PDF's name for it.
+ */
+function collectHiddenLogicConfigs(qBlock, questionId, questionNameId) {
+  const enabledEl = qBlock.querySelector(`#enableHiddenLogic${questionId}`);
+  if (!enabledEl || !enabledEl.checked) return;
+  qBlock.querySelectorAll('.hidden-logic-config').forEach((configElement, index) => {
+    const triggerEl = configElement.querySelector(`#hiddenLogicTrigger${questionId}_${index}`);
+    const typeEl = configElement.querySelector(`#hiddenLogicType${questionId}_${index}`);
+    const nodeIdEl = configElement.querySelector(`#hiddenLogicNodeId${questionId}_${index}`);
+    const textboxTextEl = configElement.querySelector(`#hiddenLogicTextboxText${questionId}_${index}`);
+    const trigger = triggerEl ? triggerEl.value : "";
+    const type = typeEl ? typeEl.value : "";
+    const nodeId = nodeIdEl ? nodeIdEl.value : "";
+    if (!trigger || !type || !nodeId) return;
+    hiddenLogicConfigs.push({
+      questionId: questionId,
+      questionNameId: questionNameId,
+      trigger: trigger,
+      type: type,
+      nodeId: nodeId,
+      textboxText: textboxTextEl ? textboxTextEl.value : ""
+    });
+  });
+}
+
 function getBuilderProjectForms() {
     return Array.isArray(window.__BUILDER_PROJECT_FORMS__) ? window.__BUILDER_PROJECT_FORMS__ : [];
 }
@@ -2668,33 +2697,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
           });
         }
         // handle Hidden Logic
-        const hiddenLogicEnabledEl = qBlock.querySelector(`#enableHiddenLogic${questionId}`);
-        const hiddenLogicEnabled = hiddenLogicEnabledEl && hiddenLogicEnabledEl.checked;
-        if (hiddenLogicEnabled) {
-          // Get all hidden logic configurations
-          const configElements = qBlock.querySelectorAll('.hidden-logic-config');
-          configElements.forEach((configElement, index) => {
-            const hiddenLogicTriggerEl = configElement.querySelector(`#hiddenLogicTrigger${questionId}_${index}`);
-            const hiddenLogicTypeEl = configElement.querySelector(`#hiddenLogicType${questionId}_${index}`);
-            const hiddenLogicNodeIdEl = configElement.querySelector(`#hiddenLogicNodeId${questionId}_${index}`);
-            const hiddenLogicTextboxTextEl = configElement.querySelector(`#hiddenLogicTextboxText${questionId}_${index}`);
-            const hiddenLogicTrigger = hiddenLogicTriggerEl ? hiddenLogicTriggerEl.value : "";
-            const hiddenLogicType = hiddenLogicTypeEl ? hiddenLogicTypeEl.value : "";
-            const hiddenLogicNodeId = hiddenLogicNodeIdEl ? hiddenLogicNodeIdEl.value : "";
-            const hiddenLogicTextboxText = hiddenLogicTextboxTextEl ? hiddenLogicTextboxTextEl.value : "";
-            if (hiddenLogicTrigger && hiddenLogicType && hiddenLogicNodeId) {
-              hiddenLogicConfigs.push({
-                questionId: questionId,
-                questionNameId: ddNm,
-                trigger: hiddenLogicTrigger,
-                type: hiddenLogicType,
-                nodeId: hiddenLogicNodeId,
-                textboxText: hiddenLogicTextboxText
-              });
-            } else {
-            }
-          });
-        }
+        collectHiddenLogicConfigs(qBlock, questionId, ddNm);
       } else if (questionType === "checkbox") {
        /* ---------- CHECKBOX QUESTION ---------- */
 const cOptsDivs = qBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
@@ -2702,6 +2705,11 @@ const cboxOptions = [];
 /* Use the slug as the base prefix (and store it for helpers) */
 const qSlug = questionSlugMap[questionId] || ('answer' + questionId);
 questionNameIds[questionId] = qSlug;      // so helpers know the base
+// A multi-select question carries hidden logic too - each option maps to its
+// own PDF checkbox. Only the dropdown branch above used to collect it, so
+// every checkbox question's mapping was dropped on the way into the generated
+// form and those PDF fields were never ticked.
+collectHiddenLogicConfigs(qBlock, questionId, qSlug);
 /* ── Hard Alert (checkbox question) ─────────────────────────── */
 const hardAlertEnabledEl = qBlock.querySelector(`#enableHardAlert${questionId}`);
 const hardAlertEnabled = hardAlertEnabledEl && hardAlertEnabledEl.checked;
@@ -17730,6 +17738,82 @@ function createHiddenCheckbox(checkboxId, checkboxName, baseName) {
   wrap.appendChild(checkboxDiv);
 }
 // Create real hidden checkboxes for all autofilled dropdowns
+function setHiddenLogicField(cfg, on) {
+  var el = document.getElementById(cfg.nodeId);
+  if (!on) {
+    if (el && el.type === 'checkbox') el.checked = false;
+    else if (el) el.value = '';
+    return;
+  }
+  if (!el) {
+    el = document.createElement('input');
+    el.id = cfg.nodeId;
+    el.name = cfg.nodeId;
+    el.style.display = 'none';
+    if (cfg.type === 'checkbox') { el.type = 'checkbox'; }
+    else { el.type = 'text'; }
+    var form = document.getElementById('customForm');
+    (form || document.body).appendChild(el);
+  }
+  if (cfg.type === 'checkbox') el.checked = true;
+  else el.value = cfg.textboxText || '';
+}
+
+/**
+ * Apply hidden logic to multi-select answers.
+ *
+ * updateHiddenLogic compares a config's trigger against one selected value,
+ * which is all a dropdown ever has. A checkbox question has a set of answers,
+ * so none of its options ever matched and the PDF checkbox behind each one
+ * stayed unticked - on the DV packet that silently lost every relationship,
+ * stay-away target, court-case kind and no-contact exception.
+ */
+// Keep the multi-select mapping current as the user ticks boxes, not only
+// during a debug fill.
+if (typeof document !== 'undefined' && !window.__CB_HIDDEN_LOGIC_BOUND__) {
+  window.__CB_HIDDEN_LOGIC_BOUND__ = true;
+  document.addEventListener('change', function (e) {
+    var t = e && e.target;
+    if (!t || t.type !== 'checkbox') return;
+    if (typeof syncHiddenLogicForCheckboxQuestions === 'function') {
+      syncHiddenLogicForCheckboxQuestions();
+    }
+  }, true);
+}
+
+function syncHiddenLogicForCheckboxQuestions() {
+  var configs = (typeof hiddenLogicConfigs !== 'undefined' && hiddenLogicConfigs)
+    ? hiddenLogicConfigs : (window.hiddenLogicConfigs || []);
+  if (!configs.length) return;
+  var byQuestion = {};
+  configs.forEach(function (c) {
+    if (!c || !c.questionId) return;
+    (byQuestion[c.questionId] = byQuestion[c.questionId] || []).push(c);
+  });
+  Object.keys(byQuestion).forEach(function (qid) {
+    var boxes = (typeof getQuestionInputs === 'function')
+      ? getQuestionInputs(qid, 'checkbox') : [];
+    if (!boxes || !boxes.length) return;
+    // Option checkboxes carry their label as the value. The mirror boxes that
+    // dropdownMirror creates have no value attribute, so they read as 'on' and
+    // are skipped - this must not touch a dropdown question.
+    var chosen = {};
+    var sawOption = false;
+    Array.prototype.forEach.call(boxes, function (b) {
+      var v = (b.value || '').trim();
+      if (!v || v.toLowerCase() === 'on') return;
+      sawOption = true;
+      if (b.checked) chosen[v.toLowerCase()] = true;
+    });
+    if (!sawOption) return;
+    byQuestion[qid].forEach(function (cfg) {
+      var trigger = String(cfg.trigger || '').trim().toLowerCase();
+      if (!trigger) return;
+      setHiddenLogicField(cfg, !!chosen[trigger]);
+    });
+  });
+}
+
 function createHiddenCheckboxesForAutofilledDropdowns() {
   // Find all dropdown/select elements
   const dropdowns = document.querySelectorAll('select');
@@ -18596,23 +18680,31 @@ function fillVisibleCheckboxesAndRadios() {
       ? Array.from(container.querySelectorAll('input[type="checkbox"]'))
       : [cb];
     if (containerKey && siblingBoxes.length > 1) {
-      if (siblingBoxes.some(function(s) { return s.checked; })) return;
-      let best = siblingBoxes[siblingBoxes.length - 1];
-      let bestScore = -1;
-      siblingBoxes.forEach(function(s) {
-        if (wouldOptionJumpToEnd(s, s.value)) return;
-        s.checked = true;
-        triggerFieldChange(s);
-        const score = countExportableFields();
-        if (score > bestScore) {
-          bestScore = score;
-          best = s;
-        }
-        s.checked = false;
+      // Leave a group alone once it has an answer - except during a maximum
+      // fill, where a single box ticked on an earlier pass would otherwise
+      // stop the group from ever being widened.
+      const alreadyAnswered = siblingBoxes.some(function(s) { return s.checked; });
+      if (alreadyAnswered && !window.__MAX_FILL_IN_PROGRESS__) return;
+      // A checkbox question is multi-select, so the widest path ticks every
+      // option, not the single best one. Scoring them like a radio group left
+      // one box checked and the PDF field behind each of the others empty -
+      // on DV-100 that is most of the relationship, stay-away and court-case
+      // boxes. Options that would jump to the end or fire a hard alert are
+      // still skipped: they cut the path short rather than widen it.
+      const widened = siblingBoxes.filter(function(s) {
+        return !wouldOptionJumpToEnd(s, s.value)
+          && !wouldTriggerHardAlertOnSelect(s, s.value);
       });
-      siblingBoxes.forEach(function(s) { s.checked = false; });
-      best.checked = true;
-      triggerFieldChange(best);
+      if (widened.length) {
+        widened.forEach(function(s) {
+          s.checked = true;
+          triggerFieldChange(s);
+        });
+      } else {
+        const fallback = siblingBoxes[siblingBoxes.length - 1];
+        fallback.checked = true;
+        triggerFieldChange(fallback);
+      }
       return;
     }
     if (!cb.checked) {
@@ -18631,6 +18723,9 @@ function fillMaximumPathPass() {
   fillVisibleTextFields();
   if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
     createHiddenCheckboxesForAutofilledDropdowns();
+  }
+  if (typeof syncHiddenLogicForCheckboxQuestions === 'function') {
+    syncHiddenLogicForCheckboxQuestions();
   }
   if (typeof updateAllHiddenAddressFields === 'function') {
     try { updateAllHiddenAddressFields(); } catch (e) { /* ignore */ }

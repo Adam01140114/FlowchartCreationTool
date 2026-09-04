@@ -1,0 +1,1163 @@
+{
+  "formTitle": "DV-110 Temporary Restraining Order",
+  "fields": [
+    {
+      "id": "DV-110[0].Page1[0].StampbxSub[0].CourtInfo_ft[0]",
+      "newName": "court_name_and_street_address",
+      "type": "text",
+      "label": "court_name_and_street_address"
+    },
+    {
+      "id": "DV-110[0].Page1[0].StampbxSub[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-110[0].Page1[0].OrigAmen_cb[0]",
+      "newName": "order_type_original",
+      "type": "checkbox",
+      "label": "order_type_original"
+    },
+    {
+      "id": "DV-110[0].Page1[0].OrigAmen_cb[1]",
+      "newName": "order_type_amended",
+      "type": "checkbox",
+      "label": "order_type_amended"
+    },
+    {
+      "id": "DV-110[0].Page1[0].Amended_ft[0]",
+      "newName": "amended_order_number",
+      "type": "text",
+      "label": "amended_order_number"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List1[0].Li1[0].TextField[0]",
+      "newName": "protected_person_name",
+      "type": "text",
+      "label": "protected_person_name"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].ParentRel[0]",
+      "newName": "restrained_person_full_name",
+      "type": "text",
+      "label": "restrained_person_full_name"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].gender_cb[0]",
+      "newName": "restrained_person_gender_male",
+      "type": "checkbox",
+      "label": "restrained_person_gender_male"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].gender_cb[1]",
+      "newName": "restrained_person_gender_female",
+      "type": "checkbox",
+      "label": "restrained_person_gender_female"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].gender_cb[2]",
+      "newName": "restrained_person_gender_nonbinary",
+      "type": "checkbox",
+      "label": "restrained_person_gender_nonbinary"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].T191[0]",
+      "newName": "restrained_person_age",
+      "type": "text",
+      "label": "restrained_person_age"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].TF1[0]",
+      "newName": "restrained_person_date_of_birth",
+      "type": "text",
+      "label": "restrained_person_date_of_birth"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].TF2[0]",
+      "newName": "restrained_person_height",
+      "type": "text",
+      "label": "restrained_person_height"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].TF3[0]",
+      "newName": "restrained_person_weight",
+      "type": "text",
+      "label": "restrained_person_weight"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].TF4[0]",
+      "newName": "restrained_person_hair_color",
+      "type": "text",
+      "label": "restrained_person_hair_color"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].TF5[0]",
+      "newName": "restrained_person_eye_color",
+      "type": "text",
+      "label": "restrained_person_eye_color"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].TF6[0]",
+      "newName": "restrained_person_race",
+      "type": "text",
+      "label": "restrained_person_race"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].TextField[0]",
+      "newName": "restrained_person_relationship_to_protected_person",
+      "type": "text",
+      "label": "restrained_person_relationship_to_protected_person"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].TF7[0]",
+      "newName": "restrained_person_street_address",
+      "type": "text",
+      "label": "restrained_person_street_address"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].TF8[0]",
+      "newName": "restrained_person_city",
+      "type": "text",
+      "label": "restrained_person_city"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].TF9[0]",
+      "newName": "restrained_person_state",
+      "type": "text",
+      "label": "restrained_person_state"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].TF10[0]",
+      "newName": "restrained_person_zip_code",
+      "type": "text",
+      "label": "restrained_person_zip_code"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List2[0].Li1[0].OtherSpecify_tf[0]",
+      "newName": "DV-110[0].Page1[0].List2[0].Li1[0].OtherSpecify_tf[0]",
+      "type": "text",
+      "label": "Page1[0].List2[0].Li1[0].OtherSpecify_tf[0]"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3_cb[0]",
+      "newName": "has_other_protected_people_yes",
+      "type": "checkbox",
+      "label": "has_other_protected_people_yes"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3FullName1_tf1[0]",
+      "newName": "other_protected_person_1_full_name",
+      "type": "text",
+      "label": "other_protected_person_1_full_name"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3relation1_tf1[0]",
+      "newName": "other_protected_person_1_relationship",
+      "type": "text",
+      "label": "other_protected_person_1_relationship"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3age1_tf1[0]",
+      "newName": "other_protected_person_1_age",
+      "type": "text",
+      "label": "other_protected_person_1_age"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3FullName1_tf[0]",
+      "newName": "other_protected_person_2_full_name",
+      "type": "text",
+      "label": "other_protected_person_2_full_name"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3relation1_tf[0]",
+      "newName": "other_protected_person_2_relationship",
+      "type": "text",
+      "label": "other_protected_person_2_relationship"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3age1_tf[0]",
+      "newName": "other_protected_person_2_age",
+      "type": "text",
+      "label": "other_protected_person_2_age"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3FullName2_tf[0]",
+      "newName": "other_protected_person_3_full_name",
+      "type": "text",
+      "label": "other_protected_person_3_full_name"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3relation2_tf[0]",
+      "newName": "other_protected_person_3_relationship",
+      "type": "text",
+      "label": "other_protected_person_3_relationship"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3age2_tf[0]",
+      "newName": "other_protected_person_3_age",
+      "type": "text",
+      "label": "other_protected_person_3_age"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3FullName3_tf[0]",
+      "newName": "other_protected_person_4_full_name",
+      "type": "text",
+      "label": "other_protected_person_4_full_name"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3relation3_tf[0]",
+      "newName": "other_protected_person_4_relationship",
+      "type": "text",
+      "label": "other_protected_person_4_relationship"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].item3age3_tf[0]",
+      "newName": "other_protected_person_4_age",
+      "type": "text",
+      "label": "other_protected_person_4_age"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List3[0].Li1[0].AGHagueCert_cb[0]",
+      "newName": "other_protected_people_attached_page_yes",
+      "type": "checkbox",
+      "label": "other_protected_people_attached_page_yes"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List4[0].Li1[0].T195[0]",
+      "newName": "hearing_date",
+      "type": "text",
+      "label": "hearing_date"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List4[0].Li1[0].time1[0]",
+      "newName": "hearing_time",
+      "type": "text",
+      "label": "hearing_time"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List4[0].Li1[0].item4ampm[0]",
+      "newName": "hearing_time_am",
+      "type": "checkbox",
+      "label": "hearing_time_am"
+    },
+    {
+      "id": "DV-110[0].Page1[0].List4[0].Li1[0].item4ampm[1]",
+      "newName": "hearing_time_pm",
+      "type": "checkbox",
+      "label": "hearing_time_pm"
+    },
+    {
+      "id": "DV-110[0].Page2[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].CheckBoxRightCaption[0]",
+      "newName": "restrained_person_has_prohibited_items_yes",
+      "type": "checkbox",
+      "label": "restrained_person_has_prohibited_items_yes"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].TextField[0]",
+      "newName": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].TextField[0]",
+      "type": "text",
+      "label": "Page2[0].List6[0].Li1[0].Lista[0].Li1[0].TextField[0]"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].TextField1[0]",
+      "newName": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].TextField1[0]",
+      "type": "text",
+      "label": "Page2[0].List6[0].Li1[0].Lista[0].Li1[0].TextField1[0]"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].Choice[0]",
+      "newName": "firearm_item_1_proof_of_compliance_received_yes",
+      "type": "checkbox",
+      "label": "firearm_item_1_proof_of_compliance_received_yes"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].DateField1[0]",
+      "newName": "firearm_item_1_proof_of_compliance_date",
+      "type": "text",
+      "label": "firearm_item_1_proof_of_compliance_date"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].TextField[0]",
+      "newName": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].TextField[0]",
+      "type": "text",
+      "label": "Page2[0].List6[0].Li1[0].Lista[0].Li2[0].TextField[0]"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].TextField1[0]",
+      "newName": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].TextField1[0]",
+      "type": "text",
+      "label": "Page2[0].List6[0].Li1[0].Lista[0].Li2[0].TextField1[0]"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].Choice[0]",
+      "newName": "firearm_item_2_proof_of_compliance_received_yes",
+      "type": "checkbox",
+      "label": "firearm_item_2_proof_of_compliance_received_yes"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].DateField2[0]",
+      "newName": "firearm_item_2_proof_of_compliance_date",
+      "type": "text",
+      "label": "firearm_item_2_proof_of_compliance_date"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].TextField[0]",
+      "newName": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].TextField[0]",
+      "type": "text",
+      "label": "Page2[0].List6[0].Li1[0].Lista[0].Li3[0].TextField[0]"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].TextField1[0]",
+      "newName": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].TextField1[0]",
+      "type": "text",
+      "label": "Page2[0].List6[0].Li1[0].Lista[0].Li3[0].TextField1[0]"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].Choice[0]",
+      "newName": "firearm_item_3_proof_of_compliance_received_yes",
+      "type": "checkbox",
+      "label": "firearm_item_3_proof_of_compliance_received_yes"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].DateField3[0]",
+      "newName": "firearm_item_3_proof_of_compliance_date",
+      "type": "text",
+      "label": "firearm_item_3_proof_of_compliance_date"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].TextField[0]",
+      "newName": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].TextField[0]",
+      "type": "text",
+      "label": "Page2[0].List6[0].Li1[0].Lista[0].Li4[0].TextField[0]"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].TextField1[0]",
+      "newName": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].TextField1[0]",
+      "type": "text",
+      "label": "Page2[0].List6[0].Li1[0].Lista[0].Li4[0].TextField1[0]"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].Choice[0]",
+      "newName": "firearm_item_4_proof_of_compliance_received_yes",
+      "type": "checkbox",
+      "label": "firearm_item_4_proof_of_compliance_received_yes"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].DateField4[0]",
+      "newName": "firearm_item_4_proof_of_compliance_date",
+      "type": "text",
+      "label": "firearm_item_4_proof_of_compliance_date"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li1[0].TextField[0]",
+      "newName": "ammunition_item_1_description",
+      "type": "text",
+      "label": "ammunition_item_1_description"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li1[0].TextField1[0]",
+      "newName": "ammunition_item_1_amount",
+      "type": "text",
+      "label": "ammunition_item_1_amount"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li1[0].TextField2[0]",
+      "newName": "ammunition_item_1_location",
+      "type": "text",
+      "label": "ammunition_item_1_location"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li1[0].Choice[0]",
+      "newName": "ammunition_item_1_proof_of_compliance_received_yes",
+      "type": "checkbox",
+      "label": "ammunition_item_1_proof_of_compliance_received_yes"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li1[0].DateField5[0]",
+      "newName": "ammunition_item_1_proof_of_compliance_date",
+      "type": "text",
+      "label": "ammunition_item_1_proof_of_compliance_date"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li2[0].TextField[0]",
+      "newName": "ammunition_item_2_description",
+      "type": "text",
+      "label": "ammunition_item_2_description"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li2[0].TextField1[0]",
+      "newName": "ammunition_item_2_amount",
+      "type": "text",
+      "label": "ammunition_item_2_amount"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li2[0].TextField2[0]",
+      "newName": "ammunition_item_2_location",
+      "type": "text",
+      "label": "ammunition_item_2_location"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li2[0].Choice[0]",
+      "newName": "ammunition_item_2_proof_of_compliance_received_yes",
+      "type": "checkbox",
+      "label": "ammunition_item_2_proof_of_compliance_received_yes"
+    },
+    {
+      "id": "DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li2[0].DateField6[0]",
+      "newName": "ammunition_item_2_proof_of_compliance_date",
+      "type": "text",
+      "label": "ammunition_item_2_proof_of_compliance_date"
+    },
+    {
+      "id": "DV-110[0].Page3[0].List7[0].Li1[0].AGHagueCert_cb[0]",
+      "newName": "firearms_compliance_review_hearing_required_yes",
+      "type": "checkbox",
+      "label": "firearms_compliance_review_hearing_required_yes"
+    },
+    {
+      "id": "DV-110[0].Page3[0].List7[0].Li1[0].HearingDate_dt[0]",
+      "newName": "firearms_review_hearing_date",
+      "type": "text",
+      "label": "firearms_review_hearing_date"
+    },
+    {
+      "id": "DV-110[0].Page3[0].List7[0].Li1[0].HearingDept_ft[0]",
+      "newName": "firearms_review_hearing_department",
+      "type": "text",
+      "label": "firearms_review_hearing_department"
+    },
+    {
+      "id": "DV-110[0].Page3[0].List7[0].Li1[0].HearingTime_dt[0]",
+      "newName": "firearms_review_hearing_time",
+      "type": "text",
+      "label": "firearms_review_hearing_time"
+    },
+    {
+      "id": "DV-110[0].Page3[0].List7[0].Li1[0].HearingRm_ft[0]",
+      "newName": "firearms_review_hearing_room",
+      "type": "text",
+      "label": "firearms_review_hearing_room"
+    },
+    {
+      "id": "DV-110[0].Page3[0].List7[0].Li1[0].HearingCourt_ft[0]",
+      "newName": "firearms_review_hearing_court_name_and_address",
+      "type": "text",
+      "label": "firearms_review_hearing_court_name_and_address"
+    },
+    {
+      "id": "DV-110[0].Page3[0].List9set[0].List9[0].Li1[0].AGHagueCert_cb[0]",
+      "newName": "cannot_look_order_not_granted_good_cause_yes",
+      "type": "checkbox",
+      "label": "cannot_look_order_not_granted_good_cause_yes"
+    },
+    {
+      "id": "DV-110[0].Page3[0].List10[0].item7_cb[0]",
+      "newName": "order_not_abuse_not_requested",
+      "type": "checkbox",
+      "label": "order_not_abuse_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page3[0].List10[0].item7_cb[1]",
+      "newName": "order_not_abuse_denied_until_hearing",
+      "type": "checkbox",
+      "label": "order_not_abuse_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page3[0].List10[0].item7_cb[2]",
+      "newName": "order_not_abuse_granted",
+      "type": "checkbox",
+      "label": "order_not_abuse_granted"
+    },
+    {
+      "id": "DV-110[0].Page3[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List11[0].item8_cb[0]",
+      "newName": "no_contact_order_not_requested",
+      "type": "checkbox",
+      "label": "no_contact_order_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List11[0].item8_cb[1]",
+      "newName": "no_contact_order_denied_until_hearing",
+      "type": "checkbox",
+      "label": "no_contact_order_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List11[0].item8_cb[2]",
+      "newName": "no_contact_order_granted",
+      "type": "checkbox",
+      "label": "no_contact_order_granted"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List11[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "no_contact_protected_person_yes",
+      "type": "checkbox",
+      "label": "no_contact_protected_person_yes"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List11[0].Li1[0].AGHagueCert_cb[0]",
+      "newName": "no_contact_other_protected_people_yes",
+      "type": "checkbox",
+      "label": "no_contact_other_protected_people_yes"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List11[0].Li2[0].AGHagueCert_cb1[0]",
+      "newName": "no_contact_exception_applies_yes",
+      "type": "checkbox",
+      "label": "no_contact_exception_applies_yes"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].MultilineCheckBox[0]",
+      "newName": "no_contact_exception_child_communication",
+      "type": "checkbox",
+      "label": "no_contact_exception_child_communication"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].AGHagueCert_cb[0]",
+      "newName": "no_contact_exception_children_visits_only",
+      "type": "checkbox",
+      "label": "no_contact_exception_children_visits_only"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List11[0].Li2[0].List[0].Li3[0].AGHagueCert_cb[0]",
+      "newName": "no_contact_exception_other",
+      "type": "checkbox",
+      "label": "no_contact_exception_other"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List11[0].Li2[0].List[0].Li3[0].TextField2[0]",
+      "newName": "no_contact_exception_other_explanation",
+      "type": "text",
+      "label": "no_contact_exception_other_explanation"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].item9_cb[0]",
+      "newName": "stay_away_order_not_requested",
+      "type": "checkbox",
+      "label": "stay_away_order_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].item9_cb[1]",
+      "newName": "stay_away_order_denied_until_hearing",
+      "type": "checkbox",
+      "label": "stay_away_order_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].item9_cb[2]",
+      "newName": "stay_away_order_granted",
+      "type": "checkbox",
+      "label": "stay_away_order_granted"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li1[0].T161[0]",
+      "newName": "stay_away_distance_yards",
+      "type": "text",
+      "label": "stay_away_distance_yards"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb1[0]",
+      "newName": "stay_away_from_protected_person",
+      "type": "checkbox",
+      "label": "stay_away_from_protected_person"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb2[0]",
+      "newName": "stay_away_from_protected_person_school",
+      "type": "checkbox",
+      "label": "stay_away_from_protected_person_school"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb3[0]",
+      "newName": "stay_away_from_protected_person_home",
+      "type": "checkbox",
+      "label": "stay_away_from_protected_person_home"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb4[0]",
+      "newName": "stay_away_from_other_protected_people",
+      "type": "checkbox",
+      "label": "stay_away_from_other_protected_people"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb5[0]",
+      "newName": "stay_away_from_protected_person_workplace",
+      "type": "checkbox",
+      "label": "stay_away_from_protected_person_workplace"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb6[0]",
+      "newName": "stay_away_from_childrens_school_or_child_care",
+      "type": "checkbox",
+      "label": "stay_away_from_childrens_school_or_child_care"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb7[0]",
+      "newName": "stay_away_from_protected_person_vehicle",
+      "type": "checkbox",
+      "label": "stay_away_from_protected_person_vehicle"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li1[0].AGHagueCert_cb[0]",
+      "newName": "stay_away_from_other_location",
+      "type": "checkbox",
+      "label": "stay_away_from_other_location"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li1[0].TextField2[0]",
+      "newName": "stay_away_other_location_explanation",
+      "type": "text",
+      "label": "stay_away_other_location_explanation"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li2[0].AGHagueCert_cb1[0]",
+      "newName": "stay_away_exception_applies_yes",
+      "type": "checkbox",
+      "label": "stay_away_exception_applies_yes"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li2[0].List[0].Li1[0].AGHagueCert_cb[0]",
+      "newName": "stay_away_exception_child_exchange",
+      "type": "checkbox",
+      "label": "stay_away_exception_child_exchange"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li2[0].List[0].Li2[0].AGHagueCert_cb[0]",
+      "newName": "stay_away_exception_child_visits",
+      "type": "checkbox",
+      "label": "stay_away_exception_child_visits"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li2[0].List[0].Li3[0].AGHagueCert_cb[0]",
+      "newName": "stay_away_exception_other",
+      "type": "checkbox",
+      "label": "stay_away_exception_other"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li2[0].List[0].Li3[0].TextFieldItem9b3[0]",
+      "newName": "stay_away_exception_other_explanation_line_1",
+      "type": "text",
+      "label": "stay_away_exception_other_explanation_line_1"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List12[0].Li2[0].List[0].Li3[0].TextFieldItem9b3_tf[0]",
+      "newName": "stay_away_exception_other_explanation_line_2",
+      "type": "text",
+      "label": "stay_away_exception_other_explanation_line_2"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List13[0].Li1[0].item10_cb[0]",
+      "newName": "move_out_order_not_requested",
+      "type": "checkbox",
+      "label": "move_out_order_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List13[0].Li1[0].item10_cb[1]",
+      "newName": "move_out_order_denied_until_hearing",
+      "type": "checkbox",
+      "label": "move_out_order_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List13[0].Li1[0].item10_cb[2]",
+      "newName": "move_out_order_granted",
+      "type": "checkbox",
+      "label": "move_out_order_granted"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List13[0].Li1[0].TextField2[0]",
+      "newName": "move_out_address",
+      "type": "text",
+      "label": "move_out_address"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List14[0].Li1[0].item11_cb[0]",
+      "newName": "other_orders_not_requested",
+      "type": "checkbox",
+      "label": "other_orders_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List14[0].Li1[0].item11_cb[1]",
+      "newName": "other_orders_denied_until_hearing",
+      "type": "checkbox",
+      "label": "other_orders_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List14[0].Li1[0].item11_cb[2]",
+      "newName": "other_orders_granted",
+      "type": "checkbox",
+      "label": "other_orders_granted"
+    },
+    {
+      "id": "DV-110[0].Page4[0].List14[0].Li1[0].OtherSpecify_tf[0]",
+      "newName": "other_orders_details",
+      "type": "text",
+      "label": "other_orders_details"
+    },
+    {
+      "id": "DV-110[0].Page4[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-110[0].Page5[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List15[0].Li1[0].item12_cb[0]",
+      "newName": "child_custody_visitation_not_requested",
+      "type": "checkbox",
+      "label": "child_custody_visitation_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List15[0].Li1[0].item12_cb[1]",
+      "newName": "child_custody_visitation_denied_until_hearing",
+      "type": "checkbox",
+      "label": "child_custody_visitation_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List15[0].Li1[0].item12_cb[2]",
+      "newName": "child_custody_visitation_granted",
+      "type": "checkbox",
+      "label": "child_custody_visitation_granted"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List15[0].Li1[0].AGHagueCert11_cb[0]",
+      "newName": "child_custody_other_form_attached_yes",
+      "type": "checkbox",
+      "label": "child_custody_other_form_attached_yes"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List15[0].Li1[0].TextField[0]",
+      "newName": "child_custody_other_form_name",
+      "type": "text",
+      "label": "child_custody_other_form_name"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].item13_cb[0]",
+      "newName": "protect_animals_not_requested",
+      "type": "checkbox",
+      "label": "protect_animals_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].item13_cb[1]",
+      "newName": "protect_animals_denied_until_hearing",
+      "type": "checkbox",
+      "label": "protect_animals_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].item13_cb[2]",
+      "newName": "protect_animals_granted",
+      "type": "checkbox",
+      "label": "protect_animals_granted"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li1[0].AGHagueCert11_cb[0]",
+      "newName": "protect_animals_stay_away_yes",
+      "type": "checkbox",
+      "label": "protect_animals_stay_away_yes"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li1[0].FillText11\\.yards[0]",
+      "newName": "protect_animals_stay_away_distance_yards",
+      "type": "text",
+      "label": "protect_animals_stay_away_distance_yards"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li2[0].AGHagueCert_cb[0]",
+      "newName": "protect_animals_no_harm_or_transfer_yes",
+      "type": "checkbox",
+      "label": "protect_animals_no_harm_or_transfer_yes"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].AGHagueCert11_cb[0]",
+      "newName": "protect_animals_protected_person_sole_possession_yes",
+      "type": "checkbox",
+      "label": "protect_animals_protected_person_sole_possession_yes"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3FullName3_tf1[0]",
+      "newName": "animal_1_name_or_id",
+      "type": "text",
+      "label": "animal_1_name_or_id"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation2_tf1[0]",
+      "newName": "animal_1_type",
+      "type": "text",
+      "label": "animal_1_type"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf2[0]",
+      "newName": "animal_1_breed",
+      "type": "text",
+      "label": "animal_1_breed"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf3[0]",
+      "newName": "animal_1_color",
+      "type": "text",
+      "label": "animal_1_color"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3FullName3_tf2[0]",
+      "newName": "animal_2_name_or_id",
+      "type": "text",
+      "label": "animal_2_name_or_id"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation2_tf4[0]",
+      "newName": "animal_2_type",
+      "type": "text",
+      "label": "animal_2_type"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf5[0]",
+      "newName": "animal_2_breed",
+      "type": "text",
+      "label": "animal_2_breed"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf6[0]",
+      "newName": "animal_2_color",
+      "type": "text",
+      "label": "animal_2_color"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3FullName3_tf7[0]",
+      "newName": "animal_3_name_or_id",
+      "type": "text",
+      "label": "animal_3_name_or_id"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation2_tf8[0]",
+      "newName": "animal_3_type",
+      "type": "text",
+      "label": "animal_3_type"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf9[0]",
+      "newName": "animal_3_breed",
+      "type": "text",
+      "label": "animal_3_breed"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf10[0]",
+      "newName": "animal_3_color",
+      "type": "text",
+      "label": "animal_3_color"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3FullName3_tf11[0]",
+      "newName": "animal_4_name_or_id",
+      "type": "text",
+      "label": "animal_4_name_or_id"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation2_tf12[0]",
+      "newName": "animal_4_type",
+      "type": "text",
+      "label": "animal_4_type"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf13[0]",
+      "newName": "animal_4_breed",
+      "type": "text",
+      "label": "animal_4_breed"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf[0]",
+      "newName": "animal_4_color",
+      "type": "text",
+      "label": "animal_4_color"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List17[0].Li1[0].item14_cb[0]",
+      "newName": "control_of_property_not_requested",
+      "type": "checkbox",
+      "label": "control_of_property_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List17[0].Li1[0].item14_cb[1]",
+      "newName": "control_of_property_denied_until_hearing",
+      "type": "checkbox",
+      "label": "control_of_property_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List17[0].Li1[0].item14_cb[2]",
+      "newName": "control_of_property_granted",
+      "type": "checkbox",
+      "label": "control_of_property_granted"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List17[0].Li1[0].OtherSpecify_tf[0]",
+      "newName": "controlled_property_description",
+      "type": "text",
+      "label": "controlled_property_description"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List18[0].Li1[0].item15_cb[0]",
+      "newName": "health_insurance_order_not_requested",
+      "type": "checkbox",
+      "label": "health_insurance_order_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List18[0].Li1[0].item15_cb[1]",
+      "newName": "health_insurance_order_denied_until_hearing",
+      "type": "checkbox",
+      "label": "health_insurance_order_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List18[0].Li1[0].item15_cb[2]",
+      "newName": "health_insurance_order_granted",
+      "type": "checkbox",
+      "label": "health_insurance_order_granted"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List18[0].Li1[0].PersonIn1_cb[0]",
+      "newName": "health_insurance_order_applies_to_protected_person_yes",
+      "type": "checkbox",
+      "label": "health_insurance_order_applies_to_protected_person_yes"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List18[0].Li1[0].PersonIn2_cb[0]",
+      "newName": "health_insurance_order_applies_to_restrained_person_yes",
+      "type": "checkbox",
+      "label": "health_insurance_order_applies_to_restrained_person_yes"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List19[0].Li1[0].item16_cb[0]",
+      "newName": "record_communications_not_requested",
+      "type": "checkbox",
+      "label": "record_communications_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List19[0].Li1[0].item16_cb[1]",
+      "newName": "record_communications_denied_until_hearing",
+      "type": "checkbox",
+      "label": "record_communications_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page5[0].List19[0].Li1[0].item16_cb[2]",
+      "newName": "record_communications_granted",
+      "type": "checkbox",
+      "label": "record_communications_granted"
+    },
+    {
+      "id": "DV-110[0].Page6[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List20[0].Li1[0].item17_cb[0]",
+      "newName": "property_restraint_not_requested",
+      "type": "checkbox",
+      "label": "property_restraint_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List20[0].Li1[0].item17_cb[1]",
+      "newName": "property_restraint_denied_until_hearing",
+      "type": "checkbox",
+      "label": "property_restraint_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List20[0].Li1[0].item17_cb[2]",
+      "newName": "property_restraint_granted",
+      "type": "checkbox",
+      "label": "property_restraint_granted"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List20[0].Li1[0].PersonIn1_cb[0]",
+      "newName": "property_restraint_applies_to_protected_person_yes",
+      "type": "checkbox",
+      "label": "property_restraint_applies_to_protected_person_yes"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List20[0].Li1[0].PersonIn2_cb[0]",
+      "newName": "property_restraint_applies_to_restrained_person_yes",
+      "type": "checkbox",
+      "label": "property_restraint_applies_to_restrained_person_yes"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].item18_cb[0]",
+      "newName": "pay_property_debts_not_requested",
+      "type": "checkbox",
+      "label": "pay_property_debts_not_requested"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].item18_cb[1]",
+      "newName": "pay_property_debts_denied_until_hearing",
+      "type": "checkbox",
+      "label": "pay_property_debts_denied_until_hearing"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].item18_cb[2]",
+      "newName": "pay_property_debts_granted",
+      "type": "checkbox",
+      "label": "pay_property_debts_granted"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T241[0]",
+      "newName": "property_debt_payment_1_pay_to",
+      "type": "text",
+      "label": "property_debt_payment_1_pay_to"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T244[0]",
+      "newName": "property_debt_payment_1_for",
+      "type": "text",
+      "label": "property_debt_payment_1_for"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T247[0]",
+      "newName": "property_debt_payment_1_amount",
+      "type": "text",
+      "label": "property_debt_payment_1_amount"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T250[0]",
+      "newName": "property_debt_payment_1_due_date",
+      "type": "text",
+      "label": "property_debt_payment_1_due_date"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T341[0]",
+      "newName": "property_debt_payment_2_pay_to",
+      "type": "text",
+      "label": "property_debt_payment_2_pay_to"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T344[0]",
+      "newName": "property_debt_payment_2_for",
+      "type": "text",
+      "label": "property_debt_payment_2_for"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T347[0]",
+      "newName": "property_debt_payment_2_amount",
+      "type": "text",
+      "label": "property_debt_payment_2_amount"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T350[0]",
+      "newName": "property_debt_payment_2_due_date",
+      "type": "text",
+      "label": "property_debt_payment_2_due_date"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T441[0]",
+      "newName": "property_debt_payment_3_pay_to",
+      "type": "text",
+      "label": "property_debt_payment_3_pay_to"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T444[0]",
+      "newName": "property_debt_payment_3_for",
+      "type": "text",
+      "label": "property_debt_payment_3_for"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T447[0]",
+      "newName": "property_debt_payment_3_amount",
+      "type": "text",
+      "label": "property_debt_payment_3_amount"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List21[0].Li1[0].T450[0]",
+      "newName": "property_debt_payment_3_due_date",
+      "type": "text",
+      "label": "property_debt_payment_3_due_date"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List24[0].FieldName_cb[0]",
+      "newName": "has_attached_pages_yes",
+      "type": "checkbox",
+      "label": "has_attached_pages_yes"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List24[0].Li1[0].NumberOfAttachedPages_ft[0]",
+      "newName": "attached_pages_count",
+      "type": "text",
+      "label": "attached_pages_count"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List24[0].Li2[0].FieldName_cb1[0]",
+      "newName": "attachment_form_dv_140",
+      "type": "checkbox",
+      "label": "attachment_form_dv_140"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List24[0].Li2[0].FieldName_cb2[0]",
+      "newName": "attachment_form_dv_145",
+      "type": "checkbox",
+      "label": "attachment_form_dv_145"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List24[0].Li2[0].FieldName_cb3[0]",
+      "newName": "attachment_form_dv_820",
+      "type": "checkbox",
+      "label": "attachment_form_dv_820"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List24[0].Li2[0].AGHagueCert_cb[0]",
+      "newName": "attachment_form_other",
+      "type": "checkbox",
+      "label": "attachment_form_other"
+    },
+    {
+      "id": "DV-110[0].Page6[0].List24[0].Li2[0].TextField2[0]",
+      "newName": "attachment_other_form_name",
+      "type": "text",
+      "label": "attachment_other_form_name"
+    },
+    {
+      "id": "DV-110[0].Page6[0].SignatureSub[0].SigDate[0]",
+      "newName": "judge_signature_date",
+      "type": "text",
+      "label": "judge_signature_date"
+    },
+    {
+      "id": "DV-110[0].Page7[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-110[0].Page8[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-110[0].Page9[0].ClertSub[0].T57[0]",
+      "newName": "DV-110[0].Page9[0].ClertSub[0].T57[0]",
+      "type": "text",
+      "label": "Page9[0].ClertSub[0].T57[0]"
+    },
+    {
+      "id": "DV-110[0].Page9[0].ClertSub[0].T154[0]",
+      "newName": "DV-110[0].Page9[0].ClertSub[0].T154[0]",
+      "type": "text",
+      "label": "Page9[0].ClertSub[0].T154[0]"
+    },
+    {
+      "id": "DV-110[0].Page9[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    }
+  ]
+}

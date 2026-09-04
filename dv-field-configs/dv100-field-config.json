@@ -1,0 +1,1931 @@
+{
+  "formTitle": "DV-100 Request for Domestic Violence Restraining Order",
+  "fields": [
+    {
+      "id": "DV-100[0].Page1[0].rightCaption[0].CourtInfo[0]",
+      "newName": "court_name_and_street_address",
+      "type": "text",
+      "label": "court_name_and_street_address"
+    },
+    {
+      "id": "DV-100[0].Page1[0].rightCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li1[0].YourName_tf[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "person_asking_protection_name"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li2[0].tf[0]",
+      "newName": "person_asking_protection_age",
+      "type": "text",
+      "label": "person_asking_protection_age"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li3[0].address_ft[0]",
+      "newName": "person_asking_protection_mailing_address",
+      "type": "text",
+      "label": "person_asking_protection_mailing_address"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li3[0].T70[0]",
+      "newName": "person_asking_protection_mailing_city",
+      "type": "text",
+      "label": "person_asking_protection_mailing_city"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li3[0].T76[0]",
+      "newName": "person_asking_protection_mailing_state",
+      "type": "text",
+      "label": "person_asking_protection_mailing_state"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li3[0].T77[0]",
+      "newName": "person_asking_protection_mailing_zip_code",
+      "type": "text",
+      "label": "person_asking_protection_mailing_zip_code"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li4[0].T42[0]",
+      "newName": "person_asking_protection_telephone",
+      "type": "text",
+      "label": "person_asking_protection_telephone"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li4[0].T67[0]",
+      "newName": "person_asking_protection_fax",
+      "type": "text",
+      "label": "person_asking_protection_fax"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li4[0].T73[0]",
+      "newName": "person_asking_protection_email",
+      "type": "text",
+      "label": "person_asking_protection_email"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li5[0].ParentRel1[0]",
+      "newName": "person_asking_protection_lawyer_name",
+      "type": "text",
+      "label": "person_asking_protection_lawyer_name"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li5[0].ParentRel2[0]",
+      "newName": "person_asking_protection_lawyer_state_bar_number",
+      "type": "text",
+      "label": "person_asking_protection_lawyer_state_bar_number"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li5[0].ParentRel[0]",
+      "newName": "person_asking_protection_lawyer_firm_name",
+      "type": "text",
+      "label": "person_asking_protection_lawyer_firm_name"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li1[0].TextField[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "person_to_restrain_full_name"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li2[0].T78[0]",
+      "newName": "person_to_restrain_age",
+      "type": "text",
+      "label": "person_to_restrain_age"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li3[0].T78[0]",
+      "newName": "person_to_restrain_date_of_birth",
+      "type": "text",
+      "label": "person_to_restrain_date_of_birth"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li4[0].gender2d_cb[0]",
+      "newName": "person_to_restrain_gender_male",
+      "type": "checkbox",
+      "label": "person_to_restrain_gender_male"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li4[0].gender2d_cb[1]",
+      "newName": "person_to_restrain_gender_female",
+      "type": "checkbox",
+      "label": "person_to_restrain_gender_female"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li4[0].gender2d_cb[2]",
+      "newName": "person_to_restrain_gender_nonbinary",
+      "type": "checkbox",
+      "label": "person_to_restrain_gender_nonbinary"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].li5[0].TextField[0]",
+      "newName": "person_to_restrain_race",
+      "type": "text",
+      "label": "person_to_restrain_race"
+    },
+    {
+      "id": "DV-100[0].Page2[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li1[0].CheckBox2[0]",
+      "newName": "relationship_have_children_together",
+      "type": "checkbox",
+      "label": "relationship_have_children_together"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li1[0].TextField[0]",
+      "newName": "relationship_children_names_line_1",
+      "type": "text",
+      "label": "relationship_children_names_line_1"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li1[0].TextField1[0]",
+      "newName": "relationship_children_names_line_2",
+      "type": "text",
+      "label": "relationship_children_names_line_2"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li2[0].CheckBox2[0]",
+      "newName": "relationship_current_spouses_or_domestic_partners",
+      "type": "checkbox",
+      "label": "relationship_current_spouses_or_domestic_partners"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li3[0].CheckBox2[0]",
+      "newName": "relationship_former_spouses_or_domestic_partners",
+      "type": "checkbox",
+      "label": "relationship_former_spouses_or_domestic_partners"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li4[0].CheckBox2[0]",
+      "newName": "relationship_dating_or_formerly_dated",
+      "type": "checkbox",
+      "label": "relationship_dating_or_formerly_dated"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li5[0].CheckBox2[0]",
+      "newName": "relationship_engaged_or_formerly_engaged",
+      "type": "checkbox",
+      "label": "relationship_engaged_or_formerly_engaged"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox1[0]",
+      "newName": "relationship_related",
+      "type": "checkbox",
+      "label": "relationship_related"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox2[0]",
+      "newName": "relationship_relative_parent_stepparent_parent_in_law",
+      "type": "checkbox",
+      "label": "relationship_relative_parent_stepparent_parent_in_law"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox3[0]",
+      "newName": "relationship_relative_sibling_stepsibling_sibling_in_law",
+      "type": "checkbox",
+      "label": "relationship_relative_sibling_stepsibling_sibling_in_law"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox4[0]",
+      "newName": "relationship_relative_child_stepchild_adopted_child",
+      "type": "checkbox",
+      "label": "relationship_relative_child_stepchild_adopted_child"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox5[0]",
+      "newName": "relationship_relative_grandparent",
+      "type": "checkbox",
+      "label": "relationship_relative_grandparent"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox6[0]",
+      "newName": "relationship_relative_child_spouse",
+      "type": "checkbox",
+      "label": "relationship_relative_child_spouse"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox7[0]",
+      "newName": "relationship_relative_grandchild",
+      "type": "checkbox",
+      "label": "relationship_relative_grandchild"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li7[0].CheckBox2[0]",
+      "newName": "relationship_live_or_lived_together",
+      "type": "checkbox",
+      "label": "relationship_live_or_lived_together"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li7[0].YesNo3g_cb[0]",
+      "newName": "relationship_lived_together_as_family_yes",
+      "type": "checkbox",
+      "label": "relationship_lived_together_as_family_yes"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li7[0].YesNo3g_cb[1]",
+      "newName": "relationship_lived_together_as_family_no",
+      "type": "checkbox",
+      "label": "relationship_lived_together_as_family_no"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].YesNo4a_cb[0]",
+      "newName": "recent_restraining_orders_no",
+      "type": "checkbox",
+      "label": "recent_restraining_orders_no"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].YesNo4a_cb[1]",
+      "newName": "recent_restraining_orders_yes",
+      "type": "checkbox",
+      "label": "recent_restraining_orders_yes"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li1[0].DateField8[0]",
+      "newName": "recent_restraining_order_1_date",
+      "type": "text",
+      "label": "recent_restraining_order_1_date"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li1[0].DateField5[0]",
+      "newName": "recent_restraining_order_1_expiration_date",
+      "type": "text",
+      "label": "recent_restraining_order_1_expiration_date"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li2[0].DateField9[0]",
+      "newName": "recent_restraining_order_2_date",
+      "type": "text",
+      "label": "recent_restraining_order_2_date"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li2[0].DateField7[0]",
+      "newName": "recent_restraining_order_2_expiration_date",
+      "type": "text",
+      "label": "recent_restraining_order_2_expiration_date"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].YesNo4b_cb[0]",
+      "newName": "other_court_case_involvement_no",
+      "type": "checkbox",
+      "label": "other_court_case_involvement_no"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].YesNo4b_cb[1]",
+      "newName": "other_court_case_involvement_yes",
+      "type": "checkbox",
+      "label": "other_court_case_involvement_yes"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox1[0]",
+      "newName": "other_court_case_custody_selected",
+      "type": "checkbox",
+      "label": "other_court_case_custody_selected"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField1[0]",
+      "newName": "other_court_case_custody_details",
+      "type": "text",
+      "label": "other_court_case_custody_details"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox2[0]",
+      "newName": "other_court_case_divorce_selected",
+      "type": "checkbox",
+      "label": "other_court_case_divorce_selected"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField2[0]",
+      "newName": "other_court_case_divorce_details",
+      "type": "text",
+      "label": "other_court_case_divorce_details"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox3[0]",
+      "newName": "other_court_case_juvenile_selected",
+      "type": "checkbox",
+      "label": "other_court_case_juvenile_selected"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField3[0]",
+      "newName": "other_court_case_juvenile_details",
+      "type": "text",
+      "label": "other_court_case_juvenile_details"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox4[0]",
+      "newName": "other_court_case_guardianship_selected",
+      "type": "checkbox",
+      "label": "other_court_case_guardianship_selected"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField4[0]",
+      "newName": "other_court_case_guardianship_details",
+      "type": "text",
+      "label": "other_court_case_guardianship_details"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox5[0]",
+      "newName": "other_court_case_criminal_selected",
+      "type": "checkbox",
+      "label": "other_court_case_criminal_selected"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox6[0]",
+      "newName": "other_court_case_other_selected",
+      "type": "checkbox",
+      "label": "other_court_case_other_selected"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField5[0]",
+      "newName": "other_court_case_criminal_details",
+      "type": "text",
+      "label": "other_court_case_criminal_details"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField6[0]",
+      "newName": "other_court_case_other_details",
+      "type": "text",
+      "label": "other_court_case_other_details"
+    },
+    {
+      "id": "DV-100[0].Page3[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li1[0].dtAbs[0]",
+      "newName": "most_recent_abuse_date",
+      "type": "text",
+      "label": "most_recent_abuse_date"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li2[0].YesNo5b_cb[0]",
+      "newName": "most_recent_abuse_witnesses_unknown",
+      "type": "checkbox",
+      "label": "most_recent_abuse_witnesses_unknown"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li2[0].YesNo5b_cb[1]",
+      "newName": "most_recent_abuse_witnesses_no",
+      "type": "checkbox",
+      "label": "most_recent_abuse_witnesses_no"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li2[0].YesNo5b_cb[2]",
+      "newName": "most_recent_abuse_witnesses_yes",
+      "type": "checkbox",
+      "label": "most_recent_abuse_witnesses_yes"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li2[0].item5a2[0]",
+      "newName": "most_recent_abuse_witness_names",
+      "type": "text",
+      "label": "most_recent_abuse_witness_names"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li3[0].YesNo5c_cb[0]",
+      "newName": "most_recent_abuse_weapon_no",
+      "type": "checkbox",
+      "label": "most_recent_abuse_weapon_no"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li3[0].YesNo5c_cb[1]",
+      "newName": "most_recent_abuse_weapon_yes",
+      "type": "checkbox",
+      "label": "most_recent_abuse_weapon_yes"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li3[0].item5a3[0]",
+      "newName": "most_recent_abuse_weapon_description",
+      "type": "text",
+      "label": "most_recent_abuse_weapon_description"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li4[0].YesNo5d_cb[0]",
+      "newName": "most_recent_abuse_harm_no",
+      "type": "checkbox",
+      "label": "most_recent_abuse_harm_no"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li4[0].YesNo5d_cb[1]",
+      "newName": "most_recent_abuse_harm_yes",
+      "type": "checkbox",
+      "label": "most_recent_abuse_harm_yes"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li4[0].item26d_tf[0]",
+      "newName": "most_recent_abuse_harm_description",
+      "type": "text",
+      "label": "most_recent_abuse_harm_description"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li5[0].YesNo5e_cb[0]",
+      "newName": "most_recent_abuse_police_unknown",
+      "type": "checkbox",
+      "label": "most_recent_abuse_police_unknown"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li5[0].YesNo5e_cb[1]",
+      "newName": "most_recent_abuse_police_no",
+      "type": "checkbox",
+      "label": "most_recent_abuse_police_no"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li5[0].YesNo5e_cb[2]",
+      "newName": "most_recent_abuse_police_yes",
+      "type": "checkbox",
+      "label": "most_recent_abuse_police_yes"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li6[0].TextField[0]",
+      "newName": "most_recent_abuse_details",
+      "type": "text",
+      "label": "most_recent_abuse_details"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[0]",
+      "newName": "most_recent_abuse_frequency_once",
+      "type": "checkbox",
+      "label": "most_recent_abuse_frequency_once"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[1]",
+      "newName": "most_recent_abuse_frequency_two_to_five",
+      "type": "checkbox",
+      "label": "most_recent_abuse_frequency_two_to_five"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[2]",
+      "newName": "most_recent_abuse_frequency_weekly",
+      "type": "checkbox",
+      "label": "most_recent_abuse_frequency_weekly"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[3]",
+      "newName": "most_recent_abuse_frequency_other",
+      "type": "checkbox",
+      "label": "most_recent_abuse_frequency_other"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].TextField7[0]",
+      "newName": "most_recent_abuse_other_dates",
+      "type": "text",
+      "label": "most_recent_abuse_other_dates"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].TextField[0]",
+      "newName": "most_recent_abuse_frequency_other_description",
+      "type": "text",
+      "label": "most_recent_abuse_frequency_other_description"
+    },
+    {
+      "id": "DV-100[0].Page4[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li1[0].dtabs[0]",
+      "newName": "different_abuse_incident_date",
+      "type": "text",
+      "label": "different_abuse_incident_date"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].li2[0].YesNo6b_cb[0]",
+      "newName": "different_abuse_incident_witnesses_unknown",
+      "type": "checkbox",
+      "label": "different_abuse_incident_witnesses_unknown"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].li2[0].YesNo6b_cb[1]",
+      "newName": "different_abuse_incident_witnesses_no",
+      "type": "checkbox",
+      "label": "different_abuse_incident_witnesses_no"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].li2[0].YesNo6b_cb[2]",
+      "newName": "different_abuse_incident_witnesses_yes",
+      "type": "checkbox",
+      "label": "different_abuse_incident_witnesses_yes"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].li2[0].item5b2[0]",
+      "newName": "different_abuse_incident_witness_names",
+      "type": "text",
+      "label": "different_abuse_incident_witness_names"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li3[0].YesNo6c_cb[0]",
+      "newName": "different_abuse_incident_weapon_no",
+      "type": "checkbox",
+      "label": "different_abuse_incident_weapon_no"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li3[0].YesNo6c_cb[1]",
+      "newName": "different_abuse_incident_weapon_yes",
+      "type": "checkbox",
+      "label": "different_abuse_incident_weapon_yes"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li3[0].item5b3[0]",
+      "newName": "different_abuse_incident_weapon_description",
+      "type": "text",
+      "label": "different_abuse_incident_weapon_description"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li4[0].YesNo6d_cb[0]",
+      "newName": "different_abuse_incident_harm_no",
+      "type": "checkbox",
+      "label": "different_abuse_incident_harm_no"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li4[0].YesNo6d_cb[1]",
+      "newName": "different_abuse_incident_harm_yes",
+      "type": "checkbox",
+      "label": "different_abuse_incident_harm_yes"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li4[0].item26d_tf[0]",
+      "newName": "different_abuse_incident_harm_description",
+      "type": "text",
+      "label": "different_abuse_incident_harm_description"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li5[0].YesNo6e_cb[0]",
+      "newName": "different_abuse_incident_police_unknown",
+      "type": "checkbox",
+      "label": "different_abuse_incident_police_unknown"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li5[0].YesNo6e_cb[1]",
+      "newName": "different_abuse_incident_police_no",
+      "type": "checkbox",
+      "label": "different_abuse_incident_police_no"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li5[0].YesNo6e_cb[2]",
+      "newName": "different_abuse_incident_police_yes",
+      "type": "checkbox",
+      "label": "different_abuse_incident_police_yes"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li6[0].TextField[0]",
+      "newName": "different_abuse_incident_details",
+      "type": "text",
+      "label": "different_abuse_incident_details"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].item26d_tf[0]",
+      "newName": "different_abuse_incident_other_dates",
+      "type": "text",
+      "label": "different_abuse_incident_other_dates"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[0]",
+      "newName": "different_abuse_incident_frequency_once_yes",
+      "type": "checkbox",
+      "label": "different_abuse_incident_frequency_once_yes"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[1]",
+      "newName": "different_abuse_incident_frequency_two_to_five_yes",
+      "type": "checkbox",
+      "label": "different_abuse_incident_frequency_two_to_five_yes"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[2]",
+      "newName": "different_abuse_incident_frequency_weekly_yes",
+      "type": "checkbox",
+      "label": "different_abuse_incident_frequency_weekly_yes"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[3]",
+      "newName": "different_abuse_incident_frequency_other_yes",
+      "type": "checkbox",
+      "label": "different_abuse_incident_frequency_other_yes"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].TextField[0]",
+      "newName": "different_abuse_incident_frequency_other_description",
+      "type": "text",
+      "label": "different_abuse_incident_frequency_other_description"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li1[0].dtabs[0]",
+      "newName": "other_abuse_incident_date",
+      "type": "text",
+      "label": "other_abuse_incident_date"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li2[0].YesNo7b_cb[0]",
+      "newName": "other_abuse_incident_witnesses_unknown",
+      "type": "checkbox",
+      "label": "other_abuse_incident_witnesses_unknown"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li2[0].YesNo7b_cb[1]",
+      "newName": "other_abuse_incident_witnesses_no",
+      "type": "checkbox",
+      "label": "other_abuse_incident_witnesses_no"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li2[0].YesNo7b_cb[2]",
+      "newName": "other_abuse_incident_witnesses_yes",
+      "type": "checkbox",
+      "label": "other_abuse_incident_witnesses_yes"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li2[0].item5b2[0]",
+      "newName": "other_abuse_incident_witness_names",
+      "type": "text",
+      "label": "other_abuse_incident_witness_names"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li3[0].YesNo7c_cb[0]",
+      "newName": "other_abuse_incident_weapon_no",
+      "type": "checkbox",
+      "label": "other_abuse_incident_weapon_no"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li3[0].YesNo7c_cb[1]",
+      "newName": "other_abuse_incident_weapon_yes",
+      "type": "checkbox",
+      "label": "other_abuse_incident_weapon_yes"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li3[0].item5b3[0]",
+      "newName": "other_abuse_incident_weapon_description",
+      "type": "text",
+      "label": "other_abuse_incident_weapon_description"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li4[0].YesNo7d_cb[0]",
+      "newName": "other_abuse_incident_harm_no",
+      "type": "checkbox",
+      "label": "other_abuse_incident_harm_no"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li4[0].YesNo7d_cb[1]",
+      "newName": "other_abuse_incident_harm_yes",
+      "type": "checkbox",
+      "label": "other_abuse_incident_harm_yes"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li4[0].item26d_tf[0]",
+      "newName": "other_abuse_incident_harm_description",
+      "type": "text",
+      "label": "other_abuse_incident_harm_description"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li5[0].YesNo7e_cb[0]",
+      "newName": "other_abuse_incident_police_unknown",
+      "type": "checkbox",
+      "label": "other_abuse_incident_police_unknown"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li5[0].YesNo7e_cb[1]",
+      "newName": "other_abuse_incident_police_no",
+      "type": "checkbox",
+      "label": "other_abuse_incident_police_no"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li5[0].YesNo7e_cb[2]",
+      "newName": "other_abuse_incident_police_yes",
+      "type": "checkbox",
+      "label": "other_abuse_incident_police_yes"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li6[0].TextField[0]",
+      "newName": "other_abuse_incident_details",
+      "type": "text",
+      "label": "other_abuse_incident_details"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[0]",
+      "newName": "other_abuse_incident_frequency_once",
+      "type": "checkbox",
+      "label": "other_abuse_incident_frequency_once"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[1]",
+      "newName": "other_abuse_incident_frequency_two_to_five",
+      "type": "checkbox",
+      "label": "other_abuse_incident_frequency_two_to_five"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[2]",
+      "newName": "other_abuse_incident_frequency_weekly",
+      "type": "checkbox",
+      "label": "other_abuse_incident_frequency_weekly"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[3]",
+      "newName": "other_abuse_incident_frequency_other",
+      "type": "checkbox",
+      "label": "other_abuse_incident_frequency_other"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].TextField[0]",
+      "newName": "other_abuse_incident_frequency_other_description",
+      "type": "text",
+      "label": "other_abuse_incident_frequency_other_description"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].item26d_tf[0]",
+      "newName": "other_abuse_incident_other_dates",
+      "type": "text",
+      "label": "other_abuse_incident_other_dates"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].MultilineCheckBox[0]",
+      "newName": "other_abuse_incident_additional_space_attached_yes",
+      "type": "checkbox",
+      "label": "other_abuse_incident_additional_space_attached_yes"
+    },
+    {
+      "id": "DV-100[0].Page5[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page6[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li1[0].YesNo8a1_cb[0]",
+      "newName": "other_protected_people_no_yes",
+      "type": "checkbox",
+      "label": "other_protected_people_no_yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].YesNo8a2_cb[0]",
+      "newName": "other_protected_people_yes_yes",
+      "type": "checkbox",
+      "label": "other_protected_people_yes_yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname1_tf[0]",
+      "newName": "other_protected_person_1_full_name",
+      "type": "text",
+      "label": "other_protected_person_1_full_name"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age1_tf[0]",
+      "newName": "other_protected_person_1_age",
+      "type": "text",
+      "label": "other_protected_person_1_age"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation1_tf[0]",
+      "newName": "other_protected_person_1_relationship",
+      "type": "text",
+      "label": "other_protected_person_1_relationship"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b11_cb[0]",
+      "newName": "other_protected_person_1_lives_with_you_yes",
+      "type": "checkbox",
+      "label": "other_protected_person_1_lives_with_you_yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b11_cb[1]",
+      "newName": "other_protected_person_1_lives_with_you_no",
+      "type": "checkbox",
+      "label": "other_protected_person_1_lives_with_you_no"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname2_tf[0]",
+      "newName": "other_protected_person_2_full_name",
+      "type": "text",
+      "label": "other_protected_person_2_full_name"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age2_tf[0]",
+      "newName": "other_protected_person_2_age",
+      "type": "text",
+      "label": "other_protected_person_2_age"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation2_tf[0]",
+      "newName": "other_protected_person_2_relationship",
+      "type": "text",
+      "label": "other_protected_person_2_relationship"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b12_cb[0]",
+      "newName": "other_protected_person_2_lives_with_you_yes",
+      "type": "checkbox",
+      "label": "other_protected_person_2_lives_with_you_yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b12_cb[1]",
+      "newName": "other_protected_person_2_lives_with_you_no",
+      "type": "checkbox",
+      "label": "other_protected_person_2_lives_with_you_no"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname3_tf[0]",
+      "newName": "other_protected_person_3_full_name",
+      "type": "text",
+      "label": "other_protected_person_3_full_name"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age_tf[0]",
+      "newName": "other_protected_person_3_age",
+      "type": "text",
+      "label": "other_protected_person_3_age"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation3_tf[0]",
+      "newName": "other_protected_person_3_relationship",
+      "type": "text",
+      "label": "other_protected_person_3_relationship"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b13_cb[0]",
+      "newName": "other_protected_person_3_lives_with_you_yes",
+      "type": "checkbox",
+      "label": "other_protected_person_3_lives_with_you_yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b13_cb[1]",
+      "newName": "other_protected_person_3_lives_with_you_no",
+      "type": "checkbox",
+      "label": "other_protected_person_3_lives_with_you_no"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname4_tf[0]",
+      "newName": "other_protected_person_4_full_name",
+      "type": "text",
+      "label": "other_protected_person_4_full_name"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age4_tf[0]",
+      "newName": "other_protected_person_4_age",
+      "type": "text",
+      "label": "other_protected_person_4_age"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation4_tf[0]",
+      "newName": "other_protected_person_4_relationship",
+      "type": "text",
+      "label": "other_protected_person_4_relationship"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b14_cb[0]",
+      "newName": "other_protected_person_4_lives_with_you_yes",
+      "type": "checkbox",
+      "label": "other_protected_person_4_lives_with_you_yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b14_cb[1]",
+      "newName": "other_protected_person_4_lives_with_you_no",
+      "type": "checkbox",
+      "label": "other_protected_person_4_lives_with_you_no"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].MultilineCheckBox[0]",
+      "newName": "other_protected_people_additional_list_attached_yes",
+      "type": "checkbox",
+      "label": "other_protected_people_additional_list_attached_yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li2[0].TextField[0]",
+      "newName": "other_protected_people_reason_for_protection",
+      "type": "text",
+      "label": "other_protected_people_reason_for_protection"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].Li1[0].YesNo9abc_cb[0]",
+      "newName": "person_to_restrain_firearms_unknown_yes",
+      "type": "checkbox",
+      "label": "person_to_restrain_firearms_unknown_yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].LI2[0].YesNo9abc_cb[0]",
+      "newName": "person_to_restrain_firearms_no_yes",
+      "type": "checkbox",
+      "label": "person_to_restrain_firearms_no_yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].YesNo9abc_cb[0]",
+      "newName": "person_to_restrain_firearms_yes_yes",
+      "type": "checkbox",
+      "label": "person_to_restrain_firearms_yes_yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li1[0].TextField1[0]",
+      "newName": "firearm_item_1_description",
+      "type": "text",
+      "label": "firearm_item_1_description"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li1[0].TextField2[0]",
+      "newName": "firearm_item_1_number_or_amount",
+      "type": "text",
+      "label": "firearm_item_1_number_or_amount"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li1[0].TextField3[0]",
+      "newName": "firearm_item_1_location",
+      "type": "text",
+      "label": "firearm_item_1_location"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li2[0].TextField1[0]",
+      "newName": "firearm_item_2_description",
+      "type": "text",
+      "label": "firearm_item_2_description"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li2[0].TextField2[0]",
+      "newName": "firearm_item_2_number_or_amount",
+      "type": "text",
+      "label": "firearm_item_2_number_or_amount"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li2[0].TextField3[0]",
+      "newName": "firearm_item_2_location",
+      "type": "text",
+      "label": "firearm_item_2_location"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li3[0].TextField1[0]",
+      "newName": "firearm_item_3_description",
+      "type": "text",
+      "label": "firearm_item_3_description"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li3[0].TextField2[0]",
+      "newName": "firearm_item_3_number_or_amount",
+      "type": "text",
+      "label": "firearm_item_3_number_or_amount"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li3[0].TextField3[0]",
+      "newName": "firearm_item_3_location",
+      "type": "text",
+      "label": "firearm_item_3_location"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li4[0].TextField1[0]",
+      "newName": "firearm_item_4_description",
+      "type": "text",
+      "label": "firearm_item_4_description"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li4[0].TextField2[0]",
+      "newName": "firearm_item_4_number_or_amount",
+      "type": "text",
+      "label": "firearm_item_4_number_or_amount"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li4[0].TextField3[0]",
+      "newName": "firearm_item_4_location",
+      "type": "text",
+      "label": "firearm_item_4_location"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li5[0].TextField1[0]",
+      "newName": "firearm_item_5_description",
+      "type": "text",
+      "label": "firearm_item_5_description"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li5[0].TextField2[0]",
+      "newName": "firearm_item_5_number_or_amount",
+      "type": "text",
+      "label": "firearm_item_5_number_or_amount"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li5[0].TextField3[0]",
+      "newName": "firearm_item_5_location",
+      "type": "text",
+      "label": "firearm_item_5_location"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li6[0].TextField1[0]",
+      "newName": "firearm_item_6_description",
+      "type": "text",
+      "label": "firearm_item_6_description"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li6[0].TextField2[0]",
+      "newName": "firearm_item_6_number_or_amount",
+      "type": "text",
+      "label": "firearm_item_6_number_or_amount"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li6[0].TextField3[0]",
+      "newName": "firearm_item_6_location",
+      "type": "text",
+      "label": "firearm_item_6_location"
+    },
+    {
+      "id": "DV-100[0].Page7[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List10[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "order_not_to_abuse_requested",
+      "type": "checkbox",
+      "label": "order_not_to_abuse_requested"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List11[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "no_contact_order_requested",
+      "type": "checkbox",
+      "label": "no_contact_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox1[0]",
+      "newName": "stay_away_from_me",
+      "type": "checkbox",
+      "label": "stay_away_from_me"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox2[0]",
+      "newName": "stay_away_from_my_school",
+      "type": "checkbox",
+      "label": "stay_away_from_my_school"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox3[0]",
+      "newName": "stay_away_from_my_home",
+      "type": "checkbox",
+      "label": "stay_away_from_my_home"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox4[0]",
+      "newName": "stay_away_from_other_protected_people",
+      "type": "checkbox",
+      "label": "stay_away_from_other_protected_people"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox5[0]",
+      "newName": "stay_away_from_my_workplace",
+      "type": "checkbox",
+      "label": "stay_away_from_my_workplace"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox6[0]",
+      "newName": "stay_away_from_childrens_school_or_childcare",
+      "type": "checkbox",
+      "label": "stay_away_from_childrens_school_or_childcare"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox7[0]",
+      "newName": "stay_away_from_my_vehicle",
+      "type": "checkbox",
+      "label": "stay_away_from_my_vehicle"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox8[0]",
+      "newName": "stay_away_from_other_place",
+      "type": "checkbox",
+      "label": "stay_away_from_other_place"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].TextField[0]",
+      "newName": "stay_away_other_place_description",
+      "type": "text",
+      "label": "stay_away_other_place_description"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].CheckBoxRightCaption[0]",
+      "newName": "stay_away_order_requested",
+      "type": "checkbox",
+      "label": "stay_away_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li2[0].CheckBox12b1[0]",
+      "newName": "stay_away_distance_100_yards",
+      "type": "checkbox",
+      "label": "stay_away_distance_100_yards"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li2[0].CheckBox12b2[0]",
+      "newName": "stay_away_distance_other",
+      "type": "checkbox",
+      "label": "stay_away_distance_other"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li2[0].FillText8Yards[0]",
+      "newName": "stay_away_distance_other_yards",
+      "type": "text",
+      "label": "stay_away_distance_other_yards"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesNo12c_cb[0]",
+      "newName": "live_together_or_close_no_yes",
+      "type": "checkbox",
+      "label": "live_together_or_close_no_yes"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesNo12c_cb[0]",
+      "newName": "live_together_or_close_yes_yes",
+      "type": "checkbox",
+      "label": "live_together_or_close_yes_yes"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[0]",
+      "newName": "living_arrangement_live_together",
+      "type": "checkbox",
+      "label": "living_arrangement_live_together"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[1]",
+      "newName": "living_arrangement_same_building",
+      "type": "checkbox",
+      "label": "living_arrangement_same_building"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[2]",
+      "newName": "living_arrangement_same_neighborhood",
+      "type": "checkbox",
+      "label": "living_arrangement_same_neighborhood"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[3]",
+      "newName": "living_arrangement_other",
+      "type": "checkbox",
+      "label": "living_arrangement_other"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].TextField[0]",
+      "newName": "living_arrangement_other_description",
+      "type": "text",
+      "label": "living_arrangement_other_description"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].YesNo12d_cb[0]",
+      "newName": "same_workplace_or_school_no",
+      "type": "checkbox",
+      "label": "same_workplace_or_school_no"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].YesNo12d_cb[1]",
+      "newName": "same_workplace_or_school_yes",
+      "type": "checkbox",
+      "label": "same_workplace_or_school_yes"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].CheckBox1[0]",
+      "newName": "same_workplace_selected",
+      "type": "checkbox",
+      "label": "same_workplace_selected"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].TextField1[0]",
+      "newName": "same_workplace_company_name",
+      "type": "text",
+      "label": "same_workplace_company_name"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].CheckBox2[0]",
+      "newName": "same_school_selected",
+      "type": "checkbox",
+      "label": "same_school_selected"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].TextField2[0]",
+      "newName": "same_school_name",
+      "type": "text",
+      "label": "same_school_name"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].CheckBox3[0]",
+      "newName": "same_workplace_or_school_other",
+      "type": "checkbox",
+      "label": "same_workplace_or_school_other"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].TextField4[0]",
+      "newName": "same_workplace_or_school_other_description",
+      "type": "text",
+      "label": "same_workplace_or_school_other_description"
+    },
+    {
+      "id": "DV-100[0].Page8[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].CheckBoxRightCaption[0]",
+      "newName": "move_out_order_requested",
+      "type": "checkbox",
+      "label": "move_out_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li1[0].TextField[0]",
+      "newName": "move_out_home_address",
+      "type": "text",
+      "label": "move_out_home_address"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox1[0]",
+      "newName": "move_out_right_to_live_owner",
+      "type": "checkbox",
+      "label": "move_out_right_to_live_owner"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox2[0]",
+      "newName": "move_out_right_to_live_length_of_residence",
+      "type": "checkbox",
+      "label": "move_out_right_to_live_length_of_residence"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].FillText9years[0]",
+      "newName": "move_out_years_at_address",
+      "type": "text",
+      "label": "move_out_years_at_address"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].FillText9months[0]",
+      "newName": "move_out_months_at_address",
+      "type": "text",
+      "label": "move_out_months_at_address"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox3[0]",
+      "newName": "move_out_right_to_live_on_lease",
+      "type": "checkbox",
+      "label": "move_out_right_to_live_on_lease"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox4[0]",
+      "newName": "move_out_right_to_live_pay_rent_or_mortgage",
+      "type": "checkbox",
+      "label": "move_out_right_to_live_pay_rent_or_mortgage"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox5[0]",
+      "newName": "move_out_right_to_live_with_children",
+      "type": "checkbox",
+      "label": "move_out_right_to_live_with_children"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox6[0]",
+      "newName": "move_out_right_to_live_other",
+      "type": "checkbox",
+      "label": "move_out_right_to_live_other"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].TextField1[0]",
+      "newName": "move_out_right_to_live_other_explanation_line_1",
+      "type": "text",
+      "label": "move_out_right_to_live_other_explanation_line_1"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].TextField2[0]",
+      "newName": "move_out_right_to_live_other_explanation_line_2",
+      "type": "text",
+      "label": "move_out_right_to_live_other_explanation_line_2"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List14[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "other_orders_requested",
+      "type": "checkbox",
+      "label": "other_orders_requested"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List14[0].Li1[0].item26d_tf[0]",
+      "newName": "other_orders_description",
+      "type": "text",
+      "label": "other_orders_description"
+    },
+    {
+      "id": "DV-100[0].Page8[0].LIST15[0].CtyChildFreed_cb[0]",
+      "newName": "child_custody_and_visitation_order_requested",
+      "type": "checkbox",
+      "label": "child_custody_and_visitation_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page9[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField1[0]",
+      "newName": "protected_animal_1_name_or_id",
+      "type": "text",
+      "label": "protected_animal_1_name_or_id"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField2[0]",
+      "newName": "protected_animal_1_type",
+      "type": "text",
+      "label": "protected_animal_1_type"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField3[0]",
+      "newName": "protected_animal_1_breed",
+      "type": "text",
+      "label": "protected_animal_1_breed"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField4[0]",
+      "newName": "protected_animal_1_color",
+      "type": "text",
+      "label": "protected_animal_1_color"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField[0]",
+      "newName": "protected_animal_2_name_or_id",
+      "type": "text",
+      "label": "protected_animal_2_name_or_id"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField1[0]",
+      "newName": "protected_animal_2_type",
+      "type": "text",
+      "label": "protected_animal_2_type"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField2[0]",
+      "newName": "protected_animal_2_breed",
+      "type": "text",
+      "label": "protected_animal_2_breed"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField3[0]",
+      "newName": "protected_animal_2_color",
+      "type": "text",
+      "label": "protected_animal_2_color"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField[0]",
+      "newName": "protected_animal_3_name_or_id",
+      "type": "text",
+      "label": "protected_animal_3_name_or_id"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField1[0]",
+      "newName": "protected_animal_3_type",
+      "type": "text",
+      "label": "protected_animal_3_type"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField2[0]",
+      "newName": "protected_animal_3_breed",
+      "type": "text",
+      "label": "protected_animal_3_breed"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField3[0]",
+      "newName": "protected_animal_3_color",
+      "type": "text",
+      "label": "protected_animal_3_color"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField[0]",
+      "newName": "protected_animal_4_name_or_id",
+      "type": "text",
+      "label": "protected_animal_4_name_or_id"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField1[0]",
+      "newName": "protected_animal_4_type",
+      "type": "text",
+      "label": "protected_animal_4_type"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField2[0]",
+      "newName": "protected_animal_4_breed",
+      "type": "text",
+      "label": "protected_animal_4_breed"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField3[0]",
+      "newName": "protected_animal_4_color",
+      "type": "text",
+      "label": "protected_animal_4_color"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "animal_order_stay_away_requested_yes",
+      "type": "checkbox",
+      "label": "animal_order_stay_away_requested_yes"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].YesNo16b1_cb[0]",
+      "newName": "animal_stay_away_distance_100_yards",
+      "type": "checkbox",
+      "label": "animal_stay_away_distance_100_yards"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].YesNo16b1_cb[1]",
+      "newName": "animal_stay_away_distance_other",
+      "type": "checkbox",
+      "label": "animal_stay_away_distance_other"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].TextField[0]",
+      "newName": "animal_stay_away_distance_other_yards",
+      "type": "text",
+      "label": "animal_stay_away_distance_other_yards"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li2[0].MultilineCheckBox[0]",
+      "newName": "animal_order_no_harm_or_transfer_yes",
+      "type": "checkbox",
+      "label": "animal_order_no_harm_or_transfer_yes"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption1[0]",
+      "newName": "animal_order_sole_possession_requested_yes",
+      "type": "checkbox",
+      "label": "animal_order_sole_possession_requested_yes"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption2[0]",
+      "newName": "animal_sole_possession_reason_person_abuses_animals",
+      "type": "checkbox",
+      "label": "animal_sole_possession_reason_person_abuses_animals"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption3[0]",
+      "newName": "animal_sole_possession_reason_i_care_for_animals",
+      "type": "checkbox",
+      "label": "animal_sole_possession_reason_i_care_for_animals"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption4[0]",
+      "newName": "animal_sole_possession_reason_i_purchased_animals",
+      "type": "checkbox",
+      "label": "animal_sole_possession_reason_i_purchased_animals"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption5[0]",
+      "newName": "animal_sole_possession_reason_other",
+      "type": "checkbox",
+      "label": "animal_sole_possession_reason_other"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].TextField1[0]",
+      "newName": "animal_sole_possession_other_reason_line_1",
+      "type": "text",
+      "label": "animal_sole_possession_other_reason_line_1"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].TextField2[0]",
+      "newName": "animal_sole_possession_other_reason_line_2",
+      "type": "text",
+      "label": "animal_sole_possession_other_reason_line_2"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].CheckBoxRightCaption[0]",
+      "newName": "protect_animals_order_requested",
+      "type": "checkbox",
+      "label": "protect_animals_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List17[0].CtyChildFreed_cb[0]",
+      "newName": "control_of_property_order_requested",
+      "type": "checkbox",
+      "label": "control_of_property_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List17[0].Li1[0].item26d_tf[0]",
+      "newName": "control_of_property_description",
+      "type": "text",
+      "label": "control_of_property_description"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List17[0].Li2[0].item26d_tf[0]",
+      "newName": "control_of_property_reason",
+      "type": "text",
+      "label": "control_of_property_reason"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List18[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "health_and_other_insurance_order_requested",
+      "type": "checkbox",
+      "label": "health_and_other_insurance_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List19[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "record_communications_order_requested",
+      "type": "checkbox",
+      "label": "record_communications_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page10[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List21[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "extend_service_deadline_requested",
+      "type": "checkbox",
+      "label": "extend_service_deadline_requested"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List21[0].Li1[0].item26d_tf[0]",
+      "newName": "extend_service_deadline_reason",
+      "type": "text",
+      "label": "extend_service_deadline_reason"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List20[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "property_restraint_order_requested",
+      "type": "checkbox",
+      "label": "property_restraint_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].CheckBoxRightCaption[0]",
+      "newName": "pay_property_debts_order_requested",
+      "type": "checkbox",
+      "label": "pay_property_debts_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].TextField[0]",
+      "newName": "property_debt_1_pay_to",
+      "type": "text",
+      "label": "property_debt_1_pay_to"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].TextField2[0]",
+      "newName": "property_debt_1_for",
+      "type": "text",
+      "label": "property_debt_1_for"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].TextField3[0]",
+      "newName": "property_debt_1_amount",
+      "type": "text",
+      "label": "property_debt_1_amount"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].DateField1[0]",
+      "newName": "property_debt_1_due_date",
+      "type": "text",
+      "label": "property_debt_1_due_date"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].TextField[0]",
+      "newName": "property_debt_2_pay_to",
+      "type": "text",
+      "label": "property_debt_2_pay_to"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].TextField1[0]",
+      "newName": "property_debt_2_for",
+      "type": "text",
+      "label": "property_debt_2_for"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].TextField3[0]",
+      "newName": "property_debt_2_amount",
+      "type": "text",
+      "label": "property_debt_2_amount"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].DateField2[0]",
+      "newName": "property_debt_2_due_date",
+      "type": "text",
+      "label": "property_debt_2_due_date"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].TextField[0]",
+      "newName": "property_debt_3_pay_to",
+      "type": "text",
+      "label": "property_debt_3_pay_to"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].TextField1[0]",
+      "newName": "property_debt_3_for",
+      "type": "text",
+      "label": "property_debt_3_for"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].TextField3[0]",
+      "newName": "property_debt_3_amount",
+      "type": "text",
+      "label": "property_debt_3_amount"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].DateField3[0]",
+      "newName": "property_debt_3_due_date",
+      "type": "text",
+      "label": "property_debt_3_due_date"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].item26d_tf[0]",
+      "newName": "property_debts_payment_reason",
+      "type": "text",
+      "label": "property_debts_payment_reason"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption1[0]",
+      "newName": "property_debt_special_finding_debt_1",
+      "type": "checkbox",
+      "label": "property_debt_special_finding_debt_1"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption2[0]",
+      "newName": "property_debt_special_finding_debt_2",
+      "type": "checkbox",
+      "label": "property_debt_special_finding_debt_2"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption3[0]",
+      "newName": "property_debt_special_finding_debt_3",
+      "type": "checkbox",
+      "label": "property_debt_special_finding_debt_3"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li2[0].YesNo22b2_cb[0]",
+      "newName": "property_debt_how_made_known_no",
+      "type": "checkbox",
+      "label": "property_debt_how_made_known_no"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li2[0].YesNo22b2_cb[1]",
+      "newName": "property_debt_how_made_known_yes",
+      "type": "checkbox",
+      "label": "property_debt_how_made_known_yes"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li2[0].item26d_tf[0]",
+      "newName": "property_debt_how_made_explanation",
+      "type": "text",
+      "label": "property_debt_how_made_explanation"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].checkbox22b[0]",
+      "newName": "property_debt_special_finding_no",
+      "type": "checkbox",
+      "label": "property_debt_special_finding_no"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].checkbox22b[1]",
+      "newName": "property_debt_special_finding_yes",
+      "type": "checkbox",
+      "label": "property_debt_special_finding_yes"
+    },
+    {
+      "id": "DV-100[0].Page11[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "pay_expenses_caused_by_abuse_order_requested",
+      "type": "checkbox",
+      "label": "pay_expenses_caused_by_abuse_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T47[0]",
+      "newName": "abuse_expense_1_pay_to",
+      "type": "text",
+      "label": "abuse_expense_1_pay_to"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T50[0]",
+      "newName": "abuse_expense_1_for",
+      "type": "text",
+      "label": "abuse_expense_1_for"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T53[0]",
+      "newName": "abuse_expense_1_amount",
+      "type": "text",
+      "label": "abuse_expense_1_amount"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T56[0]",
+      "newName": "abuse_expense_2_pay_to",
+      "type": "text",
+      "label": "abuse_expense_2_pay_to"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T59[0]",
+      "newName": "abuse_expense_2_for",
+      "type": "text",
+      "label": "abuse_expense_2_for"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T62[0]",
+      "newName": "abuse_expense_2_amount",
+      "type": "text",
+      "label": "abuse_expense_2_amount"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T63[0]",
+      "newName": "abuse_expense_3_pay_to",
+      "type": "text",
+      "label": "abuse_expense_3_pay_to"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T66[0]",
+      "newName": "abuse_expense_3_for",
+      "type": "text",
+      "label": "abuse_expense_3_for"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T67[0]",
+      "newName": "abuse_expense_3_amount",
+      "type": "text",
+      "label": "abuse_expense_3_amount"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T68[0]",
+      "newName": "abuse_expense_4_pay_to",
+      "type": "text",
+      "label": "abuse_expense_4_pay_to"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T69[0]",
+      "newName": "abuse_expense_4_for",
+      "type": "text",
+      "label": "abuse_expense_4_for"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T70[0]",
+      "newName": "abuse_expense_4_amount",
+      "type": "text",
+      "label": "abuse_expense_4_amount"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List24[0].CheckBoxRightCaption[0]",
+      "newName": "child_support_order_requested",
+      "type": "checkbox",
+      "label": "child_support_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List24[0].Li1[0].CheckBox3[0]",
+      "newName": "child_support_no_existing_order_want_one",
+      "type": "checkbox",
+      "label": "child_support_no_existing_order_want_one"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List24[0].Li2[0].CheckBox3[0]",
+      "newName": "child_support_existing_order_want_changed",
+      "type": "checkbox",
+      "label": "child_support_existing_order_want_changed"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List24[0].Li3[0].CheckBox3[0]",
+      "newName": "child_support_receive_or_applied_tanf_welfare_calworks",
+      "type": "checkbox",
+      "label": "child_support_receive_or_applied_tanf_welfare_calworks"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List25[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "spousal_support_order_requested",
+      "type": "checkbox",
+      "label": "spousal_support_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List26[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "lawyers_fees_and_costs_order_requested",
+      "type": "checkbox",
+      "label": "lawyers_fees_and_costs_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page12[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List27[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "batterer_intervention_program_order_requested",
+      "type": "checkbox",
+      "label": "batterer_intervention_program_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].AGHagueCert_cb[0]",
+      "newName": "wireless_phone_account_transfer_order_requested",
+      "type": "checkbox",
+      "label": "wireless_phone_account_transfer_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li1[0].item28aMyNoa_cb[0]",
+      "newName": "wireless_transfer_phone_1_is_my_number",
+      "type": "checkbox",
+      "label": "wireless_transfer_phone_1_is_my_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li1[0].item28aMyNoa_cb[1]",
+      "newName": "wireless_transfer_phone_1_is_child_number",
+      "type": "checkbox",
+      "label": "wireless_transfer_phone_1_is_child_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li1[0].Telephone2_ft[0]",
+      "newName": "wireless_transfer_phone_1_number",
+      "type": "text",
+      "label": "wireless_transfer_phone_1_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li2[0].item28bMyNob_cb[0]",
+      "newName": "wireless_transfer_phone_2_is_my_number",
+      "type": "checkbox",
+      "label": "wireless_transfer_phone_2_is_my_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li2[0].item28bMyNob_cb[1]",
+      "newName": "wireless_transfer_phone_2_is_child_number",
+      "type": "checkbox",
+      "label": "wireless_transfer_phone_2_is_child_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li2[0].Telephone3_ft[0]",
+      "newName": "wireless_transfer_phone_2_number",
+      "type": "text",
+      "label": "wireless_transfer_phone_2_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li3[0].item28aMyNoc_cb[0]",
+      "newName": "wireless_transfer_phone_3_is_my_number",
+      "type": "checkbox",
+      "label": "wireless_transfer_phone_3_is_my_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li3[0].item28aMyNoc_cb[1]",
+      "newName": "wireless_transfer_phone_3_is_child_number",
+      "type": "checkbox",
+      "label": "wireless_transfer_phone_3_is_child_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li3[0].Telephone2_ft[0]",
+      "newName": "wireless_transfer_phone_3_number",
+      "type": "text",
+      "label": "wireless_transfer_phone_3_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li4[0].item28bMyNod_cb[0]",
+      "newName": "wireless_transfer_phone_4_is_my_number",
+      "type": "checkbox",
+      "label": "wireless_transfer_phone_4_is_my_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li4[0].item28bMyNod_cb[1]",
+      "newName": "wireless_transfer_phone_4_is_child_number",
+      "type": "checkbox",
+      "label": "wireless_transfer_phone_4_is_child_number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li4[0].Telephone3_ft[0]",
+      "newName": "wireless_transfer_phone_4_number",
+      "type": "text",
+      "label": "wireless_transfer_phone_4_number"
+    },
+    {
+      "id": "DV-100[0].Page13[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "case_number"
+    },
+    {
+      "id": "DV-100[0].Page13[0].List32[0].Li1[0].T97[0]",
+      "newName": "additional_pages_count",
+      "type": "text",
+      "label": "additional_pages_count"
+    },
+    {
+      "id": "DV-100[0].Page13[0].List33[0].Li1[0].SigDate[0]",
+      "newName": "person_asking_protection_signature_date",
+      "type": "text",
+      "label": "person_asking_protection_signature_date"
+    },
+    {
+      "id": "DV-100[0].Page13[0].List33[0].Li1[0].YourName_tf[0]",
+      "newName": "person_asking_protection_signature_printed_name",
+      "type": "text",
+      "label": "person_asking_protection_signature_printed_name"
+    },
+    {
+      "id": "DV-100[0].Page13[0].List34[0].Li1[0].SigDate[0]",
+      "newName": "lawyer_signature_date",
+      "type": "text",
+      "label": "lawyer_signature_date"
+    },
+    {
+      "id": "DV-100[0].Page13[0].List34[0].Li1[0].T14[0]",
+      "newName": "lawyer_signature_printed_name",
+      "type": "text",
+      "label": "lawyer_signature_printed_name"
+    }
+  ]
+}
