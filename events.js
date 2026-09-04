@@ -416,6 +416,15 @@ function setupCustomClickHandlers(graph) {
   // Proper double-click handler that handles all cases
   const baseDblClick = graph.dblClick.bind(graph);
   graph.dblClick = function(evt, cell) {
+    // A connector carries one setting - which form it activates - so editing
+    // it is just picking that form rather than editing a label.
+    if (cell && typeof window.isConnectorNode === 'function' && window.isConnectorNode(cell)) {
+      if (typeof window.chooseConnectorTarget === 'function') {
+        window.chooseConnectorTarget(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
     // Check for Shift+double-click on numbered dropdown nodes (always show custom properties)
     if (cell && evt && evt.shiftKey && typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'multipleDropdownType') {
       if (typeof window.showNumberedDropdownProperties === 'function') {

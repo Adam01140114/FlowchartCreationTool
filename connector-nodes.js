@@ -133,12 +133,15 @@
         const target = c._connectorTarget
           || (/connectorTarget=([^;]*)/.exec(c.style || '') || [])[1];
         if (!target) return;
-        // The option feeding this connector is what the answer selects.
+        // A connector fed by an option activates its target only when that
+        // option is chosen. A connector wired to nothing activates its target
+        // unconditionally - the way to say two forms always travel together.
         const feeder = cells.find((e) => e.edge && e.target === c.id);
         const option = feeder ? byId.get(feeder.source) : null;
         out.push({
           fromForm: slot.name || ('Form ' + (formIndex + 1)),
           fromFormIndex: formIndex,
+          unconditional: !option,
           optionNodeId: option ? (option._nameId || option.id) : null,
           optionLabel: option ? String(option.value || '').replace(/<[^>]*>/g, '').trim() : null,
           targetForm: decodeURIComponent(target)
