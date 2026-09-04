@@ -4867,7 +4867,7 @@ function previewForm() {
   showPreviewFormStyleModal();
 }
 
-function startPreviewForm(questionStyle, deploymentStyle) {
+async function startPreviewForm(questionStyle, deploymentStyle) {
   const normalizedStyle = (questionStyle === 'question' || questionStyle === 'section' || questionStyle === 'all')
     ? questionStyle
     : 'section';
@@ -4886,15 +4886,35 @@ function startPreviewForm(questionStyle, deploymentStyle) {
     resetAllNodeIds();
   } else {
   }
-  // Generate the GUI JSON string (do not download)
+  // Opening the tab has to happen before the first await. The project export
+  // walks every form with a settle delay between them, and a window.open() on
+  // the far side of that has lost the click that started it, so the browser
+  // blocks it as a popup. Claim the tab up front and point it at the preview
+  // once the JSON is ready.
+  const previewWindow = window.open('', '_blank');
+
+  // Generate the GUI JSON string (do not download).
+  // A project with more than one form has to go through the project export:
+  // exportGuiJson only ever sees the form that is currently open, so using it
+  // here previewed just the first form and silently dropped the rest of the
+  // packet along with its activations and shared-value mirrors.
   let guiJsonStr = "";
-  if (typeof window.exportGuiJson === "function") {
+  const projectFormCount = Array.isArray(window.projectForms) ? window.projectForms.length : 0;
+  if (projectFormCount > 1 && typeof window.exportProjectGuiJson === "function") {
+    try {
+      guiJsonStr = await window.exportProjectGuiJson(false);
+    } catch (e) {
+      console.error('Project preview export failed, falling back to the open form:', e);
+      guiJsonStr = "";
+    }
+  }
+  if (!guiJsonStr && typeof window.exportGuiJson === "function") {
     // exportGuiJson returns the JSON string if called directly
     guiJsonStr = window.exportGuiJson(false);
-    if (typeof guiJsonStr !== "string") {
-      // If it returned an object, convert to string
-      guiJsonStr = JSON.stringify(guiJsonStr, null, 2);
-    }
+  }
+  if (guiJsonStr && typeof guiJsonStr !== "string") {
+    // If it returned an object, convert to string
+    guiJsonStr = JSON.stringify(guiJsonStr, null, 2);
   }
   if (guiJsonStr) {
       // Store JSON in localStorage to avoid URL length limits
@@ -4909,7 +4929,7 @@ function startPreviewForm(questionStyle, deploymentStyle) {
         // Fallback to URL method if localStorage fails (though it may still have size limits)
       const encodedJson = encodeURIComponent(guiJsonStr);
         const guiUrl = `FormWiz GUI/gui.html?preview=${encodedJson}&questionStyle=${encodeURIComponent(normalizedStyle)}&deploymentStyle=${encodeURIComponent(normalizedDeployment)}`;
-        window.open(guiUrl, '_blank');
+        openPreviewTab(previewWindow, guiUrl);
         return;
       }
       
@@ -4920,11 +4940,20 @@ function startPreviewForm(questionStyle, deploymentStyle) {
       
       // Open the GUI preview in a new tab with the preview key in the URL
       const guiUrl = `FormWiz GUI/gui.html?previewKey=${encodeURIComponent(previewKey)}&questionStyle=${encodeURIComponent(normalizedStyle)}&deploymentStyle=${encodeURIComponent(normalizedDeployment)}`;
-      window.open(guiUrl, '_blank');
+      openPreviewTab(previewWindow, guiUrl);
     } else {
       // Fallback to regular GUI if no JSON generated
-      window.open('FormWiz GUI/gui.html', '_blank');
+      openPreviewTab(previewWindow, 'FormWiz GUI/gui.html');
     }
+}
+
+/**
+ * Send the tab claimed before the export to the preview, falling back to a
+ * fresh window if the browser refused to give us one.
+ */
+function openPreviewTab(win, url) {
+  if (win && !win.closed) win.location = url;
+  else window.open(url, '_blank');
 }
 
 document.addEventListener('DOMContentLoaded', () => {

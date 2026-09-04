@@ -256,6 +256,37 @@ function consolidateSectionsMinQuestions(sections, minQuestions = 2) {
   return { sections: working, sectionIdMap: sectionIdMap };
 }
 
+/**
+ * Make an option's name unique to the question that owns it.
+ *
+ * Option cells carry whatever name the compiler gave them, and for a plain
+ * Yes/No branch that is the bare word "yes" or "no". Those become hidden
+ * checkbox ids, so across the DV packet 55 questions all wrote to one checkbox
+ * called "yes" and 56 to one called "no" - every Yes/No answer in the packet
+ * landing on the same two fields. Anything that already carries its question's
+ * vocabulary is left alone, so names like
+ * "temporary_restraining_orders_all_granted" keep the wording the hints and
+ * PDFs were written against.
+ *
+ * The qualified form is <question nameId>_<option nameId>, which is the shape
+ * form activations already look for.
+ */
+function qualifyOptionNameId(questionNameId, optionNameId) {
+  const q = String(questionNameId || '').trim();
+  const o = String(optionNameId || '').trim();
+  if (!q || !o) return o;
+  if (o === q || o.indexOf(q + '_') === 0) return o;
+  // Already speaks the question's language: share at least the first two
+  // tokens, e.g. question "denial_reason" and option
+  // "denial_reason_no_reasonable_proof_of_abuse".
+  const qt = q.split('_').filter(Boolean);
+  const ot = o.split('_').filter(Boolean);
+  let shared = 0;
+  while (shared < qt.length && shared < ot.length && qt[shared] === ot[shared]) shared++;
+  if (shared >= 2) return o;
+  return q + '_' + o;
+}
+
 window.exportGuiJson = function(download = true) {
   // Automatically reset PDF inheritance and Node IDs before export
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
@@ -1573,7 +1604,10 @@ window.exportGuiJson = function(download = true) {
             text: optionText
           };
           if (targetCell._nameId && String(targetCell._nameId).trim()) {
-            option.nameId = String(targetCell._nameId).trim();
+            option.nameId = qualifyOptionNameId(
+              question.nameId,
+              String(targetCell._nameId).trim()
+            );
             const alreadyMapped = hiddenLogicConfigs.some(
               (c) => c.trigger === optionText.trim() && c.nodeId === option.nameId
             );

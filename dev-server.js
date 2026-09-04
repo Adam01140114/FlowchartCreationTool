@@ -31,6 +31,20 @@ app.use(bodyParser.urlencoded({ extended: true, limit: BODY_LIMIT }));
 app.use(fileUpload());
 app.use(cors());
 
+// TEMP DIAGNOSTIC: log every request so we can see what actually reaches this
+// process (method, path, origin, and the status we send back).
+app.use((req, res, next) => {
+  const started = Date.now();
+  res.on('finish', () => {
+    const tag = res.statusCode === 404 ? ' <-- 404' : '';
+    console.log(
+      `[req] ${req.method} ${req.originalUrl} -> ${res.statusCode} `
+      + `(${Date.now() - started}ms) ua=${(req.headers['user-agent'] || '').slice(0, 28)}${tag}`
+    );
+  });
+  next();
+});
+
 app.use((req, res, next) => {
   if (req.path === '/.env' || req.path.endsWith('.env')) {
     return res.status(404).end();

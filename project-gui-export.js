@@ -209,7 +209,12 @@ function repointReferences(merged, replacement) {
         firstSection: sectionOffset + 1,
         lastSection: sectionOffset + count,
         // The first form is the one the interview always starts in.
-        alwaysIncluded: index === 0
+        alwaysIncluded: index === 0,
+        // Each form fills its own PDF. The merged config keeps only the first
+        // form's pdfOutputName, so without carrying the name per form the
+        // packet finished by producing one PDF and silently dropping the rest.
+        pdfFile: gui.pdfOutputName || gui.defaultPDFName || '',
+        pdfName: gui.defaultPDFName || entry.name
       });
 
       merged.sections = merged.sections.concat(gui.sections || []);

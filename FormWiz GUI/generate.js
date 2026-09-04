@@ -13796,8 +13796,27 @@ async function processAllPdfs() {
 
     // Track processed PDFs to prevent duplicates
     const processedPdfs = new Set();
+    // A packet fills one PDF per form the interview actually turned on. The
+    // merged config carries only the first form's pdfOutputName, so relying on
+    // it alone finished a three-form packet with a single PDF and no sign that
+    // the other two were missing. Forms that were never activated are skipped:
+    // the answers behind them were never asked.
+    const packetForms = (typeof getProjectForms === 'function') ? getProjectForms() : [];
+    let emittedForForms = false;
+    if (packetForms.length > 1) {
+        for (const form of packetForms) {
+            if (typeof isFormActivated === 'function' && !isFormActivated(form)) continue;
+            const file = form.pdfFile || '';
+            if (!file) continue;
+            const baseName = file.replace(/\.pdf$/i, '');
+            if (processedPdfs.has(baseName)) continue;
+            processedPdfs.add(baseName);
+            emittedForForms = true;
+            await editAndDownloadPDF(baseName);
+        }
+    }
     // Process main PDFs - use the actual PDF filename, not the form name
-    if (pdfOutputFileName) {
+    if (!emittedForForms && pdfOutputFileName) {
         // Remove .pdf extension if present since server adds it automatically
         const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
         if (!processedPdfs.has(baseName)) {
@@ -18395,6 +18414,81 @@ function isNumberedDropdownSelect(select) {
     && !!select.querySelector('option[value="1"]')
     && !!select.querySelector('option[value="2"]');
 }
+/**
+ * How many form fields live in a range of sections.
+ *
+ * Used to price a form activation. The sections of an inactive form are in the
+ * document already, just switched off, so this counts what turning the form on
+ * would actually put in front of the user.
+ */
+function fieldsInSectionRange(firstSection, lastSection) {
+  let total = 0;
+  for (let n = firstSection; n <= lastSection; n++) {
+    const sec = document.getElementById('section' + n);
+    if (sec) total += sec.querySelectorAll('input, select, textarea').length;
+  }
+  return total;
+}
+
+/**
+ * The select that carries a form-activation option, e.g. the rule
+ * "serve_form_dv_110_yes" belongs to the select "serve_form_dv_110".
+ */
+function activationGateSelect(rule) {
+  if (!rule || !rule.optionNameId) return null;
+  const wanted = String(rule.optionNameId);
+  const selects = document.querySelectorAll('select');
+  for (let i = 0; i < selects.length; i++) {
+    const sel = selects[i];
+    if (sel.id && wanted.indexOf(sel.id + '_') === 0) return sel;
+  }
+  return null;
+}
+
+/**
+ * What the current answers are worth in forms unlocked, on top of the fields
+ * countExportableFields can see right now.
+ *
+ * The option scorer is greedy - it counts what becomes visible the instant an
+ * option is picked. That is blind to an activation that is more than one
+ * question away, and on the DV packet it picked the wrong branch because of
+ * it: "Partly Granted and Partly Denied" reveals its orders detail
+ * immediately, while "All Granted Until the Court Hearing" only reveals
+ * "Must DV-110 be served with this notice?", and the whole of DV-110 - six
+ * sections of it - hangs off answering that Yes. The immediate count made the
+ * branch that skips a third of the packet look like the richer one.
+ *
+ * So price an activation at the size of the form it turns on, and pay it both
+ * when the option is already chosen and when the choice has merely brought its
+ * gate question into view. Without the second case the scorer never steers
+ * toward the gate, and the option that opens the form is never reached.
+ */
+function activationLookaheadBonus() {
+  const rules = (typeof getFormActivations === 'function') ? getFormActivations() : [];
+  if (!rules.length) return 0;
+  const forms = (typeof getProjectForms === 'function') ? getProjectForms() : [];
+  let bonus = 0;
+  rules.forEach(function(rule) {
+    if (!rule || rule.unconditional || !rule.optionNameId) return;
+    const form = forms.find(function(f) { return f.name === rule.targetForm; });
+    if (!form) return;
+    const worth = fieldsInSectionRange(form.firstSection, form.lastSection);
+    if (!worth) return;
+    if (typeof isActivationOptionChosen === 'function' && isActivationOptionChosen(rule)) {
+      bonus += worth;
+      return;
+    }
+    const gate = activationGateSelect(rule);
+    if (gate && isDebugFillEligible(gate)) bonus += worth;
+  });
+  return bonus;
+}
+
+/** Immediate field count plus whatever forms the current answers unlock. */
+function scoreCurrentState() {
+  return countExportableFields() + activationLookaheadBonus();
+}
+
 function pickBestSelectValue(select) {
   let options = getSelectOptions(select).filter(function(o) {
     return !wouldOptionJumpToEnd(select, o.value) && !wouldTriggerHardAlertOnSelect(select, o.value);
@@ -18433,13 +18527,13 @@ function pickBestSelectValue(select) {
   }
 
   let bestValue = select.value || options[options.length - 1].value;
-  let bestScore = countExportableFields();
+  let bestScore = scoreCurrentState();
   options.forEach(function(opt) {
     select.value = opt.value;
     triggerFieldChange(select);
     triggerSelectSideEffects(select);
-    const score = countExportableFields();
-    if (score >= bestScore) {
+    const score = scoreCurrentState();
+    if (score > bestScore) {
       bestScore = score;
       bestValue = opt.value;
     }
