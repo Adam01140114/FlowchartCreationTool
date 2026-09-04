@@ -62,6 +62,21 @@ function getFormDeploymentStyle() {
         : 'production';
     return raw === 'test' ? 'test' : 'production';
 }
+/*
+ * Packet metadata carried by an imported project GUI JSON.
+ *
+ * loadFormData parks it on these globals because the builder DOM has nowhere
+ * to put it - it describes the whole packet, not any one question.
+ */
+function getBuilderProjectForms() {
+    return Array.isArray(window.__BUILDER_PROJECT_FORMS__) ? window.__BUILDER_PROJECT_FORMS__ : [];
+}
+function getBuilderFormActivations() {
+    return Array.isArray(window.__BUILDER_FORM_ACTIVATIONS__) ? window.__BUILDER_FORM_ACTIVATIONS__ : [];
+}
+function getBuilderPacketMirrors() {
+    return Array.isArray(window.__BUILDER_PACKET_MIRRORS__) ? window.__BUILDER_PACKET_MIRRORS__ : [];
+}
 function getLogicConditionFromRow(questionId, row, rowIndex) {
     const pqEl = row.querySelector("#prevQuestion" + questionId + "_" + rowIndex);
     const paEl = row.querySelector("#prevAnswer" + questionId + "_" + rowIndex);
@@ -1215,6 +1230,12 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     `<body class="form-style-${formQuestionStyle}">`,
     `<script>window.__FORM_QUESTION_STYLE__=${JSON.stringify(formQuestionStyle)};</script>`,
     `<script>window.__FORM_DEPLOYMENT_STYLE__=${JSON.stringify(formDeploymentStyle)};</script>`,
+    // A multi-form packet needs its section ranges and activation rules in the
+    // generated page - the runtime reads them from these globals, and without
+    // them every form reads as "not part of a project" and is asked in order.
+    `<script>window.__PROJECT_FORMS__=${JSON.stringify(getBuilderProjectForms())};` +
+      `window.__FORM_ACTIVATIONS__=${JSON.stringify(getBuilderFormActivations())};` +
+      `window.__PACKET_MIRRORS__=${JSON.stringify(getBuilderPacketMirrors())};</script>`,
     ...(skipSignInGate ? ['<script>window.__FORM_SKIP_SIGNIN_GATE__=true;</script>'] : []),
     '<script>',
     '/*──────── mirror a dropdown → textbox and checkbox ────────*/',

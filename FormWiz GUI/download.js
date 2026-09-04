@@ -176,6 +176,12 @@ function loadFormData(formData) {
     // set; see addQuestion. Cleared in the finally below so a failed import
     // cannot leave the builder permanently skipping those refreshes.
     window.__fwBulkImport = true;
+    // Packet metadata describes the whole project, so there is nowhere in the
+    // builder DOM to keep it. Park it here; generate.js emits it into the
+    // generated form, which is the only place that reads it.
+    window.__BUILDER_PROJECT_FORMS__ = Array.isArray(formData.projectForms) ? formData.projectForms : [];
+    window.__BUILDER_FORM_ACTIVATIONS__ = Array.isArray(formData.formActivations) ? formData.formActivations : [];
+    window.__BUILDER_PACKET_MIRRORS__ = Array.isArray(formData.packetMirrors) ? formData.packetMirrors : [];
     if (typeof showFormBuilderImportLoading === 'function') {
         try {
             showFormBuilderImportLoading();
