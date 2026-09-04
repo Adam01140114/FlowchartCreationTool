@@ -182,6 +182,94 @@
   }
 
   /* ---------------------------------------------------------------- */
+  /* persistence — autosave and the Firebase library                   */
+  /* ---------------------------------------------------------------- */
+
+  function projectNameInput() {
+    return document.getElementById('projectNameInput');
+  }
+
+  /**
+   * Add the whole project to a payload that otherwise describes only the
+   * open form. Both autosave and the library save one flowchart; without
+   * this the other forms are silently dropped.
+   */
+  function attachProjectToPayload(data) {
+    if (!data) return data;
+    captureCurrentForm();
+    data.projectForms = window.projectForms.map(function (f) {
+      return { name: f.name || '', flowchart: f.flowchart || blankFlowchart() };
+    });
+    data.currentFormIndex = window.currentFormIndex;
+    data.projectName = projectNameInput() ? projectNameInput().value.trim() : '';
+    return data;
+  }
+
+  /**
+   * Adopt a project out of a saved payload and hand back the form that should
+   * actually be shown. Returns null when the payload holds no project, so
+   * callers can fall back to their existing single-form path.
+   */
+  function adoptProjectFromPayload(data) {
+    if (!data || !Array.isArray(data.projectForms) || !data.projectForms.length) return null;
+    window.projectForms = data.projectForms.map(function (f, i) {
+      const flowchart = f.flowchart || blankFlowchart();
+      return { name: f.name || flowchart.formName || ('Form ' + (i + 1)), flowchart: flowchart };
+    });
+    const idx = Number(data.currentFormIndex);
+    window.currentFormIndex = (idx >= 0 && idx < window.projectForms.length) ? idx : 0;
+    if (projectNameInput() && data.projectName) projectNameInput().value = data.projectName;
+    updateFormNavUi();
+    return window.projectForms[window.currentFormIndex].flowchart;
+  }
+
+  /**
+   * Restoring a save goes through loadFlowchartData, so intercepting it covers
+   * both "pick up where you left off" and opening from the library. A payload
+   * carrying a project loads its active form; anything else passes straight
+   * through, including the per-slot loads this module itself performs.
+   */
+  function installLoadHook() {
+    if (typeof window.loadFlowchartData !== 'function' || window.loadFlowchartData.__projectAware) return false;
+    const original = window.loadFlowchartData;
+    const wrapped = function (data, libraryFlowchartName, onComplete) {
+      const active = adoptProjectFromPayload(data);
+      return original.call(this, active || data, libraryFlowchartName, onComplete);
+    };
+    wrapped.__projectAware = true;
+    window.loadFlowchartData = wrapped;
+    return true;
+  }
+
+  /** Every library save funnels through here, so one wrapper covers them all. */
+  function installSaveHook() {
+    if (typeof window.persistFlowchartRecord !== 'function' || window.persistFlowchartRecord.__projectAware) return false;
+    const original = window.persistFlowchartRecord;
+    const wrapped = function (name, data) {
+      try {
+        attachProjectToPayload(data);
+      } catch (err) {
+        console.warn('[project] Could not attach the project to this save:', err && err.message);
+      }
+      return original.apply(this, [name, data].concat([].slice.call(arguments, 2)));
+    };
+    wrapped.__projectAware = true;
+    window.persistFlowchartRecord = wrapped;
+    return true;
+  }
+
+  // Both targets are defined by other modules, and loadFlowchartData is
+  // reassigned by more than one of them, so a wrapper installed too early can
+  // be replaced later. Keep checking and re-wrap whenever the marker is gone,
+  // and evaluate the two hooks independently - one failing must not stop the
+  // other from being installed.
+  (function keepHooksInstalled() {
+    installLoadHook();
+    installSaveHook();
+    setTimeout(keepHooksInstalled, 1000);
+  })();
+
+  /* ---------------------------------------------------------------- */
 
   document.addEventListener('DOMContentLoaded', function () {
     // Seed the project with whatever the editor opened with, so form 1 is real.
@@ -202,4 +290,6 @@
   window.applyProjectJson = applyProjectJson;
   window.importProjectJson = importProjectJson;
   window.updateFormNavUi = updateFormNavUi;
+  window.attachProjectToPayload = attachProjectToPayload;
+  window.adoptProjectFromPayload = adoptProjectFromPayload;
 })();

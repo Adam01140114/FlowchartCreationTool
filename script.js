@@ -4948,6 +4948,23 @@ document.addEventListener('keydown', (e) => {
 // --- AUTOSAVE CORE FUNCTIONS (localStorage version) ---
 // Cache for autosave data to avoid unnecessary processing
   // lastAutosaveData and autosaveDataHash moved to config.js module
+/** Does the saved restore point still hold work, in any form of the project? */
+function autosaveHasStoredWork() {
+  try {
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    if (saved && Array.isArray(saved.cells) && saved.cells.length) return true;
+    if (saved && Array.isArray(saved.projectForms)) {
+      return saved.projectForms.some(function (f) {
+        return f && f.flowchart && Array.isArray(f.flowchart.cells) && f.flowchart.cells.length;
+      });
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
 function autosaveFlowchartToLocalStorage() {
   try {
     if (!graph) {
@@ -4956,6 +4973,14 @@ function autosaveFlowchartToLocalStorage() {
     const parent = graph.getDefaultParent();
     const cells = graph.getChildCells(parent, true, true);
     const libraryFlowchartName = window.currentFlowchartName || null;
+    // A page starts with an empty canvas, and autosave can fire before the
+    // operator has answered "pick up where you left off". Writing that empty
+    // canvas would destroy the restore point they were about to accept - and
+    // with projects, every other form in it too.
+    if (!cells.length && autosaveHasStoredWork()) {
+      console.log('[AUTOSAVE] Skipped (canvas empty, keeping the existing restore point)');
+      return;
+    }
     console.log('[AUTOSAVE] Starting autosave', {
       cellCount: cells.length,
       libraryFlowchartName
@@ -5143,6 +5168,11 @@ function autosaveFlowchartToLocalStorage() {
       edgeStyle: currentEdgeStyle,
       viewportPosition: viewportPosition
     };
+    // A project may hold several forms; without this only the open one
+    // would survive "pick up where you left off".
+    if (typeof window.attachProjectToPayload === 'function') {
+      window.attachProjectToPayload(data);
+    }
     // Cache the data and hash for next comparison
     lastAutosaveData = data;
     autosaveDataHash = currentHash;

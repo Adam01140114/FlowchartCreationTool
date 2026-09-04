@@ -17,6 +17,15 @@
 <style>
   /* The form panel groups everything belonging to the open form, so it reads
      as one unit rather than a run of unrelated boxes. */
+  .project-name-container { margin: 8px 0 4px; }
+  .project-name-container input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 4px;
+    box-sizing: border-box;
+  }
   .form-panel {
     border: 1px solid #c9d3df;
     border-radius: 8px;
@@ -232,6 +241,10 @@
     <button id="saveAsFlowchartBtn" onclick="saveAsFlowchart()">Save As</button>
     <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
     <button id="settingsBtn" onclick="showSettingsMenu()">Settings</button><br>
+    <div class="project-name-container">
+      <label for="projectNameInput" style="font-weight:bold;">Project Name:</label>
+      <input type="text" id="projectNameInput" placeholder="Name this project..." />
+    </div>
   </div>
 
   <!-- Everything from here to the end of the PDF defaults belongs to the form
@@ -731,5 +744,6 @@
 <script src="script.js"></script>
 <!-- Multi-form projects - loaded last so the editor API exists -->
 <script src="project-forms.js"></script>
+<script src="connector-nodes.js"></script>
 </body>
 </html>
