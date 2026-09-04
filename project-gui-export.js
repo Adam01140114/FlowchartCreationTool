@@ -79,7 +79,78 @@
     return gui;
   }
 
-  /** Activation rules from the project's connectors, keyed by target form name. */
+  /**
+ * Ask each shared value once.
+ *
+ * The packet shares a lot of fields - the case number appears on all three
+ * forms, as do the party names, court address and hearing date. Separately
+ * that is fine; merged into one interview those become duplicate DOM ids,
+ * where answers overwrite each other, and the person is asked the same thing
+ * three times.
+ *
+ * The first question with a given nameId survives; later duplicates are
+ * dropped and every reference to them is repointed at the survivor. The
+ * dropped questions are recorded in packetMirrors so the filler still knows
+ * every PDF field the single answer has to reach.
+ */
+function collapseSharedQuestions(merged) {
+  const firstByName = new Map();
+  const replacement = new Map();
+  const mirrors = [];
+
+  merged.sections.forEach(function (section) {
+    const keep = [];
+    section.questions.forEach(function (q) {
+      const name = q.nameId;
+      if (!name) { keep.push(q); return; }
+
+      const first = firstByName.get(name);
+      if (!first) {
+        firstByName.set(name, { question: q, section: section.sectionId });
+        mirrors.push({ nameId: name, askedInSection: section.sectionId,
+                       questionId: q.questionId, alsoAnswers: [] });
+        keep.push(q);
+        return;
+      }
+      // Same value, asked again later in the packet - drop it.
+      replacement.set(String(q.questionId), String(first.question.questionId));
+      const record = mirrors.find(function (m) { return m.nameId === name; });
+      if (record) record.alsoAnswers.push({ questionId: q.questionId, section: section.sectionId });
+    });
+    section.questions = keep;
+  });
+
+  if (replacement.size) repointReferences(merged, replacement);
+
+  // Only the ones that actually stood in for something are worth carrying.
+  merged.packetMirrors = mirrors.filter(function (m) { return m.alsoAnswers.length; });
+  return replacement.size;
+}
+
+/** Repoint every reference from a dropped question to the one that replaced it. */
+function repointReferences(merged, replacement) {
+  merged.sections.forEach(function (section) {
+    section.questions.forEach(function (q) {
+      if (q.logic && Array.isArray(q.logic.conditions)) {
+        q.logic.conditions.forEach(function (c) {
+          const to = replacement.get(String(c.prevQuestion));
+          if (to) c.prevQuestion = to;
+        });
+      }
+      if (Array.isArray(q.hiddenLogic)) {
+        q.hiddenLogic.forEach(function (h) {
+          if (!h || !Array.isArray(h.conditions)) return;
+          h.conditions.forEach(function (c) {
+            const to = replacement.get(String(c.prevQuestion));
+            if (to) c.prevQuestion = to;
+          });
+        });
+      }
+    });
+  });
+}
+
+/** Activation rules from the project's connectors, keyed by target form name. */
   function buildActivations() {
     if (typeof window.collectProjectConnectors !== 'function') return [];
     return window.collectProjectConnectors().map(function (c) {
@@ -158,6 +229,13 @@
       || merged.formName || 'Project';
     merged.projectForms = ranges;
     merged.formActivations = buildActivations();
+
+    // Must run after every form is merged, so a value shared by forms one and
+    // three is still recognised as the same question.
+    const collapsed = collapseSharedQuestions(merged);
+    if (collapsed) {
+      console.log('[project-gui] Collapsed ' + collapsed + ' repeated shared question(s)');
+    }
 
     return merged;
   }

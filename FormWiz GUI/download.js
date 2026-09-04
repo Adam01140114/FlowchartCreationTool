@@ -172,6 +172,10 @@ function hideFormBuilderImportLoadingDeferred() {
     });
 }
 function loadFormData(formData) {
+    // Per-question work that walks the whole form is deferred while this is
+    // set; see addQuestion. Cleared in the finally below so a failed import
+    // cannot leave the builder permanently skipping those refreshes.
+    window.__fwBulkImport = true;
     if (typeof showFormBuilderImportLoading === 'function') {
         try {
             showFormBuilderImportLoading();
@@ -3007,7 +3011,14 @@ function loadFormData(formData) {
         } catch (e2) { /* ignore */ }
     }
     } finally {
-        if (typeof hideFormBuilderImportLoadingDeferred === 'function') {
+        // Import finished: run the whole-form refreshes that were skipped, once.
+    window.__fwBulkImport = false;
+    try {
+      if (typeof updateGlobalQuestionLabels === 'function') updateGlobalQuestionLabels();
+      if (typeof updateAllChecklistLogicDropdowns === 'function') updateAllChecklistLogicDropdowns();
+    } catch (e) { /* a refresh failing must not fail the import */ }
+
+    if (typeof hideFormBuilderImportLoadingDeferred === 'function') {
             try {
                 hideFormBuilderImportLoadingDeferred();
             } catch (eHide) { /* ignore */ }

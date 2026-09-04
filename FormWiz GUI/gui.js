@@ -1091,7 +1091,11 @@ function addQuestion(sectionId, questionId = null) {
             updateGlobalQuestionLabels();
         });
     }
-    updateGlobalQuestionLabels();
+    // Both of these walk every question in the form. Doing that once per
+    // question added makes an import quadratic - importing 358 questions took
+    // minutes, with this call alone accounting for ~60% of it. During a bulk
+    // import they are run once at the end instead.
+    if (!window.__fwBulkImport) updateGlobalQuestionLabels();
     // New questions after the first in a section: enable conditional logic and show its panel
     if (!questionId && questionsInSectionBeforeAdd >= 1) {
         const logicCb = document.getElementById(`logic${currentQuestionId}`);
@@ -1101,7 +1105,7 @@ function addQuestion(sectionId, questionId = null) {
         }
     }
     // Update all checklist logic dropdowns to include the new question
-    updateAllChecklistLogicDropdowns();
+    if (!window.__fwBulkImport) updateAllChecklistLogicDropdowns();
 }
 /**
  * Updates linking targets for all dropdown questions in the form
