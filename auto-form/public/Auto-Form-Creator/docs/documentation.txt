@@ -1,7 +1,8 @@
 Auto-Form Creator — Project Documentation
 =========================================
-Last updated: June 2026
-Primary demo URL: http://localhost:3000/Auto-Form-Creator/demo.html
+Last updated: September 3, 2026
+Primary demo URL: http://127.0.0.1:8080/Auto-Form-Creator/demo.html
+  (served by `npm start` from the FlowchartCreationTool repo root)
 
 This document is a handoff guide. A new developer or AI agent should be able to read
 this file, explore the referenced source files, and continue work without prior chat
@@ -12,7 +13,7 @@ TABLE OF CONTENTS
 -----------------
 1. Purpose and intended goal
 2. High-level architecture
-3. The 8-step demo pipeline
+3. The 9-step demo pipeline
 4. Data artifacts and how they connect
 5. Autofill / user profile system
 6. Generated HTML forms
@@ -89,8 +90,45 @@ Critical invariant (same as production FormStar):
 
 
 ================================================================================
-3. THE 8-STEP DEMO PIPELINE
+3. THE 9-STEP DEMO PIPELINE
 ================================================================================
+
+The demo now runs nine steps, and several were renamed. The old 8-step list below
+each entry is kept where the mechanics are unchanged.
+
+  Step 1 — Sign In with FormStar     Step 6 — Generate Form Config
+  Step 2 — Create Payload            Step 7 — User Info Fields
+  Step 3 — Extract Form Fields       Step 8 — Form Previews
+  Step 4 — Generate Sanitized PDF    Step 9 — Add Form to Site
+  Step 5 — Download Payload
+
+Step 2 accepts MULTIPLE PDFs at once (the file input is `multiple`) and queues them,
+one payload per PDF. That is how a packet like DV-100 + DV-109 + DV-110 goes in.
+
+RUNNING WITHOUT AN API KEY
+--------------------------
+With no ANTHROPIC_API_KEY / OPENAI_API_KEY in `.env`, every `/api/generate-*` route is
+disabled and the demo says so. Each AI step then offers "Automatic processing"
+(calls the API, costs money) and "Manual processing", which is the path that works
+offline:
+
+  - Manual opens an import modal with a "download prompt bundle" button.
+  - POST /api/field-config-prompt-zip returns a zip: README.md, PROMPT.md,
+    form-data.json (the extracted fields), pages/*.png, source.pdf.
+  - Hand that to a chat session, paste the returned JSON into the modal, Import.
+  - The same shape exists for connections: /api/form-connections-prompt-zip.
+
+Note the demo's step-1 sign-in only gates `unlockStep2()` and loads a Firebase profile
+for prefill. It is not a security boundary; extraction and sanitizing work without it.
+
+MULTI-FORM PACKETS
+------------------
+Generate each form's field_config first, then form_connections.json LAST — it
+references fields from every form, so it cannot be written until they all exist.
+`form_connections.json` is a claim, not ground truth: validate every field it names
+against the real `newName`s, and read its `openQuestions`, where it admits what it
+guessed.
+
 
 Step 1 — Sign In
   - Firebase email/password auth
@@ -98,12 +136,12 @@ Step 1 — Sign In
   - Shows profile JSON + editable "User Profile Entries" grid (2 columns)
   - Entries can be added, edited (key locked), or deleted (uid is not deletable)
 
-Step 2 — Unlock PDF
+Step 2 — Create Payload (was: Unlock PDF)
   - Upload XFA PDF
   - POST /api/unlock-pdf strips XFA, produces AcroForm PDF
   - Download unlocked PDF
 
-Step 3 — Extract Fields
+Step 3 — Extract Form Fields
   - Upload prepared/unlocked PDF
   - Client pdf-extractor.js extracts:
       [[field_name]] for text fields
@@ -121,7 +159,7 @@ Step 4 — Generate field_config.json
   - Output maps every PDF field id → semantic newName, type, label
   - Example: form1[0].#subform[0].city[0] → applicant_home_city
 
-Step 5 — Sanitize PDF
+Step 4/5 — Generate Sanitized PDF, then Download Payload
   - POST /api/sanitize-pdf renames PDF fields to semantic newName values
   - Promotes fields to top-level AcroForm (removes form1[0] hierarchy)
   - Fixes checkbox widget Parent/Annots issues (MorF sex checkboxes must survive)
@@ -144,7 +182,7 @@ Step 7 — User Info Fields (autopopulate analysis)
   - POST /api/enrich-autopopulate refreshes after profile edits
   - Yellow "Not in profile yet" pills; green "Available" pills
 
-Step 8 — Generate Form HTML
+Step 8 — Form Previews (generate + view form HTML)
   - FormHtmlRenderer.build(formConfig, userProfile, options)
   - Buttons: Generate Form HTML | View HTML | Download HTML
   - View HTML toggles inline HTML source (with copy icon on code toolbar)
@@ -155,6 +193,44 @@ Step 8 — Generate Form HTML
 ================================================================================
 4. DATA ARTIFACTS AND HOW THEY CONNECT
 ================================================================================
+
+*** field_config.json IS THE LINCHPIN — SAVE IT ***
+----------------------------------------------------
+It is the ONLY artifact that holds the raw AcroForm path and the canonical name
+together. Everything downstream depends on that pairing:
+
+  raw PDF (encrypted, XFA-style paths)
+        -> unlock            (qpdf; the paths only LOOK like XFA, the block is
+                              encryption — pdf-lib reports 0 fields until decrypted)
+        -> extract fields
+        -> field_config.json   id  ->  newName        <-- the mapping, and only here
+        -> sanitize PDF        rewrites each field's /T from id to newName
+        -> HTML form posts newName
+        -> /edit_pdf matches EXACTLY: req.body[field.getName()]
+
+Lose the field_config and the chain silently breaks at the last step. `/edit_pdf`
+still returns 200 and hands back a completely untouched PDF, because nothing threw —
+the names simply never matched.
+
+This is not hypothetical. The DV packet (DV-100 + DV-109 + DV-110) was compiled to
+flowcharts in one session without ever saving the field configs. Result: the form
+posted `case_number` at a field really called
+`DV-100[0].Page1[0].rightCaption[0].CaseNumber[0]`, and ZERO of the 419 names the form
+sent matched any of the 575 in the PDFs. Reconstructing the three configs (321, 30 and
+182 fields) took most of a later session. They now live in `dv-field-configs/` at the
+repo root, with the sanitized PDFs in `FormWiz GUI/`.
+
+Two rules that are easy to get wrong:
+
+  - `newName` must be the name the generated form ACTUALLY POSTS — question `nameId`s
+    and hiddenLogic `nodeId`s. Read them out of the exported GUI JSON; do not assume.
+  - LIST EVERY FIELD. `rebuildAcroFormFields()` keeps only what the config names and
+    drops the rest from the document. For a field with no question behind it, map it
+    to its own `id` so it survives unfilled.
+
+Repeated fields may share a `newName` — a case number on nine pages can be nine fields
+all called `case_number`. `/edit_pdf` iterates every field, so one answer fills all
+nine.
 
 field_config.json
   {
@@ -425,6 +501,35 @@ After code changes to server routes: restart node server.js
 ================================================================================
 12. KNOWN ISSUES AND WORKAROUNDS
 ================================================================================
+
+Added September 3, 2026, from wiring the DV packet end to end:
+
+  - Judicial Council PDFs are ENCRYPTED, not XFA. The `DV-110[0].Page1[0]...` names
+    look like XFA, but pdf-lib returns 0 fields because of encryption.
+    `/api/unlock-pdf` decrypts with qpdf; `PDFDocument.load(bytes)` without
+    `ignoreEncryption` throws outright, which is how `/edit_pdf` fails on a raw
+    government PDF.
+
+  - `/edit_pdf` matches field names EXACTLY (`req.body[field.getName()]`). There is no
+    fuzzy fallback and no error when nothing matches — it returns 200 and a blank PDF.
+    A 200 is not evidence the PDF was filled.
+
+  - Downloads initiated by a page are blocked in some embedded browsers, so the manual
+    prompt-bundle zip may never reach disk. The same data is written server-side to
+    `Current Data/` (structured-fields.json, checkbox-fields.txt, text-fields.txt,
+    extracted-document-content.txt) at extraction time — read it from there instead.
+
+  - `Current Data/` is overwritten per form. Snapshot it between forms when processing
+    a packet, or form N+1's extraction destroys form N's.
+
+  - `structuredFields[].nearestLabel` is unreliable on dense legal forms (labels land
+    on the wrong field, or come back empty). Pairing widget rectangles against the
+    pdfjs text layer by position gives far better labels; page images plus the text
+    layer are what actually make the mapping writable.
+
+  - Rendered page images from `pdf-page-renderer.js` show form field boxes but NO text
+    on these PDFs. Use the pdfjs text layer for wording, not the images alone.
+
 
 Firestore ERR_BLOCKED_BY_CLIENT
   - Ad blocker blocking firestore.googleapis.com

@@ -1,6 +1,6 @@
 # Flowchart Creation Tool — Agent Handoff
 
-**Date:** September 2, 2026  
+**Date:** September 3, 2026  
 **Repository:** https://github.com/Adam01140114/FlowchartCreationTool  
 **Branch:** `main`
 
@@ -94,6 +94,11 @@ Defaults:
 | `flowchart_ai_trainer_doc.txt` | AI trainer spec (duplicate in `Hand Off/`) |
 | `w9-flowchart.json` | Latest compiled W-9 flowchart |
 | `_w9_payload/` | W-9 logical schema (`field_config.txt`) |
+| `project-gui-export.js` | **Project-level GUI JSON** — merges every form, builds `projectForms` / `formActivations` / `packetMirrors` |
+| `dv-packet-project.json` | The DV packet project (DV-100 + DV-109 + DV-110). This is what `Import Project JSON` takes |
+| `dv-field-configs/` | **`id` → `newName` maps for the three DV PDFs.** Without these there are no sanitized PDFs and nothing fills |
+| `dv100.pdf` / `dv109.pdf` / `dv110.pdf` | Original Judicial Council forms (encrypted; qpdf decrypts them) |
+| `FormWiz GUI/dv1*.pdf` | **Sanitized** copies — fields renamed to `newName`. These are the ones `/edit_pdf` fills |
 
 ### FormWiz GUI (generated form)
 
@@ -163,12 +168,123 @@ Defaults:
 
 ---
 
+## 5b. September 3, 2026 session — making the DV packet actually produce filled PDFs
+
+Importing `dv-packet-project.json` and pressing Preview Form produced a form that
+looked fine and was wrong in six ways. All six are fixed; the notes matter because
+several were invisible until you checked the output rather than the chart.
+
+### Preview only ever showed the first form
+
+`startPreviewForm()` called `exportGuiJson`, which only sees the form currently open
+on the canvas. A three-form packet previewed as DV-100 alone — 9 sections instead of
+20 — and dropped `formActivations` and `packetMirrors` with the other two forms. It
+now routes through `exportProjectGuiJson` whenever `window.projectForms.length > 1`.
+
+That export is `async` (it walks each form with a settle delay), so the preview tab is
+now opened **before** the first `await`. A `window.open()` after an await has lost the
+user gesture that started it and the browser blocks it as a popup.
+
+### 55 questions shared one checkbox called `yes`, 56 shared one called `no`
+
+Option cells on a plain Yes/No branch are named with the bare word, and `exportGuiJson`
+used that as the hidden checkbox id verbatim. `qualifyOptionNameId()` in `library.js`
+now prefixes the owning question — `serve_form_dv_110_yes` — but **only for names that
+say nothing on their own** (`yes`, `no`, `true`, `false`, `none`, `other`, `unknown`,
+`n_a`, `na`).
+
+Do not widen that rule. An earlier attempt qualified anything not sharing two leading
+tokens with its question, which rewrote perfectly good names like
+`relationship_have_children_together` into
+`relationship_to_person_to_restrain_relationship_have_children_together` and broke the
+PDF mapping those names were written against.
+
+### Fill maximum path took the branch that skipped a third of the packet
+
+The option scorer counts what becomes visible the instant an option is picked. On
+DV-109 that made "Partly Granted and Partly Denied" beat "All Granted Until the Court
+Hearing": the first reveals its orders detail immediately, while the second only
+reveals *"Must DV-110 be served with this notice?"* — and the whole of DV-110 hangs
+off answering that Yes. `activationLookaheadBonus()` now prices an activation at the
+size of the form it unlocks, and pays it when a choice merely brings the gate question
+into view, so the path toward it gets explored at all.
+
+### Multi-select answers never reached the PDF (three stacked faults)
+
+1. `updateHiddenLogicTriggerOptions()` in `gui.js` read a question's options only from
+   `dropdownOptions{id}`. A checkbox question keeps its options in
+   `checkboxOptions{id}`, so its trigger list came back empty; import then assigned
+   trigger values that did not exist as `<option>`s, **which a `<select>` silently
+   discards**, and generation threw the rule away with them. 246 of 323 configs
+   survived. Rebuilding the list now also preserves the current selection, because the
+   post-bulk-import catch-up runs it a second time.
+2. Hidden logic was collected only in the dropdown branch of `getFormHTML()`.
+   `collectHiddenLogicConfigs()` is now shared with the checkbox branch.
+3. Nothing evaluated a rule against a *set* of answers — `updateHiddenLogic()` compares
+   a trigger to one selected value. `syncHiddenLogicForCheckboxQuestions()` handles the
+   multi-select case and is bound to `change`, so it works for real users and not just
+   during a debug fill.
+
+Also: max fill scored a checkbox group like a radio group and left **one** box ticked.
+A checkbox question is multi-select, so the widest path ticks every option that would
+not jump to the end or fire a hard alert.
+
+### The missing artifact: `field_config.json` was never saved for these forms
+
+This is the one to remember. The form posted `case_number`; the PDF field is really
+called `DV-100[0].Page1[0].rightCaption[0].CaseNumber[0]`. **Zero of 419 names the form
+sends matched any of the 575 in the three PDFs.**
+
+`field_config.json` is the only artifact that carries the raw AcroForm path next to the
+canonical name, and `pdf-field-sanitizer.js` uses it to rewrite each field's `/T` from
+`id` to `newName`. That is why `FormWiz GUI/W9.pdf` has a field literally called
+`taxpayer_name` and fills correctly. No DV field config had ever been committed, so no
+sanitized DV PDF existed and nothing could match.
+
+The three configs are now in `dv-field-configs/` (321, 30 and 182 fields) and the
+sanitized PDFs sit in `FormWiz GUI/`. Eleven DV-110 fields have no question behind them
+— the firearm description and location columns, the page-9 clerk block — and are mapped
+to their own names so the sanitizer **preserves** them; it keeps only fields listed in
+the config and drops the rest.
+
+The DV PDFs are also **encrypted**, not XFA as the paths suggest. `/api/unlock-pdf`
+handles that with qpdf. `/edit_pdf` still calls `PDFDocument.load(bytes)` without
+`ignoreEncryption`, so it can only fill an already-decrypted (sanitized) PDF.
+
+### The interview asked about the wrong person
+
+The compiler phrased every field as "What is your <field>?" whoever the field was about,
+so the animal block asked "What is your breed?", DV-110 asked the filer "What is your
+race?" about the restrained person, and three yes/no pairs became the literal questions
+"Do you have a no?" and "Do you have yes?". 484 questions reworded from their nameIds;
+the 14 still starting "What is your" are genuinely about the person filling the form.
+
+### Where it stands
+
+Maximum path, one run, section-at-a-time + test:
+
+| Form | text fields | checkboxes |
+|------|-------------|------------|
+| DV-100 | 163 / 163 | 105 / 158 |
+| DV-109 | 17 / 17 | 9 / 13 |
+| DV-110 | 97 / 108 | 56 / 85 |
+
+Unticked checkboxes are branches the answers ruled out (gender Nonbinary, so not
+male/female). **This is not production ready** — see section 8.
+
+---
+
 ## 6. Critical workflows
 
 ### Preview Form
 
 1. User clicks **Preview Form** → chooses **question style** + **deployment style** (default: **Test**, **One section at a time**).
-2. `script.js` → `resetAllPdfInheritance()` + `resetAllNodeIds()` → `exportGuiJson()` → localStorage → `FormWiz GUI/gui.html?previewKey=...&questionStyle=...&deploymentStyle=test`.
+2. `script.js` → opens the preview tab (before any await, or the popup blocker eats
+   it) → `resetAllPdfInheritance()` + `resetAllNodeIds()` → **`exportProjectGuiJson()`
+   when the project holds more than one form, otherwise `exportGuiJson()`** →
+   localStorage → `FormWiz GUI/gui.html?previewKey=...&questionStyle=...&deploymentStyle=test`.
+   The project export walks every form and switches back, so the canvas visibly
+   flickers through each one — that is expected.
 3. `gui.html` sets `window.__FORM_QUESTION_STYLE__`, `window.__FORM_DEPLOYMENT_STYLE__`, loads JSON, auto-runs `showPreview()`.
 4. `generate.js` `getFormHTML()` reads style/deployment and generates HTML + nav behavior.
 5. On completion (test mode): **Download Payload** / **Preview PDFs** require dev server (`npm start`).
@@ -188,6 +304,30 @@ Before calling a form done:
 3. Run **Ctrl+Shift** → **Fill maximum path** → **Preview PDFs** or **Download PDFs** (dev server must be running).
 4. In DevTools Network, confirm `POST /edit_pdf?pdf=W9.pdf` body includes keys matching PDF AcroForm names (`taxpayer_name`, `tax_classification_individual`, etc.).
 5. Compiler `auditForm()` output if using `compile-form-schema.js`.
+
+### Wiring a compiled form to its PDF (do not skip the field config)
+
+A flowchart that compiles and previews cleanly still produces a blank PDF until this
+is done, and the failure is silent — `/edit_pdf` returns 200 and an untouched form.
+
+1. Get the real field names: decrypt the source PDF (`qpdf --decrypt in.pdf out.pdf`)
+   and list `getForm().getFields()`. Judicial Council forms are encrypted, so pdf-lib
+   reports 0 fields until you do.
+2. Write `<form>-field-config.json`: `{ formTitle, fields: [{ id, newName, type, label }] }`
+   where `id` is the raw AcroForm path and `newName` is **the name the generated form
+   actually posts** — question `nameId`s and hiddenLogic `nodeId`s, not what you wish
+   they were called. Get the real list from the exported GUI JSON.
+   *List every field.* The sanitizer drops anything absent; map unknowns to their own
+   `id` to keep them.
+3. Sanitize: `sanitizePdfFields(bytes, config)` rewrites each `/T` to `newName`. Put
+   the result where `findPdfFile` looks — `FormWiz GUI/` wins over the repo root.
+4. Point the flowchart at it: `defaultPdfProperties.pdfFile` must be a real filename.
+   All three DV flowcharts shipped with the placeholder `"form.pdf"`.
+5. Check coverage by name before trusting it, then **verify visually** — matching names
+   do not prove values land in the right boxes.
+
+Repeated fields (a case number on nine pages) can share one `newName`; `/edit_pdf`
+loops every field, so all nine fill from one answer.
 
 ### Compiling a form to a flowchart
 
@@ -267,30 +407,84 @@ On the DV packet only one connection had an actual triggering field
     duplicate, retarget the field's `conditional.onlyWhen` at the real field instead.
 13. **A clean audit is not a good interview** — `auditForm()` checks geometry and
     reachability only. Read the question list before calling a form done.
+14. **`exportGuiJson` only ever sees the form on the canvas.** For a project use
+    `exportProjectGuiJson` (or the four toolbar buttons: *Export Project JSON* to
+    round-trip the project, *Export Project GUI JSON* for the merged config; the two
+    without "Project" silently give you one form).
+15. **Without `field_config.json` nothing fills.** It is the only place the raw
+    AcroForm path and the canonical name sit together. Save one per form, in
+    `dv-field-configs/`-style, whenever you compile a new packet — the previous
+    session compiled three flowcharts and never saved the configs, which cost this
+    session most of a day to reconstruct.
+16. **The sanitizer keeps only what the config lists.** A field you leave out is
+    removed from the PDF, not merely left unfilled. Map unknown fields to their own
+    `id` to preserve them.
+17. **Setting `<select>.value` to a value with no matching `<option>` fails silently.**
+    It leaves the select empty and no error is raised. This is what swallowed every
+    checkbox question's hidden logic. If an import "loses" values, check that the
+    options were populated before the values were assigned.
+18. **A `window.open()` after an `await` is popup-blocked.** Claim the tab before the
+    first await and set `location` afterwards.
+19. **Judicial Council PDFs are encrypted, not XFA.** The `DV-110[0].Page1[0]...`
+    paths look like XFA but pdf-lib reports 0 fields because of encryption. Decrypt
+    with qpdf (`/api/unlock-pdf` does this) before reading fields.
+20. **`Fill maximum path` is a coverage tool, not a correctness test.** It proves
+    fields *can* be filled with "Test Value", not that values land in the right boxes.
 
 ---
 
 ## 8. Suggested next steps for the new agent
 
-1. Re-read [`flowchart_ai_trainer_doc.txt`](./flowchart_ai_trainer_doc.txt) and run through W-9 Preview + PDF export after pull (**must use `npm start`**).
-2. Verify test payload zip → unzip → localhost preview workflow end-to-end.
-3. Extend `compile-form-schema.js` beyond W-9 when new schemas arrive (reuse generic router).
-5. **Packet-level mirroring is not built yet.** `mirrors` collapses repeated fields
-   within one form; the DV case number is 25 fields *across* three. Extending
-   `mirrors` across forms would collapse those to one question.
-6. **Nothing consumes `_mirrorTargets` yet.** The compiler records every PDF field a
-   mirrored answer must reach; the filler still has to be taught to write them.
-4. Optionally persist **question style** and **deployment style** in exported GUI JSON (not only preview URL).
-5. Add automated test: Fill maximum path → POST `/edit_pdf` → assert PDF field values match exportable HTML field names.
-6. Keep **form audit** in the loop — any flowchart change should be validated in Preview Form.
+Ordered by what actually blocks shipping the DV packet.
 
----
+1. **Verify the field mapping visually — this is the blocker.** The 83% / 89% / 81%
+   coverage figures measure that *names* match, not that values land in the *right*
+   boxes. A swapped pair (height ↔ weight, or the restrained person's address into the
+   protected person's block) scores as filled and is wrong. Fill each form with
+   per-field marker values (so `person_to_restrain_age` prints as
+   `person_to_restrain_age`), render every page, and read them against the blank forms.
+   Nothing else on this list matters until this is done.
+2. **Test more than the maximum path.** Only the widest path has been run, once. Run
+   the minimum path, a typical path, and specifically the branch where DV-110 is *not*
+   served — that exercises the activation logic that changed most.
+3. **Use realistic answers.** Everything so far is "Test User" / "Test Value" / `100`.
+   Real answers bring long text that overflows fixed-width fields, real dates and
+   apostrophes in names.
+4. **Close the eleven unmapped DV-110 fields** — firearm description and location
+   columns, page-9 clerk block. They have no question behind them and file blank.
+5. **Fix the three DV-100 yes/no pairs structurally.** `other_protected_people_no` /
+   `_yes`, `person_to_restrain_firearms_no` / `_yes`, `live_together_or_close_no` /
+   `_yes` are two questions where the form has one. They were reworded, not merged;
+   merging needs flowchart surgery.
+6. **Have a domestic violence practitioner read the 484 reworded questions.** They were
+   rewritten mechanically from nameIds and nobody with practice experience has reviewed
+   them.
+7. **Audit conditional visibility.** Questions were confirmed to *fill*; no one has
+   confirmed each appears under the right conditions across 386 questions.
+8. **Test production deployment mode.** Only `deploymentStyle=test` has ever been run.
+   Production shows checkout, hides the PDF tools and enforces the sign-in gate that
+   was bypassed throughout.
+9. **Add regression tests.** Every fix this session was verified by hand. Nothing stops
+   the next change reintroducing the `yes`/`no` collision or the dropped hidden logic.
+   Good first assertions: no two questions share a hiddenLogic `nodeId`; the project
+   export yields 20 sections; a maximum-path fill posts a key for every field name in
+   each sanitized PDF.
+10. **Packet-level mirroring across forms.** `mirrors` collapses repeats within one
+    form; `packetMirrors` (26 entries) handles them across forms at question level.
+    `_mirrorTargets` on the flowchart cells is still consumed by nothing.
+11. Extend `compile-form-schema.js` beyond W-9 when new schemas arrive.
+12. Optionally persist question style and deployment style in exported GUI JSON rather
+    than only the preview URL.
 
 ## 9. Git & contact context
 
 - **Remote:** `origin` → `https://github.com/Adam01140114/FlowchartCreationTool.git`
 - **User expectation:** Flowchart bot owns layout + routing + form quality; human supplies logical schema payloads.
 - **Commit before handoff:** All session changes including this `Hand Off/` folder, compiler, W-9 artifacts, and UI/form updates.
+- **Also read:** `auto-form/public/Auto-Form-Creator/docs/documentation.txt` — the
+  Auto Form Creator pipeline (9 steps, the manual no-API-key path, and why
+  `field_config.json` is the artifact that must not be lost). A duplicate copy lives at
+  `Auto-Form-Creator/docs/documentation.txt`; keep the two in sync.
 
 ---
 
