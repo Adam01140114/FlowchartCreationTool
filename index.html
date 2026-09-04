@@ -236,6 +236,7 @@
     <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
     <button onclick="showExportGuiJsonModal()">Export GUI JSON</button><br>
     <button onclick="exportProjectJson()">Export Project JSON</button>
+    <button onclick="exportProjectGuiJson()">Export Project GUI JSON</button>
     <button onclick="document.getElementById('importProjectFile').click()">Import Project JSON</button>
     <input
       type="file"
@@ -752,5 +753,6 @@
 <!-- Multi-form projects - loaded last so the editor API exists -->
 <script src="project-forms.js"></script>
 <script src="connector-nodes.js"></script>
+<script src="project-gui-export.js"></script>
 </body>
 </html>
