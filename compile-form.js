@@ -143,6 +143,38 @@ function normalizeFields(schema) {
   }));
 }
 
+/**
+ * Collapse fields that always hold the same value into a single question.
+ *
+ * A case number reprinted on every page is one answer, not thirteen. The
+ * surviving field records every PDF field the answer has to reach, so one
+ * response can fill all of them at fill time. Merging them in the PDF itself
+ * would mean two AcroForm fields sharing a fully-qualified name, which is
+ * malformed and read inconsistently by viewers.
+ */
+function applyMirrors(fields, hints) {
+  const specs = hints.mirrors || [];
+  if (!specs.length) return fields;
+
+  const dropped = new Set();
+  specs.forEach((spec) => {
+    const members = (spec.members || [])
+      .map((m) => fields.find((f) => f.id === m || f.nameId === m))
+      .filter(Boolean);
+    if (members.length < 2) return;
+
+    const [keeper, ...rest] = members;
+    if (spec.nameId) keeper.nameId = spec.nameId;
+    if (spec.question) keeper.question = spec.question;
+    if (spec.label) keeper.label = spec.label;
+    // Every target, keeper included - the filler needs the whole list.
+    keeper.mirrorTargets = members.map((m) => m.id);
+    rest.forEach((m) => dropped.add(m.id));
+  });
+
+  return fields.filter((f) => !dropped.has(f.id));
+}
+
 /** Longest shared underscore-token prefix across ids (>=1 token). */
 function commonTokenPrefix(ids) {
   const parts = ids.map((s) => s.split('_'));
@@ -633,7 +665,7 @@ function createBuilder() {
     sources.forEach((s) => addEdge(s.id, target.id, 'funnel'));
   }
 
-  function addQuestion({ text, type, nameId, section, x, y }) {
+  function addQuestion({ text, type, nameId, section, x, y, mirrorTargets }) {
     const box = fitBox(text, { minW: Q_W, minH: Q_H, maxW: Q_W });
     const stroke = sectionStyle(section);
     return addVertex({
@@ -654,7 +686,8 @@ function createBuilder() {
       _questionText: text,
       _questionId: String(questionCounter++),
       _nameId: nameId,
-      _placeholder: ''
+      _placeholder: '',
+      _mirrorTargets: (mirrorTargets && mirrorTargets.length) ? mirrorTargets : null
     });
   }
 
@@ -775,7 +808,9 @@ function layoutSequence(b, steps, startY, centerX) {
       nameId: step.nameId,
       section: step.section || 1,
       x: centerX - Q_W / 2,
-      y: qy
+      y: qy,
+      // Set only on mirrored fields; every step carries its source field.
+      mirrorTargets: step.field ? step.field.mirrorTargets : null
     });
     step.cell = q;
 
@@ -838,7 +873,7 @@ function layoutSequence(b, steps, startY, centerX) {
 
 function compile(schema, hints = {}) {
   const merged = Object.assign({}, schema.interview || {}, hints);
-  const fields = normalizeFields(schema);
+  const fields = applyMirrors(normalizeFields(schema), merged);
   const { steps, notes, groups } = buildInterview(fields, merged);
 
   const b = createBuilder();

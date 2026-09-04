@@ -1,0 +1,160 @@
+{
+  "_comment": "Interview knowledge the DV-109 field_config cannot express: which checkbox sets are one exclusive choice, which fields repeat the same value on every page, readable question wording, and the section names. Same shape may be embedded in a schema as an \"interview\" block.",
+  "mirrors": [
+    {
+      "nameId": "case_number",
+      "question": "What is the case number?",
+      "label": "Case Number",
+      "members": [
+        "case_number_page_1",
+        "case_number_page_2",
+        "case_number_page_3"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "nameId": "temporary_restraining_orders_outcome",
+      "question": "What did the judge decide about the temporary restraining orders?",
+      "members": [
+        "temporary_restraining_orders_all_granted",
+        "temporary_restraining_orders_all_denied",
+        "temporary_restraining_orders_partly_granted_partly_denied"
+      ]
+    },
+    {
+      "nameId": "service_deadline",
+      "question": "How long before the hearing must the papers be served?",
+      "members": [
+        "service_deadline_five_days",
+        "service_deadline_other_days"
+      ]
+    },
+    {
+      "nameId": "denial_reason",
+      "question": "Why were the orders denied?",
+      "multiSelect": true,
+      "members": [
+        "denial_reason_no_reasonable_proof_of_abuse",
+        "denial_reason_insufficient_incident_detail",
+        "denial_reason_other"
+      ]
+    }
+  ],
+  "questions": {
+    "person_asking_for_protection_name": {
+      "text": "Who is asking for protection?"
+    },
+    "person_to_be_restrained_name": {
+      "text": "Who is to be restrained?"
+    },
+    "court_name_and_street_address": {
+      "text": "What is the court's name and street address?"
+    },
+    "hearing_court_name_and_address": {
+      "text": "What is the hearing court's name and address?"
+    },
+    "hearing_date": {
+      "text": "What is the hearing date?"
+    },
+    "hearing_time": {
+      "text": "What time is the hearing?"
+    },
+    "hearing_department": {
+      "text": "Which department is the hearing in?"
+    },
+    "hearing_room": {
+      "text": "Which room is the hearing in?"
+    },
+    "temporary_restraining_order_denial_reasons_apply": {
+      "text": "Did the judge give reasons for the denial?"
+    },
+    "denial_reason_other_explanation": {
+      "text": "What is the other reason for the denial?"
+    },
+    "minor_confidentiality_request_granted": {
+      "text": "Was the request to keep a minor's information confidential granted?"
+    },
+    "service_deadline_other_days_count": {
+      "text": "How many days before the hearing?"
+    },
+    "serve_form_dv_110": {
+      "text": "Must DV-110 be served with this notice?",
+      "conditional": {
+        "onlyWhen": "temporary_restraining_orders_all_granted"
+      }
+    },
+    "serve_forms_dv_170_and_dv_165": {
+      "text": "Must DV-170 and DV-165 be served with this notice?",
+      "conditional": {
+        "onlyWhen": "minor_confidentiality_request_granted"
+      }
+    },
+    "serve_other_form": {
+      "text": "Must any other form be served with this notice?"
+    },
+    "serve_other_form_name": {
+      "text": "Which other form must be served?"
+    },
+    "judicial_officer_signature_date": {
+      "text": "What date did the judicial officer sign?"
+    },
+    "clerk_deputy_name": {
+      "text": "Which deputy clerk completed the certificate?"
+    },
+    "clerk_certificate_date": {
+      "text": "What date was the clerk's certificate completed?"
+    }
+  },
+  "sections": [
+    {
+      "name": "Parties and Court",
+      "fields": [
+        "person_asking_for_protection_name",
+        "person_to_be_restrained_name",
+        "court_name_and_street_address",
+        "case_number"
+      ]
+    },
+    {
+      "name": "Hearing",
+      "fields": [
+        "hearing_court_different",
+        "hearing_court_name_and_address",
+        "hearing_date",
+        "hearing_time",
+        "hearing_department",
+        "hearing_room"
+      ]
+    },
+    {
+      "name": "Judge's Decision",
+      "fields": [
+        "temporary_restraining_orders_outcome",
+        "temporary_restraining_order_denial_reasons_apply",
+        "denial_reason",
+        "denial_reason_other_explanation",
+        "minor_confidentiality_request_granted"
+      ]
+    },
+    {
+      "name": "Service",
+      "fields": [
+        "service_deadline",
+        "service_deadline_other_days_count",
+        "serve_form_dv_110",
+        "serve_forms_dv_170_and_dv_165",
+        "serve_other_form",
+        "serve_other_form_name"
+      ]
+    },
+    {
+      "name": "Signatures",
+      "fields": [
+        "judicial_officer_signature_date",
+        "clerk_deputy_name",
+        "clerk_certificate_date"
+      ]
+    }
+  ]
+}
