@@ -1,0 +1,1158 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-18T00:31:59.016Z",
+  "byNameId": {
+    "agency_ori": {
+      "pdfId": "agency_ori",
+      "page": 1,
+      "rect": [
+        28.27,
+        671.41,
+        295.28,
+        685.65
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].ORI[0]",
+      "label": "ORI",
+      "nameId": "agency_ori"
+    },
+    "agency_authorized_applicant_type": {
+      "pdfId": "agency_authorized_applicant_type",
+      "page": 1,
+      "rect": [
+        317.37,
+        671.9,
+        582.17,
+        684.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].authorizedapptype[0]",
+      "label": "Authorized Applicant Type",
+      "nameId": "agency_authorized_applicant_type"
+    },
+    "agency_type_of_license": {
+      "pdfId": "agency_type_of_license",
+      "page": 1,
+      "rect": [
+        28.27,
+        643.48,
+        583.58,
+        658.65
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].typeof[0]",
+      "label": "Type of License/Certification/Permit",
+      "nameId": "agency_type_of_license"
+    },
+    "agency_authorized_to_receive_criminal_record_info": {
+      "pdfId": "agency_authorized_to_receive_criminal_record_info",
+      "page": 1,
+      "rect": [
+        29.69,
+        599.91,
+        293.86,
+        612.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].agencyauthorized[0]",
+      "label": "Agency Authorized to Receive Criminal Record Information",
+      "nameId": "agency_authorized_to_receive_criminal_record_info"
+    },
+    "agency_mail_code": {
+      "pdfId": "agency_mail_code",
+      "page": 1,
+      "rect": [
+        317.37,
+        599.16,
+        582.17,
+        612.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].mailcode[0]",
+      "label": "Mail Code",
+      "nameId": "agency_mail_code"
+    },
+    "agency_street_address": {
+      "pdfId": "agency_street_address",
+      "page": 1,
+      "rect": [
+        29.69,
+        572.91,
+        293.86,
+        585.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].streetaddress[0]",
+      "label": "Street Address or P.O. Box",
+      "nameId": "agency_street_address"
+    },
+    "agency_contact_name": {
+      "pdfId": "agency_contact_name",
+      "page": 1,
+      "rect": [
+        317.37,
+        572.91,
+        582.17,
+        585.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].contactname[0]",
+      "label": "Contact Name",
+      "nameId": "agency_contact_name"
+    },
+    "agency_city": {
+      "pdfId": "agency_city",
+      "page": 1,
+      "rect": [
+        29.69,
+        545.15,
+        198.11,
+        558.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].city[0]",
+      "label": "City",
+      "nameId": "agency_city"
+    },
+    "agency_zip_code": {
+      "pdfId": "agency_zip_code",
+      "page": 1,
+      "rect": [
+        242.5,
+        545.15,
+        293.86,
+        558.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].zip[0]",
+      "label": "ZIP Code",
+      "nameId": "agency_zip_code"
+    },
+    "agency_contact_telephone_number": {
+      "pdfId": "agency_contact_telephone_number",
+      "page": 1,
+      "rect": [
+        317.35,
+        545.12,
+        582.19,
+        558.26
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].PhoneNum[0]",
+      "label": "Contact Telephone Number",
+      "nameId": "agency_contact_telephone_number"
+    },
+    "applicant_first_name": {
+      "pdfId": "applicant_first_name",
+      "page": 1,
+      "rect": [
+        316.94,
+        502.21,
+        555,
+        513.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].firstname[0]",
+      "label": "First Name",
+      "nameId": "applicant_first_name"
+    },
+    "applicant_middle_initial": {
+      "pdfId": "applicant_middle_initial",
+      "page": 1,
+      "rect": [
+        560.89,
+        502.21,
+        582.17,
+        513.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].suffix[0]",
+      "label": "Middle Initial",
+      "nameId": "applicant_middle_initial"
+    },
+    "applicant_last_name": {
+      "pdfId": "applicant_last_name",
+      "page": 1,
+      "rect": [
+        29.69,
+        501.69,
+        294.44,
+        513.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].lastname[0]",
+      "label": "Last Name",
+      "nameId": "applicant_last_name"
+    },
+    "other_name_suffix": {
+      "pdfId": "other_name_suffix",
+      "page": 1,
+      "rect": [
+        560.89,
+        460.3,
+        582.17,
+        471.83
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].suffix[1]",
+      "label": "Suffix (Other Name)",
+      "nameId": "other_name_suffix"
+    },
+    "other_name_last": {
+      "pdfId": "other_name_last",
+      "page": 1,
+      "rect": [
+        29.69,
+        460.29,
+        294.44,
+        471.83
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].last[0]",
+      "label": "Other Name (Last)",
+      "nameId": "other_name_last"
+    },
+    "other_name_first": {
+      "pdfId": "other_name_first",
+      "page": 1,
+      "rect": [
+        316.94,
+        460.29,
+        555,
+        471.83
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].first[0]",
+      "label": "Other Name (First)",
+      "nameId": "other_name_first"
+    },
+    "applicant_date_of_birth": {
+      "pdfId": "applicant_date_of_birth",
+      "page": 1,
+      "rect": [
+        29.69,
+        427.85,
+        105.06,
+        440.93
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].DOB[0]",
+      "label": "Date of Birth",
+      "nameId": "applicant_date_of_birth"
+    },
+    "applicant_drivers_license_number": {
+      "pdfId": "applicant_drivers_license_number",
+      "page": 1,
+      "rect": [
+        316.94,
+        427.85,
+        582.17,
+        440.93
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].DLnumber[0]",
+      "label": "Driver's License Number",
+      "nameId": "applicant_drivers_license_number"
+    },
+    "applicant_weight": {
+      "pdfId": "applicant_weight",
+      "page": 1,
+      "rect": [
+        101.64,
+        401.16,
+        156.9,
+        414.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].weight[0]",
+      "label": "Weight",
+      "nameId": "applicant_weight"
+    },
+    "applicant_eye_color": {
+      "pdfId": "applicant_eye_color",
+      "page": 1,
+      "rect": [
+        171.28,
+        401.16,
+        226.54,
+        414.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].eye[0]",
+      "label": "Eye Color",
+      "nameId": "applicant_eye_color"
+    },
+    "applicant_height": {
+      "pdfId": "applicant_height",
+      "page": 1,
+      "rect": [
+        29.69,
+        401.15,
+        84.95,
+        414.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].height[0]",
+      "label": "Height",
+      "nameId": "applicant_height"
+    },
+    "applicant_hair_color": {
+      "pdfId": "applicant_hair_color",
+      "page": 1,
+      "rect": [
+        240.92,
+        401.15,
+        294.44,
+        414.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].hair[0]",
+      "label": "Hair Color",
+      "nameId": "applicant_hair_color"
+    },
+    "agency_billing_number": {
+      "pdfId": "agency_billing_number",
+      "page": 1,
+      "rect": [
+        348.57,
+        394.41,
+        583.58,
+        415.65
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].billingnumber[0]",
+      "label": "Billing Number",
+      "nameId": "agency_billing_number"
+    },
+    "applicant_place_of_birth": {
+      "pdfId": "applicant_place_of_birth",
+      "page": 1,
+      "rect": [
+        29.69,
+        375.31,
+        154.59,
+        386.84
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].POB[0]",
+      "label": "Place of Birth",
+      "nameId": "applicant_place_of_birth"
+    },
+    "applicant_social_security_number": {
+      "pdfId": "applicant_social_security_number",
+      "page": 1,
+      "rect": [
+        171.25,
+        375.29,
+        294.47,
+        386.87
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].SSN[0]",
+      "label": "Social Security Number",
+      "nameId": "applicant_social_security_number"
+    },
+    "applicant_misc_number": {
+      "pdfId": "applicant_misc_number",
+      "page": 1,
+      "rect": [
+        348.57,
+        365.08,
+        583.58,
+        383.99
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].miscnumber[0]",
+      "label": "Miscellaneous Number",
+      "nameId": "applicant_misc_number"
+    },
+    "applicant_home_address": {
+      "pdfId": "applicant_home_address",
+      "page": 1,
+      "rect": [
+        66.82,
+        339.39,
+        294.43,
+        351.83
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].streetorPO[0]",
+      "label": "Home Address",
+      "nameId": "applicant_home_address"
+    },
+    "applicant_home_city": {
+      "pdfId": "applicant_home_city",
+      "page": 1,
+      "rect": [
+        316.94,
+        339.39,
+        485.36,
+        351.83
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].city[1]",
+      "label": "City (Home)",
+      "nameId": "applicant_home_city"
+    },
+    "applicant_home_zip_code": {
+      "pdfId": "applicant_home_zip_code",
+      "page": 1,
+      "rect": [
+        530.13,
+        339.39,
+        582.17,
+        351.83
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].zip[1]",
+      "label": "ZIP Code (Home)",
+      "nameId": "applicant_home_zip_code"
+    },
+    "applicant_signature_date": {
+      "pdfId": "applicant_signature_date",
+      "page": 1,
+      "rect": [
+        383.67,
+        283.78,
+        545.13,
+        298.66
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].DateTimeField1[0]",
+      "label": "Applicant Signature Date",
+      "nameId": "applicant_signature_date"
+    },
+    "applicant_number": {
+      "pdfId": "applicant_number",
+      "page": 1,
+      "rect": [
+        99.18,
+        252.38,
+        296.44,
+        264.38
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].yournumber[0]",
+      "label": "Your Number",
+      "nameId": "applicant_number"
+    },
+    "original_ati_number": {
+      "pdfId": "original_ati_number",
+      "page": 1,
+      "rect": [
+        211.27,
+        217.67,
+        582.17,
+        229.22
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].origATI[0]",
+      "label": "Original ATI Number",
+      "nameId": "original_ati_number"
+    },
+    "employer_name": {
+      "pdfId": "employer_name",
+      "page": 1,
+      "rect": [
+        29.76,
+        165.48,
+        582.17,
+        177
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].emplname[0]",
+      "label": "Employer Name",
+      "nameId": "employer_name"
+    },
+    "employer_address": {
+      "pdfId": "employer_address",
+      "page": 1,
+      "rect": [
+        29.76,
+        136.92,
+        376.93,
+        150
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].address[0]",
+      "label": "Employer Street Address or P.O. Box",
+      "nameId": "employer_address"
+    },
+    "employer_phone_number": {
+      "pdfId": "employer_phone_number",
+      "page": 1,
+      "rect": [
+        383.11,
+        136.81,
+        582.19,
+        149.43
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].PhoneNum[1]",
+      "label": "Employer Telephone Number",
+      "nameId": "employer_phone_number"
+    },
+    "employer_city": {
+      "pdfId": "employer_city",
+      "page": 1,
+      "rect": [
+        29.76,
+        110.67,
+        260.88,
+        123
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].city[2]",
+      "label": "Employer City",
+      "nameId": "employer_city"
+    },
+    "employer_zip_code": {
+      "pdfId": "employer_zip_code",
+      "page": 1,
+      "rect": [
+        312.97,
+        110.67,
+        376.93,
+        123
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].zip[2]",
+      "label": "Employer ZIP Code",
+      "nameId": "employer_zip_code"
+    },
+    "employer_mail_code": {
+      "pdfId": "employer_mail_code",
+      "page": 1,
+      "rect": [
+        383.14,
+        110.19,
+        582.17,
+        122.4
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].mailcode[1]",
+      "label": "Employer Mail Code",
+      "nameId": "employer_mail_code"
+    },
+    "applicant_sex_male": {
+      "pdfId": "applicant_sex_male",
+      "page": 1,
+      "rect": [
+        128.24,
+        426.5,
+        139.24,
+        437.5
+      ],
+      "type": "checkbox",
+      "originalPdfId": "form1[0].#subform[0].MorF[0]__1_1",
+      "label": "Male",
+      "nameId": "applicant_sex_male"
+    },
+    "applicant_sex_female": {
+      "pdfId": "applicant_sex_female",
+      "page": 1,
+      "rect": [
+        161.54,
+        426.5,
+        172.54,
+        437.5
+      ],
+      "type": "checkbox",
+      "originalPdfId": "form1[0].#subform[0].MorF[0]__2_2",
+      "label": "Female",
+      "nameId": "applicant_sex_female"
+    },
+    "applicant_sex_nonbinary": {
+      "pdfId": "applicant_sex_nonbinary",
+      "page": 1,
+      "rect": [
+        203.84,
+        426.5,
+        214.84,
+        437.5
+      ],
+      "type": "checkbox",
+      "originalPdfId": "form1[0].#subform[0].MorF[0]__3_2",
+      "label": "Nonbinary/Unspecified",
+      "nameId": "applicant_sex_nonbinary"
+    },
+    "level_of_service_doj": {
+      "pdfId": "level_of_service_doj",
+      "page": 1,
+      "rect": [
+        405.14,
+        256.8,
+        415.14,
+        266.8
+      ],
+      "type": "checkbox",
+      "originalPdfId": "form1[0].#subform[0].DOJ[0]",
+      "label": "DOJ",
+      "nameId": "level_of_service_doj"
+    },
+    "level_of_service_fbi": {
+      "pdfId": "level_of_service_fbi",
+      "page": 1,
+      "rect": [
+        457.37,
+        256.8,
+        467.37,
+        266.8
+      ],
+      "type": "checkbox",
+      "originalPdfId": "form1[0].#subform[0].FBI[0]",
+      "label": "FBI",
+      "nameId": "level_of_service_fbi"
+    },
+    "agency_state": {
+      "pdfId": "agency_state",
+      "page": 1,
+      "rect": [
+        203.75,
+        545.15,
+        236.18,
+        558.23
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].DropDownList1[0]",
+      "label": "State",
+      "nameId": "agency_state"
+    },
+    "applicant_home_state": {
+      "pdfId": "applicant_home_state",
+      "page": 1,
+      "rect": [
+        491.43,
+        339.38,
+        523.87,
+        351.83
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].DropDownList1[1]",
+      "label": "State",
+      "nameId": "applicant_home_state"
+    },
+    "employer_state": {
+      "pdfId": "employer_state",
+      "page": 1,
+      "rect": [
+        266.55,
+        110.67,
+        307.3,
+        123
+      ],
+      "type": "text",
+      "originalPdfId": "form1[0].#subform[0].DropDownList1[2]",
+      "label": "State",
+      "nameId": "employer_state"
+    }
+  },
+  "byPdfId": {
+    "agency_ori": {
+      "pdfId": "agency_ori",
+      "page": 1,
+      "rect": [
+        28.27,
+        671.41,
+        295.28,
+        685.65
+      ],
+      "type": "text"
+    },
+    "agency_authorized_applicant_type": {
+      "pdfId": "agency_authorized_applicant_type",
+      "page": 1,
+      "rect": [
+        317.37,
+        671.9,
+        582.17,
+        684.23
+      ],
+      "type": "text"
+    },
+    "agency_type_of_license": {
+      "pdfId": "agency_type_of_license",
+      "page": 1,
+      "rect": [
+        28.27,
+        643.48,
+        583.58,
+        658.65
+      ],
+      "type": "text"
+    },
+    "agency_authorized_to_receive_criminal_record_info": {
+      "pdfId": "agency_authorized_to_receive_criminal_record_info",
+      "page": 1,
+      "rect": [
+        29.69,
+        599.91,
+        293.86,
+        612.23
+      ],
+      "type": "text"
+    },
+    "agency_mail_code": {
+      "pdfId": "agency_mail_code",
+      "page": 1,
+      "rect": [
+        317.37,
+        599.16,
+        582.17,
+        612.23
+      ],
+      "type": "text"
+    },
+    "agency_street_address": {
+      "pdfId": "agency_street_address",
+      "page": 1,
+      "rect": [
+        29.69,
+        572.91,
+        293.86,
+        585.23
+      ],
+      "type": "text"
+    },
+    "agency_city": {
+      "pdfId": "agency_city",
+      "page": 1,
+      "rect": [
+        29.69,
+        545.15,
+        198.11,
+        558.23
+      ],
+      "type": "text"
+    },
+    "agency_zip_code": {
+      "pdfId": "agency_zip_code",
+      "page": 1,
+      "rect": [
+        242.5,
+        545.15,
+        293.86,
+        558.23
+      ],
+      "type": "text"
+    },
+    "agency_contact_name": {
+      "pdfId": "agency_contact_name",
+      "page": 1,
+      "rect": [
+        317.37,
+        572.91,
+        582.17,
+        585.23
+      ],
+      "type": "text"
+    },
+    "agency_contact_telephone_number": {
+      "pdfId": "agency_contact_telephone_number",
+      "page": 1,
+      "rect": [
+        317.35,
+        545.12,
+        582.19,
+        558.26
+      ],
+      "type": "text"
+    },
+    "applicant_last_name": {
+      "pdfId": "applicant_last_name",
+      "page": 1,
+      "rect": [
+        29.69,
+        501.69,
+        294.44,
+        513.23
+      ],
+      "type": "text"
+    },
+    "applicant_first_name": {
+      "pdfId": "applicant_first_name",
+      "page": 1,
+      "rect": [
+        316.94,
+        502.21,
+        555,
+        513.23
+      ],
+      "type": "text"
+    },
+    "applicant_middle_initial": {
+      "pdfId": "applicant_middle_initial",
+      "page": 1,
+      "rect": [
+        560.89,
+        502.21,
+        582.17,
+        513.23
+      ],
+      "type": "text"
+    },
+    "other_name_last": {
+      "pdfId": "other_name_last",
+      "page": 1,
+      "rect": [
+        29.69,
+        460.29,
+        294.44,
+        471.83
+      ],
+      "type": "text"
+    },
+    "other_name_first": {
+      "pdfId": "other_name_first",
+      "page": 1,
+      "rect": [
+        316.94,
+        460.29,
+        555,
+        471.83
+      ],
+      "type": "text"
+    },
+    "other_name_suffix": {
+      "pdfId": "other_name_suffix",
+      "page": 1,
+      "rect": [
+        560.89,
+        460.3,
+        582.17,
+        471.83
+      ],
+      "type": "text"
+    },
+    "applicant_date_of_birth": {
+      "pdfId": "applicant_date_of_birth",
+      "page": 1,
+      "rect": [
+        29.69,
+        427.85,
+        105.06,
+        440.93
+      ],
+      "type": "text"
+    },
+    "applicant_drivers_license_number": {
+      "pdfId": "applicant_drivers_license_number",
+      "page": 1,
+      "rect": [
+        316.94,
+        427.85,
+        582.17,
+        440.93
+      ],
+      "type": "text"
+    },
+    "applicant_height": {
+      "pdfId": "applicant_height",
+      "page": 1,
+      "rect": [
+        29.69,
+        401.15,
+        84.95,
+        414.23
+      ],
+      "type": "text"
+    },
+    "applicant_weight": {
+      "pdfId": "applicant_weight",
+      "page": 1,
+      "rect": [
+        101.64,
+        401.16,
+        156.9,
+        414.23
+      ],
+      "type": "text"
+    },
+    "applicant_eye_color": {
+      "pdfId": "applicant_eye_color",
+      "page": 1,
+      "rect": [
+        171.28,
+        401.16,
+        226.54,
+        414.23
+      ],
+      "type": "text"
+    },
+    "applicant_hair_color": {
+      "pdfId": "applicant_hair_color",
+      "page": 1,
+      "rect": [
+        240.92,
+        401.15,
+        294.44,
+        414.23
+      ],
+      "type": "text"
+    },
+    "applicant_place_of_birth": {
+      "pdfId": "applicant_place_of_birth",
+      "page": 1,
+      "rect": [
+        29.69,
+        375.31,
+        154.59,
+        386.84
+      ],
+      "type": "text"
+    },
+    "applicant_social_security_number": {
+      "pdfId": "applicant_social_security_number",
+      "page": 1,
+      "rect": [
+        171.25,
+        375.29,
+        294.47,
+        386.87
+      ],
+      "type": "text"
+    },
+    "applicant_home_address": {
+      "pdfId": "applicant_home_address",
+      "page": 1,
+      "rect": [
+        66.82,
+        339.39,
+        294.43,
+        351.83
+      ],
+      "type": "text"
+    },
+    "applicant_home_city": {
+      "pdfId": "applicant_home_city",
+      "page": 1,
+      "rect": [
+        316.94,
+        339.39,
+        485.36,
+        351.83
+      ],
+      "type": "text"
+    },
+    "applicant_home_zip_code": {
+      "pdfId": "applicant_home_zip_code",
+      "page": 1,
+      "rect": [
+        530.13,
+        339.39,
+        582.17,
+        351.83
+      ],
+      "type": "text"
+    },
+    "agency_billing_number": {
+      "pdfId": "agency_billing_number",
+      "page": 1,
+      "rect": [
+        348.57,
+        394.41,
+        583.58,
+        415.65
+      ],
+      "type": "text"
+    },
+    "applicant_misc_number": {
+      "pdfId": "applicant_misc_number",
+      "page": 1,
+      "rect": [
+        348.57,
+        365.08,
+        583.58,
+        383.99
+      ],
+      "type": "text"
+    },
+    "applicant_number": {
+      "pdfId": "applicant_number",
+      "page": 1,
+      "rect": [
+        99.18,
+        252.38,
+        296.44,
+        264.38
+      ],
+      "type": "text"
+    },
+    "level_of_service_doj": {
+      "pdfId": "level_of_service_doj",
+      "page": 1,
+      "rect": [
+        405.14,
+        256.8,
+        415.14,
+        266.8
+      ],
+      "type": "checkbox"
+    },
+    "level_of_service_fbi": {
+      "pdfId": "level_of_service_fbi",
+      "page": 1,
+      "rect": [
+        457.37,
+        256.8,
+        467.37,
+        266.8
+      ],
+      "type": "checkbox"
+    },
+    "original_ati_number": {
+      "pdfId": "original_ati_number",
+      "page": 1,
+      "rect": [
+        211.27,
+        217.67,
+        582.17,
+        229.22
+      ],
+      "type": "text"
+    },
+    "employer_name": {
+      "pdfId": "employer_name",
+      "page": 1,
+      "rect": [
+        29.76,
+        165.48,
+        582.17,
+        177
+      ],
+      "type": "text"
+    },
+    "employer_address": {
+      "pdfId": "employer_address",
+      "page": 1,
+      "rect": [
+        29.76,
+        136.92,
+        376.93,
+        150
+      ],
+      "type": "text"
+    },
+    "employer_city": {
+      "pdfId": "employer_city",
+      "page": 1,
+      "rect": [
+        29.76,
+        110.67,
+        260.88,
+        123
+      ],
+      "type": "text"
+    },
+    "employer_zip_code": {
+      "pdfId": "employer_zip_code",
+      "page": 1,
+      "rect": [
+        312.97,
+        110.67,
+        376.93,
+        123
+      ],
+      "type": "text"
+    },
+    "employer_mail_code": {
+      "pdfId": "employer_mail_code",
+      "page": 1,
+      "rect": [
+        383.14,
+        110.19,
+        582.17,
+        122.4
+      ],
+      "type": "text"
+    },
+    "employer_phone_number": {
+      "pdfId": "employer_phone_number",
+      "page": 1,
+      "rect": [
+        383.11,
+        136.81,
+        582.19,
+        149.43
+      ],
+      "type": "text"
+    },
+    "agency_state": {
+      "pdfId": "agency_state",
+      "page": 1,
+      "rect": [
+        203.75,
+        545.15,
+        236.18,
+        558.23
+      ],
+      "type": "text"
+    },
+    "applicant_home_state": {
+      "pdfId": "applicant_home_state",
+      "page": 1,
+      "rect": [
+        491.43,
+        339.38,
+        523.87,
+        351.83
+      ],
+      "type": "text"
+    },
+    "employer_state": {
+      "pdfId": "employer_state",
+      "page": 1,
+      "rect": [
+        266.55,
+        110.67,
+        307.3,
+        123
+      ],
+      "type": "text"
+    },
+    "applicant_signature_date": {
+      "pdfId": "applicant_signature_date",
+      "page": 1,
+      "rect": [
+        383.67,
+        283.78,
+        545.13,
+        298.66
+      ],
+      "type": "text"
+    },
+    "applicant_sex_male": {
+      "pdfId": "applicant_sex_male",
+      "page": 1,
+      "rect": [
+        128.24,
+        426.5,
+        139.24,
+        437.5
+      ],
+      "type": "checkbox"
+    },
+    "applicant_sex_female": {
+      "pdfId": "applicant_sex_female",
+      "page": 1,
+      "rect": [
+        161.54,
+        426.5,
+        172.54,
+        437.5
+      ],
+      "type": "checkbox"
+    },
+    "applicant_sex_nonbinary": {
+      "pdfId": "applicant_sex_nonbinary",
+      "page": 1,
+      "rect": [
+        203.84,
+        426.5,
+        214.84,
+        437.5
+      ],
+      "type": "checkbox"
+    }
+  }
+}

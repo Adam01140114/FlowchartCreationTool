@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Enhanced PDF Text Extraction with Field Renaming</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <style>
+    /* Your styles here (same as before, truncated for brevity) */
+    .renaming-btn {
+      margin-top: 1rem;
+      padding: 0.8rem 1.5rem;
+      background-color: #48bb78;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .renaming-btn:hover {
+      background-color: #38a169;
+    }
+    
+    /* Adding styles for field highlighting */
+    .field-highlight, .checkbox-highlight {
+      background-color: #cce5ff;
+      padding: 2px 4px;
+      border-radius: 3px;
+      display: inline-block;
+      cursor: pointer;
+    }
+    
+     * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            margin-top: 2rem;
+        }
+
+        h1 {
+            color: #2d3436;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .upload-section {
+            border: 2px dashed #a0aec0;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #4299e1;
+            background-color: #f8fafc;
+        }
+
+        #pdfInput {
+            display: none;
+        }
+
+        .custom-upload-btn {
+            background-color: #4299e1;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .custom-upload-btn:hover {
+            background-color: #3182ce;
+        }
+
+        #results {
+            display: none;
+            margin-top: 2rem;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .field-item {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+        }
+
+        .field-type {
+            margin-left: auto;
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .checkbox-type {
+            color: #48bb78;
+        }
+
+        .text-type {
+            color: #4299e1;
+        }
+
+        #loading {
+            display: none;
+            color: #718096;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .error {
+            color: #e53e3e;
+            text-align: center;
+            margin-top: 1rem;
+        }
+    
+    
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📄 Enhanced PDF Form Extractor</h1>
+    
+    <div class="upload-section">
+      <label class="custom-upload-btn" for="pdfInput">
+        Choose PDF File
+      </label>
+      <p>or drag and drop PDF here</p>
+      <input type="file" id="pdfInput" accept=".pdf" />
+    </div>
+
+    <div id="loading">Analyzing PDF... Please wait</div>
+    <div class="extracted-text-container">
+      <h2 class="section-header">Extracted Document Content</h2>
+      <div class="formatted-text" id="formattedOutput"></div>
+    </div>
+
+    <button class="renaming-btn" id="downloadBtn" style="display:none;">Download Updated PDF</button>
+  </div>
+
+  <script>
+    const pdfInput = document.getElementById('pdfInput');
+    const loadingDiv = document.getElementById('loading');
+    const formattedOutput = document.getElementById('formattedOutput');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    let originalPdfBytes = null;
+    let renameMap = {};
+
+    const lineThreshold = 10;
+    const wordSpacingThreshold = 1;
+
+    pdfInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) analyzePDF(file);
+    });
+
+    document.addEventListener('dragover', e => {
+      e.preventDefault();
+      document.querySelector('.upload-section').style.borderColor = '#4299e1';
+    });
+    document.addEventListener('dragleave', () => {
+      document.querySelector('.upload-section').style.borderColor = '#a0aec0';
+    });
+    document.addEventListener('drop', e => {
+      e.preventDefault();
+      document.querySelector('.upload-section').style.borderColor = '#a0aec0';
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') {
+        pdfInput.files = e.dataTransfer.files;
+        analyzePDF(file);
+      }
+    });
+
+    async function analyzePDF(file) {
+      loadingDiv.style.display = 'block';
+      formattedOutput.innerHTML = '';
+      renameMap = {};
+      downloadBtn.style.display = 'none';
+
+      try {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          originalPdfBytes = new Uint8Array(e.target.result);
+          const pdf = await pdfjsLib.getDocument({ data: originalPdfBytes }).promise;
+          let allPagesContent = [];
+
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            const annotations = await page.getAnnotations();
+
+            let textItems = textContent.items.map(item => ({
+              type: 'text',
+              text: item.str,
+              xStart: item.transform[4],
+              xEnd: item.transform[4] + (item.str.length * 0.6 * Math.abs(item.transform[0])),
+              y: item.transform[5]
+            }));
+
+            textItems.sort((a, b) => b.y - a.y || a.xStart - b.xStart);
+
+            let lines = [];
+            let currentLine = { y: null, items: [] };
+
+            textItems.forEach(ti => {
+              if (!currentLine.y || Math.abs(currentLine.y - ti.y) < lineThreshold) {
+                currentLine.items.push(ti);
+                currentLine.y = currentLine.y || ti.y;
+              } else {
+                lines.push(currentLine);
+                currentLine = { y: ti.y, items: [ti] };
+              }
+            });
+            if (currentLine.items.length) lines.push(currentLine);
+
+            const isFillableCheckboxField = (a) => a.fieldType === 'Btn' && a.checkBox === true;
+            const isExtractableFormField = (a) => a.fieldType === 'Tx' || isFillableCheckboxField(a);
+
+            const pageFields = annotations
+              .filter(isExtractableFormField)
+              .map(a => ({
+                name: a.fieldName || 'Unnamed Field',
+                type: 'field',
+                fieldType: a.fieldType,
+                isCheckbox: isFillableCheckboxField(a),
+                xStart: (a.rect[0] + a.rect[2]) / 2,
+                xEnd: (a.rect[0] + a.rect[2]) / 2,
+                centerY: (a.rect[1] + a.rect[3]) / 2
+              }));
+
+            pageFields.sort((a, b) => b.centerY - a.centerY);
+
+            pageFields.forEach(field => {
+              const closestLine = lines.reduce((closest, ln) =>
+                Math.abs(ln.y - field.centerY) < Math.abs(closest.y - field.centerY) ? ln : closest
+              );
+              field.text = field.isCheckbox
+                ? `{{${field.name}}}`
+                : `[[${field.name}]]`;
+
+              closestLine.items.push(field);
+            });
+
+            const pageContent = lines.map(ln => {
+              ln.items.sort((a, b) => a.xStart - b.xStart);
+              let lineParts = [];
+              ln.items.forEach((item, i) => {
+                if (item.type === 'field') {
+                  const className = item.isCheckbox ? 'checkbox-highlight' : 'field-highlight';
+                  const dataAttr = `data-original-name="${item.name}" data-field-type="${item.fieldType}" data-is-checkbox="${item.isCheckbox}"`;
+                  lineParts.push(
+                    `<span class="${className} renameable-field" ${dataAttr}>${item.text}</span>`
+                  );
+                } else {
+                  const prev = ln.items[i - 1];
+                  const gap = prev ? item.xStart - prev.xEnd : 0;
+                  lineParts.push((gap > wordSpacingThreshold ? ' ' : '') + item.text);
+                }
+              });
+              return `<div class="text-line">${lineParts.join('')}</div>`;
+            }).join('');
+
+            allPagesContent.push(pageContent);
+          }
+
+          formattedOutput.innerHTML = allPagesContent.join('<div class="page-break"></div>');
+          attachRenameListeners();
+          loadingDiv.style.display = 'none';
+          downloadBtn.style.display = 'inline-block';
+        };
+        reader.readAsArrayBuffer(file);
+      } catch (err) {
+        loadingDiv.style.display = 'none';
+        formattedOutput.innerHTML = `<div class="error">Error processing PDF: ${err.message}</div>`;
+      }
+    }
+
+    function attachRenameListeners() {
+      const fields = document.querySelectorAll('.renameable-field');
+      fields.forEach(fieldEl => {
+        fieldEl.addEventListener('dblclick', () => {
+          const oldName = fieldEl.getAttribute('data-original-name');
+          const fieldType = fieldEl.getAttribute('data-field-type');
+          const isCheckbox = fieldEl.getAttribute('data-is-checkbox') === 'true';
+
+          const newName = prompt("Enter a new name for this field:", oldName);
+          if (newName && newName !== oldName) {
+            renameMap[oldName] = newName;
+            if (isCheckbox) {
+              fieldEl.textContent = `{{${newName}}}`;
+            } else {
+              fieldEl.textContent = `[[${newName}]]`;
+            }
+            fieldEl.setAttribute('data-original-name', newName);
+          }
+        });
+      });
+    }
+
+    downloadBtn.addEventListener('click', async () => {
+      if (!originalPdfBytes) return;
+
+      try {
+        const pdfDoc = await PDFLib.PDFDocument.load(originalPdfBytes);
+        const form = pdfDoc.getForm();
+
+        for (const [oldName, newName] of Object.entries(renameMap)) {
+          try {
+            const field = form.getField(oldName);
+            field.acroField.dict.set(
+              PDFLib.PDFName.of('T'),
+              PDFLib.PDFString.of(newName)
+            );
+          } catch (e) {
+            console.warn(`Could not rename field "${oldName}":`, e);
+          }
+        }
+
+        const newPdfBytes = await pdfDoc.save();
+        downloadFile(newPdfBytes, "updated-fields.pdf");
+      } catch (err) {
+        alert("Error renaming fields: " + err.message);
+      }
+    });
+
+    function downloadFile(arrayBuffer, filename) {
+      const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

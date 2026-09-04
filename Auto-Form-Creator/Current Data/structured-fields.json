@@ -1,0 +1,301 @@
+[
+  {
+    "id": "taxpayer_name",
+    "name": "taxpayer_name",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 317,
+      "y": 667
+    },
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "business_name",
+    "name": "business_name",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 317,
+      "y": 643
+    },
+    "nearestLabel": "of the following seven boxes",
+    "sanitizedLabel": "of the following seven boxes",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "tax_classification_individual",
+    "name": "tax_classification_individual",
+    "type": "checkbox",
+    "page": 1,
+    "position": {
+      "x": 77,
+      "y": 608
+    },
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "tax_classification_corporation",
+    "name": "tax_classification_corporation",
+    "type": "checkbox",
+    "page": 1,
+    "position": {
+      "x": 184,
+      "y": 608
+    },
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "tax_classification_s_corporation",
+    "name": "tax_classification_s_corporation",
+    "type": "checkbox",
+    "page": 1,
+    "position": {
+      "x": 256,
+      "y": 608
+    },
+    "nearestLabel": "C corporation",
+    "sanitizedLabel": "C corporation",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "tax_classification_partnership",
+    "name": "tax_classification_partnership",
+    "type": "checkbox",
+    "page": 1,
+    "position": {
+      "x": 328,
+      "y": 608
+    },
+    "nearestLabel": "S corporation",
+    "sanitizedLabel": "S corporation",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "tax_classification_trust_estate",
+    "name": "tax_classification_trust_estate",
+    "type": "checkbox",
+    "page": 1,
+    "position": {
+      "x": 393,
+      "y": 608
+    },
+    "nearestLabel": "Partnership",
+    "sanitizedLabel": "Partnership",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "tax_classification_llc",
+    "name": "tax_classification_llc",
+    "type": "checkbox",
+    "page": 1,
+    "position": {
+      "x": 77,
+      "y": 594
+    },
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "tax_classification_other",
+    "name": "tax_classification_other",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 432,
+      "y": 594
+    },
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "exempt_payee_code",
+    "name": "exempt_payee_code",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 560,
+      "y": 594
+    },
+    "nearestLabel": "Exempt payee code (if any)",
+    "sanitizedLabel": "Exempt payee code (if any)",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "tax_classification_other_checkbox",
+    "name": "tax_classification_other_checkbox",
+    "type": "checkbox",
+    "page": 1,
+    "position": {
+      "x": 77,
+      "y": 558
+    },
+    "nearestLabel": "Print or type",
+    "sanitizedLabel": "Print or type",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "tax_classification_code",
+    "name": "tax_classification_code",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 304,
+      "y": 558
+    },
+    "nearestLabel": "box for the tax classification of its owner",
+    "sanitizedLabel": "box for the tax classification of its owner",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "fatca_code",
+    "name": "fatca_code",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 538,
+      "y": 558
+    },
+    "nearestLabel": "code (if any)",
+    "sanitizedLabel": "code (if any)",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "foreign_partners_checkbox",
+    "name": "foreign_partners_checkbox",
+    "type": "checkbox",
+    "page": 1,
+    "position": {
+      "x": 445,
+      "y": 525
+    },
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "address",
+    "name": "address",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 223,
+      "y": 499
+    },
+    "nearestLabel": "5",
+    "sanitizedLabel": "5",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "optional_requester_name",
+    "name": "optional_requester_name",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 483,
+      "y": 487
+    },
+    "nearestLabel": "6 City, state, and ZIP code",
+    "sanitizedLabel": "6 City, state, and ZIP code",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "city_state_zip",
+    "name": "city_state_zip",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 223,
+      "y": 475
+    },
+    "nearestLabel": "City, state, and ZIP code",
+    "sanitizedLabel": "City, state, and ZIP code",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "account_number",
+    "name": "account_number",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 317,
+      "y": 451
+    },
+    "nearestLabel": "List account number(s) here (optional)",
+    "sanitizedLabel": "List account number(s) here (optional)",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "tin_ssn",
+    "name": "tin_ssn",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 439,
+      "y": 408
+    },
+    "nearestLabel": "or",
+    "sanitizedLabel": "or",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "tin_ein",
+    "name": "tin_ein",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 490,
+      "y": 408
+    },
+    "nearestLabel": "–",
+    "sanitizedLabel": "–",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "name_for_ein",
+    "name": "name_for_ein",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 547,
+      "y": 408
+    },
+    "nearestLabel": "for Part I, later. For other",
+    "sanitizedLabel": "for Part I, later. For other",
+    "sectionHint": "Under penalties of"
+  },
+  {
+    "id": "name_for_ssn",
+    "name": "name_for_ssn",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 432,
+      "y": 360
+    },
+    "nearestLabel": "What Name and",
+    "sanitizedLabel": "What Name and",
+    "sectionHint": "Employer"
+  },
+  {
+    "id": "additional_name_info",
+    "name": "additional_name_info",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 511,
+      "y": 360
+    },
+    "nearestLabel": "–",
+    "sanitizedLabel": "–",
+    "sectionHint": "Employer"
+  }
+]

@@ -1,0 +1,285 @@
+{
+  "formTitle": "Request for Live Scan Service",
+  "fields": [
+    {
+      "id": "form1[0].#subform[0].ORI[0]",
+      "newName": "agency_ori",
+      "type": "text",
+      "label": "ORI"
+    },
+    {
+      "id": "form1[0].#subform[0].authorizedapptype[0]",
+      "newName": "agency_authorized_applicant_type",
+      "type": "text",
+      "label": "Authorized Applicant Type"
+    },
+    {
+      "id": "form1[0].#subform[0].typeof[0]",
+      "newName": "agency_type_of_license",
+      "type": "text",
+      "label": "Type of License/Certification/Permit"
+    },
+    {
+      "id": "form1[0].#subform[0].agencyauthorized[0]",
+      "newName": "agency_authorized_to_receive_criminal_record_info",
+      "type": "text",
+      "label": "Agency Authorized to Receive Criminal Record Information"
+    },
+    {
+      "id": "form1[0].#subform[0].mailcode[0]",
+      "newName": "agency_mail_code",
+      "type": "text",
+      "label": "Mail Code"
+    },
+    {
+      "id": "form1[0].#subform[0].streetaddress[0]",
+      "newName": "agency_street_address",
+      "type": "text",
+      "label": "Street Address or P.O. Box"
+    },
+    {
+      "id": "form1[0].#subform[0].contactname[0]",
+      "newName": "agency_contact_name",
+      "type": "text",
+      "label": "Contact Name"
+    },
+    {
+      "id": "form1[0].#subform[0].city[0]",
+      "newName": "agency_city",
+      "type": "text",
+      "label": "City"
+    },
+    {
+      "id": "form1[0].#subform[0].zip[0]",
+      "newName": "agency_zip_code",
+      "type": "text",
+      "label": "ZIP Code"
+    },
+    {
+      "id": "form1[0].#subform[0].PhoneNum[0]",
+      "newName": "agency_contact_telephone_number",
+      "type": "text",
+      "label": "Contact Telephone Number"
+    },
+    {
+      "id": "form1[0].#subform[0].firstname[0]",
+      "newName": "applicant_first_name",
+      "type": "text",
+      "label": "First Name"
+    },
+    {
+      "id": "form1[0].#subform[0].suffix[0]",
+      "newName": "applicant_middle_initial",
+      "type": "text",
+      "label": "Middle Initial"
+    },
+    {
+      "id": "form1[0].#subform[0].lastname[0]",
+      "newName": "applicant_last_name",
+      "type": "text",
+      "label": "Last Name"
+    },
+    {
+      "id": "form1[0].#subform[0].suffix[1]",
+      "newName": "other_name_suffix",
+      "type": "text",
+      "label": "Suffix (Other Name)"
+    },
+    {
+      "id": "form1[0].#subform[0].last[0]",
+      "newName": "other_name_last",
+      "type": "text",
+      "label": "Other Name (Last)"
+    },
+    {
+      "id": "form1[0].#subform[0].first[0]",
+      "newName": "other_name_first",
+      "type": "text",
+      "label": "Other Name (First)"
+    },
+    {
+      "id": "form1[0].#subform[0].DOB[0]",
+      "newName": "applicant_date_of_birth",
+      "type": "text",
+      "label": "Date of Birth"
+    },
+    {
+      "id": "form1[0].#subform[0].DLnumber[0]",
+      "newName": "applicant_drivers_license_number",
+      "type": "text",
+      "label": "Driver's License Number"
+    },
+    {
+      "id": "form1[0].#subform[0].weight[0]",
+      "newName": "applicant_weight",
+      "type": "text",
+      "label": "Weight"
+    },
+    {
+      "id": "form1[0].#subform[0].eye[0]",
+      "newName": "applicant_eye_color",
+      "type": "text",
+      "label": "Eye Color"
+    },
+    {
+      "id": "form1[0].#subform[0].height[0]",
+      "newName": "applicant_height",
+      "type": "text",
+      "label": "Height"
+    },
+    {
+      "id": "form1[0].#subform[0].hair[0]",
+      "newName": "applicant_hair_color",
+      "type": "text",
+      "label": "Hair Color"
+    },
+    {
+      "id": "form1[0].#subform[0].billingnumber[0]",
+      "newName": "agency_billing_number",
+      "type": "text",
+      "label": "Billing Number"
+    },
+    {
+      "id": "form1[0].#subform[0].POB[0]",
+      "newName": "applicant_place_of_birth",
+      "type": "text",
+      "label": "Place of Birth"
+    },
+    {
+      "id": "form1[0].#subform[0].SSN[0]",
+      "newName": "applicant_social_security_number",
+      "type": "text",
+      "label": "Social Security Number"
+    },
+    {
+      "id": "form1[0].#subform[0].miscnumber[0]",
+      "newName": "applicant_misc_number",
+      "type": "text",
+      "label": "Miscellaneous Number"
+    },
+    {
+      "id": "form1[0].#subform[0].streetorPO[0]",
+      "newName": "applicant_home_address",
+      "type": "text",
+      "label": "Home Address"
+    },
+    {
+      "id": "form1[0].#subform[0].city[1]",
+      "newName": "applicant_home_city",
+      "type": "text",
+      "label": "City (Home)"
+    },
+    {
+      "id": "form1[0].#subform[0].zip[1]",
+      "newName": "applicant_home_zip_code",
+      "type": "text",
+      "label": "ZIP Code (Home)"
+    },
+    {
+      "id": "form1[0].#subform[0].DateTimeField1[0]",
+      "newName": "applicant_signature_date",
+      "type": "text",
+      "label": "Applicant Signature Date"
+    },
+    {
+      "id": "form1[0].#subform[0].yournumber[0]",
+      "newName": "applicant_number",
+      "type": "text",
+      "label": "Your Number"
+    },
+    {
+      "id": "form1[0].#subform[0].origATI[0]",
+      "newName": "original_ati_number",
+      "type": "text",
+      "label": "Original ATI Number",
+      "conditional": {
+        "onlyWhen": "resubmission",
+        "gateQuestion": "Is this a resubmission?"
+      }
+    },
+    {
+      "id": "form1[0].#subform[0].emplname[0]",
+      "newName": "employer_name",
+      "type": "text",
+      "label": "Employer Name"
+    },
+    {
+      "id": "form1[0].#subform[0].address[0]",
+      "newName": "employer_address",
+      "type": "text",
+      "label": "Employer Street Address or P.O. Box"
+    },
+    {
+      "id": "form1[0].#subform[0].PhoneNum[1]",
+      "newName": "employer_phone_number",
+      "type": "text",
+      "label": "Employer Telephone Number"
+    },
+    {
+      "id": "form1[0].#subform[0].city[2]",
+      "newName": "employer_city",
+      "type": "text",
+      "label": "Employer City"
+    },
+    {
+      "id": "form1[0].#subform[0].zip[2]",
+      "newName": "employer_zip_code",
+      "type": "text",
+      "label": "Employer ZIP Code"
+    },
+    {
+      "id": "form1[0].#subform[0].mailcode[1]",
+      "newName": "employer_mail_code",
+      "type": "text",
+      "label": "Employer Mail Code"
+    },
+    {
+      "id": "form1[0].#subform[0].MorF[0]__1_1",
+      "newName": "applicant_sex_male",
+      "type": "checkbox",
+      "label": "Male"
+    },
+    {
+      "id": "form1[0].#subform[0].MorF[0]__2_2",
+      "newName": "applicant_sex_female",
+      "type": "checkbox",
+      "label": "Female"
+    },
+    {
+      "id": "form1[0].#subform[0].MorF[0]__3_2",
+      "newName": "applicant_sex_nonbinary",
+      "type": "checkbox",
+      "label": "Nonbinary/Unspecified"
+    },
+    {
+      "id": "form1[0].#subform[0].DOJ[0]",
+      "newName": "level_of_service_doj",
+      "type": "checkbox",
+      "label": "DOJ"
+    },
+    {
+      "id": "form1[0].#subform[0].FBI[0]",
+      "newName": "level_of_service_fbi",
+      "type": "checkbox",
+      "label": "FBI"
+    },
+    {
+      "id": "form1[0].#subform[0].DropDownList1[0]",
+      "newName": "agency_state",
+      "type": "dropdown",
+      "label": "State"
+    },
+    {
+      "id": "form1[0].#subform[0].DropDownList1[1]",
+      "newName": "applicant_home_state",
+      "type": "dropdown",
+      "label": "State"
+    },
+    {
+      "id": "form1[0].#subform[0].DropDownList1[2]",
+      "newName": "employer_state",
+      "type": "dropdown",
+      "label": "State"
+    }
+  ]
+}

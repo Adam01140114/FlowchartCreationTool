@@ -1,0 +1,3208 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-18T01:44:16.180Z",
+  "byNameId": {
+    "employee_last_name": {
+      "pdfId": "employee_last_name",
+      "page": 1,
+      "rect": [
+        42.72,
+        604.76,
+        198.4,
+        620
+      ],
+      "type": "text",
+      "originalPdfId": "Last Name (Family Name)",
+      "label": "Last Name (Family Name)",
+      "nameId": "employee_last_name"
+    },
+    "employee_first_name": {
+      "pdfId": "employee_first_name",
+      "page": 1,
+      "rect": [
+        204.16,
+        604.76,
+        341.84,
+        620
+      ],
+      "type": "text",
+      "originalPdfId": "First Name Given Name",
+      "label": "First Name (Given Name)",
+      "nameId": "employee_first_name"
+    },
+    "employee_middle_initial": {
+      "pdfId": "employee_middle_initial",
+      "page": 1,
+      "rect": [
+        348.44,
+        604.76,
+        413.84,
+        620
+      ],
+      "type": "text",
+      "originalPdfId": "Employee Middle Initial (if any)",
+      "label": "Middle Initial (if any)",
+      "nameId": "employee_middle_initial"
+    },
+    "employee_other_last_names": {
+      "pdfId": "employee_other_last_names",
+      "page": 1,
+      "rect": [
+        420.44,
+        604.76,
+        576.12,
+        620
+      ],
+      "type": "text",
+      "originalPdfId": "Employee Other Last Names Used (if any)",
+      "label": "Other Last Names Used (if any)",
+      "nameId": "employee_other_last_names"
+    },
+    "employee_street_address": {
+      "pdfId": "employee_street_address",
+      "page": 1,
+      "rect": [
+        41.88,
+        579.92,
+        228.12,
+        593.48
+      ],
+      "type": "text",
+      "originalPdfId": "Address Street Number and Name",
+      "label": "Street Number and Name",
+      "nameId": "employee_street_address"
+    },
+    "employee_apartment_number": {
+      "pdfId": "employee_apartment_number",
+      "page": 1,
+      "rect": [
+        233.6,
+        579.92,
+        299.28,
+        593.47
+      ],
+      "type": "text",
+      "originalPdfId": "Apt Number (if any)",
+      "label": "Apt. Number (if any)",
+      "nameId": "employee_apartment_number"
+    },
+    "employee_city": {
+      "pdfId": "employee_city",
+      "page": 1,
+      "rect": [
+        305.88,
+        579.92,
+        455.28,
+        593.47
+      ],
+      "type": "text",
+      "originalPdfId": "City or Town",
+      "label": "City or Town",
+      "nameId": "employee_city"
+    },
+    "employee_state": {
+      "pdfId": "employee_state",
+      "page": 1,
+      "rect": [
+        461.25,
+        579.92,
+        502.42,
+        593.47
+      ],
+      "type": "text",
+      "originalPdfId": "State",
+      "label": "State",
+      "nameId": "employee_state"
+    },
+    "employee_zip_code": {
+      "pdfId": "employee_zip_code",
+      "page": 1,
+      "rect": [
+        509.88,
+        579.92,
+        575.28,
+        593.47
+      ],
+      "type": "text",
+      "originalPdfId": "ZIP Code",
+      "label": "ZIP Code",
+      "nameId": "employee_zip_code"
+    },
+    "employee_date_of_birth": {
+      "pdfId": "employee_date_of_birth",
+      "page": 1,
+      "rect": [
+        41.78,
+        553.64,
+        140.87,
+        567.48
+      ],
+      "type": "text",
+      "originalPdfId": "Date of Birth mmddyyyy",
+      "label": "Date of Birth (mm/dd/yyyy)",
+      "nameId": "employee_date_of_birth"
+    },
+    "employee_social_security_number": {
+      "pdfId": "employee_social_security_number",
+      "page": 1,
+      "rect": [
+        150,
+        553.44,
+        255,
+        567.2
+      ],
+      "type": "text",
+      "originalPdfId": "US Social Security Number",
+      "label": "U.S. Social Security Number",
+      "nameId": "employee_social_security_number"
+    },
+    "employee_email_address": {
+      "pdfId": "employee_email_address",
+      "page": 1,
+      "rect": [
+        264.16,
+        553.64,
+        450.12,
+        567.48
+      ],
+      "type": "text",
+      "originalPdfId": "Employees E-mail Address",
+      "label": "Email Address",
+      "nameId": "employee_email_address"
+    },
+    "employee_telephone_number": {
+      "pdfId": "employee_telephone_number",
+      "page": 1,
+      "rect": [
+        456.15,
+        553.48,
+        575.35,
+        567.59
+      ],
+      "type": "text",
+      "originalPdfId": "Telephone Number",
+      "label": "Telephone Number",
+      "nameId": "employee_telephone_number"
+    },
+    "citizenship_status_us_citizen": {
+      "pdfId": "citizenship_status_us_citizen",
+      "page": 1,
+      "rect": [
+        181.68,
+        523.32,
+        191.16,
+        532.8
+      ],
+      "type": "checkbox",
+      "originalPdfId": "CB_1",
+      "label": "A citizen of the United States",
+      "nameId": "citizenship_status_us_citizen"
+    },
+    "citizenship_status_noncitizen_national": {
+      "pdfId": "citizenship_status_noncitizen_national",
+      "page": 1,
+      "rect": [
+        181.68,
+        511.32,
+        191.16,
+        520.8
+      ],
+      "type": "checkbox",
+      "originalPdfId": "CB_2",
+      "label": "A noncitizen national of the United States",
+      "nameId": "citizenship_status_noncitizen_national"
+    },
+    "citizenship_status_lawful_permanent_resident": {
+      "pdfId": "citizenship_status_lawful_permanent_resident",
+      "page": 1,
+      "rect": [
+        181.68,
+        499.32,
+        191.16,
+        508.8
+      ],
+      "type": "checkbox",
+      "originalPdfId": "CB_3",
+      "label": "A lawful permanent resident",
+      "nameId": "citizenship_status_lawful_permanent_resident"
+    },
+    "lawful_permanent_resident_number": {
+      "pdfId": "lawful_permanent_resident_number",
+      "page": 1,
+      "rect": [
+        390.6,
+        498.24,
+        575.52,
+        509.4
+      ],
+      "type": "text",
+      "originalPdfId": "3 A lawful permanent resident Enter USCIS or ANumber",
+      "label": "USCIS or A-Number",
+      "nameId": "lawful_permanent_resident_number"
+    },
+    "citizenship_status_alien_authorized_to_work": {
+      "pdfId": "citizenship_status_alien_authorized_to_work",
+      "page": 1,
+      "rect": [
+        181.96,
+        487.32,
+        191.16,
+        496.36
+      ],
+      "type": "checkbox",
+      "originalPdfId": "CB_4",
+      "label": "An alien authorized to work",
+      "nameId": "citizenship_status_alien_authorized_to_work"
+    },
+    "alien_authorized_expiration_date": {
+      "pdfId": "alien_authorized_expiration_date",
+      "page": 1,
+      "rect": [
+        390.19,
+        484.11,
+        449.52,
+        497.03
+      ],
+      "type": "text",
+      "originalPdfId": "Exp Date mmddyyyy",
+      "label": "Expiration Date (if any)",
+      "nameId": "alien_authorized_expiration_date"
+    },
+    "alien_uscis_a_number": {
+      "pdfId": "alien_uscis_a_number",
+      "page": 1,
+      "rect": [
+        180.6,
+        444.24,
+        263.4,
+        455.4
+      ],
+      "type": "text",
+      "originalPdfId": "USCIS ANumber",
+      "label": "USCIS A-Number",
+      "nameId": "alien_uscis_a_number"
+    },
+    "alien_form_i94_admission_number": {
+      "pdfId": "alien_form_i94_admission_number",
+      "page": 1,
+      "rect": [
+        276.6,
+        444.24,
+        383.4,
+        455.4
+      ],
+      "type": "text",
+      "originalPdfId": "Form I94 Admission Number",
+      "label": "Form I-94 Admission Number",
+      "nameId": "alien_form_i94_admission_number"
+    },
+    "alien_foreign_passport_number_and_country": {
+      "pdfId": "alien_foreign_passport_number_and_country",
+      "page": 1,
+      "rect": [
+        396.6,
+        444.24,
+        575.4,
+        455.4
+      ],
+      "type": "text",
+      "originalPdfId": "Foreign Passport Number and Country of IssuanceRow1",
+      "label": "Foreign Passport Number and Country of Issuance",
+      "nameId": "alien_foreign_passport_number_and_country"
+    },
+    "employee_signature": {
+      "pdfId": "employee_signature",
+      "page": 1,
+      "rect": [
+        42.08,
+        420.8,
+        365.28,
+        433.72
+      ],
+      "type": "text",
+      "originalPdfId": "Signature of Employee",
+      "label": "Signature of Employee",
+      "nameId": "employee_signature"
+    },
+    "employee_signature_date": {
+      "pdfId": "employee_signature_date",
+      "page": 1,
+      "rect": [
+        372.44,
+        420.8,
+        474.12,
+        433.72
+      ],
+      "type": "text",
+      "originalPdfId": "Today's Date mmddyyy",
+      "label": "Today's Date (mm/dd/yyyy)",
+      "nameId": "employee_signature_date"
+    },
+    "list_a_document_title_1": {
+      "pdfId": "list_a_document_title_1",
+      "page": 4,
+      "rect": [
+        41.75,
+        322.74,
+        239.28,
+        336.16
+      ],
+      "type": "text",
+      "originalPdfId": "Document Title 1",
+      "label": "Document Title 1",
+      "nameId": "list_a_document_title_1"
+    },
+    "list_a_issuing_authority_1": {
+      "pdfId": "list_a_issuing_authority_1",
+      "page": 1,
+      "rect": [
+        126.84,
+        324.24,
+        263.28,
+        341.28
+      ],
+      "type": "text",
+      "originalPdfId": "Issuing Authority 1",
+      "label": "Issuing Authority",
+      "nameId": "list_a_issuing_authority_1"
+    },
+    "list_a_document_number_1": {
+      "pdfId": "list_a_document_number_1",
+      "page": 1,
+      "rect": [
+        126.84,
+        306.24,
+        263.28,
+        323.16
+      ],
+      "type": "text",
+      "originalPdfId": "Document Number 0 (if any)",
+      "label": "Document Number (if any)",
+      "nameId": "list_a_document_number_1"
+    },
+    "list_a_expiration_date_1": {
+      "pdfId": "list_a_expiration_date_1",
+      "page": 1,
+      "rect": [
+        126.84,
+        288.72,
+        263.28,
+        305.16
+      ],
+      "type": "text",
+      "originalPdfId": "Expiration Date if any",
+      "label": "Expiration Date (if any)",
+      "nameId": "list_a_expiration_date_1"
+    },
+    "list_a_document_title_2": {
+      "pdfId": "list_a_document_title_2",
+      "page": 1,
+      "rect": [
+        126.84,
+        270.24,
+        263.28,
+        286.92
+      ],
+      "type": "text",
+      "originalPdfId": "Document Title 2 If any",
+      "label": "Document Title 2 (if any)",
+      "nameId": "list_a_document_title_2"
+    },
+    "list_a_issuing_authority_2": {
+      "pdfId": "list_a_issuing_authority_2",
+      "page": 1,
+      "rect": [
+        126.84,
+        252.24,
+        263.28,
+        269.16
+      ],
+      "type": "text",
+      "originalPdfId": "Issuing Authority_2",
+      "label": "Issuing Authority",
+      "nameId": "list_a_issuing_authority_2"
+    },
+    "list_a_document_number_2": {
+      "pdfId": "list_a_document_number_2",
+      "page": 1,
+      "rect": [
+        126.84,
+        234.24,
+        263.28,
+        251.16
+      ],
+      "type": "text",
+      "originalPdfId": "Document Number If any_2",
+      "label": "Document Number (if any)",
+      "nameId": "list_a_document_number_2"
+    },
+    "list_a_expiration_date_2": {
+      "pdfId": "list_a_expiration_date_2",
+      "page": 1,
+      "rect": [
+        127.28,
+        216.48,
+        263.72,
+        233.16
+      ],
+      "type": "text",
+      "originalPdfId": "List A.  Document 2. Expiration Date (if any)",
+      "label": "Expiration Date (if any)",
+      "nameId": "list_a_expiration_date_2"
+    },
+    "list_a_document_title_3": {
+      "pdfId": "list_a_document_title_3",
+      "page": 1,
+      "rect": [
+        126.84,
+        198.24,
+        263.28,
+        214.92
+      ],
+      "type": "text",
+      "originalPdfId": "List A.   Document Title 3.  If any",
+      "label": "Document Title 3 (if any)",
+      "nameId": "list_a_document_title_3"
+    },
+    "list_a_issuing_authority_3": {
+      "pdfId": "list_a_issuing_authority_3",
+      "page": 1,
+      "rect": [
+        126.84,
+        180.24,
+        263.28,
+        197.16
+      ],
+      "type": "text",
+      "originalPdfId": "List A. Document 3.  Enter Issuing Authority",
+      "label": "Issuing Authority",
+      "nameId": "list_a_issuing_authority_3"
+    },
+    "list_a_document_number_3": {
+      "pdfId": "list_a_document_number_3",
+      "page": 1,
+      "rect": [
+        127.28,
+        161.59,
+        263.72,
+        178.51
+      ],
+      "type": "text",
+      "originalPdfId": "List A.  Document 3 Number.  If any",
+      "label": "Document Number (if any)",
+      "nameId": "list_a_document_number_3"
+    },
+    "list_a_expiration_date_3": {
+      "pdfId": "list_a_expiration_date_3",
+      "page": 1,
+      "rect": [
+        126.84,
+        144.24,
+        263.28,
+        161.16
+      ],
+      "type": "text",
+      "originalPdfId": "Document Number if any_3",
+      "label": "Expiration Date (if any)",
+      "nameId": "list_a_expiration_date_3"
+    },
+    "list_b_document_title_1": {
+      "pdfId": "list_b_document_title_1",
+      "page": 1,
+      "rect": [
+        276.84,
+        342.41,
+        419.2,
+        359.73
+      ],
+      "type": "text",
+      "originalPdfId": "List B Document 1 Title",
+      "label": "List B Document Title",
+      "nameId": "list_b_document_title_1"
+    },
+    "list_b_issuing_authority_1": {
+      "pdfId": "list_b_issuing_authority_1",
+      "page": 1,
+      "rect": [
+        277.49,
+        324.73,
+        419.73,
+        341.77
+      ],
+      "type": "text",
+      "originalPdfId": "List B Issuing Authority 1",
+      "label": "List B Issuing Authority",
+      "nameId": "list_b_issuing_authority_1"
+    },
+    "list_b_document_number_1": {
+      "pdfId": "list_b_document_number_1",
+      "page": 1,
+      "rect": [
+        276.84,
+        306.82,
+        419.06,
+        323.86
+      ],
+      "type": "text",
+      "originalPdfId": "List B Document Number 1",
+      "label": "List B Document Number",
+      "nameId": "list_b_document_number_1"
+    },
+    "list_b_expiration_date_1": {
+      "pdfId": "list_b_expiration_date_1",
+      "page": 1,
+      "rect": [
+        276.84,
+        288.89,
+        419.06,
+        305.93
+      ],
+      "type": "text",
+      "originalPdfId": "List B Expiration Date 1",
+      "label": "List B Expiration Date",
+      "nameId": "list_b_expiration_date_1"
+    },
+    "list_c_document_title_1": {
+      "pdfId": "list_c_document_title_1",
+      "page": 1,
+      "rect": [
+        420.77,
+        342.41,
+        575.42,
+        359.45
+      ],
+      "type": "text",
+      "originalPdfId": "List C Document Title 1",
+      "label": "List C Document Title",
+      "nameId": "list_c_document_title_1"
+    },
+    "list_c_issuing_authority_1": {
+      "pdfId": "list_c_issuing_authority_1",
+      "page": 1,
+      "rect": [
+        420.77,
+        324.73,
+        575.42,
+        341.8
+      ],
+      "type": "text",
+      "originalPdfId": "List C Issuing Authority 1",
+      "label": "List C Issuing Authority",
+      "nameId": "list_c_issuing_authority_1"
+    },
+    "list_c_document_number_1": {
+      "pdfId": "list_c_document_number_1",
+      "page": 1,
+      "rect": [
+        420.77,
+        306.82,
+        575.42,
+        323.86
+      ],
+      "type": "text",
+      "originalPdfId": "List C Document Number 1",
+      "label": "List C Document Number",
+      "nameId": "list_c_document_number_1"
+    },
+    "list_c_expiration_date_1": {
+      "pdfId": "list_c_expiration_date_1",
+      "page": 1,
+      "rect": [
+        420.77,
+        288.89,
+        575.42,
+        305.93
+      ],
+      "type": "text",
+      "originalPdfId": "List C Expiration Date 1",
+      "label": "List C Expiration Date",
+      "nameId": "list_c_expiration_date_1"
+    },
+    "section2_additional_information": {
+      "pdfId": "section2_additional_information",
+      "page": 1,
+      "rect": [
+        266.73,
+        158.42,
+        575.73,
+        274.68
+      ],
+      "type": "text",
+      "originalPdfId": "Additional Information",
+      "label": "Additional Information",
+      "nameId": "section2_additional_information"
+    },
+    "section2_alternative_procedure_used": {
+      "pdfId": "section2_alternative_procedure_used",
+      "page": 1,
+      "rect": [
+        267.51,
+        147.2,
+        276.99,
+        156.68
+      ],
+      "type": "checkbox",
+      "originalPdfId": "CB_Alt",
+      "label": "Alternative procedure authorized by DHS",
+      "nameId": "section2_alternative_procedure_used"
+    },
+    "first_day_employed": {
+      "pdfId": "first_day_employed",
+      "page": 1,
+      "rect": [
+        462.6,
+        111.29,
+        547.69,
+        126.64
+      ],
+      "type": "text",
+      "originalPdfId": "FirstDayEmployed mmddyyyy",
+      "label": "First Day of Employment (mm/dd/yyyy)",
+      "nameId": "first_day_employed"
+    },
+    "employer_representative_name_and_title": {
+      "pdfId": "employer_representative_name_and_title",
+      "page": 1,
+      "rect": [
+        36.61,
+        79.64,
+        287.88,
+        99.24
+      ],
+      "type": "text",
+      "originalPdfId": "Last Name First Name and Title of Employer or Authorized Representative",
+      "label": "Last Name, First Name and Title of Employer or Authorized Representative",
+      "nameId": "employer_representative_name_and_title"
+    },
+    "employer_representative_signature": {
+      "pdfId": "employer_representative_signature",
+      "page": 1,
+      "rect": [
+        294.28,
+        79.64,
+        485.32,
+        99.24
+      ],
+      "type": "text",
+      "originalPdfId": "Signature of Employer or AR",
+      "label": "Signature of Employer or Authorized Representative",
+      "nameId": "employer_representative_signature"
+    },
+    "employer_signature_date": {
+      "pdfId": "employer_signature_date",
+      "page": 1,
+      "rect": [
+        489.85,
+        79.64,
+        567.86,
+        99.24
+      ],
+      "type": "text",
+      "originalPdfId": "S2 Todays Date mmddyyyy",
+      "label": "Today's Date (mm/dd/yyyy)",
+      "nameId": "employer_signature_date"
+    },
+    "employer_business_name": {
+      "pdfId": "employer_business_name",
+      "page": 1,
+      "rect": [
+        36.69,
+        53.04,
+        238.87,
+        66.74
+      ],
+      "type": "text",
+      "originalPdfId": "Employers Business or Org Name",
+      "label": "Business or Organization Name",
+      "nameId": "employer_business_name"
+    },
+    "employer_business_address": {
+      "pdfId": "employer_business_address",
+      "page": 1,
+      "rect": [
+        245.82,
+        53.04,
+        574.98,
+        66.74
+      ],
+      "type": "text",
+      "originalPdfId": "Employers Business or Org Address",
+      "label": "Business or Organization Address, City or Town, State, ZIP Code",
+      "nameId": "employer_business_address"
+    },
+    "preparer_employee_last_name": {
+      "pdfId": "preparer_employee_last_name",
+      "page": 3,
+      "rect": [
+        36.96,
+        660.12,
+        257.04,
+        679.76
+      ],
+      "type": "text",
+      "originalPdfId": "Last Name Family Name from Section 1",
+      "label": "Last Name (Family Name) from Section 1",
+      "nameId": "preparer_employee_last_name"
+    },
+    "preparer_employee_first_name": {
+      "pdfId": "preparer_employee_first_name",
+      "page": 3,
+      "rect": [
+        258.96,
+        660.12,
+        437.04,
+        679.75
+      ],
+      "type": "text",
+      "originalPdfId": "First Name Given Name from Section 1",
+      "label": "First Name (Given Name) from Section 1",
+      "nameId": "preparer_employee_first_name"
+    },
+    "preparer_employee_middle_initial": {
+      "pdfId": "preparer_employee_middle_initial",
+      "page": 3,
+      "rect": [
+        438.96,
+        660.12,
+        575.04,
+        679.75
+      ],
+      "type": "text",
+      "originalPdfId": "Middle initial if any from Section 1",
+      "label": "Middle Initial (if any) from Section 1",
+      "nameId": "preparer_employee_middle_initial"
+    },
+    "preparer_signature_0": {
+      "pdfId": "preparer_signature_0",
+      "page": 3,
+      "rect": [
+        39.32,
+        540.8,
+        413.16,
+        563.72
+      ],
+      "type": "text",
+      "originalPdfId": "Signature of Preparer or Translator 0",
+      "label": "Signature of Preparer or Translator",
+      "nameId": "preparer_signature_0"
+    },
+    "preparer_signature_date_0": {
+      "pdfId": "preparer_signature_date_0",
+      "page": 3,
+      "rect": [
+        417.56,
+        540.8,
+        567.94,
+        563.72
+      ],
+      "type": "text",
+      "originalPdfId": "Sig Date mmddyyyy 0",
+      "label": "Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_0"
+    },
+    "preparer_last_name_0": {
+      "pdfId": "preparer_last_name_0",
+      "page": 3,
+      "rect": [
+        39.64,
+        510.8,
+        269.16,
+        526.8
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator Last Name (Family Name) 0",
+      "label": "Last Name (Family Name)",
+      "nameId": "preparer_last_name_0"
+    },
+    "preparer_first_name_0": {
+      "pdfId": "preparer_first_name_0",
+      "page": 3,
+      "rect": [
+        273.08,
+        510.8,
+        491.16,
+        526.8
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator First Name (Given Name) 0",
+      "label": "First Name (Given Name)",
+      "nameId": "preparer_first_name_0"
+    },
+    "preparer_middle_initial_0": {
+      "pdfId": "preparer_middle_initial_0",
+      "page": 3,
+      "rect": [
+        495.08,
+        510.8,
+        575.16,
+        526.8
+      ],
+      "type": "text",
+      "originalPdfId": "PT Middle Initial 0",
+      "label": "Middle Initial (if any)",
+      "nameId": "preparer_middle_initial_0"
+    },
+    "preparer_address_0": {
+      "pdfId": "preparer_address_0",
+      "page": 3,
+      "rect": [
+        38.96,
+        482.24,
+        293.28,
+        498.24
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator Address (Street Number and Name) 0",
+      "label": "Address (Street Number and Name)",
+      "nameId": "preparer_address_0"
+    },
+    "preparer_city_0": {
+      "pdfId": "preparer_city_0",
+      "page": 3,
+      "rect": [
+        297.24,
+        482.24,
+        449.28,
+        498.24
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator City or Town 0",
+      "label": "City or Town",
+      "nameId": "preparer_city_0"
+    },
+    "preparer_state_0": {
+      "pdfId": "preparer_state_0",
+      "page": 3,
+      "rect": [
+        453.12,
+        482.24,
+        491.49,
+        498.24
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer State 0",
+      "label": "State",
+      "nameId": "preparer_state_0"
+    },
+    "preparer_zip_code_0": {
+      "pdfId": "preparer_zip_code_0",
+      "page": 3,
+      "rect": [
+        496.64,
+        482.24,
+        575.28,
+        498.24
+      ],
+      "type": "text",
+      "originalPdfId": "Zip Code 0",
+      "label": "ZIP Code",
+      "nameId": "preparer_zip_code_0"
+    },
+    "preparer_signature_1": {
+      "pdfId": "preparer_signature_1",
+      "page": 3,
+      "rect": [
+        39.16,
+        415.08,
+        413.16,
+        438
+      ],
+      "type": "text",
+      "originalPdfId": "Signature of Preparer or Translator 1",
+      "label": "Signature of Preparer or Translator",
+      "nameId": "preparer_signature_1"
+    },
+    "preparer_signature_date_1": {
+      "pdfId": "preparer_signature_date_1",
+      "page": 3,
+      "rect": [
+        417.4,
+        415.08,
+        567.78,
+        438
+      ],
+      "type": "text",
+      "originalPdfId": "Sig Date mmddyyyy 1",
+      "label": "Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_1"
+    },
+    "preparer_last_name_1": {
+      "pdfId": "preparer_last_name_1",
+      "page": 3,
+      "rect": [
+        273.08,
+        384.84,
+        491.16,
+        400.84
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator Last Name (Family Name) 1",
+      "label": "Last Name (Family Name)",
+      "nameId": "preparer_last_name_1"
+    },
+    "preparer_middle_initial_1": {
+      "pdfId": "preparer_middle_initial_1",
+      "page": 3,
+      "rect": [
+        495.08,
+        384.84,
+        575.16,
+        400.84
+      ],
+      "type": "text",
+      "originalPdfId": "PT Middle Initial 1",
+      "label": "Middle Initial (if any)",
+      "nameId": "preparer_middle_initial_1"
+    },
+    "preparer_address_1": {
+      "pdfId": "preparer_address_1",
+      "page": 3,
+      "rect": [
+        38.96,
+        356.24,
+        292.32,
+        372.24
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator Address (Street Number and Name) 1",
+      "label": "Address (Street Number and Name)",
+      "nameId": "preparer_address_1"
+    },
+    "preparer_city_1": {
+      "pdfId": "preparer_city_1",
+      "page": 3,
+      "rect": [
+        297.25,
+        356.24,
+        449.28,
+        372.24
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator City or Town 1",
+      "label": "City or Town",
+      "nameId": "preparer_city_1"
+    },
+    "preparer_state_1": {
+      "pdfId": "preparer_state_1",
+      "page": 3,
+      "rect": [
+        453.12,
+        356.24,
+        491.5,
+        372.24
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer State 1",
+      "label": "State",
+      "nameId": "preparer_state_1"
+    },
+    "preparer_zip_code_1": {
+      "pdfId": "preparer_zip_code_1",
+      "page": 3,
+      "rect": [
+        496.64,
+        356.24,
+        575.28,
+        372.24
+      ],
+      "type": "text",
+      "originalPdfId": "Zip Code 1",
+      "label": "ZIP Code",
+      "nameId": "preparer_zip_code_1"
+    },
+    "preparer_signature_2": {
+      "pdfId": "preparer_signature_2",
+      "page": 3,
+      "rect": [
+        39.16,
+        288.8,
+        413.16,
+        311.72
+      ],
+      "type": "text",
+      "originalPdfId": "Signature of Preparer or Translator 2",
+      "label": "Signature of Preparer or Translator",
+      "nameId": "preparer_signature_2"
+    },
+    "preparer_signature_date_2": {
+      "pdfId": "preparer_signature_date_2",
+      "page": 3,
+      "rect": [
+        417.56,
+        288.8,
+        567.94,
+        311.72
+      ],
+      "type": "text",
+      "originalPdfId": "Sig Date mmddyyyy 2",
+      "label": "Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_2"
+    },
+    "preparer_last_name_2": {
+      "pdfId": "preparer_last_name_2",
+      "page": 3,
+      "rect": [
+        39.36,
+        258.68,
+        268.88,
+        274.68
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator Last Name (Family Name) 2",
+      "label": "Last Name (Family Name)",
+      "nameId": "preparer_last_name_2"
+    },
+    "preparer_first_name_2": {
+      "pdfId": "preparer_first_name_2",
+      "page": 3,
+      "rect": [
+        273.08,
+        258.68,
+        490.88,
+        274.68
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator First Name (Given Name) 2",
+      "label": "First Name (Given Name)",
+      "nameId": "preparer_first_name_2"
+    },
+    "preparer_middle_initial_2": {
+      "pdfId": "preparer_middle_initial_2",
+      "page": 3,
+      "rect": [
+        494.8,
+        258.68,
+        574.88,
+        274.68
+      ],
+      "type": "text",
+      "originalPdfId": "PT Middle Initial 2",
+      "label": "Middle Initial (if any)",
+      "nameId": "preparer_middle_initial_2"
+    },
+    "preparer_address_2": {
+      "pdfId": "preparer_address_2",
+      "page": 3,
+      "rect": [
+        38.68,
+        230.12,
+        292.04,
+        246.12
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator Address (Street Number and Name) 2",
+      "label": "Address (Street Number and Name)",
+      "nameId": "preparer_address_2"
+    },
+    "preparer_city_2": {
+      "pdfId": "preparer_city_2",
+      "page": 3,
+      "rect": [
+        296.96,
+        230.12,
+        451.64,
+        246.12
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator City or Town 2",
+      "label": "City or Town",
+      "nameId": "preparer_city_2"
+    },
+    "preparer_state_2": {
+      "pdfId": "preparer_state_2",
+      "page": 3,
+      "rect": [
+        453.4,
+        230.28,
+        491.79,
+        246.28
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer State 2",
+      "label": "State",
+      "nameId": "preparer_state_2"
+    },
+    "preparer_zip_code_2": {
+      "pdfId": "preparer_zip_code_2",
+      "page": 3,
+      "rect": [
+        496.36,
+        230.12,
+        575,
+        246.12
+      ],
+      "type": "text",
+      "originalPdfId": "Zip Code 2",
+      "label": "ZIP Code",
+      "nameId": "preparer_zip_code_2"
+    },
+    "preparer_signature_3": {
+      "pdfId": "preparer_signature_3",
+      "page": 3,
+      "rect": [
+        39.16,
+        162.8,
+        413.16,
+        185.72
+      ],
+      "type": "text",
+      "originalPdfId": "Signature of Preparer or Translator 3",
+      "label": "Signature of Preparer or Translator",
+      "nameId": "preparer_signature_3"
+    },
+    "preparer_signature_date_3": {
+      "pdfId": "preparer_signature_date_3",
+      "page": 3,
+      "rect": [
+        418.21,
+        162.8,
+        568.59,
+        185.72
+      ],
+      "type": "text",
+      "originalPdfId": "Sig Date mmddyyyy 3",
+      "label": "Date (mm/dd/yyyy)",
+      "nameId": "preparer_signature_date_3"
+    },
+    "preparer_last_name_3": {
+      "pdfId": "preparer_last_name_3",
+      "page": 3,
+      "rect": [
+        39.36,
+        132.68,
+        269.16,
+        148.68
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator Last Name (Family Name) 3",
+      "label": "Last Name (Family Name)",
+      "nameId": "preparer_last_name_3"
+    },
+    "preparer_first_name_3": {
+      "pdfId": "preparer_first_name_3",
+      "page": 3,
+      "rect": [
+        273.08,
+        132.68,
+        491.16,
+        148.68
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator First Name (Given Name) 3",
+      "label": "First Name (Given Name)",
+      "nameId": "preparer_first_name_3"
+    },
+    "preparer_middle_initial_3": {
+      "pdfId": "preparer_middle_initial_3",
+      "page": 3,
+      "rect": [
+        494.8,
+        132.68,
+        575.16,
+        148.68
+      ],
+      "type": "text",
+      "originalPdfId": "PT Middle Initial 3",
+      "label": "Middle Initial (if any)",
+      "nameId": "preparer_middle_initial_3"
+    },
+    "preparer_address_3": {
+      "pdfId": "preparer_address_3",
+      "page": 3,
+      "rect": [
+        38.96,
+        104,
+        293.28,
+        120
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator Address (Street Number and Name) 3",
+      "label": "Address (Street Number and Name)",
+      "nameId": "preparer_address_3"
+    },
+    "preparer_city_3": {
+      "pdfId": "preparer_city_3",
+      "page": 3,
+      "rect": [
+        297.25,
+        104.24,
+        449.28,
+        120.24
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer or Translator City or Town 3",
+      "label": "City or Town",
+      "nameId": "preparer_city_3"
+    },
+    "preparer_state_3": {
+      "pdfId": "preparer_state_3",
+      "page": 3,
+      "rect": [
+        453.15,
+        104.44,
+        491.25,
+        120.43
+      ],
+      "type": "text",
+      "originalPdfId": "Preparer State 3",
+      "label": "State",
+      "nameId": "preparer_state_3"
+    },
+    "preparer_zip_code_3": {
+      "pdfId": "preparer_zip_code_3",
+      "page": 3,
+      "rect": [
+        496.21,
+        104.24,
+        574.84,
+        120.24
+      ],
+      "type": "text",
+      "originalPdfId": "Zip Code 3",
+      "label": "ZIP Code",
+      "nameId": "preparer_zip_code_3"
+    },
+    "supplementb_employee_last_name": {
+      "pdfId": "supplementb_employee_last_name",
+      "page": 4,
+      "rect": [
+        41.42,
+        659.06,
+        257.49,
+        677.72
+      ],
+      "type": "text",
+      "originalPdfId": "Last Name Family Name from Section 1-2",
+      "label": "Last Name (Family Name) from Section 1",
+      "nameId": "supplementb_employee_last_name"
+    },
+    "supplementb_employee_first_name": {
+      "pdfId": "supplementb_employee_first_name",
+      "page": 4,
+      "rect": [
+        264.08,
+        659.06,
+        437.16,
+        677.71
+      ],
+      "type": "text",
+      "originalPdfId": "First Name Given Name from Section 1-2",
+      "label": "First Name (Given Name) from Section 1",
+      "nameId": "supplementb_employee_first_name"
+    },
+    "supplementb_employee_middle_initial": {
+      "pdfId": "supplementb_employee_middle_initial",
+      "page": 4,
+      "rect": [
+        444.08,
+        659.06,
+        575.16,
+        677.71
+      ],
+      "type": "text",
+      "originalPdfId": "Middle initial if any from Section 1-2",
+      "label": "Middle Initial (if any) from Section 1",
+      "nameId": "supplementb_employee_middle_initial"
+    },
+    "supplementb_date_of_rehire_0": {
+      "pdfId": "supplementb_date_of_rehire_0",
+      "page": 4,
+      "rect": [
+        42.2,
+        556.74,
+        129.31,
+        575.39
+      ],
+      "type": "text",
+      "originalPdfId": "Date of Rehire 0",
+      "label": "Date of Rehire (if applicable)",
+      "nameId": "supplementb_date_of_rehire_0"
+    },
+    "supplementb_new_last_name_0": {
+      "pdfId": "supplementb_new_last_name_0",
+      "page": 4,
+      "rect": [
+        143.75,
+        556.74,
+        335.16,
+        575.39
+      ],
+      "type": "text",
+      "originalPdfId": "Last Name 0",
+      "label": "New Last Name (if applicable)",
+      "nameId": "supplementb_new_last_name_0"
+    },
+    "supplementb_new_first_name_0": {
+      "pdfId": "supplementb_new_first_name_0",
+      "page": 4,
+      "rect": [
+        342.08,
+        556.74,
+        515.16,
+        575.39
+      ],
+      "type": "text",
+      "originalPdfId": "First Name 0",
+      "label": "New First Name (if applicable)",
+      "nameId": "supplementb_new_first_name_0"
+    },
+    "supplementb_new_middle_initial_0": {
+      "pdfId": "supplementb_new_middle_initial_0",
+      "page": 4,
+      "rect": [
+        521.75,
+        556.74,
+        575.16,
+        575.39
+      ],
+      "type": "text",
+      "originalPdfId": "Middle Initial 0",
+      "label": "New Middle Initial (if applicable)",
+      "nameId": "supplementb_new_middle_initial_0"
+    },
+    "supplementb_document_title_0": {
+      "pdfId": "supplementb_document_title_0",
+      "page": 4,
+      "rect": [
+        41.75,
+        509.06,
+        239.28,
+        522.49
+      ],
+      "type": "text",
+      "originalPdfId": "Document Title 0",
+      "label": "Document Title",
+      "nameId": "supplementb_document_title_0"
+    },
+    "supplementb_document_number_0": {
+      "pdfId": "supplementb_document_number_0",
+      "page": 4,
+      "rect": [
+        245.96,
+        509.06,
+        443.28,
+        522.49
+      ],
+      "type": "text",
+      "originalPdfId": "Document Number 0",
+      "label": "Document Number (if any)",
+      "nameId": "supplementb_document_number_0"
+    },
+    "supplementb_expiration_date_0": {
+      "pdfId": "supplementb_expiration_date_0",
+      "page": 4,
+      "rect": [
+        450.28,
+        509.06,
+        575.28,
+        522.49
+      ],
+      "type": "text",
+      "originalPdfId": "Expiration Date 0",
+      "label": "Expiration Date (if any)",
+      "nameId": "supplementb_expiration_date_0"
+    },
+    "supplementb_employer_representative_name_0": {
+      "pdfId": "supplementb_employer_representative_name_0",
+      "page": 4,
+      "rect": [
+        41.54,
+        450.9,
+        239.16,
+        469.55
+      ],
+      "type": "text",
+      "originalPdfId": "Name of Emp or Auth Rep 0",
+      "label": "Name of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_name_0"
+    },
+    "supplementb_employer_representative_signature_0": {
+      "pdfId": "supplementb_employer_representative_signature_0",
+      "page": 4,
+      "rect": [
+        246.08,
+        450.89,
+        467.16,
+        469.55
+      ],
+      "type": "text",
+      "originalPdfId": "Signature of Emp Rep 0",
+      "label": "Signature of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_signature_0"
+    },
+    "supplementb_signature_date_0": {
+      "pdfId": "supplementb_signature_date_0",
+      "page": 4,
+      "rect": [
+        473.75,
+        450.89,
+        568.18,
+        469.55
+      ],
+      "type": "text",
+      "originalPdfId": "Todays Date 0",
+      "label": "Today's Date",
+      "nameId": "supplementb_signature_date_0"
+    },
+    "supplementb_additional_information_0": {
+      "pdfId": "supplementb_additional_information_0",
+      "page": 4,
+      "rect": [
+        41.01,
+        415.73,
+        450.68,
+        438.6
+      ],
+      "type": "text",
+      "originalPdfId": "Addtl Info 0",
+      "label": "Additional Information",
+      "nameId": "supplementb_additional_information_0"
+    },
+    "supplementb_alternative_procedure_used_0": {
+      "pdfId": "supplementb_alternative_procedure_used_0",
+      "page": 4,
+      "rect": [
+        455.26,
+        426.44,
+        464.74,
+        435.92
+      ],
+      "type": "checkbox",
+      "originalPdfId": "CB_Alt_0",
+      "label": "Alternative procedure authorized by DHS",
+      "nameId": "supplementb_alternative_procedure_used_0"
+    },
+    "supplementb_date_of_rehire_1": {
+      "pdfId": "supplementb_date_of_rehire_1",
+      "page": 4,
+      "rect": [
+        42.2,
+        370.74,
+        129.31,
+        389.39
+      ],
+      "type": "text",
+      "originalPdfId": "Date of Rehire 1",
+      "label": "Date of Rehire (if applicable)",
+      "nameId": "supplementb_date_of_rehire_1"
+    },
+    "supplementb_new_last_name_1": {
+      "pdfId": "supplementb_new_last_name_1",
+      "page": 4,
+      "rect": [
+        143.75,
+        370.74,
+        335.16,
+        389.39
+      ],
+      "type": "text",
+      "originalPdfId": "Last Name 1",
+      "label": "New Last Name (if applicable)",
+      "nameId": "supplementb_new_last_name_1"
+    },
+    "supplementb_new_first_name_1": {
+      "pdfId": "supplementb_new_first_name_1",
+      "page": 4,
+      "rect": [
+        342.08,
+        370.74,
+        515.16,
+        389.39
+      ],
+      "type": "text",
+      "originalPdfId": "First Name 1",
+      "label": "New First Name (if applicable)",
+      "nameId": "supplementb_new_first_name_1"
+    },
+    "supplementb_new_middle_initial_1": {
+      "pdfId": "supplementb_new_middle_initial_1",
+      "page": 4,
+      "rect": [
+        522.73,
+        370.74,
+        575.16,
+        389.39
+      ],
+      "type": "text",
+      "originalPdfId": "Middle Initial 1",
+      "label": "New Middle Initial (if applicable)",
+      "nameId": "supplementb_new_middle_initial_1"
+    },
+    "supplementb_document_number_1": {
+      "pdfId": "supplementb_document_number_1",
+      "page": 4,
+      "rect": [
+        245.63,
+        322.73,
+        443.28,
+        336.16
+      ],
+      "type": "text",
+      "originalPdfId": "Document Number 1",
+      "label": "Document Number (if any)",
+      "nameId": "supplementb_document_number_1"
+    },
+    "supplementb_expiration_date_1": {
+      "pdfId": "supplementb_expiration_date_1",
+      "page": 4,
+      "rect": [
+        449.96,
+        322.73,
+        575.28,
+        336.16
+      ],
+      "type": "text",
+      "originalPdfId": "Expiration Date 1",
+      "label": "Expiration Date (if any)",
+      "nameId": "supplementb_expiration_date_1"
+    },
+    "supplementb_employer_representative_name_1": {
+      "pdfId": "supplementb_employer_representative_name_1",
+      "page": 4,
+      "rect": [
+        41.87,
+        265.55,
+        241.32,
+        284.2
+      ],
+      "type": "text",
+      "originalPdfId": "Name of Emp or Auth Rep 1",
+      "label": "Name of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_name_1"
+    },
+    "supplementb_employer_representative_signature_1": {
+      "pdfId": "supplementb_employer_representative_signature_1",
+      "page": 4,
+      "rect": [
+        245.29,
+        265.55,
+        467.16,
+        284.21
+      ],
+      "type": "text",
+      "originalPdfId": "Signature of Emp Rep 1",
+      "label": "Signature of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_signature_1"
+    },
+    "supplementb_signature_date_1": {
+      "pdfId": "supplementb_signature_date_1",
+      "page": 4,
+      "rect": [
+        474.08,
+        265.55,
+        568.5,
+        284.21
+      ],
+      "type": "text",
+      "originalPdfId": "Todays Date 1",
+      "label": "Today's Date",
+      "nameId": "supplementb_signature_date_1"
+    },
+    "supplementb_additional_information_1": {
+      "pdfId": "supplementb_additional_information_1",
+      "page": 4,
+      "rect": [
+        41.13,
+        228.9,
+        450.8,
+        253.07
+      ],
+      "type": "text",
+      "originalPdfId": "Addtl Info 1",
+      "label": "Additional Information",
+      "nameId": "supplementb_additional_information_1"
+    },
+    "supplementb_alternative_procedure_used_1": {
+      "pdfId": "supplementb_alternative_procedure_used_1",
+      "page": 4,
+      "rect": [
+        455.58,
+        241.31,
+        464.74,
+        250.8
+      ],
+      "type": "checkbox",
+      "originalPdfId": "CB_Alt_1",
+      "label": "Alternative procedure authorized by DHS",
+      "nameId": "supplementb_alternative_procedure_used_1"
+    },
+    "supplementb_date_of_rehire_2": {
+      "pdfId": "supplementb_date_of_rehire_2",
+      "page": 4,
+      "rect": [
+        42.2,
+        185.06,
+        129.31,
+        203.72
+      ],
+      "type": "text",
+      "originalPdfId": "Date of Rehire 2",
+      "label": "Date of Rehire (if applicable)",
+      "nameId": "supplementb_date_of_rehire_2"
+    },
+    "supplementb_new_last_name_2": {
+      "pdfId": "supplementb_new_last_name_2",
+      "page": 4,
+      "rect": [
+        144.08,
+        185.06,
+        335.16,
+        203.72
+      ],
+      "type": "text",
+      "originalPdfId": "Last Name 2",
+      "label": "New Last Name (if applicable)",
+      "nameId": "supplementb_new_last_name_2"
+    },
+    "supplementb_new_first_name_2": {
+      "pdfId": "supplementb_new_first_name_2",
+      "page": 4,
+      "rect": [
+        342.08,
+        185.06,
+        515.16,
+        203.72
+      ],
+      "type": "text",
+      "originalPdfId": "First Name 2",
+      "label": "New First Name (if applicable)",
+      "nameId": "supplementb_new_first_name_2"
+    },
+    "supplementb_new_middle_initial_2": {
+      "pdfId": "supplementb_new_middle_initial_2",
+      "page": 4,
+      "rect": [
+        522.73,
+        185.06,
+        575.16,
+        203.72
+      ],
+      "type": "text",
+      "originalPdfId": "Middle Initial 2",
+      "label": "New Middle Initial (if applicable)",
+      "nameId": "supplementb_new_middle_initial_2"
+    },
+    "supplementb_document_title_2": {
+      "pdfId": "supplementb_document_title_2",
+      "page": 4,
+      "rect": [
+        41.18,
+        136.65,
+        238.71,
+        150.07
+      ],
+      "type": "text",
+      "originalPdfId": "Document Title 2",
+      "label": "Document Title",
+      "nameId": "supplementb_document_title_2"
+    },
+    "supplementb_document_number_2": {
+      "pdfId": "supplementb_document_number_2",
+      "page": 4,
+      "rect": [
+        245.06,
+        136.65,
+        442.71,
+        150.07
+      ],
+      "type": "text",
+      "originalPdfId": "Document Number 2",
+      "label": "Document Number (if any)",
+      "nameId": "supplementb_document_number_2"
+    },
+    "supplementb_expiration_date_2": {
+      "pdfId": "supplementb_expiration_date_2",
+      "page": 4,
+      "rect": [
+        449.39,
+        136.65,
+        575.19,
+        150.07
+      ],
+      "type": "text",
+      "originalPdfId": "Expiration Date 2",
+      "label": "Expiration Date (if any)",
+      "nameId": "supplementb_expiration_date_2"
+    },
+    "supplementb_employer_representative_name_2": {
+      "pdfId": "supplementb_employer_representative_name_2",
+      "page": 4,
+      "rect": [
+        41.87,
+        79.24,
+        239.16,
+        97.9
+      ],
+      "type": "text",
+      "originalPdfId": "Name of Emp or Auth Rep 2",
+      "label": "Name of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_name_2"
+    },
+    "supplementb_employer_representative_signature_2": {
+      "pdfId": "supplementb_employer_representative_signature_2",
+      "page": 4,
+      "rect": [
+        245.29,
+        79.24,
+        467.16,
+        97.9
+      ],
+      "type": "text",
+      "originalPdfId": "Signature of Emp Rep 2",
+      "label": "Signature of Employer or Authorized Representative",
+      "nameId": "supplementb_employer_representative_signature_2"
+    },
+    "supplementb_signature_date_2": {
+      "pdfId": "supplementb_signature_date_2",
+      "page": 4,
+      "rect": [
+        474.08,
+        79.24,
+        568.51,
+        97.9
+      ],
+      "type": "text",
+      "originalPdfId": "Todays Date 2",
+      "label": "Today's Date",
+      "nameId": "supplementb_signature_date_2"
+    },
+    "supplementb_additional_information_2": {
+      "pdfId": "supplementb_additional_information_2",
+      "page": 4,
+      "rect": [
+        41.45,
+        43.24,
+        451.13,
+        67.42
+      ],
+      "type": "text",
+      "originalPdfId": "Addtl Info 2",
+      "label": "Additional Information",
+      "nameId": "supplementb_additional_information_2"
+    },
+    "supplementb_alternative_procedure_used_2": {
+      "pdfId": "supplementb_alternative_procedure_used_2",
+      "page": 4,
+      "rect": [
+        456.26,
+        53.88,
+        465.74,
+        63.36
+      ],
+      "type": "checkbox",
+      "originalPdfId": "CB_Alt_2",
+      "label": "Alternative procedure authorized by DHS",
+      "nameId": "supplementb_alternative_procedure_used_2"
+    }
+  },
+  "byPdfId": {
+    "employee_last_name": {
+      "pdfId": "employee_last_name",
+      "page": 1,
+      "rect": [
+        42.72,
+        604.76,
+        198.4,
+        620
+      ],
+      "type": "text"
+    },
+    "employee_first_name": {
+      "pdfId": "employee_first_name",
+      "page": 1,
+      "rect": [
+        204.16,
+        604.76,
+        341.84,
+        620
+      ],
+      "type": "text"
+    },
+    "employee_middle_initial": {
+      "pdfId": "employee_middle_initial",
+      "page": 1,
+      "rect": [
+        348.44,
+        604.76,
+        413.84,
+        620
+      ],
+      "type": "text"
+    },
+    "employee_other_last_names": {
+      "pdfId": "employee_other_last_names",
+      "page": 1,
+      "rect": [
+        420.44,
+        604.76,
+        576.12,
+        620
+      ],
+      "type": "text"
+    },
+    "employee_street_address": {
+      "pdfId": "employee_street_address",
+      "page": 1,
+      "rect": [
+        41.88,
+        579.92,
+        228.12,
+        593.48
+      ],
+      "type": "text"
+    },
+    "employee_apartment_number": {
+      "pdfId": "employee_apartment_number",
+      "page": 1,
+      "rect": [
+        233.6,
+        579.92,
+        299.28,
+        593.47
+      ],
+      "type": "text"
+    },
+    "employee_city": {
+      "pdfId": "employee_city",
+      "page": 1,
+      "rect": [
+        305.88,
+        579.92,
+        455.28,
+        593.47
+      ],
+      "type": "text"
+    },
+    "employee_state": {
+      "pdfId": "employee_state",
+      "page": 1,
+      "rect": [
+        461.25,
+        579.92,
+        502.42,
+        593.47
+      ],
+      "type": "text"
+    },
+    "employee_zip_code": {
+      "pdfId": "employee_zip_code",
+      "page": 1,
+      "rect": [
+        509.88,
+        579.92,
+        575.28,
+        593.47
+      ],
+      "type": "text"
+    },
+    "employee_date_of_birth": {
+      "pdfId": "employee_date_of_birth",
+      "page": 1,
+      "rect": [
+        41.78,
+        553.64,
+        140.87,
+        567.48
+      ],
+      "type": "text"
+    },
+    "employee_social_security_number": {
+      "pdfId": "employee_social_security_number",
+      "page": 1,
+      "rect": [
+        150,
+        553.44,
+        255,
+        567.2
+      ],
+      "type": "text"
+    },
+    "employee_email_address": {
+      "pdfId": "employee_email_address",
+      "page": 1,
+      "rect": [
+        264.16,
+        553.64,
+        450.12,
+        567.48
+      ],
+      "type": "text"
+    },
+    "employee_telephone_number": {
+      "pdfId": "employee_telephone_number",
+      "page": 1,
+      "rect": [
+        456.15,
+        553.48,
+        575.35,
+        567.59
+      ],
+      "type": "text"
+    },
+    "citizenship_status_us_citizen": {
+      "pdfId": "citizenship_status_us_citizen",
+      "page": 1,
+      "rect": [
+        181.68,
+        523.32,
+        191.16,
+        532.8
+      ],
+      "type": "checkbox"
+    },
+    "citizenship_status_noncitizen_national": {
+      "pdfId": "citizenship_status_noncitizen_national",
+      "page": 1,
+      "rect": [
+        181.68,
+        511.32,
+        191.16,
+        520.8
+      ],
+      "type": "checkbox"
+    },
+    "citizenship_status_lawful_permanent_resident": {
+      "pdfId": "citizenship_status_lawful_permanent_resident",
+      "page": 1,
+      "rect": [
+        181.68,
+        499.32,
+        191.16,
+        508.8
+      ],
+      "type": "checkbox"
+    },
+    "lawful_permanent_resident_number": {
+      "pdfId": "lawful_permanent_resident_number",
+      "page": 1,
+      "rect": [
+        390.6,
+        498.24,
+        575.52,
+        509.4
+      ],
+      "type": "text"
+    },
+    "citizenship_status_alien_authorized_to_work": {
+      "pdfId": "citizenship_status_alien_authorized_to_work",
+      "page": 1,
+      "rect": [
+        181.96,
+        487.32,
+        191.16,
+        496.36
+      ],
+      "type": "checkbox"
+    },
+    "alien_authorized_expiration_date": {
+      "pdfId": "alien_authorized_expiration_date",
+      "page": 1,
+      "rect": [
+        390.19,
+        484.11,
+        449.52,
+        497.03
+      ],
+      "type": "text"
+    },
+    "alien_uscis_a_number": {
+      "pdfId": "alien_uscis_a_number",
+      "page": 1,
+      "rect": [
+        180.6,
+        444.24,
+        263.4,
+        455.4
+      ],
+      "type": "text"
+    },
+    "alien_form_i94_admission_number": {
+      "pdfId": "alien_form_i94_admission_number",
+      "page": 1,
+      "rect": [
+        276.6,
+        444.24,
+        383.4,
+        455.4
+      ],
+      "type": "text"
+    },
+    "alien_foreign_passport_number_and_country": {
+      "pdfId": "alien_foreign_passport_number_and_country",
+      "page": 1,
+      "rect": [
+        396.6,
+        444.24,
+        575.4,
+        455.4
+      ],
+      "type": "text"
+    },
+    "employee_signature": {
+      "pdfId": "employee_signature",
+      "page": 1,
+      "rect": [
+        42.08,
+        420.8,
+        365.28,
+        433.72
+      ],
+      "type": "text"
+    },
+    "employee_signature_date": {
+      "pdfId": "employee_signature_date",
+      "page": 1,
+      "rect": [
+        372.44,
+        420.8,
+        474.12,
+        433.72
+      ],
+      "type": "text"
+    },
+    "list_a_document_title_1": {
+      "pdfId": "list_a_document_title_1",
+      "page": 4,
+      "rect": [
+        41.75,
+        322.74,
+        239.28,
+        336.16
+      ],
+      "type": "text"
+    },
+    "list_a_issuing_authority_1": {
+      "pdfId": "list_a_issuing_authority_1",
+      "page": 1,
+      "rect": [
+        126.84,
+        324.24,
+        263.28,
+        341.28
+      ],
+      "type": "text"
+    },
+    "list_a_document_number_1": {
+      "pdfId": "list_a_document_number_1",
+      "page": 1,
+      "rect": [
+        126.84,
+        306.24,
+        263.28,
+        323.16
+      ],
+      "type": "text"
+    },
+    "list_a_expiration_date_1": {
+      "pdfId": "list_a_expiration_date_1",
+      "page": 1,
+      "rect": [
+        126.84,
+        288.72,
+        263.28,
+        305.16
+      ],
+      "type": "text"
+    },
+    "list_a_document_title_2": {
+      "pdfId": "list_a_document_title_2",
+      "page": 1,
+      "rect": [
+        126.84,
+        270.24,
+        263.28,
+        286.92
+      ],
+      "type": "text"
+    },
+    "list_a_issuing_authority_2": {
+      "pdfId": "list_a_issuing_authority_2",
+      "page": 1,
+      "rect": [
+        126.84,
+        252.24,
+        263.28,
+        269.16
+      ],
+      "type": "text"
+    },
+    "list_a_document_number_2": {
+      "pdfId": "list_a_document_number_2",
+      "page": 1,
+      "rect": [
+        126.84,
+        234.24,
+        263.28,
+        251.16
+      ],
+      "type": "text"
+    },
+    "list_a_expiration_date_2": {
+      "pdfId": "list_a_expiration_date_2",
+      "page": 1,
+      "rect": [
+        127.28,
+        216.48,
+        263.72,
+        233.16
+      ],
+      "type": "text"
+    },
+    "list_a_document_title_3": {
+      "pdfId": "list_a_document_title_3",
+      "page": 1,
+      "rect": [
+        126.84,
+        198.24,
+        263.28,
+        214.92
+      ],
+      "type": "text"
+    },
+    "list_a_issuing_authority_3": {
+      "pdfId": "list_a_issuing_authority_3",
+      "page": 1,
+      "rect": [
+        126.84,
+        180.24,
+        263.28,
+        197.16
+      ],
+      "type": "text"
+    },
+    "list_a_document_number_3": {
+      "pdfId": "list_a_document_number_3",
+      "page": 1,
+      "rect": [
+        127.28,
+        161.59,
+        263.72,
+        178.51
+      ],
+      "type": "text"
+    },
+    "list_a_expiration_date_3": {
+      "pdfId": "list_a_expiration_date_3",
+      "page": 1,
+      "rect": [
+        126.84,
+        144.24,
+        263.28,
+        161.16
+      ],
+      "type": "text"
+    },
+    "list_b_document_title_1": {
+      "pdfId": "list_b_document_title_1",
+      "page": 1,
+      "rect": [
+        276.84,
+        342.41,
+        419.2,
+        359.73
+      ],
+      "type": "text"
+    },
+    "list_b_issuing_authority_1": {
+      "pdfId": "list_b_issuing_authority_1",
+      "page": 1,
+      "rect": [
+        277.49,
+        324.73,
+        419.73,
+        341.77
+      ],
+      "type": "text"
+    },
+    "list_b_document_number_1": {
+      "pdfId": "list_b_document_number_1",
+      "page": 1,
+      "rect": [
+        276.84,
+        306.82,
+        419.06,
+        323.86
+      ],
+      "type": "text"
+    },
+    "list_b_expiration_date_1": {
+      "pdfId": "list_b_expiration_date_1",
+      "page": 1,
+      "rect": [
+        276.84,
+        288.89,
+        419.06,
+        305.93
+      ],
+      "type": "text"
+    },
+    "list_c_document_title_1": {
+      "pdfId": "list_c_document_title_1",
+      "page": 1,
+      "rect": [
+        420.77,
+        342.41,
+        575.42,
+        359.45
+      ],
+      "type": "text"
+    },
+    "list_c_issuing_authority_1": {
+      "pdfId": "list_c_issuing_authority_1",
+      "page": 1,
+      "rect": [
+        420.77,
+        324.73,
+        575.42,
+        341.8
+      ],
+      "type": "text"
+    },
+    "list_c_document_number_1": {
+      "pdfId": "list_c_document_number_1",
+      "page": 1,
+      "rect": [
+        420.77,
+        306.82,
+        575.42,
+        323.86
+      ],
+      "type": "text"
+    },
+    "list_c_expiration_date_1": {
+      "pdfId": "list_c_expiration_date_1",
+      "page": 1,
+      "rect": [
+        420.77,
+        288.89,
+        575.42,
+        305.93
+      ],
+      "type": "text"
+    },
+    "section2_additional_information": {
+      "pdfId": "section2_additional_information",
+      "page": 1,
+      "rect": [
+        266.73,
+        158.42,
+        575.73,
+        274.68
+      ],
+      "type": "text"
+    },
+    "section2_alternative_procedure_used": {
+      "pdfId": "section2_alternative_procedure_used",
+      "page": 1,
+      "rect": [
+        267.51,
+        147.2,
+        276.99,
+        156.68
+      ],
+      "type": "checkbox"
+    },
+    "first_day_employed": {
+      "pdfId": "first_day_employed",
+      "page": 1,
+      "rect": [
+        462.6,
+        111.29,
+        547.69,
+        126.64
+      ],
+      "type": "text"
+    },
+    "employer_representative_name_and_title": {
+      "pdfId": "employer_representative_name_and_title",
+      "page": 1,
+      "rect": [
+        36.61,
+        79.64,
+        287.88,
+        99.24
+      ],
+      "type": "text"
+    },
+    "employer_representative_signature": {
+      "pdfId": "employer_representative_signature",
+      "page": 1,
+      "rect": [
+        294.28,
+        79.64,
+        485.32,
+        99.24
+      ],
+      "type": "text"
+    },
+    "employer_signature_date": {
+      "pdfId": "employer_signature_date",
+      "page": 1,
+      "rect": [
+        489.85,
+        79.64,
+        567.86,
+        99.24
+      ],
+      "type": "text"
+    },
+    "employer_business_name": {
+      "pdfId": "employer_business_name",
+      "page": 1,
+      "rect": [
+        36.69,
+        53.04,
+        238.87,
+        66.74
+      ],
+      "type": "text"
+    },
+    "employer_business_address": {
+      "pdfId": "employer_business_address",
+      "page": 1,
+      "rect": [
+        245.82,
+        53.04,
+        574.98,
+        66.74
+      ],
+      "type": "text"
+    },
+    "preparer_employee_last_name": {
+      "pdfId": "preparer_employee_last_name",
+      "page": 3,
+      "rect": [
+        36.96,
+        660.12,
+        257.04,
+        679.76
+      ],
+      "type": "text"
+    },
+    "preparer_employee_first_name": {
+      "pdfId": "preparer_employee_first_name",
+      "page": 3,
+      "rect": [
+        258.96,
+        660.12,
+        437.04,
+        679.75
+      ],
+      "type": "text"
+    },
+    "preparer_employee_middle_initial": {
+      "pdfId": "preparer_employee_middle_initial",
+      "page": 3,
+      "rect": [
+        438.96,
+        660.12,
+        575.04,
+        679.75
+      ],
+      "type": "text"
+    },
+    "preparer_signature_0": {
+      "pdfId": "preparer_signature_0",
+      "page": 3,
+      "rect": [
+        39.32,
+        540.8,
+        413.16,
+        563.72
+      ],
+      "type": "text"
+    },
+    "preparer_signature_date_0": {
+      "pdfId": "preparer_signature_date_0",
+      "page": 3,
+      "rect": [
+        417.56,
+        540.8,
+        567.94,
+        563.72
+      ],
+      "type": "text"
+    },
+    "preparer_last_name_0": {
+      "pdfId": "preparer_last_name_0",
+      "page": 3,
+      "rect": [
+        39.64,
+        510.8,
+        269.16,
+        526.8
+      ],
+      "type": "text"
+    },
+    "preparer_first_name_0": {
+      "pdfId": "preparer_first_name_0",
+      "page": 3,
+      "rect": [
+        273.08,
+        510.8,
+        491.16,
+        526.8
+      ],
+      "type": "text"
+    },
+    "preparer_middle_initial_0": {
+      "pdfId": "preparer_middle_initial_0",
+      "page": 3,
+      "rect": [
+        495.08,
+        510.8,
+        575.16,
+        526.8
+      ],
+      "type": "text"
+    },
+    "preparer_address_0": {
+      "pdfId": "preparer_address_0",
+      "page": 3,
+      "rect": [
+        38.96,
+        482.24,
+        293.28,
+        498.24
+      ],
+      "type": "text"
+    },
+    "preparer_city_0": {
+      "pdfId": "preparer_city_0",
+      "page": 3,
+      "rect": [
+        297.24,
+        482.24,
+        449.28,
+        498.24
+      ],
+      "type": "text"
+    },
+    "preparer_state_0": {
+      "pdfId": "preparer_state_0",
+      "page": 3,
+      "rect": [
+        453.12,
+        482.24,
+        491.49,
+        498.24
+      ],
+      "type": "text"
+    },
+    "preparer_zip_code_0": {
+      "pdfId": "preparer_zip_code_0",
+      "page": 3,
+      "rect": [
+        496.64,
+        482.24,
+        575.28,
+        498.24
+      ],
+      "type": "text"
+    },
+    "preparer_signature_1": {
+      "pdfId": "preparer_signature_1",
+      "page": 3,
+      "rect": [
+        39.16,
+        415.08,
+        413.16,
+        438
+      ],
+      "type": "text"
+    },
+    "preparer_signature_date_1": {
+      "pdfId": "preparer_signature_date_1",
+      "page": 3,
+      "rect": [
+        417.4,
+        415.08,
+        567.78,
+        438
+      ],
+      "type": "text"
+    },
+    "preparer_last_name_1": {
+      "pdfId": "preparer_last_name_1",
+      "page": 3,
+      "rect": [
+        273.08,
+        384.84,
+        491.16,
+        400.84
+      ],
+      "type": "text"
+    },
+    "preparer_middle_initial_1": {
+      "pdfId": "preparer_middle_initial_1",
+      "page": 3,
+      "rect": [
+        495.08,
+        384.84,
+        575.16,
+        400.84
+      ],
+      "type": "text"
+    },
+    "preparer_address_1": {
+      "pdfId": "preparer_address_1",
+      "page": 3,
+      "rect": [
+        38.96,
+        356.24,
+        292.32,
+        372.24
+      ],
+      "type": "text"
+    },
+    "preparer_city_1": {
+      "pdfId": "preparer_city_1",
+      "page": 3,
+      "rect": [
+        297.25,
+        356.24,
+        449.28,
+        372.24
+      ],
+      "type": "text"
+    },
+    "preparer_state_1": {
+      "pdfId": "preparer_state_1",
+      "page": 3,
+      "rect": [
+        453.12,
+        356.24,
+        491.5,
+        372.24
+      ],
+      "type": "text"
+    },
+    "preparer_zip_code_1": {
+      "pdfId": "preparer_zip_code_1",
+      "page": 3,
+      "rect": [
+        496.64,
+        356.24,
+        575.28,
+        372.24
+      ],
+      "type": "text"
+    },
+    "preparer_signature_2": {
+      "pdfId": "preparer_signature_2",
+      "page": 3,
+      "rect": [
+        39.16,
+        288.8,
+        413.16,
+        311.72
+      ],
+      "type": "text"
+    },
+    "preparer_signature_date_2": {
+      "pdfId": "preparer_signature_date_2",
+      "page": 3,
+      "rect": [
+        417.56,
+        288.8,
+        567.94,
+        311.72
+      ],
+      "type": "text"
+    },
+    "preparer_last_name_2": {
+      "pdfId": "preparer_last_name_2",
+      "page": 3,
+      "rect": [
+        39.36,
+        258.68,
+        268.88,
+        274.68
+      ],
+      "type": "text"
+    },
+    "preparer_first_name_2": {
+      "pdfId": "preparer_first_name_2",
+      "page": 3,
+      "rect": [
+        273.08,
+        258.68,
+        490.88,
+        274.68
+      ],
+      "type": "text"
+    },
+    "preparer_middle_initial_2": {
+      "pdfId": "preparer_middle_initial_2",
+      "page": 3,
+      "rect": [
+        494.8,
+        258.68,
+        574.88,
+        274.68
+      ],
+      "type": "text"
+    },
+    "preparer_address_2": {
+      "pdfId": "preparer_address_2",
+      "page": 3,
+      "rect": [
+        38.68,
+        230.12,
+        292.04,
+        246.12
+      ],
+      "type": "text"
+    },
+    "preparer_city_2": {
+      "pdfId": "preparer_city_2",
+      "page": 3,
+      "rect": [
+        296.96,
+        230.12,
+        451.64,
+        246.12
+      ],
+      "type": "text"
+    },
+    "preparer_state_2": {
+      "pdfId": "preparer_state_2",
+      "page": 3,
+      "rect": [
+        453.4,
+        230.28,
+        491.79,
+        246.28
+      ],
+      "type": "text"
+    },
+    "preparer_zip_code_2": {
+      "pdfId": "preparer_zip_code_2",
+      "page": 3,
+      "rect": [
+        496.36,
+        230.12,
+        575,
+        246.12
+      ],
+      "type": "text"
+    },
+    "preparer_signature_3": {
+      "pdfId": "preparer_signature_3",
+      "page": 3,
+      "rect": [
+        39.16,
+        162.8,
+        413.16,
+        185.72
+      ],
+      "type": "text"
+    },
+    "preparer_signature_date_3": {
+      "pdfId": "preparer_signature_date_3",
+      "page": 3,
+      "rect": [
+        418.21,
+        162.8,
+        568.59,
+        185.72
+      ],
+      "type": "text"
+    },
+    "preparer_last_name_3": {
+      "pdfId": "preparer_last_name_3",
+      "page": 3,
+      "rect": [
+        39.36,
+        132.68,
+        269.16,
+        148.68
+      ],
+      "type": "text"
+    },
+    "preparer_first_name_3": {
+      "pdfId": "preparer_first_name_3",
+      "page": 3,
+      "rect": [
+        273.08,
+        132.68,
+        491.16,
+        148.68
+      ],
+      "type": "text"
+    },
+    "preparer_middle_initial_3": {
+      "pdfId": "preparer_middle_initial_3",
+      "page": 3,
+      "rect": [
+        494.8,
+        132.68,
+        575.16,
+        148.68
+      ],
+      "type": "text"
+    },
+    "preparer_address_3": {
+      "pdfId": "preparer_address_3",
+      "page": 3,
+      "rect": [
+        38.96,
+        104,
+        293.28,
+        120
+      ],
+      "type": "text"
+    },
+    "preparer_city_3": {
+      "pdfId": "preparer_city_3",
+      "page": 3,
+      "rect": [
+        297.25,
+        104.24,
+        449.28,
+        120.24
+      ],
+      "type": "text"
+    },
+    "preparer_state_3": {
+      "pdfId": "preparer_state_3",
+      "page": 3,
+      "rect": [
+        453.15,
+        104.44,
+        491.25,
+        120.43
+      ],
+      "type": "text"
+    },
+    "preparer_zip_code_3": {
+      "pdfId": "preparer_zip_code_3",
+      "page": 3,
+      "rect": [
+        496.21,
+        104.24,
+        574.84,
+        120.24
+      ],
+      "type": "text"
+    },
+    "supplementb_employee_last_name": {
+      "pdfId": "supplementb_employee_last_name",
+      "page": 4,
+      "rect": [
+        41.42,
+        659.06,
+        257.49,
+        677.72
+      ],
+      "type": "text"
+    },
+    "supplementb_employee_first_name": {
+      "pdfId": "supplementb_employee_first_name",
+      "page": 4,
+      "rect": [
+        264.08,
+        659.06,
+        437.16,
+        677.71
+      ],
+      "type": "text"
+    },
+    "supplementb_employee_middle_initial": {
+      "pdfId": "supplementb_employee_middle_initial",
+      "page": 4,
+      "rect": [
+        444.08,
+        659.06,
+        575.16,
+        677.71
+      ],
+      "type": "text"
+    },
+    "supplementb_date_of_rehire_0": {
+      "pdfId": "supplementb_date_of_rehire_0",
+      "page": 4,
+      "rect": [
+        42.2,
+        556.74,
+        129.31,
+        575.39
+      ],
+      "type": "text"
+    },
+    "supplementb_new_last_name_0": {
+      "pdfId": "supplementb_new_last_name_0",
+      "page": 4,
+      "rect": [
+        143.75,
+        556.74,
+        335.16,
+        575.39
+      ],
+      "type": "text"
+    },
+    "supplementb_new_first_name_0": {
+      "pdfId": "supplementb_new_first_name_0",
+      "page": 4,
+      "rect": [
+        342.08,
+        556.74,
+        515.16,
+        575.39
+      ],
+      "type": "text"
+    },
+    "supplementb_new_middle_initial_0": {
+      "pdfId": "supplementb_new_middle_initial_0",
+      "page": 4,
+      "rect": [
+        521.75,
+        556.74,
+        575.16,
+        575.39
+      ],
+      "type": "text"
+    },
+    "supplementb_document_title_0": {
+      "pdfId": "supplementb_document_title_0",
+      "page": 4,
+      "rect": [
+        41.75,
+        509.06,
+        239.28,
+        522.49
+      ],
+      "type": "text"
+    },
+    "supplementb_document_number_0": {
+      "pdfId": "supplementb_document_number_0",
+      "page": 4,
+      "rect": [
+        245.96,
+        509.06,
+        443.28,
+        522.49
+      ],
+      "type": "text"
+    },
+    "supplementb_expiration_date_0": {
+      "pdfId": "supplementb_expiration_date_0",
+      "page": 4,
+      "rect": [
+        450.28,
+        509.06,
+        575.28,
+        522.49
+      ],
+      "type": "text"
+    },
+    "supplementb_employer_representative_name_0": {
+      "pdfId": "supplementb_employer_representative_name_0",
+      "page": 4,
+      "rect": [
+        41.54,
+        450.9,
+        239.16,
+        469.55
+      ],
+      "type": "text"
+    },
+    "supplementb_employer_representative_signature_0": {
+      "pdfId": "supplementb_employer_representative_signature_0",
+      "page": 4,
+      "rect": [
+        246.08,
+        450.89,
+        467.16,
+        469.55
+      ],
+      "type": "text"
+    },
+    "supplementb_signature_date_0": {
+      "pdfId": "supplementb_signature_date_0",
+      "page": 4,
+      "rect": [
+        473.75,
+        450.89,
+        568.18,
+        469.55
+      ],
+      "type": "text"
+    },
+    "supplementb_additional_information_0": {
+      "pdfId": "supplementb_additional_information_0",
+      "page": 4,
+      "rect": [
+        41.01,
+        415.73,
+        450.68,
+        438.6
+      ],
+      "type": "text"
+    },
+    "supplementb_alternative_procedure_used_0": {
+      "pdfId": "supplementb_alternative_procedure_used_0",
+      "page": 4,
+      "rect": [
+        455.26,
+        426.44,
+        464.74,
+        435.92
+      ],
+      "type": "checkbox"
+    },
+    "supplementb_date_of_rehire_1": {
+      "pdfId": "supplementb_date_of_rehire_1",
+      "page": 4,
+      "rect": [
+        42.2,
+        370.74,
+        129.31,
+        389.39
+      ],
+      "type": "text"
+    },
+    "supplementb_new_last_name_1": {
+      "pdfId": "supplementb_new_last_name_1",
+      "page": 4,
+      "rect": [
+        143.75,
+        370.74,
+        335.16,
+        389.39
+      ],
+      "type": "text"
+    },
+    "supplementb_new_first_name_1": {
+      "pdfId": "supplementb_new_first_name_1",
+      "page": 4,
+      "rect": [
+        342.08,
+        370.74,
+        515.16,
+        389.39
+      ],
+      "type": "text"
+    },
+    "supplementb_new_middle_initial_1": {
+      "pdfId": "supplementb_new_middle_initial_1",
+      "page": 4,
+      "rect": [
+        522.73,
+        370.74,
+        575.16,
+        389.39
+      ],
+      "type": "text"
+    },
+    "supplementb_document_number_1": {
+      "pdfId": "supplementb_document_number_1",
+      "page": 4,
+      "rect": [
+        245.63,
+        322.73,
+        443.28,
+        336.16
+      ],
+      "type": "text"
+    },
+    "supplementb_expiration_date_1": {
+      "pdfId": "supplementb_expiration_date_1",
+      "page": 4,
+      "rect": [
+        449.96,
+        322.73,
+        575.28,
+        336.16
+      ],
+      "type": "text"
+    },
+    "supplementb_employer_representative_name_1": {
+      "pdfId": "supplementb_employer_representative_name_1",
+      "page": 4,
+      "rect": [
+        41.87,
+        265.55,
+        241.32,
+        284.2
+      ],
+      "type": "text"
+    },
+    "supplementb_employer_representative_signature_1": {
+      "pdfId": "supplementb_employer_representative_signature_1",
+      "page": 4,
+      "rect": [
+        245.29,
+        265.55,
+        467.16,
+        284.21
+      ],
+      "type": "text"
+    },
+    "supplementb_signature_date_1": {
+      "pdfId": "supplementb_signature_date_1",
+      "page": 4,
+      "rect": [
+        474.08,
+        265.55,
+        568.5,
+        284.21
+      ],
+      "type": "text"
+    },
+    "supplementb_additional_information_1": {
+      "pdfId": "supplementb_additional_information_1",
+      "page": 4,
+      "rect": [
+        41.13,
+        228.9,
+        450.8,
+        253.07
+      ],
+      "type": "text"
+    },
+    "supplementb_alternative_procedure_used_1": {
+      "pdfId": "supplementb_alternative_procedure_used_1",
+      "page": 4,
+      "rect": [
+        455.58,
+        241.31,
+        464.74,
+        250.8
+      ],
+      "type": "checkbox"
+    },
+    "supplementb_date_of_rehire_2": {
+      "pdfId": "supplementb_date_of_rehire_2",
+      "page": 4,
+      "rect": [
+        42.2,
+        185.06,
+        129.31,
+        203.72
+      ],
+      "type": "text"
+    },
+    "supplementb_new_last_name_2": {
+      "pdfId": "supplementb_new_last_name_2",
+      "page": 4,
+      "rect": [
+        144.08,
+        185.06,
+        335.16,
+        203.72
+      ],
+      "type": "text"
+    },
+    "supplementb_new_first_name_2": {
+      "pdfId": "supplementb_new_first_name_2",
+      "page": 4,
+      "rect": [
+        342.08,
+        185.06,
+        515.16,
+        203.72
+      ],
+      "type": "text"
+    },
+    "supplementb_new_middle_initial_2": {
+      "pdfId": "supplementb_new_middle_initial_2",
+      "page": 4,
+      "rect": [
+        522.73,
+        185.06,
+        575.16,
+        203.72
+      ],
+      "type": "text"
+    },
+    "supplementb_document_title_2": {
+      "pdfId": "supplementb_document_title_2",
+      "page": 4,
+      "rect": [
+        41.18,
+        136.65,
+        238.71,
+        150.07
+      ],
+      "type": "text"
+    },
+    "supplementb_document_number_2": {
+      "pdfId": "supplementb_document_number_2",
+      "page": 4,
+      "rect": [
+        245.06,
+        136.65,
+        442.71,
+        150.07
+      ],
+      "type": "text"
+    },
+    "supplementb_expiration_date_2": {
+      "pdfId": "supplementb_expiration_date_2",
+      "page": 4,
+      "rect": [
+        449.39,
+        136.65,
+        575.19,
+        150.07
+      ],
+      "type": "text"
+    },
+    "supplementb_employer_representative_name_2": {
+      "pdfId": "supplementb_employer_representative_name_2",
+      "page": 4,
+      "rect": [
+        41.87,
+        79.24,
+        239.16,
+        97.9
+      ],
+      "type": "text"
+    },
+    "supplementb_employer_representative_signature_2": {
+      "pdfId": "supplementb_employer_representative_signature_2",
+      "page": 4,
+      "rect": [
+        245.29,
+        79.24,
+        467.16,
+        97.9
+      ],
+      "type": "text"
+    },
+    "supplementb_signature_date_2": {
+      "pdfId": "supplementb_signature_date_2",
+      "page": 4,
+      "rect": [
+        474.08,
+        79.24,
+        568.51,
+        97.9
+      ],
+      "type": "text"
+    },
+    "supplementb_additional_information_2": {
+      "pdfId": "supplementb_additional_information_2",
+      "page": 4,
+      "rect": [
+        41.45,
+        43.24,
+        451.13,
+        67.42
+      ],
+      "type": "text"
+    },
+    "supplementb_alternative_procedure_used_2": {
+      "pdfId": "supplementb_alternative_procedure_used_2",
+      "page": 4,
+      "rect": [
+        456.26,
+        53.88,
+        465.74,
+        63.36
+      ],
+      "type": "checkbox"
+    }
+  }
+}

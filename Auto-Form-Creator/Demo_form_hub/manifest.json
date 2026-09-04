@@ -1,0 +1,59 @@
+{
+  "title": "Demo Form Hub",
+  "subtitle": "Stamp-approved AI pipeline outputs — frozen review copies",
+  "updatedAt": "2026-08-25T01:40:55.866Z",
+  "forms": [
+    {
+      "id": "livescan",
+      "title": "Request for Live Scan Service",
+      "description": "California DOJ form for requesting a Live Scan fingerprint background check.",
+      "sections": 3,
+      "questions": 36,
+      "approvedAt": "2026-07-18",
+      "sourcePdf": "forms/livescan/source.pdf",
+      "formHtml": "forms/livescan/form-all-at-once.html",
+      "formHtmlOneAtATime": "forms/livescan/form-one-at-a-time.html",
+      "formConfig": "forms/livescan/form_config.json",
+      "fieldMap": "forms/livescan/field_map.json"
+    },
+    {
+      "id": "w-9-form",
+      "title": "W-9 Request for Taxpayer Identification Number and Certification",
+      "description": "Collects taxpayer identification and certification information for IRS reporting purposes.",
+      "sections": 3,
+      "questions": 23,
+      "approvedAt": "2026-07-17",
+      "sourcePdf": "forms/w-9-form/source.pdf",
+      "formHtml": "forms/w-9-form/form-all-at-once.html",
+      "formHtmlOneAtATime": "forms/w-9-form/form-one-at-a-time.html",
+      "formConfig": "forms/w-9-form/form_config.json",
+      "fieldMap": "forms/w-9-form/field_map.json"
+    },
+    {
+      "id": "w-4-form",
+      "title": "Employee’s Withholding Certificate (Form W-4, 2026)",
+      "description": "Complete this form to determine your federal income tax withholding for employment in 2026.",
+      "sections": 3,
+      "questions": 49,
+      "approvedAt": "2026-07-17",
+      "sourcePdf": "forms/w-4-form/source.pdf",
+      "formHtml": "forms/w-4-form/form-all-at-once.html",
+      "formHtmlOneAtATime": "forms/w-4-form/form-one-at-a-time.html",
+      "formConfig": "forms/w-4-form/form_config.json",
+      "fieldMap": "forms/w-4-form/field_map.json"
+    },
+    {
+      "id": "i-9-form",
+      "title": "Employment Eligibility Verification (Form I-9)",
+      "description": "Verifies identity and employment authorization for individuals hired for employment in the United States.",
+      "sections": 4,
+      "questions": 41,
+      "approvedAt": "2026-07-18",
+      "sourcePdf": "forms/i-9-form/source.pdf",
+      "formHtml": "forms/i-9-form/form-all-at-once.html",
+      "formHtmlOneAtATime": "forms/i-9-form/form-one-at-a-time.html",
+      "formConfig": "forms/i-9-form/form_config.json",
+      "fieldMap": "forms/i-9-form/field_map.json"
+    }
+  ]
+}

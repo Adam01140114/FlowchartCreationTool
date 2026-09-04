@@ -1,0 +1,583 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-17T06:59:40.755Z",
+  "byNameId": {
+    "taxpayer_name": {
+      "pdfId": "taxpayer_name",
+      "page": 1,
+      "rect": [
+        58.6,
+        659.97,
+        576,
+        673.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_01[0]",
+      "label": "Name of entity/individual",
+      "nameId": "taxpayer_name"
+    },
+    "business_name": {
+      "pdfId": "business_name",
+      "page": 1,
+      "rect": [
+        58.6,
+        635.97,
+        576,
+        649.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_02[0]",
+      "label": "Business name/disregarded entity name",
+      "nameId": "business_name"
+    },
+    "tax_classification_other": {
+      "pdfId": "tax_classification_other",
+      "page": 1,
+      "rect": [
+        417.6,
+        588.97,
+        446.4,
+        599.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].f1_03[0]",
+      "label": "Other tax classification (if applicable)",
+      "nameId": "tax_classification_other"
+    },
+    "exempt_payee_code": {
+      "pdfId": "exempt_payee_code",
+      "page": 1,
+      "rect": [
+        543.6,
+        587.97,
+        576,
+        599.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_05[0]",
+      "label": "Exempt payee code (if any)",
+      "nameId": "exempt_payee_code"
+    },
+    "tax_classification_code": {
+      "pdfId": "tax_classification_code",
+      "page": 1,
+      "rect": [
+        162.4,
+        551.97,
+        446.4,
+        563.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].f1_04[0]",
+      "label": "Tax classification code",
+      "nameId": "tax_classification_code"
+    },
+    "fatca_code": {
+      "pdfId": "fatca_code",
+      "page": 1,
+      "rect": [
+        500.6,
+        551.97,
+        576,
+        563.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_06[0]",
+      "label": "FATCA reporting code (if any)",
+      "nameId": "fatca_code"
+    },
+    "address": {
+      "pdfId": "address",
+      "page": 1,
+      "rect": [
+        58.6,
+        491.97,
+        388.05,
+        505.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_07[0]",
+      "label": "Address (number, street, and apt. or suite no.)",
+      "nameId": "address"
+    },
+    "optional_requester_name": {
+      "pdfId": "optional_requester_name",
+      "page": 1,
+      "rect": [
+        389.8,
+        467.97,
+        576,
+        505.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_09[0]",
+      "label": "Requester’s name and address (optional)",
+      "nameId": "optional_requester_name"
+    },
+    "city_state_zip": {
+      "pdfId": "city_state_zip",
+      "page": 1,
+      "rect": [
+        58.6,
+        467.97,
+        388.05,
+        481.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_08[0]",
+      "label": "City, state, and ZIP code",
+      "nameId": "city_state_zip"
+    },
+    "account_number": {
+      "pdfId": "account_number",
+      "page": 1,
+      "rect": [
+        58.6,
+        443.97,
+        576,
+        457.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_10[0]",
+      "label": "List account number(s) here (optional)",
+      "nameId": "account_number"
+    },
+    "tin_ssn": {
+      "pdfId": "tin_ssn",
+      "page": 1,
+      "rect": [
+        417.6,
+        395.97,
+        460.8,
+        419.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_11[0]",
+      "label": "Taxpayer Identification Number (TIN)",
+      "nameId": "tin_ssn"
+    },
+    "tin_ein": {
+      "pdfId": "tin_ein",
+      "page": 1,
+      "rect": [
+        475.2,
+        395.97,
+        504,
+        419.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_12[0]",
+      "label": "Employer Identification Number (EIN)",
+      "nameId": "tin_ein"
+    },
+    "name_for_ein": {
+      "pdfId": "name_for_ein",
+      "page": 1,
+      "rect": [
+        518.4,
+        395.97,
+        576,
+        419.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_13[0]",
+      "label": "What Name and Number To Give the Requester",
+      "nameId": "name_for_ein"
+    },
+    "name_for_ssn": {
+      "pdfId": "name_for_ssn",
+      "page": 1,
+      "rect": [
+        417.6,
+        347.97,
+        446.4,
+        371.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_14[0]",
+      "label": "Name for SSN",
+      "nameId": "name_for_ssn"
+    },
+    "additional_name_info": {
+      "pdfId": "additional_name_info",
+      "page": 1,
+      "rect": [
+        460.8,
+        347.97,
+        561.6,
+        371.97
+      ],
+      "type": "text",
+      "originalPdfId": "topmostSubform[0].Page1[0].f1_15[0]",
+      "label": "Additional name information",
+      "nameId": "additional_name_info"
+    },
+    "tax_classification_individual": {
+      "pdfId": "tax_classification_individual",
+      "page": 1,
+      "rect": [
+        73,
+        603.72,
+        81,
+        611.72
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[0]",
+      "label": "Individual/sole proprietor",
+      "nameId": "tax_classification_individual"
+    },
+    "tax_classification_corporation": {
+      "pdfId": "tax_classification_corporation",
+      "page": 1,
+      "rect": [
+        180,
+        603.72,
+        188,
+        611.72
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[1]",
+      "label": "C corporation",
+      "nameId": "tax_classification_corporation"
+    },
+    "tax_classification_s_corporation": {
+      "pdfId": "tax_classification_s_corporation",
+      "page": 1,
+      "rect": [
+        252,
+        603.72,
+        260,
+        611.72
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[2]",
+      "label": "S corporation",
+      "nameId": "tax_classification_s_corporation"
+    },
+    "tax_classification_partnership": {
+      "pdfId": "tax_classification_partnership",
+      "page": 1,
+      "rect": [
+        324,
+        603.72,
+        332,
+        611.72
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[3]",
+      "label": "Partnership",
+      "nameId": "tax_classification_partnership"
+    },
+    "tax_classification_trust_estate": {
+      "pdfId": "tax_classification_trust_estate",
+      "page": 1,
+      "rect": [
+        388.8,
+        603.72,
+        396.8,
+        611.72
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[4]",
+      "label": "Trust/estate",
+      "nameId": "tax_classification_trust_estate"
+    },
+    "tax_classification_llc": {
+      "pdfId": "tax_classification_llc",
+      "page": 1,
+      "rect": [
+        73,
+        590.47,
+        81,
+        598.47
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[5]",
+      "label": "LLC",
+      "nameId": "tax_classification_llc"
+    },
+    "tax_classification_other_checkbox": {
+      "pdfId": "tax_classification_other_checkbox",
+      "page": 1,
+      "rect": [
+        73,
+        553.97,
+        81,
+        561.97
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[6]",
+      "label": "Other (see instructions)",
+      "nameId": "tax_classification_other_checkbox"
+    },
+    "foreign_partners_checkbox": {
+      "pdfId": "foreign_partners_checkbox",
+      "page": 1,
+      "rect": [
+        440.6,
+        520.97,
+        448.6,
+        528.97
+      ],
+      "type": "checkbox",
+      "originalPdfId": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_2[0]",
+      "label": "Check if you have foreign partners",
+      "nameId": "foreign_partners_checkbox"
+    }
+  },
+  "byPdfId": {
+    "taxpayer_name": {
+      "pdfId": "taxpayer_name",
+      "page": 1,
+      "rect": [
+        58.6,
+        659.97,
+        576,
+        673.97
+      ],
+      "type": "text"
+    },
+    "business_name": {
+      "pdfId": "business_name",
+      "page": 1,
+      "rect": [
+        58.6,
+        635.97,
+        576,
+        649.97
+      ],
+      "type": "text"
+    },
+    "tax_classification_individual": {
+      "pdfId": "tax_classification_individual",
+      "page": 1,
+      "rect": [
+        73,
+        603.72,
+        81,
+        611.72
+      ],
+      "type": "checkbox"
+    },
+    "tax_classification_corporation": {
+      "pdfId": "tax_classification_corporation",
+      "page": 1,
+      "rect": [
+        180,
+        603.72,
+        188,
+        611.72
+      ],
+      "type": "checkbox"
+    },
+    "tax_classification_s_corporation": {
+      "pdfId": "tax_classification_s_corporation",
+      "page": 1,
+      "rect": [
+        252,
+        603.72,
+        260,
+        611.72
+      ],
+      "type": "checkbox"
+    },
+    "tax_classification_partnership": {
+      "pdfId": "tax_classification_partnership",
+      "page": 1,
+      "rect": [
+        324,
+        603.72,
+        332,
+        611.72
+      ],
+      "type": "checkbox"
+    },
+    "tax_classification_trust_estate": {
+      "pdfId": "tax_classification_trust_estate",
+      "page": 1,
+      "rect": [
+        388.8,
+        603.72,
+        396.8,
+        611.72
+      ],
+      "type": "checkbox"
+    },
+    "tax_classification_llc": {
+      "pdfId": "tax_classification_llc",
+      "page": 1,
+      "rect": [
+        73,
+        590.47,
+        81,
+        598.47
+      ],
+      "type": "checkbox"
+    },
+    "tax_classification_other": {
+      "pdfId": "tax_classification_other",
+      "page": 1,
+      "rect": [
+        417.6,
+        588.97,
+        446.4,
+        599.97
+      ],
+      "type": "text"
+    },
+    "tax_classification_other_checkbox": {
+      "pdfId": "tax_classification_other_checkbox",
+      "page": 1,
+      "rect": [
+        73,
+        553.97,
+        81,
+        561.97
+      ],
+      "type": "checkbox"
+    },
+    "tax_classification_code": {
+      "pdfId": "tax_classification_code",
+      "page": 1,
+      "rect": [
+        162.4,
+        551.97,
+        446.4,
+        563.97
+      ],
+      "type": "text"
+    },
+    "foreign_partners_checkbox": {
+      "pdfId": "foreign_partners_checkbox",
+      "page": 1,
+      "rect": [
+        440.6,
+        520.97,
+        448.6,
+        528.97
+      ],
+      "type": "checkbox"
+    },
+    "exempt_payee_code": {
+      "pdfId": "exempt_payee_code",
+      "page": 1,
+      "rect": [
+        543.6,
+        587.97,
+        576,
+        599.97
+      ],
+      "type": "text"
+    },
+    "fatca_code": {
+      "pdfId": "fatca_code",
+      "page": 1,
+      "rect": [
+        500.6,
+        551.97,
+        576,
+        563.97
+      ],
+      "type": "text"
+    },
+    "address": {
+      "pdfId": "address",
+      "page": 1,
+      "rect": [
+        58.6,
+        491.97,
+        388.05,
+        505.97
+      ],
+      "type": "text"
+    },
+    "city_state_zip": {
+      "pdfId": "city_state_zip",
+      "page": 1,
+      "rect": [
+        58.6,
+        467.97,
+        388.05,
+        481.97
+      ],
+      "type": "text"
+    },
+    "optional_requester_name": {
+      "pdfId": "optional_requester_name",
+      "page": 1,
+      "rect": [
+        389.8,
+        467.97,
+        576,
+        505.97
+      ],
+      "type": "text"
+    },
+    "account_number": {
+      "pdfId": "account_number",
+      "page": 1,
+      "rect": [
+        58.6,
+        443.97,
+        576,
+        457.97
+      ],
+      "type": "text"
+    },
+    "tin_ssn": {
+      "pdfId": "tin_ssn",
+      "page": 1,
+      "rect": [
+        417.6,
+        395.97,
+        460.8,
+        419.97
+      ],
+      "type": "text"
+    },
+    "tin_ein": {
+      "pdfId": "tin_ein",
+      "page": 1,
+      "rect": [
+        475.2,
+        395.97,
+        504,
+        419.97
+      ],
+      "type": "text"
+    },
+    "name_for_ein": {
+      "pdfId": "name_for_ein",
+      "page": 1,
+      "rect": [
+        518.4,
+        395.97,
+        576,
+        419.97
+      ],
+      "type": "text"
+    },
+    "name_for_ssn": {
+      "pdfId": "name_for_ssn",
+      "page": 1,
+      "rect": [
+        417.6,
+        347.97,
+        446.4,
+        371.97
+      ],
+      "type": "text"
+    },
+    "additional_name_info": {
+      "pdfId": "additional_name_info",
+      "page": 1,
+      "rect": [
+        460.8,
+        347.97,
+        561.6,
+        371.97
+      ],
+      "type": "text"
+    }
+  }
+}

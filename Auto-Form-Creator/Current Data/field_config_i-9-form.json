@@ -1,0 +1,773 @@
+{
+  "formTitle": "Employment Eligibility Verification (Form I-9)",
+  "fields": [
+    {
+      "id": "Last Name (Family Name)",
+      "newName": "employee_last_name",
+      "type": "text",
+      "label": "Last Name (Family Name)"
+    },
+    {
+      "id": "First Name Given Name",
+      "newName": "employee_first_name",
+      "type": "text",
+      "label": "First Name (Given Name)"
+    },
+    {
+      "id": "Employee Middle Initial (if any)",
+      "newName": "employee_middle_initial",
+      "type": "text",
+      "label": "Middle Initial (if any)"
+    },
+    {
+      "id": "Employee Other Last Names Used (if any)",
+      "newName": "employee_other_last_names",
+      "type": "text",
+      "label": "Other Last Names Used (if any)"
+    },
+    {
+      "id": "Address Street Number and Name",
+      "newName": "employee_street_address",
+      "type": "text",
+      "label": "Street Number and Name"
+    },
+    {
+      "id": "Apt Number (if any)",
+      "newName": "employee_apartment_number",
+      "type": "text",
+      "label": "Apt. Number (if any)"
+    },
+    {
+      "id": "City or Town",
+      "newName": "employee_city",
+      "type": "text",
+      "label": "City or Town"
+    },
+    {
+      "id": "State",
+      "newName": "employee_state",
+      "type": "dropdown",
+      "label": "State"
+    },
+    {
+      "id": "ZIP Code",
+      "newName": "employee_zip_code",
+      "type": "text",
+      "label": "ZIP Code"
+    },
+    {
+      "id": "Date of Birth mmddyyyy",
+      "newName": "employee_date_of_birth",
+      "type": "text",
+      "label": "Date of Birth (mm/dd/yyyy)"
+    },
+    {
+      "id": "US Social Security Number",
+      "newName": "employee_social_security_number",
+      "type": "text",
+      "label": "U.S. Social Security Number"
+    },
+    {
+      "id": "Employees E-mail Address",
+      "newName": "employee_email_address",
+      "type": "text",
+      "label": "Email Address"
+    },
+    {
+      "id": "Telephone Number",
+      "newName": "employee_telephone_number",
+      "type": "text",
+      "label": "Telephone Number"
+    },
+    {
+      "id": "CB_1",
+      "newName": "citizenship_status_us_citizen",
+      "type": "checkbox",
+      "label": "A citizen of the United States"
+    },
+    {
+      "id": "CB_2",
+      "newName": "citizenship_status_noncitizen_national",
+      "type": "checkbox",
+      "label": "A noncitizen national of the United States"
+    },
+    {
+      "id": "CB_3",
+      "newName": "citizenship_status_lawful_permanent_resident",
+      "type": "checkbox",
+      "label": "A lawful permanent resident"
+    },
+    {
+      "id": "3 A lawful permanent resident Enter USCIS or ANumber",
+      "newName": "lawful_permanent_resident_number",
+      "type": "text",
+      "label": "USCIS or A-Number"
+    },
+    {
+      "id": "CB_4",
+      "newName": "citizenship_status_alien_authorized_to_work",
+      "type": "checkbox",
+      "label": "An alien authorized to work"
+    },
+    {
+      "id": "Exp Date mmddyyyy",
+      "newName": "alien_authorized_expiration_date",
+      "type": "text",
+      "label": "Expiration Date (if any)"
+    },
+    {
+      "id": "USCIS ANumber",
+      "newName": "alien_uscis_a_number",
+      "type": "text",
+      "label": "USCIS A-Number"
+    },
+    {
+      "id": "Form I94 Admission Number",
+      "newName": "alien_form_i94_admission_number",
+      "type": "text",
+      "label": "Form I-94 Admission Number"
+    },
+    {
+      "id": "Foreign Passport Number and Country of IssuanceRow1",
+      "newName": "alien_foreign_passport_number_and_country",
+      "type": "text",
+      "label": "Foreign Passport Number and Country of Issuance"
+    },
+    {
+      "id": "Signature of Employee",
+      "newName": "employee_signature",
+      "type": "text",
+      "label": "Signature of Employee"
+    },
+    {
+      "id": "Today's Date mmddyyy",
+      "newName": "employee_signature_date",
+      "type": "text",
+      "label": "Today's Date (mm/dd/yyyy)"
+    },
+    {
+      "id": "Document Title 1",
+      "newName": "list_a_document_title_1",
+      "type": "text",
+      "label": "Document Title 1"
+    },
+    {
+      "id": "Issuing Authority 1",
+      "newName": "list_a_issuing_authority_1",
+      "type": "text",
+      "label": "Issuing Authority"
+    },
+    {
+      "id": "Document Number 0 (if any)",
+      "newName": "list_a_document_number_1",
+      "type": "text",
+      "label": "Document Number (if any)"
+    },
+    {
+      "id": "Expiration Date if any",
+      "newName": "list_a_expiration_date_1",
+      "type": "text",
+      "label": "Expiration Date (if any)"
+    },
+    {
+      "id": "Document Title 2 If any",
+      "newName": "list_a_document_title_2",
+      "type": "text",
+      "label": "Document Title 2 (if any)"
+    },
+    {
+      "id": "Issuing Authority_2",
+      "newName": "list_a_issuing_authority_2",
+      "type": "text",
+      "label": "Issuing Authority"
+    },
+    {
+      "id": "Document Number If any_2",
+      "newName": "list_a_document_number_2",
+      "type": "text",
+      "label": "Document Number (if any)"
+    },
+    {
+      "id": "List A.  Document 2. Expiration Date (if any)",
+      "newName": "list_a_expiration_date_2",
+      "type": "text",
+      "label": "Expiration Date (if any)"
+    },
+    {
+      "id": "List A.   Document Title 3.  If any",
+      "newName": "list_a_document_title_3",
+      "type": "text",
+      "label": "Document Title 3 (if any)"
+    },
+    {
+      "id": "List A. Document 3.  Enter Issuing Authority",
+      "newName": "list_a_issuing_authority_3",
+      "type": "text",
+      "label": "Issuing Authority"
+    },
+    {
+      "id": "List A.  Document 3 Number.  If any",
+      "newName": "list_a_document_number_3",
+      "type": "text",
+      "label": "Document Number (if any)"
+    },
+    {
+      "id": "Document Number if any_3",
+      "newName": "list_a_expiration_date_3",
+      "type": "text",
+      "label": "Expiration Date (if any)"
+    },
+    {
+      "id": "List B Document 1 Title",
+      "newName": "list_b_document_title_1",
+      "type": "text",
+      "label": "List B Document Title"
+    },
+    {
+      "id": "List B Issuing Authority 1",
+      "newName": "list_b_issuing_authority_1",
+      "type": "text",
+      "label": "List B Issuing Authority"
+    },
+    {
+      "id": "List B Document Number 1",
+      "newName": "list_b_document_number_1",
+      "type": "text",
+      "label": "List B Document Number"
+    },
+    {
+      "id": "List B Expiration Date 1",
+      "newName": "list_b_expiration_date_1",
+      "type": "text",
+      "label": "List B Expiration Date"
+    },
+    {
+      "id": "List C Document Title 1",
+      "newName": "list_c_document_title_1",
+      "type": "text",
+      "label": "List C Document Title"
+    },
+    {
+      "id": "List C Issuing Authority 1",
+      "newName": "list_c_issuing_authority_1",
+      "type": "text",
+      "label": "List C Issuing Authority"
+    },
+    {
+      "id": "List C Document Number 1",
+      "newName": "list_c_document_number_1",
+      "type": "text",
+      "label": "List C Document Number"
+    },
+    {
+      "id": "List C Expiration Date 1",
+      "newName": "list_c_expiration_date_1",
+      "type": "text",
+      "label": "List C Expiration Date"
+    },
+    {
+      "id": "Additional Information",
+      "newName": "section2_additional_information",
+      "type": "text",
+      "label": "Additional Information"
+    },
+    {
+      "id": "CB_Alt",
+      "newName": "section2_alternative_procedure_used",
+      "type": "checkbox",
+      "label": "Alternative procedure authorized by DHS"
+    },
+    {
+      "id": "FirstDayEmployed mmddyyyy",
+      "newName": "first_day_employed",
+      "type": "text",
+      "label": "First Day of Employment (mm/dd/yyyy)"
+    },
+    {
+      "id": "Last Name First Name and Title of Employer or Authorized Representative",
+      "newName": "employer_representative_name_and_title",
+      "type": "text",
+      "label": "Last Name, First Name and Title of Employer or Authorized Representative"
+    },
+    {
+      "id": "Signature of Employer or AR",
+      "newName": "employer_representative_signature",
+      "type": "text",
+      "label": "Signature of Employer or Authorized Representative"
+    },
+    {
+      "id": "S2 Todays Date mmddyyyy",
+      "newName": "employer_signature_date",
+      "type": "text",
+      "label": "Today's Date (mm/dd/yyyy)"
+    },
+    {
+      "id": "Employers Business or Org Name",
+      "newName": "employer_business_name",
+      "type": "text",
+      "label": "Business or Organization Name"
+    },
+    {
+      "id": "Employers Business or Org Address",
+      "newName": "employer_business_address",
+      "type": "text",
+      "label": "Business or Organization Address, City or Town, State, ZIP Code"
+    },
+    {
+      "id": "Last Name Family Name from Section 1",
+      "newName": "preparer_employee_last_name",
+      "type": "text",
+      "label": "Last Name (Family Name) from Section 1"
+    },
+    {
+      "id": "First Name Given Name from Section 1",
+      "newName": "preparer_employee_first_name",
+      "type": "text",
+      "label": "First Name (Given Name) from Section 1"
+    },
+    {
+      "id": "Middle initial if any from Section 1",
+      "newName": "preparer_employee_middle_initial",
+      "type": "text",
+      "label": "Middle Initial (if any) from Section 1"
+    },
+    {
+      "id": "Signature of Preparer or Translator 0",
+      "newName": "preparer_signature_0",
+      "type": "text",
+      "label": "Signature of Preparer or Translator"
+    },
+    {
+      "id": "Sig Date mmddyyyy 0",
+      "newName": "preparer_signature_date_0",
+      "type": "text",
+      "label": "Date (mm/dd/yyyy)"
+    },
+    {
+      "id": "Preparer or Translator Last Name (Family Name) 0",
+      "newName": "preparer_last_name_0",
+      "type": "text",
+      "label": "Last Name (Family Name)"
+    },
+    {
+      "id": "Preparer or Translator First Name (Given Name) 0",
+      "newName": "preparer_first_name_0",
+      "type": "text",
+      "label": "First Name (Given Name)"
+    },
+    {
+      "id": "PT Middle Initial 0",
+      "newName": "preparer_middle_initial_0",
+      "type": "text",
+      "label": "Middle Initial (if any)"
+    },
+    {
+      "id": "Preparer or Translator Address (Street Number and Name) 0",
+      "newName": "preparer_address_0",
+      "type": "text",
+      "label": "Address (Street Number and Name)"
+    },
+    {
+      "id": "Preparer or Translator City or Town 0",
+      "newName": "preparer_city_0",
+      "type": "text",
+      "label": "City or Town"
+    },
+    {
+      "id": "Preparer State 0",
+      "newName": "preparer_state_0",
+      "type": "dropdown",
+      "label": "State"
+    },
+    {
+      "id": "Zip Code 0",
+      "newName": "preparer_zip_code_0",
+      "type": "text",
+      "label": "ZIP Code"
+    },
+    {
+      "id": "Signature of Preparer or Translator 1",
+      "newName": "preparer_signature_1",
+      "type": "text",
+      "label": "Signature of Preparer or Translator"
+    },
+    {
+      "id": "Sig Date mmddyyyy 1",
+      "newName": "preparer_signature_date_1",
+      "type": "text",
+      "label": "Date (mm/dd/yyyy)"
+    },
+    {
+      "id": "Preparer or Translator Last Name (Family Name) 1",
+      "newName": "preparer_last_name_1",
+      "type": "text",
+      "label": "Last Name (Family Name)"
+    },
+    {
+      "id": "PT Middle Initial 1",
+      "newName": "preparer_middle_initial_1",
+      "type": "text",
+      "label": "Middle Initial (if any)"
+    },
+    {
+      "id": "Preparer or Translator Address (Street Number and Name) 1",
+      "newName": "preparer_address_1",
+      "type": "text",
+      "label": "Address (Street Number and Name)"
+    },
+    {
+      "id": "Preparer or Translator City or Town 1",
+      "newName": "preparer_city_1",
+      "type": "text",
+      "label": "City or Town"
+    },
+    {
+      "id": "Preparer State 1",
+      "newName": "preparer_state_1",
+      "type": "dropdown",
+      "label": "State"
+    },
+    {
+      "id": "Zip Code 1",
+      "newName": "preparer_zip_code_1",
+      "type": "text",
+      "label": "ZIP Code"
+    },
+    {
+      "id": "Signature of Preparer or Translator 2",
+      "newName": "preparer_signature_2",
+      "type": "text",
+      "label": "Signature of Preparer or Translator"
+    },
+    {
+      "id": "Sig Date mmddyyyy 2",
+      "newName": "preparer_signature_date_2",
+      "type": "text",
+      "label": "Date (mm/dd/yyyy)"
+    },
+    {
+      "id": "Preparer or Translator Last Name (Family Name) 2",
+      "newName": "preparer_last_name_2",
+      "type": "text",
+      "label": "Last Name (Family Name)"
+    },
+    {
+      "id": "Preparer or Translator First Name (Given Name) 2",
+      "newName": "preparer_first_name_2",
+      "type": "text",
+      "label": "First Name (Given Name)"
+    },
+    {
+      "id": "PT Middle Initial 2",
+      "newName": "preparer_middle_initial_2",
+      "type": "text",
+      "label": "Middle Initial (if any)"
+    },
+    {
+      "id": "Preparer or Translator Address (Street Number and Name) 2",
+      "newName": "preparer_address_2",
+      "type": "text",
+      "label": "Address (Street Number and Name)"
+    },
+    {
+      "id": "Preparer or Translator City or Town 2",
+      "newName": "preparer_city_2",
+      "type": "text",
+      "label": "City or Town"
+    },
+    {
+      "id": "Preparer State 2",
+      "newName": "preparer_state_2",
+      "type": "dropdown",
+      "label": "State"
+    },
+    {
+      "id": "Zip Code 2",
+      "newName": "preparer_zip_code_2",
+      "type": "text",
+      "label": "ZIP Code"
+    },
+    {
+      "id": "Signature of Preparer or Translator 3",
+      "newName": "preparer_signature_3",
+      "type": "text",
+      "label": "Signature of Preparer or Translator"
+    },
+    {
+      "id": "Sig Date mmddyyyy 3",
+      "newName": "preparer_signature_date_3",
+      "type": "text",
+      "label": "Date (mm/dd/yyyy)"
+    },
+    {
+      "id": "Preparer or Translator Last Name (Family Name) 3",
+      "newName": "preparer_last_name_3",
+      "type": "text",
+      "label": "Last Name (Family Name)"
+    },
+    {
+      "id": "Preparer or Translator First Name (Given Name) 3",
+      "newName": "preparer_first_name_3",
+      "type": "text",
+      "label": "First Name (Given Name)"
+    },
+    {
+      "id": "PT Middle Initial 3",
+      "newName": "preparer_middle_initial_3",
+      "type": "text",
+      "label": "Middle Initial (if any)"
+    },
+    {
+      "id": "Preparer or Translator Address (Street Number and Name) 3",
+      "newName": "preparer_address_3",
+      "type": "text",
+      "label": "Address (Street Number and Name)"
+    },
+    {
+      "id": "Preparer or Translator City or Town 3",
+      "newName": "preparer_city_3",
+      "type": "text",
+      "label": "City or Town"
+    },
+    {
+      "id": "Preparer State 3",
+      "newName": "preparer_state_3",
+      "type": "dropdown",
+      "label": "State"
+    },
+    {
+      "id": "Zip Code 3",
+      "newName": "preparer_zip_code_3",
+      "type": "text",
+      "label": "ZIP Code"
+    },
+    {
+      "id": "Last Name Family Name from Section 1-2",
+      "newName": "supplementb_employee_last_name",
+      "type": "text",
+      "label": "Last Name (Family Name) from Section 1"
+    },
+    {
+      "id": "First Name Given Name from Section 1-2",
+      "newName": "supplementb_employee_first_name",
+      "type": "text",
+      "label": "First Name (Given Name) from Section 1"
+    },
+    {
+      "id": "Middle initial if any from Section 1-2",
+      "newName": "supplementb_employee_middle_initial",
+      "type": "text",
+      "label": "Middle Initial (if any) from Section 1"
+    },
+    {
+      "id": "Date of Rehire 0",
+      "newName": "supplementb_date_of_rehire_0",
+      "type": "text",
+      "label": "Date of Rehire (if applicable)"
+    },
+    {
+      "id": "Last Name 0",
+      "newName": "supplementb_new_last_name_0",
+      "type": "text",
+      "label": "New Last Name (if applicable)"
+    },
+    {
+      "id": "First Name 0",
+      "newName": "supplementb_new_first_name_0",
+      "type": "text",
+      "label": "New First Name (if applicable)"
+    },
+    {
+      "id": "Middle Initial 0",
+      "newName": "supplementb_new_middle_initial_0",
+      "type": "text",
+      "label": "New Middle Initial (if applicable)"
+    },
+    {
+      "id": "Document Title 0",
+      "newName": "supplementb_document_title_0",
+      "type": "text",
+      "label": "Document Title"
+    },
+    {
+      "id": "Document Number 0",
+      "newName": "supplementb_document_number_0",
+      "type": "text",
+      "label": "Document Number (if any)"
+    },
+    {
+      "id": "Expiration Date 0",
+      "newName": "supplementb_expiration_date_0",
+      "type": "text",
+      "label": "Expiration Date (if any)"
+    },
+    {
+      "id": "Name of Emp or Auth Rep 0",
+      "newName": "supplementb_employer_representative_name_0",
+      "type": "text",
+      "label": "Name of Employer or Authorized Representative"
+    },
+    {
+      "id": "Signature of Emp Rep 0",
+      "newName": "supplementb_employer_representative_signature_0",
+      "type": "text",
+      "label": "Signature of Employer or Authorized Representative"
+    },
+    {
+      "id": "Todays Date 0",
+      "newName": "supplementb_signature_date_0",
+      "type": "text",
+      "label": "Today's Date"
+    },
+    {
+      "id": "Addtl Info 0",
+      "newName": "supplementb_additional_information_0",
+      "type": "text",
+      "label": "Additional Information"
+    },
+    {
+      "id": "CB_Alt_0",
+      "newName": "supplementb_alternative_procedure_used_0",
+      "type": "checkbox",
+      "label": "Alternative procedure authorized by DHS"
+    },
+    {
+      "id": "Date of Rehire 1",
+      "newName": "supplementb_date_of_rehire_1",
+      "type": "text",
+      "label": "Date of Rehire (if applicable)"
+    },
+    {
+      "id": "Last Name 1",
+      "newName": "supplementb_new_last_name_1",
+      "type": "text",
+      "label": "New Last Name (if applicable)"
+    },
+    {
+      "id": "First Name 1",
+      "newName": "supplementb_new_first_name_1",
+      "type": "text",
+      "label": "New First Name (if applicable)"
+    },
+    {
+      "id": "Middle Initial 1",
+      "newName": "supplementb_new_middle_initial_1",
+      "type": "text",
+      "label": "New Middle Initial (if applicable)"
+    },
+    {
+      "id": "Document Number 1",
+      "newName": "supplementb_document_number_1",
+      "type": "text",
+      "label": "Document Number (if any)"
+    },
+    {
+      "id": "Expiration Date 1",
+      "newName": "supplementb_expiration_date_1",
+      "type": "text",
+      "label": "Expiration Date (if any)"
+    },
+    {
+      "id": "Name of Emp or Auth Rep 1",
+      "newName": "supplementb_employer_representative_name_1",
+      "type": "text",
+      "label": "Name of Employer or Authorized Representative"
+    },
+    {
+      "id": "Signature of Emp Rep 1",
+      "newName": "supplementb_employer_representative_signature_1",
+      "type": "text",
+      "label": "Signature of Employer or Authorized Representative"
+    },
+    {
+      "id": "Todays Date 1",
+      "newName": "supplementb_signature_date_1",
+      "type": "text",
+      "label": "Today's Date"
+    },
+    {
+      "id": "Addtl Info 1",
+      "newName": "supplementb_additional_information_1",
+      "type": "text",
+      "label": "Additional Information"
+    },
+    {
+      "id": "CB_Alt_1",
+      "newName": "supplementb_alternative_procedure_used_1",
+      "type": "checkbox",
+      "label": "Alternative procedure authorized by DHS"
+    },
+    {
+      "id": "Date of Rehire 2",
+      "newName": "supplementb_date_of_rehire_2",
+      "type": "text",
+      "label": "Date of Rehire (if applicable)"
+    },
+    {
+      "id": "Last Name 2",
+      "newName": "supplementb_new_last_name_2",
+      "type": "text",
+      "label": "New Last Name (if applicable)"
+    },
+    {
+      "id": "First Name 2",
+      "newName": "supplementb_new_first_name_2",
+      "type": "text",
+      "label": "New First Name (if applicable)"
+    },
+    {
+      "id": "Middle Initial 2",
+      "newName": "supplementb_new_middle_initial_2",
+      "type": "text",
+      "label": "New Middle Initial (if applicable)"
+    },
+    {
+      "id": "Document Title 2",
+      "newName": "supplementb_document_title_2",
+      "type": "text",
+      "label": "Document Title"
+    },
+    {
+      "id": "Document Number 2",
+      "newName": "supplementb_document_number_2",
+      "type": "text",
+      "label": "Document Number (if any)"
+    },
+    {
+      "id": "Expiration Date 2",
+      "newName": "supplementb_expiration_date_2",
+      "type": "text",
+      "label": "Expiration Date (if any)"
+    },
+    {
+      "id": "Name of Emp or Auth Rep 2",
+      "newName": "supplementb_employer_representative_name_2",
+      "type": "text",
+      "label": "Name of Employer or Authorized Representative"
+    },
+    {
+      "id": "Signature of Emp Rep 2",
+      "newName": "supplementb_employer_representative_signature_2",
+      "type": "text",
+      "label": "Signature of Employer or Authorized Representative"
+    },
+    {
+      "id": "Todays Date 2",
+      "newName": "supplementb_signature_date_2",
+      "type": "text",
+      "label": "Today's Date"
+    },
+    {
+      "id": "Addtl Info 2",
+      "newName": "supplementb_additional_information_2",
+      "type": "text",
+      "label": "Additional Information"
+    },
+    {
+      "id": "CB_Alt_2",
+      "newName": "supplementb_alternative_procedure_used_2",
+      "type": "checkbox",
+      "label": "Alternative procedure authorized by DHS"
+    }
+  ]
+}

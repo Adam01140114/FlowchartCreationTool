@@ -1,0 +1,464 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  user-select: none;
+  /* Prevent default browser wheel scroll so we can do zoom */
+  overflow: hidden;
+}
+
+/* MAIN TOOLBAR */
+.toolbar {
+  width: 220px;
+  min-width: 150px;
+  background: #f9f9f9;
+  border-right: 1px solid #ccc;
+  float: left;
+  padding: 10px;
+  box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+  resize: horizontal;
+}
+
+/* GRAPH AREA */
+#graphContainer {
+  position: absolute;
+  left: 220px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  cursor: default;
+  overflow: hidden; /* This container is where we do the wheel zoom */
+}
+
+/* SHAPES IN THE TOOLBAR */
+.shape {
+  background: #fff;
+  border: 1px solid #999;
+  margin-bottom: 8px;
+  text-align: center;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: move;
+}
+.shape:hover {
+  background: #e0e0e0;
+}
+
+/* BUTTONS */
+.button-bar {
+  margin-top: 15px;
+}
+button {
+  margin-bottom: 6px;
+  padding: 6px 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+button:hover {
+  background-color: #0056b3;
+}
+input[type="file"] {
+  display: none;
+}
+
+/* CONTEXT MENUS */
+.context-menu {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+  display: none;
+  z-index: 1000;
+  padding: 5px;
+}
+.context-menu button {
+  border: none;
+  background: none;
+  color: #000;
+  padding: 5px 10px;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+.context-menu button:hover {
+  background-color: #f0f0f0;
+}
+
+/* SUBMENU FOR TYPES */
+.submenu {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  padding: 5px;
+  display: none;
+  z-index: 2000;
+}
+.submenu button {
+  display: block;
+  margin-bottom: 4px;
+  border: none;
+  background: none;
+  color: #000;
+  padding: 5px 10px;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+.submenu button:hover {
+  background-color: #f0f0f0;
+}
+
+/* PROPERTIES MENU */
+#propertiesMenu {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  display: none;
+  z-index: 3000;
+  width: 220px;
+}
+#propertiesMenu p {
+  margin: 4px 0;
+}
+.editable-field {
+  border: 1px dashed transparent;
+  padding: 20px;
+  display: inline-block;
+  min-width: 50px;
+  cursor: text;
+}
+.editable-field:focus {
+  outline: 1px dashed #888;
+}
+
+/* LEGENDS */
+.legend {
+  margin-top: 10px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.legend .legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.legend-color-box {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+/* SECTION LEGEND */
+#sectionLegend {
+  margin-top: 10px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+#sectionLegend h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.section-item {
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.section-item.highlighted {
+  border: 2px solid #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.section-color-box {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+.section-name {
+  flex-grow: 1;
+  border: 1px dashed transparent;
+  padding: 2px;
+  min-width: 80px;
+  cursor: text;
+}
+.section-name:focus {
+  outline: 1px dashed #888;
+}
+.section-number {
+  margin-right: 4px;
+}
+#resetSectionColorsBtn {
+  margin-top: 6px;
+  padding: 4px 8px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+#resetSectionColorsBtn:hover {
+  background-color: #0056b3;
+}
+.section-buttons {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+.delete-section-btn,
+.add-section-btn {
+  padding: 2px 6px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+  flex: 1;
+}
+
+/* LOGIN OVERLAY */
+#loginOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+#loginForm {
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  min-width: 300px;
+}
+#loginForm input[type="email"],
+#loginForm input[type="password"] {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+#loginError {
+  color: red;
+  margin-bottom: 8px;
+}
+
+/* FLOWCHART LIST OVERLAY */
+#flowchartListOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  display: none;  /* hidden by default */
+  justify-content: center;
+  align-items: center;
+}
+#flowchartListPanel {
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  min-width: 300px;
+  text-align: center;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+#flowchartListPanel h3 {
+  margin-top: 0;
+  text-align: center;
+}
+#flowchartList {
+  overflow-y: auto;
+  max-height: calc(80vh - 100px);
+  padding-right: 10px;
+  margin-bottom: 10px;
+}
+.flowchart-item {
+  margin-bottom: 16px; /* More space below each item */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px; /* Increased padding for better appearance */
+  text-align: center;
+}
+.flowchart-item strong {
+  display: block;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+.flowchart-item button {
+  margin-right: 6px;
+}
+
+/* MULTIPLE TEXTBOXES CUSTOM STYLES */
+.multiple-textboxes-node .question-text {
+  background: transparent; /* default, changes on focus */
+  border-radius: 4px;
+  padding: 4px;
+  min-height: 20px;
+  /* Let it wrap nicely if user types a long question */
+  word-wrap: break-word;
+  cursor: text;
+}
+.multiple-textboxes-node .question-text:focus {
+  background: #fff;
+  outline: none;
+  border: 1px solid #ccc;
+  padding: 6px;
+}
+
+.multiple-textboxes-node .multiple-textboxes-container {
+  margin-top: 8px;
+}
+.multiple-textboxes-node .textbox-entry {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.multiple-textboxes-node .textbox-entry input {
+  width: 100%;
+  padding: 4px;
+  margin-right: 8px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+.multiple-textboxes-node .textbox-entry input:focus {
+  border-color: #007bff;
+}
+.multiple-textboxes-node .textbox-entry button {
+  background-color: #dc3545;
+  margin: 0;
+  width: auto;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.multiple-textboxes-node button:hover {
+  background-color: #c82333;
+}
+
+/* mxGraph Editor Tweaks */
+.mxGraph .mxCellEditor,
+.mxGraph .mxCellOverlay {
+  background: transparent !important;
+}
+.mxCellEditor {
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  overflow: visible !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+  box-sizing: border-box !important;
+}
+.mxCellEditor div {
+  padding: 16px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  min-width: 20px !important;
+  min-height: 60px !important;
+  box-sizing: border-box !important;
+}
+.mxCellEditor textarea {
+  padding: 16px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  min-width: 20px !important;
+  min-height: 50px !important;
+  resize: none;
+  box-sizing: border-box !important;
+}
+
+.numbered-dropdown-node {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.numbered-dropdown-node .question-text {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.range-container {
+  margin-bottom: 8px;
+}
+
+.labels-container .label-row {
+  margin-bottom: 4px;
+}
+
+/* Add padding around the entire "multiple textboxes" node */
+.multiple-textboxes-node {
+  padding: 12px;
+  box-sizing: border-box; /* ensures padding doesn't shrink the box */
+}
+
+/* Spacing between each row (textbox + delete button) */
+.textbox-entry {
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px; /* space between the text field and the delete button */
+  align-items: center;
+}
+
+/* You can also add some margin or padding around the container if desired */
+.multiple-textboxes-container {
+  margin-top: 10px;
+}
+
+.dropdown-question .question-text {
+  font-weight: normal;
+  margin-bottom: 8px;
+  outline: none;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  cursor: text !important;
+}
+
+.dropdown-question .question-text:focus {
+  background: #fff;
+  outline: none;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 4px rgba(0,123,255,0.25);
+  pointer-events: auto !important;
+  cursor: text !important;
+}

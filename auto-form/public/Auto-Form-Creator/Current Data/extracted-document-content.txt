@@ -1,290 +1,404 @@
 --- PAGE 1 ---
-DV-110 Temporary Restraining Order Clerk stamps date here when form is filed.
-{{DV-110[0].Page1[0].OrigAmen_cb[0]}} Original Order {{DV-110[0].Page1[0].OrigAmen_cb[1]}} [[DV-110[0].Page1[0].Amended_ft[0]]] Amended Order
-Instruction: The person asking for a restraining order must complete
-1 , 2 , and 3 only. The court will complete the rest of this form.
-1 Protected Person (name): [[DV-110[0].Page1[0].List1[0].Li1[0].TextField[0]]]
-2 Restrained Person
-*Full Name: [[DV-110[0].Page1[0].List2[0].Li1[0].ParentRel[0]]] Fill in court name and street address:
-*Gender: {{DV-110[0].Page1[0].List2[0].Li1[0].gender_cb[0]}} M {{DV-110[0].Page1[0].List2[0].Li1[0].gender_cb[1]}} F {{DV-110[0].Page1[0].List2[0].Li1[0].gender_cb[2]}} Nonbinary*Race: [[DV-110[0].Page1[0].List2[0].Li1[0].TF6[0]]] Superior Court of California, County of
-*Age: [[DV-110[0].Page1[0].List2[0].Li1[0].T191[0]]] (estimate, if age unknown) Date of Birth: [[DV-110[0].Page1[0].List2[0].Li1[0].TF1[0]]]
-Height: [[DV-110[0].Page1[0].List2[0].Li1[0].TF2[0]]] Weight: [[DV-110[0].Page1[0].List2[0].Li1[0].TF3[0]]]
-Hair Color: [[DV-110[0].Page1[0].List2[0].Li1[0].TF4[0]]] Eye Color: [[DV-110[0].Page1[0].List2[0].Li1[0].TF5[0]]] [[DV-110[0].Page1[0].StampbxSub[0].CourtInfo_ft[0]]]
-Relationship to person in 1 : [[DV-110[0].Page1[0].List2[0].Li1[0].TextField[0]]]
-Address of restrained person: [[DV-110[0].Page1[0].List2[0].Li1[0].TF7[0]]] Court fills in case number when form is filed.
-City: [[DV-110[0].Page1[0].List2[0].Li1[0].TF8[0]]] State: [[DV-110[0].Page1[0].List2[0].Li1[0].TF9[0]]] Zip: [[DV-110[0].Page1[0].List2[0].Li1[0].TF10[0]]] Case Number:
-Firearms, firearm parts, or ammunition that restrained person may have: [[DV-110[0].Page1[0].StampbxSub[0].CaseNumber[0]]]
-(Include information from form DV-100, item 9) [[DV-110[0].Page1[0].List2[0].Li1[0].OtherSpecify_tf[0]]]
-(Information that has a star (*) next to it is required to add this
-order into a California police database. Give all the information you
-know.)
-3 {{DV-110[0].Page1[0].List3[0].Li1[0].item3_cb[0]}} Other Protected People
-In addition to the person named in 1 , the people listed below are protected by the orders listed in 9 through 12 .
-Full name [[DV-110[0].Page1[0].List3[0].Li1[0].item3FullName1_tf1[0]]] [[DV-110[0].Page1[0].List3[0].Li1[0].item3FullName1_tf[0]]] Relationship to person in [[DV-110[0].Page1[0].List3[0].Li1[0].item3relation1_tf1[0]]] [[DV-110[0].Page1[0].List3[0].Li1[0].item3relation1_tf[0]]] 1 Age [[DV-110[0].Page1[0].List3[0].Li1[0].item3age1_tf1[0]]] [[DV-110[0].Page1[0].List3[0].Li1[0].item3age1_tf[0]]]
-{{DV-110[0].Page1[0].List3[0].Li1[0].AGHagueCert_cb[0]}} Check here if you need to list more people. List them on a separate piece of paper, write “DV-110, Other [[DV-110[0].Page1[0].List3[0].Li1[0].item3FullName2_tf[0]]] [[DV-110[0].Page1[0].List3[0].Li1[0].item3FullName3_tf[0]]] [[DV-110[0].Page1[0].List3[0].Li1[0].item3relation2_tf[0]]] [[DV-110[0].Page1[0].List3[0].Li1[0].item3relation3_tf[0]]] [[DV-110[0].Page1[0].List3[0].Li1[0].item3age2_tf[0]]] [[DV-110[0].Page1[0].List3[0].Li1[0].item3age3_tf[0]]]
-Protected People” at the top, and attach it to this form.
-(The court will complete the rest of this form)
-4 Your Hearing Date (Court Date)
-This order expires at the end of the hearing listed below:
-Hearing Date: [[DV-110[0].Page1[0].List4[0].Li1[0].T195[0]]] Time: [[DV-110[0].Page1[0].List4[0].Li1[0].time1[0]]] {{DV-110[0].Page1[0].List4[0].Li1[0].item4ampm[0]}} a.m. {{DV-110[0].Page1[0].List4[0].Li1[0].item4ampm[1]}} p.m.
-This order must be enforced throughout the United States. See page 7.
-This is a Court Order.
-Judicial Council of California ,Rev. January 1, 2025, Mandatory Formwww.courts.ca.gov Temporary Restraining Order DV-110, Page 1 of 9
-Family Code, § 6200 et seq.Approved by DOJ (CLETS-TRO) (Domestic Violence Prevention)
+DV-100 Request for Domestic Clerk stamps date here when form is filed.
+Violence Restraining Order
+Instructions
+To ask for a domestic violence restraining order, you will need to complete
+this form and other forms (see page 13 for list of forms). If this case includes
+sensitive information about a minor child (under 18 years old), see form
+DV-160-INFO, Privacy Protection for a Minor (Person Under 18 Years
+Old), for more information on how to protect the child’s information.
+Fill in court name and street address:
+1 Person Asking for Protection Superior Court of California, County of
+a. Your name: [[DV-100[0].Page1[0].List1[0].Li1[0].YourName_tf[0]]]
+b. Your age: [[DV-100[0].Page1[0].List1[0].Li2[0].tf[0]]] [[DV-100[0].Page1[0].rightCaption[0].CourtInfo[0]]]
+c. Address where you can receive court papers
+(This address will be used by the court and by the person in 2 to sendCourt fills in case number when form is filed.
+you official court dates, orders, and papers. For privacy, you may useCase Number:
+another address like a post office box, a Safe at Home address, or [[DV-100[0].Page1[0].rightCaption[0].CaseNumber[0]]]
+another person’s address, if you have their permission and can get your
+mail regularly. If you have a lawyer, give their information.)
+Address: [[DV-100[0].Page1[0].List1[0].Li3[0].address_ft[0]]]
+City: [[DV-100[0].Page1[0].List1[0].Li3[0].T70[0]]] State: [[DV-100[0].Page1[0].List1[0].Li3[0].T76[0]]] Zip: [[DV-100[0].Page1[0].List1[0].Li3[0].T77[0]]]
+d. Your contact information (optional)
+(The court could use this information to contact you. If you don’t want the person in 2 to have this information,
+leave it blank or provide a safe phone number or email address. If you have a lawyer, give their information.)
+Telephone: [[DV-100[0].Page1[0].List1[0].Li4[0].T42[0]]] Fax: [[DV-100[0].Page1[0].List1[0].Li4[0].T67[0]]]
+Email Address: [[DV-100[0].Page1[0].List1[0].Li4[0].T73[0]]]
+e. Your lawyer’s information (if you have one)
+Name: [[DV-100[0].Page1[0].List1[0].Li5[0].ParentRel1[0]]] State Bar No.: [[DV-100[0].Page1[0].List1[0].Li5[0].ParentRel2[0]]]
+Firm Name: [[DV-100[0].Page1[0].List1[0].Li5[0].ParentRel[0]]]
+2 Person You Want Protection From
+a. Full name: [[DV-100[0].Page1[0].List2[0].Li1[0].TextField[0]]]
+b. Age (give estimate if you do not know exact age): [[DV-100[0].Page1[0].List2[0].Li2[0].T78[0]]]
+c. Date of birth (if known): [[DV-100[0].Page1[0].List2[0].Li3[0].T78[0]]]
+d. Gender: {{DV-100[0].Page1[0].List2[0].Li4[0].gender2d_cb[0]}} M {{DV-100[0].Page1[0].List2[0].Li4[0].gender2d_cb[1]}} F {{DV-100[0].Page1[0].List2[0].Li4[0].gender2d_cb[2]}} Nonbinary
+e. Race: [[DV-100[0].Page1[0].List2[0].li5[0].TextField[0]]]
+This is not a Court Order.
+Judicial Council of California,www.courts.ca.gov Request for Domestic Violence Restraining OrderDV-100, Page 1 of 13
+Rev. January 1, 2025, Mandatory FormFamily Code, § 6200 et seq. (Domestic Violence Prevention)
 
 --- PAGE 2 ---
-Case Number: [[DV-110[0].Page2[0].PxCaption[0].CaseNumber[0]]]
-To the Person in 2 : The judge has granted temporary orders. See 5 through 21 . If you do not obey
-these orders, you can be charged with a crime, go to jail or prison, and/or pay a fine. It is a felony to take or hide a
-child in violation of this order.
-5 No Firearms (Guns), Firearm Parts, or Ammunition
-a. You cannot own, possess, have, buy or try to buy, receive or try to receive, or in any other way get any
-prohibited item listed below in b.
-b. Prohibited items are:
-(1) Firearms (guns);
-(2) Firearm parts, meaning receivers, frames, and any item that may be used as or easily turned into a receiver
-or frame (see Penal Code section 16531); and
-(3) Ammunition.
-c. Within 24 hours of receiving this order, you must sell to or store with a licensed gun dealer, or turn in to law
-enforcement, any prohibited items you have in your immediate possession or control.
-d. If law enforcement asks you for your prohibited items, you must turn them over immediately.
-e. Within 48 hours of receiving this order, you must file a receipt with the court that proves all prohibited items
-have been turned in, sold, or stored. (You may use form DV-800/JV-270, Receipt for Firearms, Firearm Parts,
-and Ammunition.) If law enforcement served you with the restraining order, you must give a copy of the
-receipt to that law enforcement agency.
-6 {{DV-110[0].Page2[0].List6[0].CheckBoxRightCaption[0]}} Restrained person has prohibited items
-The court finds that you have the following prohibited items:
-a. Firearms and/or firearm parts Proof of compliance
-Description (include serial number, if known) Location, if known received by the court
-(1) [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].TextField[0]]] [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].TextField1[0]]] {{DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].Choice[0]}} (date): [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].DateField1[0]]]
-(2) [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].TextField[0]]] [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].TextField1[0]]] {{DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].Choice[0]}} (date): [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].DateField2[0]]]
-(3) [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].TextField[0]]] [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].TextField1[0]]] {{DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].Choice[0]}} (date): [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].DateField3[0]]]
-(4) [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].TextField[0]]] [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].TextField1[0]]] {{DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].Choice[0]}} (date): [[DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].DateField4[0]]]
-b. Ammunition
-Amount, if Proof of compliance
-Description known Location, if known received by the court
-(1) [[DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li1[0].TextField[0]]] [[DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li1[0].TextField1[0]]] [[DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li1[0].TextField2[0]]] {{DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li1[0].Choice[0]}} (date): [[DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li1[0].DateField5[0]]]
-(2) [[DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li2[0].TextField[0]]] [[DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li2[0].TextField1[0]]] [[DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li2[0].TextField2[0]]] {{DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li2[0].Choice[0]}} (date): [[DV-110[0].Page2[0].List6[0].Li2[0].Listb[0].Li2[0].DateField6[0]]]
-This is a Court Order.
-Rev. January 1, 2025 Temporary Restraining Order DV-110, Page 2 of 9
-(CLETS-TRO) (Domestic Violence Prevention)
+Case Number: [[DV-100[0].Page2[0].PxCaption[0].CaseNumber[0]]]
+3 Your Relationship to the Person in 2
+(If you do not have one of these relationships with the person in 2 , do not complete the rest of this form. You may
+be eligible for another type of restraining order. Learn more at https://selfhelp.courts.ca.gov/restraining-orders.)
+(Check all that apply)
+a. {{DV-100[0].Page2[0].List3[0].Li1[0].CheckBox2[0]}} We have a child or children together (names of children): [[DV-100[0].Page2[0].List3[0].Li1[0].TextField1[0]]] [[DV-100[0].Page2[0].List3[0].Li1[0].TextField[0]]]
+b. {{DV-100[0].Page2[0].List3[0].Li2[0].CheckBox2[0]}} We are married or registered domestic partners.
+c. {{DV-100[0].Page2[0].List3[0].Li3[0].CheckBox2[0]}} We used to be married or registered domestic partners.
+d. {{DV-100[0].Page2[0].List3[0].Li4[0].CheckBox2[0]}} We are dating or used to date.
+e. {{DV-100[0].Page2[0].List3[0].Li5[0].CheckBox2[0]}} We are or used to be engaged to be married.
+f. {{DV-100[0].Page2[0].List3[0].Li6[0].CheckBox1[0]}} We are related. The person in 2 is my (check all that apply):
+{{DV-100[0].Page2[0].List3[0].Li6[0].CheckBox2[0]}} Parent, stepparent, or parent-in-law {{DV-100[0].Page2[0].List3[0].Li6[0].CheckBox3[0]}} Brother, sister, sibling, stepsibling, or sibling in-law
+{{DV-100[0].Page2[0].List3[0].Li6[0].CheckBox4[0]}} Child, stepchild, or legally adopted child {{DV-100[0].Page2[0].List3[0].Li6[0].CheckBox5[0]}} Grandparent, step-grandparent, or grandparent-in-law
+{{DV-100[0].Page2[0].List3[0].Li6[0].CheckBox6[0]}} Child’s spouse {{DV-100[0].Page2[0].List3[0].Li6[0].CheckBox7[0]}} Grandchild, step-grandchild, or grandchild-in-law
+g. {{DV-100[0].Page2[0].List3[0].Li7[0].CheckBox2[0]}} We live together or used to live together. (If checked, answer question below):
+Have you lived together with the person in 2 as a family or household (more than just roommates)?
+{{DV-100[0].Page2[0].List3[0].Li7[0].YesNo3g_cb[0]}} Yes {{DV-100[0].Page2[0].List3[0].Li7[0].YesNo3g_cb[1]}} No (If no, you do not qualify for this kind of restraining order unless you checked one of
+the other relationships listed above.)
+4 O ther Restraining Orders and Court Cases
+a. Are there any restraining orders currently in place or that have expired in the last six months (examples: Did the
+police give you a restraining order that lasts a few days? Do you have one from the criminal court?)
+{{DV-100[0].Page2[0].List4[0].Li1[0].YesNo4a_cb[0]}} No
+{{DV-100[0].Page2[0].List4[0].Li1[0].YesNo4a_cb[1]}} Yes (If yes, give information below and attach a copy if you have one.)
+(1) (date of order): [[DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li1[0].DateField8[0]]] (date it expires): [[DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li1[0].DateField5[0]]]
+(2) (date of order): [[DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li2[0].DateField9[0]]] (date it expires): [[DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li2[0].DateField7[0]]]
+b. Are you involved in any other court case with the person in 2 ?
+{{DV-100[0].Page2[0].List4[0].Li2[0].YesNo4b_cb[0]}} No
+{{DV-100[0].Page2[0].List4[0].Li2[0].YesNo4b_cb[1]}} Yes (If you know, list where the case was filed (city, state, or tribe), the year it was filed, and case number.)
+{{DV-100[0].Page2[0].List4[0].Li2[0].CheckBox1[0]}} Custody [[DV-100[0].Page2[0].List4[0].Li2[0].TextField1[0]]]
+{{DV-100[0].Page2[0].List4[0].Li2[0].CheckBox2[0]}} Divorce [[DV-100[0].Page2[0].List4[0].Li2[0].TextField2[0]]]
+{{DV-100[0].Page2[0].List4[0].Li2[0].CheckBox3[0]}} Juvenile (child welfare or juvenile justice): [[DV-100[0].Page2[0].List4[0].Li2[0].TextField3[0]]]
+{{DV-100[0].Page2[0].List4[0].Li2[0].CheckBox4[0]}} Guardianship [[DV-100[0].Page2[0].List4[0].Li2[0].TextField4[0]]]
+{{DV-100[0].Page2[0].List4[0].Li2[0].CheckBox5[0]}} Criminal [[DV-100[0].Page2[0].List4[0].Li2[0].TextField5[0]]]
+{{DV-100[0].Page2[0].List4[0].Li2[0].CheckBox6[0]}} Other (what kind of case?): [[DV-100[0].Page2[0].List4[0].Li2[0].TextField6[0]]]
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 2 of 13
+(Domestic Violence Prevention)
 
 --- PAGE 3 ---
-Case Number: [[DV-110[0].Page3[0].PxCaption[0].CaseNumber[0]]]
-7 {{DV-110[0].Page3[0].List7[0].Li1[0].AGHagueCert_cb[0]}} Court Hearing to Review Firearms (Guns), Firearm Parts, and Ammunition Compliance
-In addition to the hearing listed on form DV-109, item 3 , you must attend the court hearing listed below to prove
-that you have properly turned in, sold, or stored all prohibited items (described in 5 b) you still have or own,
-including any items listed in 6 . If you do not attend the court hearing listed below, a judge may find that you
-have violated the restraining order and notify law enforcement and a prosecuting attorney of the violation.
-Name and address of court, if different than court
-address listed on page 1
-Date: [[DV-110[0].Page3[0].List7[0].Li1[0].HearingDate_dt[0]]] Dept.: [[DV-110[0].Page3[0].List7[0].Li1[0].HearingDept_ft[0]]]
-Time: [[DV-110[0].Page3[0].List7[0].Li1[0].HearingTime_dt[0]]] Room: [[DV-110[0].Page3[0].List7[0].Li1[0].HearingRm_ft[0]]] [[DV-110[0].Page3[0].List7[0].Li1[0].HearingCourt_ft[0]]]
-8 No Body Armor
-You cannot own, possess, or buy body armor (defined in Penal Code section 16288). You must relinquish any body
-armor you have in your possession.
-9 Cannot Look for Protected People
-You must not take any action to look for any person protected by this order, including their addresses or locations.
-{{DV-110[0].Page3[0].List9set[0].List9[0].Li1[0].AGHagueCert_cb[0]}} If checked, this order was not granted because the judge found good cause not to make the order.
-10 Order to Not Abuse {{DV-110[0].Page3[0].List10[0].item7_cb[1]}} Not requested {{DV-110[0].Page3[0].List10[0].item7_cb[0]}} Denied until the hearing {{DV-110[0].Page3[0].List10[0].item7_cb[2]}} Granted as follows:
-You must not do the following things to the person in 1 and any person listed in 3 :
-Harass, attack, strike, threaten, assault (sexually or otherwise), hit, follow, stalk, molest, destroy personal
-property, keep under surveillance, impersonate (on the internet, electronically, or otherwise), block movements,
-annoy by phone or other electronic means (including repeatedly contact), or disturb the peace.
-“Disturb the peace” means to destroy someone’s mental or emotional calm. This can be done directly or
-indirectly, such as through someone else. This can also be done in any way, such as by phone, over text, or
-online. Disturbing the peace includes coercive control.
-“Coercive control” means a number of acts that unreasonably limit the free will and individual rights of any
-person protected by this restraining order. Examples include isolating them from friends, relatives, or other
-support; keeping them from food or basic needs; controlling or keeping track of them, including their
-movements, contacts, actions, money, or access to services; and making them do something by force, threat, or
-intimidation, including threats based on actual or suspected immigration status. Coercive control includes
-reproductive coercion meaning controlling someone’s reproductive choices, such as using force, threat, or
-intimidation to pressure someone to be or not be pregnant, and to control or interfere with someone’s
-contraception, birth control, pregnancy, or access to health information.
-This is a Court Order.
-Rev. January 1, 2025 Temporary Restraining Order DV-110, Page 3 of 9
-(CLETS-TRO) (Domestic Violence Prevention)
+Case Number: [[DV-100[0].Page3[0].PxCaption[0].CaseNumber[0]]]
+Describe Abuse
+In this section, explain how the person in 2 has been abusive. The judge will use this information to decide your
+request. Listed below are some examples of what “abuse” means under the law. It is not a complete list of all examples
+of abuse. Give information on any incident that you believe was abusive.
+made repeated unwanted contact with you harassed you
+tracked, controlled, or blocked your movements hit, kicked, pushed, or bit you
+kept you from getting food or basic needs injured you or tried to
+isolated you from friends, family, or other support threatened to hurt or kill you
+made threats based on actual or suspected immigration statussexually abused you
+made you do something by force, threat, or intimidationabused a pet or animal
+stopped you from accessing or earning money destroyed your property
+tried to control/interfere with your contraception, birth control,choked or strangled you
+pregnancy, or access to health information abused your children
+5 Most Recent Abuse
+a. Date of abuse (give an estimate if you don’t know the exact date): [[DV-100[0].Page3[0].List5[0].Li1[0].dtAbs[0]]]
+b. Did anyone else hear or see what happened on this day?
+{{DV-100[0].Page3[0].List5[0].Li2[0].YesNo5b_cb[0]}} I don’t know {{DV-100[0].Page3[0].List5[0].Li2[0].YesNo5b_cb[1]}} No {{DV-100[0].Page3[0].List5[0].Li2[0].YesNo5b_cb[2]}} Yes (If yes, give names): [[DV-100[0].Page3[0].List5[0].Li2[0].item5a2[0]]]
+c. Did the person in 2 use or threaten to use a gun or other weapon?
+{{DV-100[0].Page3[0].List5[0].Li3[0].YesNo5c_cb[0]}} No {{DV-100[0].Page3[0].List5[0].Li3[0].YesNo5c_cb[1]}} Yes (If yes, describe gun or weapon): [[DV-100[0].Page3[0].List5[0].Li3[0].item5a3[0]]]
+d. Did the person in 2 cause you any emotional or physical harm?
+{{DV-100[0].Page3[0].List5[0].Li4[0].YesNo5d_cb[0]}} No {{DV-100[0].Page3[0].List5[0].Li4[0].YesNo5d_cb[1]}} Yes (If yes, describe harm): [[DV-100[0].Page3[0].List5[0].Li4[0].item26d_tf[0]]]
+e. Did the police come? {{DV-100[0].Page3[0].List5[0].Li5[0].YesNo5e_cb[0]}} I don’t know {{DV-100[0].Page3[0].List5[0].Li5[0].YesNo5e_cb[1]}} No {{DV-100[0].Page3[0].List5[0].Li5[0].YesNo5e_cb[2]}} Yes (If the police gave you a restraining order, list it in 4 .)
+f. Give more details about how the person in 2 was abusive on this day. Details can include what was said, done,
+or sent to you (examples: text messages, emails, or pictures), how often something happened, etc. [[DV-100[0].Page3[0].List5[0].Li6[0].TextField[0]]]
+g. How often has the person in 2 abused you like this?
+{{DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[0]}} Just this once {{DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[1]}} 2–5 times {{DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[2]}} Weekly {{DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[3]}} Other: [[DV-100[0].Page3[0].List5[0].Li7[0].TextField[0]]]
+Give dates or estimates of when it happened, if known: [[DV-100[0].Page3[0].List5[0].Li7[0].TextField7[0]]]
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 3 of 13
+(Domestic Violence Prevention)
 
 --- PAGE 4 ---
-Case Number: [[DV-110[0].Page4[0].PxCaption[0].CaseNumber[0]]]
-11 No-Contact Order {{DV-110[0].Page4[0].List11[0].item8_cb[0]}} Not requested {{DV-110[0].Page4[0].List11[0].item8_cb[1]}} Denied until the hearing {{DV-110[0].Page4[0].List11[0].item8_cb[2]}} Granted as follows:
-a. You must not contact {{DV-110[0].Page4[0].List11[0].Li1[0].CheckBoxRightCaption[0]}} the person in 1 {{DV-110[0].Page4[0].List11[0].Li1[0].AGHagueCert_cb[0]}} the persons in 3
-directly or indirectly, by any means, including by telephone, mail, email, or other electronic means.
-b. {{DV-110[0].Page4[0].List11[0].Li2[0].AGHagueCert_cb1[0]}} Exception to 11a:
-(1) {{DV-110[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].MultilineCheckBox[0]}} You may have brief and peaceful contact with the person in 1 only to communicate about your
-children for court-ordered visits.
-(2) {{DV-110[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].AGHagueCert_cb[0]}} You may have contact with your children only during court-ordered contact or visits.
-(3) {{DV-110[0].Page4[0].List11[0].Li2[0].List[0].Li3[0].AGHagueCert_cb[0]}} Other (explain): [[DV-110[0].Page4[0].List11[0].Li2[0].List[0].Li3[0].TextField2[0]]]
-c. Peaceful written contact through a lawyer or process server or another person for service of legal papers related
-to a court case is allowed and does not violate this order.
-12 Stay-Away Order {{DV-110[0].Page4[0].List12[0].item9_cb[0]}} Not requested {{DV-110[0].Page4[0].List12[0].item9_cb[1]}} Denied until the hearing {{DV-110[0].Page4[0].List12[0].item9_cb[2]}} Granted as follows:
-a. You must stay at least (specify): [[DV-110[0].Page4[0].List12[0].Li1[0].T161[0]]] yards away from (check all that apply):
-{{DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb1[0]}} Person in 1 . {{DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb2[0]}} School of person in 1 .
-{{DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb3[0]}} Home of person in 1 . {{DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb4[0]}} Persons in 3 .
-{{DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb5[0]}} Job or workplace of person in 1 . {{DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb6[0]}} Children’s school or child care.
-{{DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb7[0]}} Vehicle of person in 1 . {{DV-110[0].Page4[0].List12[0].Li1[0].AGHagueCert_cb[0]}} Other (explain): [[DV-110[0].Page4[0].List12[0].Li1[0].TextField2[0]]]
-b. {{DV-110[0].Page4[0].List12[0].Li2[0].AGHagueCert_cb1[0]}} Exception to 12a:
-The stay-away orders do not apply:
-(1) {{DV-110[0].Page4[0].List12[0].Li2[0].List[0].Li1[0].AGHagueCert_cb[0]}} For you to exchange your children for court-ordered visits. You must do so briefly and peacefully.
-(2) {{DV-110[0].Page4[0].List12[0].Li2[0].List[0].Li2[0].AGHagueCert_cb[0]}} For you to visit with your children for court-ordered contact or visits.
-(3) {{DV-110[0].Page4[0].List12[0].Li2[0].List[0].Li3[0].AGHagueCert_cb[0]}} Other (explain): [[DV-110[0].Page4[0].List12[0].Li2[0].List[0].Li3[0].TextFieldItem9b3_tf[0]]] [[DV-110[0].Page4[0].List12[0].Li2[0].List[0].Li3[0].TextFieldItem9b3[0]]]
-13 Order to Move Out {{DV-110[0].Page4[0].List13[0].Li1[0].item10_cb[0]}} Not requested {{DV-110[0].Page4[0].List13[0].Li1[0].item10_cb[1]}} Denied until the hearing {{DV-110[0].Page4[0].List13[0].Li1[0].item10_cb[2]}} Granted as follows:
-You must take only personal clothing and belongings needed until the hearing and move out immediately from
-(address): [[DV-110[0].Page4[0].List13[0].Li1[0].TextField2[0]]]
-14 Other Orders {{DV-110[0].Page4[0].List14[0].Li1[0].item11_cb[0]}} Not requested {{DV-110[0].Page4[0].List14[0].Li1[0].item11_cb[1]}} Denied until the hearing [[DV-110[0].Page4[0].List14[0].Li1[0].OtherSpecify_tf[0]]] {{DV-110[0].Page4[0].List14[0].Li1[0].item11_cb[2]}} Granted as follows:
-This is a Court Order.
-Rev. January 1, 2025 Temporary Restraining Order DV-110, Page 4 of 9
-(CLETS-TRO) (Domestic Violence Prevention)
+Case Number: [[DV-100[0].Page4[0].PxCaption[0].CaseNumber[0]]]
+6 Has the person in 2 abused you in a different way from the abuse you described in 5 ?
+If yes, describe below.
+a. Date of abuse (give an estimate if you don’t know the exact date): [[DV-100[0].Page4[0].List6[0].Li1[0].dtabs[0]]]
+b. Did anyone else hear or see what happened on this day?
+{{DV-100[0].Page4[0].List6[0].li2[0].YesNo6b_cb[0]}} I don’t know {{DV-100[0].Page4[0].List6[0].li2[0].YesNo6b_cb[1]}} No {{DV-100[0].Page4[0].List6[0].li2[0].YesNo6b_cb[2]}} Yes (If yes, give names): [[DV-100[0].Page4[0].List6[0].li2[0].item5b2[0]]]
+c. Did the person in 2 use or threaten to use a gun or other weapon?
+{{DV-100[0].Page4[0].List6[0].Li3[0].YesNo6c_cb[0]}} No {{DV-100[0].Page4[0].List6[0].Li3[0].YesNo6c_cb[1]}} Yes (If yes, describe gun or weapon): [[DV-100[0].Page4[0].List6[0].Li3[0].item5b3[0]]]
+d. Did the person in 2 cause you any emotional or physical harm?
+{{DV-100[0].Page4[0].List6[0].Li4[0].YesNo6d_cb[0]}} No {{DV-100[0].Page4[0].List6[0].Li4[0].YesNo6d_cb[1]}} Yes (If yes, describe harm): [[DV-100[0].Page4[0].List6[0].Li4[0].item26d_tf[0]]]
+e. Did the police come? {{DV-100[0].Page4[0].List6[0].Li5[0].YesNo6e_cb[0]}} I don’t know {{DV-100[0].Page4[0].List6[0].Li5[0].YesNo6e_cb[1]}} No {{DV-100[0].Page4[0].List6[0].Li5[0].YesNo6e_cb[2]}} Yes (If the police gave you a restraining order, list it in 4 .)
+f. Give more details about how the person in 2 was abusive on this day. Details can include what was said,
+done, or sent to you (examples: text messages, emails, or pictures), how often something happened, etc. [[DV-100[0].Page4[0].List6[0].Li6[0].TextField[0]]]
+g. How often has the person in 2 abused you like this?
+{{DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[0]}} Just this once {{DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[1]}} 2–5 times {{DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[2]}} Weekly {{DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[3]}} Other: [[DV-100[0].Page4[0].List6[0].Li7[0].TextField[0]]]
+Give dates or estimates of when it happened, if known: [[DV-100[0].Page4[0].List6[0].Li7[0].item26d_tf[0]]]
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 4 of 13
+(Domestic Violence Prevention)
 
 --- PAGE 5 ---
-Case Number: [[DV-110[0].Page5[0].PxCaption[0].CaseNumber[0]]]
-15 Child Custody and Visitation {{DV-110[0].Page5[0].List15[0].Li1[0].item12_cb[0]}} Not requested {{DV-110[0].Page5[0].List15[0].Li1[0].item12_cb[1]}} Denied until the hearing {{DV-110[0].Page5[0].List15[0].Li1[0].item12_cb[2]}} Granted as follows:
-Granted on the attached form DV-140, Child Custody and Visitation Order, and
-{{DV-110[0].Page5[0].List15[0].Li1[0].AGHagueCert11_cb[0]}} (list other form): [[DV-110[0].Page5[0].List15[0].Li1[0].TextField[0]]] .
-16 Protect Animals {{DV-110[0].Page5[0].List16[0].item13_cb[0]}} Not requested {{DV-110[0].Page5[0].List16[0].item13_cb[1]}} Denied until the hearing {{DV-110[0].Page5[0].List16[0].item13_cb[2]}} Granted as follows:
-a. {{DV-110[0].Page5[0].List16[0].Li1[0].AGHagueCert11_cb[0]}} You must stay at least [[DV-110[0].Page5[0].List16[0].Li1[0].FillText11\.yards[0]]] yards away from the animals listed below.
-b. {{DV-110[0].Page5[0].List16[0].Li2[0].AGHagueCert_cb[0]}} You must not take, sell, hide, molest, attack, strike, threaten, harm, get rid of, transfer, or borrow against the
-animals.
-c. {{DV-110[0].Page5[0].List16[0].Li3[0].AGHagueCert11_cb[0]}} The person in 1 is given the sole possession, care, and control of the animals listed below.
-Name (or other way to ID animal) [[DV-110[0].Page5[0].List16[0].Li3[0].item3FullName3_tf1[0]]] [[DV-110[0].Page5[0].List16[0].Li3[0].item3FullName3_tf2[0]]] [[DV-110[0].Page5[0].List16[0].Li3[0].item3FullName3_tf7[0]]] Type of animal [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation2_tf1[0]]] [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation2_tf4[0]]] [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation2_tf8[0]]] Breed (if known) [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf2[0]]] [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf5[0]]] [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf9[0]]] Color [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf3[0]]] [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf6[0]]] [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf10[0]]]
-17 Control of Property [[DV-110[0].Page5[0].List16[0].Li3[0].item3FullName3_tf11[0]]] {{DV-110[0].Page5[0].List17[0].Li1[0].item14_cb[0]}} Not requested [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation2_tf12[0]]] {{DV-110[0].Page5[0].List17[0].Li1[0].item14_cb[1]}} Denied until the hearing [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf13[0]]] {{DV-110[0].Page5[0].List17[0].Li1[0].item14_cb[2]}} Granted as follows: [[DV-110[0].Page5[0].List16[0].Li3[0].item3relation1_tf[0]]]
-Until the hearing, only the person in 1 can use, control, and possess the following property: [[DV-110[0].Page5[0].List17[0].Li1[0].OtherSpecify_tf[0]]]
-18 Health and Other Insurance {{DV-110[0].Page5[0].List18[0].Li1[0].item15_cb[0]}} Not requested {{DV-110[0].Page5[0].List18[0].Li1[0].item15_cb[1]}} Denied until the hearing {{DV-110[0].Page5[0].List18[0].Li1[0].item15_cb[2]}} Granted as follows:
-The person {{DV-110[0].Page5[0].List18[0].Li1[0].PersonIn1_cb[0]}} in 1 {{DV-110[0].Page5[0].List18[0].Li1[0].PersonIn2_cb[0]}} in 2 is ordered not to cash, borrow against, cancel, transfer, dispose of, or change
-the beneficiaries of any insurance or coverage held for the benefit of the parties—or their children, if any—for
-whom support may be ordered, or both.
-19 Record Communications {{DV-110[0].Page5[0].List19[0].Li1[0].item16_cb[0]}} Not requested {{DV-110[0].Page5[0].List19[0].Li1[0].item16_cb[1]}} Denied until the hearing {{DV-110[0].Page5[0].List19[0].Li1[0].item16_cb[2]}} Granted as follows:
-The person in 1 may record communications made by the person in 2 that violate this order.
-This is a Court Order.
-Rev. January 1, 2025 Temporary Restraining Order DV-110, Page 5 of 9
-(CLETS-TRO) (Domestic Violence Prevention)
+Case Number: [[DV-100[0].Page5[0].PxCaption[0].CaseNumber[0]]]
+7 Is there other abuse by the person in 2 that you want the judge to know about?
+If yes, describe below.
+a. Date of abuse (give an estimate if you don’t know the exact date): [[DV-100[0].Page5[0].List7[0].Li1[0].dtabs[0]]]
+b. Did anyone else hear or see what happened on this day?
+{{DV-100[0].Page5[0].List7[0].Li2[0].YesNo7b_cb[0]}} I don’t know {{DV-100[0].Page5[0].List7[0].Li2[0].YesNo7b_cb[1]}} No {{DV-100[0].Page5[0].List7[0].Li2[0].YesNo7b_cb[2]}} Yes (If yes, give names): [[DV-100[0].Page5[0].List7[0].Li2[0].item5b2[0]]]
+c. Did the person in 2 use or threaten to use a gun or other weapon?
+{{DV-100[0].Page5[0].List7[0].Li3[0].YesNo7c_cb[0]}} No {{DV-100[0].Page5[0].List7[0].Li3[0].YesNo7c_cb[1]}} Yes (If yes, describe gun or weapon): [[DV-100[0].Page5[0].List7[0].Li3[0].item5b3[0]]]
+d. Did the person in 2 cause you any emotional or physical harm?
+{{DV-100[0].Page5[0].List7[0].Li4[0].YesNo7d_cb[0]}} No {{DV-100[0].Page5[0].List7[0].Li4[0].YesNo7d_cb[1]}} Yes (If yes, describe harm): [[DV-100[0].Page5[0].List7[0].Li4[0].item26d_tf[0]]]
+e. Did the police come? {{DV-100[0].Page5[0].List7[0].Li5[0].YesNo7e_cb[0]}} I don’t know {{DV-100[0].Page5[0].List7[0].Li5[0].YesNo7e_cb[1]}} No {{DV-100[0].Page5[0].List7[0].Li5[0].YesNo7e_cb[2]}} Yes (If the police gave you a restraining order, list it in 4 .)
+f. Give more details about how the person in 2 was abusive on this day. Details can include what was said,
+done, or sent to you (examples: text messages, emails, or pictures), how often something happened, etc. [[DV-100[0].Page5[0].List7[0].Li6[0].TextField[0]]]
+g. How often has the person in 2 abused you like this?
+{{DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[0]}} Just this once {{DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[1]}} 2–5 times {{DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[2]}} Weekly {{DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[3]}} Other: [[DV-100[0].Page5[0].List7[0].Li7[0].TextField[0]]]
+Give dates or estimates of when it happened, if known: [[DV-100[0].Page5[0].List7[0].Li7[0].item26d_tf[0]]]
+{{DV-100[0].Page5[0].List7[0].MultilineCheckBox[0]}} Check this box if you need more space to describe the abuse. You can use form DV-101, Description of
+Abuse, and turn it in with this form. You can also use a separate sheet of paper, write “Describe Abuse” abuse at
+the top, and turn it in with this form.
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 5 of 13
+(Domestic Violence Prevention)
 
 --- PAGE 6 ---
-Case Number: [[DV-110[0].Page6[0].PxCaption[0].CaseNumber[0]]]
-20 Property Restraint {{DV-110[0].Page6[0].List20[0].Li1[0].item17_cb[0]}} Not requested {{DV-110[0].Page6[0].List20[0].Li1[0].item17_cb[1]}} Denied until the hearing {{DV-110[0].Page6[0].List20[0].Li1[0].item17_cb[2]}} Granted as follows:
-The person {{DV-110[0].Page6[0].List20[0].Li1[0].PersonIn1_cb[0]}} in 1 {{DV-110[0].Page6[0].List20[0].Li1[0].PersonIn2_cb[0]}} in 2 must not transfer, borrow against, sell, hide, or get rid of or destroy any property,
-including animals, except in the usual course of business or for necessities of life. In addition, each person must
-notify the other of any new or big expenses and explain them to the court. (If the court granted 11, the person in2
-must not contact the person in 1 . To notify the person in 1 of new or big expenses, have a server mail or
-personally give the information to the person in 1 or contact their lawyer, if they have one.)
-21 Pay Debts Owed for Property {{DV-110[0].Page6[0].List21[0].Li1[0].item18_cb[0]}} Not requested {{DV-110[0].Page6[0].List21[0].Li1[0].item18_cb[1]}} Denied until the hearing {{DV-110[0].Page6[0].List21[0].Li1[0].item18_cb[2]}} Granted as follows:
-The person in 2 must make these payments until this order ends:
-Pay to: [[DV-110[0].Page6[0].List21[0].Li1[0].T241[0]]] For: [[DV-110[0].Page6[0].List21[0].Li1[0].T244[0]]] Amount: $ [[DV-110[0].Page6[0].List21[0].Li1[0].T247[0]]] Due date: [[DV-110[0].Page6[0].List21[0].Li1[0].T250[0]]]
-Pay to: [[DV-110[0].Page6[0].List21[0].Li1[0].T341[0]]] For: [[DV-110[0].Page6[0].List21[0].Li1[0].T344[0]]] Amount: $ [[DV-110[0].Page6[0].List21[0].Li1[0].T347[0]]] Due date: [[DV-110[0].Page6[0].List21[0].Li1[0].T350[0]]]
-Pay to: [[DV-110[0].Page6[0].List21[0].Li1[0].T441[0]]] For: [[DV-110[0].Page6[0].List21[0].Li1[0].T444[0]]] Amount: $ [[DV-110[0].Page6[0].List21[0].Li1[0].T447[0]]] Due date: [[DV-110[0].Page6[0].List21[0].Li1[0].T450[0]]]
-22 Orders That May Be Made at the Hearing Date (Court Date)
-If the person in 1 checked any of these orders on form DV-100, a judge could grant them at your court date.
-Child Support Lawyer’s Fees and Costs Batterer Intervention Program
-Spousal Support Pay Expenses Caused by AbuseTransfer of Wireless Phone Account
-23 No Fee to Serve (Notify) Restrained Person
-The sheriff or marshal will serve this order for free. If you want the sheriff to serve your papers, complete form
-SER-001, Request for Sheriff to Serve Court Papers. Give form SER-001 and a copy of this order to the sheriff.
-24 {{DV-110[0].Page6[0].List24[0].FieldName_cb[0]}} Attached Pages (All of the attached pages are part of this order.)
-a. Number of pages attached to this nine-page form: [[DV-110[0].Page6[0].List24[0].Li1[0].NumberOfAttachedPages_ft[0]]]
-b. Attachments include forms (check all that apply):
-{{DV-110[0].Page6[0].List24[0].Li2[0].FieldName_cb1[0]}} DV-140 {{DV-110[0].Page6[0].List24[0].Li2[0].FieldName_cb2[0]}} DV-145 {{DV-110[0].Page6[0].List24[0].Li2[0].FieldName_cb3[0]}} DV-820 {{DV-110[0].Page6[0].List24[0].Li2[0].AGHagueCert_cb[0]}} Other: [[DV-110[0].Page6[0].List24[0].Li2[0].TextField2[0]]]
-Judge's Signature
-Date: [[DV-110[0].Page6[0].SignatureSub[0].SigDate[0]]]
-Judge or Judicial Officer
-This is a Court Order.
-Rev. January 1, 2025 Temporary Restraining Order DV-110, Page 6 of 9
-(CLETS-TRO) (Domestic Violence Prevention)
+Case Number: [[DV-100[0].Page6[0].PxCaption[0].CaseNumber[0]]]
+8 Other Protected People
+Do you want the restraining order to protect your children, family, or someone you live with?
+a. {{DV-100[0].Page6[0].List8[0].Li1[0].YesNo8a1_cb[0]}} No
+b. {{DV-100[0].Page6[0].List8[0].Li2[0].YesNo8a2_cb[0]}} Yes (If yes, complete the section below):
+(1) Full name Age Relationship to you Lives with you?
+[[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname1_tf[0]]] [[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age1_tf[0]]] [[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation1_tf[0]]] {{DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b11_cb[0]}} Yes {{DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b11_cb[1]}} No
+[[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname2_tf[0]]] [[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age2_tf[0]]] [[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation2_tf[0]]] {{DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b12_cb[0]}} Yes {{DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b12_cb[1]}} No
+[[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname3_tf[0]]] [[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age_tf[0]]] [[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation3_tf[0]]] {{DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b13_cb[0]}} Yes {{DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b13_cb[1]}} No
+[[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname4_tf[0]]] [[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age4_tf[0]]] [[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation4_tf[0]]] {{DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b14_cb[0]}} Yes {{DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b14_cb[1]}} No
+{{DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].MultilineCheckBox[0]}} Check this box if you need to list more people. Use a separate piece of paper and write “DV-100, Other
+Protected People” at the top. Turn it in with this form.
+(2) Why do these people need protection? [[DV-100[0].Page6[0].List8[0].Li2[0].List[0].li2[0].TextField[0]]]
+9 Does person in 2 have firearms (guns), firearm parts, or ammunition?
+(A firearm includes a handgun, rifle, shotgun, and assault weapon. A firearm part means a receiver or frame or any
+item that may be used as or easily turned into a receiver or frame. Ammunition includes bullets, shells, cartridges,
+and clips.)
+a. {{DV-100[0].Page6[0].List9[0].Li1[0].YesNo9abc_cb[0]}} I don’t know
+b. {{DV-100[0].Page6[0].List9[0].LI2[0].YesNo9abc_cb[0]}} No
+c. {{DV-100[0].Page6[0].List9[0].li3[0].YesNo9abc_cb[0]}} Yes (If you have information, complete the section below.)
+Describe Firearms (Guns), Firearm Parts, or AmmunitionNumber or Amount Location, if known
+(1) [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li1[0].TextField1[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li1[0].TextField2[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li1[0].TextField3[0]]]
+(2) [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li2[0].TextField1[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li2[0].TextField2[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li2[0].TextField3[0]]]
+(3) [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li3[0].TextField1[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li3[0].TextField2[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li3[0].TextField3[0]]]
+(4) [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li4[0].TextField1[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li4[0].TextField2[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li4[0].TextField3[0]]]
+(5) [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li5[0].TextField1[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li5[0].TextField2[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li5[0].TextField3[0]]]
+(6) [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li6[0].TextField1[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li6[0].TextField2[0]]] [[DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li6[0].TextField3[0]]]
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 6 of 13
+(Domestic Violence Prevention)
 
 --- PAGE 7 ---
-Case Number: [[DV-110[0].Page7[0].PxCaption[0].CaseNumber[0]]]
-Certificate of Compliance With VAWA
-This temporary protective order meets all “full faith and credit” requirements of the Violence Against Women Act,
-18 U.S.C. section 2265 (1994) (VAWA), upon notice of the restrained person. This court has jurisdiction over the
-parties and the subject matter; the restrained person has been or will be afforded notice and a timely opportunity to be
-heard as provided by the laws of this jurisdiction. This order is valid and entitled to enforcement in each jurisdiction
-throughout the 50 states of the United States, the District of Columbia, all tribal lands, and all U.S. territories,
-commonwealths, and possessions and shall be enforced as if it were an order of that jurisdiction.
-Warnings and Notices to the Restrained Person in 2
-Your Address to Receive Court Orders
-If the judge makes a restraining order at the hearing (court date), which has the same orders as in this Temporary
-Restraining Order, you will get a copy of that order by mail at your last known address, which is written in 2 on page 1.
-If your address was not listed on this form or is incorrect, contact the court. If you did not attend your hearing and want to
-know if the judge granted a restraining order against you, contact the court.
-Child Custody, Visitation, and Support
-Child custody and visitation: If you do not attend your hearing (court date), the judge can make custody and
-visitation orders for your children without hearing from you.
-Child support: The judge can order child support based on the income of both parents. The judge can also have
-that support taken directly from a parent's paycheck. Child support can be a lot of money, and usually you have to
-pay until the child is age 18. File and serve form FL-150, Income and Expense Declaration, or form FL-155,
-Financial Statement (Simplified), if you want the judge to have information about your finances. Otherwise, the
-court may make support orders without hearing from you.
-Spousal support: File and serve form FL-150, Income and Expense Declaration, so the judge will have
-information about your finances. Otherwise, the court may make support orders without hearing from you.
-Firearms (Guns), Firearm Parts, and Ammunition
-Under California law, you cannot have any firearms (guns), certain firearm parts, or ammunition. (Family Code sections
-6216 and 6389(a)). Ask the court for information on how to properly turn in, sell, or store these items in your city or
-county. You can also contact your local police department for instructions.
-This is a Court Order.
-Rev. January 1, 2025 Temporary Restraining Order DV-110, Page 7 of 9
-(CLETS-TRO) (Domestic Violence Prevention)
+Case Number: [[DV-100[0].Page7[0].PxCaption[0].CaseNumber[0]]]
+Choose the Orders That You Want a Judge to Make
+In this section, you will choose the orders you want a judge to make now. Every situation is different.
+Choose the orders that fit your situation.
+Check all the orders that you want a judge to make (order).
+10 {{DV-100[0].Page7[0].List10[0].Li1[0].CheckBoxRightCaption[0]}} Order to Not Abuse
+I ask the judge to order the person in 2 to not do the following things to me or anyone listed in 8 :
+Harass, attack, strike, threaten, assault (sexually or otherwise), hit, follow, stalk, molest, destroy personal
+property, keep under surveillance, impersonate (on the internet, electronically, or otherwise), block movements,
+annoy by phone or other electronic means (including repeatedly contact), or disturb the peace. (For more
+information on what “disturbing the peace” means, read form DV-500-INFO, Can A Domestic Violence
+Restraining Order Help Me?)
+11 {{DV-100[0].Page7[0].List11[0].Li1[0].CheckBoxRightCaption[0]}} No-Contact Order
+I ask the judge to order the person in 2 to not contact me or anyone listed in 8 .
+12 {{DV-100[0].Page7[0].List12[0].CheckBoxRightCaption[0]}} Stay-Away Order
+a. I ask the judge to order the person in 2 to stay away from (check all that apply):
+{{DV-100[0].Page7[0].List12[0].li1[0].CheckBox1[0]}} Me. {{DV-100[0].Page7[0].List12[0].li1[0].CheckBox2[0]}} My school.
+{{DV-100[0].Page7[0].List12[0].li1[0].CheckBox3[0]}} My home. {{DV-100[0].Page7[0].List12[0].li1[0].CheckBox4[0]}} Each person in 8 .
+{{DV-100[0].Page7[0].List12[0].li1[0].CheckBox5[0]}} My job or workplace. {{DV-100[0].Page7[0].List12[0].li1[0].CheckBox6[0]}} My children’s school or childcare.
+{{DV-100[0].Page7[0].List12[0].li1[0].CheckBox7[0]}} My vehicle. {{DV-100[0].Page7[0].List12[0].li1[0].CheckBox8[0]}} Other (please explain): [[DV-100[0].Page7[0].List12[0].li1[0].TextField[0]]]
+b. How far do you want the person to stay away from all the places you checked above?
+{{DV-100[0].Page7[0].List12[0].Li2[0].CheckBox12b1[0]}} 100 yards (300 feet) {{DV-100[0].Page7[0].List12[0].Li2[0].CheckBox12b2[0]}} Other (give distance in yards): [[DV-100[0].Page7[0].List12[0].Li2[0].FillText8Yards[0]]]
+c. Do you and the person in 2 live together or live close to each other?
+{{DV-100[0].Page7[0].List12[0].Li3[0].YesNo12c_cb[0]}} No {{DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesNo12c_cb[0]}} Yes (If yes, check one):
+{{DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[0]}} Live together (If you live together, you can ask that the person in 2 move out in 13 .)
+{{DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[1]}} Live in the same building, but not in the same home
+{{DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[2]}} Live in the same neighborhood
+{{DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[3]}} Other (please explain): [[DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].TextField[0]]]
+d. Do you and the person in 2 have the same workplace or go to the same school?
+{{DV-100[0].Page7[0].List12[0].Li4[0].YesNo12d_cb[0]}} No {{DV-100[0].Page7[0].List12[0].Li4[0].YesNo12d_cb[1]}} Yes (If yes, check all that apply):
+{{DV-100[0].Page7[0].List12[0].Li4[0].CheckBox1[0]}} Work together at (name of company): [[DV-100[0].Page7[0].List12[0].Li4[0].TextField1[0]]]
+{{DV-100[0].Page7[0].List12[0].Li4[0].CheckBox2[0]}} Go to the same school (name of school): [[DV-100[0].Page7[0].List12[0].Li4[0].TextField2[0]]]
+{{DV-100[0].Page7[0].List12[0].Li4[0].CheckBox3[0]}} Other (please explain): [[DV-100[0].Page7[0].List12[0].Li4[0].TextField4[0]]]
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 7 of 13
+(Domestic Violence Prevention)
 
 --- PAGE 8 ---
-Case Number: [[DV-110[0].Page8[0].PxCaption[0].CaseNumber[0]]]
-Instructions for Law Enforcement
-This order is effective when made. It is enforceable by any law enforcement agency that has received the order, is shown
-a copy of the order, or has verified its existence on the California Law Enforcement Telecommunications System
-(CLETS). If the law enforcement agency has not received proof of service on the restrained person, and the restrained
-person was not present at the court hearing, the agency shall advise the restrained person of the terms of the order and
-then shall enforce it. Violations of this order are subject to criminal penalties.
-Duties of Officer Serving This Order
-The officer who serves this order on the Restrained Person must do the following:
-Ask if the Restrained Person is in possession of any of the prohibited items listed in 6 , or has custody or
-control of any that they have not already turned in.
-Order the Restrained Person to immediately surrender to you all prohibited items.
-Issue a receipt to the Restrained Person for all prohibited items that have been surrendered.
-Complete a proof of personal service and file it with the court. You may use form DV-200 for this purpose.
-Within one business day of service, submit the proof of service directly into the California Restraining and
-Protective Order System (CARPOS), including the serving officer’s name and law enforcement agency.
-Arrest Required if Order Is Violated
-If an officer has probable cause to believe that the restrained person had notice of the order and has disobeyed the order,
-the officer must arrest the restrained person. (Penal Code sections 836(c)(1), 13701(b).) A violation of the order may be
-a violation of Penal Code section 166 or 273.6.
-If the Protected Person Contacts the Restrained Person
-Even if the protected person invites or consents to contact with the restrained person, the orders remain in effect and must
-be enforced. The protected person cannot be arrested for inviting or consenting to contact with the restrained person. The
-orders can be changed only by another court order. (Penal Code section 13710(b).)
-Child Custody and Visitation
-Child custody and visitation orders are listed on form DV-140 or another attached form. If the judge made these
-orders, look at 11 and 12 of this order to see if the judge granted an exception for brief and peaceful contact with the
-person in 1 as needed to follow court-ordered visits. Contact by the person in 2 that is not brief and peaceful is a
-violation of this order. Forms DV-100 and DV-105 are not orders. Do not enforce them.
-This is a Court Order.
-Rev. January 1, 2025 Temporary Restraining Order DV-110, Page 8 of 9
-(CLETS-TRO) (Domestic Violence Prevention)
+Case Number: [[DV-100[0].Page8[0].PxCaption[0].CaseNumber[0]]]
+13 {{DV-100[0].Page8[0].List13[0].CheckBoxRightCaption[0]}} Order to Move Out
+a. I ask the judge to order the person in 2 to move out of the home, located at:
+(Give address): [[DV-100[0].Page8[0].List13[0].Li1[0].TextField[0]]]
+b. I have a right to live at this address because:
+(Check all that apply)
+{{DV-100[0].Page8[0].List13[0].Li2[0].CheckBox1[0]}} I own the home. {{DV-100[0].Page8[0].List13[0].Li2[0].CheckBox2[0]}} I have lived at this address for [[DV-100[0].Page8[0].List13[0].Li2[0].FillText9years[0]]] years, [[DV-100[0].Page8[0].List13[0].Li2[0].FillText9months[0]]] months.
+{{DV-100[0].Page8[0].List13[0].Li2[0].CheckBox3[0]}} My name is on the lease. {{DV-100[0].Page8[0].List13[0].Li2[0].CheckBox4[0]}} I pay for some or all the rent or mortgage.
+{{DV-100[0].Page8[0].List13[0].Li2[0].CheckBox5[0]}} I live at this address with my child(ren). {{DV-100[0].Page8[0].List13[0].Li2[0].CheckBox6[0]}} Other (please explain): [[DV-100[0].Page8[0].List13[0].Li2[0].TextField2[0]]] [[DV-100[0].Page8[0].List13[0].Li2[0].TextField1[0]]]
+14 {{DV-100[0].Page8[0].List14[0].Li1[0].CheckBoxRightCaption[0]}} Other Orders
+(Describe any additional orders you want the judge to make to keep you, your children, or the people in [[DV-100[0].Page8[0].List14[0].Li1[0].item26d_tf[0]]] 8 safe):
+15 {{DV-100[0].Page8[0].LIST15[0].CtyChildFreed_cb[0]}} Child Custody and Visitation
+(Check this box if you have a child with the person in 2 and want the judge to make or change a child custody or
+visitation order. You must fill out form DV-105, Request for Child Custody and Visitation Orders, and attach it
+to this form.)
+Orders that you can request on form DV-105 include:
+Child custody No visits with your children
+Stop person in 2 from accessing your Virtual visits with your children
+child’s school or medical informationSupervised (monitored) visits with your children
+Unsupervised (unmonitored) visits with your children
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 8 of 13
+(Domestic Violence Prevention)
 
 --- PAGE 9 ---
-Case Number: [[DV-110[0].Page9[0].PxCaption[0].CaseNumber[0]]]
-Conflicting Orders—Priorities for Enforcement
-If more than one restraining order has been issued protecting the protected person from the restrained
-person, the orders must be enforced in the following priority (see Penal Code section 136.2 and Family Code
-sections 6383(h)(2), 6405(b)):
-1. Emergency Protective Order (EPO): If one of the orders is an Emergency Protective Order (form EPO-001),
-provisions (e.g., stay away order) that are more restrictive than in the other restraining/protective orders must be
-enforced. Provisions of another order that do not conflict with the EPO must be enforced.
-2. No-Contact Order: If a restraining/protective order includes a no-contact order, the no-contact order must be
-enforced. Item 11 is an example of a no-contact order.
-3. Criminal Protective Order (CPO): If none of the orders include an EPO or a no-contact order, the most recent
-CPO must be enforced. (Family Code sections 6383(h)(2) and 6405(b).) Additionally, a CPO issued in a criminal
-case involving charges of domestic violence, Penal Code sections 261, 261.5, or former 262, or charges requiring
-sex offender registration must be enforced over any civil court order. (Penal Code section 136.2(e)(2).) All
-provisions in the civil court order that do not conflict with the CPO must be enforced.
-4. Civil Restraining Orders: If there is more than one civil restraining order (e.g., domestic violence, juvenile, elder
-abuse, civil harassment), then the order that was issued last must be enforced. Provisions that do not conflict with
-the most recent civil restraining order must be enforced.
-(The clerk will fill out this part.)
-Instructions to Clerk: You must give up to three free (certified, stamped, and endorsed) copies of this order to the
-protected party.
-Clerk’s Certificate — Clerk's Certificate—
-[seal]
-I certify that this Temporary Restraining Order is a true and correct copy of the
-original on file in the court.
-Date: [[DV-110[0].Page9[0].ClertSub[0].T57[0]]] Clerk, by [[DV-110[0].Page9[0].ClertSub[0].T154[0]]] , Deputy
-This is a Court Order.
-Rev. January 1, 2025 Temporary Restraining Order DV-110, Page 9 of 9
-(CLETS-TRO) (Domestic Violence Prevention)
+Case Number: [[DV-100[0].Page9[0].PxCaption[0].CaseNumber[0]]]
+16 {{DV-100[0].Page9[0].List16[0].CheckBoxRightCaption[0]}} Protect Animals
+a. (You may ask the court to protect your animals, your children’s animals, or the person in 2 ’s animals.)
+Name (or other way to ID animal) Type of animal Breed (if known) Color
+(1) [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField1[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField2[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField3[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField4[0]]]
+(2) [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField1[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField2[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField3[0]]]
+(3) [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField1[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField2[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField3[0]]]
+(4) [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField1[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField2[0]]] [[DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField3[0]]]
+b. I ask the judge to protect the animals listed above by ordering the person in 2 to:
+(Check all that apply)
+(1) {{DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[0]}} Stay away from the animals by at least: {{DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].YesNo16b1_cb[0]}} 100 yards (300 feet) {{DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].YesNo16b1_cb[1]}} Other (number of yards): [[DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].TextField[0]]]
+(2) {{DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li2[0].MultilineCheckBox[0]}} Not take, sell, hide, molest, attack, strike, threaten, harm, get rid of, transfer, or borrow against the
+animals.
+(3) {{DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption1[0]}} Give me sole possession, care, and control of the animals because (check all that apply):
+{{DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption2[0]}} Person in 2 abuses the animals. {{DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption3[0]}} I take care of these animals.
+{{DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption4[0]}} I purchased these animals. {{DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption5[0]}} Other (please explain): [[DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].TextField2[0]]] [[DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].TextField1[0]]]
+17 {{DV-100[0].Page9[0].List17[0].CtyChildFreed_cb[0]}} Control of Property
+a. I ask the judge to give only me temporary use, possession, and control of the property listed here [[DV-100[0].Page9[0].List17[0].Li1[0].item26d_tf[0]]] (describe):
+b. Explain why you want control of the property you listed: [[DV-100[0].Page9[0].List17[0].Li2[0].item26d_tf[0]]]
+18 {{DV-100[0].Page9[0].List18[0].Li1[0].CtyChildFreed_cb[0]}} Health and Other Insurance
+I ask the judge to order the person in 2 to not make any changes to any insurance or other coverage for me, the
+person in 2 , or our children, including not being allowed to cancel, cash, borrow against, transfer, dispose of, or
+change the beneficiaries for the insurance.
+19 {{DV-100[0].Page9[0].List19[0].Li1[0].CtyChildFreed_cb[0]}} Record Communications
+I ask the judge to allow me to record calls or communications the person in 2 makes to me, when those calls or
+communications violate this restraining order.
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 9 of 13
+(Domestic Violence Prevention)
+
+--- PAGE 10 ---
+Case Number: [[DV-100[0].Page10[0].PxCaption[0].CaseNumber[0]]]
+20 {{DV-100[0].Page10[0].List20[0].Li1[0].CheckBoxRightCaption[0]}} Property Restraint (only if you are married or a registered domestic partner with the person in 2 .)
+I ask the judge to order the person in 2 not to borrow against, sell, hide, or get rid of or destroy any possessions
+or property, except in the usual course of business or for necessities of life. I also ask the judge to order the person
+in 2 to notify me of any new or big expenses and to explain them to the court.
+21 {{DV-100[0].Page10[0].List21[0].Li1[0].CtyChildFreed_cb[0]}} Extend my deadline to give notice to person in 2
+(Usually, the judge will give you about two weeks to give notice, or to “serve” the person in 2 of your request. If
+you need more time to serve, the judge may be able to give you a few extra days.)
+I ask the judge to give me more time to serve the person in [[DV-100[0].Page10[0].List21[0].Li1[0].item26d_tf[0]]] 2 because (explain why you need more time):
+22 {{DV-100[0].Page10[0].List22[0].CheckBoxRightCaption[0]}} Pay Debts (Bills) Owed for Property
+(If you want the person in 2 to pay any debts owed for property, list them and explain why. The amount can be
+for the entire bill or only a portion. Some examples include rent, mortgage, car payment, etc.)
+a. I ask the judge to order the person in 2 to make these payments while the restraining order is in effect:
+(1) Pay to: [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].TextField[0]]] For: [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].TextField2[0]]] Amount: $ [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].TextField3[0]]] Due date: [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].DateField1[0]]]
+(2) Pay to: [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].TextField[0]]] For: [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].TextField1[0]]] Amount: $ [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].TextField3[0]]] Due date: [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].DateField2[0]]]
+(3) Pay to: [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].TextField[0]]] For: [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].TextField1[0]]] Amount: $ [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].TextField3[0]]] Due date: [[DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].DateField3[0]]]
+Explain why you want the person in 2 to pay the debts listed above: [[DV-100[0].Page10[0].List22[0].Li1[0].item26d_tf[0]]]
+b. Special decision (finding) by the judge if you did not agree to the debt (optional)
+(If you did not agree to the debt or debts listed above, you can ask the judge to decide (find) that one or more
+debts was made without your permission and resulted from the person in 2 ’s abuse. This may help you
+defend against the debt if you are sued in another case.)
+Do you want the judge to make this special decision (finding)?
+{{DV-100[0].Page10[0].List22[0].Li2[0].List[0].checkbox22b[0]}} No {{DV-100[0].Page10[0].List22[0].Li2[0].List[0].checkbox22b[1]}} Yes (If yes, answer the questions below.)
+(1) Which of the debts listed above resulted from the abuse? (check all that apply):
+{{DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption1[0]}} a(1) {{DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption2[0]}} a(2) {{DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption3[0]}} a(3)
+(2) Do you know how the person in 2 made the debt or debts?
+{{DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li2[0].YesNo22b2_cb[0]}} No {{DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li2[0].YesNo22b2_cb[1]}} Yes
+(If yes, explain how the person in 2 made the debt or debts): [[DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li2[0].item26d_tf[0]]]
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 10 of 13
+(Domestic Violence Prevention)
+
+--- PAGE 11 ---
+Case Number: [[DV-100[0].Page11[0].PxCaption[0].CaseNumber[0]]]
+Orders That You Want a Judge to Make at Your Court Date
+Below is a list of orders that a judge cannot make right away but can make at your court date in a few weeks. The
+person in 2 must be notified of your court date before the judge can consider making any of the orders listed below.
+Check all the orders that you want the judge to make at your court date.
+23 {{DV-100[0].Page11[0].List23[0].Li1[0].CtyChildFreed_cb[0]}} Pay Expenses Caused by the Abuse
+I ask the judge to order the person in 2 to pay for things caused directly by the person in 2 (damaged
+property, medical care, counseling, temporary housing, etc.). Bring proof of these amounts to your court date.
+Pay to: [[DV-100[0].Page11[0].List23[0].Li1[0].T47[0]]] For: [[DV-100[0].Page11[0].List23[0].Li1[0].T50[0]]] Amount: $ [[DV-100[0].Page11[0].List23[0].Li1[0].T53[0]]]
+Pay to: [[DV-100[0].Page11[0].List23[0].Li1[0].T56[0]]] For: [[DV-100[0].Page11[0].List23[0].Li1[0].T59[0]]] Amount: $ [[DV-100[0].Page11[0].List23[0].Li1[0].T62[0]]]
+Pay to: [[DV-100[0].Page11[0].List23[0].Li1[0].T63[0]]] For: [[DV-100[0].Page11[0].List23[0].Li1[0].T66[0]]] Amount: $ [[DV-100[0].Page11[0].List23[0].Li1[0].T67[0]]]
+Pay to: [[DV-100[0].Page11[0].List23[0].Li1[0].T68[0]]] For: [[DV-100[0].Page11[0].List23[0].Li1[0].T69[0]]] Amount: $ [[DV-100[0].Page11[0].List23[0].Li1[0].T70[0]]]
+24 {{DV-100[0].Page11[0].List24[0].CheckBoxRightCaption[0]}} Child Support (this applies only if you have a minor child with the person in 2 )
+(Check all that apply)
+a. {{DV-100[0].Page11[0].List24[0].Li1[0].CheckBox3[0]}} I do not have a child support order and I want one.
+b. {{DV-100[0].Page11[0].List24[0].Li2[0].CheckBox3[0]}} I have a child support order and I want it changed (attach a copy if you have one).
+c. {{DV-100[0].Page11[0].List24[0].Li3[0].CheckBox3[0]}} I now receive or have applied for TANF, Welfare, or CalWORKS.
+25 {{DV-100[0].Page11[0].List25[0].Li1[0].CheckBoxRightCaption[0]}} Spousal Support
+(You must be married or a registered domestic partner with person in 2 .)
+I ask the judge to order the person in 2 to give me financial assistance.
+26 {{DV-100[0].Page11[0].List26[0].Li1[0].CtyChildFreed_cb[0]}} Lawyer's Fees and Costs
+I ask that the person in 2 pay for some or all of my lawyer’s fees and costs. (If you ask for fees and costs and the
+court grants your restraining order, the court must award you fees and costs if the respondent can afford to pay.)
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 11 of 13
+(Domestic Violence Prevention)
+
+--- PAGE 12 ---
+Case Number: [[DV-100[0].Page12[0].PxCaption[0].CaseNumber[0]]]
+27 {{DV-100[0].Page12[0].List27[0].Li1[0].CtyChildFreed_cb[0]}} Batterer Intervention Program
+I ask the judge to order the person listed in 2 to go to a 52-week batterer intervention program.
+(The goal of this program is to stop abuse. There are weekly classes on accountability, abuse effects, and gender
+roles. If ordered, the person in 2 has to show the judge that they enrolled and completed the program.)
+28 {{DV-100[0].Page12[0].List28[0].AGHagueCert_cb[0]}} Transfer of Wireless Phone Account
+(If the person in 2 holds the rights to your cell phone account, you can ask the judge to transfer your number or
+your child’s number to you. This means you will be financially responsible for these accounts. If you want to have
+control over a mobile device, like a cell phone, make this request at 17 .)
+I ask the judge to order the wireless service provider to transfer the billing responsibility and rights to the wireless
+phone numbers listed below to me because the account currently belongs to the person in 2 :
+a. {{DV-100[0].Page12[0].List28[0].Li1[0].item28aMyNoa_cb[0]}} My number {{DV-100[0].Page12[0].List28[0].Li1[0].item28aMyNoa_cb[1]}} Number of child in my care (including area code): [[DV-100[0].Page12[0].List28[0].Li1[0].Telephone2_ft[0]]]
+b. {{DV-100[0].Page12[0].List28[0].Li2[0].item28bMyNob_cb[0]}} My number {{DV-100[0].Page12[0].List28[0].Li2[0].item28bMyNob_cb[1]}} Number of child in my care (including area code): [[DV-100[0].Page12[0].List28[0].Li2[0].Telephone3_ft[0]]]
+c. {{DV-100[0].Page12[0].List28[0].Li3[0].item28aMyNoc_cb[0]}} My number {{DV-100[0].Page12[0].List28[0].Li3[0].item28aMyNoc_cb[1]}} Number of child in my care (including area code): [[DV-100[0].Page12[0].List28[0].Li3[0].Telephone2_ft[0]]]
+d. {{DV-100[0].Page12[0].List28[0].Li4[0].item28bMyNod_cb[0]}} My number {{DV-100[0].Page12[0].List28[0].Li4[0].item28bMyNod_cb[1]}} Number of child in my care (including area code): [[DV-100[0].Page12[0].List28[0].Li4[0].Telephone3_ft[0]]]
+Automatic Orders if the Judge Grants Restraining Order
+In this section are orders that the person in 2 would have to follow if the judge grants a restraining order.
+29 No Firearms (Guns), Firearm Parts, or Ammunition
+Cannot own, possess, or buy firearms (guns), firearm parts, and ammunition.
+Must turn in, sell, or store any firearms (guns), firearm parts, or ammunition that they have or control.
+30 No Body Armor
+Cannot own, possess, or buy body armor.
+Must relinquish any body armor in their possession.
+31 Cannot Look for Protected People
+Cannot look for the address or location of any person protected by the restraining order, unless the court finds good
+cause not to make this order.
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 12 of 13
+(Domestic Violence Prevention)
+
+--- PAGE 13 ---
+Case Number: [[DV-100[0].Page13[0].PxCaption[0].CaseNumber[0]]]
+32 Additional Pages
+If you used additional paper or forms, enter the number of extra pages attached to this form: [[DV-100[0].Page13[0].List32[0].Li1[0].T97[0]]]
+33 Your Signature
+I declare under penalty of perjury under the laws of the State of California that the information above is true and
+correct.
+Date: [[DV-100[0].Page13[0].List33[0].Li1[0].SigDate[0]]] [[DV-100[0].Page13[0].List33[0].Li1[0].YourName_tf[0]]]
+Type or print your name Sign your name
+34 Your Lawyer's Signature (if you have one)
+Date: [[DV-100[0].Page13[0].List34[0].Li1[0].SigDate[0]]] [[DV-100[0].Page13[0].List34[0].Li1[0].T14[0]]]
+Lawyer’s name Lawyer’s signature
+Your Next Steps
+u You must complete at least three additional forms:
+Form , Temporary Restraining Order (only items 1, 2 and 3)
+Form , Notice of Court Hearing (only items 1 and 2)
+Form , Confidential Information for Law Enforcement
+If you are asking for child custody and visitation orders, you must complete form , Request for Child
+Custody and Visitation Orders, and form , Child Custody and Visitation Order.
+v Turn in your completed forms to the court. Find out when your forms will be ready for you.
+w Once you get your forms back from the court, have someone “serve” a copy of all forms on the person in 2 . The
+sheriff or marshal can do this for free. See form , Request for Sheriff to Serve Court Papers. Learn more
+about service at .
+x If you are asking for child support or spousal support you must also complete form , Income and Expense
+Declaration. If you are only asking for child support, you may be eligible to fill out a simpler form, . Read
+form to see if you are eligible. Turn in your completed form to the court before your court date. You must
+also have someone mail or personally deliver a copy to the person in 2 .
+This is not a Court Order.
+Rev. January 1, 2025 Request for Domestic Violence Restraining OrderDV-100, Page 13 of 13
+(Domestic Violence Prevention)

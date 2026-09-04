@@ -1,0 +1,293 @@
+{
+  "formTitle": "Employee’s Withholding Certificate (Form W-4, 2026)",
+  "fields": [
+    {
+      "id": "topmostSubform[0].Page1[0].Step1a[0].f1_01[0]",
+      "newName": "first_name_and_middle_initial",
+      "type": "text",
+      "label": "First Name and Middle Initial"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Step1a[0].f1_02[0]",
+      "newName": "last_name",
+      "type": "text",
+      "label": "Last Name"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_05[0]",
+      "newName": "social_security_number",
+      "type": "text",
+      "label": "Social Security Number"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Step1a[0].f1_03[0]",
+      "newName": "street_address",
+      "type": "text",
+      "label": "Street Address"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Step1a[0].f1_04[0]",
+      "newName": "city_state_zip_code",
+      "type": "text",
+      "label": "City or Town, State, and ZIP Code"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].c1_1[0]",
+      "newName": "filing_status_single_or_married_separately",
+      "type": "checkbox",
+      "label": "Single or Married filing separately"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].c1_1[1]",
+      "newName": "filing_status_married_jointly_or_surviving_spouse",
+      "type": "checkbox",
+      "label": "Married filing jointly or Qualifying surviving spouse"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].c1_1[2]",
+      "newName": "filing_status_head_of_household",
+      "type": "checkbox",
+      "label": "Head of household"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].c1_2[0]",
+      "newName": "multiple_jobs_or_spouse_works",
+      "type": "checkbox",
+      "label": "Multiple jobs or spouse works"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_06[0]",
+      "newName": "qualifying_children_amount",
+      "type": "text",
+      "label": "Qualifying Children Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_07[0]",
+      "newName": "other_dependents_amount",
+      "type": "text",
+      "label": "Other Dependents Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_08[0]",
+      "newName": "total_credits_amount",
+      "type": "text",
+      "label": "Total Credits Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_09[0]",
+      "newName": "other_income_amount",
+      "type": "text",
+      "label": "Other Income Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_10[0]",
+      "newName": "deductions_amount",
+      "type": "text",
+      "label": "Deductions Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_11[0]",
+      "newName": "extra_withholding_amount",
+      "type": "text",
+      "label": "Extra Withholding Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].c1_3[0]",
+      "newName": "exempt_from_withholding",
+      "type": "checkbox",
+      "label": "Exempt from withholding"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_12[0]",
+      "newName": "employer_name_and_address",
+      "type": "text",
+      "label": "Employer Name and Address"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_13[0]",
+      "newName": "first_date_of_employment",
+      "type": "text",
+      "label": "First Date of Employment"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].f1_14[0]",
+      "newName": "employer_identification_number",
+      "type": "text",
+      "label": "Employer Identification Number (EIN)"
+    },
+    {
+      "id": "topmostSubform[0].Page3[0].f3_01[0]",
+      "newName": "multiple_jobs_line_1_amount",
+      "type": "text",
+      "label": "Multiple Jobs Worksheet Line 1 Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page3[0].f3_02[0]",
+      "newName": "multiple_jobs_line_2a_amount",
+      "type": "text",
+      "label": "Multiple Jobs Worksheet Line 2a Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page3[0].f3_03[0]",
+      "newName": "multiple_jobs_line_2b_amount",
+      "type": "text",
+      "label": "Multiple Jobs Worksheet Line 2b Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page3[0].f3_04[0]",
+      "newName": "multiple_jobs_line_2c_amount",
+      "type": "text",
+      "label": "Multiple Jobs Worksheet Line 2c Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page3[0].f3_05[0]",
+      "newName": "multiple_jobs_pay_periods_per_year",
+      "type": "text",
+      "label": "Pay Periods Per Year"
+    },
+    {
+      "id": "topmostSubform[0].Page3[0].f3_06[0]",
+      "newName": "multiple_jobs_line_4_amount",
+      "type": "text",
+      "label": "Multiple Jobs Worksheet Line 4 Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_01[0]",
+      "newName": "qualified_tips_amount",
+      "type": "text",
+      "label": "Qualified Tips Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_02[0]",
+      "newName": "qualified_overtime_compensation_amount",
+      "type": "text",
+      "label": "Qualified Overtime Compensation Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_03[0]",
+      "newName": "qualified_passenger_vehicle_loan_interest_amount",
+      "type": "text",
+      "label": "Qualified Passenger Vehicle Loan Interest Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_04[0]",
+      "newName": "deductions_line_2_total",
+      "type": "text",
+      "label": "Deductions Worksheet Line 2 Total"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_05[0]",
+      "newName": "senior_self_amount",
+      "type": "text",
+      "label": "Senior (Self) Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_06[0]",
+      "newName": "senior_spouse_amount",
+      "type": "text",
+      "label": "Senior (Spouse) Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_07[0]",
+      "newName": "senior_total_amount",
+      "type": "text",
+      "label": "Senior Total Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_08[0]",
+      "newName": "other_adjustments_amount",
+      "type": "text",
+      "label": "Other Adjustments Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_09[0]",
+      "newName": "medical_and_dental_expenses_amount",
+      "type": "text",
+      "label": "Medical and Dental Expenses Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_10[0]",
+      "newName": "state_and_local_taxes_amount",
+      "type": "text",
+      "label": "State and Local Taxes Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_11[0]",
+      "newName": "home_mortgage_interest_amount",
+      "type": "text",
+      "label": "Home Mortgage Interest Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_12[0]",
+      "newName": "charitable_gifts_amount",
+      "type": "text",
+      "label": "Charitable Gifts Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_13[0]",
+      "newName": "other_itemized_deductions_amount",
+      "type": "text",
+      "label": "Other Itemized Deductions Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_14[0]",
+      "newName": "itemized_deductions_total",
+      "type": "text",
+      "label": "Itemized Deductions Total"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_15[0]",
+      "newName": "total_income_amount",
+      "type": "text",
+      "label": "Total Income Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_16[0]",
+      "newName": "income_minus_senior_total",
+      "type": "text",
+      "label": "Income Minus Senior Total"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_17[0]",
+      "newName": "itemized_deductions_limit",
+      "type": "text",
+      "label": "Itemized Deductions Limit"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_18[0]",
+      "newName": "adjusted_itemized_deductions",
+      "type": "text",
+      "label": "Adjusted Itemized Deductions"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_19[0]",
+      "newName": "standard_deduction_amount",
+      "type": "text",
+      "label": "Standard Deduction Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_20[0]",
+      "newName": "cash_gifts_to_charities_amount",
+      "type": "text",
+      "label": "Cash Gifts to Charities Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_21[0]",
+      "newName": "standard_deduction_plus_cash_gifts",
+      "type": "text",
+      "label": "Standard Deduction Plus Cash Gifts"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_22[0]",
+      "newName": "deductions_line_14_amount",
+      "type": "text",
+      "label": "Deductions Worksheet Line 14 Amount"
+    },
+    {
+      "id": "topmostSubform[0].Page4[0].f4_23[0]",
+      "newName": "deductions_worksheet_total",
+      "type": "text",
+      "label": "Deductions Worksheet Total"
+    }
+  ]
+}

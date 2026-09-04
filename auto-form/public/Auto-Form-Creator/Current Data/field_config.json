@@ -1,95 +1,2911 @@
 {
-  "formTitle": "MC-031 Attached Declaration",
+  "formTitle": "DV-100 Request for Domestic Violence Restraining Order",
   "fields": [
     {
-      "id": "NoticeHeader1",
-      "newName": "form_number",
+      "id": "DV-100[0].Page1[0].List1[0].Li1[0].YourName_tf[0]",
+      "newName": "person_asking_protection_name",
       "type": "text",
-      "label": "Form Number"
+      "label": "Your name"
     },
     {
-      "id": "user_fullname",
-      "newName": "declarant_name",
+      "id": "DV-100[0].Page1[0].List1[0].Li2[0].tf[0]",
+      "newName": "person_asking_protection_age",
       "type": "text",
-      "label": "Name"
+      "label": "Your age"
     },
     {
-      "id": "text",
-      "newName": "declaration_text",
+      "id": "DV-100[0].Page1[0].rightCaption[0].CourtInfo[0]",
+      "newName": "court_name_and_street_address",
       "type": "text",
-      "label": "Declaration"
+      "label": "Court name and street address"
     },
     {
-      "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_1",
-      "newName": "defendant_name_1",
+      "id": "DV-100[0].Page1[0].rightCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_01",
       "type": "text",
-      "label": "Defendant Name 1"
+      "label": "Case Number"
     },
     {
-      "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_2",
-      "newName": "defendant_name_2",
+      "id": "DV-100[0].Page1[0].List1[0].Li3[0].address_ft[0]",
+      "newName": "person_asking_protection_mailing_address",
       "type": "text",
-      "label": "Defendant Name 2"
+      "label": "Address where you can receive court papers"
     },
     {
-      "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_3",
-      "newName": "defendant_name_3",
+      "id": "DV-100[0].Page1[0].List1[0].Li3[0].T70[0]",
+      "newName": "person_asking_protection_mailing_city",
       "type": "text",
-      "label": "Defendant Name 3"
+      "label": "City"
     },
     {
-      "id": "current_date",
-      "newName": "declaration_date",
+      "id": "DV-100[0].Page1[0].List1[0].Li3[0].T76[0]",
+      "newName": "person_asking_protection_mailing_state",
+      "type": "text",
+      "label": "State"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li3[0].T77[0]",
+      "newName": "person_asking_protection_mailing_zip_code",
+      "type": "text",
+      "label": "ZIP Code"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li4[0].T42[0]",
+      "newName": "person_asking_protection_telephone",
+      "type": "text",
+      "label": "Telephone",
+      "conditional": {
+        "onlyWhen": "provide_optional_contact_information",
+        "gateQuestion": "Do you want to provide optional contact information?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li4[0].T67[0]",
+      "newName": "person_asking_protection_fax",
+      "type": "text",
+      "label": "Fax",
+      "conditional": {
+        "onlyWhen": "provide_optional_contact_information",
+        "gateQuestion": "Do you want to provide optional contact information?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li4[0].T73[0]",
+      "newName": "person_asking_protection_email",
+      "type": "text",
+      "label": "Email Address",
+      "conditional": {
+        "onlyWhen": "provide_optional_contact_information",
+        "gateQuestion": "Do you want to provide optional contact information?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li5[0].ParentRel1[0]",
+      "newName": "person_asking_protection_lawyer_name",
+      "type": "text",
+      "label": "Lawyer name",
+      "conditional": {
+        "onlyWhen": "has_lawyer",
+        "gateQuestion": "Do you have a lawyer?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li5[0].ParentRel2[0]",
+      "newName": "person_asking_protection_lawyer_state_bar_number",
+      "type": "text",
+      "label": "State Bar Number",
+      "conditional": {
+        "onlyWhen": "has_lawyer",
+        "gateQuestion": "Do you have a lawyer?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page1[0].List1[0].Li5[0].ParentRel[0]",
+      "newName": "person_asking_protection_lawyer_firm_name",
+      "type": "text",
+      "label": "Firm Name",
+      "conditional": {
+        "onlyWhen": "has_lawyer",
+        "gateQuestion": "Do you have a lawyer?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li1[0].TextField[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "Full name"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li2[0].T78[0]",
+      "newName": "person_to_restrain_age",
+      "type": "text",
+      "label": "Age"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li3[0].T78[0]",
+      "newName": "person_to_restrain_date_of_birth",
+      "type": "text",
+      "label": "Date of birth"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li4[0].gender2d_cb[0]",
+      "newName": "person_to_restrain_gender_male",
+      "type": "checkbox",
+      "label": "Male"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li4[0].gender2d_cb[1]",
+      "newName": "person_to_restrain_gender_female",
+      "type": "checkbox",
+      "label": "Female"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].Li4[0].gender2d_cb[2]",
+      "newName": "person_to_restrain_gender_nonbinary",
+      "type": "checkbox",
+      "label": "Nonbinary"
+    },
+    {
+      "id": "DV-100[0].Page1[0].List2[0].li5[0].TextField[0]",
+      "newName": "person_to_restrain_race",
+      "type": "text",
+      "label": "Race"
+    },
+    {
+      "id": "DV-100[0].Page2[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_02",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li1[0].CheckBox2[0]",
+      "newName": "relationship_have_children_together",
+      "type": "checkbox",
+      "label": "We have a child or children together"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li1[0].TextField1[0]",
+      "newName": "relationship_children_names_line_1",
+      "type": "text",
+      "label": "Names of children",
+      "conditional": {
+        "onlyWhen": "have_children_together",
+        "gateQuestion": "Do you have a child or children together?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li1[0].TextField[0]",
+      "newName": "relationship_children_names_line_2",
+      "type": "text",
+      "label": "Names of children, continued",
+      "conditional": {
+        "onlyWhen": "have_children_together",
+        "gateQuestion": "Do you have a child or children together?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li2[0].CheckBox2[0]",
+      "newName": "relationship_current_spouses_or_domestic_partners",
+      "type": "checkbox",
+      "label": "We are married or registered domestic partners"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li3[0].CheckBox2[0]",
+      "newName": "relationship_former_spouses_or_domestic_partners",
+      "type": "checkbox",
+      "label": "We used to be married or registered domestic partners"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li4[0].CheckBox2[0]",
+      "newName": "relationship_dating_or_formerly_dated",
+      "type": "checkbox",
+      "label": "We are dating or used to date"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li5[0].CheckBox2[0]",
+      "newName": "relationship_engaged_or_formerly_engaged",
+      "type": "checkbox",
+      "label": "We are or used to be engaged to be married"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox1[0]",
+      "newName": "relationship_related",
+      "type": "checkbox",
+      "label": "We are related"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox2[0]",
+      "newName": "relationship_relative_parent_stepparent_parent_in_law",
+      "type": "checkbox",
+      "label": "Parent, stepparent, or parent-in-law",
+      "conditional": {
+        "onlyWhen": "related",
+        "gateQuestion": "Are you related to the person you want protection from?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox3[0]",
+      "newName": "relationship_relative_sibling_stepsibling_sibling_in_law",
+      "type": "checkbox",
+      "label": "Brother, sister, sibling, stepsibling, or sibling in-law",
+      "conditional": {
+        "onlyWhen": "related",
+        "gateQuestion": "Are you related to the person you want protection from?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox4[0]",
+      "newName": "relationship_relative_child_stepchild_adopted_child",
+      "type": "checkbox",
+      "label": "Child, stepchild, or legally adopted child",
+      "conditional": {
+        "onlyWhen": "related",
+        "gateQuestion": "Are you related to the person you want protection from?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox5[0]",
+      "newName": "relationship_relative_grandparent",
+      "type": "checkbox",
+      "label": "Grandparent, step-grandparent, or grandparent-in-law",
+      "conditional": {
+        "onlyWhen": "related",
+        "gateQuestion": "Are you related to the person you want protection from?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox6[0]",
+      "newName": "relationship_relative_child_spouse",
+      "type": "checkbox",
+      "label": "Child’s spouse",
+      "conditional": {
+        "onlyWhen": "related",
+        "gateQuestion": "Are you related to the person you want protection from?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li6[0].CheckBox7[0]",
+      "newName": "relationship_relative_grandchild",
+      "type": "checkbox",
+      "label": "Grandchild, step-grandchild, or grandchild-in-law",
+      "conditional": {
+        "onlyWhen": "related",
+        "gateQuestion": "Are you related to the person you want protection from?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li7[0].CheckBox2[0]",
+      "newName": "relationship_live_or_lived_together",
+      "type": "checkbox",
+      "label": "We live together or used to live together"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li7[0].YesNo3g_cb[0]",
+      "newName": "relationship_lived_together_as_family_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "live_or_lived_together",
+        "gateQuestion": "Do you live together or used to live together?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li7[0].YesNo3g_cb[1]",
+      "newName": "relationship_lived_together_as_family_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "live_or_lived_together",
+        "gateQuestion": "Do you live together or used to live together?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].YesNo4a_cb[0]",
+      "newName": "recent_restraining_orders_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].YesNo4a_cb[1]",
+      "newName": "recent_restraining_orders_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li1[0].DateField8[0]",
+      "newName": "recent_restraining_order_1_date",
+      "type": "text",
+      "label": "Date of order",
+      "conditional": {
+        "onlyWhen": "recent_restraining_orders_yes",
+        "gateQuestion": "Are there any restraining orders currently in place or that expired in the last six months?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li1[0].DateField5[0]",
+      "newName": "recent_restraining_order_1_expiration_date",
+      "type": "text",
+      "label": "Date it expires",
+      "conditional": {
+        "onlyWhen": "recent_restraining_orders_yes",
+        "gateQuestion": "Are there any restraining orders currently in place or that expired in the last six months?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li2[0].DateField9[0]",
+      "newName": "recent_restraining_order_2_date",
+      "type": "text",
+      "label": "Date of order",
+      "conditional": {
+        "onlyWhen": "recent_restraining_orders_yes",
+        "gateQuestion": "Are there any restraining orders currently in place or that expired in the last six months?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li1[0].List1[0].Li2[0].DateField7[0]",
+      "newName": "recent_restraining_order_2_expiration_date",
+      "type": "text",
+      "label": "Date it expires",
+      "conditional": {
+        "onlyWhen": "recent_restraining_orders_yes",
+        "gateQuestion": "Are there any restraining orders currently in place or that expired in the last six months?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].YesNo4b_cb[0]",
+      "newName": "other_court_case_involvement_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].YesNo4b_cb[1]",
+      "newName": "other_court_case_involvement_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox1[0]",
+      "newName": "other_court_case_custody_selected",
+      "type": "checkbox",
+      "label": "Custody",
+      "conditional": {
+        "onlyWhen": "other_court_case_yes",
+        "gateQuestion": "Are you involved in any other court case with this person?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField1[0]",
+      "newName": "other_court_case_custody_details",
+      "type": "text",
+      "label": "Custody case details",
+      "conditional": {
+        "onlyWhen": "court_case_custody_selected",
+        "gateQuestion": "Is the other court case a custody case?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox2[0]",
+      "newName": "other_court_case_divorce_selected",
+      "type": "checkbox",
+      "label": "Divorce",
+      "conditional": {
+        "onlyWhen": "other_court_case_yes",
+        "gateQuestion": "Are you involved in any other court case with this person?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField2[0]",
+      "newName": "other_court_case_divorce_details",
+      "type": "text",
+      "label": "Divorce case details",
+      "conditional": {
+        "onlyWhen": "court_case_divorce_selected",
+        "gateQuestion": "Is the other court case a divorce case?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox3[0]",
+      "newName": "other_court_case_juvenile_selected",
+      "type": "checkbox",
+      "label": "Juvenile",
+      "conditional": {
+        "onlyWhen": "other_court_case_yes",
+        "gateQuestion": "Are you involved in any other court case with this person?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField3[0]",
+      "newName": "other_court_case_juvenile_details",
+      "type": "text",
+      "label": "Juvenile case details",
+      "conditional": {
+        "onlyWhen": "court_case_juvenile_selected",
+        "gateQuestion": "Is the other court case a juvenile case?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox4[0]",
+      "newName": "other_court_case_guardianship_selected",
+      "type": "checkbox",
+      "label": "Guardianship",
+      "conditional": {
+        "onlyWhen": "other_court_case_yes",
+        "gateQuestion": "Are you involved in any other court case with this person?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField4[0]",
+      "newName": "other_court_case_guardianship_details",
+      "type": "text",
+      "label": "Guardianship case details",
+      "conditional": {
+        "onlyWhen": "court_case_guardianship_selected",
+        "gateQuestion": "Is the other court case a guardianship case?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox5[0]",
+      "newName": "other_court_case_criminal_selected",
+      "type": "checkbox",
+      "label": "Criminal",
+      "conditional": {
+        "onlyWhen": "other_court_case_yes",
+        "gateQuestion": "Are you involved in any other court case with this person?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField5[0]",
+      "newName": "other_court_case_criminal_details",
+      "type": "text",
+      "label": "Criminal case details",
+      "conditional": {
+        "onlyWhen": "court_case_criminal_selected",
+        "gateQuestion": "Is the other court case a criminal case?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].CheckBox6[0]",
+      "newName": "other_court_case_other_selected",
+      "type": "checkbox",
+      "label": "Other",
+      "conditional": {
+        "onlyWhen": "other_court_case_yes",
+        "gateQuestion": "Are you involved in any other court case with this person?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page2[0].List4[0].Li2[0].TextField6[0]",
+      "newName": "other_court_case_other_details",
+      "type": "text",
+      "label": "Other court case details",
+      "conditional": {
+        "onlyWhen": "court_case_other_selected",
+        "gateQuestion": "Is there another kind of court case?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page3[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_03",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li1[0].dtAbs[0]",
+      "newName": "most_recent_abuse_date",
+      "type": "text",
+      "label": "Date of abuse"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li2[0].YesNo5b_cb[0]",
+      "newName": "most_recent_abuse_witnesses_unknown",
+      "type": "checkbox",
+      "label": "I don’t know"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li2[0].YesNo5b_cb[1]",
+      "newName": "most_recent_abuse_witnesses_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li2[0].YesNo5b_cb[2]",
+      "newName": "most_recent_abuse_witnesses_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li2[0].item5a2[0]",
+      "newName": "most_recent_abuse_witness_names",
+      "type": "text",
+      "label": "Names of people who heard or saw what happened",
+      "conditional": {
+        "onlyWhen": "most_recent_abuse_witnesses_yes",
+        "gateQuestion": "Did anyone else hear or see what happened on this day?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li3[0].YesNo5c_cb[0]",
+      "newName": "most_recent_abuse_weapon_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li3[0].YesNo5c_cb[1]",
+      "newName": "most_recent_abuse_weapon_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li3[0].item5a3[0]",
+      "newName": "most_recent_abuse_weapon_description",
+      "type": "text",
+      "label": "Describe gun or weapon",
+      "conditional": {
+        "onlyWhen": "most_recent_abuse_weapon_yes",
+        "gateQuestion": "Did the person use or threaten to use a gun or other weapon?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li4[0].YesNo5d_cb[0]",
+      "newName": "most_recent_abuse_harm_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li4[0].YesNo5d_cb[1]",
+      "newName": "most_recent_abuse_harm_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li4[0].item26d_tf[0]",
+      "newName": "most_recent_abuse_harm_description",
+      "type": "text",
+      "label": "Describe emotional or physical harm",
+      "conditional": {
+        "onlyWhen": "most_recent_abuse_harm_yes",
+        "gateQuestion": "Did the person cause you any emotional or physical harm?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li5[0].YesNo5e_cb[0]",
+      "newName": "most_recent_abuse_police_unknown",
+      "type": "checkbox",
+      "label": "I don’t know"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li5[0].YesNo5e_cb[1]",
+      "newName": "most_recent_abuse_police_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li5[0].YesNo5e_cb[2]",
+      "newName": "most_recent_abuse_police_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li6[0].TextField[0]",
+      "newName": "most_recent_abuse_details",
+      "type": "text",
+      "label": "Details of abuse"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[0]",
+      "newName": "most_recent_abuse_frequency_once",
+      "type": "checkbox",
+      "label": "Just this once"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[1]",
+      "newName": "most_recent_abuse_frequency_two_to_five",
+      "type": "checkbox",
+      "label": "2–5 times"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[2]",
+      "newName": "most_recent_abuse_frequency_weekly",
+      "type": "checkbox",
+      "label": "Weekly"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].YesNo5g_cb[3]",
+      "newName": "most_recent_abuse_frequency_other",
+      "type": "checkbox",
+      "label": "Other"
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].TextField[0]",
+      "newName": "most_recent_abuse_frequency_other_description",
+      "type": "text",
+      "label": "Other frequency",
+      "conditional": {
+        "onlyWhen": "most_recent_abuse_frequency_other",
+        "gateQuestion": "How often has this abuse happened?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page3[0].List5[0].Li7[0].TextField7[0]",
+      "newName": "most_recent_abuse_other_dates",
+      "type": "text",
+      "label": "Dates or estimates of when it happened"
+    },
+    {
+      "id": "DV-100[0].Page4[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_04",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li1[0].dtabs[0]",
+      "newName": "different_abuse_incident_date",
+      "type": "text",
+      "label": "Date of abuse",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].li2[0].YesNo6b_cb[0]",
+      "newName": "different_abuse_incident_witnesses_unknown",
+      "type": "checkbox",
+      "label": "I don’t know",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].li2[0].YesNo6b_cb[1]",
+      "newName": "different_abuse_incident_witnesses_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].li2[0].YesNo6b_cb[2]",
+      "newName": "different_abuse_incident_witnesses_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].li2[0].item5b2[0]",
+      "newName": "different_abuse_incident_witness_names",
+      "type": "text",
+      "label": "Names of people who heard or saw what happened",
+      "conditional": {
+        "onlyWhen": "different_abuse_incident_witnesses_yes",
+        "gateQuestion": "Did anyone else hear or see what happened on this day?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li3[0].YesNo6c_cb[0]",
+      "newName": "different_abuse_incident_weapon_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li3[0].YesNo6c_cb[1]",
+      "newName": "different_abuse_incident_weapon_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li3[0].item5b3[0]",
+      "newName": "different_abuse_incident_weapon_description",
+      "type": "text",
+      "label": "Describe gun or weapon",
+      "conditional": {
+        "onlyWhen": "different_abuse_incident_weapon_yes",
+        "gateQuestion": "Did the person use or threaten to use a gun or other weapon?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li4[0].YesNo6d_cb[0]",
+      "newName": "different_abuse_incident_harm_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li4[0].YesNo6d_cb[1]",
+      "newName": "different_abuse_incident_harm_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li4[0].item26d_tf[0]",
+      "newName": "different_abuse_incident_harm_description",
+      "type": "text",
+      "label": "Describe emotional or physical harm",
+      "conditional": {
+        "onlyWhen": "different_abuse_incident_harm_yes",
+        "gateQuestion": "Did the person cause you any emotional or physical harm?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li5[0].YesNo6e_cb[0]",
+      "newName": "different_abuse_incident_police_unknown",
+      "type": "checkbox",
+      "label": "I don’t know",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li5[0].YesNo6e_cb[1]",
+      "newName": "different_abuse_incident_police_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li5[0].YesNo6e_cb[2]",
+      "newName": "different_abuse_incident_police_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li6[0].TextField[0]",
+      "newName": "different_abuse_incident_details",
+      "type": "text",
+      "label": "Details of abuse",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[0]",
+      "newName": "different_abuse_incident_frequency_once",
+      "type": "checkbox",
+      "label": "Just this once",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[1]",
+      "newName": "different_abuse_incident_frequency_two_to_five",
+      "type": "checkbox",
+      "label": "2–5 times",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[2]",
+      "newName": "different_abuse_incident_frequency_weekly",
+      "type": "checkbox",
+      "label": "Weekly",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[3]",
+      "newName": "different_abuse_incident_frequency_other",
+      "type": "checkbox",
+      "label": "Other",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].TextField[0]",
+      "newName": "different_abuse_incident_frequency_other_description",
+      "type": "text",
+      "label": "Other frequency",
+      "conditional": {
+        "onlyWhen": "different_abuse_incident_frequency_other",
+        "gateQuestion": "How often has this abuse happened?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].item26d_tf[0]",
+      "newName": "different_abuse_incident_other_dates",
+      "type": "text",
+      "label": "Dates or estimates of when it happened",
+      "conditional": {
+        "onlyWhen": "different_abuse_to_describe",
+        "gateQuestion": "Has the person abused you in a different way from the most recent abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_05",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li1[0].dtabs[0]",
+      "newName": "other_abuse_incident_date",
+      "type": "text",
+      "label": "Date of abuse",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li2[0].YesNo7b_cb[0]",
+      "newName": "other_abuse_incident_witnesses_unknown",
+      "type": "checkbox",
+      "label": "I don’t know",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li2[0].YesNo7b_cb[1]",
+      "newName": "other_abuse_incident_witnesses_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li2[0].YesNo7b_cb[2]",
+      "newName": "other_abuse_incident_witnesses_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li2[0].item5b2[0]",
+      "newName": "other_abuse_incident_witness_names",
+      "type": "text",
+      "label": "Names of people who heard or saw what happened",
+      "conditional": {
+        "onlyWhen": "other_abuse_incident_witnesses_yes",
+        "gateQuestion": "Did anyone else hear or see what happened on this day?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li3[0].YesNo7c_cb[0]",
+      "newName": "other_abuse_incident_weapon_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li3[0].YesNo7c_cb[1]",
+      "newName": "other_abuse_incident_weapon_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li3[0].item5b3[0]",
+      "newName": "other_abuse_incident_weapon_description",
+      "type": "text",
+      "label": "Describe gun or weapon",
+      "conditional": {
+        "onlyWhen": "other_abuse_incident_weapon_yes",
+        "gateQuestion": "Did the person use or threaten to use a gun or other weapon?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li4[0].YesNo7d_cb[0]",
+      "newName": "other_abuse_incident_harm_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li4[0].YesNo7d_cb[1]",
+      "newName": "other_abuse_incident_harm_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li4[0].item26d_tf[0]",
+      "newName": "other_abuse_incident_harm_description",
+      "type": "text",
+      "label": "Describe emotional or physical harm",
+      "conditional": {
+        "onlyWhen": "other_abuse_incident_harm_yes",
+        "gateQuestion": "Did the person cause you any emotional or physical harm?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li5[0].YesNo7e_cb[0]",
+      "newName": "other_abuse_incident_police_unknown",
+      "type": "checkbox",
+      "label": "I don’t know",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li5[0].YesNo7e_cb[1]",
+      "newName": "other_abuse_incident_police_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li5[0].YesNo7e_cb[2]",
+      "newName": "other_abuse_incident_police_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li6[0].TextField[0]",
+      "newName": "other_abuse_incident_details",
+      "type": "text",
+      "label": "Details of abuse",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[0]",
+      "newName": "other_abuse_incident_frequency_once",
+      "type": "checkbox",
+      "label": "Just this once",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[1]",
+      "newName": "other_abuse_incident_frequency_two_to_five",
+      "type": "checkbox",
+      "label": "2–5 times",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[2]",
+      "newName": "other_abuse_incident_frequency_weekly",
+      "type": "checkbox",
+      "label": "Weekly",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].YesNo7g_cb[3]",
+      "newName": "other_abuse_incident_frequency_other",
+      "type": "checkbox",
+      "label": "Other",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].TextField[0]",
+      "newName": "other_abuse_incident_frequency_other_description",
+      "type": "text",
+      "label": "Other frequency",
+      "conditional": {
+        "onlyWhen": "other_abuse_incident_frequency_other",
+        "gateQuestion": "How often has this abuse happened?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].Li7[0].item26d_tf[0]",
+      "newName": "other_abuse_incident_other_dates",
+      "type": "text",
+      "label": "Dates or estimates of when it happened",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page5[0].List7[0].MultilineCheckBox[0]",
+      "newName": "other_abuse_incident_additional_space_attached",
+      "type": "checkbox",
+      "label": "Additional description of abuse attached",
+      "conditional": {
+        "onlyWhen": "other_abuse_to_describe",
+        "gateQuestion": "Is there other abuse you want the judge to know about?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_06",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li1[0].YesNo8a1_cb[0]",
+      "newName": "other_protected_people_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].YesNo8a2_cb[0]",
+      "newName": "other_protected_people_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname1_tf[0]",
+      "newName": "other_protected_person_1_full_name",
+      "type": "text",
+      "label": "Full name",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age1_tf[0]",
+      "newName": "other_protected_person_1_age",
+      "type": "text",
+      "label": "Age",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation1_tf[0]",
+      "newName": "other_protected_person_1_relationship",
+      "type": "text",
+      "label": "Relationship to you",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b11_cb[0]",
+      "newName": "other_protected_person_1_lives_with_you_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b11_cb[1]",
+      "newName": "other_protected_person_1_lives_with_you_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname2_tf[0]",
+      "newName": "other_protected_person_2_full_name",
+      "type": "text",
+      "label": "Full name",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age2_tf[0]",
+      "newName": "other_protected_person_2_age",
+      "type": "text",
+      "label": "Age",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation2_tf[0]",
+      "newName": "other_protected_person_2_relationship",
+      "type": "text",
+      "label": "Relationship to you",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b12_cb[0]",
+      "newName": "other_protected_person_2_lives_with_you_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b12_cb[1]",
+      "newName": "other_protected_person_2_lives_with_you_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname3_tf[0]",
+      "newName": "other_protected_person_3_full_name",
+      "type": "text",
+      "label": "Full name",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age_tf[0]",
+      "newName": "other_protected_person_3_age",
+      "type": "text",
+      "label": "Age",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation3_tf[0]",
+      "newName": "other_protected_person_3_relationship",
+      "type": "text",
+      "label": "Relationship to you",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b13_cb[0]",
+      "newName": "other_protected_person_3_lives_with_you_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b13_cb[1]",
+      "newName": "other_protected_person_3_lives_with_you_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3fullname4_tf[0]",
+      "newName": "other_protected_person_4_full_name",
+      "type": "text",
+      "label": "Full name",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3age4_tf[0]",
+      "newName": "other_protected_person_4_age",
+      "type": "text",
+      "label": "Age",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].item3Relation4_tf[0]",
+      "newName": "other_protected_person_4_relationship",
+      "type": "text",
+      "label": "Relationship to you",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b14_cb[0]",
+      "newName": "other_protected_person_4_lives_with_you_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].YesNo8b14_cb[1]",
+      "newName": "other_protected_person_4_lives_with_you_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li1[0].MultilineCheckBox[0]",
+      "newName": "other_protected_people_additional_list_attached",
+      "type": "checkbox",
+      "label": "Additional protected people list attached",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List8[0].Li2[0].List[0].li2[0].TextField[0]",
+      "newName": "other_protected_people_reason_for_protection",
+      "type": "text",
+      "label": "Why these people need protection",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes",
+        "gateQuestion": "Do you want the restraining order to protect other people?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].Li1[0].YesNo9abc_cb[0]",
+      "newName": "person_to_restrain_firearms_unknown",
+      "type": "checkbox",
+      "label": "I don’t know"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].LI2[0].YesNo9abc_cb[0]",
+      "newName": "person_to_restrain_firearms_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].YesNo9abc_cb[0]",
+      "newName": "person_to_restrain_firearms_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li1[0].TextField1[0]",
+      "newName": "firearm_item_1_description",
+      "type": "text",
+      "label": "Describe firearms, firearm parts, or ammunition",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li1[0].TextField2[0]",
+      "newName": "firearm_item_1_number_or_amount",
+      "type": "text",
+      "label": "Number or Amount",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li1[0].TextField3[0]",
+      "newName": "firearm_item_1_location",
+      "type": "text",
+      "label": "Location, if known",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li2[0].TextField1[0]",
+      "newName": "firearm_item_2_description",
+      "type": "text",
+      "label": "Describe firearms, firearm parts, or ammunition",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li2[0].TextField2[0]",
+      "newName": "firearm_item_2_number_or_amount",
+      "type": "text",
+      "label": "Number or Amount",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li2[0].TextField3[0]",
+      "newName": "firearm_item_2_location",
+      "type": "text",
+      "label": "Location, if known",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li3[0].TextField1[0]",
+      "newName": "firearm_item_3_description",
+      "type": "text",
+      "label": "Describe firearms, firearm parts, or ammunition",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li3[0].TextField2[0]",
+      "newName": "firearm_item_3_number_or_amount",
+      "type": "text",
+      "label": "Number or Amount",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li3[0].TextField3[0]",
+      "newName": "firearm_item_3_location",
+      "type": "text",
+      "label": "Location, if known",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li4[0].TextField1[0]",
+      "newName": "firearm_item_4_description",
+      "type": "text",
+      "label": "Describe firearms, firearm parts, or ammunition",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li4[0].TextField2[0]",
+      "newName": "firearm_item_4_number_or_amount",
+      "type": "text",
+      "label": "Number or Amount",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li4[0].TextField3[0]",
+      "newName": "firearm_item_4_location",
+      "type": "text",
+      "label": "Location, if known",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li5[0].TextField1[0]",
+      "newName": "firearm_item_5_description",
+      "type": "text",
+      "label": "Describe firearms, firearm parts, or ammunition",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li5[0].TextField2[0]",
+      "newName": "firearm_item_5_number_or_amount",
+      "type": "text",
+      "label": "Number or Amount",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li5[0].TextField3[0]",
+      "newName": "firearm_item_5_location",
+      "type": "text",
+      "label": "Location, if known",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li6[0].TextField1[0]",
+      "newName": "firearm_item_6_description",
+      "type": "text",
+      "label": "Describe firearms, firearm parts, or ammunition",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li6[0].TextField2[0]",
+      "newName": "firearm_item_6_number_or_amount",
+      "type": "text",
+      "label": "Number or Amount",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page6[0].List9[0].li3[0].LIst[0].li6[0].TextField3[0]",
+      "newName": "firearm_item_6_location",
+      "type": "text",
+      "label": "Location, if known",
+      "conditional": {
+        "onlyWhen": "person_to_restrain_firearms_yes",
+        "gateQuestion": "Does the person you want protection from have firearms, firearm parts, or ammunition?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_07",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List10[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "order_not_to_abuse_requested",
+      "type": "checkbox",
+      "label": "Order to Not Abuse"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List11[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "no_contact_order_requested",
+      "type": "checkbox",
+      "label": "No-Contact Order"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].CheckBoxRightCaption[0]",
+      "newName": "stay_away_order_requested",
+      "type": "checkbox",
+      "label": "Stay-Away Order"
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox1[0]",
+      "newName": "stay_away_from_me",
+      "type": "checkbox",
+      "label": "Me",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox2[0]",
+      "newName": "stay_away_from_my_school",
+      "type": "checkbox",
+      "label": "My school",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox3[0]",
+      "newName": "stay_away_from_my_home",
+      "type": "checkbox",
+      "label": "My home",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox4[0]",
+      "newName": "stay_away_from_other_protected_people",
+      "type": "checkbox",
+      "label": "Each person in item 8",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox5[0]",
+      "newName": "stay_away_from_my_workplace",
+      "type": "checkbox",
+      "label": "My job or workplace",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox6[0]",
+      "newName": "stay_away_from_childrens_school_or_childcare",
+      "type": "checkbox",
+      "label": "My children’s school or childcare",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox7[0]",
+      "newName": "stay_away_from_my_vehicle",
+      "type": "checkbox",
+      "label": "My vehicle",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].CheckBox8[0]",
+      "newName": "stay_away_from_other_place",
+      "type": "checkbox",
+      "label": "Other",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].li1[0].TextField[0]",
+      "newName": "stay_away_other_place_description",
+      "type": "text",
+      "label": "Other place",
+      "conditional": {
+        "onlyWhen": "stay_away_from_other_place",
+        "gateQuestion": "Did you select another place for the Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li2[0].CheckBox12b1[0]",
+      "newName": "stay_away_distance_100_yards",
+      "type": "checkbox",
+      "label": "100 yards (300 feet)",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li2[0].CheckBox12b2[0]",
+      "newName": "stay_away_distance_other",
+      "type": "checkbox",
+      "label": "Other distance",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li2[0].FillText8Yards[0]",
+      "newName": "stay_away_distance_other_yards",
+      "type": "text",
+      "label": "Other distance in yards",
+      "conditional": {
+        "onlyWhen": "stay_away_distance_other",
+        "gateQuestion": "Do you want a distance other than 100 yards?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesNo12c_cb[0]",
+      "newName": "live_together_or_close_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesNo12c_cb[0]",
+      "newName": "live_together_or_close_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[0]",
+      "newName": "living_arrangement_live_together",
+      "type": "checkbox",
+      "label": "Live together",
+      "conditional": {
+        "onlyWhen": "live_together_or_close_yes",
+        "gateQuestion": "Do you and the person live together or live close to each other?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[1]",
+      "newName": "living_arrangement_same_building",
+      "type": "checkbox",
+      "label": "Live in the same building, but not in the same home",
+      "conditional": {
+        "onlyWhen": "live_together_or_close_yes",
+        "gateQuestion": "Do you and the person live together or live close to each other?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[2]",
+      "newName": "living_arrangement_same_neighborhood",
+      "type": "checkbox",
+      "label": "Live in the same neighborhood",
+      "conditional": {
+        "onlyWhen": "live_together_or_close_yes",
+        "gateQuestion": "Do you and the person live together or live close to each other?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].CheckBox12c[3]",
+      "newName": "living_arrangement_other",
+      "type": "checkbox",
+      "label": "Other",
+      "conditional": {
+        "onlyWhen": "live_together_or_close_yes",
+        "gateQuestion": "Do you and the person live together or live close to each other?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li3[0].YesSub[0].YesCheckBoxSub[0].TextField[0]",
+      "newName": "living_arrangement_other_description",
+      "type": "text",
+      "label": "Other living arrangement",
+      "conditional": {
+        "onlyWhen": "living_arrangement_other",
+        "gateQuestion": "Did you select another living arrangement?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].YesNo12d_cb[0]",
+      "newName": "same_workplace_or_school_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].YesNo12d_cb[1]",
+      "newName": "same_workplace_or_school_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested",
+        "gateQuestion": "Do you want a Stay-Away Order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].CheckBox1[0]",
+      "newName": "same_workplace_selected",
+      "type": "checkbox",
+      "label": "Work together",
+      "conditional": {
+        "onlyWhen": "same_workplace_or_school_yes",
+        "gateQuestion": "Do you and the person have the same workplace or go to the same school?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].TextField1[0]",
+      "newName": "same_workplace_company_name",
+      "type": "text",
+      "label": "Name of company",
+      "conditional": {
+        "onlyWhen": "same_workplace_selected",
+        "gateQuestion": "Do you work together?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].CheckBox2[0]",
+      "newName": "same_school_selected",
+      "type": "checkbox",
+      "label": "Go to the same school",
+      "conditional": {
+        "onlyWhen": "same_workplace_or_school_yes",
+        "gateQuestion": "Do you and the person have the same workplace or go to the same school?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].TextField2[0]",
+      "newName": "same_school_name",
+      "type": "text",
+      "label": "Name of school",
+      "conditional": {
+        "onlyWhen": "same_school_selected",
+        "gateQuestion": "Do you go to the same school?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].CheckBox3[0]",
+      "newName": "same_workplace_or_school_other",
+      "type": "checkbox",
+      "label": "Other",
+      "conditional": {
+        "onlyWhen": "same_workplace_or_school_yes",
+        "gateQuestion": "Do you and the person have the same workplace or go to the same school?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page7[0].List12[0].Li4[0].TextField4[0]",
+      "newName": "same_workplace_or_school_other_description",
+      "type": "text",
+      "label": "Other explanation",
+      "conditional": {
+        "onlyWhen": "same_workplace_or_school_other",
+        "gateQuestion": "Did you select another shared workplace or school situation?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_08",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].CheckBoxRightCaption[0]",
+      "newName": "move_out_order_requested",
+      "type": "checkbox",
+      "label": "Order to Move Out"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li1[0].TextField[0]",
+      "newName": "move_out_home_address",
+      "type": "text",
+      "label": "Home address",
+      "conditional": {
+        "onlyWhen": "move_out_order_requested",
+        "gateQuestion": "Do you want the person to move out?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox1[0]",
+      "newName": "move_out_right_to_live_owner",
+      "type": "checkbox",
+      "label": "I own the home",
+      "conditional": {
+        "onlyWhen": "move_out_order_requested",
+        "gateQuestion": "Do you want the person to move out?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox2[0]",
+      "newName": "move_out_right_to_live_length_of_residence",
+      "type": "checkbox",
+      "label": "I have lived at this address for",
+      "conditional": {
+        "onlyWhen": "move_out_order_requested",
+        "gateQuestion": "Do you want the person to move out?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].FillText9years[0]",
+      "newName": "move_out_years_at_address",
+      "type": "text",
+      "label": "Years",
+      "conditional": {
+        "onlyWhen": "move_out_right_to_live_length_of_residence",
+        "gateQuestion": "Is length of residence a reason you have a right to live there?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].FillText9months[0]",
+      "newName": "move_out_months_at_address",
+      "type": "text",
+      "label": "Months",
+      "conditional": {
+        "onlyWhen": "move_out_right_to_live_length_of_residence",
+        "gateQuestion": "Is length of residence a reason you have a right to live there?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox3[0]",
+      "newName": "move_out_right_to_live_on_lease",
+      "type": "checkbox",
+      "label": "My name is on the lease",
+      "conditional": {
+        "onlyWhen": "move_out_order_requested",
+        "gateQuestion": "Do you want the person to move out?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox4[0]",
+      "newName": "move_out_right_to_live_pay_rent_or_mortgage",
+      "type": "checkbox",
+      "label": "I pay some or all of the rent or mortgage",
+      "conditional": {
+        "onlyWhen": "move_out_order_requested",
+        "gateQuestion": "Do you want the person to move out?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox5[0]",
+      "newName": "move_out_right_to_live_with_children",
+      "type": "checkbox",
+      "label": "I live at this address with my child or children",
+      "conditional": {
+        "onlyWhen": "move_out_order_requested",
+        "gateQuestion": "Do you want the person to move out?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].CheckBox6[0]",
+      "newName": "move_out_right_to_live_other",
+      "type": "checkbox",
+      "label": "Other",
+      "conditional": {
+        "onlyWhen": "move_out_order_requested",
+        "gateQuestion": "Do you want the person to move out?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].TextField2[0]",
+      "newName": "move_out_right_to_live_other_explanation_line_1",
+      "type": "text",
+      "label": "Other explanation",
+      "conditional": {
+        "onlyWhen": "move_out_right_to_live_other",
+        "gateQuestion": "Is there another reason you have a right to live there?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].List13[0].Li2[0].TextField1[0]",
+      "newName": "move_out_right_to_live_other_explanation_line_2",
+      "type": "text",
+      "label": "Other explanation, continued",
+      "conditional": {
+        "onlyWhen": "move_out_right_to_live_other",
+        "gateQuestion": "Is there another reason you have a right to live there?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].List14[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "other_orders_requested",
+      "type": "checkbox",
+      "label": "Other Orders"
+    },
+    {
+      "id": "DV-100[0].Page8[0].List14[0].Li1[0].item26d_tf[0]",
+      "newName": "other_orders_description",
+      "type": "text",
+      "label": "Describe additional orders",
+      "conditional": {
+        "onlyWhen": "other_orders_requested",
+        "gateQuestion": "Do you want any other orders?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page8[0].LIST15[0].CtyChildFreed_cb[0]",
+      "newName": "child_custody_and_visitation_order_requested",
+      "type": "checkbox",
+      "label": "Child Custody and Visitation",
+      "conditional": {
+        "onlyWhen": "has_child_with_person_to_restrain",
+        "gateQuestion": "Do you have a child with the person you want protection from?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_09",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].CheckBoxRightCaption[0]",
+      "newName": "protect_animals_order_requested",
+      "type": "checkbox",
+      "label": "Protect Animals"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField1[0]",
+      "newName": "protected_animal_1_name_or_id",
+      "type": "text",
+      "label": "Name or other way to identify animal",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField2[0]",
+      "newName": "protected_animal_1_type",
+      "type": "text",
+      "label": "Type of animal",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField3[0]",
+      "newName": "protected_animal_1_breed",
+      "type": "text",
+      "label": "Breed, if known",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField4[0]",
+      "newName": "protected_animal_1_color",
+      "type": "text",
+      "label": "Color",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField[0]",
+      "newName": "protected_animal_2_name_or_id",
+      "type": "text",
+      "label": "Name or other way to identify animal",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField1[0]",
+      "newName": "protected_animal_2_type",
+      "type": "text",
+      "label": "Type of animal",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField2[0]",
+      "newName": "protected_animal_2_breed",
+      "type": "text",
+      "label": "Breed, if known",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li2[0].TextField3[0]",
+      "newName": "protected_animal_2_color",
+      "type": "text",
+      "label": "Color",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField[0]",
+      "newName": "protected_animal_3_name_or_id",
+      "type": "text",
+      "label": "Name or other way to identify animal",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField1[0]",
+      "newName": "protected_animal_3_type",
+      "type": "text",
+      "label": "Type of animal",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField2[0]",
+      "newName": "protected_animal_3_breed",
+      "type": "text",
+      "label": "Breed, if known",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li3[0].TextField3[0]",
+      "newName": "protected_animal_3_color",
+      "type": "text",
+      "label": "Color",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField[0]",
+      "newName": "protected_animal_4_name_or_id",
+      "type": "text",
+      "label": "Name or other way to identify animal",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField1[0]",
+      "newName": "protected_animal_4_type",
+      "type": "text",
+      "label": "Type of animal",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField2[0]",
+      "newName": "protected_animal_4_breed",
+      "type": "text",
+      "label": "Breed, if known",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li4[0].TextField3[0]",
+      "newName": "protected_animal_4_color",
+      "type": "text",
+      "label": "Color",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "animal_order_stay_away_requested",
+      "type": "checkbox",
+      "label": "Stay away from the animals",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].YesNo16b1_cb[0]",
+      "newName": "animal_stay_away_distance_100_yards",
+      "type": "checkbox",
+      "label": "100 yards (300 feet)",
+      "conditional": {
+        "onlyWhen": "animal_order_stay_away_requested",
+        "gateQuestion": "Do you want the person to stay away from the animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].YesNo16b1_cb[1]",
+      "newName": "animal_stay_away_distance_other",
+      "type": "checkbox",
+      "label": "Other distance",
+      "conditional": {
+        "onlyWhen": "animal_order_stay_away_requested",
+        "gateQuestion": "Do you want the person to stay away from the animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li1[0].TextField[0]",
+      "newName": "animal_stay_away_distance_other_yards",
+      "type": "text",
+      "label": "Other number of yards",
+      "conditional": {
+        "onlyWhen": "animal_stay_away_distance_other",
+        "gateQuestion": "Do you want a distance other than 100 yards from the animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li2[0].MultilineCheckBox[0]",
+      "newName": "animal_order_no_harm_or_transfer",
+      "type": "checkbox",
+      "label": "Do not take, sell, hide, molest, attack, strike, threaten, harm, get rid of, transfer, or borrow against the animals",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption1[0]",
+      "newName": "animal_order_sole_possession_requested",
+      "type": "checkbox",
+      "label": "Give me sole possession, care, and control of the animals",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested",
+        "gateQuestion": "Do you want the court to protect animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption2[0]",
+      "newName": "animal_sole_possession_reason_person_abuses_animals",
+      "type": "checkbox",
+      "label": "Person in item 2 abuses the animals",
+      "conditional": {
+        "onlyWhen": "animal_order_sole_possession_requested",
+        "gateQuestion": "Do you want sole possession, care, and control of the animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption3[0]",
+      "newName": "animal_sole_possession_reason_i_care_for_animals",
+      "type": "checkbox",
+      "label": "I take care of these animals",
+      "conditional": {
+        "onlyWhen": "animal_order_sole_possession_requested",
+        "gateQuestion": "Do you want sole possession, care, and control of the animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption4[0]",
+      "newName": "animal_sole_possession_reason_i_purchased_animals",
+      "type": "checkbox",
+      "label": "I purchased these animals",
+      "conditional": {
+        "onlyWhen": "animal_order_sole_possession_requested",
+        "gateQuestion": "Do you want sole possession, care, and control of the animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption5[0]",
+      "newName": "animal_sole_possession_reason_other",
+      "type": "checkbox",
+      "label": "Other",
+      "conditional": {
+        "onlyWhen": "animal_order_sole_possession_requested",
+        "gateQuestion": "Do you want sole possession, care, and control of the animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].TextField2[0]",
+      "newName": "animal_sole_possession_other_reason_line_1",
+      "type": "text",
+      "label": "Other reason",
+      "conditional": {
+        "onlyWhen": "animal_sole_possession_reason_other",
+        "gateQuestion": "Is there another reason for sole possession of the animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List16[0].Li2[0].List[0].Li3[0].TextField1[0]",
+      "newName": "animal_sole_possession_other_reason_line_2",
+      "type": "text",
+      "label": "Other reason, continued",
+      "conditional": {
+        "onlyWhen": "animal_sole_possession_reason_other",
+        "gateQuestion": "Is there another reason for sole possession of the animals?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List17[0].CtyChildFreed_cb[0]",
+      "newName": "control_of_property_order_requested",
+      "type": "checkbox",
+      "label": "Control of Property"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List17[0].Li1[0].item26d_tf[0]",
+      "newName": "control_of_property_description",
+      "type": "text",
+      "label": "Property to be controlled",
+      "conditional": {
+        "onlyWhen": "control_of_property_order_requested",
+        "gateQuestion": "Do you want temporary use, possession, and control of property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List17[0].Li2[0].item26d_tf[0]",
+      "newName": "control_of_property_reason",
+      "type": "text",
+      "label": "Why you want control of the property",
+      "conditional": {
+        "onlyWhen": "control_of_property_order_requested",
+        "gateQuestion": "Do you want temporary use, possession, and control of property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page9[0].List18[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "health_and_other_insurance_order_requested",
+      "type": "checkbox",
+      "label": "Health and Other Insurance"
+    },
+    {
+      "id": "DV-100[0].Page9[0].List19[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "record_communications_order_requested",
+      "type": "checkbox",
+      "label": "Record Communications"
+    },
+    {
+      "id": "DV-100[0].Page10[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_10",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List20[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "property_restraint_order_requested",
+      "type": "checkbox",
+      "label": "Property Restraint",
+      "conditional": {
+        "onlyWhen": "married_or_registered_domestic_partners",
+        "gateQuestion": "Are you married or registered domestic partners with the person you want protection from?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List21[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "extend_service_deadline_requested",
+      "type": "checkbox",
+      "label": "Extend my deadline to give notice"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List21[0].Li1[0].item26d_tf[0]",
+      "newName": "extend_service_deadline_reason",
+      "type": "text",
+      "label": "Why you need more time to serve the person",
+      "conditional": {
+        "onlyWhen": "extend_service_deadline_requested",
+        "gateQuestion": "Do you want more time to give notice to the person?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].CheckBoxRightCaption[0]",
+      "newName": "pay_property_debts_order_requested",
+      "type": "checkbox",
+      "label": "Pay Debts (Bills) Owed for Property"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].TextField[0]",
+      "newName": "property_debt_1_pay_to",
+      "type": "text",
+      "label": "Pay to",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].TextField2[0]",
+      "newName": "property_debt_1_for",
+      "type": "text",
+      "label": "For",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].TextField3[0]",
+      "newName": "property_debt_1_amount",
+      "type": "text",
+      "label": "Amount",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li1[0].DateField1[0]",
+      "newName": "property_debt_1_due_date",
+      "type": "text",
+      "label": "Due date",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].TextField[0]",
+      "newName": "property_debt_2_pay_to",
+      "type": "text",
+      "label": "Pay to",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].TextField1[0]",
+      "newName": "property_debt_2_for",
+      "type": "text",
+      "label": "For",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].TextField3[0]",
+      "newName": "property_debt_2_amount",
+      "type": "text",
+      "label": "Amount",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li2[0].DateField2[0]",
+      "newName": "property_debt_2_due_date",
+      "type": "text",
+      "label": "Due date",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].TextField[0]",
+      "newName": "property_debt_3_pay_to",
+      "type": "text",
+      "label": "Pay to",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].TextField1[0]",
+      "newName": "property_debt_3_for",
+      "type": "text",
+      "label": "For",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].TextField3[0]",
+      "newName": "property_debt_3_amount",
+      "type": "text",
+      "label": "Amount",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].List[0].Li3[0].DateField3[0]",
+      "newName": "property_debt_3_due_date",
+      "type": "text",
+      "label": "Due date",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li1[0].item26d_tf[0]",
+      "newName": "property_debts_payment_reason",
+      "type": "text",
+      "label": "Why you want the person to pay these debts",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].checkbox22b[0]",
+      "newName": "property_debt_special_finding_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].checkbox22b[1]",
+      "newName": "property_debt_special_finding_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested",
+        "gateQuestion": "Do you want the person to pay debts owed for property?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption1[0]",
+      "newName": "property_debt_special_finding_debt_1",
+      "type": "checkbox",
+      "label": "Debt a(1)",
+      "conditional": {
+        "onlyWhen": "property_debt_special_finding_yes",
+        "gateQuestion": "Do you want the judge to make a special finding about debts caused by abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption2[0]",
+      "newName": "property_debt_special_finding_debt_2",
+      "type": "checkbox",
+      "label": "Debt a(2)",
+      "conditional": {
+        "onlyWhen": "property_debt_special_finding_yes",
+        "gateQuestion": "Do you want the judge to make a special finding about debts caused by abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption3[0]",
+      "newName": "property_debt_special_finding_debt_3",
+      "type": "checkbox",
+      "label": "Debt a(3)",
+      "conditional": {
+        "onlyWhen": "property_debt_special_finding_yes",
+        "gateQuestion": "Do you want the judge to make a special finding about debts caused by abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li2[0].YesNo22b2_cb[0]",
+      "newName": "property_debt_how_made_known_no",
+      "type": "checkbox",
+      "label": "No",
+      "conditional": {
+        "onlyWhen": "property_debt_special_finding_yes",
+        "gateQuestion": "Do you want the judge to make a special finding about debts caused by abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li2[0].YesNo22b2_cb[1]",
+      "newName": "property_debt_how_made_known_yes",
+      "type": "checkbox",
+      "label": "Yes",
+      "conditional": {
+        "onlyWhen": "property_debt_special_finding_yes",
+        "gateQuestion": "Do you want the judge to make a special finding about debts caused by abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li2[0].item26d_tf[0]",
+      "newName": "property_debt_how_made_explanation",
+      "type": "text",
+      "label": "Explain how the person made the debt or debts",
+      "conditional": {
+        "onlyWhen": "property_debt_how_made_known_yes",
+        "gateQuestion": "Do you know how the person made the debt or debts?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_11",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "pay_expenses_caused_by_abuse_order_requested",
+      "type": "checkbox",
+      "label": "Pay Expenses Caused by the Abuse"
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T47[0]",
+      "newName": "abuse_expense_1_pay_to",
+      "type": "text",
+      "label": "Pay to",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T50[0]",
+      "newName": "abuse_expense_1_for",
+      "type": "text",
+      "label": "For",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T53[0]",
+      "newName": "abuse_expense_1_amount",
+      "type": "text",
+      "label": "Amount",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T56[0]",
+      "newName": "abuse_expense_2_pay_to",
+      "type": "text",
+      "label": "Pay to",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T59[0]",
+      "newName": "abuse_expense_2_for",
+      "type": "text",
+      "label": "For",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T62[0]",
+      "newName": "abuse_expense_2_amount",
+      "type": "text",
+      "label": "Amount",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T63[0]",
+      "newName": "abuse_expense_3_pay_to",
+      "type": "text",
+      "label": "Pay to",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T66[0]",
+      "newName": "abuse_expense_3_for",
+      "type": "text",
+      "label": "For",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T67[0]",
+      "newName": "abuse_expense_3_amount",
+      "type": "text",
+      "label": "Amount",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T68[0]",
+      "newName": "abuse_expense_4_pay_to",
+      "type": "text",
+      "label": "Pay to",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T69[0]",
+      "newName": "abuse_expense_4_for",
+      "type": "text",
+      "label": "For",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List23[0].Li1[0].T70[0]",
+      "newName": "abuse_expense_4_amount",
+      "type": "text",
+      "label": "Amount",
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested",
+        "gateQuestion": "Do you want the person to pay expenses caused by the abuse?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List24[0].CheckBoxRightCaption[0]",
+      "newName": "child_support_order_requested",
+      "type": "checkbox",
+      "label": "Child Support",
+      "conditional": {
+        "onlyWhen": "has_minor_child_with_person_to_restrain",
+        "gateQuestion": "Do you have a minor child with the person you want protection from?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List24[0].Li1[0].CheckBox3[0]",
+      "newName": "child_support_no_existing_order_want_one",
+      "type": "checkbox",
+      "label": "I do not have a child support order and I want one",
+      "conditional": {
+        "onlyWhen": "child_support_order_requested",
+        "gateQuestion": "Do you want a child support order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List24[0].Li2[0].CheckBox3[0]",
+      "newName": "child_support_existing_order_want_changed",
+      "type": "checkbox",
+      "label": "I have a child support order and I want it changed",
+      "conditional": {
+        "onlyWhen": "child_support_order_requested",
+        "gateQuestion": "Do you want a child support order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List24[0].Li3[0].CheckBox3[0]",
+      "newName": "child_support_receive_or_applied_tanf_welfare_calworks",
+      "type": "checkbox",
+      "label": "I now receive or have applied for TANF, Welfare, or CalWORKS",
+      "conditional": {
+        "onlyWhen": "child_support_order_requested",
+        "gateQuestion": "Do you want a child support order?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List25[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "spousal_support_order_requested",
+      "type": "checkbox",
+      "label": "Spousal Support",
+      "conditional": {
+        "onlyWhen": "married_or_registered_domestic_partners",
+        "gateQuestion": "Are you married or registered domestic partners with the person you want protection from?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page11[0].List26[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "lawyers_fees_and_costs_order_requested",
+      "type": "checkbox",
+      "label": "Lawyer’s Fees and Costs"
+    },
+    {
+      "id": "DV-100[0].Page12[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_12",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List27[0].Li1[0].CtyChildFreed_cb[0]",
+      "newName": "batterer_intervention_program_order_requested",
+      "type": "checkbox",
+      "label": "Batterer Intervention Program"
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].AGHagueCert_cb[0]",
+      "newName": "wireless_phone_account_transfer_order_requested",
+      "type": "checkbox",
+      "label": "Transfer of Wireless Phone Account",
+      "conditional": {
+        "onlyWhen": "wireless_account_belongs_to_person_to_restrain",
+        "gateQuestion": "Does the wireless phone account belong to the person you want protection from?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li1[0].item28aMyNoa_cb[0]",
+      "newName": "wireless_transfer_phone_1_is_my_number",
+      "type": "checkbox",
+      "label": "My number",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li1[0].item28aMyNoa_cb[1]",
+      "newName": "wireless_transfer_phone_1_is_child_number",
+      "type": "checkbox",
+      "label": "Number of child in my care",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li1[0].Telephone2_ft[0]",
+      "newName": "wireless_transfer_phone_1_number",
+      "type": "text",
+      "label": "Phone number including area code",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li2[0].item28bMyNob_cb[0]",
+      "newName": "wireless_transfer_phone_2_is_my_number",
+      "type": "checkbox",
+      "label": "My number",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li2[0].item28bMyNob_cb[1]",
+      "newName": "wireless_transfer_phone_2_is_child_number",
+      "type": "checkbox",
+      "label": "Number of child in my care",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li2[0].Telephone3_ft[0]",
+      "newName": "wireless_transfer_phone_2_number",
+      "type": "text",
+      "label": "Phone number including area code",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li3[0].item28aMyNoc_cb[0]",
+      "newName": "wireless_transfer_phone_3_is_my_number",
+      "type": "checkbox",
+      "label": "My number",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li3[0].item28aMyNoc_cb[1]",
+      "newName": "wireless_transfer_phone_3_is_child_number",
+      "type": "checkbox",
+      "label": "Number of child in my care",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li3[0].Telephone2_ft[0]",
+      "newName": "wireless_transfer_phone_3_number",
+      "type": "text",
+      "label": "Phone number including area code",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li4[0].item28bMyNod_cb[0]",
+      "newName": "wireless_transfer_phone_4_is_my_number",
+      "type": "checkbox",
+      "label": "My number",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li4[0].item28bMyNod_cb[1]",
+      "newName": "wireless_transfer_phone_4_is_child_number",
+      "type": "checkbox",
+      "label": "Number of child in my care",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page12[0].List28[0].Li4[0].Telephone3_ft[0]",
+      "newName": "wireless_transfer_phone_4_number",
+      "type": "text",
+      "label": "Phone number including area code",
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested",
+        "gateQuestion": "Do you want to transfer a wireless phone account?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page13[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number_page_13",
+      "type": "text",
+      "label": "Case Number"
+    },
+    {
+      "id": "DV-100[0].Page13[0].List32[0].Li1[0].T97[0]",
+      "newName": "additional_pages_count",
+      "type": "text",
+      "label": "Number of extra pages attached",
+      "conditional": {
+        "onlyWhen": "has_additional_pages",
+        "gateQuestion": "Did you attach additional paper or forms?"
+      }
+    },
+    {
+      "id": "DV-100[0].Page13[0].List33[0].Li1[0].SigDate[0]",
+      "newName": "person_asking_protection_signature_date",
       "type": "text",
       "label": "Date"
     },
     {
-      "id": "FillText13",
-      "newName": "other_role_specify",
+      "id": "DV-100[0].Page13[0].List33[0].Li1[0].YourName_tf[0]",
+      "newName": "person_asking_protection_signature_printed_name",
       "type": "text",
-      "label": "Other (Specify)"
+      "label": "Type or print your name"
     },
     {
-      "id": "NoticeFooter1",
-      "newName": "form_footer",
+      "id": "DV-100[0].Page13[0].List34[0].Li1[0].SigDate[0]",
+      "newName": "lawyer_signature_date",
       "type": "text",
-      "label": "Form Footer"
+      "label": "Date",
+      "conditional": {
+        "onlyWhen": "has_lawyer",
+        "gateQuestion": "Do you have a lawyer?"
+      }
     },
     {
-      "id": "CheckBox61",
-      "newName": "attorney_for",
-      "type": "checkbox",
-      "label": "Attorney for"
-    },
-    {
-      "id": "CheckBox6",
-      "newName": "role_plaintiff",
-      "type": "checkbox",
-      "label": "Plaintiff"
-    },
-    {
-      "id": "CheckBx6",
-      "newName": "role_petitioner",
-      "type": "checkbox",
-      "label": "Petitioner"
-    },
-    {
-      "id": "ChckBox6",
-      "newName": "role_defendant",
-      "type": "checkbox",
-      "label": "Defendant"
-    },
-    {
-      "id": "Chck6",
-      "newName": "role_respondent",
-      "type": "checkbox",
-      "label": "Respondent"
-    },
-    {
-      "id": "Ck6",
-      "newName": "role_other",
-      "type": "checkbox",
-      "label": "Other"
+      "id": "DV-100[0].Page13[0].List34[0].Li1[0].T14[0]",
+      "newName": "lawyer_signature_printed_name",
+      "type": "text",
+      "label": "Lawyer’s name",
+      "conditional": {
+        "onlyWhen": "has_lawyer",
+        "gateQuestion": "Do you have a lawyer?"
+      }
     }
   ]
 }

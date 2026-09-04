@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>__FORM_TITLE__</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/Forms/CSS/generate.css">
+    <link rel="stylesheet" href="/Forms/CSS/generate2.css">
+    <script src="/CountyLookup/zipData.js"></script>
+    <script src="/CountyLookup/courtData.js"></script>
+    <script src="/CountyLookup/courtLookup.js"></script>
+    <style>
+        .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }
+        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 737px; width: 100%; }
+        .question-container .question-text { margin-top: 0; }
+        .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 737px; }
+        .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }
+        .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }
+        .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }
+        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; pointer-events: auto !important; }
+        .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }
+        .question-step-hidden { display: none !important; }
+        #box { padding-top: 100px; margin: 50px; }
+        @media (max-width: 600px) {
+            body { padding: 0 !important; }
+            #box { margin: 12px !important; max-width: none !important; }
+            .question-container { margin: 6px auto !important; padding: 20px 18px !important; }
+            .question-nav { margin: 40px auto 0 !important; }
+        }
+        .address-field { margin: 4px auto; }
+        .address-input { width: 80%; max-width: 400px; padding: 12px 16px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; height: 44px; line-height: 20px; }
+        .address-input:focus, .address-select:focus, .address-select-main:focus, .address-select-trigger:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+        .address-input::placeholder { color: #6c757d; opacity: 1; }
+        .address-select { width: 93%; max-width: 465px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
+        .address-select-main { width: 160px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; padding: 12px 24px 12px 8px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
+        .address-select-trigger { width: 160px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 2px center; background-size: 12px; padding: 0; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
+        .address-field:first-child { margin-top: 2px; }
+        .address-field:last-child { margin-bottom: 2px; }
+        .hidden { display: none !important; }
+        .file-upload-container { margin: 20px 0; }
+        .file-upload-dropzone { border: 2px dashed #2f7bff; border-radius: 12px; padding: 40px 20px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease; }
+        .file-upload-dropzone:hover { background-color: #e9ecef; border-color: #0d4ed8; }
+        .file-upload-dropzone.file-upload-dragover { background-color: #e3f2fd; border-color: #0d4ed8; border-style: solid; }
+        .file-upload-content { pointer-events: none; }
+        .file-upload-text { margin: 8px 0; color: #2c3e50; font-size: 16px; font-weight: 500; }
+        .file-upload-link { color: #2f7bff; text-decoration: underline; cursor: pointer; pointer-events: auto; }
+        .file-upload-link:hover { color: #0d4ed8; }
+        .file-upload-hint { margin: 4px 0 0 0; color: #6c757d; font-size: 14px; }
+        .file-upload-preview { margin-top: 20px; border: 1px solid #dee2e6; border-radius: 8px; background-color: #ffffff; padding: 16px; }
+        .file-upload-preview-body { margin-bottom: 12px; }
+        .file-upload-cancel { background: #dc3545; color: white; border: none; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s ease; }
+        .file-upload-cancel:hover { background: #c82333; }
+        .file-upload-add { background: #28a745; color: white; border: none; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s ease; }
+        .file-upload-add:hover { background: #218838; }
+        .file-upload-item { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #dee2e6; }
+        .file-upload-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .file-upload-item-header { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 10px; width: auto; max-width: 100%; }
+        .file-upload-item-title { font-weight: 600; color: #2c3e50; font-size: 14px; flex-shrink: 0; white-space: nowrap; }
+        .file-upload-item-remove { background: #dc3545; color: white; border: none; border-radius: 4px; padding: 4px 12px; cursor: pointer; font-size: 12px; font-weight: 500; transition: background 0.2s ease; flex-shrink: 0; }
+        .file-upload-item-remove:hover { background: #c82333; }
+        .file-upload-preview-body img { max-width: 100%; max-height: 400px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .file-upload-preview-body iframe { width: 100%; height: 500px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .signin-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 10000; display: none; align-items: center; justify-content: center; }
+        .signin-modal { background-color: #ffffff; border-radius: 12px; padding: 32px; max-width: 500px; width: 90%; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); text-align: center; position: relative; }
+        .signin-modal h2 { margin: 0 0 16px 0; color: #2c3e50; font-size: 24px; font-weight: 700; }
+        .signin-modal p { margin: 0 0 24px 0; color: #5a6c7d; font-size: 16px; line-height: 1.5; }
+        .signin-modal-button { background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; border: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(47, 123, 255, 0.3); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .signin-modal-button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(47, 123, 255, 0.4); }
+        .signin-modal-button:active { transform: translateY(0); }
+        
+        /* ===== HEADER AND FOOTER CSS ===== */
+        /* Header Base Styles */
+        header {
+            background-color: #2c3e50;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        header img {
+            cursor: pointer;
+        }
+        
+        /* Desktop Navigation Base Styles */
+        nav.desktop-nav {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 38px;
+            z-index: 2;
+        }
+        nav.desktop-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9em;
+            letter-spacing: 0.02em;
+            padding: 2px 8px;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s, font-size 0.2s ease, letter-spacing 0.2s ease;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+        }
+        nav.desktop-nav a:hover {
+            color: #ff7043;
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+        }
+        
+        /* Navigation Chevron (SVG Icons) */
+        .nav-chevron {
+            display: inline-block;
+            margin-left: 6px;
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+        }
+        .nav-chevron svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Header Actions (Sign In Button and Cart) */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-left: auto;
+        }
+        .sign-in-btn {
+            background: #fff;
+            color: #222;
+            font-weight: 700;
+            font-size: 1.08em;
+            border: none;
+            border-radius: 22px;
+            padding: 8px 28px;
+            margin-left: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            outline: none;
+        }
+        .sign-in-btn:hover {
+            background: #f4f4f4;
+            color: #2980b9;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        }
+        
+        /* Cart Icon Styles */
+        #cart-icon-link .cart-circle {
+            width: 54px !important;
+            height: 54px !important;
+            background: #2980b9;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        #cart-icon {
+            width: 32px !important;
+            height: 32px !important;
+            display: block;
+        }
+        
+        /* Desktop Dropdown Menu */
+        .nav-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 38px;
+            background: #fff;
+            min-width: 210px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+            border-radius: 10px;
+            z-index: 10;
+            padding: 12px 0;
+            flex-direction: column;
+            gap: 0;
+        }
+        .dropdown-menu a {
+            color: #222;
+            padding: 12px 28px;
+            text-decoration: none;
+            display: block;
+            font-weight: 600;
+            font-size: 1.08em;
+            border-radius: 0;
+            transition: background 0.18s, color 0.18s;
+        }
+        .dropdown-menu a:hover {
+            background: #eaf1f8;
+            color: #2980b9;
+        }
+        .nav-dropdown-wrapper.open .dropdown-menu {
+            display: flex;
+            animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .forms-chevron {
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+        }
+        .nav-dropdown-wrapper.open .forms-chevron {
+            transform: rotate(-90deg);
+        }
+        
+        /* Desktop Navigation Visibility */
+        .desktop-nav {
+            display: flex;
+        }
+        
+        /* Mobile Menu Toggle (Hamburger Button) */
+        .mobile-menu-toggle {
+            display: none !important;
+            flex-direction: column !important;
+            justify-content: space-around !important;
+            width: 30px !important;
+            height: 30px !important;
+            background: transparent !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            z-index: 1001 !important;
+            position: absolute !important;
+            left: 15px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+        }
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            transform-origin: 1px;
+        }
+        .mobile-menu-toggle.active span:first-child {
+            transform: rotate(45deg);
+        }
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .mobile-menu-toggle.active span:last-child {
+            transform: rotate(-45deg);
+        }
+        
+        /* Mobile Navigation Menu */
+        .mobile-nav {
+            display: none !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: -100% !important;
+            width: 85% !important;
+            max-width: 300px !important;
+            height: 100vh !important;
+            background: #2c3e50 !important;
+            flex-direction: column !important;
+            gap: 0 !important;
+            padding: 140px 20px 20px 20px !important;
+            transition: left 0.3s ease !important;
+            z-index: 1000 !important;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3) !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            transform: none !important;
+            margin: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            right: auto !important;
+        }
+        .mobile-nav.active {
+            left: 0 !important;
+            display: flex !important;
+            right: auto !important;
+            transform: none !important;
+            margin-left: 0 !important;
+            position: fixed !important;
+        }
+        
+        /* Main Navigation Links (Home, About Us, Contact Us, FAQ) */
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 0 12px 25px;
+            border-bottom: 1px solid #34495e;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            margin-top: 0;
+        }
+        
+        /* Navigation Section Container */
+        .mobile-nav-section {
+            border-bottom: 1px solid #34495e;
+        }
+        
+        /* Dropdown Toggle (Forms with ▼) */
+        .mobile-nav-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            padding: 15px 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .mobile-nav-toggle span {
+            transition: transform 0.3s ease;
+        }
+        .mobile-nav-toggle.active span {
+            transform: rotate(180deg);
+        }
+        
+        /* Submenu Container (My Forms, Free Form, etc.) */
+        .mobile-nav-submenu {
+            display: none;
+            padding-left: 20px;
+        }
+        .mobile-nav-submenu.active {
+            display: block;
+        }
+        
+        /* Submenu Items (Free Form, Immigration, Small Claims, Other) */
+        .mobile-nav-submenu a {
+            padding: 10px 0 10px 45px;
+            font-size: 1em;
+            border-bottom: 1px solid #34495e;
+            line-height: 1.1;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* CRITICAL: First Submenu Item ("My Forms") Vertical Centering */
+        .mobile-nav-submenu a:first-child {
+            border-top: 1px solid #34495e;
+            margin-top: 0px;
+            padding-top: 30px;
+            padding-bottom: 0;
+        }
+        
+        /* Logout Button Styling */
+        .mobile-nav-logout,
+        .mobile-nav-logout a,
+        #mobile-logout-btn {
+            color: #ff7043 !important;
+            font-weight: 700 !important;
+        }
+        
+        /* Mobile Overlay (Dark background when menu is open) */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .mobile-nav-overlay.active {
+            display: block;
+        }
+        
+        /* Footer Base Styles (Desktop) */
+        .pro-footer {
+            background: #2c3e50;
+            color: #f3f7f8;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;
+            padding: 48px 10vw 20px 10vw;
+            border-top: 2px solid #2c3e50;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.18em;
+            margin-top: 0;
+        }
+        .pro-footer-col {
+            flex: 1 1 320px;
+            min-width: 220px;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .address-col {
+            border-right: 1.5px solid #2c7a7d;
+            padding-right: 48px;
+            align-items: flex-start;
+        }
+        .nav-col {
+            align-items: flex-start;
+            padding-left: 32px;
+            padding-right: 32px;
+            border-right: 1.5px solid #2c7a7d;
+        }
+        .company-col {
+            align-items: flex-start;
+            padding-left: 48px;
+        }
+        .pro-footer-title {
+            font-weight: 700;
+            font-size: 1.25em;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+        .company-title {
+            margin-top: 8px;
+            margin-bottom: 0;
+        }
+        .pro-footer-contact a {
+            color: #b6e2e6;
+            text-decoration: underline;
+            font-weight: 500;
+            margin-right: 18px;
+            transition: color 0.2s;
+        }
+        .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
+            color: #ff7043;
+        }
+        .pro-footer-logo {
+            margin-bottom: 8px;
+        }
+        .pro-footer-desc {
+            color: #e0e6ea;
+            font-size: 1em;
+            margin-top: 0;
+            line-height: 1.5;
+        }
+        .pro-footer-col.nav-col a {
+            color: #b6e2e6;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 6px;
+            transition: color 0.2s;
+            font-size: 1em;
+        }
+        .pro-footer-col.nav-col a:not(:last-child) {
+            margin-bottom: 8px;
+        }
+        .pro-footer, footer {
+            flex-shrink: 0;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #374656;
+            color: white;
+        }
+        
+        /* Desktop nav: progressively smaller text/gaps before hamburger layout */
+        @media (max-width: 1240px) {
+            nav.desktop-nav { gap: 28px; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.84em; }
+            .nav-chevron { width: 13px; height: 13px; margin-left: 5px; }
+        }
+        @media (max-width: 1120px) {
+            nav.desktop-nav { gap: 20px; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.8em; }
+            .dropdown-menu { top: 36px; }
+            .dropdown-menu a { font-size: 1em; padding: 10px 22px; }
+        }
+        @media (max-width: 1040px) {
+            nav.desktop-nav { gap: 14px; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.76em; letter-spacing: 0.015em; }
+            .nav-chevron { width: 12px; height: 12px; margin-left: 4px; }
+        }
+        @media (max-width: 1000px) {
+            nav.desktop-nav { gap: 9px; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.72em; letter-spacing: 0.01em; padding: 2px 4px; }
+            .nav-chevron { width: 11px; height: 11px; margin-left: 3px; }
+            .dropdown-menu { min-width: 188px; top: 34px; }
+            .dropdown-menu a { font-size: 0.94em; padding: 9px 18px; }
+        }
+        
+        /* Mobile layout (hamburger): switches sooner than 768px */
+        /* Mobile Responsive Breakpoint — hamburger earlier */
+        @media (max-width: 1200px) {
+            /* Show mobile menu toggle */
+            .mobile-menu-toggle {
+                display: flex !important;
+                position: absolute !important;
+                left: 15px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                z-index: 1001 !important;
+            }
+            
+            /* Hide desktop nav */
+            .desktop-nav {
+                display: none !important;
+            }
+            
+            /* Show mobile nav structure */
+            .mobile-nav {
+                display: flex !important;
+            }
+            
+            .mobile-nav.active {
+                left: 0 !important;
+                right: auto !important;
+                transform: none !important;
+                position: fixed !important;
+                margin-left: 0 !important;
+            }
+            
+            /* Typography adjustments */
+            html {
+                font-size: 14px !important;
+            }
+            
+            body {
+                overflow-x: hidden;
+            }
+            
+            /* Header mobile optimization */
+            header {
+                padding: 16px 15px;
+                min-height: 80px;
+                flex-wrap: wrap;
+                gap: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: relative;
+            }
+            
+            header img {
+                width: 119px;
+                height: 73px;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            /* Header actions mobile */
+            .header-actions {
+                gap: 10px;
+                margin-left: auto;
+                margin-right: 15px;
+            }
+            
+            .sign-in-btn {
+                font-size: 0.9em;
+                padding: 6px 20px;
+                margin-left: 0;
+            }
+            
+            #cart-icon-link .cart-circle {
+                width: 55px !important;
+                height: 55px !important;
+            }
+            
+            #cart-icon {
+                width: 30px !important;
+                height: 30px !important;
+            }
+            
+            /* Hide desktop sign-in/logout buttons on mobile */
+            #logout-btn,
+            .sign-in-btn {
+                display: none !important;
+            }
+            
+            /* Footer mobile - hide navigation column */
+            .pro-footer-col.nav-col {
+                display: none !important;
+            }
+            
+            /* Footer mobile - match homepage layout (two columns side-by-side) */
+            .pro-footer {
+                gap: 20px !important;
+                padding: 30px 20px 15px 20px !important;
+                flex-direction: row !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+            }
+            
+            /* Reset column constraints for mobile */
+            .pro-footer-col {
+                min-width: unset !important;
+                max-width: unset !important;
+                padding: 0 !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+            }
+            
+            /* Address column - branding centered in column */
+            .pro-footer-col.address-col {
+                padding-right: 0 !important;
+                border-right: 1.5px solid #2c7a7d !important;
+                align-items: center !important;
+                text-align: center !important;
+            }
+            .pro-footer-col.address-col .pro-footer-logo {
+                display: flex !important;
+                justify-content: center !important;
+                width: 100% !important;
+            }
+            .pro-footer-col.address-col .pro-footer-title {
+                text-align: center !important;
+                width: 100% !important;
+            }
+            .pro-footer-col.address-col .pro-footer-contact {
+                align-items: center !important;
+                text-align: center !important;
+            }
+            
+            /* Company column - add left padding for spacing */
+            .pro-footer-col.company-col {
+                padding-left: 20px !important;
+                border-right: none !important;
+            }
+            
+            /* Contact info - stack vertically */
+            .pro-footer-contact {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            
+            /* Contact links - remove horizontal margin */
+            .pro-footer-contact a {
+                margin-right: 0 !important;
+            }
+            
+            /* Footer copyright - consistent padding */
+            footer {
+                padding: 20px !important;
+                padding-bottom: 20px !important;
+                margin-bottom: 0 !important;
+            }
+            
+            /* Prevent white space below footer */
+            html, body {
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            
+            .pro-footer, footer {
+                margin-bottom: 0 !important;
+            }
+        }
+        
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            nav a {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .sign-in-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+    </style>
+    <script>
+      // Phone formatter: Phone Number
+      window.updatePhoneSplitFields = window.updatePhoneSplitFields || function(inputEl) {
+        if (!inputEl) return;
+        const id = inputEl.id || inputEl.name;
+        if (!id) return;
+        const digits = (inputEl.value || "").replace(/\D/g, "").slice(0, 10);
+        const match = id.match(/^(.*)_([0-9]+)$/);
+        const base = match ? match[1] : id;
+        const suffix = match ? "_" + match[2] : "";
+        const codeField = document.getElementById(base + "_code" + suffix);
+        const noCodeField = document.getElementById(base + "_no_code" + suffix);
+        if (!codeField && !noCodeField) return;
+        const area = digits.slice(0, 3);
+        const rest = digits.slice(3);
+        const codeValue = area ? "(" + area + ")" : "";
+        let noCodeValue = "";
+        if (rest.length > 0) {
+          if (rest.length <= 3) {
+            noCodeValue = rest;
+          } else {
+            noCodeValue = rest.slice(0, 3) + "-" + rest.slice(3, 7);
+          }
+        }
+        if (codeField) codeField.value = codeValue;
+        if (noCodeField) noCodeField.value = noCodeValue;
+      };
+      window.formatPhoneInput = window.formatPhoneInput || function(inputEl) {
+        if (!inputEl) return;
+        const digits = (inputEl.value || "").replace(/\D/g, "").slice(0, 10);
+        let formatted = "";
+        if (digits.length > 0) {
+          formatted += "(" + digits.slice(0, Math.min(3, digits.length));
+          if (digits.length >= 3) formatted += ")";
+        }
+        if (digits.length > 3) {
+          formatted += "-" + digits.slice(3, Math.min(6, digits.length));
+        }
+        if (digits.length > 6) {
+          formatted += "-" + digits.slice(6, 10);
+        }
+        inputEl.value = formatted;
+        window.updatePhoneSplitFields(inputEl);
+      };
+    </script>
+</head>
+<body>
+<script>window.__FORM_SKIP_SIGNIN_GATE__=true;</script>
+<script>
+/*──────── mirror a dropdown → textbox and checkbox ────────*/
+function dropdownMirror(selectEl, baseName){
+    const wrap = document.getElementById("dropdowntext_"+baseName);
+    if(!wrap) {
+        return;
+    }
+    const val = selectEl.value.trim();
+    if(!val) {
+        // When value is cleared, we need to dispatch events for any checkboxes that were removed
+        const existingCheckboxes = wrap.querySelectorAll('input[type="checkbox"]');
+        const removedCheckboxIds = [];
+        existingCheckboxes.forEach(checkbox => {
+            removedCheckboxIds.push(checkbox.id);
+        });
+        wrap.innerHTML = "";
+        // Dispatch events for removed checkboxes so conditional logic can re-evaluate
+        if (removedCheckboxIds.length > 0) {
+            const lastUnderscoreIndex = baseName.lastIndexOf('_');
+            if (lastUnderscoreIndex !== -1) {
+                const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+                if (/^[0-9]+$/.test(potentialEntryNumber)) {
+                    const entryNumber = parseInt(potentialEntryNumber);
+                    removedCheckboxIds.forEach(checkboxId => {
+                        const triggerDropdownEvent = new CustomEvent('triggerDropdownChanged', {
+                            detail: {
+                                entryNumber: entryNumber,
+                                checkboxId: checkboxId,
+                                baseName: baseName,
+                                removed: true
+                            }
+                        });
+                        window.dispatchEvent(triggerDropdownEvent);
+                    });
+                }
+            }
+        }
+        return;
+    }
+    const textId = baseName + "_dropdown";
+    const textField = document.getElementById(textId);
+    if(textField) {
+        textField.value = val;
+        textField.style.display = "none";
+    }
+    const existingCheckboxes = wrap.querySelectorAll("div");
+    existingCheckboxes.forEach(div => div.remove());
+    // Sanitize option value: replace all non-word characters (including spaces) with underscores
+    const idSuffix = val.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
+    // Check if baseName ends with an entry number (for numbered dropdowns or trigger sequence dropdowns)
+    const lastUnderscoreIndex = baseName.lastIndexOf('_');
+    let checkboxId;
+    if (lastUnderscoreIndex !== -1) {
+        const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+        if (/^[0-9]+$/.test(potentialEntryNumber)) {
+            const baseWithoutEntry = baseName.substring(0, lastUnderscoreIndex);
+            const underscoreCount = (baseWithoutEntry.match(/_/g) || []).length;
+            if (underscoreCount >= 1) {
+                checkboxId = baseWithoutEntry + "_" + idSuffix + "_" + potentialEntryNumber;
+            } else {
+                const fieldName = baseWithoutEntry;
+                const entryNumber = potentialEntryNumber;
+                checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;
+            }
+        } else {
+            checkboxId = baseName + "_" + idSuffix;
+        }
+    } else {
+        checkboxId = baseName + "_" + idSuffix;
+    }
+    const checkboxDiv = document.createElement("div");
+    checkboxDiv.style.display = "none";
+    checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxId + "' checked>" +
+                     "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
+    wrap.appendChild(checkboxDiv);
+    const newCheckbox = document.getElementById(checkboxId);
+    if (newCheckbox) {
+        setTimeout(() => {
+            const changeEvent = new Event('change', { bubbles: true });
+            newCheckbox.dispatchEvent(changeEvent);
+            const lastUnderscoreIndex = baseName.lastIndexOf('_');
+            if (lastUnderscoreIndex !== -1) {
+                const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+                if (/^[0-9]+$/.test(potentialEntryNumber)) {
+                    const entryNumber = parseInt(potentialEntryNumber);
+                    const triggerDropdownEvent = new CustomEvent('triggerDropdownChanged', {
+                        detail: {
+                            entryNumber: entryNumber,
+                            checkboxId: checkboxId,
+                            baseName: baseName
+                        }
+                    });
+                    window.dispatchEvent(triggerDropdownEvent);
+                }
+            }
+        }, 50);
+        const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+        if (linkedCheckboxesArray && linkedCheckboxesArray.length > 0) {
+            linkedCheckboxesArray.forEach(linkedCheckboxGroup => {
+                const checkboxIds = linkedCheckboxGroup.checkboxes || [];
+                if (checkboxIds.includes(checkboxId)) {
+                    const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
+                    newCheckbox.addEventListener('change', function() {
+                        if (typeof window.updateAllLinkedCheckboxes === 'function') {
+                            window.updateAllLinkedCheckboxes();
+                        }
+                    });
+                }
+            });
+        }
+        if (typeof window.updateAllLinkedCheckboxes === 'function') {
+            setTimeout(() => {
+                const verifyCheckbox = document.getElementById(checkboxId);
+                if (verifyCheckbox) {
+                    window.updateAllLinkedCheckboxes();
+                    if (typeof window.updateAllInverseCheckboxes === 'function') {
+                        window.updateAllInverseCheckboxes();
+                    }
+                }
+            }, 200);
+        }
+    }
+    if (typeof handleLinkedDropdowns === 'function') {
+        handleLinkedDropdowns(baseName, val);
+    }
+}
+</script>
+<header>
+    <!-- Mobile hamburger menu button -->
+    <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <!-- Logo -->
+    <img src="logo.png" alt="Form-Star Logo" width="130" height="80" onclick="location.href='../../index.html';">
+    
+    <!-- Desktop Navigation -->
+    <nav class="desktop-nav">
+        <a href="../../index.html">Home
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">
+            <a href="#" id="forms-nav-link">Forms
+                <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <div class="dropdown-menu" id="forms-dropdown-menu">
+                <a href="../../Pages/forms.html">My Forms</a>
+                <a href="../../Pages/FreeForm.html">Free Form</a>
+                <a href="../../Pages/Immigration.html">Immigration</a>
+                <a href="../../Pages/smallclaims.html">Small Claims</a>
+                <a href="../../Pages/Other.html">Other</a>
+            </div>
+        </div>
+        <a href="../../Pages/about.html">About Us
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a href="../../Pages/contact.html">Contact Us
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a href="../../Pages/FAQ.html">FAQ
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+    </nav>
+    
+    <!-- Mobile Navigation Menu -->
+    <nav class="mobile-nav" id="mobile-nav">
+        <a href="../../index.html">Home</a>
+        <div class="mobile-nav-section">
+            <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+            <div class="mobile-nav-submenu" id="mobile-forms-menu">
+                <a href="../../Pages/forms.html">My Forms</a>
+                <a href="../../Pages/FreeForm.html">Free Form</a>
+                <a href="../../Pages/Immigration.html">Immigration</a>
+                <a href="../../Pages/smallclaims.html">Small Claims</a>
+                <a href="../../Pages/Other.html">Other</a>
+            </div>
+        </div>
+        <a href="../../Pages/about.html">About Us</a>
+        <a href="../../Pages/contact.html">Contact Us</a>
+        <a href="../../Pages/FAQ.html">FAQ</a>
+        <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+            <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+        </div>
+    </nav>
+    
+    <!-- Header Actions (Sign In Button and Cart) -->
+    <div class="header-actions">
+        <a href="../../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+        <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
+        <a href="#" id="cart-icon-link" style="display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+            <span class="cart-circle">
+                <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="10" cy="21" r="1.5"/>
+                    <circle cx="18" cy="21" r="1.5"/>
+                    <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
+                </svg>
+                <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+            </span>
+        </a>
+    </div>
+</header>
+
+    <!-- Sliding Cart Menu -->
+    <div class="cart-overlay" id="cart-overlay">
+        <div class="cart-side-menu" id="cart-side-menu" style="max-height: 100vh; overflow-y: auto;">
+            <div class="cart-header" style="background:#2c3e50;color:#fff;padding:20px 0 20px 20px;display:flex;justify-content:space-between;align-items:center;">
+                <h2 style="margin:0;font-size:1.5em;font-weight:700;">🛒 Cart</h2>
+                <button class="cart-close-btn" id="cart-close-btn" style="background:none;border:none;color:#fff;font-size:1.5em;cursor:pointer;padding:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s;margin-right:8px;">&times;</button>
+            </div>
+            <div class="cart-content" id="cart-content">
+                <div class="cart-icon-large">🛒</div>
+                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>
+                <div class="cart-description" id="cart-description">
+                    To add forms to your cart and make purchases, you\'ll need to create a FormStar account. 
+                    Sign up now to access our complete library of legal forms and start simplifying your paperwork.
+                </div>
+                <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
+                <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
+                <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+<div id="pdfPreview" style="display:none;">
+    <iframe id="pdfFrame" style="display:none"></iframe>
+</div>
+
+<!-- Firebase includes -->
+<script src="https://js.stripe.com/v3/"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="/Pages/cart.js"></script>
+
+<script>
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+    authDomain: "formwiz-3f4fd.firebaseapp.com",
+    projectId: "formwiz-3f4fd",
+    storageBucket: "formwiz-3f4fd.firebasestorage.app",
+    messagingSenderId: "404259212529",
+    appId: "1:404259212529:web:15a33bce82383b21cfed50",
+    measurementId: "G-P07YEN0HPD"
+};
+
+// Initialize Firebase
+if (typeof firebase !== "undefined" && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const auth = firebase.auth();
+
+// Auth state management
+if (typeof firebase !== "undefined" && firebase.apps.length > 0) {
+    if (typeof isUserLoggedIn === "undefined") { var isUserLoggedIn = false; }
+    if (typeof userId === "undefined") { var userId = null; }
+    auth.onAuthStateChanged(function(user) {
+        isUserLoggedIn = !!user;
+        userId = user ? user.uid : null;
+        updateAuthButtons(user);
+        updateCartCountBadge();
+    });
+} else {
+    // Fallback for when Firebase is not available
+}
+
+// Function to update button display based on auth state
+function updateAuthButtons(user) {
+    const signInBtn = document.getElementById("sign-in-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    
+    if (user) {
+        if (signInBtn) signInBtn.style.display = "none";
+        if (logoutBtn) logoutBtn.style.display = "inline-block";
+    } else {
+        if (signInBtn) signInBtn.style.display = "inline-block";
+        if (logoutBtn) logoutBtn.style.display = "none";
+    }
+}
+
+// Update cart count badge in header
+function updateCartCountBadge() {
+    const cartCountElement = document.getElementById("cart-count-badge");
+    if (cartCountElement) {
+        let count = 0;
+        
+        // Try to get count from getCartCount function first
+        if (typeof getCartCount === "function") {
+            count = getCartCount();
+        } else {
+            // Fallback to localStorage
+            try {
+                const cartData = localStorage.getItem("formwiz_cart");
+                if (cartData) {
+                    const cart = JSON.parse(cartData);
+                    count = Array.isArray(cart) ? cart.length : 0;
+                }
+            } catch (e) {
+                count = 0;
+            }
+        }
+        
+        // Always update the text content, even if count is 0
+        cartCountElement.textContent = count;
+        
+        if (count > 0) {
+            cartCountElement.style.display = "flex";
+        } else {
+            cartCountElement.style.display = "none";
+        }
+    }
+}
+
+// Initialize cart count badge on page load
+document.addEventListener("DOMContentLoaded", function() {
+    updateCartCountBadge();
+    // Update cart count every 5 seconds
+    setInterval(updateCartCountBadge, 5000);
+    // Restore uploaded files from storage
+    if (typeof restoreUploadedFilesFromStorage === "function") {
+      restoreUploadedFilesFromStorage();
+    }
+});
+</script>
+
+<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">
+    <h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50;">Your Information</h3>
+    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+        <div style="flex: 1;">
+            <label for="user_firstname" style="display: block; margin-bottom: 5px; font-weight: bold;">First Name</label>
+            <input type="text" form="customForm" id="user_firstname" name="user_firstname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="flex: 1;">
+            <label for="user_lastname" style="display: block; margin-bottom: 5px; font-weight: bold;">Last Name</label>
+            <input type="text" form="customForm" id="user_lastname" name="user_lastname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+    </div>
+    <div style="margin-bottom: 15px;">
+        <label for="user_email" style="display: block; margin-bottom: 5px; font-weight: bold;">Email Address</label>
+        <input type="email" form="customForm" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    <div style="margin-bottom: 15px;">
+        <label for="user_phone" style="display: block; margin-bottom: 5px; font-weight: bold;">Phone Number</label>
+        <input type="tel" form="customForm" id="user_phone" name="user_phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    <div style="margin-bottom: 15px;">
+        <label for="user_street" style="display: block; margin-bottom: 5px; font-weight: bold;">Street Address</label>
+        <input type="text" form="customForm" id="user_street" name="user_street" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+        <div style="flex: 2;">
+            <label for="user_city" style="display: block; margin-bottom: 5px; font-weight: bold;">City</label>
+            <input type="text" form="customForm" id="user_city" name="user_city" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="flex: 1;">
+            <label for="user_state" style="display: block; margin-bottom: 5px; font-weight: bold;">State</label>
+            <input type="text" form="customForm" id="user_state" name="user_state" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="flex: 1;">
+            <label for="user_zip" style="display: block; margin-bottom: 5px; font-weight: bold;">ZIP</label>
+            <input type="text" form="customForm" id="user_zip" name="user_zip" maxlength="5" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+    </div>
+</div>
+<div id="questions">
+    <div id="result"></div>
+    <section>
+    <div id="box">
+        <form id="customForm" onsubmit="return window.__autoFormHandleSubmit ? window.__autoFormHandleSubmit(event) : false;">
+        <!-- Hidden fields for URL parameters -->
+        <input type="hidden" id="form_zip" name="form_zip" value="">
+        <input type="hidden" id="form_county" name="form_county" value="">
+        <input type="hidden" id="form_defendant" name="form_defendant" value="">
+        <input type="hidden" id="form_ID" name="form_ID" value="">
+        <input type="hidden" id="current_date" name="current_date" value="">
+        <input type="hidden" id="court_name" name="court_name" value="">
+        <input type="hidden" id="court_address" name="court_address" value="">
+__AUTO_FORM_BODY__
+  <script>
+    function formAuthAllowsProgress() {
+      if (typeof window !== 'undefined' && window.__FORM_SKIP_SIGNIN_GATE__) return true;
+      return typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn;
+    }
+    // Function to show sign-in required modal
+    function showSignInRequiredModal() {
+      if (typeof window !== 'undefined' && window.__FORM_SKIP_SIGNIN_GATE__) return;
+      const modal = document.getElementById('signinRequiredModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) {
+            modal.style.display = 'none';
+          }
+        });
+      }
+    }
+
+    // Function to hide sign-in required modal
+    function hideSignInRequiredModal() {
+      const modal = document.getElementById('signinRequiredModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    // Function to check if user is logged in before navigation
+    function checkAuthBeforeNavigate(callback) {
+      if (typeof window !== 'undefined' && window.__FORM_SKIP_SIGNIN_GATE__) {
+        if (callback) callback();
+        return;
+      }
+      // Check if isUserLoggedIn is defined (Firebase auth might not be loaded yet)
+      if (typeof isUserLoggedIn === 'undefined') {
+        // Wait a bit for Firebase auth to initialize
+        setTimeout(function() {
+          if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+            if (callback) callback();
+          } else {
+            showSignInRequiredModal();
+          }
+        }, 500);
+      } else if (isUserLoggedIn) {
+        if (callback) callback();
+      } else {
+        showSignInRequiredModal();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      console.groupCollapsed('[NAV DEBUG] form boot');
+      const qtMap = (typeof questionTypesMap !== 'undefined') ? questionTypesMap : (window.questionTypesMap || {});
+
+      console.groupEnd();
+      const sectionNodeList = document.querySelectorAll('[id^="section"]');
+      const sectionElements = Array.from(sectionNodeList);
+      const sectionNumbers = sectionElements.map(sectionEl => {
+        const match = sectionEl.id && sectionEl.id.match(/^section(\d+)$/);
+        return match ? parseInt(match[1], 10) : null;
+      });
+      if (!window.questionNavControllers) {
+        window.questionNavControllers = {};
+      }
+      sectionElements.forEach(function(sectionEl, sectionIdx) {
+        const questionItems = Array.from(sectionEl.querySelectorAll('.question-container.question-item'));
+        const navWrapper = sectionEl.querySelector('.question-nav');
+        if (!questionItems.length || !navWrapper) {
+          return;
+        }
+        const sectionId = sectionEl.id;
+        const currentSectionNumber = sectionNumbers[sectionIdx] || (sectionIdx + 1);
+        const prevBtn = navWrapper.querySelector('.question-prev');
+        const nextBtn = navWrapper.querySelector('.question-next');
+        const progressCurrent = navWrapper.querySelector('.question-current');
+        const progressTotal = navWrapper.querySelector('.question-total');
+        function getVisibleIndices() {
+          const indices = [];
+          questionItems.forEach(function(item, idx) {
+            if (!item.classList.contains('hidden')) {
+              indices.push(idx);
+            }
+          });
+          return indices;
+        }
+        function resolveShouldSubmit(activeContainer, currentPos, visibleTotal) {
+          const isLastSectionInForm = sectionIdx === sectionElements.length - 1;
+          const isLastVisibleInSection = currentPos === visibleTotal - 1 && currentPos !== -1;
+          return answerTriggersEnd(activeContainer) || (isLastSectionInForm && isLastVisibleInSection);
+        }
+        function requestAutoFormSubmit() {
+          if (typeof checkAuthBeforeNavigate === 'function') {
+            checkAuthBeforeNavigate(function() {
+              if (typeof window.__autoFormRequestSubmit === 'function') {
+                window.__autoFormRequestSubmit();
+              } else {
+                const formEl = document.getElementById('customForm');
+                if (formEl && typeof formEl.requestSubmit === 'function') formEl.requestSubmit();
+              }
+            });
+          } else if (typeof window.__autoFormRequestSubmit === 'function') {
+            window.__autoFormRequestSubmit();
+          }
+        }
+        function getVisibleIndicesForSectionElement(targetSectionEl) {
+
+          const items = Array.from(targetSectionEl.querySelectorAll('.question-container.question-item'));
+
+          const indices = [];
+          items.forEach(function(item, idx) {
+            const questionId = item.getAttribute('data-question-id') || item.id || 'unknown';
+            const hasHiddenClass = item.classList.contains('hidden');
+            const hasQuestionStepHidden = item.classList.contains('question-step-hidden');
+            const computedStyle = window.getComputedStyle(item);
+            const isActuallyVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
+
+            // CRITICAL FIX: Check both conditional visibility (hidden class) AND navigation state (question-step-hidden)
+            // A question is visible if:
+            // 1. It doesn't have the 'hidden' class (conditional logic allows it)
+            // 2. It doesn't have 'question-step-hidden' OR if it does, we should still consider it if it's conditionally visible
+            // The key insight: question-step-hidden is a navigation state, but we should prioritize questions that are conditionally visible
+            // However, if a question has both 'hidden' and 'question-step-hidden', it's definitely not visible
+
+            if (!hasHiddenClass) {
+              // Question is conditionally visible (no 'hidden' class)
+              // Even if it has 'question-step-hidden', we should include it in the indices
+              // because the navigation system will handle activating it when we navigate to this section
+              indices.push(idx);
+
+            } else {
+
+            }
+          });
+
+          return { indices, items };
+        }
+        function findNextSectionWithVisibleQuestions() {
+
+          for (let nextIdx = sectionIdx + 1; nextIdx < sectionElements.length; nextIdx++) {
+            const candidateSection = sectionElements[nextIdx];
+
+            const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
+
+            // If we find visible questions, return immediately
+            if (visibleInfo.indices.length) {
+              const result = {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
+                firstVisibleIndex: visibleInfo.indices[0]
+              };
+
+              return result;
+            }
+            // If no visible questions found, check if section has any questions at all
+            // This handles cases where questions might be hidden initially but should become visible
+            const allQuestions = candidateSection.querySelectorAll('.question-container.question-item');
+            if (allQuestions.length > 0) {
+
+              const result = {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
+                firstVisibleIndex: 0  // Will be recalculated when section becomes active
+              };
+
+              return result;
+            }
+          }
+
+          return null;
+        }
+        function findPrevSectionWithVisibleQuestions() {
+          for (let prevIdx = sectionIdx - 1; prevIdx >= 0; prevIdx--) {
+            const candidateSection = sectionElements[prevIdx];
+            const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
+            if (visibleInfo.indices.length) {
+              return {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[prevIdx] || (prevIdx + 1),
+                lastVisibleIndex: visibleInfo.indices[visibleInfo.indices.length - 1]
+              };
+            }
+          }
+          return null;
+        }
+        let activeIndex = -1;
+        let isUpdating = false;
+        let cachedNextSectionInfo = null;
+        let cachedPrevSectionInfo = null;
+        function isElementEligible(el) {
+          if (!el || el.disabled) return false;
+          if (el.type === 'hidden') return false;
+          if (el.closest('.hidden')) return false;
+          // Check if element or any parent has display: none
+          let current = el;
+          while (current && current !== document.body) {
+            const style = window.getComputedStyle(current);
+            if (style.display === 'none') {
+              return false;
+            }
+            current = current.parentElement;
+          }
+          // Also check offsetParent for elements that are not radio/checkbox
+          if (el.offsetParent === null && el.type !== 'radio' && el.type !== 'checkbox') return false;
+          return true;
+        }
+        function isQuestionAnswered(container) {
+          if (!container) {
+
+            return false;
+          }
+          const questionId = container.getAttribute('data-question-id') || container.id || 'unknown';
+          const questionTextEl = container.querySelector('.question-text');
+          const questionText = questionTextEl ? questionTextEl.textContent.trim() : '';
+
+          const elements = Array.from(container.querySelectorAll('select, textarea, input'));
+          const eligibleElements = elements.filter(isElementEligible);
+          const debugElements = eligibleElements.map(el => ({
+            id: el.id || null,
+            tag: el.tagName,
+            type: (el.type || '').toLowerCase(),
+            value: (el.type === 'checkbox' || el.type === 'radio') ? el.checked : (el.value || '').trim(),
+            display: el.style && el.style.display ? el.style.display : null
+          }));
+
+          // Check for file upload questions BEFORE early return (file inputs are hidden, so they won't be in eligibleElements)
+          const fileUploadInput = container.querySelector('input[type="file"][id^="fileUpload_"]');
+
+          if (fileUploadInput) {
+
+            // This is a file upload question - don't return early, continue to file upload validation below
+          } else if (!eligibleElements.length) {
+
+            return true;
+          }
+          let allStandardSatisfied = true;
+          const radioGroups = {};
+          let hasCheckbox = false;
+          let checkboxAnyChecked = false;
+          eligibleElements.forEach(el => {
+            const tag = el.tagName;
+            const type = (el.type || '').toLowerCase();
+            const elId = (el.id || el.name || '').toLowerCase();
+            if (tag === 'SELECT') {
+              const value = (el.value || '').trim();
+
+              if (!value) allStandardSatisfied = false;
+            } else if (tag === 'TEXTAREA' || type === 'text' || type === 'email' || type === 'tel' || type === 'url' || type === 'number' || type === 'date' || type === 'time' || type === 'datetime-local') {
+              const value = (el.value || '').trim();
+
+              if (!value) {
+                allStandardSatisfied = false;
+              }
+            } else if (type === 'radio') {
+              const group = radioGroups[el.name || el.id] || [];
+              group.push(!!el.checked);
+              radioGroups[el.name || el.id] = group;
+            } else if (type === 'checkbox') {
+              hasCheckbox = true;
+              if (el.checked) {
+                checkboxAnyChecked = true;
+              }
+            }
+          });
+          const radiosSatisfied = Object.values(radioGroups).every(group => group.some(Boolean));
+          // Ensure checkboxRequiredMap and allAreRequiredMap are defined (they might not be initialized yet)
+          const checkboxRequiredMapSafe = (typeof checkboxRequiredMap !== 'undefined' && typeof checkboxRequiredMap === 'object') ? checkboxRequiredMap : (window.checkboxRequiredMap || {});
+          const allAreRequiredMapSafe = (typeof allAreRequiredMap !== 'undefined' && typeof allAreRequiredMap === 'object') ? allAreRequiredMap : (window.allAreRequiredMap || {});
+          // Use explicit hasOwnProperty so missing entries default to optional
+          const checkboxRequired = Object.prototype.hasOwnProperty.call(checkboxRequiredMapSafe, questionId)
+            ? checkboxRequiredMapSafe[questionId]
+            : false;
+          // Check if "all are required" is enabled
+          const allAreRequired = Object.prototype.hasOwnProperty.call(allAreRequiredMapSafe, questionId)
+            ? allAreRequiredMapSafe[questionId]
+            : false;
+
+          let checkboxesSatisfied = true;
+          if (hasCheckbox && checkboxRequired) {
+            if (allAreRequired) {
+              // When "all are required" is enabled, all main checkbox options must be checked
+              // Get all checkboxes that are part of the main question (not in trigger containers)
+              // Look for checkboxes in the checkbox-group class for this question
+              const checkboxGroup = container.querySelector('.checkbox-group-' + questionId);
+              if (checkboxGroup) {
+                // Get all checkboxes in the main checkbox group (excluding "None of the above")
+                const mainCheckboxes = Array.from(checkboxGroup.querySelectorAll('input[type="checkbox"]')).filter(cb => {
+                  const cbId = cb.id || '';
+                  const cbName = cb.name || '';
+                  // Exclude "None of the above" checkbox and hidden checkboxes
+                  return !cbId.includes('none_of_the_above') && 
+                         !cbId.includes('_hidden') &&
+                         cb.style.display !== 'none' &&
+                         isElementEligible(cb);
+                });
+                // Check if all main checkboxes are checked
+                const allChecked = mainCheckboxes.length > 0 && mainCheckboxes.every(cb => cb.checked);
+                checkboxesSatisfied = allChecked;
+              } else {
+                // Fallback: use eligibleElements that are checkboxes
+                const mainCheckboxes = eligibleElements.filter(el => {
+                  const type = (el.type || '').toLowerCase();
+                  if (type !== 'checkbox') return false;
+                  const cbId = el.id || '';
+                  // Exclude "None of the above" and checkboxes in trigger containers
+                  const isInTriggerContainer = el.closest('[id^="triggerFields_"]') !== null;
+                  return !cbId.includes('none_of_the_above') && !isInTriggerContainer;
+                });
+                const allChecked = mainCheckboxes.length > 0 && mainCheckboxes.every(cb => cb.checked);
+                checkboxesSatisfied = allChecked;
+              }
+            } else {
+              // Standard behavior: at least one checkbox must be checked
+              checkboxesSatisfied = checkboxAnyChecked;
+            }
+          } else if (hasCheckbox && !checkboxRequired) {
+            // Optional checkbox question - always satisfied
+            checkboxesSatisfied = true;
+          } else if (!hasCheckbox) {
+            // No checkboxes - always satisfied
+            checkboxesSatisfied = true;
+          }
+
+          // Additional check: if any trigger sequence container is visible, its fields become required
+          const visibleTriggerContainers = Array.from(container.querySelectorAll('[id^="triggerFields_"]')).filter(tc => window.getComputedStyle(tc).display !== 'none');
+          if (visibleTriggerContainers.length > 0) {
+
+            visibleTriggerContainers.forEach(tc => {
+              const triggerInputs = tc.querySelectorAll('select, textarea, input');
+              triggerInputs.forEach(inp => {
+                if (!isElementEligible(inp)) return;
+                const tag = inp.tagName;
+                const type = (inp.type || '').toLowerCase();
+                const inpId = (inp.id || inp.name || '').toLowerCase();
+                if (tag === 'SELECT') {
+                  const value = (inp.value || '').trim();
+                  if (!value) allStandardSatisfied = false;
+                } else if (tag === 'TEXTAREA' || type === 'text' || type === 'email' || type === 'tel' || type === 'url' || type === 'number' || type === 'date' || type === 'time' || type === 'datetime-local') {
+                  const value = (inp.value || '').trim();
+                  if (!value) {
+                    allStandardSatisfied = false;
+                  }
+                } else if (type === 'radio') {
+                  const group = radioGroups[inp.name || inp.id] || [];
+                  group.push(!!inp.checked);
+                  radioGroups[inp.name || inp.id] = group;
+                } else if (type === 'checkbox') {
+                  hasCheckbox = true;
+                  if (inp.checked) {
+                    checkboxAnyChecked = true;
+                  }
+                }
+              });
+            });
+          }
+
+          // Check for file upload questions - verify a file has been uploaded (fileUploadInput already found above)
+          let fileUploadSatisfied = true;
+
+          if (fileUploadInput) {
+            const fileInputId = fileUploadInput.id;
+
+            // Extract questionId from the file input ID (format: "fileUpload_123")
+            // Use [0-9] instead of \d to avoid template literal escaping issues
+            const fileQuestionIdMatch = fileInputId.match(/fileUpload_([0-9]+)/);
+
+            if (fileQuestionIdMatch) {
+              const fileQuestionId = fileQuestionIdMatch[1];
+
+              // Check if a file has been uploaded for this question
+              const hasUploadedFile = window.uploadedFiles && window.uploadedFiles[fileQuestionId];
+
+              fileUploadSatisfied = !!hasUploadedFile;
+
+              if (!fileUploadSatisfied) {
+
+              } else {
+
+              }
+            } else {
+
+            }
+          } else {
+
+          }
+
+          const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied && fileUploadSatisfied;
+
+          return answered;
+        }
+        function answerTriggersEnd(container) {
+          // Ensure jumpLogics is defined (it might not be initialized yet)
+          const jumpLogicsArray = (typeof jumpLogics !== 'undefined' && Array.isArray(jumpLogics)) ? jumpLogics : (window.jumpLogics || []);
+          if (!container || !Array.isArray(jumpLogicsArray) || !jumpLogicsArray.length) {
+            return false;
+          }
+          const containerId = ((container.id || '') + '').trim();
+          const dataQuestionId = container.getAttribute('data-question-id');
+          let questionId = dataQuestionId ? String(dataQuestionId).trim() : null;
+          if (!questionId && containerId.startsWith('question-container-')) {
+            questionId = containerId.substring('question-container-'.length).trim();
+          }
+          if (!questionId) {
+            return false;
+          }
+          const relevantJumps = jumpLogicsArray.filter(jl => jl.questionId === questionId && typeof jl.jumpTo === 'string' && jl.jumpTo.toLowerCase() === 'end');
+          if (!relevantJumps.length) return false;
+
+          // Check for "Any Text" jump option first - this applies to textareas and text inputs
+          const hasAnyTextJump = relevantJumps.some(jl => {
+            const jumpOption = String(jl.jumpOption || '').trim().toLowerCase();
+            return jumpOption === 'any text' || jumpOption === 'any amount' || jumpOption === 'any date';
+          });
+
+          if (hasAnyTextJump) {
+            // For "Any Text", check if any textarea or text input has content
+            const textElements = container.querySelectorAll('textarea, input[type="text"], input[type="email"], input[type="tel"], input[type="url"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"]');
+            for (const el of textElements) {
+              if (el.value && el.value.trim()) {
+                return true;
+              }
+            }
+            return false;
+          }
+
+          // For dropdown/radio/checkbox questions, check their values
+          const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
+          const currentAnswers = [];
+          interactiveElements.forEach(el => {
+            if (el.tagName === 'SELECT') {
+              if (el.value) currentAnswers.push(el.value);
+            } else if (el.type === 'radio') {
+              if (el.checked) currentAnswers.push(el.value || 'true');
+            } else if (el.type === 'checkbox') {
+              if (el.checked) currentAnswers.push(el.value || 'true');
+            }
+          });
+          if (!currentAnswers.length) {
+            return false;
+          }
+          const normalizedAnswers = currentAnswers.map(val => String(val).trim().toLowerCase());
+          for (const jl of relevantJumps) {
+            const jumpOption = String(jl.jumpOption || '').trim().toLowerCase();
+            if (jumpOption && normalizedAnswers.includes(jumpOption)) {
+              return true;
+            }
+          }
+          return false;
+        }
+        function attachSubmitModeListeners(container, containerIdx) {
+          if (!container || container.dataset.submitModeListenersAttached === 'true') {
+
+            return;
+          }
+          const questionId = container.getAttribute('data-question-id') || container.id || 'unknown';
+          const questionTextEl = container.querySelector('.question-text');
+          const questionText = questionTextEl ? questionTextEl.textContent.trim() : '';
+
+          // Use event delegation - attach listeners to container to catch events from dynamically created fields
+          container.addEventListener('change', function(event) {
+            const target = event.target;
+
+            // Only handle interactive elements
+            if (target.tagName === 'SELECT' || target.type === 'radio' || target.type === 'checkbox') {
+              // Make sure the element is within this container
+              if (container.contains(target)) {
+
+                refreshNav(containerIdx);
+              } else {
+
+              }
+            }
+          });
+          container.addEventListener('input', function(event) {
+            const target = event.target;
+            const isTextarea = target.tagName === 'TEXTAREA';
+            const isTextInput = target.tagName === 'INPUT' && ['text', 'email', 'tel', 'url', 'number', 'date', 'time', 'datetime-local'].includes(target.type);
+
+            // Only handle text-like inputs
+            if (isTextarea || isTextInput) {
+              // Make sure the element is within this container
+              if (container.contains(target)) {
+
+                refreshNav(containerIdx);
+              } else {
+
+              }
+            } else {
+
+            }
+          });
+          container.dataset.submitModeListenersAttached = 'true';
+
+        }
+        function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo, submitConfig) {
+          const shouldSubmit = submitConfig && submitConfig.shouldSubmit;
+          const isAnswered = submitConfig && submitConfig.isAnswered;
+          const currentQuestionId = submitConfig && submitConfig.questionId;
+          const currentQuestionText = submitConfig && submitConfig.questionText;
+          const currentPos = submitConfig && typeof submitConfig.currentPos === 'number' ? submitConfig.currentPos : -1;
+          const visibleTotal = submitConfig && typeof submitConfig.visibleTotal === 'number' ? submitConfig.visibleTotal : 0;
+          const isLastQuestion = currentPos === visibleTotal - 1;
+
+          if (prevBtn) {
+            const canGoBack = !!(hasPrevQuestion || prevSectionInfo);
+            prevBtn.disabled = !canGoBack;
+
+            if (!canGoBack) {
+              prevBtn.dataset.advanceMode = '';
+              delete prevBtn.dataset.prevSectionNumber;
+              delete prevBtn.dataset.prevSectionId;
+            } else if (hasPrevQuestion) {
+              prevBtn.dataset.advanceMode = 'question';
+              delete prevBtn.dataset.prevSectionNumber;
+              delete prevBtn.dataset.prevSectionId;
+            } else {
+              prevBtn.dataset.advanceMode = 'section';
+              if (prevSectionInfo) {
+                prevBtn.dataset.prevSectionNumber = String(prevSectionInfo.sectionNumber);
+                prevBtn.dataset.prevSectionId = prevSectionInfo.sectionId;
+              }
+            }
+          }
+          if (nextBtn) {
+
+            if (shouldSubmit) {
+              // Use removeAttribute/setAttribute to ensure the disabled state is properly applied
+              if (isAnswered) {
+                nextBtn.removeAttribute('disabled');
+              } else {
+                nextBtn.setAttribute('disabled', 'disabled');
+              }
+
+              nextBtn.dataset.advanceMode = 'submit';
+              delete nextBtn.dataset.nextSectionNumber;
+              delete nextBtn.dataset.nextSectionId;
+              nextBtn.classList.add('submit-mode');
+
+            } else {
+              nextBtn.classList.remove('submit-mode');
+              // Allow advancing if: can advance within section, can advance across sections, OR we're on the last question and it's answered (to allow submit/end)
+              const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection || (isLastQuestion && isAnswered));
+
+              // CRITICAL FIX: Check for hard alerts before enabling the button
+              // Hard alerts should always prevent navigation, regardless of canAdvance state
+              const hasHardAlert = nextBtn.dataset.hardAlertActive === 'true';
+
+              // Use removeAttribute/setAttribute to ensure the disabled state is properly applied
+              // Don't enable if there's an active hard alert
+              if (canAdvance && !hasHardAlert) {
+
+                nextBtn.removeAttribute('disabled');
+                // Make sure styling is cleared if not disabled by hard alert
+                if (nextBtn.dataset.hardAlertActive !== 'true') {
+                  nextBtn.style.opacity = '';
+                  nextBtn.style.cursor = '';
+                }
+              } else {
+                if (hasHardAlert) {
+
+                } else {
+
+                }
+                nextBtn.setAttribute('disabled', 'disabled');
+              }
+
+              if (!canAdvance) {
+                nextBtn.dataset.advanceMode = '';
+                delete nextBtn.dataset.nextSectionNumber;
+                delete nextBtn.dataset.nextSectionId;
+              } else if (canAdvanceWithinSection) {
+                nextBtn.dataset.advanceMode = 'question';
+                delete nextBtn.dataset.nextSectionNumber;
+                delete nextBtn.dataset.nextSectionId;
+              } else {
+                nextBtn.dataset.advanceMode = 'section';
+                if (nextSectionInfo) {
+                  nextBtn.dataset.nextSectionNumber = String(nextSectionInfo.sectionNumber);
+                  nextBtn.dataset.nextSectionId = nextSectionInfo.sectionId;
+                }
+              }
+            }
+
+          }
+        }
+        function activateIndex(targetIdx) {
+
+          if (isUpdating) {
+
+            return;
+          }
+          isUpdating = true;
+          const visibleIndices = getVisibleIndices();
+
+          if (!visibleIndices.length) {
+            if (activeIndex >= 0 && activeIndex < questionItems.length) {
+              questionItems.forEach(function(item, idx) {
+                if (idx === activeIndex) {
+                  item.classList.remove('question-step-hidden');
+                } else {
+                  item.classList.add('question-step-hidden');
+                }
+              });
+              const activeContainer = questionItems[activeIndex];
+              const activeQuestionId = activeContainer ? (activeContainer.getAttribute('data-question-id') || activeContainer.id || 'unknown') : 'unknown';
+              const activeQuestionTextEl = activeContainer ? activeContainer.querySelector('.question-text') : null;
+              const activeQuestionText = activeQuestionTextEl ? activeQuestionTextEl.textContent.trim() : '';
+              const isAnswered = isQuestionAnswered(activeContainer);
+              const shouldSubmit = resolveShouldSubmit(activeContainer, 0, 1);
+              cachedNextSectionInfo = null;
+              cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
+              updateButtons(
+                false,
+                false,
+                false,
+                null,
+                cachedPrevSectionInfo,
+                { shouldSubmit, isAnswered, questionId: activeQuestionId, questionText: activeQuestionText, currentPos: 0, visibleTotal: 1 }
+              );
+              isUpdating = false;
+              return;
+            }
+
+            questionItems.forEach(function(item) {
+              item.classList.add('question-step-hidden');
+            });
+            if (progressCurrent) {
+              progressCurrent.textContent = '0';
+            }
+            if (progressTotal) {
+              progressTotal.textContent = String(questionItems.length);
+            }
+            if (prevBtn) {
+              prevBtn.disabled = true;
+            }
+            if (nextBtn) {
+              nextBtn.disabled = true;
+            }
+            activeIndex = -1;
+            isUpdating = false;
+            return;
+          }
+          if (visibleIndices.indexOf(targetIdx) === -1) {
+
+            targetIdx = visibleIndices[0];
+          }
+
+          questionItems.forEach(function(item, idx) {
+            if (idx === targetIdx) {
+              item.classList.remove('question-step-hidden');
+            } else {
+              item.classList.add('question-step-hidden');
+            }
+          });
+          const currentPos = visibleIndices.indexOf(targetIdx);
+          const position = currentPos + 1;
+          const visibleTotal = visibleIndices.length;
+          const displayTotal = questionItems.length;
+          if (progressCurrent) {
+            progressCurrent.textContent = String(position > 0 ? position : 0);
+          }
+          if (progressTotal) {
+            progressTotal.textContent = String(displayTotal);
+          }
+          const activeContainer = questionItems[targetIdx];
+          const activeQuestionId = activeContainer ? (activeContainer.getAttribute('data-question-id') || activeContainer.id || 'unknown') : 'unknown';
+          const activeQuestionTextEl = activeContainer ? activeContainer.querySelector('.question-text') : null;
+          const activeQuestionText = activeQuestionTextEl ? activeQuestionTextEl.textContent.trim() : '';
+          attachSubmitModeListeners(activeContainer, targetIdx);
+          const shouldSubmit = resolveShouldSubmit(activeContainer, currentPos, visibleTotal);
+          const isAnswered = isQuestionAnswered(activeContainer);
+          const hasPrevQuestion = currentPos > 0;
+
+          cachedNextSectionInfo = shouldSubmit ? null : findNextSectionWithVisibleQuestions();
+          cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
+
+          const canAdvanceAcrossSection = shouldSubmit ? false : !!cachedNextSectionInfo;
+          // Allow advancing within section if there's a next question in the current section
+          const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
+
+          // If we're on the last question and can't advance within section, but can advance across sections, log it for debugging
+          if (isAnswered && !shouldSubmit && currentPos === visibleTotal - 1 && !canAdvanceWithinSection) {
+
+          }
+
+          updateButtons(
+            hasPrevQuestion,
+            canAdvanceWithinSection,
+            canAdvanceAcrossSection,
+            cachedNextSectionInfo,
+            cachedPrevSectionInfo,
+            { shouldSubmit, isAnswered, questionId: activeQuestionId, questionText: activeQuestionText, currentPos, visibleTotal }
+          );
+          activeIndex = targetIdx;
+          isUpdating = false;
+        }
+        function goToNextSection() {
+
+          // Check authentication before moving to next section
+          if (!formAuthAllowsProgress()) {
+
+            if (typeof showSignInRequiredModal === 'function') {
+              showSignInRequiredModal();
+            }
+            return;
+          }
+
+          if (!cachedNextSectionInfo) {
+
+            return;
+          }
+          const targetSectionId = cachedNextSectionInfo.sectionId;
+          const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
+          const targetFirstVisibleIndex = cachedNextSectionInfo.firstVisibleIndex;
+
+          const triggerNavigation = () => {
+
+            if (typeof validateAndProceed === 'function') {
+
+              const validationResult = validateAndProceed(currentSectionNumber);
+
+              // If validation fails, still try to navigate directly
+              if (!validationResult) {
+
+                if (typeof navigateSection === 'function') {
+
+                  navigateSection(targetSectionNumber);
+                }
+              }
+            } else if (typeof navigateSection === 'function') {
+
+              navigateSection(targetSectionNumber);
+            } else {
+
+            }
+          };
+          const updateTargetNav = () => {
+
+            const activeSection = document.querySelector('.section.active');
+
+            if (activeSection && activeSection.id === targetSectionId) {
+              if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+
+                // Pass the firstVisibleIndex to the navigation controller
+                window.questionNavControllers[targetSectionId](targetFirstVisibleIndex);
+              } else {
+
+              }
+            } else {
+
+            }
+          };
+          triggerNavigation();
+          setTimeout(updateTargetNav, 0);
+        }
+        function goToPrevSection() {
+          if (!cachedPrevSectionInfo) {
+            return;
+          }
+          const targetSectionId = cachedPrevSectionInfo.sectionId;
+          const targetSectionNumber = cachedPrevSectionInfo.sectionNumber;
+          const targetQuestionIndex = cachedPrevSectionInfo.lastVisibleIndex;
+          // Use goBack() if we have navigation history (stack), otherwise use direct navigation
+          // This ensures jumps are properly handled when going back
+          const triggerNavigation = () => {
+            // Check if we have a stack entry - if so, use goBack() to respect jump history
+            if (typeof sectionStack !== 'undefined' && Array.isArray(sectionStack) && sectionStack.length > 0) {
+              if (typeof goBack === 'function') {
+                goBack();
+                // After going back, update the target navigation if needed
+                setTimeout(() => {
+                  const activeSection = document.querySelector('.section.active');
+                  if (activeSection && activeSection.id === targetSectionId) {
+                    if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                      window.questionNavControllers[targetSectionId](targetQuestionIndex);
+                    }
+                  }
+                }, 100);
+              }
+            } else {
+              // No stack history, use direct navigation
+              if (typeof navigateSection === 'function') {
+                navigateSection(targetSectionNumber);
+              } else if (typeof validateAndProceed === 'function') {
+                navigateSection(targetSectionNumber);
+              }
+              const updateTargetNav = () => {
+                const activeSection = document.querySelector('.section.active');
+                if (activeSection && activeSection.id === targetSectionId) {
+                  if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                    window.questionNavControllers[targetSectionId](targetQuestionIndex);
+                  }
+                }
+              };
+              setTimeout(updateTargetNav, 0);
+            }
+          };
+          triggerNavigation();
+        }
+        function shiftQuestion(direction) {
+
+          const visibleIndices = getVisibleIndices();
+
+          if (!visibleIndices.length || activeIndex === -1) {
+            if (direction > 0 && activeIndex >= 0 && activeIndex < questionItems.length) {
+              const activeContainer = questionItems[activeIndex];
+              const shouldSubmit = resolveShouldSubmit(activeContainer, 0, 1);
+              if (shouldSubmit && activeContainer && isQuestionAnswered(activeContainer)) {
+                requestAutoFormSubmit();
+                return;
+              }
+            }
+
+            if (direction > 0 && cachedNextSectionInfo) {
+
+              goToNextSection();
+            } else if (direction < 0 && cachedPrevSectionInfo) {
+
+              goToPrevSection();
+            } else {
+
+            }
+            return;
+          }
+          const currentPos = visibleIndices.indexOf(activeIndex);
+
+          if (direction > 0) {
+            // Check authentication before moving forward
+            if (!formAuthAllowsProgress()) {
+
+              if (typeof showSignInRequiredModal === 'function') {
+                showSignInRequiredModal();
+              }
+              return;
+            }
+            const activeContainer = questionItems[activeIndex];
+            const isAnswered = activeContainer ? isQuestionAnswered(activeContainer) : false;
+
+            if (activeContainer && !isAnswered) {
+
+              return;
+            }
+
+            // Check alert logic for the current question before navigating
+            if (activeContainer && typeof checkAlertLogic === 'function') {
+              // Get the question ID from the active container
+              const questionId = activeContainer.getAttribute('data-question-id');
+              if (questionId) {
+                // Find the input/select element for this question
+                const questionInput = activeContainer.querySelector('input, select, textarea');
+                if (questionInput) {
+                  const alertShown = checkAlertLogic(questionInput);
+                  // If alert was shown, don't navigate - user must close alert first
+                  if (alertShown) {
+                    return; // Prevent navigation until alert is closed
+                  }
+                }
+              }
+            }
+          }
+          const nextPos = currentPos + direction;
+
+          if (nextPos < 0 || nextPos >= visibleIndices.length) {
+
+            if (direction > 0) {
+              // If we're going forward and at the end, try to find next section
+              if (cachedNextSectionInfo) {
+
+                goToNextSection();
+              } else {
+                // Re-check for next section in case cache is stale
+
+                const freshNextSectionInfo = findNextSectionWithVisibleQuestions();
+                if (freshNextSectionInfo) {
+
+                  cachedNextSectionInfo = freshNextSectionInfo;
+                  goToNextSection();
+                } else {
+                  // Last resort: if there's a next section element, navigate to it anyway
+                  const nextSectionIdx = sectionIdx + 1;
+                  if (nextSectionIdx < sectionElements.length) {
+                    const nextSection = sectionElements[nextSectionIdx];
+
+                    cachedNextSectionInfo = {
+                      sectionEl: nextSection,
+                      sectionId: nextSection.id,
+                      sectionNumber: sectionNumbers[nextSectionIdx] || (nextSectionIdx + 1),
+                      firstVisibleIndex: 0
+                    };
+                    goToNextSection();
+                  } else {
+                    const activeContainer = questionItems[activeIndex];
+                    const shouldSubmit = resolveShouldSubmit(activeContainer, currentPos, visibleIndices.length);
+                    if (shouldSubmit && activeContainer && isQuestionAnswered(activeContainer)) {
+                      requestAutoFormSubmit();
+                    }
+                  }
+                }
+              }
+            } else if (direction < 0 && cachedPrevSectionInfo) {
+
+              goToPrevSection();
+            } else {
+
+            }
+            return;
+          }
+
+          activateIndex(visibleIndices[nextPos]);
+        }
+        function refreshNav(targetIdx) {
+
+          const visibleIndices = getVisibleIndices();
+
+          if (!visibleIndices.length) {
+            if (activeIndex >= 0 && activeIndex < questionItems.length) {
+              activateIndex(activeIndex);
+              return;
+            }
+
+            // If no visible questions found, try to show the first question anyway
+            // This handles cases where questions don't have the 'hidden' class but might be hidden by CSS
+
+            if (questionItems.length > 0) {
+              const firstQuestion = questionItems[0];
+              if (firstQuestion) {
+                const questionId = firstQuestion.getAttribute('data-question-id') || firstQuestion.id || 'unknown';
+
+                // Remove both question-step-hidden AND hidden classes to ensure question is visible
+                firstQuestion.classList.remove('question-step-hidden');
+                firstQuestion.classList.remove('hidden');
+
+              }
+            }
+            activateIndex(0);
+            return;
+          }
+          if (typeof targetIdx !== 'number' || visibleIndices.indexOf(targetIdx) === -1) {
+
+            const currentVisibleIdx = visibleIndices.indexOf(activeIndex);
+
+            if (currentVisibleIdx === -1) {
+
+              activateIndex(visibleIndices[0]);
+            } else {
+
+              activateIndex(activeIndex);
+            }
+            return;
+          }
+
+          activateIndex(targetIdx);
+        }
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function() {
+            shiftQuestion(-1);
+          });
+        }
+        if (nextBtn) {
+          // Use pointerdown event to handle disabled button clicks (click events don't fire on disabled buttons)
+          nextBtn.addEventListener('pointerdown', function(e) {
+            // Only handle if button is disabled
+            if (!nextBtn.disabled && !nextBtn.hasAttribute('disabled')) {
+              return; // Let normal click handler take over
+            }
+            
+            console.log('[DISABLED NEXT BTN] Pointerdown on disabled button, looking for unfilled fields...');
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Find the current active question item - use .question-item class (not .question-step-item)
+            const activeQuestionItem = sectionEl.querySelector('.question-item:not(.question-step-hidden)');
+            console.log('[DISABLED NEXT BTN] Active question item:', activeQuestionItem);
+            console.log('[DISABLED NEXT BTN] Section element:', sectionEl);
+            
+            if (activeQuestionItem) {
+              // Find all visible inputs, selects, and textareas that should be filled
+              const inputs = activeQuestionItem.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), select, textarea');
+              const checkboxGroups = activeQuestionItem.querySelectorAll('.checkbox-group, .radio-group');
+              
+              console.log('[DISABLED NEXT BTN] Found inputs:', inputs.length);
+              console.log('[DISABLED NEXT BTN] Found checkbox/radio groups:', checkboxGroups.length);
+              
+              // Helper function to check if input is properly filled (with special rules for zip/phone)
+              function isInputProperlyFilled(input) {
+                const value = input.value ? input.value.trim() : '';
+                if (input.hasAttribute('data-address-ui') && input.getAttribute('data-address-ui') === 'state') {
+                  return value.length > 0;
+                }
+                if (input.hasAttribute('data-pdf-combine-into')) {
+                  return value.length > 0;
+                }
+                return value.length > 0;
+              }
+              
+              // Check regular inputs first
+              for (const input of inputs) {
+                // Skip hidden elements
+                if (input.offsetParent === null) {
+                  console.log('[DISABLED NEXT BTN] Skipping hidden input:', input.id || input.name);
+                  continue;
+                }
+                
+                const value = input.value ? input.value.trim() : '';
+                console.log('[DISABLED NEXT BTN] Checking input:', input.id || input.name, 'value:', value);
+                
+                if (!isInputProperlyFilled(input)) {
+                  // Found unfilled/incomplete input - scroll to it and highlight
+                  console.log('[DISABLED NEXT BTN] Found unfilled/incomplete input:', input.id || input.name);
+                  input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  input.focus();
+                  
+                  // Add temporary highlight effect
+                  const originalBorder = input.style.border;
+                  const originalBoxShadow = input.style.boxShadow;
+                  input.style.border = '2px solid #e74c3c';
+                  input.style.boxShadow = '0 0 10px rgba(231, 76, 60, 0.5)';
+                  setTimeout(() => {
+                    input.style.border = originalBorder;
+                    input.style.boxShadow = originalBoxShadow;
+                  }, 2000);
+                  return;
+                }
+              }
+              
+              // Check checkbox/radio groups - at least one should be checked
+              for (const group of checkboxGroups) {
+                if (group.offsetParent === null) {
+                  console.log('[DISABLED NEXT BTN] Skipping hidden checkbox/radio group');
+                  continue;
+                }
+                
+                const checkedInputs = group.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked');
+                console.log('[DISABLED NEXT BTN] Checkbox/radio group has', checkedInputs.length, 'checked items');
+                if (checkedInputs.length === 0) {
+                  // No selection made - scroll to the group
+                  console.log('[DISABLED NEXT BTN] Found unchecked checkbox/radio group');
+                  group.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  
+                  // Highlight the group
+                  const originalBorder = group.style.border;
+                  const originalBoxShadow = group.style.boxShadow;
+                  const originalBorderRadius = group.style.borderRadius;
+                  const originalPadding = group.style.padding;
+                  group.style.border = '2px solid #e74c3c';
+                  group.style.boxShadow = '0 0 10px rgba(231, 76, 60, 0.5)';
+                  group.style.borderRadius = '8px';
+                  group.style.padding = '10px';
+                  setTimeout(() => {
+                    group.style.border = originalBorder;
+                    group.style.boxShadow = originalBoxShadow;
+                    group.style.borderRadius = originalBorderRadius;
+                    group.style.padding = originalPadding;
+                  }, 2000);
+                  return;
+                }
+              }
+              
+              // Check for dropdown/select that needs selection
+              const selects = activeQuestionItem.querySelectorAll('select');
+              console.log('[DISABLED NEXT BTN] Found selects:', selects.length);
+              for (const select of selects) {
+                if (select.offsetParent === null) {
+                  console.log('[DISABLED NEXT BTN] Skipping hidden select:', select.id || select.name);
+                  continue;
+                }
+                
+                console.log('[DISABLED NEXT BTN] Checking select:', select.id || select.name, 'value:', select.value, 'selectedIndex:', select.selectedIndex);
+                if (!select.value || select.value === '' || select.selectedIndex === 0) {
+                  console.log('[DISABLED NEXT BTN] Found unfilled select:', select.id || select.name);
+                  select.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  select.focus();
+                  
+                  const originalBorder = select.style.border;
+                  const originalBoxShadow = select.style.boxShadow;
+                  select.style.border = '2px solid #e74c3c';
+                  select.style.boxShadow = '0 0 10px rgba(231, 76, 60, 0.5)';
+                  setTimeout(() => {
+                    select.style.border = originalBorder;
+                    select.style.boxShadow = originalBoxShadow;
+                  }, 2000);
+                  return;
+                }
+              }
+              
+              console.log('[DISABLED NEXT BTN] No unfilled fields found in active question');
+            } else {
+              console.log('[DISABLED NEXT BTN] No active question item found!');
+              // Try alternate selectors as fallback
+              const allQuestionItems = sectionEl.querySelectorAll('.question-item, .question-container');
+              console.log('[DISABLED NEXT BTN] All question items in section:', allQuestionItems.length);
+              allQuestionItems.forEach((item, idx) => {
+                console.log('[DISABLED NEXT BTN] Question item', idx, ':', item.id, 'classes:', item.className);
+              });
+            }
+          });
+          
+          nextBtn.addEventListener('click', function(e) {
+            // Skip if button is disabled (handled by pointerdown)
+            if (nextBtn.disabled || nextBtn.hasAttribute('disabled')) {
+              return;
+            }
+
+            if (nextBtn.dataset.advanceMode === 'submit') {
+              requestAutoFormSubmit();
+              return;
+            }
+
+            // Check authentication before navigating
+            checkAuthBeforeNavigate(function() {
+
+            shiftQuestion(1);
+            });
+          });
+        }
+        const observer = new MutationObserver(function(mutations) {
+          if (isUpdating) return;
+          let shouldUpdate = false;
+          mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const oldClasses = mutation.oldValue || '';
+              const newClasses = mutation.target.className || '';
+              if (oldClasses.includes('hidden') !== newClasses.includes('hidden')) {
+                shouldUpdate = true;
+              }
+            }
+          });
+          if (shouldUpdate) {
+            refreshNav(activeIndex === -1 ? 0 : activeIndex);
+          }
+        });
+        questionItems.forEach(function(item) {
+          observer.observe(item, { 
+            attributes: true, 
+            attributeFilter: ['class'],
+            attributeOldValue: true
+          });
+        });
+        document.addEventListener('questionVisibilityChanged', function(evt) {
+          if (!evt || !evt.detail || !evt.detail.sectionId || evt.detail.sectionId === sectionId) {
+            refreshNav();
+          }
+        });
+        questionItems.forEach(function(item) {
+          item.addEventListener('refreshNavigation', function() {
+            refreshNav(activeIndex === -1 ? 0 : activeIndex);
+          });
+        });
+        window.questionNavControllers[sectionId] = refreshNav;
+        const visibleIndices = getVisibleIndices();
+        const initialIndex = visibleIndices.length ? visibleIndices[0] : 0;
+        activateIndex(initialIndex);
+        // Check hard alerts on initial page load
+        setTimeout(() => {
+
+          if (typeof checkAllHardAlertsAndUpdateNavigation === 'function') {
+            checkAllHardAlertsAndUpdateNavigation();
+          }
+        }, 500);
+      });
+      // Global shortcut: Shift+Enter → click the visible "next" arrow
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.shiftKey) {
+          e.preventDefault();
+          const activeSection = document.querySelector('.section.active');
+          const nextBtn = activeSection ? activeSection.querySelector('.question-next') : null;
+
+          if (nextBtn) {
+            nextBtn.click();
+          }
+        }
+      });
+      // Global shortcut: Ctrl+CapsLock (Windows/Linux) or Command+CapsLock (Mac) → click the visible "previous" arrow
+      // CRITICAL FIX: Use a flag to prevent double-firing and add extensive logging
+      let capsLockHandlerExecuting = false;
+      document.addEventListener('keydown', function(e) {
+
+        // Use e.code for more reliable CapsLock detection (works even when CapsLock is toggled)
+        const isCapsLock = (e.code === 'CapsLock' || e.key === 'CapsLock');
+        const hasModifier = (e.ctrlKey || e.metaKey);
+
+        if (isCapsLock && hasModifier) {
+
+          // Prevent double-firing: if handler is already executing, skip
+          if (capsLockHandlerExecuting) {
+
+            return;
+          }
+
+          e.preventDefault();
+          e.stopPropagation();
+
+          const activeSection = document.querySelector('.section.active');
+
+          const prevBtn = activeSection ? activeSection.querySelector('.question-prev') : null;
+
+          if (prevBtn && !prevBtn.disabled) {
+
+            // Set flag to prevent double-firing
+            capsLockHandlerExecuting = true;
+
+            // Reset flag after a short delay to allow the click to process
+            setTimeout(() => {
+              capsLockHandlerExecuting = false;
+
+            }, 100);
+
+            prevBtn.click();
+
+          } else {
+
+          }
+        }
+      });
+    });
+  </script>
+  <div id="hidden_pdf_fields">
+<input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
+<input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
+<input type="hidden" id="user_fullname"         name="user_fullname">
+<input type="hidden" id="user_email_hidden"     name="user_email_hidden">
+<input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
+<input type="hidden" id="user_street_hidden"    name="user_street_hidden">
+<input type="hidden" id="user_city_hidden"      name="user_city_hidden">
+<input type="hidden" id="user_state_hidden"     name="user_state_hidden">
+<input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
+<input type="hidden" id="user_full_address"     name="user_full_address">
+<input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden">
+<input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
+</div>
+  <script>
+    window.showLoginRequiredModal = function() {
+      const modal = document.getElementById('loginRequiredModal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    };
+    window.hideLoginRequiredModal = function() {
+      const modal = document.getElementById('loginRequiredModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    };
+  </script>
+  </form>
+<div id="thankYouMessage" class="thank-you-message auto-form-thank-you" style="display: none;" aria-hidden="true">
+  <h2 class="auto-form-thank-you-title">Thank you for completing the survey</h2>
+  <button type="button" id="autoFormViewPdfBtn" class="auto-form-view-pdf-btn">View Form</button>
+  <div id="thank-you-pdf-preview-wrap" class="thank-you-pdf-preview-wrap" hidden>
+    <iframe id="filled-pdf-preview" title="Filled PDF preview"></iframe>
+  </div>
+  <button type="button" onclick="goBackToForm()" class="auto-form-thank-you-back">Back</button>
+  <div id="checklistDisplay" style="display: none;"><h3>Your Personalized Checklist</h3><div id="checklistItems"></div></div>
+  <button id="debugDownloadPdfBtn" onclick="downloadAllPdfs()" style="display: none;">Download PDF</button>
+  <button id="debugPreviewPdfsBtn" onclick="showPreviewPdfsModal()" style="display: none;">Preview PDFs</button>
+</div>
+</div>
+</section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+  var mobileNav = document.getElementById('mobile-nav');
+  var mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+  var mobileFormsMenu = document.getElementById('mobile-forms-menu');
+  var body = document.body;
+  function toggleMobileMenu() {
+    if (!mobileMenuToggle || !mobileNav) return;
+    mobileMenuToggle.classList.toggle('active');
+    mobileNav.classList.toggle('active');
+    body.classList.toggle('menu-open');
+  }
+  if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', function(e) { e.preventDefault(); toggleMobileMenu(); });
+  }
+  if (mobileFormsToggle && mobileFormsMenu) {
+    mobileFormsToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      mobileFormsToggle.classList.toggle('active');
+      mobileFormsMenu.classList.toggle('active');
+    });
+  }
+  var formsWrapper = document.getElementById('forms-dropdown-wrapper');
+  var formsMenu = document.getElementById('forms-dropdown-menu');
+  var formsLink = document.getElementById('forms-nav-link');
+  if (formsWrapper && formsMenu && formsLink) {
+    var dropdownOpen = false;
+    function openDropdown() { dropdownOpen = true; formsMenu.style.display = 'flex'; }
+    function closeDropdown() { dropdownOpen = false; formsMenu.style.display = 'none'; }
+    formsLink.addEventListener('click', function(e) { e.preventDefault(); dropdownOpen ? closeDropdown() : openDropdown(); });
+    document.addEventListener('click', function(e) {
+      if (!formsWrapper.contains(e.target)) closeDropdown();
+    });
+  }
+});
+</script>
+<div id="signinRequiredModal" class="signin-modal-overlay" style="display:none;">
+  <div class="signin-modal">
+    <h2>Sign In Required</h2>
+    <p>Please sign in to continue filling out this form.</p>
+    <a href="/Pages/account.html" class="signin-modal-button">Sign In</a>
+  </div>
+</div>
+__AUTO_FORM_RUNTIME_SCRIPTS__
+</body>
+</html>

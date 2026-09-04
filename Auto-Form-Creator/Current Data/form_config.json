@@ -1,0 +1,886 @@
+{
+  "formTitle": "IRS Form W-9 (Request for Taxpayer Identification Number and Certification)",
+  "formName": "IRS Form W-9",
+  "formId": "w9",
+  "formDescription": "Collects taxpayer identification and certification information for IRS reporting purposes.",
+  "formFolderName": "W-9",
+  "defendant": "N/A",
+  "displayMode": "all_at_once",
+  "sections": [
+    {
+      "sectionId": 1,
+      "sectionName": "Applicant Information",
+      "questions": [
+        {
+          "questionId": 1,
+          "text": "What is your name as shown on your tax return?",
+          "needsExplanation": true,
+          "explanation": "Enter the name exactly as it appears on your income tax return. For individuals, use your legal name; for entities, use the registered business name.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "taxpayer_name",
+          "placeholder": "Name",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "full_name",
+            "profileDescription": "User's legal full name",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 2,
+          "text": "What is your business name or disregarded entity name?",
+          "needsExplanation": true,
+          "explanation": "Enter your business name exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "business_name",
+          "placeholder": "Business Name",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 3,
+          "text": "What is your federal tax classification?",
+          "needsExplanation": true,
+          "explanation": "Select the option or options that best apply to your situation.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "single",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Individual/sole proprietor",
+              "nameId": "tax_classification_individual",
+              "value": "Individual/sole proprietor"
+            },
+            {
+              "label": "C corporation",
+              "nameId": "tax_classification_corporation",
+              "value": "C corporation"
+            },
+            {
+              "label": "S corporation",
+              "nameId": "tax_classification_s_corporation",
+              "value": "S corporation"
+            },
+            {
+              "label": "Partnership",
+              "nameId": "tax_classification_partnership",
+              "value": "Partnership"
+            },
+            {
+              "label": "Trust/estate",
+              "nameId": "tax_classification_trust_estate",
+              "value": "Trust/estate"
+            },
+            {
+              "label": "LLC",
+              "nameId": "tax_classification_llc",
+              "value": "LLC"
+            },
+            {
+              "label": "Other",
+              "nameId": "tax_classification_other_checkbox",
+              "value": "Other"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 4,
+          "text": "Did you select \"Other\" for your federal tax classification?",
+          "needsExplanation": true,
+          "explanation": "Answer Yes if the following question applies to you. Answer No to skip it.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "labels": [],
+          "placeholder": "",
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 5,
+          "text": "What is your other tax classification?",
+          "needsExplanation": true,
+          "explanation": "Only complete this if you selected \"Other\" for federal tax classification. Enter the classification exactly as it should appear on the form.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "3",
+            "prevAnswer": "Other"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "tax_classification_other",
+          "placeholder": "Other Tax Classification",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 6,
+          "text": "What is the tax classification of the LLC owner?",
+          "needsExplanation": true,
+          "explanation": "If you checked LLC above, enter C for corporation, S for S corporation, or P for partnership — the tax classification of the LLC owner shown on the W-9.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "3",
+            "prevAnswer": "LLC"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "tax_classification_code",
+          "placeholder": "LLC Tax Classification Code",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 7,
+          "text": "Please confirm: Foreign partners/owners/beneficiaries",
+          "needsExplanation": true,
+          "explanation": "Check this box if you are a partnership, trust, or estate with any foreign partners, owners, or beneficiaries.",
+          "type": "checkbox",
+          "checkboxSelectionMode": "single",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Foreign partners/owners/beneficiaries",
+              "nameId": "foreign_partners_checkbox",
+              "value": "Foreign partners/owners/beneficiaries"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": 2,
+      "sectionName": "Applicant Information",
+      "questions": [
+        {
+          "questionId": 8,
+          "text": "What is your address?",
+          "needsExplanation": true,
+          "explanation": "Enter your home street address or P.O. Box as the applicant. This is your personal residence — not the agency or employer address.",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [
+            "Address",
+            "City, State, and ZIP Code"
+          ],
+          "textboxes": [
+            {
+              "label": "Address",
+              "nameId": "address",
+              "placeholder": "Street address",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "address",
+                "profileDescription": "Address"
+              }
+            },
+            {
+              "label": "City, State, and ZIP Code",
+              "nameId": "city_state_zip",
+              "placeholder": "City, state, and ZIP code",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "city_state_zip",
+                "profileDescription": "City, State, and ZIP Code"
+              }
+            }
+          ],
+          "placeholder": "",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 9,
+          "text": "Do you want to provide the requester's name and address?",
+          "needsExplanation": true,
+          "explanation": "Choose Yes if you want to provide the name and address of the person or business requesting this form. This is optional.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 10,
+          "text": "What is the requester's name and address?",
+          "needsExplanation": true,
+          "explanation": "Enter your requester name exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "9",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "optional_requester_name",
+          "placeholder": "Requester Name",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 11,
+          "text": "Do you want to provide an account number?",
+          "needsExplanation": true,
+          "explanation": "Choose Yes if you want to provide an account number for reference. This is optional and may help the requester identify your account.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 12,
+          "text": "What is your account number?",
+          "needsExplanation": true,
+          "explanation": "Enter your account number exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "11",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "account_number",
+          "placeholder": "Account Number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 13,
+          "text": "Do you need to provide an exempt payee code?",
+          "needsExplanation": true,
+          "explanation": "Choose Yes if you are exempt from backup withholding and have an exempt payee code. Most individuals will select No.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 14,
+          "text": "What is your exempt payee code?",
+          "needsExplanation": true,
+          "explanation": "Enter an exempt payee code only if you are exempt from backup withholding under IRS rules. Most individuals leave this blank.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "13",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "exempt_payee_code",
+          "placeholder": "Exempt Payee Code",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 15,
+          "text": "Do you need to provide a FATCA code?",
+          "needsExplanation": true,
+          "explanation": "Choose Yes if you are exempt from FATCA reporting and have a FATCA code. Most individuals will select No.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 16,
+          "text": "What is your FATCA code?",
+          "needsExplanation": true,
+          "explanation": "Enter your fatca code exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "15",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "fatca_code",
+          "placeholder": "FATCA Code",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": 3,
+      "sectionName": "Applicant Information",
+      "questions": [
+        {
+          "questionId": 17,
+          "text": "What is your Social Security Number?",
+          "needsExplanation": true,
+          "explanation": "Enter your social security number exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "tin_ssn",
+          "placeholder": "Social Security Number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "ssn",
+            "profileDescription": "User's Social Security Number",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 18,
+          "text": "What is your Employer Identification Number?",
+          "needsExplanation": true,
+          "explanation": "Enter the employer identification number (EIN) for the business entity, if applicable.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "tin_ein",
+          "placeholder": "Employer Identification Number",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "ein",
+            "profileDescription": "User's Employer Identification Number",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 19,
+          "text": "What name is associated with your EIN?",
+          "needsExplanation": true,
+          "explanation": "Enter the employer identification number (EIN) for the business entity, if applicable.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "name_for_ein",
+          "placeholder": "Name for EIN",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 20,
+          "text": "What name is associated with your SSN?",
+          "needsExplanation": true,
+          "explanation": "Enter your name associated with this social security number exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "name_for_ssn",
+          "placeholder": "Name for SSN",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "name_for_ssn",
+            "profileDescription": "Name for SSN",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 21,
+          "text": "Do you have any additional name information to provide?",
+          "needsExplanation": true,
+          "explanation": "Choose Yes if you need to provide any additional name information for IRS matching purposes.",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "value": "Yes"
+            },
+            {
+              "label": "No",
+              "value": "No"
+            }
+          ],
+          "labels": [],
+          "nameId": null,
+          "placeholder": "",
+          "linkedToNameId": null,
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 22,
+          "text": "Please provide any additional name information.",
+          "needsExplanation": true,
+          "explanation": "Enter your additional name or dba (if applicable) exactly as it should appear on the completed form in the Applicant Information section.",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "21",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "additional_name_info",
+          "placeholder": "Additional Name Information",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        }
+      ]
+    }
+  ],
+  "hiddenFields": [],
+  "sectionCounter": 4,
+  "questionCounter": 25,
+  "htmlMode": "normal",
+  "autopopulateFields": [
+    {
+      "questionText": "What is your name as shown on your tax return?",
+      "nameId": "taxpayer_name",
+      "profileKey": "full_name",
+      "profileDescription": "User's legal full name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your address?",
+      "nameId": "address",
+      "profileKey": "street",
+      "profileDescription": "User's home address",
+      "availableInProfile": true,
+      "currentProfileValue": "921 Sloat Road31"
+    },
+    {
+      "questionText": "What is your city, state, and ZIP code?",
+      "nameId": "city_state_zip",
+      "profileKey": "city_state_zip",
+      "profileDescription": "User's city, state, and ZIP code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Social Security Number?",
+      "nameId": "tin_ssn",
+      "profileKey": "ssn",
+      "profileDescription": "User's Social Security Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Employer Identification Number?",
+      "nameId": "tin_ein",
+      "profileKey": "ein",
+      "profileDescription": "User's Employer Identification Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What name is associated with your SSN?",
+      "nameId": "name_for_ssn",
+      "profileKey": "name_for_ssn",
+      "profileDescription": "Name for SSN",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    }
+  ],
+  "autopopulateAvailable": [
+    {
+      "questionText": "What is your address?",
+      "nameId": "address",
+      "profileKey": "street",
+      "profileDescription": "User's home address",
+      "availableInProfile": true,
+      "currentProfileValue": "921 Sloat Road31"
+    }
+  ],
+  "autopopulateMissing": [
+    {
+      "questionText": "What is your name as shown on your tax return?",
+      "nameId": "taxpayer_name",
+      "profileKey": "full_name",
+      "profileDescription": "User's legal full name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your city, state, and ZIP code?",
+      "nameId": "city_state_zip",
+      "profileKey": "city_state_zip",
+      "profileDescription": "User's city, state, and ZIP code",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Social Security Number?",
+      "nameId": "tin_ssn",
+      "profileKey": "ssn",
+      "profileDescription": "User's Social Security Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Employer Identification Number?",
+      "nameId": "tin_ein",
+      "profileKey": "ein",
+      "profileDescription": "User's Employer Identification Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What name is associated with your SSN?",
+      "nameId": "name_for_ssn",
+      "profileKey": "name_for_ssn",
+      "profileDescription": "Name for SSN",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    }
+  ],
+  "pdfToken": "b3056f0e-923b-47c4-b30b-2572f6df6528"
+}
