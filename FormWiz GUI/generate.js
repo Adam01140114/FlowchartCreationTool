@@ -13447,28 +13447,56 @@ function formOwningSection(sectionNumber){
     }) || null;
 }
 
-/** Has this option been chosen? Covers both checkbox ids and dropdown values. */
+/**
+ * Has the option that activates a form been chosen?
+ *
+ * The rule names an option node from the flowchart, which for a checkbox or
+ * radio is the element id, and for a dropdown option is the owning question's
+ * id with the option value slugged onto the end - dropdown options are values
+ * on one select, not elements of their own.
+ *
+ * Every branch below is anchored to the question that owns the option. A bare
+ * search for the label would let "Yes" anywhere in a long packet switch a form
+ * on, and a packet is full of unrelated Yes/No questions.
+ */
 function isActivationOptionChosen(rule){
     if (!rule || !rule.optionNameId) return false;
-    var el = document.getElementById(rule.optionNameId);
+    var wanted = String(rule.optionNameId);
+
+    var el = document.getElementById(wanted);
     if (el){
         if (el.type === 'checkbox' || el.type === 'radio') return !!el.checked;
         return String(el.value || '').trim() !== '';
     }
-    // A dropdown option is a value on the question's select, not an element.
-    var label = String(rule.optionLabel || rule.optionNameId).trim().toLowerCase();
-    if (!label) return false;
+
+    // <question id>_<slugged value> on a select, or on a checked box.
+    var slug = function(v){
+        return String(v).toLowerCase().replace(/\W+/g, '_').replace(/^_+|_+$/g, '');
+    };
     var selects = document.querySelectorAll('select');
     for (var i = 0; i < selects.length; i++){
-        if (String(selects[i].value || '').trim().toLowerCase() === label) return true;
+        var sel = selects[i];
+        if (!sel.id || !sel.value) continue;
+        if (sel.id + '_' + slug(sel.value) === wanted) return true;
     }
     var checked = document.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked');
-    for (var j = 0; j < checked.length; j++){
-        if (String(checked[j].value || '').trim().toLowerCase() === label) return true;
+    for (var k = 0; k < checked.length; k++){
+        var box = checked[k];
+        var base = box.name || box.id || '';
+        if (base + '_' + slug(box.value) === wanted) return true;
+    }
+
+    // Older projects recorded the label without a matching option id. Trust it
+    // only on the question the option belongs to, found by id prefix.
+    var label = String(rule.optionLabel || '').trim().toLowerCase();
+    if (!label) return false;
+    for (var m = 0; m < selects.length; m++){
+        var s2 = selects[m];
+        if (!s2.id || wanted.indexOf(s2.id + '_') !== 0) continue;
+        if (String(s2.value || '').trim().toLowerCase() === label) return true;
     }
     return false;
 }
-
 function isFormActivated(form){
     if (!form) return false;
     if (form.alwaysIncluded) return true;

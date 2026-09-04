@@ -267,6 +267,25 @@ app.post('/api/test-payload', express.json({ limit: '50mb' }), async (req, res) 
 
 // Auto Form Creator (ported from FormWiz) — mounts /Auto-Form-Creator + its API.
 // Registered before the repo-wide static handler so its routes take precedence.
+/**
+ * Save a JSON artifact the browser built, so work like a merged packet does not
+ * live only in localStorage. Dev-only: the name is reduced to a bare filename
+ * under ROOT, so it cannot be steered outside the repo.
+ */
+app.post('/api/dev-save', (req, res) => {
+  const name = path.basename(String((req.body && req.body.name) || ''));
+  if (!/^[\w.-]+\.json$/.test(name)) {
+    return res.status(400).json({ error: 'name must be a plain .json filename' });
+  }
+  const target = path.join(ROOT, name);
+  try {
+    fs.writeFileSync(target, JSON.stringify(req.body.data, null, 2));
+    res.json({ saved: name, bytes: fs.statSync(target).size });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const autoFormStatus = registerAutoFormRoutes(app);
 
 app.use(express.static(ROOT));
