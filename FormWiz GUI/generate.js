@@ -13398,6 +13398,85 @@ function getQuestionInputs (questionId, type = null) {
   );
 }
 /*------------------------------------------------------------------
+ *  Project forms — several forms in one interview.
+ *
+ *  A form is only asked when something activates it. Activation is
+ *  deliberately NOT a jump: a jump fires the moment you leave the section
+ *  holding the trigger, abandoning the rest of that form. Instead the answer
+ *  only sets a flag, and the flag is read at the form boundary - so you
+ *  always finish the form you are in before moving on.
+ *
+ *  Everything here is inert unless __PROJECT_FORMS__ is present, so
+ *  single-form output behaves exactly as before.
+ *-----------------------------------------------------------------*/
+function getProjectForms(){
+    return (typeof window !== 'undefined' && Array.isArray(window.__PROJECT_FORMS__))
+        ? window.__PROJECT_FORMS__ : [];
+}
+
+function getFormActivations(){
+    return (typeof window !== 'undefined' && Array.isArray(window.__FORM_ACTIVATIONS__))
+        ? window.__FORM_ACTIVATIONS__ : [];
+}
+
+/** Which form owns this section? */
+function formOwningSection(sectionNumber){
+    return getProjectForms().find(function(f){
+        return sectionNumber >= f.firstSection && sectionNumber <= f.lastSection;
+    }) || null;
+}
+
+/** Has this option been chosen? Covers both checkbox ids and dropdown values. */
+function isActivationOptionChosen(rule){
+    if (!rule || !rule.optionNameId) return false;
+    var el = document.getElementById(rule.optionNameId);
+    if (el){
+        if (el.type === 'checkbox' || el.type === 'radio') return !!el.checked;
+        return String(el.value || '').trim() !== '';
+    }
+    // A dropdown option is a value on the question's select, not an element.
+    var label = String(rule.optionLabel || rule.optionNameId).trim().toLowerCase();
+    if (!label) return false;
+    var selects = document.querySelectorAll('select');
+    for (var i = 0; i < selects.length; i++){
+        if (String(selects[i].value || '').trim().toLowerCase() === label) return true;
+    }
+    var checked = document.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked');
+    for (var j = 0; j < checked.length; j++){
+        if (String(checked[j].value || '').trim().toLowerCase() === label) return true;
+    }
+    return false;
+}
+
+function isFormActivated(form){
+    if (!form) return false;
+    if (form.alwaysIncluded) return true;
+    var rules = getFormActivations().filter(function(r){ return r.targetForm === form.name; });
+    for (var i = 0; i < rules.length; i++){
+        if (rules[i].unconditional) return true;
+        if (isActivationOptionChosen(rules[i])) return true;
+    }
+    return false;
+}
+
+/**
+ * Where to go after the last section of a form: the first section of the next
+ * activated form, or "end". Returns null when this is not a form boundary, so
+ * ordinary section-to-section navigation is untouched.
+ */
+function nextSectionAcrossForms(currentSection){
+    var forms = getProjectForms();
+    if (!forms.length) return null;
+    var current = formOwningSection(currentSection);
+    if (!current || currentSection !== current.lastSection) return null;
+
+    for (var i = current.index + 1; i < forms.length; i++){
+        if (isFormActivated(forms[i])) return forms[i].firstSection;
+    }
+    return 'end';
+}
+
+/*------------------------------------------------------------------
  *  handleNext(currentSection)
  *  – pushes the section you are leaving and works out where to go
  *-----------------------------------------------------------------*/
@@ -13432,6 +13511,12 @@ function handleNext(currentSection){
             }
         }
     }
+    /* ---------- form boundary: activation decides what comes next ---------- */
+    if (!jumpDetected){
+        var acrossForms = nextSectionAcrossForms(currentSection);
+        if (acrossForms !== null) nextSection = acrossForms;
+    }
+
     /* ---------- special "end" shortcut ---------- */
     if (nextSection === 'end'){
         processAllPdfs().then(()=>navigateSection('end'));
