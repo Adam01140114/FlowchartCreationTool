@@ -1458,8 +1458,10 @@ function toggleOptions(questionId) {
     }
     // Name/ID: fill from question text when still blank (e.g. after choosing a type that shows it)
     maybeAutofillTextboxNameFromQuestion(questionId);
-    // Update linking targets in case dropdown questions were added/changed
-    updateAllLinkingTargets();
+    // Update linking targets in case dropdown questions were added/changed.
+    // Skipped during a bulk import and run once at the end; rebuilding every
+    // question's targets on every question is quadratic.
+    if (!window.__fwBulkImport) updateAllLinkingTargets();
 }
 // --------------------------------------------------
 // --- Additional logic blocks (jump, PDF, alerts)
@@ -2127,7 +2129,7 @@ function addHiddenLogicConfig(questionId) {
         updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId);
     } else {
 
-        updateHiddenLogicTriggerOptions(questionId);
+        if (!window.__fwBulkImport) updateHiddenLogicTriggerOptions(questionId);
     }
 }
 // Remove a hidden logic configuration
@@ -2438,14 +2440,14 @@ function addDropdownOption(questionId, presetText) {
             updateJumpOptions(questionId, conditionId);
         });
         // Update hidden logic trigger options
-        updateHiddenLogicTriggerOptions(questionId);
+        if (!window.__fwBulkImport) updateHiddenLogicTriggerOptions(questionId);
     });
     // Update all existing jump conditions
     updateJumpOptions(questionId);
     // Update all checklist logic dropdowns
     updateAllChecklistLogicDropdowns();
     // Update hidden logic trigger options
-    updateHiddenLogicTriggerOptions(questionId);
+    if (!window.__fwBulkImport) updateHiddenLogicTriggerOptions(questionId);
 }
 function removeDropdownOption(questionId, optionNumber) {
     const optionDiv = document.querySelector(`#dropdownOptions${questionId} .option${optionNumber}`);
@@ -2465,7 +2467,7 @@ function removeDropdownOption(questionId, optionNumber) {
     // Update all checklist logic dropdowns
     updateAllChecklistLogicDropdowns();
     // Update hidden logic trigger options
-    updateHiddenLogicTriggerOptions(questionId);
+    if (!window.__fwBulkImport) updateHiddenLogicTriggerOptions(questionId);
     // Update PDF preview trigger options
     updatePdfPreviewTriggerOptions(questionId);
     // Update LaTeX preview trigger options

@@ -3016,6 +3016,16 @@ function loadFormData(formData) {
     try {
       if (typeof updateGlobalQuestionLabels === 'function') updateGlobalQuestionLabels();
       if (typeof updateAllChecklistLogicDropdowns === 'function') updateAllChecklistLogicDropdowns();
+      if (typeof updateAllLinkingTargets === 'function') updateAllLinkingTargets();
+      if (typeof refreshAllHiddenLogicTriggerOptions === 'function') {
+        refreshAllHiddenLogicTriggerOptions();
+      } else if (typeof updateHiddenLogicTriggerOptions === 'function') {
+        // No bulk variant exists, so walk the questions once here.
+        document.querySelectorAll('#formBuilder .question-block').forEach(function (b) {
+          const id = b.id.replace('questionBlock', '');
+          try { updateHiddenLogicTriggerOptions(id); } catch (e) { /* skip */ }
+        });
+      }
     } catch (e) { /* a refresh failing must not fail the import */ }
 
     if (typeof hideFormBuilderImportLoadingDeferred === 'function') {
