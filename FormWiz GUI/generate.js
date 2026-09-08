@@ -19279,19 +19279,41 @@ function fillYield() {
  */
 async function fillMaximumPathPass(pass) {
   revealAllForMaxFill();
-  const selects = [...document.querySelectorAll('select')].filter(isDebugFillEligible);
-  for (let i = 0; i < selects.length; i++) {
-    pickBestSelectValue(selects[i]);
-    // Every dropdown means scoring each of its options against the whole form,
-    // so this is where the time goes and where the page has to breathe.
-    if (i % 3 === 0) {
-      fillProgress({
-        text: 'Pass ' + pass + ' — question ' + (i + 1) + ' of ' + selects.length,
-        percent: (i / Math.max(1, selects.length)) * 100
-      });
-      await fillYield();
+
+  // Answer every dropdown, re-scanning after each sweep.
+  //
+  // A question inside a gated block only becomes eligible once the one before
+  // it is answered, so a list collected up front reaches exactly one level
+  // deeper per pass - and the outer loop stops as soon as a pass adds no
+  // fields, which it can do while a chain is still half unanswered. That is
+  // why items 6 and 7 of DV-100 came back with every text box filled and every
+  // checkbox empty: the text fields are filled by a sweep over what is visible,
+  // but the dropdowns behind them were never reached, so no answer was ever
+  // mirrored into the checkbox the PDF prints.
+  const answered = new Set();
+  let total = 0;
+  for (let sweep = 0; sweep < 12; sweep++) {
+    const found = [...document.querySelectorAll('select')]
+      .filter(isDebugFillEligible)
+      .filter((el) => !answered.has(el));
+    if (!found.length) break;
+    for (let i = 0; i < found.length; i++) {
+      answered.add(found[i]);
+      pickBestSelectValue(found[i]);
+      total++;
+      // Every dropdown means scoring each of its options against the whole
+      // form, so this is where the time goes and where the page has to breathe.
+      if (total % 3 === 0) {
+        fillProgress({
+          text: 'Pass ' + pass + ' — question ' + total + (sweep ? ' (revealed)' : ''),
+          percent: Math.min(99, (i / Math.max(1, found.length)) * 100)
+        });
+        await fillYield();
+      }
     }
+    await fillYield();
   }
+
   fillProgress({ text: 'Pass ' + pass + ' — text fields and checkboxes', percent: 100 });
   await fillYield();
   fillVisibleCheckboxesAndRadios();

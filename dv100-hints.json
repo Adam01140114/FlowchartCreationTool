@@ -1115,11 +1115,18 @@
       "text": "What is your breed, if known?"
     },
     "move_out_years_at_address": {
-      "text": "What is your years?"
+      "text": "How many years have you lived at this address?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "move_out_right_to_live_length_of_residence"
+      }
     },
     "move_out_right_to_live_other_explanation_line_1": {
       "text": "How else do you have the right to live there?",
-      "type": "bigParagraph"
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "move_out_right_to_live_other"
+      }
     },
     "stay_away_distance": {
       "text": "How far must the person stay away?",
@@ -1137,7 +1144,11 @@
       "text": "What is your color?"
     },
     "move_out_months_at_address": {
-      "text": "What is your months?"
+      "text": "And how many additional months?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "move_out_right_to_live_length_of_residence"
+      }
     },
     "property_debt_2_pay_to": {
       "text": "What is your pay to?"
@@ -1249,13 +1260,22 @@
       "text": "What is your of animal?"
     },
     "same_workplace_company_name": {
-      "text": "What is your name of company?"
+      "text": "What is the name of the company you both work at?",
+      "conditional": {
+        "onlyWhen": "same_workplace_selected"
+      }
     },
     "same_school_name": {
-      "text": "What is your name of school?"
+      "text": "What is the name of the school you both go to?",
+      "conditional": {
+        "onlyWhen": "same_school_selected"
+      }
     },
     "same_workplace_or_school_other_description": {
-      "text": "What is your other explanation?"
+      "text": "What else do you share?",
+      "conditional": {
+        "onlyWhen": "same_workplace_or_school_other"
+      }
     },
     "protected_animal_4_breed": {
       "text": "What is your breed, if known?"

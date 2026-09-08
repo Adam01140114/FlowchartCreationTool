@@ -9484,26 +9484,14 @@
         },
         {
           "questionId": 81,
-          "text": "What is your name of company?",
+          "text": "What is the name of the company you both work at?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "79",
-                "prevAnswer": "No"
-              },
-              {
                 "prevQuestion": "80",
                 "prevAnswer": "We work together"
-              },
-              {
-                "prevQuestion": "80",
-                "prevAnswer": "We go to the same school"
-              },
-              {
-                "prevQuestion": "80",
-                "prevAnswer": "Something else"
               }
             ]
           },
@@ -9592,14 +9580,14 @@
         },
         {
           "questionId": 82,
-          "text": "What is your name of school?",
+          "text": "What is the name of the school you both go to?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "81",
-                "prevAnswer": "Any Text"
+                "prevQuestion": "80",
+                "prevAnswer": "We go to the same school"
               }
             ]
           },
@@ -9688,14 +9676,14 @@
         },
         {
           "questionId": 83,
-          "text": "What is your other explanation?",
+          "text": "What else do you share?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "82",
-                "prevAnswer": "Any Text"
+                "prevQuestion": "80",
+                "prevAnswer": "Something else"
               }
             ]
           },
@@ -9789,6 +9777,18 @@
           "logic": {
             "enabled": true,
             "conditions": [
+              {
+                "prevQuestion": "79",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "81",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "82",
+                "prevAnswer": "Any Text"
+              },
               {
                 "prevQuestion": "83",
                 "prevAnswer": "Any Text"
@@ -10054,34 +10054,14 @@
         },
         {
           "questionId": 86,
-          "text": "What is your years?",
-          "type": "text",
+          "text": "How many years have you lived at this address?",
+          "type": "money",
           "logic": {
             "enabled": true,
             "conditions": [
               {
                 "prevQuestion": "85",
-                "prevAnswer": "I own the home"
-              },
-              {
-                "prevQuestion": "85",
                 "prevAnswer": "I have lived at this address for a while"
-              },
-              {
-                "prevQuestion": "85",
-                "prevAnswer": "My name is on the lease"
-              },
-              {
-                "prevQuestion": "85",
-                "prevAnswer": "I pay for some or all of the rent or mortgage"
-              },
-              {
-                "prevQuestion": "85",
-                "prevAnswer": "I live at this address with my children"
-              },
-              {
-                "prevQuestion": "85",
-                "prevAnswer": "Another reason"
               }
             ]
           },
@@ -10170,110 +10150,14 @@
         },
         {
           "questionId": 87,
-          "text": "What is your months?",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "86",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "move_out_months_at_address",
-          "placeholder": ""
-        },
-        {
-          "questionId": 88,
           "text": "How else do you have the right to live there?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "87",
-                "prevAnswer": "Any Text"
+                "prevQuestion": "85",
+                "prevAnswer": "Another reason"
               }
             ]
           },
@@ -10361,6 +10245,102 @@
           "placeholder": ""
         },
         {
+          "questionId": 88,
+          "text": "And how many additional months?",
+          "type": "money",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "85",
+                "prevAnswer": "I have lived at this address for a while"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "move_out_months_at_address",
+          "placeholder": ""
+        },
+        {
           "questionId": 89,
           "text": "What other orders do you want?",
           "type": "bigParagraph",
@@ -10368,7 +10348,27 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "88",
+                "prevQuestion": "85",
+                "prevAnswer": "I own the home"
+              },
+              {
+                "prevQuestion": "85",
+                "prevAnswer": "I have lived at this address for a while"
+              },
+              {
+                "prevQuestion": "85",
+                "prevAnswer": "My name is on the lease"
+              },
+              {
+                "prevQuestion": "85",
+                "prevAnswer": "I pay for some or all of the rent or mortgage"
+              },
+              {
+                "prevQuestion": "85",
+                "prevAnswer": "I live at this address with my children"
+              },
+              {
+                "prevQuestion": "87",
                 "prevAnswer": "Any Text"
               }
             ]

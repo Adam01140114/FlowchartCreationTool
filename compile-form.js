@@ -100,6 +100,13 @@ function isPlural(text) {
 const VERB_START = /^(is|are|was|were|do|does|did|has|have|had|will|would|can|should|must|may)\b/i;
 
 /** Value question: "Name" -> "What is your name?" */
+// Questions whose wording nobody wrote. The fallback is mechanical - "What is
+// your " plus the field name with the underscores taken out - which produces
+// "What is your years?" and "What is your name of company?". Recording them is
+// exact, where guessing at vagueness from the wording is not: a default is a
+// default however harmless it happens to read.
+const unreviewedWording = [];
+
 function valueQuestion(label, type) {
   const clean = cleanLabel(label);
   if (!clean) return 'What is your answer?';
@@ -109,6 +116,23 @@ function valueQuestion(label, type) {
 }
 
 /** Gate question: "Exempt payee code" -> "Do you have an exempt payee code?" */
+/**
+ * The wording to ask this field with, remembering whether anyone wrote it.
+ *
+ * A hint is not evidence of authorship: pipeline-harvest-text.js moved the
+ * generator's own output into the hints so it would survive a recompile, so
+ * "What is your years?" now arrives as a hint and looks deliberate. Comparing
+ * the hint against what the generator would still produce tells them apart.
+ */
+function chooseText(field) {
+  const fallback = valueQuestion(field.label, field.type);
+  const text = field.question || fallback;
+  if (text === fallback) {
+    unreviewedWording.push({ question: field.nameId || field.id, text: text });
+  }
+  return text;
+}
+
 function gateQuestion(label) {
   const clean = cleanLabel(label);
   if (!clean) return 'Do you want to answer this question?';
@@ -822,7 +846,7 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
     if (field.options && field.options.length) {
       const step = makeStep({
         nameId: field.nameId,
-        text: field.question || valueQuestion(field.label, field.type),
+        text: chooseText(field),
         type: field.type === 'checkbox' ? 'checkbox' : 'dropdown',
         options: field.options.map((o) => (
           typeof o === 'string'
@@ -864,7 +888,7 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
       steps.push(gate);
       const value = makeStep({
         nameId: field.nameId,
-        text: field.question || valueQuestion(field.label, field.type),
+        text: chooseText(field),
         type: field.type,
         field
       });
@@ -876,7 +900,7 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
     // 6. plain value question
     const step = makeStep({
       nameId: field.nameId,
-      text: field.question || valueQuestion(field.label, field.type),
+      text: chooseText(field),
       type: field.type,
       field
     });
@@ -1428,6 +1452,7 @@ function layoutSequence(b, steps, startY, centerX) {
 /* ------------------------------------------------------------------ */
 
 function compile(schema, hints = {}) {
+  unreviewedWording.length = 0;
   const merged = Object.assign({}, schema.interview || {}, hints);
   const mirrored = applyMirrors(normalizeFields(schema), merged);
   const { fields: kept, continuations } = applyContinuations(mirrored, merged);
@@ -1523,6 +1548,12 @@ function compile(schema, hints = {}) {
   // check people learn to scroll past.
   const alwaysShown = (merged.alwaysShown || []).filter((a) => a && a.question);
   if (alwaysShown.length) flowchart.alwaysShown = alwaysShown;
+  // Only the ones that survived into the interview - a field absorbed by a
+  // block or autofilled is never read by anyone.
+  const askedIds = new Set();
+  walkSteps(steps, (x) => { if (x && x.nameId) askedIds.add(x.nameId); });
+  const unreviewed = unreviewedWording.filter((u) => askedIds.has(u.question));
+  if (unreviewed.length) flowchart.unreviewedWording = unreviewed;
 
   if (autofills.length) {
     flowchart.autofilledFields = autofills.map((a) => ({ field: a.target, from: a.parts, why: a.why }));
