@@ -19255,6 +19255,10 @@ function solverAnswerElement(qid, model) {
 function applySolvedPath(plan) {
   const model = plan.model;
   const touched = [];
+  // Every control the plan has an opinion about - not only the ones it had to
+  // change. The sweep afterwards overwrites what it finds, and a box already
+  // holding the right answer must not be mistaken for one a draft left behind.
+  const owned = new Set();
 
   // Hiding a question empties it, which is what the generated logic does when
   // it closes one and what makes the fill decide the path rather than inherit
@@ -19304,6 +19308,7 @@ function applySolvedPath(plan) {
     // ticked is not measuring anything. What the path did not choose is cleared.
     if (given && given.has) {
       container.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(function (box) {
+        owned.add(box);
         const wanted = given.has(String(box.value || '').trim().toLowerCase());
         if (box.checked === wanted) return;
         box.checked = wanted;
@@ -19319,17 +19324,19 @@ function applySolvedPath(plan) {
     if (el && el.tagName === 'SELECT') {
       el.value = given;
       touched.push(el);
+      owned.add(el);
       return;
     }
     const wanted = String(given).trim().toLowerCase();
     const radios = container.querySelectorAll('input[type="radio"]');
+    radios.forEach(function (rb) { owned.add(rb); });
     for (let i = 0; i < radios.length; i++) {
       if (String(radios[i].value || '').trim().toLowerCase() !== wanted) continue;
       radios[i].checked = true;
       touched.push(radios[i]);
       return;
     }
-    if (el) { el.value = given; touched.push(el); }
+    if (el) { el.value = given; touched.push(el); owned.add(el); }
   });
 
   // 2. Visibility, straight from the model.
@@ -19358,6 +19365,7 @@ function applySolvedPath(plan) {
     if (el.tagName === 'SELECT') triggerSelectSideEffects(el);
   });
   setVisibility();
+  plan.owned = owned;
 }
 
 /**
@@ -19387,7 +19395,12 @@ function fillSolvedPhoneSplits() {
  * boxes live, and they are ordinary controls once built - so one sweep over
  * what is now visible finishes them.
  */
-function fillSolvedRemainder() {
+function fillSolvedRemainder(plan) {
+  // What the plan decided, and therefore what it owns. Everything else on the
+  // screen belongs to this sweep - including a box that already holds
+  // something, which on a signed-in page is whatever the saved draft held. A
+  // fill is the answer set, not a set of suggestions laid over yesterday's.
+  const owned = (plan && plan.owned) || new Set();
   // Entry-level dropdowns, e.g. one child's relationship to the filer. The DOM
   // fill scored these against the whole form like any other question, which
   // cost more than everything else put together and decided nothing: an option
@@ -19395,7 +19408,7 @@ function fillSolvedRemainder() {
   const minimum = !!window.__FILL_MINIMUM__;
   const preferred = minimum ? ['no', "i don't know", "i don’t know", 'none'] : ['yes', 'other'];
   document.querySelectorAll('select').forEach(function (sel) {
-    if (!solverFieldEligible(sel) || (sel.value || '').trim()) return;
+    if (!solverFieldEligible(sel) || owned.has(sel)) return;
     const opts = getSelectOptions(sel).filter(function (o) {
       return !wouldOptionJumpToEnd(sel, o.value) && !wouldTriggerHardAlertOnSelect(sel, o.value);
     });
@@ -19407,16 +19420,31 @@ function fillSolvedRemainder() {
       }) || null;
     }
     if (!pick) pick = minimum ? opts[0] : opts[opts.length - 1];
+    if (sel.value === pick.value) return;
     sel.value = pick.value;
     triggerFieldChange(sel);
     triggerSelectSideEffects(sel);
   });
 
+  // One group at a time, so the option this chooses is not read back as an
+  // answer already there when the next radio in the same group comes round.
+  const radioGroupDone = {};
   document.querySelectorAll('input[type="radio"]').forEach(function (r) {
-    if (!solverFieldEligible(r) || !r.name) return;
+    if (!solverFieldEligible(r) || !r.name || radioGroupDone[r.name]) return;
     const group = document.getElementsByName(r.name);
-    for (let i = 0; i < group.length; i++) if (group[i].checked) return;
+    for (let i = 0; i < group.length; i++) {
+      if (owned.has(group[i])) { radioGroupDone[r.name] = true; return; }
+    }
     if (wouldOptionJumpToEnd(r, r.value)) return;
+    radioGroupDone[r.name] = true;
+    // A draft may have left a different option in this group chosen. What the
+    // fill did not choose comes off.
+    for (let i = 0; i < group.length; i++) {
+      if (group[i] === r || !group[i].checked) continue;
+      group[i].checked = false;
+      triggerFieldChange(group[i]);
+    }
+    if (r.checked) return;
     r.checked = true;
     triggerFieldChange(r);
   });
@@ -19430,14 +19458,31 @@ function fillSolvedRemainder() {
       cb.checked = true;
       triggerFieldChange(cb);
     });
+  } else if (plan && !plan.draftBoxesCleared) {
+    // The narrow path ticks nothing it was not asked to, and a box a saved
+    // draft left ticked was not asked for by anybody.
+    //
+    // Once, on the way in. Settling calls this again for every repair, and a
+    // hundred and seventy boxes coming off - each one announcing itself to the
+    // questions gated on it - is enough work to keep the page moving, so doing
+    // it on each pass is a fill arguing with its own last pass. What the page
+    // puts back after that is drift, and drift is what the repair is for.
+    plan.draftBoxesCleared = true;
+    document.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
+      if (!solverFieldEligible(cb) || !cb.checked || owned.has(cb)) return;
+      cb.checked = false;
+      triggerFieldChange(cb);
+    });
   }
 
   document.querySelectorAll('input, textarea').forEach(function (el) {
-    if (!solverFieldEligible(el)) return;
+    if (!solverFieldEligible(el) || owned.has(el)) return;
     const type = (el.type || '').toLowerCase();
     if (type === 'checkbox' || type === 'radio' || type === 'file') return;
-    if ((el.value || '').trim()) return;
-    el.value = getSampleFillValue(el);
+    const value = getSampleFillValue(el);
+    // Settling re-runs this sweep, so say nothing when there is nothing to say.
+    if (String(el.value || '') === String(value)) return;
+    el.value = value;
     triggerFieldChange(el);
   });
 
@@ -19548,7 +19593,7 @@ async function settleSolvedPath(plan) {
     }
     clean = 0;
     applySolvedPath(plan);
-    fillSolvedRemainder();
+    fillSolvedRemainder(plan);
     repairs++;
     // Six goes and still moving is not drift to wait out, it is something else,
     // and the fill should stop rather than fight the page to the deadline.
@@ -19576,7 +19621,7 @@ async function fillSolvedPath(options) {
 
   fillProgress({ text: 'Filling the blocks they opened', percent: 68 });
   await fillPaint();
-  fillSolvedRemainder();
+  fillSolvedRemainder(plan);
 
   if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') createHiddenCheckboxesForAutofilledDropdowns();
   if (typeof syncHiddenLogicForCheckboxQuestions === 'function') syncHiddenLogicForCheckboxQuestions();
