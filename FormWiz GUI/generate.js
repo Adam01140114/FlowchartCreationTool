@@ -19457,15 +19457,32 @@ function solvedPathDrift(plan) {
  * and the fill should say so rather than loop.
  */
 async function settleSolvedPath(plan) {
-  for (let attempt = 1; attempt <= 3; attempt++) {
+  // Two clean looks, not one. A signed-in page fetches its saved answers from
+  // Firebase on the auth callback, which lands when it lands - after the fill,
+  // often enough - and writes them over what the fill just wrote. A single
+  // check 400ms in says the page is quiet when it has not started moving yet.
+  const deadline = Date.now() + 8000;
+  let clean = 0, repairs = 0;
+  while (Date.now() < deadline) {
+    const pct = Math.min(97, 84 + (repairs + clean) * 3);
+    fillProgress({ text: repairs ? 'Putting the path back (' + repairs + ')'
+                                 : 'Waiting for the page to settle', percent: pct });
     await new Promise(function (resolve) { setTimeout(resolve, 400); });
     const drifted = solvedPathDrift(plan);
-    if (!drifted) return attempt - 1;
-    fillProgress({ text: 'Putting back ' + drifted + ' the page undid', percent: 90 });
+    if (!drifted) {
+      clean++;
+      if (clean >= 2) return repairs;
+      continue;
+    }
+    clean = 0;
     applySolvedPath(plan);
     fillSolvedRemainder();
+    repairs++;
+    // Six goes and still moving is not drift to wait out, it is something else,
+    // and the fill should stop rather than fight the page to the deadline.
+    if (repairs >= 6) return repairs;
   }
-  return 3;
+  return repairs;
 }
 
 /**
@@ -19478,12 +19495,15 @@ async function settleSolvedPath(plan) {
 async function fillSolvedPath(options) {
   const plan = solveFillPath({ minimum: !!(options && options.minimum) });
   if (!plan) return null;
-  fillProgress({ text: 'Writing ' + Object.keys(plan.answers).length + ' answers', percent: 45 });
-  await fillYield();
+  // The long one. Writing the answers takes most of the run, so the bar has
+  // to be told that before the main thread is taken rather than after - and
+  // it has to be drawn before, too.
+  fillProgress({ text: 'Writing ' + Object.keys(plan.answers).length + ' answers', percent: 12 });
+  await fillPaint();
   applySolvedPath(plan);
 
-  fillProgress({ text: 'Filling the blocks they opened', percent: 75 });
-  await fillYield();
+  fillProgress({ text: 'Filling the blocks they opened', percent: 68 });
+  await fillPaint();
   fillSolvedRemainder();
 
   if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') createHiddenCheckboxesForAutofilledDropdowns();
@@ -19495,7 +19515,7 @@ async function fillSolvedPath(options) {
   if (typeof runAllHiddenTextCalculations === 'function') runAllHiddenTextCalculations();
   document.dispatchEvent(new CustomEvent('questionVisibilityChanged', { detail: { sectionId: null } }));
 
-  fillProgress({ text: 'Waiting for the page to settle', percent: 88 });
+  fillProgress({ text: 'Waiting for the page to settle', percent: 84 });
   await settleSolvedPath(plan);
   return plan;
 }
@@ -20043,8 +20063,14 @@ function fillProgress(state) {
       + 'Answering every question the way that opens the most fields. '
       + 'This takes a moment on a long packet.</div>'
       + '<div style="height:10px;background:#e8edf5;border-radius:5px;overflow:hidden;">'
+      // No transition on the bar. A tween only tells the truth if the thread is
+      // free to run it, and this bar moves precisely when it is not: the number
+      // was set to 45% while the width was still easing out of its last value,
+      // and the browser then had no frame to spare for several seconds. It read
+      // 45% above a bar drawn at 12. Setting the width outright makes the two
+      // agree, and six updates over a few seconds do not need easing.
       + '<div id="fillProgressBar" style="height:100%;width:0;border-radius:5px;'
-      + 'background:linear-gradient(90deg,#7b5cff,#4f8cff);transition:width 0.2s linear;">'
+      + 'background:linear-gradient(90deg,#7b5cff,#4f8cff);">'
       + '</div></div>'
       + '<div style="display:flex;justify-content:space-between;align-items:baseline;'
       + 'margin-top:12px;gap:12px;">'
@@ -20074,6 +20100,40 @@ function fillProgress(state) {
  * neither throttled nor tied to painting, so it keeps a hidden run at full
  * speed. Race all three: whichever arrives first continues the run.
  */
+/**
+ * Hand the frame back and wait until the browser has drawn.
+ *
+ * fillYield races a message channel against a frame, and the message almost
+ * always wins - which is what you want between two pieces of work, and exactly
+ * wrong before one long one. The bar was told 45% and then the main thread was
+ * taken for several seconds before the next paint, so the number said 45 above
+ * a bar still drawn at the width it had before. Two frames: the first lets the
+ * style change be committed, the second lets it be painted.
+ *
+ * A hidden page is skipped rather than waited on. It is never given a frame, and
+ * its timers are clamped to a second - so the backstop that was meant to cost
+ * 60ms cost 1000ms, three times a run, and turned a three second fill into
+ * seven. There is also nothing to paint, which is the point: the wait exists so
+ * a person can see the bar move.
+ */
+function fillPaint() {
+  return new Promise(function (resolve) {
+    const hidden = typeof document !== 'undefined' && document.visibilityState
+      && document.visibilityState !== 'visible';
+    if (hidden && typeof MessageChannel === 'function') {
+      const channel = new MessageChannel();
+      channel.port1.onmessage = function () { resolve(); };
+      channel.port2.postMessage(0);
+      return;
+    }
+    let done = false;
+    const finish = function () { if (!done) { done = true; resolve(); } };
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(function () { requestAnimationFrame(finish); });
+    }
+    setTimeout(finish, 250);
+  });
+}
 function fillYield() {
   return new Promise(function (resolve) {
     let done = false;
@@ -20192,8 +20252,8 @@ async function fillMaximumPath(options) {
     // in its closures, so there is nothing to solve from.
     const solvable = !!(window.__FORM_LOGIC__ && Object.keys(window.__FORM_LOGIC__).length);
     if (solvable) {
-      fillProgress({ text: 'Working out the path', percent: 10 });
-      await fillYield();
+      fillProgress({ text: 'Working out the path', percent: 4 });
+      await fillPaint();
       await fillSolvedPath({ minimum: minimum });
     } else {
       // Passes repeat because answering one question reveals the next. Once a
