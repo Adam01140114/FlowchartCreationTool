@@ -14245,8 +14245,32 @@ async function getAllPdfsList() {
 
     try {
 
+    // A packet produces one PDF per form the interview turned on, and this list
+    // has to say so: Download PDFs already walked the forms, while this one
+    // started from pdfOutputName and so offered a preview of the first form
+    // only. On the DV packet that hid DV-109 and DV-110 completely - two forms
+    // the filer is about to file, with no way to look at them.
+    const packetForms = (typeof getProjectForms === 'function') ? getProjectForms() : [];
+    let listedPacketForms = false;
+    if (packetForms.length > 1) {
+        for (const form of packetForms) {
+            if (typeof isFormActivated === 'function' && !isFormActivated(form)) continue;
+            const file = form.pdfFile || '';
+            if (!file) continue;
+            const baseName = file.replace(/\.pdf$/i, '');
+            if (processedPdfs.has(baseName)) continue;
+            processedPdfs.add(baseName);
+            listedPacketForms = true;
+            pdfsList.push({
+                baseName: baseName,
+                displayName: form.pdfName || baseName,
+                type: 'form'
+            });
+        }
+    }
+
     // Process main PDF
-    if (pdfOutputFileName) {
+    if (!listedPacketForms && pdfOutputFileName) {
         const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
         if (!processedPdfs.has(baseName)) {
             processedPdfs.add(baseName);
