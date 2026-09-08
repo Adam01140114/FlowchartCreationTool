@@ -74,12 +74,22 @@ function postedNames(gui) {
       // firearm_item_3_description, appended otherwise.
       const max = parseInt(q.max, 10);
       if (q.type === 'numberedDropdown' && max > 0) {
-        (q.allFieldsInOrder || q.textboxes || q.labels || []).forEach((field) => {
-          const base = (field && typeof field === 'object') ? (field.nodeId || field.nameId) : null;
+        const perEntry = (base) => {
           if (!base) return;
           for (let n = 1; n <= max; n++) {
             add(base.indexOf('{n}') !== -1 ? base.split('{n}').join(String(n)) : base + '_' + n, q);
           }
+        };
+        (q.allFieldsInOrder || q.textboxes || q.labels || []).forEach((field) => {
+          if (!field || typeof field !== 'object') return;
+          // A choice collected once per entry ("does this person live with
+          // you?") holds its PDF names on the options, not on the field: the
+          // field itself is the heading above them and fills nothing.
+          if (Array.isArray(field.options) && field.options.length) {
+            field.options.forEach((opt) => perEntry(opt && (opt.nodeId || opt.nameId)));
+            return;
+          }
+          perEntry(field.nodeId || field.nameId);
         });
       }
     });
@@ -101,10 +111,18 @@ function sectionIndexOf(gui, question) {
 
 async function pdfFieldNames(file) {
   const doc = await PDFDocument.load(fs.readFileSync(file), { ignoreEncryption: true });
-  return doc.getForm().getFields().map((f) => ({
-    name: f.getName(),
-    kind: f.constructor.name === 'PDFCheckBox' ? 'checkbox' : 'text'
-  }));
+  return doc.getForm().getFields().map((f) => {
+    // The PDF says which boxes take a narrative: a multi-line widget is one the
+    // form drew several ruled lines for. That is rule 12's evidence, so it does
+    // not have to be guessed from the wording.
+    let multiline = false;
+    try { multiline = typeof f.isMultiline === 'function' && f.isMultiline(); } catch (e) { /* not a text field */ }
+    return {
+      name: f.getName(),
+      kind: f.constructor.name === 'PDFCheckBox' ? 'checkbox' : 'text',
+      multiline: multiline
+    };
+  });
 }
 
 /** A field config's own view of a form: id (raw AcroForm path) -> newName. */
@@ -158,7 +176,8 @@ function repeatedBlocks(names) {
       family,
       entries: Math.max(...v.numbers),
       fieldsPerEntry: v.fields.size || 1,
-      total: v.names.length
+      total: v.names.length,
+      names: v.names
     }))
     .sort((a, b) => b.total - a.total);
 }
@@ -232,13 +251,98 @@ async function main() {
     (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
       if (q.type === 'numberedDropdown' && q.nodeId) asBlocks.add(q.nodeId);
     }));
+    // Numbering does not always mean repetition. "Which of the debts resulted
+    // from the abuse? (check all that apply)" prints one box per debt, and the
+    // interview asks it as one multi-select question - the numbers are its
+    // options, not three questions. A family every one of whose fields hangs
+    // off the same question is already asked once, however it is numbered.
+    const askedAsOneQuestion = (b) => {
+      const owners = new Set(b.names.map((n) => owner.get(n)).filter(Boolean));
+      return owners.size === 1 && b.names.every((n) => owner.has(n));
+    };
+    // Rule 12: a multi-line box asked as a one-line question.
+    report.rule12 = report.rule12 || [];
+    fields.filter((f) => f.multiline && !courtUse.has(f.name)).forEach((f) => {
+      const q = owner.get(f.name);
+      if (!q) return;                        // rule 1 already reports unreachable
+      if (q.type === 'bigParagraph') return;
+      // A split's parts are short values that happen to share one tall box.
+      if ((gui.linkedFields || []).some(function (l) { return l.linkedFieldId === f.name; })) return;
+      report.rule12.push({ form: form.name, field: f.name, type: q.type,
+                           text: String(q.text || '').slice(0, 52) });
+    });
     const families = repeatedBlocks(fields.filter((f) => !courtUse.has(f.name)).map((f) => f.name));
+    const satisfied = (b) => asBlocks.has(b.family) || askedAsOneQuestion(b);
     report.rule3.push({
       form: form.name,
-      blocks: families.filter((b) => !asBlocks.has(b.family)),
-      converted: families.filter((b) => asBlocks.has(b.family)).map((b) => b.family)
+      blocks: families.filter((b) => !satisfied(b)),
+      converted: families.filter(satisfied).map((b) => b.family)
     });
   }
+
+  // Rule 2 (gates): a condition that lists every option of the question above
+  // it is not a gate. It reads like one in the JSON, and it shows the question
+  // whatever the filer answered - the firearms table appearing after "No" and
+  // after "I don't know" was this. Report them, because a form can pass every
+  // other rule while asking about a gun nobody has.
+  const byQuestionId = new Map();
+  (gui.sections || []).forEach((sec) => (sec.questions || []).forEach((q) => {
+    byQuestionId.set(String(q.questionId), q);
+  }));
+  const labelsOf = (q) => (q && Array.isArray(q.options) && q.options.length)
+    ? q.options.map((o) => String((o && typeof o === 'object') ? (o.label || o.text || o.value) : o))
+    : [];
+  // Rule 2 (wording): a condition smuggled into the question text. The rule has
+  // listed these tells since it was written; nothing was checking them, and two
+  // slipped through - "Your lawyer's information, if you have one" and "Where
+  // does the restrained person live, if you know?".
+  const CONDITION_TELLS = /(if you have|if any|if known|if applicable|if it|if they|if there|if needed|if so)|,s*if/i;
+  // A continuation line is the one shape allowed to say "if": it is overflow
+  // from a single answer, not a second fact.
+  const CONTINUATION = /continue|did not fit|more space|additional space/i;
+  report.rule2wording = [];
+  // Rule 11: a question that does not say what to enter. "What is your custody
+  // case details?" is answerable only by someone holding the paper form, which
+  // is the person the interview exists to spare.
+  const VAGUE = /(details|information|info)/i;
+  report.rule11 = [];
+  (gui.sections || []).forEach((sec) => (sec.questions || []).forEach((q) => {
+    const text = String(q.text || '');
+    if (!text) return;
+    if (CONDITION_TELLS.test(text) && !CONTINUATION.test(text)) {
+      report.rule2wording.push({ question: q.nameId || q.nodeId || ('q' + q.questionId), text: text });
+    }
+    // Only a single free-text box: a multipleTextboxes question naming its
+    // boxes has already said what it wants.
+    if (VAGUE.test(text) && (q.type === 'text' || q.type === 'bigParagraph')) {
+      report.rule11.push({ question: q.nameId || q.nodeId || ('q' + q.questionId), text: text, type: q.type });
+    }
+  }));
+
+  report.rule2gates = [];
+  (gui.sections || []).forEach((sec) => (sec.questions || []).forEach((q) => {
+    const conds = (q.logic && q.logic.enabled && q.logic.conditions) || [];
+    const grouped = new Map();
+    conds.forEach((c) => {
+      const k = String(c.prevQuestion);
+      if (!grouped.has(k)) grouped.set(k, []);
+      grouped.get(k).push(String(c.prevAnswer).toLowerCase());
+    });
+    grouped.forEach((answers, prev) => {
+      const gate = byQuestionId.get(prev);
+      const labels = labelsOf(gate);
+      if (labels.length < 2) return;
+      const chosen = new Set(answers);
+      if (!labels.every((l) => chosen.has(l.toLowerCase()))) return;
+      report.rule2gates.push({
+        question: q.nameId || q.nodeId || ('q' + q.questionId),
+        text: String(q.text || '').slice(0, 46),
+        gate: gate.nameId || gate.nodeId || ('q' + prev),
+        gateText: String(gate.text || '').slice(0, 40),
+        options: labels.length
+      });
+    });
+  }));
 
   // Rule 2 (wording): nothing a person reads is a field name.
   //
@@ -249,12 +353,27 @@ async function main() {
   // "relationship_have_children_together". Question text was already checked by
   // eye; option labels were not, because they are one level down.
   const RAW_NAME = /^[a-z0-9]+(?:_[a-z0-9]+)+$/;
+  // A raw AcroForm path is a field name too, and it reaches a reader by a route
+  // the underscore test cannot see: the humanizer rewrites separators, so
+  // "…Li7[0].item26d_tf[0]" arrives as "…Li7[0].item26d tf[0]" with no
+  // underscore left to catch. What survives is the bracket notation and the
+  // page/list scaffolding, which no question ever legitimately contains.
+  // This is what let "Do you have a dV 100[0].Page4[0].List6[0].Li7[0].item26d
+  // tf[0]?" sit in the interview while the audit reported zero failures.
+  const ACROFORM_PATH = /\[\d+\]|\b(page|list|li)\s?\d+\s?\[|\b(tf|cb)\b\s?\[/i;
   report.rule2 = [];
   (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
     const text = String(q.text || '').trim();
-    if (RAW_NAME.test(text) || /[a-z0-9]_[a-z0-9]/.test(text)) {
+    if (RAW_NAME.test(text) || /[a-z0-9]_[a-z0-9]/.test(text) || ACROFORM_PATH.test(text)) {
       report.rule2.push({ where: 'question text', nameId: q.nameId, shown: text });
     }
+    // A box label inside a combined or repeating question is read too.
+    (q.allFieldsInOrder || []).forEach((f) => {
+      const lbl = String((f && f.label) || '').trim();
+      if (lbl && (RAW_NAME.test(lbl) || ACROFORM_PATH.test(lbl))) {
+        report.rule2.push({ where: 'box label', nameId: q.nameId, shown: lbl, text: String(q.text || '') });
+      }
+    });
     const labels = q.labels || [];
     (q.options || []).forEach((opt, i) => {
       const raw = labels[i] && labels[i].label !== undefined ? labels[i].label : labels[i];
@@ -430,6 +549,25 @@ async function main() {
       + r.shown + '"' + (r.text ? '   in "' + r.text + '"' : '')));
     if (report.rule2.length > 12) console.log('      ... ' + (report.rule2.length - 12) + ' more');
   }
+  if (!(report.rule2wording || []).length) {
+    console.log('  wording: no question hides a condition in its text');
+  } else {
+    console.log('  FAILS  ' + report.rule2wording.length
+      + ' question(s) hide a condition in the wording - each should be a gate plus a follow-up:');
+    report.rule2wording.forEach((r) => console.log('      - ' + r.question + ': "' + r.text + '"'));
+  }
+  const openGates = report.rule2gates || [];
+  if (!openGates.length) {
+    console.log('  gates: every condition names a subset of its gate options');
+  } else {
+    console.log('  ' + openGates.length + ' condition(s) list EVERY option of their gate, so the'
+      + ' question shows whatever was answered:');
+    openGates.slice(0, 10).forEach((g) => console.log('      - ' + g.question
+      + '  <- all ' + g.options + ' options of "' + g.gateText + '"'));
+    if (openGates.length > 10) console.log('      ... ' + (openGates.length - 10) + ' more');
+    console.log('      (not a failure on its own - this is also how the compiler rejoins a'
+      + ' branch to the spine. Read them before shipping.)');
+  }
 
   console.log('');
   console.log('RULE 3 — repeated entries use a multipleDropdownType node');
@@ -469,6 +607,27 @@ async function main() {
   if (!report.rule10.length) console.log('  passes');
   report.rule10.forEach((f) => console.log('  FAILS  ' + f.name + ' is ' + f.is
     + ', should be ' + f.should + '   ' + (f.text || '')));
+
+  console.log('');
+  console.log('RULE 11 — a question says what to enter');
+  if (!(report.rule11 || []).length) {
+    console.log('  passes');
+  } else {
+    console.log('  FAILS  ' + report.rule11.length
+      + ' question(s) ask for "details" or "information" in one box:');
+    report.rule11.forEach((r) => console.log('      - ' + r.question + ': "' + r.text + '"'));
+  }
+
+  console.log('');
+  console.log('RULE 12 — a narrative box is asked as a narrative');
+  if (!(report.rule12 || []).length) {
+    console.log('  passes');
+  } else {
+    console.log('  FAILS  ' + report.rule12.length
+      + ' multi-line PDF box(es) asked as a one-line question:');
+    report.rule12.forEach((r) => console.log('      - ' + r.form + ' ' + r.field
+      + '  [' + r.type + ']  "' + r.text + '"'));
+  }
 
   console.log('');
   console.log('RULE 7 — a form that asks nothing still ships');

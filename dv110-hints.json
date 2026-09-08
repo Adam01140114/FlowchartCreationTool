@@ -35,7 +35,8 @@
     },
     "restrained_person_prohibited_items_details": {
       "text": "What firearms, firearm parts, or ammunition might the restrained person have? Include what you listed on DV-100, item 9.",
-      "optional": true
+      "optional": true,
+      "type": "bigParagraph"
     },
     "order_type": {
       "text": "Is this the original order or an amended one?"
@@ -364,22 +365,6 @@
     "person_to_restrain_age": {
       "type": "number"
     },
-    "other_protected_person_1_age": {
-      "type": "number",
-      "text": "How old are they?"
-    },
-    "other_protected_person_2_age": {
-      "type": "number",
-      "text": "How old are they?"
-    },
-    "other_protected_person_3_age": {
-      "type": "number",
-      "text": "How old are they?"
-    },
-    "other_protected_person_4_age": {
-      "type": "number",
-      "text": "How old are they?"
-    },
     "person_to_restrain_date_of_birth": {
       "type": "date"
     }
@@ -455,7 +440,7 @@
   ],
   "combines": [
     {
-      "question": "Where does the restrained person live, if you know?",
+      "question": "Where does the restrained person live?",
       "fields": [
         {
           "field": "restrained_person_street_address",
@@ -472,6 +457,34 @@
         {
           "field": "restrained_person_zip_code",
           "label": "ZIP code"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "knows_restrained_person_address",
+        "gateQuestion": "Do you know where the restrained person lives?"
+      }
+    }
+  ],
+  "repeats": [
+    {
+      "nameId": "other_protected_person",
+      "question": "How many other people do you want the order to protect?",
+      "entryTitle": "Person",
+      "min": 0,
+      "max": 4,
+      "fields": [
+        {
+          "label": "Full name",
+          "nameId": "{n}_full_name"
+        },
+        {
+          "label": "Relationship to you",
+          "nameId": "{n}_relationship"
+        },
+        {
+          "label": "Age",
+          "nameId": "{n}_age",
+          "type": "number"
         }
       ]
     }

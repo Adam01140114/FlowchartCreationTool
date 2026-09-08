@@ -101,7 +101,12 @@ function collapseSharedQuestions(merged) {
   merged.sections.forEach(function (section) {
     const keep = [];
     section.questions.forEach(function (q) {
-      const name = q.nameId;
+      // A question that owns a PDF field is identified by that field's name.
+      // A repeating block owns a family rather than one field, so its identity
+      // is the block's nodeId - and without this a block shared by two forms
+      // (the other protected people are on DV-100 and DV-110 alike) is asked
+      // once per form, because nameId is undefined on both.
+      const name = q.nameId || q.nodeId;
       if (!name) { keep.push(q); return; }
 
       const first = firstByName.get(name);
@@ -577,7 +582,7 @@ function reportGroupProblems(merged) {
    */
   function showExportProjectGuiJsonDialog() {
     window.showExportDialog({
-      title: 'Export Project GUI JSON',
+      title: 'Export GUI JSON',
       description: 'Every form in the project merged into one interview. '
         + 'Copy it, or download it as a file.',
       filename: 'project-gui.json',

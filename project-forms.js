@@ -141,7 +141,7 @@
 
   function showExportProjectJsonDialog() {
     window.showExportDialog({
-      title: 'Export Project JSON',
+      title: 'Export JSON',
       description: 'The whole project - every form and its flowchart. '
         + 'Copy it, or download it as a file.',
       filename: 'project.json',
@@ -151,7 +151,7 @@
 
   function showImportProjectJsonDialog() {
     window.showImportDialog({
-      title: 'Import Project JSON',
+      title: 'Import JSON',
       description: 'Paste project JSON, or choose a .json file. A single '
         + 'flowchart is accepted too, and becomes a project of one form.',
       placeholder: '{"type": "flowchart-project", "forms": [...]}',

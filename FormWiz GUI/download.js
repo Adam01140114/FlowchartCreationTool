@@ -1768,6 +1768,30 @@ function loadFormData(formData) {
                                         lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
                                     }
                                 }
+                            } else if (field.type === 'number' || field.type === 'email') {
+                                // Same shape as phone: a label field carrying its
+                                // own type. Without this the import dropped the
+                                // field entirely, so an age or email column inside
+                                // a repeating block never reached the generated
+                                // form and its PDF box stayed blank.
+                                addTextboxLabel(question.questionId);
+                                const lastField = unifiedFieldsDiv.lastElementChild;
+                                if (lastField) {
+                                    const fieldOrder = lastField.getAttribute('data-order');
+                                    const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                    const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                    if (labelTextEl) labelTextEl.textContent = field.label;
+                                    if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    lastField.setAttribute('data-type', field.type);
+                                    const typeTextEl = lastField.querySelector('#typeText' + question.questionId + '_' + fieldOrder);
+                                    if (typeTextEl) typeTextEl.textContent = field.type === 'number' ? 'Number' : 'Email';
+                                    if (field.prefill !== undefined) {
+                                        lastField.setAttribute('data-prefill', field.prefill || '');
+                                    }
+                                    if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
+                                        lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
+                                    }
+                                }
                             } else if (field.type === 'checkbox') {
                                 // Add a checkbox field
                                 addCheckboxField(question.questionId);

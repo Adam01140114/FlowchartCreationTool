@@ -2683,12 +2683,14 @@ window.exportGuiJson = function(download = true) {
       delete question.linking;
       delete question.image;
     }
-    // --- PATCH: For number type questions, convert to money type ---
+    // The compiler's "number" is the builder's Number type, which is called
+    // "money" internally - the type list reads <option value="money">Number
+    // </option>, and "currency" is the one for money. Renaming it here is what
+    // makes a number question render at all; the control itself steps in whole
+    // numbers, in generate.js.
     if (exportType === "number") {
-      // Number questions should be exported as money type
       question.type = "money";
       question.placeholder = cell._placeholder || "";
-      // Clear options array for money questions
       question.options = [];
       question.labels = [];
     }

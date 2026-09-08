@@ -98,30 +98,59 @@ node pipeline-build-packet.js
 # 4. audit the static rules
 node pipeline-audit.js
 
-# 5. fill the form (debug menu: Ctrl+Shift, then "Fill marker values"),
+# 5. fill the form (debug menu: Ctrl+Shift, then "Fill maximum path"),
 #    save the answers, and produce the PDFs
 node pipeline-fill.js --render
 node pipeline-explain.js dv110
+
+# 6. read the interview yourself. This step is not optional and no packet
+#    ships without it - the audit only catches what it was taught to catch.
+node pipeline-review.js
 ```
+
+## The last step: read it
+
+`node pipeline-review.js` prints the whole interview in the order a person meets
+it - question text, type, what each one waits on, and the boxes inside combined
+and repeating questions. Read all of it, then answer the form in the preview and
+check that saying No to a gate really does remove the block behind it.
+
+This is a required step, not a review of last resort. `pipeline-audit.js` is a
+regression test for defects that already happened once; it reported zero
+failures on a packet that asked "Do you have a dV 100[0].Page4[0]...?" and that
+asked thirty questions about further abuse of a filer who had just said it
+happened once. Both were obvious on one read.
 
 ## The two fill modes
 
+Both live in the preview's debug menu (Ctrl+Shift), and both write each field's
+own id into it, so a rendered page can be read against the blank form and every
+box says which field it is. A name-level match only proves a value went
+somewhere; markers are the only way to see that height went into the height box.
+
 **Fill maximum path** answers every question the way that opens the most
-questions, and is how rule 4a is measured — every field the answers reached
+questions. It measures coverage - rule 4a, every field the answers reached
 carries a value.
 
-**Fill marker values** does the same but writes each field's own id into it, so
-a rendered page can be read against the blank form and every box says which
-field it is. That is the only way rule 4b is finished; a name-level match proves
-a value went somewhere, not that height went into the height box.
+**Fill minimum path** answers every question the way that opens the fewest:
+"no" before "yes", the smallest count on a numbered block, and no optional
+checkbox ticked at all. It measures the opposite thing - that a gate answered No
+actually closes the block behind it. A form can pass the widest path and fail
+this one, which is how thirty questions about further abuse stayed on screen for
+a filer who had just said it happened once.
 
-Fields the form validates — dates, zips, phones, amounts — keep valid data in
-both modes, because a marker there fails validation and stops the run.
+Run both. Neither is sufficient alone, and the minimum path takes seconds.
+
+Fields the form validates - dates, zips, phones, amounts - keep valid data in
+either mode, because a marker there fails validation and stops the run.
 
 ## Reading the result
 
 `pipeline-fill.js` reports, per form, how many text fields and checkboxes came
-back filled, and lists what is still empty. `pipeline-explain.js` says why each
+back filled, and lists what is still empty. `--render` also rasterises every
+page to `pipeline-out/<form>-pages/`, in-process via pdfjs - it used to shell
+out to Ghostscript, which the repo does not install, so rule 4b died on any
+machine without `gs`. `--scale` sets the resolution (1.6 by default). `pipeline-explain.js` says why each
 empty field is empty: a gate the answers closed, a field the court fills, or a
 defect. A defect is a field whose question exists, whose gates are open, and
 which is still empty — that list should always be empty before shipping.

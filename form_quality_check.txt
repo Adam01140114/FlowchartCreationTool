@@ -11,6 +11,62 @@ Run 1 to 4 in order: rule 4 is the one that proves the first three, so it is
 last. Rule 5 is structural and costs nothing, so check it whenever you like.
 
 
+THE LAST STEP IS ALWAYS A HUMAN READ. IT IS NOT OPTIONAL.
+---------------------------------------------------------
+
+No packet ships on a green audit. The final step of every form or packet, after
+every other rule passes, is to read the interview end to end, in order, as a
+person meets it - and then answer it in the preview. Both halves, every time.
+
+    node pipeline-review.js            # the whole interview, in reading order
+    node pipeline-review.js --form DV-110
+    node pipeline-review.js --section 5
+
+WHY THIS IS A RULE AND NOT ADVICE
+
+`pipeline-audit.js` only finds what someone taught it to look for. Every rule
+in this document was written after a defect got through, which makes the audit a
+regression test for mistakes already made - it can only prove a form is not
+wrong in one of the ways something was wrong before. A packet reported zero
+failures while asking
+
+    "Do you have a dV 100[0].Page4[0].List6[0].Li7[0].item26d tf[0]?"
+
+The rule against showing a person a field name had been enforced since the day
+it was written. It looked for underscores, and the humanizer had already turned
+"item26d_tf[0]" into "item26d tf[0]", so nothing matched.
+
+One pass of pipeline-review.js over that same packet found four defects, none of
+which broke a rule:
+
+  - a raw AcroForm path asked as a question
+  - items 6 and 7 of DV-100 - thirty-odd questions - with no gate in front of
+    them, so a filer who said the abuse happened once was still asked about
+    two more incidents
+  - questions about the restrained person asking for "your date of birth"
+  - an age asked as a currency amount
+
+WHAT TO LOOK FOR
+
+The audit cannot see any of these, because each needs a reader who knows what
+the question means:
+
+  - wording only a person holding the paper form could answer
+  - the wrong subject: "your" about someone else, "they" about the filer
+  - a run of questions with no gate in front of it
+  - a control that does not suit the answer
+  - two questions that read identically within one section
+  - an option list that reads as a field name rather than a choice
+  - anything a frightened person filling this in at 2am would stall on
+
+THEN ANSWER IT
+
+Reading the output is half. Open the preview, answer each gate No, and confirm
+the block it guards actually disappears. Logic that is correct in the exported
+JSON can still be overridden by how the form renders: a gated block chains
+internally, and stacked mode used to judge each link on its own and show the
+whole block anyway. The export looked right. The form was wrong.
+
 TABLE OF CONTENTS
 -----------------
   Rule 1 — Every PDF field is reachable from the HTML form
@@ -23,6 +79,8 @@ TABLE OF CONTENTS
   Rule 8 — One question asks one thing
   Rule 9 — Fields about one subject are one question
   Rule 10 — Ask for a value in the type it is
+  Rule 11 — A question says what to enter
+  Rule 12 — A narrative box is asked as a narrative
   Pre-ship checklist
   Current status: the DV packet
 
@@ -101,6 +159,20 @@ Scan question text for a condition that has been smuggled into the wording:
 
 Every one of those is a question that should have been two.
 
+  node pipeline-audit.js
+
+fails on them under rule 2. The rule listed these tells from the day it was
+written and nothing enforced them, which is exactly how two survived a packet
+that passed every other rule: "Your lawyer's information, if you have one" and
+"Where does the restrained person live, if you know?". Both are a gate plus a
+follow-up now - "Do you have a lawyer?" then the lawyer's details.
+
+A gate with no PDF field is fine and expected. The form has no box for "do you
+have a lawyer"; declare it with a gateQuestion and the compiler creates it:
+
+    "conditional": { "onlyWhen": "has_lawyer",
+                     "gateQuestion": "Do you have a lawyer?" }
+
 TWO EXCEPTIONS, AND ONLY TWO
 
   - Continuation lines. "Continue your explanation, if it did not fit" is a
@@ -111,6 +183,44 @@ TWO EXCEPTIONS, AND ONLY TWO
     has said they own an animal, "What is the animal's breed?" may be left blank
     without a gate — the qualifying question already ran. Word it plainly and
     let it be optional; do not append "if you know it".
+
+A CONDITION IS NOT A GATE
+
+A follow-up whose condition lists EVERY option of the question above it is not
+gated at all - it shows whatever the filer answered. It reads like a gate in the
+JSON, which is what makes it worth checking by machine rather than by eye:
+
+  node pipeline-audit.js
+
+reports them under rule 2. It is not a failure on its own, because listing every
+option is also how the compiler rejoins a branch to the spine, and a question on
+the spine genuinely should always show. What must not be in that list is a
+follow-up the printed form qualifies - "Yes (If yes, describe gun or weapon)".
+
+A GATE CAN BE RIGHT IN THE JSON AND STILL NOT HOLD
+
+In section and all modes a question whose condition reads "Any Text", or which
+lists every option of the one before it, is shown without waiting for an answer
+- it comes next whatever you said. That judgement used to be made one link at a
+time, so a gated block, which chains internally ("show when the date has any
+text"), was declared unconditional question by question: answering "no" to the
+gate hid the first question and left the other sixteen on screen. The rule is
+transitive now - a question can only be always-visible if the question it waits
+on is too - but the lesson is that the exported logic being correct proves
+nothing on its own. Answer the gate in the preview and look.
+
+A gate declared in the hints only binds if it names an option the interview has
+already reached. Two things go wrong otherwise:
+
+  - The gate names a question that comes LATER. hostFor() cannot nest under an
+    option that does not exist yet, so it manufactures one, and you get a
+    duplicate of the real question plus a gate reading "Do you want to answer
+    this question?" - the vague gate this rule forbids. Fix the order, or leave
+    the follow-up ungated; do not leave the invented gate.
+  - The gate is declared on a repeating block or an exclusive group. Those are
+    one question standing for a family of fields, so there is no member field
+    whose conditional could carry it. Declare it on the block or group nameId
+    in `questions`; the compiler reads it there.
 
 WHERE THE GATE LIVES
 
@@ -153,9 +263,45 @@ THE SHAPE
   _twoNumbers     { "first": <min>, "second": <max> }
   _textboxes      one entry per field collected per repetition, each with a
                   nameId, placeholder, type, prefill, conditionalPrefills
+  _checkboxes     one entry per choice collected per repetition, each with a
+                  fieldName, selectionType ("single" picks one), and options
+  _itemOrder      what puts the two lists back in one order, each entry naming
+                  the array its own type lives in
 
 Generated field names come out as <nameId>_<n>, so entry 2's Make is `Make_2`.
 Those are the names field_config must map to the PDF's slot-2 field.
+
+A COLUMN THAT IS A CHOICE
+
+Rows often end in a choice rather than a box - "lives with you? yes / no", "my
+number / a child's number". Write it in the hints as a field with options, and
+the compiler builds the checkbox side of the block:
+
+    { "label": "Lives with you?",
+      "selection": "single",
+      "options": [
+        { "label": "Yes", "nameId": "{n}_lives_with_you_yes" },
+        { "label": "No",  "nameId": "{n}_lives_with_you_no" } ] }
+
+"single" renders the options as one exclusive choice per entry. The PDF still
+gets a box per option: the runtime mirrors the chosen radio into a hidden
+checkbox named for the field it fills, and switching the answer removes the old
+mirror, so exactly one box is ever ticked in a row.
+
+WHERE THE NUMBER SITS
+
+{n} goes wherever the PDF put the number, and the block absorbs whatever its
+hints name - it does not match a pattern on the family prefix. Firearms number
+the entry ({n}_description -> firearm_item_2_description); a special finding on
+a debt numbers the field (special_finding_debt_{n} ->
+property_debt_special_finding_debt_2). Both are one rule.
+
+NUMBERED IS NOT ALWAYS REPEATED
+
+"Which of the debts resulted from the abuse? (check all that apply)" prints one
+box per debt and is ONE multi-select question whose options happen to be
+numbered. A family every one of whose fields hangs off the same question is
+already asked once, and needs no block.
 
 REFERENCE NODE
 
@@ -249,6 +395,19 @@ more than one number is a repeated block that should be one node:
 Note the min. Use 0 where the block is genuinely optional, so a user with no
 animals is asked once and moves on. Use 1 where the PDF requires at least one.
 
+NAME AND NUMBER THE ENTRIES
+
+entryTitle names one entry, and the generated form appends the number:
+
+    entryTitle "Restraining Order"  ->  Restraining Order #1
+                                        Restraining Order #2
+
+Two boxes headed "Order" and "Order" give a person no way to say which one they
+are filling, and no way to check what they typed against the numbered rows on
+the printed form. Name the thing, singular, as it reads on the form: "Restraining
+Order", "Firearm or Ammunition", "Protected Person" - not "Item", "Entry" or
+"Order".
+
 
 ================================================================================
 RULE 4 — THE MAXIMUM PATH FILLS THE RIGHT FIELDS
@@ -296,7 +455,8 @@ BEYOND THE MAXIMUM PATH
 
 The widest path is one path. Before shipping also run:
 
-  - the minimum path — every gate answered No
+  - the minimum path — the "Fill minimum path" button, every gate answered the
+    way that opens the least. Check the blocks behind those gates disappeared.
   - a typical path — what a real filer would actually enter
   - each branch that switches another form on or off; for the DV packet that is
     DV-110 both served and not served
@@ -555,6 +715,18 @@ question:
     "questions": { "person_to_restrain_date_of_birth": { "type": "date" } }
     "repeats":   [ { "fields": [ { "nameId": "{n}_due_date", "type": "date" } ] } ]
 
+THE NUMBER TYPE IS CALLED "money" INSIDE THE BUILDER
+
+Worth knowing before chasing a bug that is not there: the builder's type list
+reads <option value="money">Number</option>, and "currency" is the type for
+money. So a number question is exported with type "money" - that rename in
+library.js is what makes it render at all, and removing it emits a type the
+builder cannot hold, which renders as a bare label with no input.
+
+The control itself steps in whole numbers and prompts "Enter a number". It used
+to step in hundredths and prompt "Enter amount", which is what asked a filer's
+age, and a distance in yards, in an amount box.
+
 WHAT THIS COSTS IF IGNORED
 
 The PDF still fills - a text box will happily post "2024-06-15" - so nothing in
@@ -570,6 +742,119 @@ fails on a value question whose name says date, phone, email, age, count, years,
 months or yards and whose type is still text - inside combined and repeating
 questions as well as on its own.
 
+
+================================================================================
+RULE 11 — A QUESTION SAYS WHAT TO ENTER
+================================================================================
+
+"What is your custody case details?" is answerable only by someone holding the
+paper form - which is the person the interview exists to spare. The form says
+what it wants:
+
+    "(If you know, list where the case was filed (city, state, or tribe), the
+     year it was filed, and case number.)"
+
+So ask for those three things by name, in one question, with a box each:
+
+    What do you know about the custody case?
+      Where it was filed (city, state, or tribe)  [            ]
+      Year it was filed                           [            ]
+      Case number                                 [            ]
+
+A catch-all noun - details, information, info - in a single free-text box is the
+tell. The parenthetical under the field almost always lists the parts; if it
+does not, the field is genuinely one value and the question should name that
+value ("What is the case number?"), not ask for "details".
+
+THE PDF STILL GETS ONE VALUE
+
+The PDF prints one box, so the parts rejoin exactly as rule 8 describes - split
+the field, then combine the parts back into one question:
+
+    "splits": [
+      { "field": "other_court_case_custody_details", "join": ", ",
+        "parts": [
+          { "nameId": "other_court_case_custody_details_location",
+            "label": "Where it was filed (city, state, or tribe)" },
+          { "nameId": "other_court_case_custody_details_year",
+            "label": "Year it was filed" },
+          { "nameId": "other_court_case_custody_details_number",
+            "label": "Case number" } ] } ],
+    "combines": [
+      { "question": "What do you know about the custody case?",
+        "conditional": { "onlyWhen": "other_court_case_custody_selected" },
+        "fields": [ ...those three part names... ] } ]
+
+Name every part with the original field as its prefix. The combine takes the
+shared prefix as its nameId and the exporter composes each box id as
+<question nameId>_<box nameId>, so the ids come back to exactly the part names
+the join is waiting for. Get the prefix wrong and the boxes fill nothing,
+silently.
+
+A split's parts inherit no gate. If the original field was conditional, the
+conditional has to be restated on the combine - deleting the old question hint
+takes its gate with it, and all six court-case questions started showing for
+every kind of case.
+
+HOW TO CHECK
+
+  node pipeline-audit.js
+
+fails on a single-box question whose wording contains details, information or
+info. It cannot see a question that is vague without using one of those words,
+so read the list once per form.
+
+================================================================================
+RULE 12 — A NARRATIVE BOX IS ASKED AS A NARRATIVE
+================================================================================
+
+Where the form rules eight lines and prints its own instructions, it wants a
+story, and the interview has to ask for one. DV-100 item 5f:
+
+    "Give more details about how the person in 2 was abusive on this day.
+     Details can include what was said, done, or sent to you (examples: text
+     messages, emails, or pictures), how often something happened, etc."
+
+Asked as "What happened?" in a one-line text box, that produces a sentence
+where the judge needs a paragraph, and it throws away every prompt the form
+gives about what to include. Ask it with a bigParagraph node and carry the
+guidance into the question:
+
+    "Describe how the person was abusive that day, including what they said,
+     did, or sent to you, and how often it happened."
+
+    "questions": {
+      "most_recent_abuse_details": {
+        "type": "bigParagraph",
+        "text": "Describe how the person was abusive that day, including ..."
+      } }
+
+WHAT COUNTS AS ONE
+
+The PDF says so itself: a text widget with the multiline flag set is a box the
+form drew several ruled lines for. That is the whole test - no guessing from
+wording, no judging by field name. DV-100 has 17 such boxes, DV-109 three,
+DV-110 five; most of DV-109's and DV-110's are court fields and are never asked.
+
+Two exceptions:
+  - a court field is not asked at all (rule 6)
+  - a split's parts share the original's tall box but are each one short value,
+    so court_name_and_street_address does not qualify
+
+WORDING, NOT JUST TYPE
+
+Changing the type alone leaves "What happened?" on a bigger box. The rule is
+both: the right control AND the form's own guidance in the question, because
+the person filling it in cannot see the paper form's parenthetical. This is the
+same failure rule 11 catches from the other side - there the question named no
+parts, here it names no substance.
+
+HOW TO CHECK
+
+  node pipeline-audit.js
+
+fails on any multi-line PDF box whose question is not a bigParagraph. It found
+one the day it was written: DV-110's prohibited-items box, asked as a one-liner.
 
 ================================================================================
 PRE-SHIP CHECKLIST
@@ -602,6 +887,17 @@ PRE-SHIP CHECKLIST
          boxes still fill the same PDF fields.
   [ ] 10 Dates, phones, emails and numbers use their own question type, in
          combined and repeating questions too.
+  [ ] 11 No question asks for "details" or "information" in one box. Where the
+         form lists the parts, they are named boxes joining back into the field.
+  [ ] 12 Every multi-line PDF box is a bigParagraph question, and its wording
+         carries the guidance the form prints beside the box.
+  [ ] 3  Every repeating block's entryTitle names the thing, singular, and the
+         entries read "<Thing> #1", "<Thing> #2" in the generated form.
+  [ ] LAST, AND NOT SKIPPABLE — node pipeline-review.js, read every question in
+         order. Every one makes sense to someone who has never seen the paper
+         form, asks about the right person, and sits behind the gate it needs.
+  [ ] LAST — in the preview, answer each gate No and confirm the block it
+         guards actually disappears. A green audit is not evidence for this.
   [ ] -  Every dropdown shows its real options, never a silent Yes/No fallback.
   [ ] -  No two questions share a hiddenLogic nodeId.
 
@@ -610,9 +906,9 @@ PRE-SHIP CHECKLIST
 CURRENT STATUS: THE DV PACKET
 ================================================================================
 
-Measured September 8, 2026, against dv-packet-project.json — 147 questions in
-11 sections, rebuilt from the field configs by the pipeline in PIPELINE.md.
-Four of those questions are combined subjects, five are repeating blocks, and
+Measured September 8, 2026, against dv-packet-project.json — 125 questions in
+12 sections, rebuilt from the field configs by the pipeline in PIPELINE.md.
+Four of those questions are combined subjects, seven are repeating blocks, and
 19 carry a type of their own: 6 date, 4 phone, 9 money, plus the email and
 number boxes inside the combined questions.
 
@@ -638,15 +934,40 @@ number boxes inside the combined questions.
           recompile turned 146 questions back into
           "What is your person_asking_protection_mailing_zip_code?".
 
+          Wording now passes and is checked: the two questions that hid a
+          condition - the lawyer block and the restrained person address -
+          are a gate plus a follow-up.
+
           NOT verified: that every gate is a real question.
 
-  Rule 3  PARTLY — five of DV-100's eight numbered families are now one
-          multipleDropdownType block each: firearms, animals, debts, expenses,
-          restraining orders. 62 flat fields became 5 questions.
-          Still flat, because each entry carries a checkbox or a yes/no pair and
-          per-entry choice fields do not yet honour the {n} token:
-            other_protected_person (DV-100 and DV-110), wireless_transfer_phone,
-            property_debt_special_finding_debt.
+  Rule 3  PASSES — every numbered family on all three forms is asked once.
+          The last two on DV-100 are blocks now, and both carry a choice per
+          entry: other protected people (name, age, relationship, and "lives
+          with you?"), and the wireless numbers to transfer ("my number" or "a
+          child's", plus the number). 32 more flat fields became 2 questions.
+          DV-110 prints the same four protected people under DV-100's own field
+          names, so its block collapses into DV-100's and the packet asks once.
+
+          Three things had to change for a choice to survive inside a block.
+          A block absorbs the fields its hints name rather than matching a
+          pattern on the family prefix, so the number can sit anywhere in the
+          name. The generated form's radio handler read isMultipleTextboxes, a
+          variable belonging to another function - the ReferenceError it threw
+          stopped the chosen option ever reaching its PDF box, so a per-entry
+          choice had never filled anything. And a multi-select option's name
+          now goes through entryFieldId like every other field, instead of
+          having the entry number pasted on the end.
+
+          property_debt_special_finding_debt is not a repeat and never was:
+          "which of the debts resulted from the abuse?" prints one box per debt
+          and is one multi-select question whose options happen to be numbered.
+          The audit counts a family asked as one question as satisfied, however
+          it is numbered.
+
+          A number or email column inside a block also rendered as nothing at
+          all - the exporter passed the type through, and neither the builder's
+          import nor the entry renderer had a branch for it. The age column on
+          the protected-people block was the first to need one.
 
   Rule 4a PASSES — marker fill, section-at-a-time, test mode:
             DV-100  163/163 text   99/158 checkboxes
@@ -675,6 +996,21 @@ number boxes inside the combined questions.
 
   Rule 5  PASSES — one group per form, named after it. DV-109's group is empty
           because that form asks nothing of its own.
+
+  Rule 12 PASSES - 16 boxes the PDF marks multi-line were being asked in a
+          one-line text field, the three abuse narratives among them. "What
+          happened?" now carries item 5f's own guidance about what to include.
+          The check found a seventeenth on DV-110 that had been missed.
+
+          Two follow-ups under "How often has this abuse happened?" were also
+          shown regardless of the answer: a filer who said "just this once" was
+          asked on what OTHER dates it happened, having already given the date.
+          The dates box is gated on the answers that mean more than once, and
+          the "Other:" box on the Other option.
+
+  Rule 11 PASSES - the six court-case questions asked for "details" in one
+          box. Each is three named boxes now - where it was filed, the year,
+          the case number - rejoined into the single PDF field with ", ".
 
   Rule 8  PASSES — one field was asked as two things: the court's name and its
           street address, one box on the form and one AcroForm field. It is two
@@ -710,5 +1046,43 @@ number boxes inside the combined questions.
           description police need.
 
 The packet is ready for a human review of the flowchart. Before filing: run the
-minimum path and a typical path, finish Rule 3, and add DV-140 (Confidential
-Information for Law Enforcement), which DV-100 page 13 lists as required.
+minimum path and a typical path, and add DV-140 (Confidential Information for
+Law Enforcement), which DV-100 page 13 lists as required.
+
+  Rule 2  PARTLY on gates, and measured now rather than assumed. Conditions
+          that list every option of their gate went 48 -> 34, and real subset
+          gates 12 -> 37. Twelve follow-ups the printed form qualifies with
+          "(If yes, ...)" are now actually gated: the firearms table, the
+          restraining-order block, the other-protected-people block, and the
+          witnesses / weapon / harm follow-up on each of the three abuse
+          incidents. Their wording was fixed at the same time - "What is your
+          describe gun or weapon?" is now "What gun or weapon did they use or
+          threaten to use?".
+
+          Blocks and groups could not carry a gate at all before this: hostFor()
+          read the first member field's conditional, and a block has no such
+          field, so the declaration was silently dropped. They read it from
+          their own nameId now.
+
+          Three gates were declared and then backed out, which is the more
+          useful half of this entry. Both property-debt follow-ups name
+          property_debt_special_finding_yes, which the interview does not reach
+          until after them, so the compiler manufactured a gate asking "Do you
+          want to answer this question?" - a duplicate of the real question and
+          exactly the vague gate rule 2 forbids. Gating them properly means
+          moving the special-finding question above the debts it qualifies:
+          a reordering of item 22, not a hint. The third,
+          other_protected_people_reason_for_protection, is reached through the
+          "list more people" question rather than from the protect-others Yes,
+          so the declaration never bound.
+
+          The 34 that remain are largely the compiler rejoining a branch to the
+          spine, where always-show is correct. The ones worth reading are the
+          "other, specify" follow-ups - other frequency, other place, other
+          living arrangement - which should hang off their Other option and do
+          not. Nobody has been through that list.
+
+The packet is ready for a human review of the flowchart. Before filing: run the
+minimum path and a typical path, work through the 34 conditions rule 2 now
+reports, and add DV-140 (Confidential Information for Law Enforcement), which
+DV-100 page 13 lists as required.

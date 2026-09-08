@@ -4103,6 +4103,21 @@ function updatemultipleDropdownTypeCell(cell) {
         <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;
   }
+  // A choice collected once per entry - "does this person live with you?" - is
+  // part of the block as much as the text rows above it. Shown read-only: it is
+  // authored in the form's hints and compiled in, and a box the operator could
+  // edit here would be overwritten by the next compile.
+  (cell._checkboxes || []).forEach((cb) => {
+    const options = (cb.options || [])
+      .map((o) => escapeAttr(o.text || o.checkboxText || o.nodeId || ''))
+      .join(' &middot; ');
+    html += `
+      <div style="margin: 8px 0; padding: 8px; background-color: #f0f8ff; border: 1px solid #87CEEB; border-radius: 4px; text-align: center; font-size: 12px; color: #2980b9;">
+        <div style="font-weight: bold;">${escapeAttr(cb.fieldName || 'Choice')}</div>
+        <div style="margin-top: 4px;">${options || '(no options)'}</div>
+        <div style="margin-top: 4px; color: #7a7a7a;">${cb.selectionType === 'single' ? 'pick one' : 'pick any'}</div>
+      </div>`;
+  });
   html += `<div style="text-align:center; margin-top:8px;">
       <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
       <button onclick="window.addMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>

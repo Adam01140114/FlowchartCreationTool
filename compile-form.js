@@ -251,6 +251,7 @@ function detectGroups(fields, hints) {
       // in order, says what the option should read.
       labels: Array.isArray(g.labels) ? g.labels : null,
       multiSelect: g.multiSelect === true,
+      conditional: g.conditional || declaredConditional(hints, g.nameId || ''),
       source: 'hint'
     });
   });
@@ -341,6 +342,10 @@ function applyCombines(fields, hints) {
       nameId: prefix,
       question: spec.question,
       anchor: members[0],
+      // One question standing for several fields, so no member's conditional
+      // can carry its gate - the same reason repeats and groups read theirs
+      // from their own nameId.
+      conditional: spec.conditional || declaredConditional(hints, prefix),
       boxes: members.map((m, i) => {
         const declared = (spec.fields || [])[i];
         const suffix = m.nameId.indexOf(prefix + '_') === 0
@@ -404,6 +409,44 @@ function applySplits(fields, hints) {
 }
 
 /**
+ * The PDF field one entry of a repeating block fills.
+ *
+ * The block owns a prefix and each field states the rest, with {n} standing in
+ * for the entry number. That token sits wherever the PDF put it - firearms
+ * number the entry ({n}_description -> firearm_item_2_description), while the
+ * special finding on a debt numbers the field (special_finding_debt_{n} ->
+ * property_debt_special_finding_debt_2). One rule covers both, and the
+ * exporter composes the generated form's ids the same way.
+ */
+function repeatFieldName(blockNameId, fieldNameId, n) {
+  return blockNameId + '_' + String(fieldNameId).split('{n}').join(String(n));
+}
+
+/**
+ * The gate declared on a question that is not a single field.
+ *
+ * A repeating block and an exclusive group are each one question standing for a
+ * family of fields, so there is no field whose conditional could carry their
+ * gate - and hostFor() reading the first member's conditional silently gave
+ * them no gate at all. The firearms table showed after "no" and after "I don't
+ * know" because of this, not because the hint was missing.
+ */
+function declaredConditional(hints, nameId) {
+  const q = (hints.questions || {})[nameId];
+  return (q && q.conditional) || null;
+}
+
+/** Every field nameId a spec's entry template declares, choice options included. */
+function repeatTemplateNames(spec) {
+  const out = [];
+  (spec.fields || []).forEach((f) => {
+    if (Array.isArray(f.options)) f.options.forEach((o) => out.push(o.nameId));
+    else out.push(f.nameId);
+  });
+  return out.filter(Boolean);
+}
+
+/**
  * Collapse a numbered family into one repeating block.
  *
  * A PDF that prints six firearm rows has six sets of fields, and asking about
@@ -411,33 +454,58 @@ function applySplits(fields, hints) {
  * have. One question ("how many?") followed by that many entry blocks is the
  * same data and a fraction of the interview.
  *
- * The entry's fields keep the PDF's own naming through the {n} token, so entry
- * 3 of firearm_item fills firearm_item_3_description rather than being renamed
- * to suit the builder.
+ * Absorption follows the names the spec declares rather than a pattern over the
+ * family prefix. An entry may carry a choice - "does this person live with
+ * you?" - and its two PDF checkboxes belong to the entry as much as the name
+ * and age beside them, even though neither is numbered the way the others are.
  */
 function applyRepeats(fields, hints) {
   const specs = hints.repeats || [];
   if (!specs.length) return { fields, repeats: [] };
 
+  const byName = new Map(fields.map((f) => [f.nameId, f]));
   const absorbed = new Set();
   const repeats = [];
+
   specs.forEach((spec) => {
-    const pattern = new RegExp('^' + spec.nameId + '_(\\d+)_(.+)$');
-    const members = fields.filter((f) => pattern.test(f.nameId));
+    const template = repeatTemplateNames(spec);
+    if (!template.length) return;
+
+    // How many entries the PDF actually prints. An explicit max is trusted; a
+    // spec without one grows until the PDF stops offering a row.
+    let max = spec.max;
+    if (max == null) {
+      max = 0;
+      for (let n = 1; n <= 40; n++) {
+        if (!template.some((t) => byName.has(repeatFieldName(spec.nameId, t, n)))) break;
+        max = n;
+      }
+    }
+    if (!max) return;
+
+    const members = [];
+    for (let n = 1; n <= max; n++) {
+      template.forEach((t) => {
+        const field = byName.get(repeatFieldName(spec.nameId, t, n));
+        if (field) members.push(field);
+      });
+    }
     if (!members.length) return;
-    const entries = new Set(members.map((f) => Number(pattern.exec(f.nameId)[1])));
     members.forEach((f) => absorbed.add(f.id));
+
     repeats.push({
       nameId: spec.nameId,
       question: spec.question,
       entryTitle: spec.entryTitle || '',
       min: spec.min == null ? 0 : spec.min,
-      max: spec.max == null ? Math.max.apply(null, [...entries]) : spec.max,
+      max: max,
       // The first field of entry 1 anchors the block where the family started.
       anchor: members[0],
-      fields: spec.fields
+      fields: spec.fields,
+      conditional: spec.conditional || declaredConditional(hints, spec.nameId)
     });
   });
+
   return { fields: fields.filter((f) => !absorbed.has(f.id)), repeats };
 }
 
@@ -618,7 +686,7 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
         combine: combine,
         origin: 'combine'
       });
-      place(step, hostFor(combine.anchor));
+      place(step, hostFor(combine.conditional ? { conditional: combine.conditional } : combine.anchor));
       notes.push(`combine: ${combine.boxes.length} fields -> "${combine.question}"`);
     }
 
@@ -634,7 +702,7 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
         repeat: repeat,
         origin: 'repeat'
       });
-      place(step, hostFor(repeat.anchor));
+      place(step, hostFor(repeat.conditional ? { conditional: repeat.conditional } : repeat.anchor));
       notes.push(`repeat: ${repeat.nameId} -> "${repeat.question}" (up to ${repeat.max} entries)`);
     }
     lastIndex = field.index;
@@ -656,7 +724,7 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
         field: null,
         origin: 'group'
       });
-      place(step, hostFor(field));
+      place(step, hostFor(group.conditional ? { conditional: group.conditional } : field));
       notes.push(`${group.source}: ${group.members.length} ${group.multiSelect ? 'checkbox' : 'exclusive'} fields -> "${group.question}"`);
       return;
     }
@@ -747,7 +815,7 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
       combine: combine,
       origin: 'combine'
     });
-    place(step, hostFor(combine.anchor));
+    place(step, hostFor(combine.conditional ? { conditional: combine.conditional } : combine.anchor));
     notes.push(`combine: ${combine.boxes.length} fields -> "${combine.question}"`);
   });
 
@@ -762,7 +830,7 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
       repeat: repeat,
       origin: 'repeat'
     });
-    place(step, hostFor(repeat.anchor));
+    place(step, hostFor(repeat.conditional ? { conditional: repeat.conditional } : repeat.anchor));
     notes.push(`repeat: ${repeat.nameId} -> "${repeat.question}" (up to ${repeat.max} entries)`);
   });
 
@@ -812,9 +880,20 @@ function assignSections(steps, fields, hints, sectionPrefs) {
         if (anchor) cur = startAt.get(anchor);
       }
       else if (step.repeat) {
-        const anchor = step.repeat.fields
-          .map((f) => step.repeat.nameId + '_1' + String(f.nameId).replace('{n}', ''))
+        const anchor = repeatTemplateNames(step.repeat)
+          .map((t) => repeatFieldName(step.repeat.nameId, t, 1))
           .find((name) => startAt.has(name));
+        if (anchor) cur = startAt.get(anchor);
+      }
+      // A group stands in for its member fields, and the section hint names
+      // those members rather than the group. Without this, gating a section's
+      // opening question emptied the section it opens: "Other Protected People"
+      // and "Firearms" both collapsed into "The Abuse" the moment their blocks
+      // moved under a Yes.
+      else if (step.options && step.options.length) {
+        const anchor = step.options
+          .map((o) => o.nameId)
+          .find((name) => name && startAt.has(name));
         if (anchor) cur = startAt.get(anchor);
       }
       walkSteps([step], (sub) => { sub.section = cur + 1; });
@@ -1097,7 +1176,12 @@ function combineHeight(combine) {
 
 /** Roughly what the editor will draw for a block of this many fields, rounded up. */
 function repeatHeight(repeat) {
-  return 260 + 140 * (repeat.fields || []).length;
+  return (repeat.fields || []).reduce(
+    // A choice prints a heading and a row per option, so it needs more room
+    // than the single row a textbox draws.
+    (h, f) => h + (Array.isArray(f.options) ? 90 + 60 * f.options.length : 140),
+    260
+  );
 }
 
 /**
@@ -1112,18 +1196,54 @@ function repeatHeight(repeat) {
 function attachRepeat(cell, repeat) {
   cell._twoNumbers = { first: String(repeat.min), second: String(repeat.max) };
   cell._dropdownTitle = repeat.entryTitle || '';
-  cell._textboxes = repeat.fields.map((f) => ({
-    nameId: f.nameId,
-    label: f.label || '',
-    placeholder: f.label || '',
-    isAmountOption: f.type === 'amount',
-    // A date column inside a block is still a date: carried through so the
-    // entry offers a date picker, the same as a date asked on its own.
-    type: (f.type && f.type !== 'amount' && f.type !== 'label') ? f.type : undefined,
-    prefill: '',
-    conditionalPrefills: []
-  }));
-  cell._itemOrder = repeat.fields.map((_, i) => ({ type: 'option', index: i }));
+
+  // The editor keeps an entry's plain fields and its choices in two arrays, and
+  // _itemOrder is what puts them back in one order. Each entry here indexes the
+  // array its own type lives in, so both lists are built together.
+  const textboxes = [];
+  const checkboxes = [];
+  const order = [];
+
+  repeat.fields.forEach((f) => {
+    if (Array.isArray(f.options)) {
+      order.push({ type: 'checkbox', index: checkboxes.length });
+      checkboxes.push({
+        fieldName: f.label || '',
+        // "single" renders the options as one exclusive choice. The PDF still
+        // gets a box per option: the runtime mirrors the chosen radio into a
+        // hidden checkbox named for the field it fills.
+        selectionType: f.selection === 'single' ? 'single' : 'multiple',
+        required: f.required === 'optional' ? 'optional' : 'required',
+        options: f.options.map((o) => ({
+          // The full PDF field name, {n} and all - a choice option is not
+          // prefixed with the block's nameId the way a textbox is, so it
+          // carries the whole name itself.
+          nodeId: repeatFieldName(repeat.nameId, o.nameId, '{n}'),
+          text: o.label || '',
+          checkboxText: o.label || '',
+          linkedFields: [],
+          pdfEntries: []
+        }))
+      });
+      return;
+    }
+    order.push({ type: 'option', index: textboxes.length });
+    textboxes.push({
+      nameId: f.nameId,
+      label: f.label || '',
+      placeholder: f.label || '',
+      isAmountOption: f.type === 'amount',
+      // A date column inside a block is still a date: carried through so the
+      // entry offers a date picker, the same as a date asked on its own.
+      type: (f.type && f.type !== 'amount' && f.type !== 'label') ? f.type : undefined,
+      prefill: '',
+      conditionalPrefills: []
+    });
+  });
+
+  cell._textboxes = textboxes;
+  cell._checkboxes = checkboxes;
+  cell._itemOrder = order;
   cell._locationIndex = null;
   cell._dropdowns = [];
 }

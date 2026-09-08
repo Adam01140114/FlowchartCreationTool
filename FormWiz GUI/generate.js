@@ -148,9 +148,37 @@ function getDiscreteAnswersForQuestion(prevQuestionId) {
     }
     return answers;
 }
-function logicAlwaysVisibleInStackedMode(formQuestionStyle, questionId, logicRows) {
+/**
+ * Is this question shown in stacked mode without answering anything first?
+ *
+ * A question chained on "Any Text", or listing every option of the one before
+ * it, is not really conditional - it comes next whatever you answered - so in
+ * section and all modes it is shown rather than made to wait.
+ *
+ * That only holds if the question it waits on is itself always shown. A block
+ * behind a gate chains internally the same way ("show when the date has any
+ * text"), and reading each link in isolation declared the entire block
+ * unconditional: answering "no" to "has the person abused you in a different
+ * way?" hid the first question and left the other sixteen on screen. Walk the
+ * chain, and a question inside a branch stays inside it.
+ */
+/** A question with no logic of its own is always shown; otherwise recurse. */
+function prevAlwaysVisible(prevId, formQuestionStyle, seen) {
+    const qBlock = document.getElementById("questionBlock" + prevId);
+    if (!qBlock) return true;                       // not a question we generated
+    const logicCheckbox = qBlock.querySelector("#logic" + prevId);
+    if (!logicCheckbox || !logicCheckbox.checked) return true;   // unconditional
+    const rows = qBlock.querySelectorAll(".logic-condition-row");
+    return logicAlwaysVisibleInStackedMode(formQuestionStyle, prevId, rows, seen);
+}
+
+function logicAlwaysVisibleInStackedMode(formQuestionStyle, questionId, logicRows, seen) {
     if (formQuestionStyle !== "section" && formQuestionStyle !== "all") return false;
     if (!logicRows || !logicRows.length) return false;
+    // A question cannot justify itself, and a cycle must not hang the build.
+    seen = seen || {};
+    if (seen[questionId]) return false;
+    seen[questionId] = true;
     const ANY_VALUE = /^(any text|any amount|any date)$/i;
     const byPrev = {};
     for (let lr = 0; lr < logicRows.length; lr++) {
@@ -161,11 +189,17 @@ function logicAlwaysVisibleInStackedMode(formQuestionStyle, questionId, logicRow
     }
     const prevIds = Object.keys(byPrev);
     if (!prevIds.length) return false;
+    // Whatever this question depends on must itself be reachable without an
+    // answer, or "always visible" is only true within a branch nobody entered.
+    const dependsOnVisible = function() {
+        return prevIds.every(function(pid) { return prevAlwaysVisible(pid, formQuestionStyle, seen); });
+    };
     const allAnswers = prevIds.reduce(function(acc, id) { return acc.concat(byPrev[id]); }, []);
     if (allAnswers.length && allAnswers.every(function(ans) { return ANY_VALUE.test(ans); })) {
-        return true;
+        return dependsOnVisible();
     }
     if (prevIds.length !== 1) return false;
+    if (!dependsOnVisible()) return false;
     const listed = byPrev[prevIds[0]].map(function(ans) { return String(ans).toLowerCase(); });
     if (listed.some(function(ans) { return ANY_VALUE.test(ans); })) return true;
     const qBlock = document.getElementById("questionBlock" + prevIds[0]);
@@ -2111,9 +2145,12 @@ questionSlugMap[questionId] = slug;
         const mnPhEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
         const mnName =
           mnNmEl && mnNmEl.value ? mnNmEl.value : "answer" + questionId;
-        const mnPh = mnPhEl && mnPhEl.value ? mnPhEl.value : "Enter amount";
+        // The builder offers this as "Number" (currency is the money type), so it
+        // steps in whole numbers. It used to step in hundredths and prompt
+        // "Enter amount", which is what asked a filer's age in an amount box.
+        const mnPh = mnPhEl && mnPhEl.value ? mnPhEl.value : "Enter a number";
         questionNameIds[questionId] = mnName;
-        formHTML += `<div class="text-input-container"><input type="number" id="${mnName}" name="${mnName}" min="0" step="0.01" placeholder="${mnPh}"></div>`;
+        formHTML += `<div class="text-input-container"><input type="number" id="${mnName}" name="${mnName}" min="0" step="1" inputmode="numeric" placeholder="${mnPh}"></div>`;
       } else if (questionType === "currency") {
         const curNmEl = qBlock.querySelector("#textboxName" + questionId);
         const curPhEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
@@ -11826,7 +11863,10 @@ function showTextboxLabels(questionId, count){
         const entryTitle = (window.entryTitleMap && window.entryTitleMap[questionId]) ? window.entryTitleMap[questionId] : '';
         if (entryTitle) {
             const titleLabel = document.createElement('h4');
-            titleLabel.textContent = entryTitle;
+            // Numbered, because a stack of identically headed boxes gives a
+            // person no way to say which one they are filling in, or to match
+            // what they typed against the numbered rows on the printed form.
+            titleLabel.textContent = entryTitle + ' #' + j;
             titleLabel.style.cssText = 'margin: 0 0 15px 0; color: #2980b9; font-size: 16px; font-weight: 600; text-align: center; padding-bottom: 10px; border-bottom: 1px solid #e1e5e9;';
             entryContainer.appendChild(titleLabel);
         }
@@ -12018,6 +12058,39 @@ function showTextboxLabels(questionId, count){
                         window.formatPhoneInput(createdInput);
                     }
                 }, 0);
+            } else if (field.type === 'number' || field.type === 'email') {
+                // The exporter passes these through from the block's entry
+                // template, and without a branch here they rendered as nothing
+                // at all: an age column asked once per entry simply vanished,
+                // and its PDF box could never be filled.
+                const fieldId = entryFieldId(field.nodeId, j);
+                const isNumber = field.type === 'number';
+                let prefillValue = '';
+                if (field.conditionalPrefills && Array.isArray(field.conditionalPrefills)) {
+                    const matchingConditional = field.conditionalPrefills.find(cp => cp.trigger == j);
+                    if (matchingConditional && matchingConditional.value) {
+                        prefillValue = replaceUrlParametersInText(matchingConditional.value);
+                    }
+                } else if (field.prefill) {
+                    prefillValue = field.prefill;
+                }
+                const safePrefill = prefillValue ? prefillValue.replace(/"/g, '&quot;') : '';
+                const inputDiv = document.createElement('div');
+                inputDiv.innerHTML =
+                  '<div class="address-field">' +
+                    '<input type="' + (isNumber ? 'number' : 'email') + '"' +
+                    ' id="' + fieldId + '"' +
+                    ' name="' + fieldId + '"' +
+                    ' placeholder="' + (field.label || (isNumber ? 'Number' : 'Email')) + '"' +
+                    (isNumber ? ' min="0" inputmode="numeric"' : ' inputmode="email"') +
+                    ' class="address-input"' +
+                    ' style="margin: 4px auto; max-width: 400px;"' +
+                    ' value="' + safePrefill + '">' +
+                  '</div>';
+                Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
+                if (allFieldsInOrder.slice(fieldIndex + 1).length > 0) {
+                  entryContainer.appendChild(document.createElement('br'));
+                }
             } else if (field.type === 'amount') {
                 const fieldId = entryFieldId(field.nodeId, j);
                 const inputDiv = document.createElement('div');
@@ -12103,7 +12176,11 @@ function showTextboxLabels(questionId, count){
                     input.type = selectionType === 'single' ? 'radio' : 'checkbox';
                     input.id = selectionType === 'single'
                         ? entryFieldId(option.nodeId, j) + "_radio" : entryFieldId(option.nodeId, j);
-                    input.name = selectionType === 'single' ? 'radio_group_' + (questionId || 'unknown') + '_' + j : option.nodeId + "_" + j; // Radio buttons share the same name
+                    // The PDF is filled from element.name, so a multi-select option has to
+                    // carry its real field name - entryFieldId, not a bare suffix, because a
+                    // block numbers the entry wherever the PDF put the number. Radios share a
+                    // group name and reach the PDF through their hidden mirror checkbox instead.
+                    input.name = selectionType === 'single' ? 'radio_group_' + (questionId || 'unknown') + '_' + j : entryFieldId(option.nodeId, j);
                     input.value = option.text;
                     input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #2980b9; cursor: pointer;';
                     // Handle linked fields for this checkbox option
@@ -12293,13 +12370,13 @@ function showTextboxLabels(questionId, count){
                                         radio.checked = false;
                                         // Remove hidden checkbox for unchecked radio
                                         // The hidden checkbox ID should be the original nodeId (without _radio suffix)
-                    let originalNodeId;
-                    if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
-                      // For multipleTextboxes, remove _radio suffix to get the checkbox ID
-                      originalNodeId = radio.id.replace('_radio', '');
-                    } else {
-                      originalNodeId = radio.id.replace('_radio', '');
-                    }
+                                        // The hidden checkbox is named for the PDF field, which is
+                                        // the radio's id without the _radio suffix. This used to branch
+                                        // on isMultipleTextboxes, a variable belonging to another
+                                        // function - both arms did this, and reading it threw a
+                                        // ReferenceError that stopped the chosen option ever reaching
+                                        // the PDF.
+                                        const originalNodeId = radio.id.replace('_radio', '');
                                         const existingHiddenCheckbox = document.getElementById(originalNodeId);
                                         if (existingHiddenCheckbox) {
                                             if (existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
@@ -12308,7 +12385,7 @@ function showTextboxLabels(questionId, count){
                                         }
                                         // Also remove linked textboxes and PDF entries for unchecked radio
                                         const uncheckedOption = checkboxOptions.find(opt => {
-                                            const optId = selectionType === 'single' ? opt.nodeId + "_" + j + "_radio" : opt.nodeId + "_" + j;
+                                            const optId = selectionType === 'single' ? entryFieldId(opt.nodeId, j) + "_radio" : entryFieldId(opt.nodeId, j);
                                             return optId === radio.id;
                                         });
                                         if (uncheckedOption) {
@@ -17897,8 +17974,8 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
         <button id="fillMaximumPathBtn" style="background: linear-gradient(90deg, #ff8c42 0%, #ff5e62 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(255, 94, 98, 0.35);">
           🔥 Fill maximum path
         </button>
-        <button id="fillMarkerPathBtn" style="background: linear-gradient(90deg, #7b5cff 0%, #b06ab3 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(123, 92, 255, 0.35);">
-          🏷 Fill marker values
+        <button id="fillMinimumPathBtn" style="background: linear-gradient(90deg, #7b5cff 0%, #b06ab3 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(123, 92, 255, 0.35);">
+          🌱 Fill minimum path
         </button>
         </div>
       </div>
@@ -18972,9 +19049,12 @@ function pickBestSelectValue(select) {
   if (!options.length) options = getSelectOptions(select);
   if (!options.length) return null;
 
+  const minimum = !!window.__FILL_MINIMUM__;
+
   if (isNumberedDropdownSelect(select)) {
     const best = options.reduce(function(a, b) {
-      return (parseInt(b.value, 10) || 0) > (parseInt(a.value, 10) || 0) ? b : a;
+      const bv = parseInt(b.value, 10) || 0, av = parseInt(a.value, 10) || 0;
+      return minimum ? (bv < av ? b : a) : (bv > av ? b : a);
     });
     if (select.value !== best.value) {
       select.value = best.value;
@@ -18984,7 +19064,12 @@ function pickBestSelectValue(select) {
     return best.value;
   }
 
-  const preferred = ['yes', 'llc', 'limited liability company', 'partnership', 'trust/estate', 'trust', 'other', 's corporation', 'c corporation', 'individual/sole proprietor', 'individual'];
+  // A minimum run wants the answer that asks for the least: "no" first, then
+  // "I don't know", then the smallest count. Anything not on either list falls
+  // through to scoring, which is inverted below.
+  const preferred = minimum
+    ? ['no', "i don't know", 'i don’t know', 'none', 'just this once']
+    : ['yes', 'llc', 'limited liability company', 'partnership', 'trust/estate', 'trust', 'other', 's corporation', 'c corporation', 'individual/sole proprietor', 'individual'];
   for (let i = 0; i < preferred.length; i++) {
     const pref = preferred[i];
     const match = options.find(function(o) {
@@ -19009,7 +19094,7 @@ function pickBestSelectValue(select) {
     triggerFieldChange(select);
     triggerSelectSideEffects(select);
     const score = scoreCurrentState();
-    if (score > bestScore) {
+    if (minimum ? (score < bestScore) : (score > bestScore)) {
       bestScore = score;
       bestValue = opt.value;
     }
@@ -19044,12 +19129,14 @@ function fillVisibleCheckboxesAndRadios() {
     if (radios.some(function(r) { return r.checked; })) return;
     let best = radios[radios.length - 1];
     let bestScore = -1;
+    const minimum = !!window.__FILL_MINIMUM__;
+    if (minimum) bestScore = Infinity;
     radios.forEach(function(r) {
       if (wouldOptionJumpToEnd(r, r.value)) return;
       r.checked = true;
       triggerFieldChange(r);
       const score = countExportableFields();
-      if (score > bestScore) {
+      if (minimum ? (score < bestScore) : (score > bestScore)) {
         bestScore = score;
         best = r;
       }
@@ -19062,6 +19149,10 @@ function fillVisibleCheckboxesAndRadios() {
 
   document.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
     if (!isDebugFillEligible(cb)) return;
+    // A minimum run ticks nothing optional: a checkbox group is "mark all that
+    // apply", and the least that can apply is none. Leaving them clear is the
+    // whole point - it is what shows which follow-ups are gated on them.
+    if (window.__FILL_MINIMUM__) return;
     const container = cb.closest('.question-container');
     const isMarkOnlyOne = container && container.querySelector('input[type="radio"]');
     if (isMarkOnlyOne) return;
@@ -19178,7 +19269,15 @@ function fillYield() {
   });
 }
 
-async function fillMaximumPathPass(pass, passes) {
+/**
+ * One sweep over every dropdown, then the text fields and checkboxes it revealed.
+ *
+ * The bar reports position within THIS pass rather than a fraction of the eight
+ * a run is allowed, because the loop stops as soon as a pass changes nothing -
+ * usually after two or three. Scaling by eight meant a finishing run sat at 11%
+ * and looked hung.
+ */
+async function fillMaximumPathPass(pass) {
   revealAllForMaxFill();
   const selects = [...document.querySelectorAll('select')].filter(isDebugFillEligible);
   for (let i = 0; i < selects.length; i++) {
@@ -19187,15 +19286,13 @@ async function fillMaximumPathPass(pass, passes) {
     // so this is where the time goes and where the page has to breathe.
     if (i % 3 === 0) {
       fillProgress({
-        text: 'Filling: pass ' + pass + ' of ' + passes + ' — question ' + (i + 1)
-          + ' of ' + selects.length,
-        percent: ((pass - 1) / passes + (i / Math.max(1, selects.length)) / passes) * 100
+        text: 'Pass ' + pass + ' — question ' + (i + 1) + ' of ' + selects.length,
+        percent: (i / Math.max(1, selects.length)) * 100
       });
       await fillYield();
     }
   }
-  fillProgress({ text: 'Filling: pass ' + pass + ' of ' + passes + ' — text fields and checkboxes',
-                 percent: (pass / passes) * 100 });
+  fillProgress({ text: 'Pass ' + pass + ' — text fields and checkboxes', percent: 100 });
   await fillYield();
   fillVisibleCheckboxesAndRadios();
   fillVisibleTextFields();
@@ -19216,10 +19313,22 @@ async function fillMaximumPathPass(pass, passes) {
   }
   document.dispatchEvent(new CustomEvent('questionVisibilityChanged', { detail: { sectionId: null } }));
 }
+/**
+ * Walk the whole interview answering every question, in one of two directions.
+ *
+ * Maximum answers the way that opens the most questions, and measures coverage
+ * - every field the answers reached carries a value. Minimum answers the way
+ * that opens the fewest, and measures the opposite thing: that a gate answered
+ * No actually closes the block behind it. A form can pass the first and fail
+ * the second, which is how thirty questions about further abuse stayed on
+ * screen for a filer who had said it happened once.
+ */
 async function fillMaximumPath(options) {
   const markers = !!(options && options.markers);
+  const minimum = !!(options && options.minimum);
   window.__FILL_MARKER_VALUES__ = markers;
-  const btn = document.getElementById(markers ? 'fillMarkerPathBtn' : 'fillMaximumPathBtn');
+  window.__FILL_MINIMUM__ = minimum;
+  const btn = document.getElementById(minimum ? 'fillMinimumPathBtn' : 'fillMaximumPathBtn');
   const originalText = btn ? btn.textContent : '';
   if (btn) {
     btn.disabled = true;
@@ -19238,10 +19347,15 @@ async function fillMaximumPath(options) {
     let settled = -1;
     const passes = 8;
     for (let pass = 1; pass <= passes; pass++) {
-      await fillMaximumPathPass(pass, passes);
+      fillProgress({ text: 'Pass ' + pass + ' — starting', percent: 0 });
+      await fillMaximumPathPass(pass);
       await new Promise(function(resolve) { setTimeout(resolve, 180); });
       const filled = countExportableFields();
-      if (filled === settled) break;
+      if (filled === settled) {
+        fillProgress({ text: 'Settled after ' + pass + ' pass' + (pass === 1 ? '' : 'es'),
+                       percent: 100 });
+        break;
+      }
       settled = filled;
     }
     if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
@@ -19277,6 +19391,7 @@ async function fillMaximumPath(options) {
     fillProgress(null);
     window.__MAX_FILL_IN_PROGRESS__ = false;
     window.__FILL_MARKER_VALUES__ = false;
+    window.__FILL_MINIMUM__ = false;
     restoreSectionViewState(viewState);
     window.isInitialAutofill = false;
   }
@@ -19425,13 +19540,19 @@ document.getElementById('debugSearch').addEventListener('input', debouncedPopula
 document.getElementById('debugTypeFilter').addEventListener('change', debouncedPopulateDebugContent);
 // Export Names/IDs functionality
 document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNamesAndIds);
+// The widest path, with every free-text box carrying its own field id so the
+// filled PDF can be read page by page against the blank form. Markers used to
+// be a separate button; there was never a reason to run the widest path
+// WITHOUT them, and having both invited reading a "Test Value" run as if it
+// proved rule 4b.
 document.getElementById('fillMaximumPathBtn').addEventListener('click', function() {
-  fillMaximumPath();
-});
-// Same widest path, but every free-text box carries its own field id, so the
-// filled PDF can be read page by page against the blank form (rule 4b).
-document.getElementById('fillMarkerPathBtn').addEventListener('click', function() {
   fillMaximumPath({ markers: true });
+});
+// The other half of rule 4: every gate answered the way that opens the least.
+// It is how you check that saying No really does close a block, which the
+// widest path can never show.
+document.getElementById('fillMinimumPathBtn').addEventListener('click', function() {
+  fillMaximumPath({ markers: true, minimum: true });
 });
 // Function to create Form Name input field (to be called from the form editor interface)
 function createFormNameInput() {
@@ -19483,7 +19604,11 @@ document.addEventListener('input', function() {
   }
 });
 document.addEventListener('change', function() {
-  if (debugMenuVisible) {
+  // Not during a debug fill. The menu is open - it is how the fill was
+  // started - and this rebuilds the list of every input in the form on every
+  // change, which a fill makes more than a thousand of. fillMaximumPath
+  // repopulates once when it finishes.
+  if (debugMenuVisible && !window.__MAX_FILL_IN_PROGRESS__) {
     populateDebugContent();
   }
 });

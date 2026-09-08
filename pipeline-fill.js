@@ -14,12 +14,12 @@
  * The PDFs are also rendered to PNG so the pages can be read against the blank
  * form, which is the only way 4b is finished.
  *
- * Usage:  node pipeline-fill.js [answers.json] [--out dir] [--render] [--server url]
+ * Usage:  node pipeline-fill.js [answers.json] [--out dir] [--render] [--scale n]
+ *                                 [--server url] [--forms a,b,c]
  */
 const fs = require('fs');
 const path = require('path');
 const { PDFDocument } = require('pdf-lib');
-const { execFileSync } = require('child_process');
 
 const args = process.argv.slice(2);
 const flag = (n, d) => { const i = args.indexOf('--' + n); return i >= 0 ? args[i + 1] : d; };
@@ -28,6 +28,9 @@ const OUT = flag('out', 'pipeline-out');
 const SERVER = flag('server', 'http://127.0.0.1:8080');
 const RENDER = args.includes('--render');
 const FORMS = (flag('forms', 'dv100,dv109,dv110')).split(',');
+// Big enough to read a filled box against the printed label, small enough
+// that thirteen pages stay a reasonable size on disk.
+const RENDER_SCALE = Number(flag('scale', '1.6')) || 1.6;
 
 function multipart(data) {
   const boundary = '----pipeline' + Date.now();
@@ -63,11 +66,66 @@ async function readBack(buffer) {
   return out;
 }
 
-function renderPages(pdfPath, dir) {
+/**
+ * Rasterise every page, so a filled form can be read against the blank one.
+ *
+ * This used to shell out to Ghostscript, which the repo does not install - on a
+ * machine without `gs` the run died at exactly the point rule 4b begins, which
+ * is the one check that cannot be made from field values alone. pdfjs and
+ * @napi-rs/canvas are already dependencies, so this renders in-process and
+ * --render works wherever `npm install` has run.
+ *
+ * Four settings decide whether the answers actually appear, and getting any of
+ * them wrong produces a page that looks convincingly like a filling bug:
+ *
+ *   useSystemFonts: false   the appearance streams name Helvetica, and asking
+ *   disableFontFace: true   Node for a system font fails silently - every text
+ *   standardFontDataUrl     box renders empty while the checkboxes still tick.
+ *                           These three make pdfjs draw glyph outlines from its
+ *                           own bundled fonts instead.
+ *   annotationMode: 1       paints each widget's own appearance stream onto the
+ *                           canvas. Mode 2 hands widgets to an HTML layer that
+ *                           does not exist here, and the page comes out blank.
+ *
+ * Path2D and DOMMatrix are browser globals pdfjs expects; @napi-rs/canvas
+ * exports them but does not install them.
+ */
+async function renderPages(pdfPath, dir) {
   fs.mkdirSync(dir, { recursive: true });
-  execFileSync('gs', ['-dNOPAUSE', '-dBATCH', '-sDEVICE=png16m', '-r110',
-    '-sOutputFile=' + path.join(dir, 'page-%d.png'), pdfPath], { stdio: 'ignore' });
-  return fs.readdirSync(dir).filter((f) => f.endsWith('.png')).length;
+  const canvasLib = require('@napi-rs/canvas');
+  globalThis.Path2D = globalThis.Path2D || canvasLib.Path2D;
+  globalThis.DOMMatrix = globalThis.DOMMatrix || canvasLib.DOMMatrix;
+  globalThis.ImageData = globalThis.ImageData || canvasLib.ImageData;
+
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  const standardFontDataUrl = path.join(
+    path.dirname(require.resolve('pdfjs-dist/package.json')), 'standard_fonts') + path.sep;
+
+  const doc = await pdfjs.getDocument({
+    data: new Uint8Array(fs.readFileSync(pdfPath)),
+    useSystemFonts: false,
+    disableFontFace: true,
+    standardFontDataUrl,
+    annotationMode: 1,
+    verbosity: 0
+  }).promise;
+
+  for (let n = 1; n <= doc.numPages; n++) {
+    const page = await doc.getPage(n);
+    const viewport = page.getViewport({ scale: RENDER_SCALE });
+    const canvas = canvasLib.createCanvas(Math.ceil(viewport.width), Math.ceil(viewport.height));
+    const ctx = canvas.getContext('2d');
+    // A PDF page assumes paper. Without this the transparent ground reads as
+    // black wherever the form leaves the page empty.
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    await page.render({ canvasContext: ctx, viewport, annotationMode: 1 }).promise;
+    fs.writeFileSync(path.join(dir, 'page-' + n + '.png'), canvas.toBuffer('image/png'));
+    page.cleanup();
+  }
+  const pages = doc.numPages;
+  await doc.destroy();
+  return pages;
 }
 
 async function main() {
@@ -109,7 +167,7 @@ async function main() {
     }
     fs.writeFileSync(path.join(OUT, base + '-readback.json'), JSON.stringify(fields, null, 2));
     if (RENDER) {
-      const n = renderPages(file, path.join(OUT, base + '-pages'));
+      const n = await renderPages(file, path.join(OUT, base + '-pages'));
       console.log('  rendered ' + n + ' page(s) to ' + path.join(OUT, base + '-pages'));
     }
   }

@@ -146,7 +146,7 @@ Defaults:
 ### Form Debug Menu (Ctrl+Shift in preview)
 
 - **Fill maximum path** — fills form for worst-case PDF coverage: avoids jump-to-end and hard alerts, maxes numbered dropdowns, prefers branches that reveal more fields, up to 8 passes (stops when a pass changes nothing), with a progress bar and a yield between questions so the tab stays alive.
-- **Fill marker values** — the same path with each field's own id as its value, so a rendered page can be read against the blank form. This is how rule 4b is done.
+- **Fill minimum path** — every gate answered the way that opens the least, to check that saying No really does close the block behind it. Both modes write each field's own id as its value, so a rendered page can be read against the blank form.
 
 ### Test deployment mode & dev server (September 2026 session)
 
@@ -355,7 +355,7 @@ section hint that names a family's first field places the block that replaced it
   gets no frames and clamps timers, and a fill left in the background used to
   stall for minutes at a time. Progress shows as a modal overlay above the debug
   menu — phase, bar and percentage — rather than a word on the button.
-- **Marker fill** (`Fill marker values`) writes each field's own id into it, so a
+- **Both fill buttons** write each field's own id into it, so a
   rendered page can be read against the blank form. That is rule 4b.
 - **A composed address overwrote a real answer.** The form builds a convenience
   field `<base>_address` from street, city, state and zip. A question is free to
@@ -423,6 +423,12 @@ Before calling a form done:
 3. Run **Ctrl+Shift** → **Fill maximum path** → **Preview PDFs** or **Download PDFs** (dev server must be running).
 4. In DevTools Network, confirm `POST /edit_pdf?pdf=W9.pdf` body includes keys matching PDF AcroForm names (`taxpayer_name`, `tax_classification_individual`, etc.).
 5. Compiler `auditForm()` output if using `compile-form-schema.js`.
+6. **Read the interview yourself — always, and last.** `node pipeline-review.js`
+   prints every question in the order a person meets it; read all of them, then
+   answer each gate No in the preview and confirm the block behind it goes away.
+   `pipeline-audit.js` only finds what it was taught to find, so a green audit
+   is not evidence the form is right. See the opening section of
+   `form_quality_check.txt`.
 
 ### Wiring a compiled form to its PDF (do not skip the field config)
 
