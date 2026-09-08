@@ -16241,6 +16241,12 @@ if (typeof handleNext === 'function') {
             window.preventBlankSaves = false;
         }, 3000);
                     const fields = getFormFields();
+                    // A saved draft is not what is on the screen once a debug fill has written
+                    // the form. The restore is a round-trip and its later passes are on timers of
+                    // one, two, three and four seconds, so it can land after the fill has
+                    // finished - later still when an extension blocks Firestore and the read
+                    // falls back to cache - and put the draft back over the top of it.
+                    if (window.__fwDebugFillRan) return;
                     const debugTarget = 'are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_1';
                     const hasTargetField = fields.some(el => el && (el.id === debugTarget || el.name === debugTarget));
                     const mappedHasTarget = mappedData && (mappedData.hasOwnProperty(debugTarget) || mappedData.hasOwnProperty(debugTarget + '_dropdown'));
@@ -16270,6 +16276,14 @@ if (typeof handleNext === 'function') {
                         autofillSource = 'id: ' + el.id;
                     }
                     if (autofillValue !== null) {
+                        // An empty saved value means nobody answered that question, not that they
+                        // answered it with nothing. Written back over a box that already holds
+                        // something it can only delete - a court name typed a moment ago, or one a
+                        // debug fill just put there.
+                        if (autofillValue === "" && el.type !== "checkbox" && el.type !== "radio"
+                            && String(el.value || "") !== "") {
+                            return;
+                        }
 
                             // Skip current_date field - it should be set dynamically
                             if (el.id === 'current_date' || el.name === 'current_date') {
@@ -16527,6 +16541,12 @@ if (typeof handleNext === 'function') {
                     // Use a longer delay to ensure textbox inputs are fully generated
                     setTimeout(() => {
                         const allFields = getFormFields();
+                        // A saved draft is not what is on the screen once a debug fill has written
+                        // the form. The restore is a round-trip and its later passes are on timers of
+                        // one, two, three and four seconds, so it can land after the fill has
+                        // finished - later still when an extension blocks Firestore and the read
+                        // falls back to cache - and put the draft back over the top of it.
+                        if (window.__fwDebugFillRan) return;
                         // Also try to find fields by ID directly as a fallback
                         const fieldsById = {};
                         allFields.forEach(el => {
@@ -16759,6 +16779,12 @@ if (typeof handleNext === 'function') {
         // 🔧 NEW: Delayed autofill for conditional fields that are created after initial autofill
         setTimeout(() => {
             const conditionalFields = getFormFields();
+            // A saved draft is not what is on the screen once a debug fill has written
+            // the form. The restore is a round-trip and its later passes are on timers of
+            // one, two, three and four seconds, so it can land after the fill has
+            // finished - later still when an extension blocks Firestore and the read
+            // falls back to cache - and put the draft back over the top of it.
+            if (window.__fwDebugFillRan) return;
             conditionalFields.forEach(el => {
                 // Check both by name and by ID for autofill
                 let autofillValue = null;
@@ -16772,6 +16798,14 @@ if (typeof handleNext === 'function') {
                 if (el.name && isConditionalField) {
                 }
                 if (autofillValue !== null) {
+                    // An empty saved value means nobody answered that question, not that they
+                    // answered it with nothing. Written back over a box that already holds
+                    // something it can only delete - a court name typed a moment ago, or one a
+                    // debug fill just put there.
+                    if (autofillValue === "" && el.type !== "checkbox" && el.type !== "radio"
+                        && String(el.value || "") !== "") {
+                        return;
+                    }
                     // Skip current_date field - it should be set dynamically
                     if (el.id === 'current_date' || el.name === 'current_date') {
                         return;
@@ -16872,6 +16906,12 @@ if (typeof handleNext === 'function') {
             // 🔧 NEW: Additional delayed autofill with longer delay for stubborn fields
             setTimeout(() => {
                 const stubbornFields = getFormFields();
+                // A saved draft is not what is on the screen once a debug fill has written
+                // the form. The restore is a round-trip and its later passes are on timers of
+                // one, two, three and four seconds, so it can land after the fill has
+                // finished - later still when an extension blocks Firestore and the read
+                // falls back to cache - and put the draft back over the top of it.
+                if (window.__fwDebugFillRan) return;
                 stubbornFields.forEach(el => {
                     // Check both by name and by ID for autofill
                     let autofillValue = null;
@@ -17201,6 +17241,12 @@ if (typeof handleNext === 'function') {
                 if (savedData) {
                     const data = JSON.parse(savedData);
                     const fields = getFormFields();
+                    // A saved draft is not what is on the screen once a debug fill has written
+                    // the form. The restore is a round-trip and its later passes are on timers of
+                    // one, two, three and four seconds, so it can land after the fill has
+                    // finished - later still when an extension blocks Firestore and the read
+                    // falls back to cache - and put the draft back over the top of it.
+                    if (window.__fwDebugFillRan) return;
                     fields.forEach(el => {
                         if (data.hasOwnProperty(el.name)) {
                             if (el.type === 'checkbox') {
@@ -17309,6 +17355,12 @@ if (typeof handleNext === 'function') {
                         setTimeout(() => {
 
                             const allFields = getFormFields();
+                            // A saved draft is not what is on the screen once a debug fill has written
+                            // the form. The restore is a round-trip and its later passes are on timers of
+                            // one, two, three and four seconds, so it can land after the fill has
+                            // finished - later still when an extension blocks Firestore and the read
+                            // falls back to cache - and put the draft back over the top of it.
+                            if (window.__fwDebugFillRan) return;
 
                             // Also try to find fields by ID directly as a fallback
                             const fieldsById = {};
@@ -17417,6 +17469,12 @@ if (typeof handleNext === 'function') {
                     // 🔧 NEW: Delayed autofill for conditional fields that are created after initial autofill
                     setTimeout(() => {
                         const conditionalFields = getFormFields();
+                        // A saved draft is not what is on the screen once a debug fill has written
+                        // the form. The restore is a round-trip and its later passes are on timers of
+                        // one, two, three and four seconds, so it can land after the fill has
+                        // finished - later still when an extension blocks Firestore and the read
+                        // falls back to cache - and put the draft back over the top of it.
+                        if (window.__fwDebugFillRan) return;
                         conditionalFields.forEach(el => {
                             // Check both by name and by ID for autofill
                             let autofillValue = null;
@@ -17430,6 +17488,14 @@ if (typeof handleNext === 'function') {
                             if (el.name && isConditionalField) {
                             }
                             if (autofillValue !== null) {
+                                // An empty saved value means nobody answered that question, not that they
+                                // answered it with nothing. Written back over a box that already holds
+                                // something it can only delete - a court name typed a moment ago, or one a
+                                // debug fill just put there.
+                                if (autofillValue === "" && el.type !== "checkbox" && el.type !== "radio"
+                                    && String(el.value || "") !== "") {
+                                    return;
+                                }
                                 // Skip current_date field - it should be set dynamically
                                 if (el.id === 'current_date' || el.name === 'current_date') {
                                     return;
@@ -17530,6 +17596,12 @@ if (typeof handleNext === 'function') {
                         // 🔧 NEW: Additional delayed autofill with longer delay for stubborn fields
                         setTimeout(() => {
                             const stubbornFields = getFormFields();
+                            // A saved draft is not what is on the screen once a debug fill has written
+                            // the form. The restore is a round-trip and its later passes are on timers of
+                            // one, two, three and four seconds, so it can land after the fill has
+                            // finished - later still when an extension blocks Firestore and the read
+                            // falls back to cache - and put the draft back over the top of it.
+                            if (window.__fwDebugFillRan) return;
                             stubbornFields.forEach(el => {
                                 // Check both by name and by ID for autofill
                                 let autofillValue = null;
@@ -20242,6 +20314,9 @@ async function fillMaximumPath(options) {
   }
   window.isInitialAutofill = true;
   window.__MAX_FILL_IN_PROGRESS__ = true;
+  // Set for the life of the page, not the life of the fill: what this has to
+  // stop is a restore that has not arrived yet.
+  window.__fwDebugFillRan = true;
   fillProgress({ text: 'Starting...', percent: 0 });
   await fillYield();
   const viewState = saveSectionViewState();
