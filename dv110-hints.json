@@ -1,264 +1,63 @@
 {
-  "_comment": "Interview knowledge the DV-110 field_config cannot express. Twelve of the groups are the same three-way judge's ruling (not requested / denied until the hearing / granted), one per order type - the field_config records them as loose checkboxes, so each needs naming. Also: the case number repeats on all nine pages, and several conditionals name gates that do not exist as fields.",
-  "mirrors": [
-    {
-      "nameId": "case_number",
-      "question": "What is the case number?",
-      "label": "Case Number",
-      "members": [
-        "case_number_page_1",
-        "case_number_page_2",
-        "case_number_page_3",
-        "case_number_page_4",
-        "case_number_page_5",
-        "case_number_page_6",
-        "case_number_page_7",
-        "case_number_page_8",
-        "case_number_page_9"
-      ]
-    }
-  ],
+  "_comment": "Interview knowledge the DV-110 field_config cannot express. DV-110 prints \"The person asking for a restraining order must complete 1, 2, and 3 only. The court will complete the rest of this form\", so every field the court fills is marked courtUse in the field config and never becomes a question. Most of what is left repeats DV-100 and is renamed to DV-100's field by dv-packet-connections.json, so it is asked once; the questions below are the ones DV-110 asks that no other form does - the CLETS description of the restrained person that police need to enforce the order.",
+  "mirrors": [],
   "groups": [
     {
-      "nameId": "order_type",
-      "question": "Is this the original order or an amended one?",
-      "members": [
-        "order_type_original",
-        "order_type_amended"
-      ]
-    },
-    {
-      "nameId": "restrained_person_gender",
+      "nameId": "person_to_restrain_gender",
       "question": "What is the restrained person's gender?",
       "members": [
-        "restrained_person_gender_male",
-        "restrained_person_gender_female",
-        "restrained_person_gender_nonbinary"
-      ]
-    },
-    {
-      "nameId": "order_not_abuse_ruling",
-      "question": "What did the judge decide about the Order to Not Abuse?",
-      "members": [
-        "order_not_abuse_not_requested",
-        "order_not_abuse_denied_until_hearing",
-        "order_not_abuse_granted"
-      ]
-    },
-    {
-      "nameId": "no_contact_order_ruling",
-      "question": "What did the judge decide about the No-Contact Order?",
-      "members": [
-        "no_contact_order_not_requested",
-        "no_contact_order_denied_until_hearing",
-        "no_contact_order_granted"
-      ]
-    },
-    {
-      "nameId": "stay_away_order_ruling",
-      "question": "What did the judge decide about the Stay-Away Order?",
-      "members": [
-        "stay_away_order_not_requested",
-        "stay_away_order_denied_until_hearing",
-        "stay_away_order_granted"
-      ]
-    },
-    {
-      "nameId": "move_out_order_ruling",
-      "question": "What did the judge decide about the Order to Move Out?",
-      "members": [
-        "move_out_order_not_requested",
-        "move_out_order_denied_until_hearing",
-        "move_out_order_granted"
-      ]
-    },
-    {
-      "nameId": "other_orders_ruling",
-      "question": "What did the judge decide about the other requested orders?",
-      "members": [
-        "other_orders_not_requested",
-        "other_orders_denied_until_hearing",
-        "other_orders_granted"
-      ]
-    },
-    {
-      "nameId": "child_custody_visitation_ruling",
-      "question": "What did the judge decide about child custody and visitation?",
-      "members": [
-        "child_custody_visitation_not_requested",
-        "child_custody_visitation_denied_until_hearing",
-        "child_custody_visitation_granted"
-      ]
-    },
-    {
-      "nameId": "protect_animals_ruling",
-      "question": "What did the judge decide about protecting the animals?",
-      "members": [
-        "protect_animals_not_requested",
-        "protect_animals_denied_until_hearing",
-        "protect_animals_granted"
-      ]
-    },
-    {
-      "nameId": "control_of_property_ruling",
-      "question": "What did the judge decide about control of property?",
-      "members": [
-        "control_of_property_not_requested",
-        "control_of_property_denied_until_hearing",
-        "control_of_property_granted"
-      ]
-    },
-    {
-      "nameId": "health_insurance_order_ruling",
-      "question": "What did the judge decide about health and other insurance?",
-      "members": [
-        "health_insurance_order_not_requested",
-        "health_insurance_order_denied_until_hearing",
-        "health_insurance_order_granted"
-      ]
-    },
-    {
-      "nameId": "record_communications_ruling",
-      "question": "What did the judge decide about recording communications?",
-      "members": [
-        "record_communications_not_requested",
-        "record_communications_denied_until_hearing",
-        "record_communications_granted"
-      ]
-    },
-    {
-      "nameId": "property_restraint_ruling",
-      "question": "What did the judge decide about the property restraint?",
-      "members": [
-        "property_restraint_not_requested",
-        "property_restraint_denied_until_hearing",
-        "property_restraint_granted"
-      ]
-    },
-    {
-      "nameId": "pay_property_debts_ruling",
-      "question": "What did the judge decide about paying debts owed for property?",
-      "members": [
-        "pay_property_debts_not_requested",
-        "pay_property_debts_denied_until_hearing",
-        "pay_property_debts_granted"
-      ]
-    },
-    {
-      "nameId": "stay_away_targets",
-      "question": "What must the restrained person stay away from?",
-      "multiSelect": true,
-      "members": [
-        "stay_away_from_protected_person",
-        "stay_away_from_protected_person_home",
-        "stay_away_from_protected_person_school",
-        "stay_away_from_protected_person_workplace",
-        "stay_away_from_protected_person_vehicle",
-        "stay_away_from_other_protected_people",
-        "stay_away_from_childrens_school_or_child_care",
-        "stay_away_from_other_location"
-      ]
-    },
-    {
-      "nameId": "attachment_forms",
-      "question": "Which forms are attached to this order?",
-      "multiSelect": true,
-      "members": [
-        "attachment_form_dv_140",
-        "attachment_form_dv_145",
-        "attachment_form_dv_820",
-        "attachment_form_other"
-      ]
-    },
-    {
-      "nameId": "no_contact_exception_kinds",
-      "question": "Which exceptions to the No-Contact Order apply?",
-      "multiSelect": true,
-      "members": [
-        "no_contact_exception_child_communication",
-        "no_contact_exception_children_visits_only",
-        "no_contact_exception_other"
-      ]
-    },
-    {
-      "nameId": "stay_away_exception_kinds",
-      "question": "Which exceptions to the Stay-Away Order apply?",
-      "multiSelect": true,
-      "members": [
-        "stay_away_exception_child_exchange",
-        "stay_away_exception_child_visits",
-        "stay_away_exception_other"
-      ]
-    },
-    {
-      "nameId": "hearing_time_meridiem",
-      "question": "Is the hearing in the morning or the afternoon?",
-      "members": [
-        "hearing_time_am",
-        "hearing_time_pm"
+        "person_to_restrain_gender_male",
+        "person_to_restrain_gender_female",
+        "person_to_restrain_gender_nonbinary"
       ]
     }
   ],
   "questions": {
-    "amended_order_number": {
-      "text": "What is the amendment number?",
-      "conditional": {
-        "onlyWhen": "order_type_amended"
-      }
+    "restrained_person_height": {
+      "text": "About how tall is the restrained person?",
+      "optional": true
+    },
+    "restrained_person_weight": {
+      "text": "About how much does the restrained person weigh?",
+      "optional": true
+    },
+    "restrained_person_hair_color": {
+      "text": "What color is the restrained person's hair?",
+      "optional": true
+    },
+    "restrained_person_eye_color": {
+      "text": "What color are the restrained person's eyes?",
+      "optional": true
+    },
+    "restrained_person_relationship_to_protected_person": {
+      "text": "In a few words, how is the restrained person related to you? For example: spouse, former partner, parent.",
+      "optional": true
+    },
+    "restrained_person_street_address": {
+      "text": "What is the restrained person's street address, if you know it?",
+      "optional": true
+    },
+    "restrained_person_city": {
+      "text": "What city do they live in?",
+      "optional": true
+    },
+    "restrained_person_state": {
+      "text": "What state do they live in?",
+      "optional": true
+    },
+    "restrained_person_zip_code": {
+      "text": "What is their ZIP code?",
+      "optional": true
     },
     "restrained_person_prohibited_items_details": {
-      "text": "What firearms, firearm parts, or ammunition does the restrained person have?",
-      "conditional": {
-        "onlyWhen": "restrained_person_has_prohibited_items"
-      }
+      "text": "What firearms, firearm parts, or ammunition might the restrained person have? Include what you listed on DV-100, item 9.",
+      "optional": true
     },
-    "firearms_review_hearing_date": {
-      "text": "What is the date of the firearms compliance review hearing?",
-      "conditional": {
-        "onlyWhen": "firearms_compliance_review_hearing_required"
-      }
+    "order_type": {
+      "text": "Is this the original order or an amended one?"
     },
-    "firearms_review_hearing_time": {
-      "text": "What time is the firearms compliance review hearing?",
-      "conditional": {
-        "onlyWhen": "firearms_compliance_review_hearing_required"
-      }
-    },
-    "firearms_review_hearing_department": {
-      "text": "Which department is the firearms review hearing in?",
-      "conditional": {
-        "onlyWhen": "firearms_compliance_review_hearing_required"
-      }
-    },
-    "firearms_review_hearing_room": {
-      "text": "Which room is the firearms review hearing in?",
-      "conditional": {
-        "onlyWhen": "firearms_compliance_review_hearing_required"
-      }
-    },
-    "no_contact_exception_other_explanation": {
-      "text": "What is the other exception to the No-Contact Order?",
-      "conditional": {
-        "onlyWhen": "no_contact_exception_other"
-      }
-    },
-    "stay_away_exception_other_explanation_line_1": {
-      "text": "What is the other exception to the Stay-Away Order?",
-      "conditional": {
-        "onlyWhen": "stay_away_exception_other"
-      }
-    },
-    "stay_away_exception_other_explanation_line_2": {
-      "text": "Continue the other Stay-Away exception, if it needs a second line.",
-      "conditional": {
-        "onlyWhen": "stay_away_exception_other"
-      }
-    },
-    "child_custody_other_form_name": {
-      "text": "Which other custody or visitation form is attached?",
-      "conditional": {
-        "onlyWhen": "child_custody_other_form_attached"
-      }
+    "amended_order_number": {
+      "text": "What is the amendment number?"
     },
     "protected_person_name": {
       "text": "Who is the protected person?"
@@ -266,93 +65,336 @@
     "restrained_person_full_name": {
       "text": "Who is the restrained person?"
     },
-    "court_name_and_street_address": {
-      "text": "What is the court's name and street address?"
+    "restrained_person_gender": {
+      "text": "What is the restrained person's gender?"
     },
-    "hearing_date": {
-      "text": "What is the hearing date?"
+    "restrained_person_race": {
+      "text": "What is your race?"
     },
-    "hearing_time": {
-      "text": "What time is the hearing?"
+    "restrained_person_age": {
+      "text": "What is your age?"
     },
-    "judge_signature_date": {
-      "text": "What date did the judge sign?"
+    "restrained_person_date_of_birth": {
+      "text": "What is your date of Birth?"
     },
-    "clerk_deputy_name": {
-      "text": "Which deputy clerk completed the certificate?"
+    "has_other_protected_people": {
+      "text": "Do you have an other Protected People?"
     },
-    "clerk_certificate_date": {
-      "text": "What date was the clerk's certificate completed?"
+    "other_protected_people_attached_page": {
+      "text": "Do you have a more Protected People on Attached Page?"
+    },
+    "hearing_time_meridiem": {
+      "text": "Is the hearing in the morning or the afternoon?"
+    },
+    "restrained_person_has_prohibited_items": {
+      "text": "Do you have a firearms, Firearm Parts, or Ammunition?"
+    },
+    "restrained_person_has_prohibited_items_dup2": {
+      "text": "Do you have restrained Person Has Prohibited Items?"
+    },
+    "firearm_item_1_proof_of_compliance_received": {
+      "text": "Do you have a proof of Compliance Received?"
+    },
+    "firearm_item_1_proof_of_compliance_date": {
+      "text": "What is your proof of Compliance Date?"
+    },
+    "firearm_item_2_proof_of_compliance_received": {
+      "text": "Do you have a proof of Compliance Received?"
+    },
+    "firearm_item_2_proof_of_compliance_date": {
+      "text": "What is your proof of Compliance Date?"
+    },
+    "firearm_item_3_proof_of_compliance_date": {
+      "text": "What is your proof of Compliance Date?"
+    },
+    "firearm_item_3_proof_of_compliance_received": {
+      "text": "Do you have a proof of Compliance Received?"
+    },
+    "firearm_item_4_proof_of_compliance_received": {
+      "text": "Do you have a proof of Compliance Received?"
+    },
+    "firearm_item_4_proof_of_compliance_date": {
+      "text": "What is your proof of Compliance Date?"
+    },
+    "ammunition_item_1_description": {
+      "text": "What is your description?"
+    },
+    "ammunition_item_1_amount": {
+      "text": "What is your amount?"
+    },
+    "ammunition_item_1_location": {
+      "text": "What is your location?"
+    },
+    "ammunition_item_1_proof_of_compliance_date": {
+      "text": "What is your proof of Compliance Date?"
+    },
+    "ammunition_item_1_proof_of_compliance_received": {
+      "text": "Do you have a proof of Compliance Received?"
+    },
+    "ammunition_item_2_description": {
+      "text": "What is your description?"
+    },
+    "ammunition_item_2_amount": {
+      "text": "What is your amount?"
+    },
+    "ammunition_item_2_location": {
+      "text": "What is your location?"
+    },
+    "ammunition_item_2_proof_of_compliance_date": {
+      "text": "What is your proof of Compliance Date?"
+    },
+    "ammunition_item_2_proof_of_compliance_received": {
+      "text": "Do you have a proof of Compliance Received?"
+    },
+    "firearms_compliance_review_hearing_required": {
+      "text": "Do you have a firearms Compliance Review Hearing?"
+    },
+    "firearms_review_hearing_date": {
+      "text": "What is the date of the firearms compliance review hearing?"
+    },
+    "firearms_review_hearing_department": {
+      "text": "Which department is the firearms review hearing in?"
+    },
+    "firearms_review_hearing_time": {
+      "text": "What time is the firearms compliance review hearing?"
+    },
+    "firearms_review_hearing_room": {
+      "text": "Which room is the firearms review hearing in?"
+    },
+    "review_hearing_court_different": {
+      "text": "Is the review-hearing court different from the court on page 1?"
+    },
+    "firearms_review_hearing_court_name_and_address": {
+      "text": "What is your court Name and Address?"
+    },
+    "cannot_look_order_not_granted_good_cause": {
+      "text": "Do you have a not Granted for Good Cause?"
+    },
+    "order_not_abuse_ruling": {
+      "text": "What did the judge decide about the Order to Not Abuse?"
+    },
+    "no_contact_order_ruling": {
+      "text": "What did the judge decide about the No-Contact Order?"
+    },
+    "no_contact_protected_person": {
+      "text": "Do you have a person in Item 1?"
+    },
+    "no_contact_other_protected_people": {
+      "text": "Do you have a persons in Item 3?"
+    },
+    "no_contact_exception_applies": {
+      "text": "Do you have an exception to No-Contact Order?"
+    },
+    "no_contact_exception_other_explanation": {
+      "text": "What is the other exception to the No-Contact Order?"
+    },
+    "stay_away_order_ruling": {
+      "text": "What did the judge decide about the Stay-Away Order?"
+    },
+    "stay_away_distance_yards": {
+      "text": "How many yards must the restrained person stay away?"
+    },
+    "stay_away_other_location_explanation": {
+      "text": "What is your other Location Explanation?"
+    },
+    "stay_away_exception_applies": {
+      "text": "Do you have an exception to Stay-Away Order?"
+    },
+    "stay_away_exception_other_explanation_line_1": {
+      "text": "What is the other exception to the Stay-Away Order?"
+    },
+    "stay_away_exception_other_explanation_line_2": {
+      "text": "Continue the other Stay-Away exception, if it needs a second line."
+    },
+    "move_out_order_ruling": {
+      "text": "What did the judge decide about the Order to Move Out?"
+    },
+    "move_out_address": {
+      "text": "Which address must the restrained person move out of?"
+    },
+    "other_orders_ruling": {
+      "text": "What did the judge decide about the other requested orders?"
+    },
+    "other_orders_details": {
+      "text": "What are the other orders?"
+    },
+    "child_custody_visitation_ruling": {
+      "text": "What did the judge decide about child custody and visitation?"
+    },
+    "child_custody_other_form_attached": {
+      "text": "Do you have an other Form?"
+    },
+    "child_custody_other_form_attached_dup2": {
+      "text": "Do you have an other Form Name?"
+    },
+    "child_custody_other_form_name": {
+      "text": "Which other custody or visitation form is attached?"
+    },
+    "protect_animals_ruling": {
+      "text": "What did the judge decide about protecting the animals?"
+    },
+    "protect_animals_stay_away": {
+      "text": "Do you have stay Away From Animals?"
+    },
+    "protect_animals_no_harm_or_transfer": {
+      "text": "Do Not Harm or Transfer Animals?"
+    },
+    "protect_animals_protected_person_sole_possession": {
+      "text": "Do you have a protected Person Has Sole Possession?"
+    },
+    "animal_1_breed": {
+      "text": "What is your breed?"
+    },
+    "animal_1_color": {
+      "text": "What is your color?"
+    },
+    "animal_1_type": {
+      "text": "What is your of Animal?"
+    },
+    "animal_1_name_or_id": {
+      "text": "What is your name or Other ID?"
+    },
+    "animal_2_name_or_id": {
+      "text": "What is your name or Other ID?"
+    },
+    "animal_2_type": {
+      "text": "What is your of Animal?"
+    },
+    "animal_2_breed": {
+      "text": "What is your breed?"
+    },
+    "animal_2_color": {
+      "text": "What is your color?"
+    },
+    "animal_3_name_or_id": {
+      "text": "What is your name or Other ID?"
+    },
+    "animal_3_type": {
+      "text": "What is your of Animal?"
+    },
+    "animal_3_breed": {
+      "text": "What is your breed?"
+    },
+    "animal_3_color": {
+      "text": "What is your color?"
+    },
+    "animal_4_name_or_id": {
+      "text": "What is your name or Other ID?"
+    },
+    "animal_4_type": {
+      "text": "What is your of Animal?"
+    },
+    "animal_4_breed": {
+      "text": "What is your breed?"
+    },
+    "animal_4_color": {
+      "text": "What is your color?"
+    },
+    "protect_animals_stay_away_dup2": {
+      "text": "Must the restrained person stay away from the animals?"
+    },
+    "protect_animals_stay_away_distance_yards": {
+      "text": "How many yards must the restrained person stay away from the animals?"
+    },
+    "control_of_property_ruling": {
+      "text": "What did the judge decide about control of property?"
+    },
+    "controlled_property_description": {
+      "text": "Which property does the order cover?"
+    },
+    "health_insurance_order_ruling": {
+      "text": "What did the judge decide about health and other insurance?"
+    },
+    "health_insurance_order_applies_to_protected_person": {
+      "text": "Do you have a person in Item 1?"
+    },
+    "health_insurance_order_applies_to_restrained_person": {
+      "text": "Do you have a person in Item 2?"
+    },
+    "record_communications_ruling": {
+      "text": "What did the judge decide about recording communications?"
+    },
+    "property_restraint_ruling": {
+      "text": "What did the judge decide about the property restraint?"
+    },
+    "property_restraint_applies_to_protected_person": {
+      "text": "Do you have a person in Item 1?"
+    },
+    "property_restraint_applies_to_restrained_person": {
+      "text": "Do you have a person in Item 2?"
+    },
+    "pay_property_debts_ruling": {
+      "text": "What did the judge decide about paying debts owed for property?"
+    },
+    "property_debt_payment_1_pay_to": {
+      "text": "What is your pay To?"
+    },
+    "property_debt_payment_1_for": {
+      "text": "What is your for?"
+    },
+    "property_debt_payment_1_amount": {
+      "text": "What is your amount?"
+    },
+    "property_debt_payment_1_due_date": {
+      "text": "What is your due Date?"
+    },
+    "property_debt_payment_2_pay_to": {
+      "text": "What is your pay To?"
+    },
+    "property_debt_payment_2_for": {
+      "text": "What is your for?"
+    },
+    "property_debt_payment_2_amount": {
+      "text": "What is your amount?"
+    },
+    "property_debt_payment_2_due_date": {
+      "text": "What is your due Date?"
+    },
+    "property_debt_payment_3_pay_to": {
+      "text": "What is your pay To?"
+    },
+    "property_debt_payment_3_for": {
+      "text": "What is your for?"
+    },
+    "property_debt_payment_3_amount": {
+      "text": "What is your amount?"
+    },
+    "property_debt_payment_3_due_date": {
+      "text": "What is your due Date?"
+    },
+    "has_attached_pages": {
+      "text": "Do you have attached Pages?"
     },
     "attached_pages_count": {
       "text": "How many pages are attached?"
     },
     "attachment_other_form_name": {
-      "text": "Which other form is attached?",
-      "conditional": {
-        "onlyWhen": "attachment_form_other"
-      }
+      "text": "Which other form is attached?"
     },
-    "move_out_address": {
-      "text": "Which address must the restrained person move out of?"
+    "judge_signature_date": {
+      "text": "What date did the judge sign?"
     },
-    "other_orders_details": {
-      "text": "What are the other orders?"
-    },
-    "controlled_property_description": {
-      "text": "Which property does the order cover?"
-    },
-    "stay_away_distance_yards": {
-      "text": "How many yards must the restrained person stay away?"
-    },
-    "protect_animals_stay_away_distance_yards": {
-      "text": "How many yards must the restrained person stay away from the animals?"
-    },
-    "no_contact_exception_child_communication": {
-      "conditional": {
-        "onlyWhen": "no_contact_exception_applies"
-      }
-    },
-    "no_contact_exception_children_visits_only": {
-      "conditional": {
-        "onlyWhen": "no_contact_exception_applies"
-      }
-    },
-    "no_contact_exception_other": {
-      "conditional": {
-        "onlyWhen": "no_contact_exception_applies"
-      }
-    },
-    "stay_away_exception_child_exchange": {
-      "conditional": {
-        "onlyWhen": "stay_away_exception_applies"
-      }
-    },
-    "stay_away_exception_child_visits": {
-      "conditional": {
-        "onlyWhen": "stay_away_exception_applies"
-      }
-    },
-    "stay_away_exception_other": {
-      "conditional": {
-        "onlyWhen": "stay_away_exception_applies"
-      }
+    "other_protected_people_yes_yes": {
+      "text": "Does this order also protect other people, such as your children or family?"
     }
   },
   "sections": [
     {
-      "name": "Order and Parties",
+      "name": "Who the Order Protects",
       "fields": [
-        "order_type",
-        "amended_order_number",
-        "case_number",
         "court_name_and_street_address",
-        "protected_person_name",
-        "restrained_person_full_name",
-        "restrained_person_gender",
-        "restrained_person_date_of_birth",
-        "restrained_person_age",
-        "restrained_person_race",
+        "case_number",
+        "person_asking_protection_name",
+        "person_to_restrain_full_name",
+        "person_to_restrain_gender",
+        "person_to_restrain_age",
+        "person_to_restrain_date_of_birth",
+        "person_to_restrain_race"
+      ]
+    },
+    {
+      "name": "Restrained Person's Description",
+      "fields": [
         "restrained_person_height",
         "restrained_person_weight",
         "restrained_person_hair_color",
@@ -361,59 +403,27 @@
         "restrained_person_street_address",
         "restrained_person_city",
         "restrained_person_state",
-        "restrained_person_zip_code"
+        "restrained_person_zip_code",
+        "restrained_person_prohibited_items_details"
       ]
     },
     {
-      "name": "Other Protected People",
+      "name": "Other People This Order Protects",
       "fields": [
-        "has_other_protected_people",
-        "other_protected_people_attached_page"
-      ]
-    },
-    {
-      "name": "Hearing",
-      "fields": [
-        "hearing_date",
-        "hearing_time",
-        "hearing_time_meridiem"
-      ]
-    },
-    {
-      "name": "Firearms and Ammunition",
-      "fields": [
-        "restrained_person_has_prohibited_items",
-        "restrained_person_prohibited_items_details",
-        "firearms_compliance_review_hearing_required"
-      ]
-    },
-    {
-      "name": "Orders Granted or Denied",
-      "fields": [
-        "order_not_abuse_ruling",
-        "no_contact_order_ruling",
-        "stay_away_order_ruling",
-        "move_out_order_ruling",
-        "other_orders_ruling",
-        "child_custody_visitation_ruling",
-        "protect_animals_ruling",
-        "control_of_property_ruling",
-        "health_insurance_order_ruling",
-        "record_communications_ruling",
-        "property_restraint_ruling",
-        "pay_property_debts_ruling"
-      ]
-    },
-    {
-      "name": "Attachments and Signatures",
-      "fields": [
-        "has_attached_pages",
-        "attached_pages_count",
-        "attachment_forms",
-        "attachment_other_form_name",
-        "judge_signature_date",
-        "clerk_deputy_name",
-        "clerk_certificate_date"
+        "other_protected_people_yes_yes",
+        "other_protected_person_1_full_name",
+        "other_protected_person_1_relationship",
+        "other_protected_person_1_age",
+        "other_protected_person_2_full_name",
+        "other_protected_person_2_relationship",
+        "other_protected_person_2_age",
+        "other_protected_person_3_full_name",
+        "other_protected_person_3_relationship",
+        "other_protected_person_3_age",
+        "other_protected_person_4_full_name",
+        "other_protected_person_4_relationship",
+        "other_protected_person_4_age",
+        "other_protected_people_additional_list_attached_yes"
       ]
     }
   ]

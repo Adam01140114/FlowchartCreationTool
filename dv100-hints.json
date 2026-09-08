@@ -30,7 +30,12 @@
         "person_to_restrain_gender_female",
         "person_to_restrain_gender_nonbinary"
       ],
-      "question": "What is the gender of the person you want protection from?"
+      "question": "What is the gender of the person you want protection from?",
+      "labels": [
+        "Male",
+        "Female",
+        "Nonbinary"
+      ]
     },
     {
       "nameId": "relationship_lived_together_as_family",
@@ -38,7 +43,11 @@
         "relationship_lived_together_as_family_yes",
         "relationship_lived_together_as_family_no"
       ],
-      "question": "Did you live together as more than roommates?"
+      "question": "Did you live together as more than roommates?",
+      "labels": [
+        "Yes",
+        "No"
+      ]
     },
     {
       "nameId": "recent_restraining_orders",
@@ -46,7 +55,11 @@
         "recent_restraining_orders_no",
         "recent_restraining_orders_yes"
       ],
-      "question": "Are there restraining orders in place now, or that expired in the last six months?"
+      "question": "Are there restraining orders in place now, or that expired in the last six months?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "other_court_case_involvement",
@@ -54,7 +67,11 @@
         "other_court_case_involvement_no",
         "other_court_case_involvement_yes"
       ],
-      "question": "Are you involved in any other court case with this person?"
+      "question": "Are you involved in any other court case with this person?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "most_recent_abuse_witnesses",
@@ -63,7 +80,12 @@
         "most_recent_abuse_witnesses_no",
         "most_recent_abuse_witnesses_yes"
       ],
-      "question": "Did anyone else see or hear the most recent abuse?"
+      "question": "Did anyone else see or hear the most recent abuse?",
+      "labels": [
+        "I don\u2019t know",
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "most_recent_abuse_weapon",
@@ -71,7 +93,11 @@
         "most_recent_abuse_weapon_no",
         "most_recent_abuse_weapon_yes"
       ],
-      "question": "Did the person use or threaten to use a weapon?"
+      "question": "Did the person use or threaten to use a weapon?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "most_recent_abuse_harm",
@@ -79,7 +105,11 @@
         "most_recent_abuse_harm_no",
         "most_recent_abuse_harm_yes"
       ],
-      "question": "Did the person cause you emotional or physical harm?"
+      "question": "Did the person cause you emotional or physical harm?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "most_recent_abuse_police",
@@ -88,7 +118,12 @@
         "most_recent_abuse_police_no",
         "most_recent_abuse_police_yes"
       ],
-      "question": "Did the police come?"
+      "question": "Did the police come?",
+      "labels": [
+        "I don\u2019t know",
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "most_recent_abuse_frequency",
@@ -98,7 +133,13 @@
         "most_recent_abuse_frequency_weekly",
         "most_recent_abuse_frequency_other"
       ],
-      "question": "How often has this abuse happened?"
+      "question": "How often has this abuse happened?",
+      "labels": [
+        "Just this once",
+        "2\u20135 times",
+        "Weekly",
+        "Other"
+      ]
     },
     {
       "nameId": "different_abuse_incident_witnesses",
@@ -107,7 +148,12 @@
         "different_abuse_incident_witnesses_no",
         "different_abuse_incident_witnesses_yes"
       ],
-      "question": "Did anyone else see or hear this earlier abuse?"
+      "question": "Did anyone else see or hear this earlier abuse?",
+      "labels": [
+        "I don\u2019t know",
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "different_abuse_incident_weapon",
@@ -115,7 +161,11 @@
         "different_abuse_incident_weapon_no",
         "different_abuse_incident_weapon_yes"
       ],
-      "question": "Did the person use or threaten to use a weapon that time?"
+      "question": "Did the person use or threaten to use a weapon that time?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "different_abuse_incident_harm",
@@ -123,7 +173,11 @@
         "different_abuse_incident_harm_no",
         "different_abuse_incident_harm_yes"
       ],
-      "question": "Did the person cause you emotional or physical harm that time?"
+      "question": "Did the person cause you emotional or physical harm that time?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "different_abuse_incident_police",
@@ -132,7 +186,12 @@
         "different_abuse_incident_police_no",
         "different_abuse_incident_police_yes"
       ],
-      "question": "Did the police come that time?"
+      "question": "Did the police come that time?",
+      "labels": [
+        "I don\u2019t know",
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "other_abuse_incident_witnesses",
@@ -141,7 +200,12 @@
         "other_abuse_incident_witnesses_no",
         "other_abuse_incident_witnesses_yes"
       ],
-      "question": "Did anyone else see or hear this other abuse?"
+      "question": "Did anyone else see or hear this other abuse?",
+      "labels": [
+        "I don\u2019t know",
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "other_abuse_incident_weapon",
@@ -149,7 +213,11 @@
         "other_abuse_incident_weapon_no",
         "other_abuse_incident_weapon_yes"
       ],
-      "question": "Did the person use or threaten to use a weapon then?"
+      "question": "Did the person use or threaten to use a weapon then?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "other_abuse_incident_harm",
@@ -157,7 +225,11 @@
         "other_abuse_incident_harm_no",
         "other_abuse_incident_harm_yes"
       ],
-      "question": "Did the person cause you emotional or physical harm then?"
+      "question": "Did the person cause you emotional or physical harm then?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "other_abuse_incident_police",
@@ -166,7 +238,12 @@
         "other_abuse_incident_police_no",
         "other_abuse_incident_police_yes"
       ],
-      "question": "Did the police come then?"
+      "question": "Did the police come then?",
+      "labels": [
+        "I don\u2019t know",
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "other_abuse_incident_frequency",
@@ -176,7 +253,13 @@
         "other_abuse_incident_frequency_weekly",
         "other_abuse_incident_frequency_other"
       ],
-      "question": "How often has this other abuse happened?"
+      "question": "How often has this other abuse happened?",
+      "labels": [
+        "Just this once",
+        "2\u20135 times",
+        "Weekly",
+        "Other"
+      ]
     },
     {
       "nameId": "other_protected_person_1_lives_with_you",
@@ -184,7 +267,11 @@
         "other_protected_person_1_lives_with_you_yes",
         "other_protected_person_1_lives_with_you_no"
       ],
-      "question": "Does the first additional protected person live with you?"
+      "question": "Does the first additional protected person live with you?",
+      "labels": [
+        "Yes",
+        "No"
+      ]
     },
     {
       "nameId": "other_protected_person_2_lives_with_you",
@@ -192,7 +279,11 @@
         "other_protected_person_2_lives_with_you_yes",
         "other_protected_person_2_lives_with_you_no"
       ],
-      "question": "Does the second additional protected person live with you?"
+      "question": "Does the second additional protected person live with you?",
+      "labels": [
+        "Yes",
+        "No"
+      ]
     },
     {
       "nameId": "other_protected_person_3_lives_with_you",
@@ -200,7 +291,11 @@
         "other_protected_person_3_lives_with_you_yes",
         "other_protected_person_3_lives_with_you_no"
       ],
-      "question": "Does the third additional protected person live with you?"
+      "question": "Does the third additional protected person live with you?",
+      "labels": [
+        "Yes",
+        "No"
+      ]
     },
     {
       "nameId": "other_protected_person_4_lives_with_you",
@@ -208,7 +303,11 @@
         "other_protected_person_4_lives_with_you_yes",
         "other_protected_person_4_lives_with_you_no"
       ],
-      "question": "Does the fourth additional protected person live with you?"
+      "question": "Does the fourth additional protected person live with you?",
+      "labels": [
+        "Yes",
+        "No"
+      ]
     },
     {
       "nameId": "same_workplace_or_school",
@@ -216,7 +315,11 @@
         "same_workplace_or_school_no",
         "same_workplace_or_school_yes"
       ],
-      "question": "Do you and the person share a workplace or school?"
+      "question": "Do you and the person share a workplace or school?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "animal_stay_away_distance",
@@ -224,7 +327,11 @@
         "animal_stay_away_distance_100_yards",
         "animal_stay_away_distance_other"
       ],
-      "question": "How far must the person stay away from the animals?"
+      "question": "How far must the person stay away from the animals?",
+      "labels": [
+        "100 yards",
+        "Other distance"
+      ]
     },
     {
       "nameId": "property_debt_how_made_known",
@@ -232,7 +339,11 @@
         "property_debt_how_made_known_no",
         "property_debt_how_made_known_yes"
       ],
-      "question": "Do you know how the person made these debts?"
+      "question": "Do you know how the person made these debts?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
     },
     {
       "nameId": "wireless_transfer_phone_1_is",
@@ -240,7 +351,11 @@
         "wireless_transfer_phone_1_is_my_number",
         "wireless_transfer_phone_1_is_child_number"
       ],
-      "question": "Whose number is the first phone line?"
+      "question": "Whose number is the first phone line?",
+      "labels": [
+        "My number",
+        "Number of child in my care"
+      ]
     },
     {
       "nameId": "wireless_transfer_phone_2_is",
@@ -248,7 +363,11 @@
         "wireless_transfer_phone_2_is_my_number",
         "wireless_transfer_phone_2_is_child_number"
       ],
-      "question": "Whose number is the second phone line?"
+      "question": "Whose number is the second phone line?",
+      "labels": [
+        "My number",
+        "Number of child in my care"
+      ]
     },
     {
       "nameId": "wireless_transfer_phone_3_is",
@@ -256,7 +375,11 @@
         "wireless_transfer_phone_3_is_my_number",
         "wireless_transfer_phone_3_is_child_number"
       ],
-      "question": "Whose number is the third phone line?"
+      "question": "Whose number is the third phone line?",
+      "labels": [
+        "My number",
+        "Number of child in my care"
+      ]
     },
     {
       "nameId": "wireless_transfer_phone_4_is",
@@ -264,7 +387,11 @@
         "wireless_transfer_phone_4_is_my_number",
         "wireless_transfer_phone_4_is_child_number"
       ],
-      "question": "Whose number is the fourth phone line?"
+      "question": "Whose number is the fourth phone line?",
+      "labels": [
+        "My number",
+        "Number of child in my care"
+      ]
     },
     {
       "nameId": "relationship_to_person_to_restrain",
@@ -290,6 +417,14 @@
         "relationship_relative_grandparent",
         "relationship_relative_child_spouse",
         "relationship_relative_grandchild"
+      ],
+      "labels": [
+        "Parent, stepparent, or parent-in-law",
+        "Brother, sister, sibling, stepsibling, or sibling in-law",
+        "Child, stepchild, or legally adopted child",
+        "Grandparent, step-grandparent, or grandparent-in-law",
+        "Child\u2019s spouse",
+        "Grandchild, step-grandchild, or grandchild-in-law"
       ]
     },
     {
@@ -352,6 +487,10 @@
       "members": [
         "stay_away_distance_100_yards",
         "stay_away_distance_other"
+      ],
+      "labels": [
+        "100 yards",
+        "Other distance"
       ]
     },
     {
@@ -362,6 +501,12 @@
         "living_arrangement_same_building",
         "living_arrangement_same_neighborhood",
         "living_arrangement_other"
+      ],
+      "labels": [
+        "Live together",
+        "Live in the same building, but not in the same home",
+        "Live in the same neighborhood",
+        "Other"
       ]
     },
     {
@@ -395,6 +540,11 @@
         "child_support_no_existing_order_want_one",
         "child_support_existing_order_want_changed",
         "child_support_receive_or_applied_tanf_welfare_calworks"
+      ],
+      "labels": [
+        "I do not have a child support order and I want one",
+        "I have a child support order and I want it changed",
+        "I now receive or have applied for TANF, Welfare, or CalWORKS"
       ]
     },
     {
@@ -403,6 +553,10 @@
       "members": [
         "property_debt_special_finding_no",
         "property_debt_special_finding_yes"
+      ],
+      "labels": [
+        "No",
+        "Yes"
       ]
     },
     {
@@ -424,18 +578,74 @@
         "same_school_selected",
         "same_workplace_or_school_other"
       ]
+    },
+    {
+      "nameId": "other_protected_people",
+      "members": [
+        "other_protected_people_no_yes",
+        "other_protected_people_yes_yes"
+      ],
+      "question": "Do you want the restraining order to protect your children, family, or someone you live with?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
+    },
+    {
+      "nameId": "person_to_restrain_firearms",
+      "members": [
+        "person_to_restrain_firearms_unknown_yes",
+        "person_to_restrain_firearms_no_yes",
+        "person_to_restrain_firearms_yes_yes"
+      ],
+      "question": "Does the person you want protection from have firearms (guns), firearm parts, or ammunition?",
+      "labels": [
+        "I don't know",
+        "No",
+        "Yes"
+      ]
+    },
+    {
+      "nameId": "live_together_or_close",
+      "members": [
+        "live_together_or_close_no_yes",
+        "live_together_or_close_yes_yes"
+      ],
+      "question": "Do you and the person you want protection from live together, or live close to each other?",
+      "labels": [
+        "No",
+        "Yes"
+      ]
+    },
+    {
+      "nameId": "different_abuse_incident_frequency",
+      "members": [
+        "different_abuse_incident_frequency_once_yes",
+        "different_abuse_incident_frequency_two_to_five_yes",
+        "different_abuse_incident_frequency_weekly_yes",
+        "different_abuse_incident_frequency_other_yes"
+      ],
+      "question": "How often has the person you want protection from abused you like this?",
+      "labels": [
+        "Just this once",
+        "2\u20135 times",
+        "Weekly",
+        "Other"
+      ]
     }
   ],
   "questions": {
     "relationship_children_names_line_1": {
       "conditional": {
         "onlyWhen": "relationship_have_children_together"
-      }
+      },
+      "text": "What is your names of children?"
     },
     "relationship_children_names_line_2": {
       "conditional": {
         "onlyWhen": "relationship_have_children_together"
-      }
+      },
+      "text": "What is your names of children, continued?"
     },
     "relationship_relative_parent_stepparent_parent_in_law": {
       "conditional": {
@@ -485,7 +695,8 @@
     "other_court_case_custody_details": {
       "conditional": {
         "onlyWhen": "other_court_case_custody_selected"
-      }
+      },
+      "text": "What is your custody case details?"
     },
     "other_court_case_divorce_selected": {
       "conditional": {
@@ -495,7 +706,8 @@
     "other_court_case_divorce_details": {
       "conditional": {
         "onlyWhen": "other_court_case_divorce_selected"
-      }
+      },
+      "text": "What is your divorce case details?"
     },
     "other_court_case_juvenile_selected": {
       "conditional": {
@@ -505,7 +717,8 @@
     "other_court_case_juvenile_details": {
       "conditional": {
         "onlyWhen": "other_court_case_juvenile_selected"
-      }
+      },
+      "text": "What is your juvenile case details?"
     },
     "other_court_case_guardianship_selected": {
       "conditional": {
@@ -515,7 +728,8 @@
     "other_court_case_guardianship_details": {
       "conditional": {
         "onlyWhen": "other_court_case_guardianship_selected"
-      }
+      },
+      "text": "What is your guardianship case details?"
     },
     "other_court_case_criminal_selected": {
       "conditional": {
@@ -525,7 +739,8 @@
     "other_court_case_criminal_details": {
       "conditional": {
         "onlyWhen": "other_court_case_criminal_selected"
-      }
+      },
+      "text": "What is your criminal case details?"
     },
     "other_court_case_other_selected": {
       "conditional": {
@@ -535,7 +750,8 @@
     "other_court_case_other_details": {
       "conditional": {
         "onlyWhen": "other_court_case_other_selected"
-      }
+      },
+      "text": "What is your other court case details?"
     },
     "property_restraint_order_requested": {
       "conditional": {
@@ -609,6 +825,552 @@
     },
     "additional_pages_count": {
       "text": "How many extra pages are attached?"
+    },
+    "case_number": {
+      "text": "What is the case number?"
+    },
+    "person_asking_protection_mailing_city": {
+      "text": "What is your city?"
+    },
+    "person_asking_protection_mailing_state": {
+      "text": "What is your state?"
+    },
+    "person_asking_protection_mailing_zip_code": {
+      "text": "What is your ZIP Code?"
+    },
+    "provide_optional_contact_information": {
+      "text": "Do you want to provide optional contact information?"
+    },
+    "person_asking_protection_telephone": {
+      "text": "What is your telephone?"
+    },
+    "person_asking_protection_fax": {
+      "text": "What is your fax?"
+    },
+    "person_asking_protection_email": {
+      "text": "What is your email Address?"
+    },
+    "has_lawyer": {
+      "text": "Do you have a lawyer?"
+    },
+    "person_asking_protection_lawyer_name": {
+      "text": "What is your lawyer name?"
+    },
+    "person_asking_protection_lawyer_state_bar_number": {
+      "text": "What is your state Bar Number?"
+    },
+    "person_asking_protection_lawyer_firm_name": {
+      "text": "What is your firm Name?"
+    },
+    "lawyer_signature_date": {
+      "text": "What is your date?"
+    },
+    "lawyer_signature_printed_name": {
+      "text": "What is your lawyer\u2019s name?"
+    },
+    "person_to_restrain_age": {
+      "text": "What is your age?"
+    },
+    "person_to_restrain_date_of_birth": {
+      "text": "What is your date of birth?"
+    },
+    "person_to_restrain_gender": {
+      "text": "What is the gender of the person you want protection from?"
+    },
+    "person_to_restrain_race": {
+      "text": "What is your race?"
+    },
+    "relationship_relative_kind": {
+      "text": "How are you related?"
+    },
+    "relationship_lived_together_as_family": {
+      "text": "Did you live together as more than roommates?"
+    },
+    "recent_restraining_orders": {
+      "text": "Are there restraining orders in place now, or that expired in the last six months?"
+    },
+    "recent_restraining_order_1_date": {
+      "text": "What is your date of order?"
+    },
+    "recent_restraining_order_1_expiration_date": {
+      "text": "What is your date it expires?"
+    },
+    "recent_restraining_order_2_date": {
+      "text": "What is your date of order?"
+    },
+    "recent_restraining_order_2_expiration_date": {
+      "text": "What is your date it expires?"
+    },
+    "other_court_case_involvement": {
+      "text": "Are you involved in any other court case with this person?"
+    },
+    "most_recent_abuse_witnesses": {
+      "text": "Did anyone else see or hear the most recent abuse?"
+    },
+    "most_recent_abuse_witness_names": {
+      "text": "What is your names of people who heard or saw what happened?"
+    },
+    "most_recent_abuse_weapon": {
+      "text": "Did the person use or threaten to use a weapon?"
+    },
+    "most_recent_abuse_weapon_description": {
+      "text": "What is your describe gun or weapon?"
+    },
+    "most_recent_abuse_harm": {
+      "text": "Did the person cause you emotional or physical harm?"
+    },
+    "most_recent_abuse_harm_description": {
+      "text": "What is your describe emotional or physical harm?"
+    },
+    "most_recent_abuse_police": {
+      "text": "Did the police come?"
+    },
+    "most_recent_abuse_frequency": {
+      "text": "How often has this abuse happened?"
+    },
+    "most_recent_abuse_frequency_other_description": {
+      "text": "What is your other frequency?"
+    },
+    "different_abuse_to_describe": {
+      "text": "Has the person abused you in a different way from the most recent abuse?"
+    },
+    "different_abuse_incident_witnesses": {
+      "text": "Did anyone else see or hear this earlier abuse?"
+    },
+    "different_abuse_incident_witness_names": {
+      "text": "What is your names of people who heard or saw what happened?"
+    },
+    "different_abuse_incident_weapon": {
+      "text": "Did the person use or threaten to use a weapon that time?"
+    },
+    "different_abuse_incident_weapon_description": {
+      "text": "What is your describe gun or weapon?"
+    },
+    "different_abuse_incident_harm": {
+      "text": "Did the person cause you emotional or physical harm that time?"
+    },
+    "different_abuse_incident_harm_description": {
+      "text": "What is your describe emotional or physical harm?"
+    },
+    "different_abuse_incident_police": {
+      "text": "Did the police come that time?"
+    },
+    "different_abuse_incident_frequency_once": {
+      "text": "Do you have a just this once?"
+    },
+    "different_abuse_incident_frequency_two_to_five": {
+      "text": "Do you have 2\u20135 times?"
+    },
+    "different_abuse_incident_frequency_weekly": {
+      "text": "Do you have a weekly?"
+    },
+    "different_abuse_incident_frequency_other": {
+      "text": "Do you have an other?"
+    },
+    "different_abuse_incident_frequency_other_description": {
+      "text": "What is your other frequency?"
+    },
+    "different_abuse_incident_other_dates": {
+      "text": "What is your dates or estimates of when it happened?"
+    },
+    "other_abuse_to_describe": {
+      "text": "Is there other abuse you want the judge to know about?"
+    },
+    "other_abuse_incident_witnesses": {
+      "text": "Did anyone else see or hear this other abuse?"
+    },
+    "other_abuse_incident_witness_names": {
+      "text": "What is your names of people who heard or saw what happened?"
+    },
+    "other_abuse_incident_weapon": {
+      "text": "Did the person use or threaten to use a weapon then?"
+    },
+    "other_abuse_incident_weapon_description": {
+      "text": "What is your describe gun or weapon?"
+    },
+    "other_abuse_incident_harm": {
+      "text": "Did the person cause you emotional or physical harm then?"
+    },
+    "other_abuse_incident_harm_description": {
+      "text": "What is your describe emotional or physical harm?"
+    },
+    "other_abuse_incident_police": {
+      "text": "Did the police come then?"
+    },
+    "other_abuse_incident_frequency": {
+      "text": "How often has this other abuse happened?"
+    },
+    "other_abuse_incident_frequency_other_description": {
+      "text": "What is your other frequency?"
+    },
+    "other_abuse_incident_other_dates": {
+      "text": "What is your dates or estimates of when it happened?"
+    },
+    "other_abuse_incident_additional_space_attached": {
+      "text": "Do you have an additional description of abuse attached?"
+    },
+    "other_protected_people_no": {
+      "text": "Do you have a no?"
+    },
+    "other_protected_people_yes": {
+      "text": "Do you have yes?"
+    },
+    "other_protected_person_1_full_name": {
+      "text": "What is your full name?"
+    },
+    "other_protected_person_1_age": {
+      "text": "What is your age?"
+    },
+    "other_protected_person_1_relationship": {
+      "text": "What is your relationship to you?"
+    },
+    "other_protected_person_1_lives_with_you": {
+      "text": "Does the first additional protected person live with you?"
+    },
+    "other_protected_person_2_full_name": {
+      "text": "What is your full name?"
+    },
+    "other_protected_person_2_age": {
+      "text": "What is your age?"
+    },
+    "other_protected_person_2_relationship": {
+      "text": "What is your relationship to you?"
+    },
+    "other_protected_person_2_lives_with_you": {
+      "text": "Does the second additional protected person live with you?"
+    },
+    "other_protected_person_3_full_name": {
+      "text": "What is your full name?"
+    },
+    "other_protected_person_3_age": {
+      "text": "What is your age?"
+    },
+    "other_protected_person_3_relationship": {
+      "text": "What is your relationship to you?"
+    },
+    "other_protected_person_3_lives_with_you": {
+      "text": "Does the third additional protected person live with you?"
+    },
+    "other_protected_person_4_full_name": {
+      "text": "What is your full name?"
+    },
+    "other_protected_person_4_age": {
+      "text": "What is your age?"
+    },
+    "other_protected_person_4_relationship": {
+      "text": "What is your relationship to you?"
+    },
+    "other_protected_person_4_lives_with_you": {
+      "text": "Does the fourth additional protected person live with you?"
+    },
+    "other_protected_people_additional_list_attached": {
+      "text": "Do you have an additional protected people list attached?"
+    },
+    "other_protected_people_reason_for_protection": {
+      "text": "What is your why these people need protection?"
+    },
+    "person_to_restrain_firearms_unknown": {
+      "text": "Do you have an i don\u2019t know?"
+    },
+    "person_to_restrain_firearms_no": {
+      "text": "Do you have a no?"
+    },
+    "person_to_restrain_firearms_yes": {
+      "text": "Do you have yes?"
+    },
+    "firearm_item_1_description": {
+      "text": "What is your describe firearms, firearm parts, or ammunition?"
+    },
+    "firearm_item_1_number_or_amount": {
+      "text": "What is your number or Amount?"
+    },
+    "firearm_item_1_location": {
+      "text": "What is your location, if known?"
+    },
+    "firearm_item_2_description": {
+      "text": "What is your describe firearms, firearm parts, or ammunition?"
+    },
+    "firearm_item_2_number_or_amount": {
+      "text": "What is your number or Amount?"
+    },
+    "firearm_item_2_location": {
+      "text": "What is your location, if known?"
+    },
+    "firearm_item_3_description": {
+      "text": "What is your describe firearms, firearm parts, or ammunition?"
+    },
+    "firearm_item_3_number_or_amount": {
+      "text": "What is your number or Amount?"
+    },
+    "firearm_item_3_location": {
+      "text": "What is your location, if known?"
+    },
+    "firearm_item_4_description": {
+      "text": "What is your describe firearms, firearm parts, or ammunition?"
+    },
+    "firearm_item_4_number_or_amount": {
+      "text": "What is your number or Amount?"
+    },
+    "firearm_item_4_location": {
+      "text": "What is your location, if known?"
+    },
+    "firearm_item_5_description": {
+      "text": "What is your describe firearms, firearm parts, or ammunition?"
+    },
+    "firearm_item_5_number_or_amount": {
+      "text": "What is your number or Amount?"
+    },
+    "firearm_item_5_location": {
+      "text": "What is your location, if known?"
+    },
+    "firearm_item_6_description": {
+      "text": "What is your describe firearms, firearm parts, or ammunition?"
+    },
+    "firearm_item_6_number_or_amount": {
+      "text": "What is your number or Amount?"
+    },
+    "firearm_item_6_location": {
+      "text": "What is your location, if known?"
+    },
+    "protected_animal_1_name_or_id": {
+      "text": "What is your name or other way to identify animal?"
+    },
+    "property_debt_1_pay_to": {
+      "text": "What is your pay to?"
+    },
+    "abuse_expense_1_pay_to": {
+      "text": "What is your pay to?"
+    },
+    "child_support_situation": {
+      "text": "What is your child support situation?"
+    },
+    "wireless_transfer_phone_1_is": {
+      "text": "Whose number is the first phone line?"
+    },
+    "property_debt_1_for": {
+      "text": "What is your for?"
+    },
+    "abuse_expense_1_for": {
+      "text": "What is your for?"
+    },
+    "protected_animal_1_type": {
+      "text": "What is your of animal?"
+    },
+    "stay_away_other_place_description": {
+      "text": "What is your other place?"
+    },
+    "property_debt_1_amount": {
+      "text": "What is your amount?"
+    },
+    "abuse_expense_1_amount": {
+      "text": "What is your amount?"
+    },
+    "protected_animal_1_breed": {
+      "text": "What is your breed, if known?"
+    },
+    "wireless_transfer_phone_1_number": {
+      "text": "What is your phone number including area code?"
+    },
+    "move_out_years_at_address": {
+      "text": "What is your years?"
+    },
+    "move_out_right_to_live_other_explanation_line_1": {
+      "text": "What is your other explanation?"
+    },
+    "stay_away_distance": {
+      "text": "How far must the person stay away?"
+    },
+    "property_debt_1_due_date": {
+      "text": "What is your due date?"
+    },
+    "abuse_expense_2_pay_to": {
+      "text": "What is your pay to?"
+    },
+    "protected_animal_1_color": {
+      "text": "What is your color?"
+    },
+    "wireless_transfer_phone_2_is": {
+      "text": "Whose number is the second phone line?"
+    },
+    "move_out_months_at_address": {
+      "text": "What is your months?"
+    },
+    "move_out_right_to_live_other_explanation_line_2": {
+      "text": "What is your other explanation, continued?"
+    },
+    "property_debt_2_pay_to": {
+      "text": "What is your pay to?"
+    },
+    "abuse_expense_2_for": {
+      "text": "What is your for?"
+    },
+    "stay_away_distance_other_yards": {
+      "text": "What is your other distance in yards?"
+    },
+    "protected_animal_2_name_or_id": {
+      "text": "What is your name or other way to identify animal?"
+    },
+    "property_debt_2_for": {
+      "text": "What is your for?"
+    },
+    "abuse_expense_2_amount": {
+      "text": "What is your amount?"
+    },
+    "live_together_or_close_no": {
+      "text": "Do you have a no?"
+    },
+    "protected_animal_2_type": {
+      "text": "What is your of animal?"
+    },
+    "wireless_transfer_phone_2_number": {
+      "text": "What is your phone number including area code?"
+    },
+    "property_debt_2_amount": {
+      "text": "What is your amount?"
+    },
+    "abuse_expense_3_pay_to": {
+      "text": "What is your pay to?"
+    },
+    "protected_animal_2_breed": {
+      "text": "What is your breed, if known?"
+    },
+    "wireless_transfer_phone_3_is": {
+      "text": "Whose number is the third phone line?"
+    },
+    "property_debt_2_due_date": {
+      "text": "What is your due date?"
+    },
+    "abuse_expense_3_for": {
+      "text": "What is your for?"
+    },
+    "live_together_or_close_yes": {
+      "text": "Do you have yes?"
+    },
+    "protected_animal_2_color": {
+      "text": "What is your color?"
+    },
+    "property_debt_3_pay_to": {
+      "text": "What is your pay to?"
+    },
+    "abuse_expense_3_amount": {
+      "text": "What is your amount?"
+    },
+    "protected_animal_3_name_or_id": {
+      "text": "What is your name or other way to identify animal?"
+    },
+    "wireless_transfer_phone_3_number": {
+      "text": "What is your phone number including area code?"
+    },
+    "living_arrangement": {
+      "text": "How close do you live to each other?"
+    },
+    "property_debt_3_for": {
+      "text": "What is your for?"
+    },
+    "abuse_expense_4_pay_to": {
+      "text": "What is your pay to?"
+    },
+    "protected_animal_3_type": {
+      "text": "What is your of animal?"
+    },
+    "wireless_transfer_phone_4_is": {
+      "text": "Whose number is the fourth phone line?"
+    },
+    "property_debt_3_amount": {
+      "text": "What is your amount?"
+    },
+    "abuse_expense_4_for": {
+      "text": "What is your for?"
+    },
+    "living_arrangement_other_description": {
+      "text": "What is your other living arrangement?"
+    },
+    "protected_animal_3_breed": {
+      "text": "What is your breed, if known?"
+    },
+    "property_debt_3_due_date": {
+      "text": "What is your due date?"
+    },
+    "abuse_expense_4_amount": {
+      "text": "What is your amount?"
+    },
+    "same_workplace_or_school": {
+      "text": "Do you and the person share a workplace or school?"
+    },
+    "protected_animal_3_color": {
+      "text": "What is your color?"
+    },
+    "wireless_transfer_phone_4_number": {
+      "text": "What is your phone number including area code?"
+    },
+    "protected_animal_4_name_or_id": {
+      "text": "What is your name or other way to identify animal?"
+    },
+    "property_debt_special_finding": {
+      "text": "Do you want a special finding that the abuse caused these debts?"
+    },
+    "protected_animal_4_type": {
+      "text": "What is your of animal?"
+    },
+    "same_workplace_company_name": {
+      "text": "What is your name of company?"
+    },
+    "same_school_name": {
+      "text": "What is your name of school?"
+    },
+    "same_workplace_or_school_other_description": {
+      "text": "What is your other explanation?"
+    },
+    "protected_animal_4_breed": {
+      "text": "What is your breed, if known?"
+    },
+    "protected_animal_4_color": {
+      "text": "What is your color?"
+    },
+    "animal_order_stay_away_requested": {
+      "text": "Do you have stay away from the animals?"
+    },
+    "property_debt_how_made_known": {
+      "text": "Do you know how the person made these debts?"
+    },
+    "animal_stay_away_distance": {
+      "text": "How far must the person stay away from the animals?"
+    },
+    "property_debt_how_made_explanation": {
+      "text": "What is your explain how the person made the debt or debts?"
+    },
+    "animal_stay_away_distance_other_yards": {
+      "text": "What is your other number of yards?"
+    },
+    "animal_order_no_harm_or_transfer": {
+      "text": "Do not take, sell, hide, molest, attack, strike, threaten, harm, get rid of, transfer, or borrow against the animals?"
+    },
+    "animal_order_sole_possession_requested": {
+      "text": "Do you have give me sole possession, care, and control of the animals?"
+    },
+    "animal_sole_possession_other_reason_line_1": {
+      "text": "What is your other reason?"
+    },
+    "animal_sole_possession_other_reason_line_2": {
+      "text": "What is your other reason, continued?"
+    },
+    "has_additional_pages": {
+      "text": "Did you attach additional paper or forms?"
+    },
+    "other_abuse_incident_additional_space_attached_yes": {
+      "text": "Do you need more space to describe the abuse? You can attach form DV-101 or a separate sheet."
+    },
+    "other_protected_people_additional_list_attached_yes": {
+      "text": "Do you need to list more people on a separate page?"
+    },
+    "animal_order_stay_away_requested_yes": {
+      "text": "Do you want the judge to order the person to stay away from your animals?"
+    },
+    "animal_order_no_harm_or_transfer_yes": {
+      "text": "Do you want the judge to order the person not to harm, hide, or give away your animals?"
+    },
+    "animal_order_sole_possession_requested_yes": {
+      "text": "Do you want the judge to give you sole care and control of your animals?"
     }
   },
   "sections": [
@@ -710,6 +1472,9 @@
     {
       "name": "Animals, Property and Support",
       "fields": [
+        "abuse_expense_1_pay_to",
+        "property_debt_1_pay_to",
+        "protected_animal_1_name_or_id",
         "animal_sole_possession_reasons",
         "animal_stay_away_distance",
         "control_of_property_description",
@@ -725,6 +1490,119 @@
         "person_asking_protection_signature_printed_name",
         "lawyer_signature_date",
         "lawyer_signature_printed_name"
+      ]
+    }
+  ],
+  "repeats": [
+    {
+      "nameId": "firearm_item",
+      "question": "How many firearms, firearm parts, or ammunition items do you know about?",
+      "entryTitle": "Item",
+      "min": 0,
+      "max": 6,
+      "fields": [
+        {
+          "label": "Describe the firearm, firearm part, or ammunition (include the serial number if you know it)",
+          "nameId": "{n}_description"
+        },
+        {
+          "label": "Number or amount",
+          "nameId": "{n}_number_or_amount"
+        },
+        {
+          "label": "Where is it, if you know?",
+          "nameId": "{n}_location"
+        }
+      ]
+    },
+    {
+      "nameId": "protected_animal",
+      "question": "How many animals do you want the order to protect?",
+      "entryTitle": "Animal",
+      "min": 0,
+      "max": 4,
+      "fields": [
+        {
+          "label": "Name (or another way to identify the animal)",
+          "nameId": "{n}_name_or_id"
+        },
+        {
+          "label": "Type of animal",
+          "nameId": "{n}_type"
+        },
+        {
+          "label": "Breed, if known",
+          "nameId": "{n}_breed"
+        },
+        {
+          "label": "Color",
+          "nameId": "{n}_color"
+        }
+      ]
+    },
+    {
+      "nameId": "abuse_expense",
+      "question": "How many expenses caused by the abuse do you want the person to pay?",
+      "entryTitle": "Expense",
+      "min": 0,
+      "max": 4,
+      "fields": [
+        {
+          "label": "Pay to",
+          "nameId": "{n}_pay_to"
+        },
+        {
+          "label": "For what",
+          "nameId": "{n}_for"
+        },
+        {
+          "label": "Amount",
+          "nameId": "{n}_amount",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "property_debt",
+      "question": "How many debts owed for property do you want the person to pay?",
+      "entryTitle": "Debt",
+      "min": 0,
+      "max": 3,
+      "fields": [
+        {
+          "label": "Pay to",
+          "nameId": "{n}_pay_to"
+        },
+        {
+          "label": "For what",
+          "nameId": "{n}_for"
+        },
+        {
+          "label": "Amount",
+          "nameId": "{n}_amount",
+          "type": "amount"
+        },
+        {
+          "label": "Due date",
+          "nameId": "{n}_due_date"
+        }
+      ]
+    },
+    {
+      "nameId": "recent_restraining_order",
+      "question": "How many restraining orders are in place now, or expired in the last six months?",
+      "entryTitle": "Order",
+      "min": 0,
+      "max": 2,
+      "fields": [
+        {
+          "label": "Date of the order",
+          "nameId": "{n}_date"
+        },
+        {
+          "label": "Date it expires",
+          "nameId": "{n}_expiration_date"
+        }
       ]
     }
   ]

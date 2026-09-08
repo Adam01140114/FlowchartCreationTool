@@ -20,6 +20,11 @@
         "temporary_restraining_orders_all_granted",
         "temporary_restraining_orders_all_denied",
         "temporary_restraining_orders_partly_granted_partly_denied"
+      ],
+      "labels": [
+        "All Granted Until the Court Hearing",
+        "All Denied Until the Court Hearing",
+        "Partly Granted and Partly Denied"
       ]
     },
     {
@@ -28,6 +33,10 @@
       "members": [
         "service_deadline_five_days",
         "service_deadline_other_days"
+      ],
+      "labels": [
+        "Five Days",
+        "Other Number of Days"
       ]
     },
     {
@@ -104,6 +113,18 @@
     },
     "clerk_certificate_date": {
       "text": "What date was the clerk's certificate completed?"
+    },
+    "hearing_court_different": {
+      "text": "Is the hearing court different from the court listed above?"
+    },
+    "temporary_restraining_orders_outcome": {
+      "text": "What did the judge decide about the temporary restraining orders?"
+    },
+    "temporary_orders_denied": {
+      "text": "Were any temporary restraining orders denied?"
+    },
+    "service_deadline": {
+      "text": "How long before the hearing must the papers be served?"
     }
   },
   "sections": [
