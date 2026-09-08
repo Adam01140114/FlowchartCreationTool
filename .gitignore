@@ -71,3 +71,6 @@ firebase.json
 # Temporary files
 *.tmp
 *.temp
+# Pipeline run artifacts (filled PDFs, page renders, captured answers)
+pipeline-out/
+pipeline-answers.json

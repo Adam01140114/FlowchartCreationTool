@@ -1,0 +1,40 @@
+{
+  "_comment": "form_connections for the DV packet: which fields on different forms hold the same answer. The canonical name is the one DV-100 uses, because DV-100 is the form the filer actually completes; DV-109 and DV-110 repeat those values in their captions and party blocks. Applying this file renames the field in each form's field config, so one question fills every form that prints it - a survivor states the restrained person's name once, not three times.",
+  "canonical": {
+    "person_asking_protection_name": {
+      "dv109": ["person_asking_for_protection_name"],
+      "dv110": ["protected_person_name"]
+    },
+    "person_to_restrain_full_name": {
+      "dv109": ["person_to_be_restrained_name"],
+      "dv110": ["restrained_person_full_name"]
+    },
+    "person_to_restrain_age":            { "dv110": ["restrained_person_age"] },
+    "person_to_restrain_date_of_birth":  { "dv110": ["restrained_person_date_of_birth"] },
+    "person_to_restrain_race":           { "dv110": ["restrained_person_race"] },
+    "person_to_restrain_gender_male":      { "dv110": ["restrained_person_gender_male"] },
+    "person_to_restrain_gender_female":    { "dv110": ["restrained_person_gender_female"] },
+    "person_to_restrain_gender_nonbinary": { "dv110": ["restrained_person_gender_nonbinary"] },
+    "other_protected_people_yes_yes":    { "dv110": ["has_other_protected_people_yes"] },
+    "other_protected_people_additional_list_attached_yes": {
+      "dv110": ["other_protected_people_attached_page_yes"]
+    }
+  },
+  "_alreadyShared": [
+    "court_name_and_street_address", "case_number",
+    "other_protected_person_1_full_name", "other_protected_person_1_age", "other_protected_person_1_relationship",
+    "other_protected_person_2_full_name", "other_protected_person_2_age", "other_protected_person_2_relationship",
+    "other_protected_person_3_full_name", "other_protected_person_3_age", "other_protected_person_3_relationship",
+    "other_protected_person_4_full_name", "other_protected_person_4_age", "other_protected_person_4_relationship",
+    "firearm_item_1_description", "firearm_item_1_location",
+    "firearm_item_2_description", "firearm_item_2_location",
+    "firearm_item_3_description", "firearm_item_3_location",
+    "firearm_item_4_description", "firearm_item_4_location"
+  ],
+  "_dv110Only": [
+    "restrained_person_height", "restrained_person_weight", "restrained_person_hair_color",
+    "restrained_person_eye_color", "restrained_person_relationship_to_protected_person",
+    "restrained_person_street_address", "restrained_person_city", "restrained_person_state",
+    "restrained_person_zip_code", "restrained_person_prohibited_items_details"
+  ]
+}

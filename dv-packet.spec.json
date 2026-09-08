@@ -1,0 +1,12 @@
+{
+  "project": "DV Restraining Order Packet",
+  "_comment": "Each Judicial Council form prints who completes it. DV-100 is the request and the filer completes all of it. DV-109 and DV-110 say the filer completes only items 1-2 and 1-3; the rest is the court's, and those fields are marked courtUse in the field configs so no question is ever generated for them. All three forms are filed together, so each connector is unconditional.",
+  "forms": [
+    { "name": "DV-100", "title": "DV-100 Request for Domestic Violence Restraining Order",
+      "flowchart": "dv100-flowchart.json", "pdf": "dv100.pdf", "activates": ["DV-109"] },
+    { "name": "DV-109", "title": "DV-109 Notice of Court Hearing",
+      "flowchart": "dv109-flowchart.json", "pdf": "dv109.pdf", "activates": ["DV-110"] },
+    { "name": "DV-110", "title": "DV-110 Temporary Restraining Order",
+      "flowchart": "dv110-flowchart.json", "pdf": "dv110.pdf" }
+  ]
+}
