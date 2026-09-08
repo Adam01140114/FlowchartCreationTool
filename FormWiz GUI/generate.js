@@ -1316,6 +1316,37 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '        }',
     '    </style>',
     '    <script>',
+    '      // Is the form moving because a person moved it?',
+    '      //',
+    '      // A question that closes throws away what was typed into it, and that has to',
+    '      // happen when the filer changes their mind and not when the page is putting a',
+    '      // saved draft back. A restore writes answers one field at a time, so questions',
+    '      // are repeatedly half-answered on the way through; closing and emptying them',
+    '      // then loses work the filer did yesterday - fifty-one of the four hundred and',
+    '      // eighty-two fields on the DV packet, before this was here.',
+    '      //',
+    '      // isTrusted is the difference: a keystroke, or a click on an option, is the',
+    "      // browser's own event, and everything a restore or a debug fill dispatches is",
+    '      // not. The flag is dropped at the end of the turn rather than immediately, so',
+    '      // the whole cascade one answer sets off still counts as that one answer.',
+    '      if (!window.__fwUserEditWatch) {',
+    '        window.__fwUserEditWatch = true;',
+    '        ["input", "change", "click", "keyup"].forEach(function (type) {',
+    '          document.addEventListener(type, function (ev) {',
+    '            if (!ev.isTrusted) return;',
+    '            // Inside the form only. Pressing a button in the debug menu is a',
+    '            // real click on a real element, and counting it meant a debug fill',
+    '            // ran its whole first pass with the flag still set: every question',
+    '            // it closed emptied itself and announced it, four thousand events',
+    '            // where there had been two hundred, twelve seconds where there had',
+    '            // been forty milliseconds.',
+    '            if (window.__MAX_FILL_IN_PROGRESS__) return;',
+    '            if (!ev.target || !ev.target.closest || !ev.target.closest("#customForm")) return;',
+    '            window.__fwUserEditing = true;',
+    '            setTimeout(function () { window.__fwUserEditing = false; }, 0);',
+    '          }, true);',
+    '        });',
+    '      }',
     '      // Phone formatter: Phone Number',
     '      // Where the area code and the rest of a number are kept. A phone box',
     '      // inside a repeating block is one of two shapes - the entry number is',
@@ -5178,6 +5209,48 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
           logicScriptBuffer += `     // Trigger change event to update any dependent logic\n`;
           logicScriptBuffer += `     dropdown.dispatchEvent(new Event('change'));\n`;
           logicScriptBuffer += `   }\n`;
+          // An answer to a question nobody is being asked must not reach the PDF.
+          // Only the dropdowns inside a closing question were reset, so a filer who
+          // answered "yes, they used a weapon", described the weapon, and then
+          // changed the answer to "no" filed a form that still said "a baseball
+          // bat" - and one who said they had no other court case still printed all
+          // six kinds of case ticked. The question came off the screen; the answer
+          // did not come off the form.
+          //
+          // Only when a person moved the form. A restore writes answers one field
+          // at a time and leaves questions half-answered on the way through, so
+          // clearing on its events threw away fifty-one of the four hundred and
+          // eighty-two fields a saved draft was putting back. A debug fill decides
+          // its own path and clears what that path does not reach itself.
+          logicScriptBuffer += `   if(window.__fwUserEditing){\n`;
+          logicScriptBuffer += `     var closedFields = thisQ.querySelectorAll('input, textarea');\n`;
+          logicScriptBuffer += `     for(var cf=0; cf<closedFields.length; cf++){\n`;
+          logicScriptBuffer += `       var closed = closedFields[cf];\n`;
+          logicScriptBuffer += `       if(closed.closest('[id^="triggerFields"]')) continue;\n`;
+          logicScriptBuffer += `       if(closed.type === 'checkbox' || closed.type === 'radio'){\n`;
+          // Already empty means nothing changed, and nothing changed means no
+          // event: a question that announces itself every time its logic runs
+          // would keep waking the questions behind it, and two that gate each
+          // other would never stop.
+          logicScriptBuffer += `         if(!closed.checked) continue;\n`;
+          logicScriptBuffer += `         closed.checked = false;\n`;
+          logicScriptBuffer += `       } else {\n`;
+          logicScriptBuffer += `         if(closed.value === '') continue;\n`;
+          logicScriptBuffer += `         closed.value = '';\n`;
+          logicScriptBuffer += `       }\n`;
+          // A hidden mirror has no listeners of its own - it is written to, not
+          // watched - so clearing it is the whole job.
+          logicScriptBuffer += `       if(closed.type === 'hidden') continue;\n`;
+          logicScriptBuffer += `       closed.dispatchEvent(new Event('input', { bubbles: true }));\n`;
+          logicScriptBuffer += `       closed.dispatchEvent(new Event('change', { bubbles: true }));\n`;
+          logicScriptBuffer += `     }\n`;
+          logicScriptBuffer += `   }\n`;
+          // Last, as it always was. Adding it first so the events above would find
+          // the question already closed made every dependent hide the instant its
+          // trigger was reset, and each of those resets woke the next: one debug
+          // fill spent twelve seconds inside that cascade where it had spent forty
+          // milliseconds. It buys nothing, because a dependent reads the trigger
+          // value as well as the class, and that value has just been cleared.
           logicScriptBuffer += `   thisQ.classList.add("hidden");\n`;
           logicScriptBuffer += ` }\n`;
           logicScriptBuffer += `  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;\n`;

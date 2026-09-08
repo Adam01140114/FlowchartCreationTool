@@ -153,6 +153,21 @@ screen that it says are not asked. The step navigator will not show an empty
 section, so it un-hides the first question in one rather than put a Next button
 under a blank screen. They stay empty, and nothing of theirs reaches the PDF.
 
+### Testing the form by hand
+
+Save the generated HTML into `FormWiz GUI/` and open it at
+`/FormWiz%20GUI/<name>.html`. The page links `generate.css`, `generate2.css` and
+`cart.js` with no path, so they only resolve from that directory; served from the
+repo root it renders unstyled, every control collapses to a zero-size box, and
+nothing can be clicked. The preview iframe gets away with it because `srcdoc`
+resolves relative URLs against `/FormWiz GUI/gui.html`.
+
+That matters for anything gated on a real interaction. Rule 16 - a question that
+closes empties itself - deliberately ignores synthetic events, so it can only be
+checked with actual clicks: navigate the question-at-a-time form with its own
+arrows and click the option. Removing `question-step-hidden` by hand does not
+work; `refreshNav` puts it back within a few hundred milliseconds.
+
 Fields the form validates - dates, zips, phones, amounts - keep valid data in
 either mode, because a marker there fails validation and stops the run.
 

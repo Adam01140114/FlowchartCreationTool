@@ -1031,6 +1031,66 @@ That is the shape of what this catches - something true of the chart that the
 export happens to hide.
 
 ================================================================================
+RULE 16 — A QUESTION THAT CLOSES TAKES ITS ANSWER WITH IT
+================================================================================
+
+When an answer changes and a question that was on screen goes away, the answer
+that was in it goes away too. A hidden question must hold no value, because
+everything the form holds is what the form posts, and what the form posts is
+what prints.
+
+This is not the same as hiding it. The generated logic used to reset only the
+dropdowns inside a closing question and leave everything else alone, so:
+
+    "Did the person use or threaten to use a gun or other weapon?"   Yes
+    "If yes, describe the gun or weapon:"                            a baseball bat
+
+    ...changed to No. The question came off the screen. "a baseball bat"
+    stayed on the form, and printed at item 5c of the filed DV-100.
+
+The same filer, saying they had no other court case, still filed a DV-100 with
+all six kinds of case ticked at item 4b. Both are a court document contradicting
+the person who signed it, and neither is visible to anyone filling the form in -
+the question is gone from the screen, so there is nothing to notice.
+
+WHAT COUNTS AS THE ANSWER CHANGING
+
+A person moving the form: a keystroke, a click on an option. Not a saved draft
+being put back. A restore writes answers one field at a time, so questions are
+repeatedly half-answered on the way through, and clearing on the way past loses
+work the filer did yesterday - fifty-one of four hundred and eighty-two fields
+on the DV packet, measured. The generated page tells them apart by isTrusted,
+and only for events inside the form: a debug fill decides its own path and
+clears what that path does not reach itself.
+
+HOW TO CHECK IT
+
+The audit cannot see this - it reads the exported interview, not a form being
+used. Do it in the preview, and do it with real clicks:
+
+  1  Fill the maximum path.
+  2  Answer a gate the other way - a real click on a real option, not
+     dispatched from the console. The clearing is deliberately deaf to
+     synthetic events.
+  3  The block behind it should be gone AND empty. Check the whole form, not
+     just the question you changed: a gate closing should empty the chain
+     behind it, not only its first question.
+
+        [...document.querySelectorAll(".question-container.hidden")]
+          .flatMap(q => [...q.querySelectorAll("input,textarea,select")])
+          .filter(e => e.name && (e.type === "checkbox" || e.type === "radio"
+            ? e.checked : String(e.value || "").trim() !== ""))
+
+     That should come back empty. It is what the form would post.
+
+  4  Then reload with the draft in place and confirm the restore still brings
+     back what it brought back before. Clearing too eagerly is the failure
+     mode on the other side, and it is quieter.
+
+A question reopened later comes back empty, and that is correct: the answer was
+withdrawn, not parked. The chain behind it has to be answered again.
+
+================================================================================
 PRE-SHIP CHECKLIST
 ================================================================================
 
@@ -1049,6 +1109,9 @@ PRE-SHIP CHECKLIST
   [ ] 4a One PDF per activated form.
   [ ] 4b Marker-value pass read page by page against the blank forms.
   [ ] 4  Minimum path, typical path, and each activation branch run.
+  [ ] 16 A gate answered the other way, by a real click, empties the block
+         behind it - checked across the whole form, not just that question.
+         And a saved draft still restores what it restored before.
   [ ] 4  Realistic data, including overflow-length text.
   [ ] 5  One group per form, named after the form, holding that form's sections.
          No section name used by two forms.
