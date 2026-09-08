@@ -204,10 +204,19 @@ function findAllUpstreamOptions(questionCell) {
 function detectSectionJumps(cell, questionCellMap, questionIdMap) {
   // Section jump detection (existing code)
 }
-/** Merge sections that have fewer than minQuestions into an adjacent section. */
+/**
+ * Merge sections that have fewer than minQuestions into an adjacent section.
+ *
+ * Always hands back a NEW array. The caller empties the array it passed in and
+ * refills it from the result, so returning the same array here emptied the
+ * result too and the refill loop had nothing left to iterate - a form with a
+ * single section exported with no sections at all, and the generated HTML came
+ * out blank. A packet hid it: with several sections per form the merging path
+ * below builds its own array anyway.
+ */
 function consolidateSectionsMinQuestions(sections, minQuestions = 2) {
   if (!Array.isArray(sections) || sections.length <= 1) {
-    return { sections: sections || [], sectionIdMap: {} };
+    return { sections: (sections || []).slice(), sectionIdMap: {} };
   }
   const working = sections.map(function(s) {
     return {
@@ -3530,8 +3539,11 @@ window.exportGuiJson = function(download = true) {
   }
   sections.sort((a, b) => a.sectionId - b.sectionId);
   const consolidated = consolidateSectionsMinQuestions(sections, 2);
+  // Copy before clearing: if the helper ever hands back the same array again,
+  // emptying `sections` must not empty what we are about to refill it from.
+  const consolidatedSections = (consolidated.sections || []).slice();
   sections.length = 0;
-  consolidated.sections.forEach(function(s) { sections.push(s); });
+  consolidatedSections.forEach(function(s) { sections.push(s); });
   sectionCounter = Math.max(sectionCounter, sections.length + 1);
   // Calculate the maximum question ID found
   let maxQuestionId = 0;
