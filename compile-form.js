@@ -294,6 +294,53 @@ function optionLabel(field, groupNameId) {
 }
 
 /**
+ * Ask one thing at a time, and put the pieces back for the PDF.
+ *
+ * A PDF box labelled "Court name and street address" is one field, but it is
+ * two questions to a person: the name, then the address. A splits hint replaces
+ * that field with its parts and records how to rejoin them, so the interview
+ * asks two plain questions and the PDF still receives one value.
+ *
+ * The join is a linked-logic node, which is the generic "this hidden field is
+ * made of those fields" mechanism - nothing here knows what a court is.
+ */
+function applySplits(fields, hints) {
+  const specs = hints.splits || [];
+  if (!specs.length) return { fields, joins: [] };
+
+  const out = [];
+  const joins = [];
+  fields.forEach((field) => {
+    const spec = specs.find((sp) => sp.field === field.nameId || sp.field === field.id);
+    if (!spec || !(spec.parts || []).length) { out.push(field); return; }
+
+    spec.parts.forEach((part, i) => {
+      out.push(Object.assign({}, field, {
+        // Keep the original's place in the order, one step apart, so the parts
+        // stay together and land in the section the whole field was in.
+        index: field.index + i / (spec.parts.length + 1),
+        id: part.nameId,
+        nameId: part.nameId,
+        label: part.label || part.question || part.nameId,
+        question: part.question || null,
+        type: part.type || field.type,
+        optional: part.optional === true || field.optional,
+        mirrorTargets: null,
+        raw: field.raw
+      }));
+    });
+    joins.push({
+      target: field.nameId,
+      // Every PDF field the whole value has to reach, mirrors included.
+      targets: field.mirrorTargets && field.mirrorTargets.length ? field.mirrorTargets : [field.id],
+      parts: spec.parts.map((p) => p.nameId),
+      join: spec.join == null ? ', ' : spec.join
+    });
+  });
+  return { fields: out.sort((a, b) => a.index - b.index), joins };
+}
+
+/**
  * Collapse a numbered family into one repeating block.
  *
  * A PDF that prints six firearm rows has six sets of fields, and asking about
@@ -881,10 +928,35 @@ function createBuilder() {
     cells.slice(from).forEach((c) => { if (c.vertex) c.geometry.x = Math.round(c.geometry.x + dx); });
   }
 
+  /**
+   * A hidden PDF field made of other answers.
+   *
+   * It takes part in no flow - it is a rule, not a step - so it sits in its own
+   * column beside the chart, where it cannot cross a wire.
+   */
+  function addLinkedLogic({ target, parts, join, x, y }) {
+    return addVertex({
+      id: id(),
+      value: '<div style="text-align:center;padding:6px;"><strong>Linked Logic</strong>'
+        + '<br><span style="font-size:12px;">' + target + '</span></div>',
+      geometry: { x: Math.round(x), y: Math.round(y), width: 220, height: 80 },
+      style: 'shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;'
+        + 'spacing=12;fontSize=14;align=center;verticalAlign=middle;'
+        + 'fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;',
+      vertex: true,
+      edge: false,
+      source: null,
+      target: null,
+      _linkedLogicNodeId: target,
+      _linkedFields: parts.slice(),
+      _linkedJoin: join
+    });
+  }
+
   return {
     cells, pendingEdges, sectionPrefs,
     addVertex, addEdge, addHub, funnelInto, addQuestion, addOptions, addEnd,
-    mark, bboxSince, translateSince
+    addLinkedLogic, mark, bboxSince, translateSince
   };
 }
 
@@ -1028,7 +1100,8 @@ function layoutSequence(b, steps, startY, centerX) {
 function compile(schema, hints = {}) {
   const merged = Object.assign({}, schema.interview || {}, hints);
   const mirrored = applyMirrors(normalizeFields(schema), merged);
-  const { fields, repeats } = applyRepeats(mirrored, merged);
+  const { fields: split, joins } = applySplits(mirrored, merged);
+  const { fields, repeats } = applyRepeats(split, merged);
   const { steps, notes, groups } = buildInterview(fields, merged, repeats);
 
   const b = createBuilder();
@@ -1047,6 +1120,18 @@ function compile(schema, hints = {}) {
     const end = b.addEnd(CENTER_X, endY);
     b.addEdge(seq.exits[0].cell.id, end.id);
   }
+
+  // The joins that put split questions back together for the PDF. They are
+  // wired to nothing, so they go in a column of their own beside the chart.
+  joins.forEach((join, i) => {
+    b.addLinkedLogic({
+      target: join.target,
+      parts: join.parts,
+      join: join.join,
+      x: CENTER_X + 700,
+      y: 60 + i * 140
+    });
+  });
 
   // boxes first, wires second — never route before nodes are separated
   const moved = separateOverlappingNodes(b.cells);
@@ -1141,7 +1226,10 @@ function audit({ flowchart, fields, steps, notes }) {
       if ((out.get(v.id) || []).some((t) => reachesEnd.has(t))) { reachesEnd.add(v.id); changed = true; }
     });
   }
-  const dead = verts.filter((v) => !reachesEnd.has(v.id));
+  // A linked-logic node is a rule about a hidden field, not a step in the
+  // interview: it is wired to nothing on purpose and never "reaches End".
+  const dead = verts.filter((v) => !reachesEnd.has(v.id)
+    && !(v.style || '').includes('nodeType=linkedLogic'));
   if (dead.length) issues.push(`${dead.length} node(s) never reach End: ${dead.slice(0, 5).map((v) => v._nameId || v.value).join(', ')}`);
 
   console.log('\n--- checks ---');

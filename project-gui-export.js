@@ -379,6 +379,13 @@ function reportGroupProblems(merged) {
     merged.hiddenFields = [];
     merged.additionalPDFs = [];
     merged.groups = [];
+    // Rules that live beside the questions rather than in them. The merge kept
+    // only the first form's, so a linked field or checklist item belonging to
+    // form two or three was silently dropped from the packet.
+    merged.linkedFields = [];
+    merged.linkedCheckboxes = [];
+    merged.inverseCheckboxes = [];
+    merged.checklistItems = [];
 
     const ranges = [];
     // Activation rules are written against the flowchart's per-form question
@@ -420,6 +427,30 @@ function reportGroupProblems(merged) {
       merged.sections = merged.sections.concat(gui.sections || []);
       merged.hiddenFields = merged.hiddenFields.concat(gui.hiddenFields || []);
       merged.additionalPDFs = merged.additionalPDFs.concat(gui.additionalPDFs || []);
+      // Two forms can state the same rule - a value they both print, split the
+      // same way - so the same target appears once, from whichever form
+      // declared it first.
+      const seenLink = new Set(merged.linkedFields.map(function (f) { return f.linkedFieldId; }));
+      (gui.linkedFields || []).forEach(function (f) {
+        if (!f || seenLink.has(f.linkedFieldId)) return;
+        seenLink.add(f.linkedFieldId);
+        merged.linkedFields.push(f);
+      });
+      const seenBox = new Set(merged.linkedCheckboxes.map(function (c) { return c.linkedCheckboxId; }));
+      (gui.linkedCheckboxes || []).forEach(function (c) {
+        if (!c || seenBox.has(c.linkedCheckboxId)) return;
+        seenBox.add(c.linkedCheckboxId);
+        merged.linkedCheckboxes.push(c);
+      });
+      const seenInverse = new Set(merged.inverseCheckboxes.map(function (c) { return c.inverseCheckboxId; }));
+      (gui.inverseCheckboxes || []).forEach(function (c) {
+        if (!c || seenInverse.has(c.inverseCheckboxId)) return;
+        seenInverse.add(c.inverseCheckboxId);
+        merged.inverseCheckboxes.push(c);
+      });
+      (gui.checklistItems || []).forEach(function (item) {
+        if (merged.checklistItems.indexOf(item) === -1) merged.checklistItems.push(item);
+      });
       // Group ids restart at 1 in every form, and the builder keys its group
       // blocks by that id - two forms whose groups are both id 1 collapse into
       // one block, so the packet's progress bar lost a step per form. Renumber

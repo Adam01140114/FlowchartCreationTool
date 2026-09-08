@@ -456,6 +456,38 @@ function updateAllHiddenAddressFields() {
             addressField.value = fullAddress;
     });
 }
+/**
+ * The form's own convenience fields - the ones it fills from the URL and from
+ * the zip-to-court lookup.
+ *
+ * These names are not reserved words to a court form: "court_name" is a
+ * perfectly ordinary PDF field, and a form that asks for it ended up with two
+ * elements sharing that id, where getElementById returns the built-in empty one
+ * and the answer never reaches the PDF. A question's own field always wins - the
+ * built-in is simply not emitted - and the lookup only writes into fields it
+ * owns, marked with data-builtin.
+ */
+const BUILT_IN_HIDDEN_MARKER = '<!--builtin-hidden-fields-->';
+const BUILT_IN_HIDDEN_NAMES = ['form_zip', 'form_county', 'form_defendant', 'form_ID',
+                               'current_date', 'court_name', 'court_address'];
+
+function builtInHiddenFields() {
+  const taken = new Set();
+  if (typeof questionNameIds === 'object' && questionNameIds) {
+    Object.values(questionNameIds).forEach((n) => { if (n) taken.add(String(n)); });
+  }
+  if (typeof hiddenLogicConfigs !== 'undefined' && Array.isArray(hiddenLogicConfigs)) {
+    hiddenLogicConfigs.forEach((c) => { if (c && c.nodeId) taken.add(String(c.nodeId)); });
+  }
+  if (typeof linkedFields !== 'undefined' && Array.isArray(linkedFields)) {
+    linkedFields.forEach((f) => { if (f && f.linkedFieldId) taken.add(String(f.linkedFieldId)); });
+  }
+  return BUILT_IN_HIDDEN_NAMES
+    .filter((name) => !taken.has(name))
+    .map((name) => '        <input type="hidden" data-builtin="1" id="' + name
+      + '" name="' + name + '" value="">');
+}
+
 function getFormHTML() {
 	try {
 	// Get county lookup data from global variables (loaded via script tags in gui.html)
@@ -1650,13 +1682,10 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '    <div id="box">',
     '        <form id="customForm" onsubmit="return showThankYouMessage(event);">',
     '        <!-- Hidden fields for URL parameters -->',
-    '        <input type="hidden" id="form_zip" name="form_zip" value="">',
-    '        <input type="hidden" id="form_county" name="form_county" value="">',
-    '        <input type="hidden" id="form_defendant" name="form_defendant" value="">',
-    '        <input type="hidden" id="form_ID" name="form_ID" value="">',
-    '        <input type="hidden" id="current_date" name="current_date" value="">',
-    '        <input type="hidden" id="court_name" name="court_name" value="">',
-    '        <input type="hidden" id="court_address" name="court_address" value="">',
+    // Which of these can be emitted depends on the names the questions take,
+    // and no question has been rendered yet. Leave a marker and fill it in once
+    // they have.
+    BUILT_IN_HIDDEN_MARKER,
   ].join("\n");
   // Get all PDF names
   const pdfFormNameInputEl = document.getElementById("formPDFName");
@@ -9168,10 +9197,12 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 
     window.linkedFieldsConfig.forEach((config, index) => {
 
-      linkedFields.push({
+      const linkedEntry = {
         linkedFieldId: config.linkedFieldId,
         fields: config.fields
-      });
+      };
+      if (typeof config.join === 'string') linkedEntry.join = config.join;
+      linkedFields.push(linkedEntry);
 
     });
 
@@ -9236,28 +9267,32 @@ if (document.readyState === 'loading') {
 '}\n\n' +
 '// Function to populate hidden fields from URL parameters\n' +
 'function populateHiddenFieldsFromUrl() {\n' +
+// Same rule as the court lookup: only write into fields the form generated for
+// itself, never into a question that happens to share the name.
+'    const ownField = (id) => { const el = document.getElementById(id);\n' +
+'        return (el && el.hasAttribute("data-builtin")) ? el : null; };\n' +
 '    const zipCode = getUrlParameter("zipCode");\n' +
 '    const county = getUrlParameter("county");\n' +
 '    const defendant = getUrlParameter("defendant");\n' +
 '    const formId = getUrlParameter("formId");\n' +
 '    \n' +
 '    if (zipCode) {\n' +
-'        const zipField = document.getElementById("form_zip");\n' +
+'        const zipField = ownField("form_zip");\n' +
 '        if (zipField) zipField.value = zipCode;\n' +
 '    }\n' +
 '    \n' +
 '    if (county) {\n' +
-'        const countyField = document.getElementById("form_county");\n' +
+'        const countyField = ownField("form_county");\n' +
 '        if (countyField) countyField.value = county;\n' +
 '    }\n' +
 '    \n' +
 '    if (defendant) {\n' +
-'        const defendantField = document.getElementById("form_defendant");\n' +
+'        const defendantField = ownField("form_defendant");\n' +
 '        if (defendantField) defendantField.value = defendant;\n' +
 '    }\n' +
 '    \n' +
 '    if (formId) {\n' +
-        '        const formIdField = document.getElementById("form_ID");\n' +
+        '        const formIdField = ownField("form_ID");\n' +
         '        if (formIdField) formIdField.value = formId;\n' +
         '    }\n' +
         '    \n' +
@@ -9297,9 +9332,14 @@ if (document.readyState === 'loading') {
         '}\n\n' +
         'function lookupCourtFromZip() {\n' +
         '    const zipField = document.getElementById("form_zip");\n' +
-        '    const courtNameField = document.getElementById("court_name");\n' +
-        '    const courtAddressField = document.getElementById("court_address");\n' +
-        '    const courtCountyField = document.getElementById("court_county");\n' +
+        // The lookup owns only the fields the form generated for it. A form that
+        // asks for the court by name has its own court_name, and filling that
+        // from a zip code would overwrite what the filer typed.
+        '    const ownField = (id) => { const el = document.getElementById(id);\n' +
+        '        return (el && el.hasAttribute("data-builtin")) ? el : null; };\n' +
+        '    const courtNameField = ownField("court_name");\n' +
+        '    const courtAddressField = ownField("court_address");\n' +
+        '    const courtCountyField = ownField("court_county");\n' +
         '    if (!zipField || !courtNameField || !courtAddressField) {\n' +
         '        \n' +
         '        return;\n' +
@@ -13261,6 +13301,22 @@ function updateLinkedFields() {
 
             return field;
         }).filter(el => el);
+
+        // A joined link is a different thing from a mirrored one. Mirrors say
+        // "these boxes hold the same answer, keep the best one"; a join says
+        // "this PDF box holds several answers at once". A form that prints
+        // "Court name and street address" on one line is still two questions to
+        // a person - the join puts them back together for the PDF, in the order
+        // the fields were declared, without asking anyone to type both into one
+        // box.
+        if (linkedField.join != null) {
+            const parts = fields
+                .map(fieldId => document.getElementById(fieldId))
+                .filter(el => el && String(el.value).trim() !== '')
+                .map(el => String(el.value).trim());
+            hiddenField.value = parts.join(linkedField.join);
+            return;
+        }
         if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
         }
@@ -13353,6 +13409,12 @@ function clearInactiveLinkedFields() {
         linkedFields.forEach(linkedField => {
             const { fields } = linkedField;
             const linkedFieldId = linkedField.linkedFieldId;
+            // This whole routine is mirror housekeeping: several boxes are meant
+            // to hold one value, so the shorter ones get cleared. A joined link
+            // is the opposite - the boxes hold different halves of one PDF
+            // field, and clearing the shorter one deletes the court's name
+            // because its street address is longer.
+            if (linkedField.join != null) return;
             const isTargetLinkedField = linkedFieldId && linkedFieldId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name') !== -1;
             const isTargetPublicDateLinkedField = linkedFieldId === 'public_date';
             // Get all the linked textboxes
@@ -20056,6 +20118,10 @@ document.addEventListener('DOMContentLoaded', function() {
 </html>
 `;
   // Finally, return the assembled HTML
+  // Now that every question has claimed its name, emit only the built-in fields
+  // whose names are still free.
+  formHTML = formHTML.replace(BUILT_IN_HIDDEN_MARKER, builtInHiddenFields().join('\n'));
+
   return formHTML;
   } catch (error) {
     throw error;

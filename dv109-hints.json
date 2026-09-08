@@ -134,6 +134,8 @@
         "person_asking_for_protection_name",
         "person_to_be_restrained_name",
         "court_name_and_street_address",
+        "court_name",
+        "court_street_address",
         "case_number"
       ]
     },
@@ -175,6 +177,24 @@
         "judicial_officer_signature_date",
         "clerk_deputy_name",
         "clerk_certificate_date"
+      ]
+    }
+  ],
+  "splits": [
+    {
+      "field": "court_name_and_street_address",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "court_name",
+          "label": "Court name",
+          "question": "What is the name of the court?"
+        },
+        {
+          "nameId": "court_street_address",
+          "label": "Court street address",
+          "question": "What is the court's street address?"
+        }
       ]
     }
   ]

@@ -5127,6 +5127,10 @@ function autosaveFlowchartToLocalStorage() {
       if (cell.hasOwnProperty('_linkedFields')) {
         cellData._linkedFields = cell._linkedFields;
       }
+      // The separator that makes a link a join rather than a mirror.
+      if (cell.hasOwnProperty('_linkedJoin')) {
+        cellData._linkedJoin = cell._linkedJoin;
+      }
       // Linked checkbox node properties - always save these if they exist on the cell
       if (cell.hasOwnProperty('_linkedCheckboxNodeId')) {
         cellData._linkedCheckboxNodeId = cell._linkedCheckboxNodeId;
@@ -5665,7 +5669,7 @@ function copySelectedNodeAsJson() {
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
               '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText', '_linkedLogicNodeId', '_linkedFields', '_linkedCheckboxNodeId', '_linkedCheckboxOptions', '_pdfLogicEnabled', '_pdfTriggerLimit', '_bigParagraphPdfName', '_bigParagraphPdfFile', '_bigParagraphPdfPrice', '_locationIndex', '_locationTitle', '_checkboxes', '_itemOrder', '_times', '_dropdowns', '_lineLimit', '_characterLimit', '_paragraphLimit', '_pdfPreviewTitle', '_pdfPreviewFile', '_pdfPreviewFilename', '_pdfPreviewPriceId', '_pdfPreviewAttachment'
+      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText', '_linkedLogicNodeId', '_linkedFields', '_linkedJoin', '_linkedCheckboxNodeId', '_linkedCheckboxOptions', '_pdfLogicEnabled', '_pdfTriggerLimit', '_bigParagraphPdfName', '_bigParagraphPdfFile', '_bigParagraphPdfPrice', '_locationIndex', '_locationTitle', '_checkboxes', '_itemOrder', '_times', '_dropdowns', '_lineLimit', '_characterLimit', '_paragraphLimit', '_pdfPreviewTitle', '_pdfPreviewFile', '_pdfPreviewFilename', '_pdfPreviewPriceId', '_pdfPreviewAttachment'
       ];
       safeProperties.forEach(prop => {
         // For limit properties, copy even if empty string or null
@@ -5846,7 +5850,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.vertex = true;
         newCell.id = nodeData.newId;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_fileName","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_pdfPreviewTitle","_pdfPreviewFile","_pdfPreviewFilename","_pdfPreviewPriceId","_pdfPreviewAttachment","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns","_lineLimit","_characterLimit","_paragraphLimit","_currencyAlerts"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_fileName","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_pdfPreviewTitle","_pdfPreviewFile","_pdfPreviewFilename","_pdfPreviewPriceId","_pdfPreviewAttachment","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedJoin","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns","_lineLimit","_characterLimit","_paragraphLimit","_currencyAlerts"].forEach(k => {
           // For limit properties, also copy empty strings and null values
           const isLimitProperty = k === '_lineLimit' || k === '_characterLimit' || k === '_paragraphLimit';
           if (isLimitProperty) {
@@ -5988,7 +5992,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_fileName","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_pdfPreviewTitle","_pdfPreviewFile","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_fileName","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_pdfPreviewTitle","_pdfPreviewFile","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedJoin","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section

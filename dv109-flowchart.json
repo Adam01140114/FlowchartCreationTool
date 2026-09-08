@@ -4,22 +4,22 @@
   "cells": [
     {
       "id": "2",
-      "value": "What is the court's name and street address?",
+      "value": "What is the name of the court?",
       "geometry": {
         "x": 610,
         "y": 60,
         "width": 300,
         "height": 96
       },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=court_name_and_street_address;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=court_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
       "vertex": true,
       "edge": false,
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the court's name and street address?",
+      "_questionText": "What is the name of the court?",
       "_questionId": "1",
-      "_nameId": "court_name_and_street_address",
+      "_nameId": "court_name",
       "_placeholder": "",
       "_mirrorTargets": null,
       "_pdfName": "",
@@ -28,10 +28,34 @@
     },
     {
       "id": "3",
-      "value": "What is your case number?",
+      "value": "What is the court's street address?",
       "geometry": {
         "x": 610,
         "y": 326,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=court_street_address;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is the court's street address?",
+      "_questionId": "2",
+      "_nameId": "court_street_address",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "4",
+      "value": "What is your case number?",
+      "geometry": {
+        "x": 610,
+        "y": 592,
         "width": 300,
         "height": 96
       },
@@ -42,7 +66,7 @@
       "target": null,
       "_textboxes": null,
       "_questionText": "What is your case number?",
-      "_questionId": "2",
+      "_questionId": "3",
       "_nameId": "case_number",
       "_placeholder": "",
       "_mirrorTargets": [
@@ -55,11 +79,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "4",
+      "id": "5",
       "value": "What is your person asking for protection?",
       "geometry": {
         "x": 610,
-        "y": 592,
+        "y": 858,
         "width": 300,
         "height": 96
       },
@@ -70,7 +94,7 @@
       "target": null,
       "_textboxes": null,
       "_questionText": "What is your person asking for protection?",
-      "_questionId": "3",
+      "_questionId": "4",
       "_nameId": "person_asking_protection_name",
       "_placeholder": "",
       "_mirrorTargets": null,
@@ -79,11 +103,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "5",
+      "id": "6",
       "value": "What is your person to be restrained?",
       "geometry": {
         "x": 610,
-        "y": 858,
+        "y": 1124,
         "width": 300,
         "height": 96
       },
@@ -94,7 +118,7 @@
       "target": null,
       "_textboxes": null,
       "_questionText": "What is your person to be restrained?",
-      "_questionId": "4",
+      "_questionId": "5",
       "_nameId": "person_to_restrain_full_name",
       "_placeholder": "",
       "_mirrorTargets": null,
@@ -103,11 +127,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "6",
+      "id": "7",
       "value": "End",
       "geometry": {
         "x": 700,
-        "y": 1124,
+        "y": 1390,
         "width": 120,
         "height": 60
       },
@@ -121,7 +145,31 @@
       "_pdfPrice": ""
     },
     {
-      "id": "7",
+      "id": "8",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">court_name_and_street_address</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 60,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "court_name_and_street_address",
+      "_linkedFields": [
+        "court_name",
+        "court_street_address"
+      ],
+      "_linkedJoin": ", ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "9",
       "value": "",
       "geometry": {
         "x": 0,
@@ -148,7 +196,7 @@
       }
     },
     {
-      "id": "8",
+      "id": "10",
       "value": "",
       "geometry": {
         "x": 0,
@@ -175,7 +223,7 @@
       }
     },
     {
-      "id": "9",
+      "id": "11",
       "value": "",
       "geometry": {
         "x": 0,
@@ -202,7 +250,7 @@
       }
     },
     {
-      "id": "10",
+      "id": "12",
       "value": "",
       "geometry": {
         "x": 0,
@@ -224,6 +272,33 @@
           {
             "x": 760,
             "y": 1120
+          }
+        ]
+      }
+    },
+    {
+      "id": "13",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "6",
+      "target": "7",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 1232
+          },
+          {
+            "x": 760,
+            "y": 1384
           }
         ]
       }

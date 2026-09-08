@@ -7749,7 +7749,11 @@ function createLinkedFieldDisplayFromImport(linkedFieldData) {
     window.linkedFieldsConfig.push({
         id: displayId,
         linkedFieldId: linkedFieldId,
-        fields: fieldsArr
+        fields: fieldsArr,
+        // A separator means the target holds all of these joined, rather than
+        // the best one of them. Carry it through or the builder loses it on the
+        // way from the imported JSON to the generated form.
+        join: typeof linkedFieldData.join === 'string' ? linkedFieldData.join : undefined
     });
 }
 // Search functionality for linked field dropdowns

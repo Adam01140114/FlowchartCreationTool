@@ -235,6 +235,27 @@ async function main() {
     });
   }
 
+  // Rule 8: one question asks one thing. Two signals, with different weight.
+  // A field name that joins two nouns - court_name_and_street_address - is the
+  // PDF telling you it holds two answers, and a question for it asks a person
+  // for both at once. Wording alone is weaker: "names of people who heard or
+  // saw" is one answer despite the "or", so that is reported for a human to
+  // read rather than failed.
+  const VALUE_TYPES = new Set(['text', 'bigParagraph', 'number', 'date', 'money', 'phone', 'email']);
+  const joined = new Set((gui.linkedFields || [])
+    .filter((f) => typeof f.join === 'string').map((f) => f.linkedFieldId));
+  report.rule8 = { compound: [], review: [] };
+  (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
+    if (!VALUE_TYPES.has(q.type)) return;
+    const name = String(q.nameId || '');
+    const text = String(q.text || '');
+    if (/_and_/.test(name) && !joined.has(name)) {
+      report.rule8.compound.push({ name, text });
+    } else if (/\b(?:and)\b|\s\/\s/.test(text) && !/_and_/.test(name)) {
+      report.rule8.review.push({ name, text });
+    }
+  }));
+
   // A question gated on one that comes later can never open: the form reveals
   // questions in order, so its trigger is still unanswered when it is passed.
   // This is how a numbered block that the editor renumbered ended up waiting on
@@ -321,6 +342,19 @@ async function main() {
     r.blocks.forEach((b) => console.log('      - ' + b.family
       + '  ' + b.entries + ' entries x ' + b.fieldsPerEntry + ' field(s) = ' + b.total + ' fields'));
   });
+  console.log('');
+  console.log('RULE 8 — one question asks one thing');
+  if (!report.rule8.compound.length) {
+    console.log('  passes' + (joined.size ? '  (' + joined.size + ' field(s) asked in parts and rejoined)' : ''));
+  }
+  report.rule8.compound.forEach((c) => console.log('  FAILS  ' + c.name
+    + ' holds two answers and is asked as one question: "' + c.text + '"'));
+  if (report.rule8.review.length) {
+    console.log('  review (wording joins two things, may still be one answer):');
+    report.rule8.review.slice(0, 8).forEach((c) => console.log('      - ' + c.text));
+    if (report.rule8.review.length > 8) console.log('      ... ' + (report.rule8.review.length - 8) + ' more');
+  }
+
   console.log('');
   console.log('RULE 7 — a form that asks nothing still ships');
   report.rule7.forEach((f) => {

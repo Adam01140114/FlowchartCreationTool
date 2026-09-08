@@ -37,6 +37,27 @@ It stays on the PDF, blank, for the judge or clerk. This is not a cosmetic
 choice: asking a survivor what the judge decided produces an answer they cannot
 know and a filed order that says the court ruled something it has not.
 
+## Splitting a field that holds two answers
+
+A PDF box labelled "Court name and street address" is one field and two
+questions. Declare the split in the form's hints and the pipeline handles both
+halves:
+
+```json
+"splits": [
+  { "field": "court_name_and_street_address",
+    "join": ", ",
+    "parts": [
+      { "nameId": "court_name",           "question": "What is the name of the court?" },
+      { "nameId": "court_street_address", "question": "What is the court's street address?" }
+    ] } ]
+```
+
+The compiler asks the parts in the original's place and emits a linked-logic
+node carrying the separator; the generated form keeps a hidden field of the
+original name holding the parts joined in order, and that is what fills the PDF.
+Any field, any separator, any form - see rule 8.
+
 ## Running it
 
 ```bash

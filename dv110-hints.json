@@ -383,6 +383,8 @@
       "name": "Who the Order Protects",
       "fields": [
         "court_name_and_street_address",
+        "court_name",
+        "court_street_address",
         "case_number",
         "person_asking_protection_name",
         "person_to_restrain_full_name",
@@ -424,6 +426,24 @@
         "other_protected_person_4_relationship",
         "other_protected_person_4_age",
         "other_protected_people_additional_list_attached_yes"
+      ]
+    }
+  ],
+  "splits": [
+    {
+      "field": "court_name_and_street_address",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "court_name",
+          "label": "Court name",
+          "question": "What is the name of the court?"
+        },
+        {
+          "nameId": "court_street_address",
+          "label": "Court street address",
+          "question": "What is the court's street address?"
+        }
       ]
     }
   ]

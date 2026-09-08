@@ -3144,11 +3144,15 @@ function exportForm(options) {
     }
     // Collect all linked fields
     if (window.linkedFieldsConfig && window.linkedFieldsConfig.length > 0) {
-        formData.linkedFields = window.linkedFieldsConfig.map(config => ({
-            id: config.id,
-            linkedFieldId: config.linkedFieldId,
-            fields: config.fields
-        }));
+        formData.linkedFields = window.linkedFieldsConfig.map(config => {
+            const entry = {
+                id: config.id,
+                linkedFieldId: config.linkedFieldId,
+                fields: config.fields
+            };
+            if (typeof config.join === 'string') entry.join = config.join;
+            return entry;
+        });
     }
     // Collect all linked checkboxes
     if (window.linkedCheckboxesConfig && window.linkedCheckboxesConfig.length > 0) {

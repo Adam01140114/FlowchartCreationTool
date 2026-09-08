@@ -3606,6 +3606,12 @@ window.exportGuiJson = function(download = true) {
         linkedFieldId: cell._linkedLogicNodeId,
         fields: processedFields
       };
+      // A separator turns the link from "keep the best of these" into "join
+      // these", which is how one PDF box can hold two answers that were asked
+      // as two questions.
+      if (typeof cell._linkedJoin === 'string') {
+        linkedFieldEntry.join = cell._linkedJoin;
+      }
       linkedFields.push(linkedFieldEntry);
     } else {
     }
@@ -3916,6 +3922,9 @@ window.exportBothJson = function() {
       }
       if (cell._linkedFields !== undefined) {
         cellData._linkedFields = cell._linkedFields;
+      }
+      if (cell._linkedJoin !== undefined) {
+        cellData._linkedJoin = cell._linkedJoin;
       } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
       }
       if (cell._linkedCheckboxNodeId !== undefined) {
@@ -4118,7 +4127,7 @@ window.saveFlowchart = function() {
       _times: cell._times||null,
       _dropdowns: cell._dropdowns||null,
       _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
-      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null,
+      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null, _linkedJoin: cell._linkedJoin||null,
       _linkedCheckboxNodeId: cell._linkedCheckboxNodeId||null, _linkedCheckboxOptions: cell._linkedCheckboxOptions||null,
       _inverseCheckboxNodeId: (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) ? (cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null) : (cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null),
       _inverseCheckboxOption: (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) ? (cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null) : (cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null)
@@ -4260,7 +4269,7 @@ window.saveAsFlowchart = function() {
       _times: cell._times||null,
       _dropdowns: cell._dropdowns||null,
       _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
-      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null,
+      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null, _linkedJoin: cell._linkedJoin||null,
       _linkedCheckboxNodeId: cell._linkedCheckboxNodeId||null, _linkedCheckboxOptions: cell._linkedCheckboxOptions||null,
       _inverseCheckboxNodeId: (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) ? (cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null) : (cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null),
       _inverseCheckboxOption: (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) ? (cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null) : (cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null)
@@ -5387,6 +5396,9 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         }
         if (item._linkedFields !== undefined) {
           newCell._linkedFields = item._linkedFields;
+        }
+        if (item._linkedJoin !== undefined) {
+          newCell._linkedJoin = item._linkedJoin;
         }
         if (item._linkedCheckboxNodeId !== undefined) {
           newCell._linkedCheckboxNodeId = item._linkedCheckboxNodeId;
