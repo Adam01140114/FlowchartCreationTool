@@ -13462,29 +13462,75 @@ function formOwningSection(sectionNumber){
 /**
  * Has the option that activates a form been chosen?
  *
- * The rule names an option node from the flowchart, which for a checkbox or
- * radio is the element id, and for a dropdown option is the owning question's
- * id with the option value slugged onto the end - dropdown options are values
- * on one select, not elements of their own.
+ * The rule names an option from the flowchart, but an option node is not
+ * necessarily anything the page renders: a dropdown option is one value on a
+ * <select>, and an option carrying no Node ID has no name of its own at all.
+ * So the rule also names the question that owns it, and reading the answer off
+ * that question is the check that always works.
  *
- * Every branch below is anchored to the question that owns the option. A bare
- * search for the label would let "Yes" anywhere in a long packet switch a form
- * on, and a packet is full of unrelated Yes/No questions.
+ * Every branch is anchored to that question. A bare search for the label would
+ * let "Yes" anywhere in a long packet switch a form on, and a packet is full of
+ * unrelated Yes/No questions.
+ *
+ * Character classes below stand in for the shorthand escapes on purpose: this
+ * function is emitted inside a template literal, which eats the backslash.
  */
 function isActivationOptionChosen(rule){
-    if (!rule || !rule.optionNameId) return false;
-    var wanted = String(rule.optionNameId);
+    if (!rule) return false;
+    var norm = function(v){ return String(v == null ? '' : v).trim().toLowerCase(); };
+    var slug = function(v){
+        return norm(v).replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
+    };
+    var label = norm(rule.optionLabel);
+    var wanted = rule.optionNameId ? String(rule.optionNameId) : '';
 
-    var el = document.getElementById(wanted);
-    if (el){
-        if (el.type === 'checkbox' || el.type === 'radio') return !!el.checked;
-        return String(el.value || '').trim() !== '';
+    // 1. The option as an element in its own right: a checkbox or radio option,
+    //    or the hidden box a dropdown's Node ID mirrors the answer into.
+    if (wanted){
+        var el = document.getElementById(wanted);
+        if (el){
+            if (el.type === 'checkbox' || el.type === 'radio') return !!el.checked;
+            return String(el.value || '').trim() !== '';
+        }
     }
 
-    // <question id>_<slugged value> on a select, or on a checked box.
-    var slug = function(v){
-        return String(v).toLowerCase().replace(/\W+/g, '_').replace(/^_+|_+$/g, '');
-    };
+    // 2. The question that owns the option. Its container holds exactly this
+    //    question's controls, so a matching answer here cannot be some other
+    //    question's identical answer.
+    var container = rule.questionId
+        ? document.getElementById('question-container-' + rule.questionId) : null;
+    if (container && label){
+        var qSelect = container.querySelector('select');
+        if (qSelect) return norm(qSelect.value) === label;
+        var boxes = container.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+        if (boxes.length){
+            for (var b = 0; b < boxes.length; b++){
+                if (!boxes[b].checked) continue;
+                if (norm(boxes[b].value) === label) return true;
+                if (norm(boxes[b].getAttribute('data-label')) === label) return true;
+            }
+            return false;
+        }
+    }
+
+    // 3. Same question, found by the name the form gives it rather than by
+    //    number - covers output written before rules carried a question id.
+    var qName = rule.questionNameId ? String(rule.questionNameId) : '';
+    if (qName && label){
+        var named = document.getElementById(qName);
+        if (named && named.tagName === 'SELECT') return norm(named.value) === label;
+        var mirror = document.getElementById(qName + '_' + slug(label));
+        if (mirror) return !!mirror.checked;
+        var grouped = document.querySelectorAll(
+            'input[type="checkbox"][name="' + qName + '"], input[type="radio"][name="' + qName + '"]');
+        for (var g = 0; g < grouped.length; g++){
+            if (grouped[g].checked && norm(grouped[g].value) === label) return true;
+        }
+    }
+
+    if (!wanted) return false;
+
+    // 4. <question id>_<slugged value> on a select, or on a checked box.
     var selects = document.querySelectorAll('select');
     for (var i = 0; i < selects.length; i++){
         var sel = selects[i];
@@ -13498,14 +13544,13 @@ function isActivationOptionChosen(rule){
         if (base + '_' + slug(box.value) === wanted) return true;
     }
 
-    // Older projects recorded the label without a matching option id. Trust it
-    // only on the question the option belongs to, found by id prefix.
-    var label = String(rule.optionLabel || '').trim().toLowerCase();
+    // 5. Older projects recorded the label without a matching option id. Trust
+    //    it only on the question the option belongs to, found by id prefix.
     if (!label) return false;
     for (var m = 0; m < selects.length; m++){
         var s2 = selects[m];
         if (!s2.id || wanted.indexOf(s2.id + '_') !== 0) continue;
-        if (String(s2.value || '').trim().toLowerCase() === label) return true;
+        if (norm(s2.value) === label) return true;
     }
     return false;
 }
@@ -18589,7 +18634,20 @@ function fieldsInSectionRange(firstSection, lastSection) {
  * "serve_form_dv_110_yes" belongs to the select "serve_form_dv_110".
  */
 function activationGateSelect(rule) {
-  if (!rule || !rule.optionNameId) return null;
+  if (!rule) return null;
+  // The rule names its own question when the project export could resolve one;
+  // that is exact, where matching an option id by prefix is only a guess.
+  const container = rule.questionId
+    ? document.getElementById('question-container-' + rule.questionId) : null;
+  if (container) {
+    const owned = container.querySelector('select');
+    if (owned) return owned;
+  }
+  if (rule.questionNameId) {
+    const named = document.getElementById(String(rule.questionNameId));
+    if (named && named.tagName === 'SELECT') return named;
+  }
+  if (!rule.optionNameId) return null;
   const wanted = String(rule.optionNameId);
   const selects = document.querySelectorAll('select');
   for (let i = 0; i < selects.length; i++) {

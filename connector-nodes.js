@@ -122,12 +122,29 @@
   /**
    * Every connector in the project, as {fromForm, optionNodeId, targetForm}.
    * Reads the stored slots, so capture the live graph first.
+   *
+   * The option alone is not enough to recognise the answer later: an option
+   * node need not carry a Node ID at all, and a dropdown option never becomes
+   * an element of its own in the generated form. So the question that owns the
+   * option travels with the rule, and the export turns it into the id the form
+   * actually renders.
    */
   function collectProjectConnectors() {
     const out = [];
+    // A hand-edited style can carry a target that is not valid percent-encoding.
+    // Reading it literally is better than throwing and taking the whole project
+    // export down with it.
+    const decodeTarget = (raw) => {
+      try { return decodeURIComponent(raw); } catch (err) { return String(raw); }
+    };
     (window.projectForms || []).forEach((slot, formIndex) => {
       const cells = (slot.flowchart && slot.flowchart.cells) || [];
       const byId = new Map(cells.map((c) => [c.id, c]));
+      const sourceOf = (cell) => {
+        if (!cell) return null;
+        const edge = cells.find((e) => e.edge && e.target === cell.id);
+        return edge ? byId.get(edge.source) : null;
+      };
       cells.forEach((c) => {
         if (!/nodeType=connector/.test(c.style || '')) return;
         const target = c._connectorTarget
@@ -136,15 +153,19 @@
         // A connector fed by an option activates its target only when that
         // option is chosen. A connector wired to nothing activates its target
         // unconditionally - the way to say two forms always travel together.
-        const feeder = cells.find((e) => e.edge && e.target === c.id);
-        const option = feeder ? byId.get(feeder.source) : null;
+        const option = sourceOf(c);
+        const owner = option ? sourceOf(option) : null;
         out.push({
           fromForm: slot.name || ('Form ' + (formIndex + 1)),
           fromFormIndex: formIndex,
           unconditional: !option,
           optionNodeId: option ? (option._nameId || option.id) : null,
           optionLabel: option ? String(option.value || '').replace(/<[^>]*>/g, '').trim() : null,
-          targetForm: decodeURIComponent(target)
+          // Per-form question number, renumbered on export; the project export
+          // shifts it into the merged numbering.
+          questionId: owner && owner._questionId ? String(owner._questionId) : null,
+          questionNodeId: owner ? (owner._nameId || '') : '',
+          targetForm: decodeTarget(target)
         });
       });
     });

@@ -129,6 +129,12 @@ function collapseSharedQuestions(merged) {
 
 /** Repoint every reference from a dropped question to the one that replaced it. */
 function repointReferences(merged, replacement) {
+  // Form activations name their trigger question too; a rule left pointing at
+  // a dropped duplicate would stop switching its form on.
+  (merged.formActivations || []).forEach(function (rule) {
+    const to = replacement.get(String(rule.questionId));
+    if (to) rule.questionId = to;
+  });
   merged.sections.forEach(function (section) {
     section.questions.forEach(function (q) {
       if (q.logic && Array.isArray(q.logic.conditions)) {
@@ -150,17 +156,64 @@ function repointReferences(merged, replacement) {
   });
 }
 
-/** Activation rules from the project's connectors, keyed by target form name. */
-  function buildActivations() {
+/**
+   * Activation rules from the project's connectors, keyed by target form name.
+   *
+   * A connector points at an option node, but that node is not what the
+   * generated form renders. A dropdown option is a value on one <select>, and
+   * an option node carrying no Node ID leaves nothing in the flowchart to name
+   * it by at all - the old rule then fell back to the mxGraph cell id ("6"),
+   * which matches nothing in the page, so the form never switched on and the
+   * interview ended at the first form instead.
+   *
+   * So each rule also carries the question that owns the option, in the merged
+   * numbering and under the name the form gives it. That is the anchor the
+   * runtime can always resolve, and it keeps a bare "Yes" from being confused
+   * with the same answer to some other question.
+   *
+   * @param {Array<Map<string, object>>} questionsByForm  per-form questionId ->
+   *        question, captured before the ids were shifted
+   * @param {number[]} questionOffsets  how far each form's ids moved
+   */
+  function buildActivations(questionsByForm, questionOffsets) {
     if (typeof window.collectProjectConnectors !== 'function') return [];
     return window.collectProjectConnectors().map(function (c) {
-      return {
+      const rule = {
         targetForm: c.targetForm,
         unconditional: !!c.unconditional,
         optionNameId: c.optionNodeId || null,
         optionLabel: c.optionLabel || null,
         fromForm: c.fromForm
       };
+      if (rule.unconditional) return rule;
+
+      const byId = questionsByForm[c.fromFormIndex];
+      const question = (byId && c.questionId) ? byId.get(String(c.questionId)) : null;
+      if (!question) return rule;
+
+      rule.questionId = String((parseInt(c.questionId, 10) || 0)
+        + (questionOffsets[c.fromFormIndex] || 0));
+      if (question.nameId) rule.questionNameId = question.nameId;
+
+      // The option's exported name, which is what the page actually renders.
+      // A checkbox option carries its own name; a dropdown option does not -
+      // its Node ID survives only as the hidden field the answer is mirrored
+      // into, and library.js qualifies a generic "yes" into "<question>_yes"
+      // on the way, so the raw name off the flowchart cell matches nothing.
+      const label = String(c.optionLabel || '').trim().toLowerCase();
+      const sameLabel = function (text) {
+        return String(text == null ? '' : text).trim().toLowerCase() === label;
+      };
+      const option = (question.options || []).find(function (o) {
+        if (o && typeof o === 'object') return sameLabel(o.text) || sameLabel(o.label);
+        return sameLabel(o);
+      });
+      const mirrored = (((question.hiddenLogic || {}).configs) || []).find(function (h) {
+        return h && h.nodeId && sameLabel(h.trigger);
+      });
+      if (option && option.nameId) rule.optionNameId = option.nameId;
+      else if (mirrored) rule.optionNameId = mirrored.nodeId;
+      return rule;
     });
   }
 
@@ -196,10 +249,24 @@ function repointReferences(merged, replacement) {
     merged.groups = [];
 
     const ranges = [];
+    // Activation rules are written against the flowchart's per-form question
+    // numbers, so both the lookup and the shift have to be captured here,
+    // before offsetForm renumbers everything in place.
+    const questionsByForm = [];
+    const questionOffsets = [];
     let sectionOffset = 0;
     let questionOffset = 0;
 
     perForm.forEach(function (entry, index) {
+      const beforeOffset = new Map();
+      (entry.gui.sections || []).forEach(function (section) {
+        (section.questions || []).forEach(function (q) {
+          beforeOffset.set(String(q.questionId), q);
+        });
+      });
+      questionsByForm[index] = beforeOffset;
+      questionOffsets[index] = questionOffset;
+
       const gui = offsetForm(entry.gui, sectionOffset, questionOffset);
       const count = (gui.sections || []).length;
 
@@ -233,7 +300,7 @@ function repointReferences(merged, replacement) {
     merged.formName = (document.getElementById('projectNameInput') || {}).value
       || merged.formName || 'Project';
     merged.projectForms = ranges;
-    merged.formActivations = buildActivations();
+    merged.formActivations = buildActivations(questionsByForm, questionOffsets);
 
     // Must run after every form is merged, so a value shared by forms one and
     // three is still recognised as the same question.
