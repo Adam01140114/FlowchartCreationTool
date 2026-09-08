@@ -1,0 +1,369 @@
+Form Quality Check
+==================
+Last updated: September 3, 2026
+
+Four rules a generated form must satisfy before it ships. A form can pass the
+compiler's `auditForm()` — clean geometry, no unreachable nodes, no overlaps —
+and still fail every one of these. The audit checks the chart. These check the
+form.
+
+Run them in order. Rule 4 is the one that proves the other three, so it is last.
+
+
+TABLE OF CONTENTS
+-----------------
+  Rule 1 — Every PDF field is reachable from the HTML form
+  Rule 2 — Ask the qualifying question first, never fold it into the question
+  Rule 3 — Repeated entries use a multipleDropdownType node
+  Rule 4 — The maximum path fills the right fields
+  Pre-ship checklist
+  Current status: the DV packet
+
+
+================================================================================
+RULE 1 — EVERY PDF FIELD IS REACHABLE FROM THE HTML FORM
+================================================================================
+
+Every fillable field on the PDF must be reachable from some field on the HTML
+form, directly or indirectly.
+
+  Directly    A question's nameId is the PDF field's name.
+              `case_number` -> the field called `case_number`.
+
+  Indirectly  The answer reaches the field through something else:
+                - a hiddenLogic nodeId, where picking a dropdown option or
+                  ticking a checkbox sets a hidden field named for the PDF box
+                  (`serve_form_dv_110` = Yes  ->  `serve_form_dv_110_yes`)
+                - a mirror, where one answer fills the same field on nine pages
+                  (a case number repeated in every page header)
+                - a packet mirror, where a value asked once in DV-100 also fills
+                  DV-109 and DV-110
+
+"Indirectly" is a legitimate route, not a loophole. What is NOT allowed is a
+fillable field with no path back to anything the user is ever asked.
+
+HOW TO CHECK
+
+  1. List the sanitized PDF's field names:
+       getForm().getFields().map(f => f.getName())
+  2. List every name the generated form posts — question nameIds, option
+     nameIds, and hiddenLogic nodeIds. Read them out of the exported GUI JSON,
+     not out of the flowchart.
+  3. Every PDF field name must appear in that list.
+
+A field mapped to its own raw `id` in field_config (the escape hatch that stops
+the sanitizer deleting it) is NOT reachable. It is preserved, not filled, and it
+counts as a violation.
+
+WHAT FAILURE LOOKS LIKE
+
+Nothing. That is the problem. `/edit_pdf` returns 200 and hands back a PDF with
+that box blank. No error is raised anywhere in the chain.
+
+Do not confuse this rule with the mapping being *correct* — see Rule 4.
+
+
+================================================================================
+RULE 2 — ASK THE QUALIFYING QUESTION FIRST, NEVER FOLD IT INTO THE QUESTION
+================================================================================
+
+When the PDF says "If you have a car, list the make and model below", the form
+asks two questions, in this order:
+
+  1. "Do you have a car?"                        <- dropdown, Yes / No
+  2. "What is the make and model of your car?"   <- only if Yes
+
+It must NOT ask:
+
+  "What is the make and model of your car, if you have one?"
+
+WHY
+
+A user without a car should never see the second question. Folding the condition
+into the wording pushes the branching decision onto the user and leaves the field
+blank-or-junk either way — and a blank the form never asked about is
+indistinguishable from a blank the user chose.
+
+THE TELL
+
+Scan question text for a condition that has been smuggled into the wording:
+
+    if you have        if any        if known        if applicable
+    if it              if they       if there        (if ...)
+    , if               , if it did not fit
+
+Every one of those is a question that should have been two.
+
+TWO EXCEPTIONS, AND ONLY TWO
+
+  - Continuation lines. "Continue your explanation, if it did not fit" is a
+    second textarea for overflow from a single logical answer, not a separate
+    fact. It is gated on the first line being filled, not on a Yes/No.
+
+  - Genuinely optional detail inside an already-qualified block. Once the user
+    has said they own an animal, "What is the animal's breed?" may be left blank
+    without a gate — the qualifying question already ran. Word it plainly and
+    let it be optional; do not append "if you know it".
+
+WHERE THE GATE LIVES
+
+The gate is a real question in the flowchart with its own nameId, and the
+follow-up carries `logic.conditions` pointing at it. Do not invent a gate that
+names a field which does not exist — the compiler will manufacture a question
+for it, usually a near-duplicate of a real one. Check every `conditional.onlyWhen`
+against the actual set of `newName`s.
+
+
+================================================================================
+RULE 3 — REPEATED ENTRIES USE A multipleDropdownType NODE
+================================================================================
+
+When the PDF gives room for several numbered entries of the same thing — three
+cars, four animals, six firearms, three debts — do NOT emit one flat question per
+slot:
+
+  WRONG
+    "What is the make and model of your first car?"
+    "What is the make and model of your second car?"
+    "What is the make and model of your third car?"
+
+That asks every user about three cars. It assumes a count nobody gave, and the
+user has to work out that questions 2 and 3 do not apply to them.
+
+  RIGHT
+    Ask how many, then collect that many entries:
+      "How many cars do you have?"   ->  0 to 3
+      then Make + Model per entry, repeated exactly that many times.
+
+That is a single `multipleDropdownType` node. The two numbers on the node are the
+minimum and maximum entry count; the field rows below are the fields collected
+per entry.
+
+THE SHAPE
+
+  style      questionType=multipleDropdownType  (on a nodeType=question cell)
+  _questionText   the "how many" question
+  _twoNumbers     { "first": <min>, "second": <max> }
+  _textboxes      one entry per field collected per repetition, each with a
+                  nameId, placeholder, type, prefill, conditionalPrefills
+
+Generated field names come out as <nameId>_<n>, so entry 2's Make is `Make_2`.
+Those are the names field_config must map to the PDF's slot-2 field.
+
+REFERENCE NODE
+
+A minimal project containing exactly one such node — "How many cars do you have",
+0 to 3, collecting Make and Model:
+
+{
+  "type": "flowchart-project",
+  "version": 1,
+  "exportedAt": "2026-09-08T02:20:11.593Z",
+  "currentFormIndex": 0,
+  "forms": [
+    {
+      "name": "",
+      "flowchart": {
+        "cells": [
+          {
+            "id": "2",
+            "vertex": true,
+            "edge": false,
+            "value": "<div class=\"multiple-textboxes-node\" style=\"display:flex; flex-direction:column; align-items:center;\">\n    <input class=\"question-title-input\" type=\"text\" value=\"How many cars do you have\" placeholder=\"Enter question text\" onkeydown=\"window.handleTitleInputKeydown(event)\" onblur=\"window.updatemultipleDropdownTypeTextHandler('2', this.value)\" style=\"margin-bottom:8px; width:90%; text-align:center;\" />\n    <div class=\"two-number-container\" style=\"display: flex; justify-content:center; gap: 10px; margin-top: 8px; width:100%;\">\n      <input type=\"number\" value=\"0\" onkeydown=\"window.handleTitleInputKeydown(event)\" onblur=\"window.updatemultipleDropdownTypeNumber('2', 'first', this.value)\"/>\n      <input type=\"number\" value=\"3\" onkeydown=\"window.handleTitleInputKeydown(event)\" onblur=\"window.updatemultipleDropdownTypeNumber('2', 'second', this.value)\"/>\n    </div>\n    <div class=\"multiple-textboxes-container\" ondragover=\"window.handleDragOver(event)\" ondrop=\"window.handleDrop(event, '2')\" style=\"margin-top:8px;width:100%;\">\n      <div class=\"textbox-entry\" style=\"margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;\" data-index=\"0\">\n        <div class=\"drag-handle\" style=\"cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;\" draggable=\"true\" data-cell-id=\"2\" ondragstart=\"window.handleDragStart(event, '2', 0)\" ondragend=\"window.handleDragEnd(event)\" onmousedown=\"event.stopPropagation()\">Field:</div>\n        <input type=\"text\" value=\"Make\" data-index=\"0\" placeholder=\"Make\" onkeydown=\"window.handleTitleInputKeydown(event)\" onblur=\"window.updatemultipleDropdownTypeHandler('2', 0, this.value)\" style=\"flex: 1;\"/>\n        <button onclick=\"window.deletemultipleDropdownTypeHandler('2', 0)\">Delete</button>\n        <button onclick=\"window.copyMultipleDropdownId('2', 0)\" style=\"margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;\">Copy ID</button>\n        <label>\n          <input type=\"checkbox\"  onclick=\"window.toggleMultipleDropdownAmount('2', 0, this.checked)\" />\n          Amount?\n        </label>\n      </div>\n      <div class=\"textbox-entry\" style=\"margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;\" data-index=\"1\">\n        <div class=\"drag-handle\" style=\"cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;\" draggable=\"true\" data-cell-id=\"2\" ondragstart=\"window.handleDragStart(event, '2', 1)\" ondragend=\"window.handleDragEnd(event)\" onmousedown=\"event.stopPropagation()\">Field:</div>\n        <input type=\"text\" value=\"Model\" data-index=\"1\" placeholder=\"Model\" onkeydown=\"window.handleTitleInputKeydown(event)\" onblur=\"window.updatemultipleDropdownTypeHandler('2', 1, this.value)\" style=\"flex: 1;\"/>\n        <button onclick=\"window.deletemultipleDropdownTypeHandler('2', 1)\">Delete</button>\n        <button onclick=\"window.copyMultipleDropdownId('2', 1)\" style=\"margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;\">Copy ID</button>\n        <label>\n          <input type=\"checkbox\"  onclick=\"window.toggleMultipleDropdownAmount('2', 1, this.checked)\" />\n          Amount?\n        </label>\n      </div><div style=\"text-align:center; margin-top:8px;\">\n      <button onclick=\"window.addmultipleDropdownTypeHandler('2')\">Add Option</button>\n      <button onclick=\"window.addMultipleDropdownLocationHandler('2')\" style=\"margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;\">Add Location</button>\n      <button onclick=\"window.showReorderModal('2', 'multipleDropdownType')\" style=\"margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;\">Reorder</button>\n    </div>\n    </div>\n  </div>",
+            "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;;section=1;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;;;;;;questionType=multipleDropdownType;align=center;verticalAlign=middle;spacing=12;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;fillColor=#e3f2fd;fontColor=#1976d2;strokeColor=#1976d2;;nodeId=Question_node;",
+            "geometry": {
+              "x": 255,
+              "y": 50,
+              "width": 470,
+              "height": 580
+            },
+            "_textboxes": [
+              {
+                "nameId": "Make",
+                "placeholder": "Make",
+                "isAmountOption": false,
+                "type": "label",
+                "prefill": "",
+                "conditionalPrefills": []
+              },
+              {
+                "nameId": "Model",
+                "placeholder": "Model",
+                "isAmountOption": false,
+                "type": "label",
+                "prefill": "",
+                "conditionalPrefills": []
+              }
+            ],
+            "_questionText": "How many cars do you have",
+            "_twoNumbers": {
+              "first": "0",
+              "second": "3"
+            },
+            "_questionId": 1
+          }
+        ],
+        "sectionPrefs": {
+          "1": {
+            "borderColor": "#1976d2",
+            "name": "Enter Name"
+          }
+        },
+        "groups": [],
+        "defaultPdfProperties": {
+          "pdfName": "",
+          "pdfFile": "",
+          "pdfPrice": ""
+        },
+        "formName": "",
+        "edgeStyle": "curved"
+      }
+    }
+  ]
+}
+
+HOW TO CHECK
+
+Group every question nameId matching `<base>_<number>_<field>`. Any base with
+more than one number is a repeated block that should be one node:
+
+    node -e '
+    const p=require("./dv-packet-project.json");
+    const g={};
+    for (const f of p.forms) for (const c of f.flowchart.cells) {
+      if (!(c.style||"").includes("nodeType=question")) continue;
+      const m=(c._nameId||"").match(/^(.*?)_(\d+)_/);
+      if (m) (g[m[1]]=g[m[1]]||new Set()).add(m[2]);
+    }
+    Object.entries(g).filter(([,s])=>s.size>1)
+      .forEach(([k,s])=>console.log(s.size, k));
+    '
+
+Note the min. Use 0 where the block is genuinely optional, so a user with no
+animals is asked once and moves on. Use 1 where the PDF requires at least one.
+
+
+================================================================================
+RULE 4 — THE MAXIMUM PATH FILLS THE RIGHT FIELDS
+================================================================================
+
+Run the debug menu's "Fill maximum path" (Ctrl+Shift in the preview), complete
+the form, and produce the PDFs. Two things must hold, and they are not the same
+thing.
+
+4a. THE FIELDS FILL
+
+  Every field the answers reached carries a value. A field left blank must be
+  blank because the answers ruled it out — the gender is Nonbinary so the male
+  and female boxes stay clear, the order was Granted so Not-Requested stays
+  clear — and not because nothing was wired to it.
+
+  Check by name: every field name in the sanitized PDF should appear as a key in
+  what the form posts. What is left over is your Rule 1 violation list.
+
+  For a packet, one PDF per activated form must come out, not just the first.
+
+4b. THE VALUES LAND IN THE RIGHT BOXES
+
+  This is the one that gets skipped, because 4a looks like proof and is not.
+
+  Matching names prove a value went *somewhere*. They say nothing about whether
+  height went into the height box or the weight box, or whether the restrained
+  person's address landed in the protected person's block. A swapped pair scores
+  100% on 4a and is completely wrong on the filed form.
+
+  The check is visual and there is no shortcut:
+
+    1. Fill each field with a value that identifies it — make
+       `person_to_restrain_age` print the literal text
+       `person_to_restrain_age`, not "Test Value".
+    2. Render every page of the filled PDF.
+    3. Read each page against the blank form and confirm each marker sits in the
+       box named after it.
+
+  "Fill maximum path" is a coverage tool. It proves fields CAN be filled. It
+  cannot tell you they were filled correctly, and a green result from it is not
+  evidence for 4b.
+
+BEYOND THE MAXIMUM PATH
+
+The widest path is one path. Before shipping also run:
+
+  - the minimum path — every gate answered No
+  - a typical path — what a real filer would actually enter
+  - each branch that switches another form on or off; for the DV packet that is
+    DV-110 both served and not served
+  - realistic data — long text that overflows a fixed-width box, real dates,
+    apostrophes in names. "Test Value" overflows nothing and reveals nothing.
+
+
+================================================================================
+PRE-SHIP CHECKLIST
+================================================================================
+
+  [ ] 1  Every PDF field name appears in what the form posts. No field is mapped
+         to its own raw id as a placeholder.
+  [ ] 2  No question text contains an embedded condition, except a continuation
+         line or optional detail inside an already-qualified block.
+  [ ] 2  Every gate is a real question; every conditional points at a field that
+         exists.
+  [ ] 3  No `<base>_<n>_<field>` group has more than one n. Each is one
+         multipleDropdownType node with a sensible min/max.
+  [ ] 4a Maximum path fills every reachable field; every blank is explained by a
+         branch the answers ruled out.
+  [ ] 4a One PDF per activated form.
+  [ ] 4b Marker-value pass read page by page against the blank forms.
+  [ ] 4  Minimum path, typical path, and each activation branch run.
+  [ ] 4  Realistic data, including overflow-length text.
+  [ ] -  Every dropdown shows its real options, never a silent Yes/No fallback.
+  [ ] -  No two questions share a hiddenLogic nodeId.
+
+
+================================================================================
+CURRENT STATUS: THE DV PACKET
+================================================================================
+
+Measured September 3, 2026, against dv-packet-project.json (386 questions).
+
+  Rule 1  FAILS — 11 DV-110 fields have no question behind them: the firearm
+          description and location columns on page 2, and the page-9 clerk
+          block. They are mapped to their own ids in
+          dv-field-configs/dv110-field-config.json so the sanitizer preserves
+          them, which means they file blank.
+
+  Rule 2  PASSES on wording — 4 questions carry an embedded condition and all
+          four are the allowed continuation-line case ("Continue your
+          explanation, if it did not fit"). The other 20 were repaired on
+          September 3: the rewriter had appended "if you know it" / "or another
+          way to identify it" to breed, location and name attributes, which both
+          broke Rule 2 and produced broken word order once the subject moved to
+          the end of the sentence ("What is the location, if you know it of the
+          first firearm item?").
+
+          NOT verified: that every gate is a real question and every conditional
+          points at a field that exists. The gate structure has never been
+          audited — see Rule 2's "where the gate lives".
+
+  Rule 3  FAILS — zero multipleDropdownType nodes in the whole packet. Ten
+          repeated blocks are flat numbered questions:
+
+            6  firearm_item              4  wireless_transfer_phone
+            4  other_protected_person    4  animal          (DV-110)
+            4  protected_animal          3  property_debt
+            4  abuse_expense             3  property_debt_payment
+            2  recent_restraining_order  2  ammunition_item
+
+          Every user is currently asked about six firearms and four animals.
+
+  Rule 4a PASSES — maximum path, section-at-a-time, test mode:
+            DV-100  163/163 text   105/158 checkboxes
+            DV-109   17/17  text     9/13  checkboxes
+            DV-110   97/108 text    56/85  checkboxes
+          Unticked boxes are branches the answers ruled out. The 11 unfilled
+          DV-110 text fields are the Rule 1 violation above. Three PDFs are
+          produced, one per activated form.
+
+  Rule 4b NOT DONE — the mapping has been verified by name only. No filled page
+          has been read against a blank form. This is the blocker.
+
+The packet is suitable for internal QA. It is not ready to file.

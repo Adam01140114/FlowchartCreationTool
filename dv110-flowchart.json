@@ -1478,7 +1478,7 @@
     },
     {
       "id": "69",
-      "value": "What is the location, if you know it of the first firearm item?",
+      "value": "What is the location of the first firearm item?",
       "geometry": {
         "x": 515,
         "y": 12882,
@@ -1491,7 +1491,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the location, if you know it of the first firearm item?",
+      "_questionText": "What is the location of the first firearm item?",
       "_questionId": "43",
       "_nameId": "firearm_item_1_location",
       "_placeholder": "",
@@ -1631,7 +1631,7 @@
     },
     {
       "id": "76",
-      "value": "What is the location, if you know it of the second firearm item?",
+      "value": "What is the location of the second firearm item?",
       "geometry": {
         "x": 515,
         "y": 14234,
@@ -1644,7 +1644,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the location, if you know it of the second firearm item?",
+      "_questionText": "What is the location of the second firearm item?",
       "_questionId": "47",
       "_nameId": "firearm_item_2_location",
       "_placeholder": "",
@@ -1679,7 +1679,7 @@
     },
     {
       "id": "78",
-      "value": "What is the location, if you know it of the third firearm item?",
+      "value": "What is the location of the third firearm item?",
       "geometry": {
         "x": 515,
         "y": 14766,
@@ -1692,7 +1692,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the location, if you know it of the third firearm item?",
+      "_questionText": "What is the location of the third firearm item?",
       "_questionId": "49",
       "_nameId": "firearm_item_3_location",
       "_placeholder": "",
@@ -1832,7 +1832,7 @@
     },
     {
       "id": "85",
-      "value": "What is the location, if you know it of the fourth firearm item?",
+      "value": "What is the location of the fourth firearm item?",
       "geometry": {
         "x": 515,
         "y": 16118,
@@ -1845,7 +1845,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the location, if you know it of the fourth firearm item?",
+      "_questionText": "What is the location of the fourth firearm item?",
       "_questionId": "53",
       "_nameId": "firearm_item_4_location",
       "_placeholder": "",
@@ -2009,7 +2009,7 @@
     },
     {
       "id": "93",
-      "value": "What is the location, if you know it of the first ammunition item?",
+      "value": "What is the location of the first ammunition item?",
       "geometry": {
         "x": 515,
         "y": 17736,
@@ -2022,7 +2022,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the location, if you know it of the first ammunition item?",
+      "_questionText": "What is the location of the first ammunition item?",
       "_questionId": "58",
       "_nameId": "ammunition_item_1_location",
       "_placeholder": "",
@@ -2186,7 +2186,7 @@
     },
     {
       "id": "101",
-      "value": "What is the location, if you know it of the second ammunition item?",
+      "value": "What is the location of the second ammunition item?",
       "geometry": {
         "x": 515,
         "y": 19354,
@@ -2199,7 +2199,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the location, if you know it of the second ammunition item?",
+      "_questionText": "What is the location of the second ammunition item?",
       "_questionId": "63",
       "_nameId": "ammunition_item_2_location",
       "_placeholder": "",
@@ -4770,7 +4770,7 @@
     },
     {
       "id": "227",
-      "value": "What is the first animal's breed, if you know it?",
+      "value": "What is the first animal's breed?",
       "geometry": {
         "x": 800,
         "y": 34366,
@@ -4783,7 +4783,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the first animal's breed, if you know it?",
+      "_questionText": "What is the first animal's breed?",
       "_questionId": "101",
       "_nameId": "animal_1_breed",
       "_placeholder": "",
@@ -4842,7 +4842,7 @@
     },
     {
       "id": "230",
-      "value": "What is the first animal's name, or another way to identify it?",
+      "value": "What is the first animal's name?",
       "geometry": {
         "x": 800,
         "y": 35164,
@@ -4855,7 +4855,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the first animal's name, or another way to identify it?",
+      "_questionText": "What is the first animal's name?",
       "_questionId": "104",
       "_nameId": "animal_1_name_or_id",
       "_placeholder": "",
@@ -4866,7 +4866,7 @@
     },
     {
       "id": "231",
-      "value": "What is the second animal's name, or another way to identify it?",
+      "value": "What is the second animal's name?",
       "geometry": {
         "x": 800,
         "y": 35430,
@@ -4879,7 +4879,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the second animal's name, or another way to identify it?",
+      "_questionText": "What is the second animal's name?",
       "_questionId": "105",
       "_nameId": "animal_2_name_or_id",
       "_placeholder": "",
@@ -4914,7 +4914,7 @@
     },
     {
       "id": "233",
-      "value": "What is the second animal's breed, if you know it?",
+      "value": "What is the second animal's breed?",
       "geometry": {
         "x": 800,
         "y": 35962,
@@ -4927,7 +4927,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the second animal's breed, if you know it?",
+      "_questionText": "What is the second animal's breed?",
       "_questionId": "107",
       "_nameId": "animal_2_breed",
       "_placeholder": "",
@@ -4962,7 +4962,7 @@
     },
     {
       "id": "235",
-      "value": "What is the third animal's name, or another way to identify it?",
+      "value": "What is the third animal's name?",
       "geometry": {
         "x": 800,
         "y": 36494,
@@ -4975,7 +4975,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the third animal's name, or another way to identify it?",
+      "_questionText": "What is the third animal's name?",
       "_questionId": "109",
       "_nameId": "animal_3_name_or_id",
       "_placeholder": "",
@@ -5010,7 +5010,7 @@
     },
     {
       "id": "237",
-      "value": "What is the third animal's breed, if you know it?",
+      "value": "What is the third animal's breed?",
       "geometry": {
         "x": 800,
         "y": 37026,
@@ -5023,7 +5023,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the third animal's breed, if you know it?",
+      "_questionText": "What is the third animal's breed?",
       "_questionId": "111",
       "_nameId": "animal_3_breed",
       "_placeholder": "",
@@ -5058,7 +5058,7 @@
     },
     {
       "id": "239",
-      "value": "What is the fourth animal's name, or another way to identify it?",
+      "value": "What is the fourth animal's name?",
       "geometry": {
         "x": 800,
         "y": 37558,
@@ -5071,7 +5071,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the fourth animal's name, or another way to identify it?",
+      "_questionText": "What is the fourth animal's name?",
       "_questionId": "113",
       "_nameId": "animal_4_name_or_id",
       "_placeholder": "",
@@ -5106,7 +5106,7 @@
     },
     {
       "id": "241",
-      "value": "What is the fourth animal's breed, if you know it?",
+      "value": "What is the fourth animal's breed?",
       "geometry": {
         "x": 800,
         "y": 38090,
@@ -5119,7 +5119,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is the fourth animal's breed, if you know it?",
+      "_questionText": "What is the fourth animal's breed?",
       "_questionId": "115",
       "_nameId": "animal_4_breed",
       "_placeholder": "",
