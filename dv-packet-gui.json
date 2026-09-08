@@ -630,7 +630,7 @@
           "nodeId": "person_asking_protection_mailing"
         },
         {
-          "questionId": 117,
+          "questionId": 113,
           "text": "How can the court reach you? (optional)",
           "type": "multipleTextboxes",
           "logic": {
@@ -12771,8 +12771,8 @@
         },
         {
           "questionId": 111,
-          "text": "What date are you signing?",
-          "type": "date",
+          "text": "Do you have a lawyer?",
+          "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
@@ -12787,390 +12787,6 @@
               {
                 "prevQuestion": "108",
                 "prevAnswer": "I now receive or have applied for TANF, Welfare, or CalWORKS"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "person_asking_protection_signature_date",
-          "placeholder": ""
-        },
-        {
-          "questionId": 112,
-          "text": "Print your name.",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "111",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "person_asking_protection_signature_printed_name",
-          "placeholder": ""
-        },
-        {
-          "questionId": 113,
-          "text": "What is your date?",
-          "type": "date",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "112",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "lawyer_signature_date",
-          "placeholder": ""
-        },
-        {
-          "questionId": 114,
-          "text": "What is your lawyer’s name?",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "113",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "lawyer_signature_printed_name",
-          "placeholder": ""
-        },
-        {
-          "questionId": 115,
-          "text": "Do you have a lawyer?",
-          "type": "dropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "114",
-                "prevAnswer": "Any Text"
               }
             ]
           },
@@ -13265,14 +12881,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 116,
+          "questionId": 112,
           "text": "Your lawyer's information",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "115",
+                "prevQuestion": "111",
                 "prevAnswer": "Yes"
               }
             ]
@@ -13409,7 +13025,7 @@
       "sectionName": "Restrained Person's Description",
       "questions": [
         {
-          "questionId": 131,
+          "questionId": 127,
           "text": "About how tall is the restrained person?",
           "type": "text",
           "logic": {
@@ -13505,14 +13121,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 132,
+          "questionId": 128,
           "text": "About how much does the restrained person weigh?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "131",
+                "prevQuestion": "127",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -13601,14 +13217,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 133,
+          "questionId": 129,
           "text": "What color is the restrained person's hair?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "132",
+                "prevQuestion": "128",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -13697,14 +13313,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 134,
+          "questionId": 130,
           "text": "What color are the restrained person's eyes?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "133",
+                "prevQuestion": "129",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -13798,7 +13414,7 @@
           "placeholder": ""
         },
         {
-          "questionId": 136,
+          "questionId": 132,
           "text": "In a few words, how is the restrained person related to you? For example: spouse, former partner, parent.",
           "type": "text",
           "logic": {
@@ -13894,14 +13510,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 137,
+          "questionId": 133,
           "text": "Do you know where the restrained person lives?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "136",
+                "prevQuestion": "132",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -13997,14 +13613,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 138,
+          "questionId": 134,
           "text": "Where does the restrained person live?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "137",
+                "prevQuestion": "133",
                 "prevAnswer": "Yes"
               }
             ]
@@ -14147,18 +13763,18 @@
           "nodeId": "restrained_person"
         },
         {
-          "questionId": 139,
+          "questionId": 135,
           "text": "What firearms, firearm parts, or ammunition might the restrained person have? Include what you listed on DV-100, item 9.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "137",
+                "prevQuestion": "133",
                 "prevAnswer": "Yes"
               },
               {
-                "prevQuestion": "137",
+                "prevQuestion": "133",
                 "prevAnswer": "No"
               }
             ]
@@ -14253,14 +13869,14 @@
       "sectionName": "Other People This Order Protects",
       "questions": [
         {
-          "questionId": 140,
+          "questionId": 136,
           "text": "Does this order also protect other people, such as your children or family?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "139",
+                "prevQuestion": "135",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -14391,7 +14007,7 @@
   ],
   "hiddenFields": [],
   "sectionCounter": 13,
-  "questionCounter": 143,
+  "questionCounter": 139,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "DV-100",
@@ -14472,6 +14088,38 @@
     },
     {
       "id": "linkedField7",
+      "linkedFieldId": "person_asking_protection_signature_date",
+      "fields": [
+        "current_date"
+      ],
+      "join": " "
+    },
+    {
+      "id": "linkedField8",
+      "linkedFieldId": "lawyer_signature_date",
+      "fields": [
+        "current_date"
+      ],
+      "join": " "
+    },
+    {
+      "id": "linkedField9",
+      "linkedFieldId": "person_asking_protection_signature_printed_name",
+      "fields": [
+        "person_asking_protection_name"
+      ],
+      "join": " "
+    },
+    {
+      "id": "linkedField10",
+      "linkedFieldId": "lawyer_signature_printed_name",
+      "fields": [
+        "person_asking_protection_lawyer_name"
+      ],
+      "join": " "
+    },
+    {
+      "id": "linkedField11",
       "linkedFieldId": "relationship_children_names_line_1",
       "fields": [
         "child_together_1_name",
@@ -14539,11 +14187,11 @@
       "questionId": 1,
       "alsoAnswers": [
         {
-          "questionId": 118,
+          "questionId": 114,
           "section": 11
         },
         {
-          "questionId": 123,
+          "questionId": 119,
           "section": 12
         }
       ]
@@ -14554,11 +14202,11 @@
       "questionId": 2,
       "alsoAnswers": [
         {
-          "questionId": 119,
+          "questionId": 115,
           "section": 11
         },
         {
-          "questionId": 124,
+          "questionId": 120,
           "section": 12
         }
       ]
@@ -14569,11 +14217,11 @@
       "questionId": 3,
       "alsoAnswers": [
         {
-          "questionId": 120,
+          "questionId": 116,
           "section": 11
         },
         {
-          "questionId": 125,
+          "questionId": 121,
           "section": 12
         }
       ]
@@ -14584,11 +14232,11 @@
       "questionId": 4,
       "alsoAnswers": [
         {
-          "questionId": 121,
+          "questionId": 117,
           "section": 11
         },
         {
-          "questionId": 126,
+          "questionId": 122,
           "section": 12
         }
       ]
@@ -14599,11 +14247,11 @@
       "questionId": 7,
       "alsoAnswers": [
         {
-          "questionId": 122,
+          "questionId": 118,
           "section": 11
         },
         {
-          "questionId": 127,
+          "questionId": 123,
           "section": 12
         }
       ]
@@ -14614,7 +14262,7 @@
       "questionId": 8,
       "alsoAnswers": [
         {
-          "questionId": 129,
+          "questionId": 125,
           "section": 12
         }
       ]
@@ -14625,7 +14273,7 @@
       "questionId": 9,
       "alsoAnswers": [
         {
-          "questionId": 130,
+          "questionId": 126,
           "section": 12
         }
       ]
@@ -14636,7 +14284,7 @@
       "questionId": 10,
       "alsoAnswers": [
         {
-          "questionId": 128,
+          "questionId": 124,
           "section": 12
         }
       ]
@@ -14647,7 +14295,7 @@
       "questionId": 11,
       "alsoAnswers": [
         {
-          "questionId": 135,
+          "questionId": 131,
           "section": 12
         }
       ]
@@ -14658,7 +14306,7 @@
       "questionId": 66,
       "alsoAnswers": [
         {
-          "questionId": 141,
+          "questionId": 137,
           "section": 12
         }
       ]
@@ -14669,7 +14317,7 @@
       "questionId": 67,
       "alsoAnswers": [
         {
-          "questionId": 142,
+          "questionId": 138,
           "section": 12
         }
       ]

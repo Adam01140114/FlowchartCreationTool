@@ -4,11 +4,16 @@
   "groups": [
     {
       "nameId": "person_to_restrain_gender",
-      "question": "What is the restrained person's gender?",
+      "question": "What is their gender?",
       "members": [
         "person_to_restrain_gender_male",
         "person_to_restrain_gender_female",
         "person_to_restrain_gender_nonbinary"
+      ],
+      "labels": [
+        "Male",
+        "Female",
+        "Nonbinary"
       ]
     }
   ],
@@ -357,10 +362,27 @@
       "text": "Does this order also protect other people, such as your children or family?"
     },
     "person_to_restrain_age": {
-      "type": "number"
+      "type": "number",
+      "text": "About how old are they?"
     },
     "person_to_restrain_date_of_birth": {
-      "type": "date"
+      "type": "date",
+      "text": "What is their date of birth?"
+    },
+    "case_number": {
+      "text": "What is the case number?"
+    },
+    "person_asking_protection_name": {
+      "text": "Who is asking for protection?"
+    },
+    "person_to_restrain_full_name": {
+      "text": "Who do you want protection from?"
+    },
+    "person_to_restrain_race": {
+      "text": "What is their race?"
+    },
+    "other_protected_people_additional_list_attached_yes": {
+      "text": "Is there a separate page listing more protected people?"
     }
   },
   "sections": [

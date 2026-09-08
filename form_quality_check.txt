@@ -82,6 +82,8 @@ TABLE OF CONTENTS
   Rule 11 — A question says what to enter
   Rule 12 — A narrative box is asked as a narrative
   Rule 13 — Ruled lines are one answer, not several questions
+  Rule 14 — Never ask for something the form already knows
+  Rule 15 — The flowchart is audited too
   Pre-ship checklist
   Current status: the DV packet
 
@@ -923,6 +925,81 @@ that each hold a different fact are a repeating block (rule 3); the tell is
 whether the form gives them separate column headings.
 
 ================================================================================
+RULE 14 — NEVER ASK FOR SOMETHING THE FORM ALREADY KNOWS
+================================================================================
+
+"What date are you signing?" has one correct answer - today - and a filer who
+types anything else has made their filing wrong without being told. "Print your
+name" under a signature is the name they gave on page 1. Asking either spends
+the filer's attention and invites a mistake they cannot see.
+
+Both are filled in the background:
+
+    "autofill": [
+      { "field": "person_asking_protection_signature_date",
+        "from":  ["current_date"],
+        "why":   "A signature date has one correct answer." },
+      { "field": "person_asking_protection_signature_printed_name",
+        "from":  ["person_asking_protection_name"],
+        "why":   "The printed name is the name given on page 1." } ]
+
+`current_date` is a hidden field the generated form sets to today. Any other
+question's id works as a source, so a printed name copies from the name
+question. Each becomes a linked-logic node with one part and no separator, so
+the value arrives unchanged - the same mechanism as a split's join.
+
+WHAT QUALIFIES
+
+  - signature and today's dates
+  - a printed name repeating a name already asked for
+  - any field whose value is fully determined by another answer
+
+WHAT DOES NOT
+
+A field that merely *usually* matches another. If a filer could legitimately put
+something else there, ask. The test is whether a different answer would be a
+mistake, not whether it would be unusual.
+
+The autofilled fields are recorded in the flowchart's `autofilledFields` so a
+reader can see why a field has no question, and rule 1 still counts them
+reachable - they are, through the join.
+
+================================================================================
+RULE 15 — THE FLOWCHART IS AUDITED TOO
+================================================================================
+
+    node pipeline-audit-flowchart.js
+
+pipeline-audit.js reads the packet GUI JSON - what the flowchart *became*. That
+misses anything the export quietly repairs or drops, and the flowchart is the
+artifact a person opens, edits and reviews. A chart can export a clean interview
+and still be wrong.
+
+It checks the graph is sound:
+
+  1  every edge joins two nodes that exist
+  2  every node is reachable from the first question (linked-logic and
+     connector nodes are detached by design and exempt)
+  3  every path ends - no node without an outgoing edge that is not an End
+  4  no option node hangs off no question
+  5  nothing a person reads is a field name or a raw AcroForm path
+  6  no two questions claim the same nodeId
+  7  every question has a nodeId
+  8  no two nodes overlap
+
+WHAT IT CAUGHT THE DAY IT WAS WRITTEN
+
+Ten DV-110 nodes reading "What is your dV 110[0].Page1[0].List2[0].Li1[0].T191
+[0]?". The interview audit passed them because those questions collapse into
+DV-100's in the packet and never reach a filer - but they are in the chart,
+where a person reviews them, and DV-110 compiled on its own would ask them
+exactly like that. Three were option labels: the gender group had a question but
+no `labels`, so each option fell back to the field's own raw id.
+
+That is the shape of what this catches - something true of the chart that the
+export happens to hide.
+
+================================================================================
 PRE-SHIP CHECKLIST
 ================================================================================
 
@@ -959,6 +1036,10 @@ PRE-SHIP CHECKLIST
          carries the guidance the form prints beside the box.
   [ ] 13 No X_line_1 / X_line_2 family is asked as two questions. Prose is asked
          once and written to line 1; a list is counted and joined into it.
+  [ ] 14 No question asks for a signature date, a printed name repeating a name
+         already given, or anything else another answer fully determines.
+  [ ] 15 node pipeline-audit-flowchart.js is clean - the chart itself, not only
+         the interview it exports to.
   [ ] 3  Every repeating block's entryTitle names the thing, singular, and the
          entries read "<Thing> #1", "<Thing> #2" in the generated form.
   [ ] LAST, AND NOT SKIPPABLE — node pipeline-review.js, read every question in
@@ -1064,6 +1145,16 @@ number boxes inside the combined questions.
 
   Rule 5  PASSES — one group per form, named after it. DV-109's group is empty
           because that form asks nothing of its own.
+
+  Rule 15 PASSES - the flowchart audit found ten DV-110 nodes showing raw
+          AcroForm paths, which the interview audit could not see because those
+          questions collapse into DV-100's in the packet.
+
+  Rule 14 PASSES - four fields are filled in the background now: both signature
+          dates from current_date, and both printed names from the name already
+          given. The lawyer's name was being asked twice and, worse, before
+          "Do you have a lawyer?" - that question was the signature block's
+          printed name, and it is gone.
 
   Rule 13 PASSES - four families of ruled lines were asked as eight questions.
           The children's names are a counted block now ("How many children do

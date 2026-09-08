@@ -423,7 +423,8 @@ Before calling a form done:
 3. Run **Ctrl+Shift** → **Fill maximum path** → **Preview PDFs** or **Download PDFs** (dev server must be running).
 4. In DevTools Network, confirm `POST /edit_pdf?pdf=W9.pdf` body includes keys matching PDF AcroForm names (`taxpayer_name`, `tax_classification_individual`, etc.).
 5. Compiler `auditForm()` output if using `compile-form-schema.js`.
-6. **Read the interview yourself — always, and last.** `node pipeline-review.js`
+6. `node pipeline-audit-flowchart.js` — the chart itself: reachability, dead ends, stray options, duplicate nodeIds, overlaps, and any node showing a raw field name. The interview audit cannot see these.
+7. **Read the interview yourself — always, and last.** `node pipeline-review.js`
    prints every question in the order a person meets it; read all of them, then
    answer each gate No in the preview and confirm the block behind it goes away.
    `pipeline-audit.js` only finds what it was taught to find, so a green audit

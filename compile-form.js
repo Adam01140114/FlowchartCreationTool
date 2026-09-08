@@ -409,6 +409,42 @@ function applySplits(fields, hints) {
 }
 
 /**
+ * Fields the form fills for itself, which nobody should ever be asked.
+ *
+ * "What date are you signing?" has one correct answer - today - and a person
+ * who types anything else has made their filing wrong. "Print your name" under
+ * a signature is the name they gave on page 1. Asking either wastes the filer's
+ * attention and invites a mistake they cannot see.
+ *
+ * Each becomes a linked-logic node copying from something the form already
+ * holds: current_date is a hidden field the generated form sets to today, and
+ * any other question's id can be the source. One part and no separator, so the
+ * value arrives unchanged.
+ */
+function applyAutofill(fields, hints) {
+  const specs = hints.autofill || [];
+  if (!specs.length) return { fields, autofills: [] };
+
+  const dropped = new Set();
+  const autofills = [];
+  specs.forEach((spec) => {
+    const field = fields.find((f) => f.nameId === spec.field || f.id === spec.field);
+    if (!field) return;
+    const from = (spec.from || []).filter(Boolean);
+    if (!from.length) return;
+    dropped.add(field.id);
+    autofills.push({
+      target: field.nameId,
+      targets: field.mirrorTargets && field.mirrorTargets.length ? field.mirrorTargets : [field.id],
+      parts: from,
+      join: spec.separator == null ? ' ' : spec.separator,
+      why: spec.why || ''
+    });
+  });
+  return { fields: fields.filter((f) => !dropped.has(f.id)), autofills };
+}
+
+/**
  * Drop the overflow lines of an answer that only looks like several questions.
  *
  * A form that rules two lines for one answer names them X_line_1 and X_line_2.
@@ -1395,7 +1431,11 @@ function compile(schema, hints = {}) {
   const merged = Object.assign({}, schema.interview || {}, hints);
   const mirrored = applyMirrors(normalizeFields(schema), merged);
   const { fields: kept, continuations } = applyContinuations(mirrored, merged);
-  const { fields: split, joins } = applySplits(kept, merged);
+  const { fields: asked, autofills } = applyAutofill(kept, merged);
+  const { fields: split, joins } = applySplits(asked, merged);
+  // Autofilled fields are joins with one part: the same linked-logic node, so
+  // they need no machinery of their own.
+  autofills.forEach((a) => joins.push(a));
   const { fields: combined, combines } = applyCombines(split, merged);
   const { fields, repeats } = applyRepeats(combined, merged);
 
@@ -1475,6 +1515,9 @@ function compile(schema, hints = {}) {
     if (drop.length) overflow.push({ keep: r.joinInto.field, drop: drop });
   });
   if (overflow.length) flowchart.continuationLines = overflow;
+  if (autofills.length) {
+    flowchart.autofilledFields = autofills.map((a) => ({ field: a.target, from: a.parts, why: a.why }));
+  }
 
   return { flowchart, notes, groups, steps, fields, sectionCount, moved };
 }

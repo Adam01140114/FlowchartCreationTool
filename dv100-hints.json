@@ -772,13 +772,6 @@
       "text": "Why should the person pay these debts?",
       "type": "bigParagraph"
     },
-    "person_asking_protection_signature_date": {
-      "text": "What date are you signing?",
-      "type": "date"
-    },
-    "person_asking_protection_signature_printed_name": {
-      "text": "Print your name."
-    },
     "additional_pages_count": {
       "text": "How many extra pages are attached?",
       "type": "number"
@@ -791,13 +784,6 @@
     },
     "has_lawyer": {
       "text": "Do you have a lawyer?"
-    },
-    "lawyer_signature_date": {
-      "text": "What is your date?",
-      "type": "date"
-    },
-    "lawyer_signature_printed_name": {
-      "text": "What is your lawyer’s name?"
     },
     "person_to_restrain_age": {
       "text": "About how old are they?",
@@ -2149,6 +2135,36 @@
       "drop": [
         "animal_sole_possession_other_reason_line_2"
       ]
+    }
+  ],
+  "autofill": [
+    {
+      "field": "person_asking_protection_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "A signature date has one correct answer and the form already knows it."
+    },
+    {
+      "field": "lawyer_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "Same, for the lawyer signature block."
+    },
+    {
+      "field": "person_asking_protection_signature_printed_name",
+      "from": [
+        "person_asking_protection_name"
+      ],
+      "why": "The printed name under a signature is the name given on page 1."
+    },
+    {
+      "field": "lawyer_signature_printed_name",
+      "from": [
+        "person_asking_protection_lawyer_name"
+      ],
+      "why": "The lawyer names themselves once, in their own block."
     }
   ]
 }

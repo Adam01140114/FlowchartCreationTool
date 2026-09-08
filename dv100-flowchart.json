@@ -7387,106 +7387,10 @@
     },
     {
       "id": "326",
-      "value": "What date are you signing?",
-      "geometry": {
-        "x": 610,
-        "y": 43060,
-        "width": 300,
-        "height": 96
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=date;nodeId=person_asking_protection_signature_date;section=10;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(120, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "What date are you signing?",
-      "_questionId": "111",
-      "_nameId": "person_asking_protection_signature_date",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "327",
-      "value": "Print your name.",
-      "geometry": {
-        "x": 610,
-        "y": 43326,
-        "width": 300,
-        "height": 96
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=person_asking_protection_signature_printed_name;section=10;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(120, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "Print your name.",
-      "_questionId": "112",
-      "_nameId": "person_asking_protection_signature_printed_name",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "328",
-      "value": "What is your date?",
-      "geometry": {
-        "x": 610,
-        "y": 43592,
-        "width": 300,
-        "height": 96
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=date;nodeId=lawyer_signature_date;section=10;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(120, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "What is your date?",
-      "_questionId": "113",
-      "_nameId": "lawyer_signature_date",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "329",
-      "value": "What is your lawyer’s name?",
-      "geometry": {
-        "x": 610,
-        "y": 43858,
-        "width": 300,
-        "height": 96
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=lawyer_signature_printed_name;section=10;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(120, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "What is your lawyer’s name?",
-      "_questionId": "114",
-      "_nameId": "lawyer_signature_printed_name",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "330",
       "value": "Do you have a lawyer?",
       "geometry": {
         "x": 610,
-        "y": 44124,
+        "y": 43060,
         "width": 300,
         "height": 96
       },
@@ -7497,7 +7401,7 @@
       "target": null,
       "_textboxes": null,
       "_questionText": "Do you have a lawyer?",
-      "_questionId": "115",
+      "_questionId": "111",
       "_nameId": "has_lawyer",
       "_placeholder": "",
       "_mirrorTargets": null,
@@ -7506,11 +7410,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "331",
+      "id": "327",
       "value": "Yes",
       "geometry": {
         "x": 581,
-        "y": 44300,
+        "y": 43236,
         "width": 168,
         "height": 80
       },
@@ -7525,11 +7429,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "332",
+      "id": "328",
       "value": "No",
       "geometry": {
         "x": 771,
-        "y": 44300,
+        "y": 43236,
         "width": 168,
         "height": 80
       },
@@ -7544,11 +7448,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "333",
+      "id": "329",
       "value": "Your lawyer's information",
       "geometry": {
         "x": 515,
-        "y": 44500,
+        "y": 43436,
         "width": 300,
         "height": 530
       },
@@ -7584,7 +7488,7 @@
         }
       ],
       "_questionText": "Your lawyer's information",
-      "_questionId": "116",
+      "_questionId": "112",
       "_nameId": "person_asking_protection_lawyer",
       "_placeholder": "",
       "_mirrorTargets": null,
@@ -7607,11 +7511,11 @@
       ]
     },
     {
-      "id": "334",
+      "id": "330",
       "value": "",
       "geometry": {
         "x": 755,
-        "y": 45150,
+        "y": 44086,
         "width": 10,
         "height": 10
       },
@@ -7626,11 +7530,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "335",
+      "id": "331",
       "value": "How can the court reach you? (optional)",
       "geometry": {
         "x": 610,
-        "y": 45208,
+        "y": 44144,
         "width": 300,
         "height": 530
       },
@@ -7666,7 +7570,7 @@
         }
       ],
       "_questionText": "How can the court reach you? (optional)",
-      "_questionId": "117",
+      "_questionId": "113",
       "_nameId": "person_asking_protection",
       "_placeholder": "",
       "_mirrorTargets": null,
@@ -7689,11 +7593,11 @@
       ]
     },
     {
-      "id": "336",
+      "id": "332",
       "value": "End",
       "geometry": {
         "x": 700,
-        "y": 45908,
+        "y": 44844,
         "width": 120,
         "height": 60
       },
@@ -7707,7 +7611,7 @@
       "_pdfPrice": ""
     },
     {
-      "id": "337",
+      "id": "333",
       "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">court_name_and_street_address</span></div>",
       "geometry": {
         "x": 1460,
@@ -7731,7 +7635,7 @@
       "_pdfPrice": ""
     },
     {
-      "id": "338",
+      "id": "334",
       "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">other_court_case_custody_details</span></div>",
       "geometry": {
         "x": 1460,
@@ -7756,7 +7660,7 @@
       "_pdfPrice": ""
     },
     {
-      "id": "339",
+      "id": "335",
       "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">other_court_case_divorce_details</span></div>",
       "geometry": {
         "x": 1460,
@@ -7781,7 +7685,7 @@
       "_pdfPrice": ""
     },
     {
-      "id": "340",
+      "id": "336",
       "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">other_court_case_juvenile_details</span></div>",
       "geometry": {
         "x": 1460,
@@ -7806,7 +7710,7 @@
       "_pdfPrice": ""
     },
     {
-      "id": "341",
+      "id": "337",
       "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">other_court_case_guardianship_details</span></div>",
       "geometry": {
         "x": 1460,
@@ -7831,7 +7735,7 @@
       "_pdfPrice": ""
     },
     {
-      "id": "342",
+      "id": "338",
       "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">other_court_case_criminal_details</span></div>",
       "geometry": {
         "x": 1460,
@@ -7856,7 +7760,7 @@
       "_pdfPrice": ""
     },
     {
-      "id": "343",
+      "id": "339",
       "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">other_court_case_other_details</span></div>",
       "geometry": {
         "x": 1460,
@@ -7881,11 +7785,103 @@
       "_pdfPrice": ""
     },
     {
+      "id": "340",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">person_asking_protection_signature_date</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 1040,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "person_asking_protection_signature_date",
+      "_linkedFields": [
+        "current_date"
+      ],
+      "_linkedJoin": " ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "341",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">lawyer_signature_date</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 1180,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "lawyer_signature_date",
+      "_linkedFields": [
+        "current_date"
+      ],
+      "_linkedJoin": " ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "342",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">person_asking_protection_signature_printed_name</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 1320,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "person_asking_protection_signature_printed_name",
+      "_linkedFields": [
+        "person_asking_protection_name"
+      ],
+      "_linkedJoin": " ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "343",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">lawyer_signature_printed_name</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 1460,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "lawyer_signature_printed_name",
+      "_linkedFields": [
+        "person_asking_protection_lawyer_name"
+      ],
+      "_linkedJoin": " ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
       "id": "344",
       "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">relationship_children_names_line_1</span></div>",
       "geometry": {
         "x": 1460,
-        "y": 1040,
+        "y": 1600,
         "width": 220,
         "height": 80
       },
@@ -19323,11 +19319,11 @@
         "points": [
           {
             "x": 760,
-            "y": 43168
+            "y": 43176
           },
           {
-            "x": 760,
-            "y": 43320
+            "x": 665,
+            "y": 43176
           }
         ]
       }
@@ -19344,17 +19340,17 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
       "vertex": false,
       "edge": true,
-      "source": "327",
+      "source": "326",
       "target": "328",
       "edgeGeometry": {
         "points": [
           {
             "x": 760,
-            "y": 43432
+            "y": 43176
           },
           {
-            "x": 760,
-            "y": 43584
+            "x": 855,
+            "y": 43176
           }
         ]
       }
@@ -19371,17 +19367,17 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
       "vertex": false,
       "edge": true,
-      "source": "328",
+      "source": "327",
       "target": "329",
       "edgeGeometry": {
         "points": [
           {
-            "x": 760,
-            "y": 43696
+            "x": 665,
+            "y": 43328
           },
           {
-            "x": 760,
-            "y": 43848
+            "x": 665,
+            "y": 43432
           }
         ]
       }
@@ -19395,7 +19391,7 @@
         "width": 0,
         "height": 0
       },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
       "vertex": false,
       "edge": true,
       "source": "329",
@@ -19403,12 +19399,16 @@
       "edgeGeometry": {
         "points": [
           {
-            "x": 760,
-            "y": 43960
+            "x": 665,
+            "y": 43982
+          },
+          {
+            "x": 665,
+            "y": 44072
           },
           {
             "x": 760,
-            "y": 44120
+            "y": 44072
           }
         ]
       }
@@ -19422,20 +19422,24 @@
         "width": 0,
         "height": 0
       },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
       "vertex": false,
       "edge": true,
-      "source": "330",
-      "target": "331",
+      "source": "328",
+      "target": "330",
       "edgeGeometry": {
         "points": [
           {
-            "x": 760,
-            "y": 44240
+            "x": 855,
+            "y": 43332
           },
           {
-            "x": 665,
-            "y": 44240
+            "x": 855,
+            "y": 44072
+          },
+          {
+            "x": 760,
+            "y": 44072
           }
         ]
       }
@@ -19453,19 +19457,7 @@
       "vertex": false,
       "edge": true,
       "source": "330",
-      "target": "332",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 44240
-          },
-          {
-            "x": 855,
-            "y": 44240
-          }
-        ]
-      }
+      "target": "331"
     },
     {
       "id": "780",
@@ -19480,120 +19472,16 @@
       "vertex": false,
       "edge": true,
       "source": "331",
-      "target": "333",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 665,
-            "y": 44392
-          },
-          {
-            "x": 665,
-            "y": 44496
-          }
-        ]
-      }
-    },
-    {
-      "id": "781",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
-      "vertex": false,
-      "edge": true,
-      "source": "333",
-      "target": "334",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 665,
-            "y": 45046
-          },
-          {
-            "x": 665,
-            "y": 45136
-          },
-          {
-            "x": 760,
-            "y": 45136
-          }
-        ]
-      }
-    },
-    {
-      "id": "782",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
-      "vertex": false,
-      "edge": true,
-      "source": "332",
-      "target": "334",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 855,
-            "y": 44396
-          },
-          {
-            "x": 855,
-            "y": 45136
-          },
-          {
-            "x": 760,
-            "y": 45136
-          }
-        ]
-      }
-    },
-    {
-      "id": "783",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "334",
-      "target": "335"
-    },
-    {
-      "id": "784",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "335",
-      "target": "336",
+      "target": "332",
       "edgeGeometry": {
         "points": [
           {
             "x": 760,
-            "y": 45744
+            "y": 44680
           },
           {
             "x": 760,
-            "y": 45904
+            "y": 44840
           }
         ]
       }
@@ -19665,6 +19553,36 @@
       "drop": [
         "relationship_children_names_line_2"
       ]
+    }
+  ],
+  "autofilledFields": [
+    {
+      "field": "person_asking_protection_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "A signature date has one correct answer and the form already knows it."
+    },
+    {
+      "field": "lawyer_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "Same, for the lawyer signature block."
+    },
+    {
+      "field": "person_asking_protection_signature_printed_name",
+      "from": [
+        "person_asking_protection_name"
+      ],
+      "why": "The printed name under a signature is the name given on page 1."
+    },
+    {
+      "field": "lawyer_signature_printed_name",
+      "from": [
+        "person_asking_protection_lawyer_name"
+      ],
+      "why": "The lawyer names themselves once, in their own block."
     }
   ]
 }

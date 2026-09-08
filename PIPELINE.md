@@ -95,7 +95,8 @@ node pipeline-build-packet.js
 # 3. open dv-packet-project.json in the editor (Import Project JSON),
 #    then Export Project GUI JSON -> dv-packet-gui.json
 
-# 4. audit the static rules
+# 4. audit the static rules - the chart, then the interview it exports to
+node pipeline-audit-flowchart.js
 node pipeline-audit.js
 
 # 5. fill the form (debug menu: Ctrl+Shift, then "Fill maximum path"),

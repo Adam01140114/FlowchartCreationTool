@@ -310,6 +310,33 @@
     }, LOAD_SETTLE_MS);
   });
 
+  /**
+   * Start over: one empty form, no sections, no groups, no project name.
+   *
+   * Reloading the page did this, which also loses the autosave and takes the
+   * editor back through a full restore. This clears in place, and because it
+   * captures nothing on the way out, the autosave that follows records the
+   * empty project rather than restoring what was just cleared.
+   */
+  function clearProject() {
+    const forms = window.projectForms || [];
+    const hasWork = forms.length > 1
+      || (forms[0] && ((forms[0].flowchart || {}).cells || []).length > 0);
+    if (hasWork && !window.confirm(
+      'Clear the whole project and start over? This cannot be undone.')) return;
+
+    window.projectForms = [{ name: '', flowchart: blankFlowchart() }];
+    window.currentFormIndex = 0;
+    window.loadFlowchartData(blankFlowchart());
+    setTimeout(function () {
+      if (formNameInput()) formNameInput().value = '';
+      if (projectNameInput()) projectNameInput().value = '';
+      updateFormNavUi();
+    }, LOAD_SETTLE_MS);
+    updateFormNavUi();
+  }
+
+  window.clearProject = clearProject;
   window.addProjectForm = addForm;
   window.prevProjectForm = prevForm;
   window.nextProjectForm = nextForm;
