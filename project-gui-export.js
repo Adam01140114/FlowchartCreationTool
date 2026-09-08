@@ -157,6 +157,41 @@ function repointReferences(merged, replacement) {
 }
 
 /**
+ * The name the merged config gives a form, from any name that form goes by.
+ *
+ * A form answers to several: the project slot's name, the flowchart's own
+ * formName, and the PDF's display name. A connector may have recorded any of
+ * them. Match on the exact string first, then case-insensitively, then on one
+ * being the start of the other ("DV-109" against "DV-109 Notice of Court
+ * Hearing"), which is what renaming actually does to it.
+ */
+function canonicalFormName(name, identity) {
+  const wanted = String(name == null ? '' : name).trim();
+  if (!wanted || !identity || !identity.length) return wanted;
+  const lower = wanted.toLowerCase();
+  for (let i = 0; i < identity.length; i++) {
+    if (identity[i].names.indexOf(wanted) !== -1) return identity[i].canonical;
+  }
+  for (let i = 0; i < identity.length; i++) {
+    const names = identity[i].names;
+    for (let j = 0; j < names.length; j++) {
+      if (String(names[j]).toLowerCase() === lower) return identity[i].canonical;
+    }
+  }
+  for (let i = 0; i < identity.length; i++) {
+    const names = identity[i].names;
+    for (let j = 0; j < names.length; j++) {
+      const other = String(names[j]).toLowerCase();
+      if (!other) continue;
+      if (other.indexOf(lower) === 0 || lower.indexOf(other) === 0) {
+        return identity[i].canonical;
+      }
+    }
+  }
+  return wanted;
+}
+
+/**
    * Activation rules from the project's connectors, keyed by target form name.
    *
    * A connector points at an option node, but that node is not what the
@@ -175,15 +210,24 @@ function repointReferences(merged, replacement) {
    *        question, captured before the ids were shifted
    * @param {number[]} questionOffsets  how far each form's ids moved
    */
-  function buildActivations(questionsByForm, questionOffsets) {
+  function buildActivations(questionsByForm, questionOffsets, formIdentity) {
     if (typeof window.collectProjectConnectors !== 'function') return [];
     return window.collectProjectConnectors().map(function (c) {
       const rule = {
-        targetForm: c.targetForm,
+        // A connector stores the name the target form had when it was drawn,
+        // and a form's display name is not stable: the editor renames a slot
+        // from the flowchart's own formName whenever it loads one, so a
+        // connector to "DV-109" ends up pointing at a form now called
+        // "DV-109 Notice of Court Hearing". The runtime matches the rule to
+        // the form by that string, so the drift silently switched two of the
+        // three forms off - the interview stopped after DV-100 and the packet
+        // produced one PDF. Resolve to the name the merged config actually
+        // uses, so the two sides cannot drift apart again.
+        targetForm: canonicalFormName(c.targetForm, formIdentity),
         unconditional: !!c.unconditional,
         optionNameId: c.optionNodeId || null,
         optionLabel: c.optionLabel || null,
-        fromForm: c.fromForm
+        fromForm: canonicalFormName(c.fromForm, formIdentity)
       };
       if (rule.unconditional) return rule;
 
@@ -393,6 +437,9 @@ function reportGroupProblems(merged) {
     // before offsetForm renumbers everything in place.
     const questionsByForm = [];
     const questionOffsets = [];
+    // Every name each form answers to, so a connector recorded against any of
+    // them still resolves to the one name projectForms uses.
+    const formIdentity = [];
     let sectionOffset = 0;
     let questionOffset = 0;
     let groupIdCounter = 0;
@@ -409,6 +456,16 @@ function reportGroupProblems(merged) {
 
       const gui = offsetForm(entry.gui, sectionOffset, questionOffset);
       const count = (gui.sections || []).length;
+
+      formIdentity.push({
+        canonical: entry.name,
+        names: [
+          entry.name,
+          entry.gui && entry.gui.formName,
+          gui.defaultPDFName,
+          gui.pdfOutputName
+        ].filter(Boolean)
+      });
 
       ranges.push({
         name: entry.name,
@@ -475,7 +532,7 @@ function reportGroupProblems(merged) {
     merged.formName = (document.getElementById('projectNameInput') || {}).value
       || merged.formName || 'Project';
     merged.projectForms = ranges;
-    merged.formActivations = buildActivations(questionsByForm, questionOffsets);
+    merged.formActivations = buildActivations(questionsByForm, questionOffsets, formIdentity);
 
     // Must run after every form is merged, so a value shared by forms one and
     // three is still recognised as the same question.

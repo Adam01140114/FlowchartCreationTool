@@ -13699,10 +13699,38 @@ function isActivationOptionChosen(rule){
     }
     return false;
 }
+/**
+ * Does this activation rule name this form?
+ *
+ * A connector records the name the target form had when it was drawn, and the
+ * editor renames a slot from the flowchart's own formName every time it loads
+ * one - so a connector to "DV-109" can end up beside a form now called
+ * "DV-109 Notice of Court Hearing". Requiring the two strings to be identical
+ * meant no rule matched, both later forms counted as switched off, and the
+ * packet ended after the first form: one PDF offered, two silently missing.
+ * The export writes canonical names now; this also accepts a name that is the
+ * start of the other, so HTML generated before that fix still works.
+ */
+function activationNamesForm(rule, form){
+    if (!rule || !form) return false;
+    var target = String(rule.targetForm == null ? '' : rule.targetForm).trim();
+    if (!target) return false;
+    if (target === form.name) return true;
+    var a = target.toLowerCase();
+    var candidates = [form.name, form.pdfName, form.pdfFile];
+    for (var i = 0; i < candidates.length; i++){
+        var b = String(candidates[i] == null ? '' : candidates[i]).trim().toLowerCase();
+        if (!b) continue;
+        if (a === b) return true;
+        if (b.indexOf(a) === 0 || a.indexOf(b) === 0) return true;
+    }
+    return false;
+}
+
 function isFormActivated(form){
     if (!form) return false;
     if (form.alwaysIncluded) return true;
-    var rules = getFormActivations().filter(function(r){ return r.targetForm === form.name; });
+    var rules = getFormActivations().filter(function(r){ return activationNamesForm(r, form); });
     for (var i = 0; i < rules.length; i++){
         if (rules[i].unconditional) return true;
         if (isActivationOptionChosen(rules[i])) return true;
@@ -19091,20 +19119,38 @@ function fillProgress(state) {
   if (!panel) {
     panel = document.createElement('div');
     panel.id = 'fillProgressPanel';
-    panel.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:100002;'
-      + 'background:#12203a;color:#fff;padding:14px 20px;box-sizing:border-box;'
-      + 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;'
-      + 'font-size:14px;box-shadow:0 -4px 20px rgba(0,0,0,0.25);';
-    panel.innerHTML = '<div id="fillProgressText" style="margin-bottom:8px;"></div>'
-      + '<div style="height:6px;background:rgba(255,255,255,0.2);border-radius:3px;overflow:hidden;">'
-      + '<div id="fillProgressBar" style="height:100%;width:0;background:#7b5cff;'
-      + 'transition:width 0.15s linear;"></div></div>';
+    // Above the debug menu (99999): the fill is started from there, and a
+    // progress bar behind the thing that launched it is no progress bar.
+    panel.style.cssText = 'position:fixed;inset:0;z-index:100002;display:flex;'
+      + 'align-items:center;justify-content:center;background:rgba(12,20,34,0.72);'
+      + 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;';
+    panel.innerHTML = '<div style="background:#fff;border-radius:14px;padding:32px 36px;'
+      + 'width:min(460px,90vw);box-sizing:border-box;text-align:center;'
+      + 'box-shadow:0 18px 50px rgba(8,15,30,0.45);">'
+      + '<div style="font-size:1.25rem;font-weight:700;color:#1f2d3d;margin-bottom:6px;">'
+      + 'Filling the form</div>'
+      + '<div style="font-size:0.9rem;color:#5a6c7d;margin-bottom:22px;">'
+      + 'Answering every question the way that opens the most fields. '
+      + 'This takes a moment on a long packet.</div>'
+      + '<div style="height:10px;background:#e8edf5;border-radius:5px;overflow:hidden;">'
+      + '<div id="fillProgressBar" style="height:100%;width:0;border-radius:5px;'
+      + 'background:linear-gradient(90deg,#7b5cff,#4f8cff);transition:width 0.2s linear;">'
+      + '</div></div>'
+      + '<div style="display:flex;justify-content:space-between;align-items:baseline;'
+      + 'margin-top:12px;gap:12px;">'
+      + '<div id="fillProgressText" style="font-size:0.9rem;color:#3d4d61;text-align:left;">'
+      + '</div>'
+      + '<div id="fillProgressPct" style="font-size:1.05rem;font-weight:700;color:#4f8cff;'
+      + 'flex:0 0 auto;">0%</div></div></div>';
     document.body.appendChild(panel);
   }
   const text = document.getElementById('fillProgressText');
   const bar = document.getElementById('fillProgressBar');
+  const pct = document.getElementById('fillProgressPct');
+  const percent = Math.max(0, Math.min(100, state.percent || 0));
   if (text) text.textContent = state.text;
-  if (bar) bar.style.width = Math.max(0, Math.min(100, state.percent || 0)) + '%';
+  if (bar) bar.style.width = percent + '%';
+  if (pct) pct.textContent = Math.round(percent) + '%';
 }
 
 /**
@@ -19181,6 +19227,8 @@ async function fillMaximumPath(options) {
   }
   window.isInitialAutofill = true;
   window.__MAX_FILL_IN_PROGRESS__ = true;
+  fillProgress({ text: 'Starting...', percent: 0 });
+  await fillYield();
   const viewState = saveSectionViewState();
   try {
     // Passes repeat because answering one question reveals the next. Once a
@@ -19206,6 +19254,8 @@ async function fillMaximumPath(options) {
       runAllHiddenTextCalculations();
     }
     const filledCount = countExportableFields();
+    fillProgress({ text: filledCount + ' fields filled', percent: 100 });
+    await new Promise(function (resolve) { setTimeout(resolve, 450); });
     if (btn) {
       btn.textContent = '✅ ' + filledCount + ' fields filled';
       setTimeout(function() {

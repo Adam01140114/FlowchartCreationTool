@@ -100,7 +100,12 @@ function main() {
   const spec = JSON.parse(fs.readFileSync(SPEC, 'utf8'));
   const forms = spec.forms.map((entry) => {
     const flowchart = JSON.parse(fs.readFileSync(entry.flowchart, 'utf8'));
-    flowchart.formName = entry.title || entry.name;
+    // The form's identity, not its PDF's title. The editor renames a project
+    // slot from this every time it loads the form, and a connector points at
+    // the slot by name - so titling the flowchart "DV-109 Notice of Court
+    // Hearing" renamed the slot out from under the connector to "DV-109" and
+    // switched the form off. The title still reaches the PDF below.
+    flowchart.formName = entry.name;
     flowchart.defaultPdfProperties = {
       pdfName: entry.title || entry.name,
       pdfFile: entry.pdf,

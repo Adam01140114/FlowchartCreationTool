@@ -353,7 +353,8 @@ section hint that names a family's first field places the block that replaced it
   the run used to freeze the tab for minutes.
   The yield races a frame, a self-posted message and a 50 ms timer: a hidden tab
   gets no frames and clamps timers, and a fill left in the background used to
-  stall for minutes at a time.
+  stall for minutes at a time. Progress shows as a modal overlay above the debug
+  menu — phase, bar and percentage — rather than a word on the button.
 - **Marker fill** (`Fill marker values`) writes each field's own id into it, so a
   rendered page can be read against the blank form. That is rule 4b.
 - **A composed address overwrote a real answer.** The form builds a convenience
@@ -364,6 +365,15 @@ section hint that names a family's first field places the block that replaced it
 - **`processAllPdfs` crashed** on four variables declared in another function, so
   finishing a packet skipped later PDFs and never showed the completion screen.
 - **Preview PDFs listed only the first form** of a packet.
+- **A renamed form switched itself off.** A connector stores the name its target
+  form had when it was drawn, and the editor renames a project slot from the
+  flowchart's own `formName` every time it loads one — so a connector to
+  "DV-109" ended up beside a form now called "DV-109 Notice of Court Hearing".
+  The runtime matched rule to form on that exact string, found nothing, and
+  counted both later forms as never activated: the interview stopped after the
+  first form and offered one PDF. The export writes canonical names now, the
+  runtime also accepts a name that is the start of the other, and the packet
+  builder titles the PDF without renaming the form.
 - **Reserved names.** The form generates hidden `court_name`, `court_address`,
   `form_zip`, `current_date` and friends. A question that claims one of those
   names now wins, and the built-in is not emitted — two elements shared an id and
