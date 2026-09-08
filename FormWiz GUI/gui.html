@@ -166,10 +166,10 @@
         <div class="fw-toolbar fw-nav-toolbar">
             <button type="button" id="pasteJsonBtn">Paste Json</button>
             <button type="button" onclick="addPdfInput()">Add PDF</button>
-            <button type="button" onclick="generateAndDownloadForm()">Export HTML</button>
+            <button type="button" onclick="showExportFormHtmlDialog()">Export HTML</button>
             <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
-            <button type="button" onclick="document.getElementById('importFileInput').click();">Import JSON</button>
-            <button type="button" onclick="exportForm()">Export JSON</button>
+            <button type="button" onclick="showImportFormJsonDialog()">Import JSON</button>
+            <button type="button" onclick="showExportFormJsonDialog()">Export JSON</button>
             <button type="button" id="loadJsonBtn">Load JSON</button>
             <button type="button" id="previewButton" onclick="setTimeout(() => showPreview(), 100);">Preview</button>
             <button type="button" id="formSettingsBtn">Form Settings</button>
@@ -347,6 +347,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="io-dialogs.js"></script>
     <script src="gui.js"></script>
     <script src="CountyLookup/zipData.js"></script>
     <script src="CountyLookup/courtData.js"></script>

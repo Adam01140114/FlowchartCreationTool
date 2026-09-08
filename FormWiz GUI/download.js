@@ -66,6 +66,59 @@ function generateAndDownloadForm() {
         alert('Error generating form: ' + error.message);
     }
 }
+/* Export and import through the shared dialogs: copy or download, paste or
+   choose a file. generateAndDownloadForm/exportForm/importForm stay as they
+   are - the draft autosave and the preview still call them directly. */
+
+function exportFileBaseName() {
+    const input = document.getElementById('formNameInput');
+    const name = (input && input.value.trim()) || 'form';
+    return name.replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^_+|_+$/g, '') || 'form';
+}
+
+function showExportFormJsonDialog() {
+    window.showExportDialog({
+        title: 'Export JSON',
+        description: "This form's GUI JSON. Copy it, or download it as a file.",
+        filename: exportFileBaseName() + '.json',
+        text: function () { return JSON.stringify(exportForm({ silent: true }), null, 2); }
+    });
+}
+
+function showExportFormHtmlDialog() {
+    window.showExportDialog({
+        title: 'Export HTML',
+        description: 'The generated form. Copy it, or download it as an .html file.',
+        filename: exportFileBaseName() + '.html',
+        mime: 'text/html',
+        text: function () { return getFormHTML(); }
+    });
+}
+
+function showImportFormJsonDialog() {
+    window.showImportDialog({
+        title: 'Import JSON',
+        description: 'Paste GUI JSON, or choose a .json file from your computer.',
+        placeholder: '{"sections": [...], "groups": [...]}',
+        accept: '.json,application/json',
+        apply: function (text) {
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (err) {
+                throw new Error('Invalid JSON: ' + err.message);
+            }
+            if (!data || !Array.isArray(data.sections)) {
+                throw new Error('That is not GUI JSON: it has no "sections" array.');
+            }
+            loadFormData(data);
+            // loadFormData can finish after its own async work; the import path
+            // has always given it a second nudge.
+            setTimeout(updateFormAfterImport, 300);
+        }
+    });
+}
+
 function applyPreviewToFrames(formHTML) {
     const modalFrame = document.getElementById('previewFrame');
     const inlineFrame = document.getElementById('previewFrameInline');

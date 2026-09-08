@@ -109,7 +109,7 @@
   /* project import / export                                           */
   /* ---------------------------------------------------------------- */
 
-  function exportProjectJson() {
+  function exportProjectJson(download) {
     captureCurrentForm();
     const payload = {
       type: 'flowchart-project',
@@ -121,16 +121,45 @@
       })
     };
     const text = JSON.stringify(payload, null, 2);
-    const blob = new Blob([text], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'project.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // The export dialog wants the text without a file landing in Downloads, so
+    // this only saves when it is asked to.
+    if (download !== false) {
+      const blob = new Blob([text], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'project.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
     return text;
+  }
+
+  /* The project's own entry points into the shared export/import dialogs. */
+
+  function showExportProjectJsonDialog() {
+    window.showExportDialog({
+      title: 'Export Project JSON',
+      description: 'The whole project - every form and its flowchart. '
+        + 'Copy it, or download it as a file.',
+      filename: 'project.json',
+      text: function () { return exportProjectJson(false); }
+    });
+  }
+
+  function showImportProjectJsonDialog() {
+    window.showImportDialog({
+      title: 'Import Project JSON',
+      description: 'Paste project JSON, or choose a .json file. A single '
+        + 'flowchart is accepted too, and becomes a project of one form.',
+      placeholder: '{"type": "flowchart-project", "forms": [...]}',
+      apply: function (text) {
+        const count = applyProjectJson(text);
+        console.log('[project] Imported ' + count + ' form(s)');
+      }
+    });
   }
 
   function applyProjectJson(jsonString) {
@@ -287,6 +316,8 @@
   window.switchToProjectForm = switchToForm;
   window.captureCurrentProjectForm = captureCurrentForm;
   window.exportProjectJson = exportProjectJson;
+  window.showExportProjectJsonDialog = showExportProjectJsonDialog;
+  window.showImportProjectJsonDialog = showImportProjectJsonDialog;
   window.applyProjectJson = applyProjectJson;
   window.importProjectJson = importProjectJson;
   window.updateFormNavUi = updateFormNavUi;
