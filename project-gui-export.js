@@ -217,6 +217,47 @@ function repointReferences(merged, replacement) {
     });
   }
 
+/**
+ * Say why a packet's progress bar will fall back to section names.
+ *
+ * The stepper is group-based only when at least one group actually holds
+ * sections, and a group names its sections by their display name - so an empty
+ * group, or two forms that share a section name, silently costs a step.
+ * Neither is visible in the editor, so report both at export time.
+ */
+function reportGroupProblems(merged) {
+  const groups = merged.groups || [];
+  if (!groups.length) return;
+
+  const empty = groups.filter(function (g) { return !(g.sections || []).length; });
+  if (empty.length) {
+    console.warn('[project-gui] ' + empty.length + ' group(s) hold no sections, so they '
+      + 'cannot appear in the progress bar: '
+      + empty.map(function (g) { return g.name; }).join(', ')
+      + '. Add each form\'s sections to its group with "Add Section to Group".');
+  }
+  if (empty.length === groups.length) {
+    console.warn('[project-gui] No group holds a section, so the form falls back to '
+      + 'one progress step per section.');
+  }
+
+  // Groups point at sections by name, so a name used twice in the packet can
+  // only ever belong to one group.
+  const seen = new Set();
+  const clashes = new Set();
+  (merged.sections || []).forEach(function (section) {
+    const name = String(section.sectionName || '').trim();
+    if (!name) return;
+    if (seen.has(name)) clashes.add(name);
+    seen.add(name);
+  });
+  if (clashes.size) {
+    console.warn('[project-gui] Section name(s) used by more than one form: '
+      + Array.from(clashes).join(', ')
+      + '. Groups match sections by name, so give each one its own name.');
+  }
+}
+
   /**
    * Load every form, export each, and merge. Restores whichever form was open.
    */
@@ -256,6 +297,7 @@ function repointReferences(merged, replacement) {
     const questionOffsets = [];
     let sectionOffset = 0;
     let questionOffset = 0;
+    let groupIdCounter = 0;
 
     perForm.forEach(function (entry, index) {
       const beforeOffset = new Map();
@@ -287,7 +329,18 @@ function repointReferences(merged, replacement) {
       merged.sections = merged.sections.concat(gui.sections || []);
       merged.hiddenFields = merged.hiddenFields.concat(gui.hiddenFields || []);
       merged.additionalPDFs = merged.additionalPDFs.concat(gui.additionalPDFs || []);
-      merged.groups = merged.groups.concat(gui.groups || []);
+      // Group ids restart at 1 in every form, and the builder keys its group
+      // blocks by that id - two forms whose groups are both id 1 collapse into
+      // one block, so the packet's progress bar lost a step per form. Renumber
+      // in merge order, which also puts the steps in form order.
+      (gui.groups || []).forEach(function (group) {
+        groupIdCounter += 1;
+        merged.groups.push({
+          groupId: groupIdCounter,
+          name: group.name || ('Group ' + groupIdCounter),
+          sections: (group.sections || []).slice()
+        });
+      });
 
       sectionOffset += count;
       // ids were shifted in place, so the highest one here is already in merged
@@ -308,6 +361,8 @@ function repointReferences(merged, replacement) {
     if (collapsed) {
       console.log('[project-gui] Collapsed ' + collapsed + ' repeated shared question(s)');
     }
+
+    reportGroupProblems(merged);
 
     return merged;
   }
