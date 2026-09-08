@@ -11554,6 +11554,22 @@ document.addEventListener('DOMContentLoaded', function() {
         subtree: true
     });
 });
+/**
+ * The id one entry of a numbered block gives a field.
+ *
+ * By default entry 3 of "firearm_item_description" is firearm_item_description_3,
+ * which is fine when we own the field names. PDFs do not work that way: DV-100
+ * calls the same box firearm_item_3_description, with the entry number in the
+ * middle. A nodeId containing {n} says where the number goes, so a block can
+ * target the names a form already uses instead of the PDF being renamed to suit
+ * the builder.
+ */
+function entryFieldId(nodeId, entryNumber) {
+  const id = String(nodeId == null ? '' : nodeId);
+  if (id.indexOf('{n}') !== -1) return id.split('{n}').join(String(entryNumber));
+  return id + '_' + entryNumber;
+}
+
 function showTextboxLabels(questionId, count){
     // 🔧 NEW: Check if we're already creating fields
     if (isCreatingFields) {
@@ -11810,7 +11826,7 @@ function showTextboxLabels(questionId, count){
                 });
                 entryContainer.appendChild(locationFieldDiv);
             } else if (field.type === 'label') {
-                const fieldId = field.nodeId + "_" + j;
+                const fieldId = entryFieldId(field.nodeId, j);
                 // Prefill has already been processed through replaceUrlParametersInText when building allFieldsInOrder
                 let prefillValue = field.prefill || '';
                 // Check for conditional prefills - if current entry number (j) matches a trigger, use that value
@@ -11858,7 +11874,7 @@ function showTextboxLabels(questionId, count){
                     }, 100);
                 }
             } else if (field.type === 'phone') {
-                const fieldId = field.nodeId + "_" + j;
+                const fieldId = entryFieldId(field.nodeId, j);
                 const inputDiv = document.createElement('div');
                 // No conditional prefills expected for phone, but keep for parity
                 let prefillValue = '';
@@ -11897,7 +11913,7 @@ function showTextboxLabels(questionId, count){
                     }
                 }, 0);
             } else if (field.type === 'amount') {
-                const fieldId = field.nodeId + "_" + j;
+                const fieldId = entryFieldId(field.nodeId, j);
                 const inputDiv = document.createElement('div');
                 let prefillValue = '';
                 // Check for conditional prefills - if current entry number (j) matches a trigger, use that value
@@ -11917,7 +11933,7 @@ function showTextboxLabels(questionId, count){
                   entryContainer.appendChild(brElement);
                 }
             } else if (field.type === 'currency') {
-                const fieldId = field.nodeId + "_" + j;
+                const fieldId = entryFieldId(field.nodeId, j);
                 const inputDiv = document.createElement('div');
                 let prefillValue = '';
                 // Check for conditional prefills - if current entry number (j) matches a trigger, use that value
@@ -11979,7 +11995,8 @@ function showTextboxLabels(questionId, count){
                     });
                     const input = document.createElement('input');
                     input.type = selectionType === 'single' ? 'radio' : 'checkbox';
-                    input.id = selectionType === 'single' ? option.nodeId + "_" + j + "_radio" : option.nodeId + "_" + j;
+                    input.id = selectionType === 'single'
+                        ? entryFieldId(option.nodeId, j) + "_radio" : entryFieldId(option.nodeId, j);
                     input.name = selectionType === 'single' ? 'radio_group_' + (questionId || 'unknown') + '_' + j : option.nodeId + "_" + j; // Radio buttons share the same name
                     input.value = option.text;
                     input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #2980b9; cursor: pointer;';
@@ -12248,7 +12265,7 @@ function showTextboxLabels(questionId, count){
                 const brBeforeDate = document.createElement('br');
                 entryContainer.appendChild(brBeforeDate);
                 // Handle date fields
-                const fieldId = field.nodeId + "_" + j;
+                const fieldId = entryFieldId(field.nodeId, j);
                 const dateDiv = document.createElement('div');
                 dateDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #ddd; border-radius: 8px; display: flex; flex-direction: column; align-items: center;';
                 const label = document.createElement('label');
@@ -13853,6 +13870,15 @@ async function processAllPdfs() {
 
     // Track processed PDFs to prevent duplicates
     const processedPdfs = new Set();
+    // getAllPdfsList declares these too, but this function read them without
+    // ever declaring them - so the moment a packet finished, the file-upload
+    // block threw a ReferenceError and took the rest of the run with it: the
+    // later PDFs were never emitted, and the caller's navigateSection('end')
+    // never ran, leaving the last question on screen doing nothing.
+    const safeQuestionNameIds = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : (window.questionNameIds || {});
+    const safeFileUploadQs = Array.isArray(window.fileUploadQuestions) ? window.fileUploadQuestions : [];
+    const safeLatexPreviewQs = Array.isArray(window.latexPreviewQuestions) ? window.latexPreviewQuestions : [];
+    const safePdfPreviewQs = Array.isArray(window.pdfPreviewQuestions) ? window.pdfPreviewQuestions : [];
     // A packet fills one PDF per form the interview actually turned on. The
     // merged config carries only the first form's pdfOutputName, so relying on
     // it alone finished a three-form packet with a single PDF and no sign that
@@ -17691,6 +17717,9 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
         <button id="fillMaximumPathBtn" style="background: linear-gradient(90deg, #ff8c42 0%, #ff5e62 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(255, 94, 98, 0.35);">
           🔥 Fill maximum path
         </button>
+        <button id="fillMarkerPathBtn" style="background: linear-gradient(90deg, #7b5cff 0%, #b06ab3 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(123, 92, 255, 0.35);">
+          🏷 Fill marker values
+        </button>
         </div>
       </div>
     </div>
@@ -18486,6 +18515,27 @@ function countExportableFields() {
   });
   return count;
 }
+
+/**
+ * How many fields an answer puts in front of the user, filled or not.
+ *
+ * Scoring options by countExportableFields was scoring the wrong thing: it only
+ * counts fields that already hold a value, and a question revealed a moment ago
+ * is empty. So every option of "What did the judge decide about the Stay-Away
+ * Order?" scored identically, the first one won, and the widest path answered
+ * "Not requested" to twelve of DV-110's orders - leaving their detail fields
+ * blank and looking, in the audit, like fields nothing was wired to.
+ *
+ * Counting what is now visible instead makes an option that opens a follow-up
+ * beat one that opens nothing, which is what "maximum path" is supposed to mean.
+ */
+function countEligibleFields() {
+  let count = 0;
+  document.querySelectorAll('input, select, textarea').forEach(function(el) {
+    if (isDebugFillEligible(el)) count++;
+  });
+  return count;
+}
 function getQuestionIdForFillElement(element) {
   if (!element) return null;
   let questionId = element.getAttribute('data-question-id');
@@ -18538,7 +18588,15 @@ function triggerSelectSideEffects(select) {
   }
   const qId = select.getAttribute('data-question-id');
   if (qId && typeof showTextboxLabels === 'function' && select.value) {
+    // showTextboxLabels refuses to rebuild an entry block while isInitialAutofill
+    // is set, so a saved answer is not wiped mid-restore. The debug fill borrows
+    // that same flag to keep alerts quiet, which meant a block that already had
+    // three entries stayed at three after the fill chose six. Drop the flag for
+    // this one call: here the new count IS the answer.
+    const restoring = window.isInitialAutofill;
+    window.isInitialAutofill = false;
     try { showTextboxLabels(parseInt(qId, 10), select.value); } catch (e) { /* ignore */ }
+    window.isInitialAutofill = restoring;
   }
   if (qId && typeof updateHiddenCheckboxes === 'function' && select.value) {
     try { updateHiddenCheckboxes(parseInt(qId, 10), parseInt(select.value, 10) || select.value); } catch (e) { /* ignore */ }
@@ -18547,8 +18605,25 @@ function triggerSelectSideEffects(select) {
     try { updateHiddenLogic(select.id, select.value); } catch (e) { /* ignore */ }
   }
 }
+/**
+ * A value for one field during a debug fill.
+ *
+ * Rule 4b of the quality check cannot be done with "Test Value" in every box:
+ * matching names prove a value went somewhere, not that height went into the
+ * height box. In marker mode each field carries its own id as its value, so a
+ * rendered page can be read against the blank form and every box says what it
+ * is. Fields the form validates - zip, phone, date, number - still get valid
+ * data, because a marker there fails validation and blocks the run.
+ */
 function getSampleFillValue(el) {
   const id = (el.id || el.name || '').toLowerCase();
+  if (window.__FILL_MARKER_VALUES__ && el.tagName !== 'SELECT') {
+    const type = (el.type || '').toLowerCase();
+    const validated = type === 'date' || type === 'number' || type === 'email'
+      || type === 'tel' || id.indexOf('zip') !== -1 || id.indexOf('phone') !== -1
+      || id.indexOf('date') !== -1 || id.indexOf('amount') !== -1;
+    if (!validated) return el.id || el.name || 'marker';
+  }
   if (el.type === 'email' || id.indexOf('email') !== -1) return 'test@example.com';
   if (el.type === 'tel' || id.indexOf('phone') !== -1 || id.indexOf('tel') !== -1) return '(555) 555-5555';
   if (el.type === 'date' || id.indexOf('date') !== -1) return '2024-06-15';
@@ -18696,9 +18771,9 @@ function activationLookaheadBonus() {
   return bonus;
 }
 
-/** Immediate field count plus whatever forms the current answers unlock. */
+/** What this answer opens up: fields now on screen, plus forms it activates. */
 function scoreCurrentState() {
-  return countExportableFields() + activationLookaheadBonus();
+  return countEligibleFields() + activationLookaheadBonus();
 }
 
 function pickBestSelectValue(select) {
@@ -18866,8 +18941,10 @@ function fillMaximumPathPass() {
   }
   document.dispatchEvent(new CustomEvent('questionVisibilityChanged', { detail: { sectionId: null } }));
 }
-async function fillMaximumPath() {
-  const btn = document.getElementById('fillMaximumPathBtn');
+async function fillMaximumPath(options) {
+  const markers = !!(options && options.markers);
+  window.__FILL_MARKER_VALUES__ = markers;
+  const btn = document.getElementById(markers ? 'fillMarkerPathBtn' : 'fillMaximumPathBtn');
   const originalText = btn ? btn.textContent : '';
   if (btn) {
     btn.disabled = true;
@@ -18877,9 +18954,17 @@ async function fillMaximumPath() {
   window.__MAX_FILL_IN_PROGRESS__ = true;
   const viewState = saveSectionViewState();
   try {
+    // Passes repeat because answering one question reveals the next. Once a
+    // pass changes nothing there is nothing left to reveal, and on a packet the
+    // size of DV-100 each pass costs minutes - so stop as soon as it settles
+    // rather than always paying for eight.
+    let settled = -1;
     for (let pass = 0; pass < 8; pass++) {
       fillMaximumPathPass();
       await new Promise(function(resolve) { setTimeout(resolve, 180); });
+      const filled = countExportableFields();
+      if (filled === settled) break;
+      settled = filled;
     }
     if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
       createHiddenCheckboxesForAutofilledDropdowns();
@@ -18910,6 +18995,7 @@ async function fillMaximumPath() {
     }
   } finally {
     window.__MAX_FILL_IN_PROGRESS__ = false;
+    window.__FILL_MARKER_VALUES__ = false;
     restoreSectionViewState(viewState);
     window.isInitialAutofill = false;
   }
@@ -18937,26 +19023,112 @@ function exportNamesAndIds() {
       formData.inputs.push(inputData);
     }
   });
-  // Create and download JSON file
+  // Offer it both ways round. This list is usually on its way into a chat
+  // window or a field-mapping sheet, and a file in ~/Downloads is a detour.
   const jsonString = JSON.stringify(formData, null, 2);
-  const blob = new Blob([jsonString], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'form-names-ids-' + new Date().toISOString().split('T')[0] + '.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  // Show success message
-  const button = document.getElementById('exportNamesIdsBtn');
-  const originalText = button.textContent;
-  button.textContent = '✅ Exported!';
-  button.style.background = 'linear-gradient(90deg, #38d39f 0%, #4f8cff 100%)';
-  setTimeout(() => {
-    button.textContent = originalText;
-    button.style.background = 'linear-gradient(90deg, #4f8cff 0%, #38d39f 100%)';
-  }, 2000);
+  showDebugExportDialog('Export Names/IDs', jsonString,
+    'form-names-ids-' + new Date().toISOString().split('T')[0] + '.json');
+}
+
+// A copy-or-download dialog for the debug menu. Self-contained and inline-styled
+// so the page's own CSS cannot restyle it out of shape.
+function showDebugExportDialog(title, text, filename) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;'
+    + 'background:rgba(20,32,54,0.6);display:flex;align-items:center;'
+    + 'justify-content:center;z-index:100001;';
+  const card = document.createElement('div');
+  card.style.cssText = 'background:#fff;border-radius:12px;padding:22px 24px 20px;'
+    + 'width:min(680px,92vw);max-height:88vh;display:flex;flex-direction:column;'
+    + 'box-sizing:border-box;box-shadow:0 12px 40px rgba(15,23,42,0.3);'
+    + 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;';
+  const heading = document.createElement('h3');
+  heading.textContent = title;
+  heading.style.cssText = 'margin:0 0 6px;font-size:1.15rem;color:#1f2d3d;font-weight:700;';
+  const hint = document.createElement('p');
+  hint.textContent = 'Copy this to the clipboard, or download it as a file.';
+  hint.style.cssText = 'margin:0 0 12px;color:#5a6c7d;font-size:0.92rem;';
+  const area = document.createElement('textarea');
+  area.readOnly = true;
+  area.value = text;
+  area.style.cssText = 'width:100%;height:300px;box-sizing:border-box;padding:10px 12px;'
+    + 'border:1px solid #cbd5e1;border-radius:8px;font-size:12px;line-height:1.45;'
+    + 'font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#1f2d3d;resize:vertical;';
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;';
+  const btnStyle = 'padding:9px 18px;border-radius:8px;font-size:0.95rem;font-weight:600;'
+    + 'cursor:pointer;width:auto;margin:0;flex:0 0 auto;';
+  const copyBtn = document.createElement('button');
+  copyBtn.type = 'button';
+  copyBtn.textContent = 'Copy';
+  copyBtn.style.cssText = btnStyle + 'border:none;background:#2980b9;color:#fff;';
+  const downloadBtn = document.createElement('button');
+  downloadBtn.type = 'button';
+  downloadBtn.textContent = 'Download';
+  downloadBtn.style.cssText = btnStyle + 'border:1px solid #cbd5e1;background:#f8fafc;color:#1f2d3d;';
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.textContent = 'Close';
+  closeBtn.style.cssText = downloadBtn.style.cssText;
+
+  function close() {
+    document.removeEventListener('keydown', onKey, true);
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  }
+  function onKey(e) { if (e.key === 'Escape') close(); }
+  function flash(button, label) {
+    const original = button.textContent;
+    button.textContent = label;
+    setTimeout(function () { button.textContent = original; }, 1600);
+  }
+  // The Clipboard API is absent outside a secure context and rejects when the
+  // document is not focused, so the old selection copy is the working fallback.
+  function selectionCopy() {
+    area.readOnly = false;
+    area.select();
+    const ok = document.execCommand('copy');
+    area.readOnly = true;
+    if (!ok) throw new Error('copy blocked');
+  }
+  copyBtn.addEventListener('click', function () {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(function () { flash(copyBtn, 'Copied'); })
+        .catch(function () {
+          try { selectionCopy(); flash(copyBtn, 'Copied'); }
+          catch (err) { flash(copyBtn, 'Copy blocked'); }
+        });
+      return;
+    }
+    try { selectionCopy(); flash(copyBtn, 'Copied'); }
+    catch (err) { flash(copyBtn, 'Copy blocked'); }
+  });
+  downloadBtn.addEventListener('click', function () {
+    const blob = new Blob([text], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    flash(downloadBtn, 'Downloaded');
+  });
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('mousedown', function (e) { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', onKey, true);
+
+  row.appendChild(copyBtn);
+  row.appendChild(downloadBtn);
+  row.appendChild(closeBtn);
+  card.appendChild(heading);
+  card.appendChild(hint);
+  card.appendChild(area);
+  card.appendChild(row);
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+  setTimeout(function () { area.focus(); area.select(); }, 0);
 }
 // Search/Filter functionality (debounced to avoid heavy rescans)
 function debounce(fn, delay = 150) {
@@ -18974,6 +19146,11 @@ document.getElementById('debugTypeFilter').addEventListener('change', debouncedP
 document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNamesAndIds);
 document.getElementById('fillMaximumPathBtn').addEventListener('click', function() {
   fillMaximumPath();
+});
+// Same widest path, but every free-text box carries its own field id, so the
+// filled PDF can be read page by page against the blank form (rule 4b).
+document.getElementById('fillMarkerPathBtn').addEventListener('click', function() {
+  fillMaximumPath({ markers: true });
 });
 // Function to create Form Name input field (to be called from the form editor interface)
 function createFormNameInput() {

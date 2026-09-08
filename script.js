@@ -3789,7 +3789,10 @@ function sanitizeNameId(str) {
   return str
     .toLowerCase()
     .replace(/<[^>]+>/g, "")
-    .replace(/[^a-z0-9\/]+/gi, "_") // replace any sequence of non-alphanumeric chars (except /) with _
+    // Braces survive: {n} is the entry-number token a numbered block uses to put
+    // the number where the PDF wants it (firearm_item_{n}_description), and
+    // slugging it away produced firearm_item__n__description, matching nothing.
+    .replace(/[^a-z0-9\/{}]+/gi, "_")
     .replace(/^_+|_+$/g, ""); // trim leading/trailing underscores
 }
 // --- PATCH END ---

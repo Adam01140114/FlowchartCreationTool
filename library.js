@@ -1959,6 +1959,11 @@ window.exportGuiJson = function(download = true) {
             if (item.type === 'option' && cell._textboxes && cell._textboxes[item.index]) {
               const tb = cell._textboxes[item.index];
               const labelName = tb.nameId || tb.placeholder || "";
+              // The nameId is the id the PDF field needs, which is not always
+              // something to show a person: a repeating block names its fields
+              // {n}_description so the entry number lands where the PDF wants
+              // it. An explicit label says what to print above the box.
+              const shownLabel = tb.label || labelName;
               const fieldType = tb.type === 'phone'
                 ? 'phone'
                 : (tb.type === 'currency'
@@ -1975,7 +1980,7 @@ window.exportGuiJson = function(download = true) {
               const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
               const fieldEntry = {
                 type: fieldType,
-                label: labelName,
+                label: shownLabel,
                 nodeId: fieldNodeId,
                 order: orderIndex + 1
               };
@@ -2549,6 +2554,7 @@ window.exportGuiJson = function(download = true) {
           // Process each textbox in order
           cell._textboxes.forEach((tb, index) => {
             const labelName = tb.nameId || tb.placeholder || "";
+            const shownLabel = tb.label || labelName;
             const fieldType = tb.type === 'phone'
               ? 'phone'
               : (tb.type === 'currency'
@@ -2565,7 +2571,7 @@ window.exportGuiJson = function(download = true) {
             const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
             const fieldEntry = {
               type: fieldType,
-              label: labelName,
+              label: shownLabel,
               nodeId: fieldNodeId,
               order: index + 1
             };
