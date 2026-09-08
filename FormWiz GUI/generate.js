@@ -18908,17 +18908,59 @@ function getSampleFillValue(el) {
   if (el.tagName === 'TEXTAREA') return 'Maximum path test content for PDF export coverage.';
   return 'Test Value';
 }
+/**
+ * Make every section active for the duration of a debug fill.
+ *
+ * A question's conditional logic only takes effect while its section is the one
+ * on screen: answering the trigger elsewhere fires the handler, but the
+ * un-hiding does not happen. In section mode that left every gated block after
+ * the current section permanently hidden, so the fill could never reach the
+ * dropdowns inside it - items 6 and 7 of DV-100 came back with their text boxes
+ * filled by the visible-fields sweep and every checkbox empty, because no
+ * dropdown was ever answered to mirror into one.
+ *
+ * This used to run only in "all" mode, where the sections happen to be open
+ * already. restoreSectionViewState puts the operator back where they were.
+ */
 function revealAllForMaxFill() {
-  const style = (typeof window !== 'undefined' && window.__FORM_QUESTION_STYLE__)
-    ? String(window.__FORM_QUESTION_STYLE__).toLowerCase().trim()
-    : 'question';
-  if (style === 'all') {
-    document.querySelectorAll('.section').forEach(function(sec) { sec.classList.add('active'); });
-    document.querySelectorAll('.question-container.question-item').forEach(function(q) {
-      if (!q.classList.contains('hidden')) q.classList.remove('question-step-hidden');
-    });
+  document.querySelectorAll('.section').forEach(function(sec) { sec.classList.add('active'); });
+  document.querySelectorAll('.question-container.question-item').forEach(function(q) {
+    if (!q.classList.contains('hidden')) q.classList.remove('question-step-hidden');
+  });
+}
+/**
+ * Make the form's visibility agree with the answers already in it.
+ *
+ * A restored draft puts values straight into the fields, so no change event
+ * ever fires and the conditional logic never runs: a question can hold "Yes"
+ * and still be hidden, because nothing told it to un-hide. The debug fill then
+ * has nothing to answer - the field is filled - and skips it, so the answer is
+ * never mirrored into the hidden checkbox the PDF prints. Items 6 and 7 of
+ * DV-100 came back with every text box filled and every checkbox empty for
+ * exactly this reason.
+ *
+ * Re-firing each answered field's own change event runs its logic, un-hides
+ * what it should, and rebuilds the mirrors. Repeated until nothing more
+ * appears, because one question's reveal is the next one's trigger.
+ */
+function resyncConditionalLogic() {
+  for (let round = 0; round < 12; round++) {
+    const before = document.querySelectorAll('.question-container.hidden').length;
+    document.querySelectorAll('#customForm select, #customForm input, #customForm textarea')
+      .forEach(function (el) {
+        if (el.disabled || el.type === 'hidden') return;
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          if (el.checked) triggerFieldChange(el);
+          return;
+        }
+        if (String(el.value || '').trim() === '') return;
+        triggerFieldChange(el);
+        if (el.tagName === 'SELECT') triggerSelectSideEffects(el);
+      });
+    if (document.querySelectorAll('.question-container.hidden').length === before) break;
   }
 }
+
 function saveSectionViewState() {
   return {
     style: (typeof window !== 'undefined' && window.__FORM_QUESTION_STYLE__)
@@ -19279,6 +19321,11 @@ function fillYield() {
  */
 async function fillMaximumPathPass(pass) {
   revealAllForMaxFill();
+  // Every pass, not just the first. A later block only becomes reachable once
+  // an earlier one is answered, so restoring it on pass 1 alone left item 7
+  // filling 7 of its 22 fields instead of 13. It is the most expensive thing
+  // the fill does and it is worth it.
+  resyncConditionalLogic();
 
   // Answer every dropdown, re-scanning after each sweep.
   //
