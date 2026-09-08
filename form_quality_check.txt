@@ -1,13 +1,14 @@
 Form Quality Check
 ==================
-Last updated: September 3, 2026
+Last updated: September 8, 2026
 
-Four rules a generated form must satisfy before it ships. A form can pass the
+Six rules a generated form must satisfy before it ships. A form can pass the
 compiler's `auditForm()` — clean geometry, no unreachable nodes, no overlaps —
 and still fail every one of these. The audit checks the chart. These check the
 form.
 
-Run them in order. Rule 4 is the one that proves the other three, so it is last.
+Run 1 to 4 in order: rule 4 is the one that proves the first three, so it is
+last. Rule 5 is structural and costs nothing, so check it whenever you like.
 
 
 TABLE OF CONTENTS
@@ -16,6 +17,8 @@ TABLE OF CONTENTS
   Rule 2 — Ask the qualifying question first, never fold it into the question
   Rule 3 — Repeated entries use a multipleDropdownType node
   Rule 4 — The maximum path fills the right fields
+  Rule 5 — Every form has exactly one group, named after the form
+  Rule 6 — Ask only what the filer completes
   Pre-ship checklist
   Current status: the DV packet
 
@@ -298,6 +301,83 @@ The widest path is one path. Before shipping also run:
 
 
 ================================================================================
+RULE 5 — EVERY FORM HAS EXACTLY ONE GROUP, NAMED AFTER THE FORM
+================================================================================
+
+All forms will have exactly one group configured, and that group is the form
+name itself. One form, one group, named DV-100 / DV-109 / DV-110 — never two
+groups in a form, never a group called "Group 1".
+
+The group is what the progress bar counts. A packet of three forms should read
+
+    1 DV-100    2 DV-109    3 DV-110
+
+and tell a filer how much of the packet is left. Without groups the stepper
+falls back to one step per section, so the same packet reads as twenty steps
+named "Parties", "Abuse", "Other Orders" and so on — accurate, useless, and it
+hides the form boundary that actually matters.
+
+HOW TO CHECK
+
+  1. In the exported GUI JSON, read `groups`.
+  2. One entry per form, in form order, each named after its form.
+  3. Each entry's `sections` lists that form's sections and nothing else.
+  4. No section name appears in two forms. Groups match sections by their
+     display name, so a name used twice can only ever belong to one group.
+
+The project export warns on the console about both failure modes: groups that
+hold no sections, and section names shared between forms.
+
+WHAT YOU NO LONGER HAVE TO DO
+
+A form whose single group lists no sections gets that form's sections
+automatically at export. Naming the group is enough. What is still on you is the
+name itself, and the one-group-per-form shape: two empty groups in one form say
+nothing about where the split falls, so the export leaves both empty and the
+packet drops back to section steps.
+
+
+================================================================================
+RULE 6 — ASK ONLY WHAT THE FILER COMPLETES
+================================================================================
+
+Every Judicial Council form prints who completes it, and the packet must obey it.
+
+  DV-100   the request. The filer completes all of it.
+  DV-109   "The person asking for a restraining order must complete items 1 and
+           2. The court will complete the rest of this form."
+  DV-110   the same, for items 1, 2 and 3.
+
+A field the court completes is marked `"courtUse": true` in the field config. It
+stays on the PDF, blank, and never becomes a question.
+
+WHY THIS IS NOT COSMETIC
+
+Before this rule the packet asked a survivor "What did the judge decide about
+the Stay-Away Order?", "What is the clerk certificate date?", and "Serve DV-110
+with this notice?" - 139 questions no filer can answer. Answering them at all
+produces a filed order that says the court ruled something it has not. The
+interview was two thirds longer and every extra question was wrong to ask.
+
+HOW TO CHECK
+
+  node pipeline-audit.js
+
+reports, per form, how many filer fields are reachable and how many are left for
+the court. It fails on a question, in THIS form's own sections, that fills a
+court field. A court field filled by an answer an earlier form already collected
+is reported separately and is fine - DV-110 item 2 says in print "Include
+information from form DV-100, item 9".
+
+WHAT IS STILL ASKED
+
+After the rule, DV-109 asks nothing of its own: both party names and the court
+came from DV-100, so its sections collapse and the packet drops the empty step.
+DV-110 asks ten questions - the physical description of the restrained person
+that police need to enforce the order, which appears on no other form.
+
+
+================================================================================
 PRE-SHIP CHECKLIST
 ================================================================================
 
@@ -315,6 +395,10 @@ PRE-SHIP CHECKLIST
   [ ] 4b Marker-value pass read page by page against the blank forms.
   [ ] 4  Minimum path, typical path, and each activation branch run.
   [ ] 4  Realistic data, including overflow-length text.
+  [ ] 5  One group per form, named after the form, holding that form's sections.
+         No section name used by two forms.
+  [ ] 6  Every field the form says the court completes is marked courtUse, and
+         no question in that form asks for one.
   [ ] -  Every dropdown shows its real options, never a silent Yes/No fallback.
   [ ] -  No two questions share a hiddenLogic nodeId.
 
@@ -323,47 +407,58 @@ PRE-SHIP CHECKLIST
 CURRENT STATUS: THE DV PACKET
 ================================================================================
 
-Measured September 3, 2026, against dv-packet-project.json (386 questions).
+Measured September 8, 2026, against dv-packet-project.json — 156 questions in
+12 sections, rebuilt from the field configs by the pipeline in PIPELINE.md.
 
-  Rule 1  FAILS — 11 DV-110 fields have no question behind them: the firearm
-          description and location columns on page 2, and the page-9 clerk
-          block. They are mapped to their own ids in
-          dv-field-configs/dv110-field-config.json so the sanitizer preserves
-          them, which means they file blank.
+  Rule 1  PASSES — every filer field on all three forms is reachable.
+          dv100 321/321, dv109 6/6, dv110 42/42. The eleven DV-110 fields that
+          used to be mapped to their own raw AcroForm path now have names: the
+          firearm table on page 2, the "prohibited items" line in item 2, and
+          the clerk's certificate on page 9.
 
-  Rule 2  PASSES on wording — 4 questions carry an embedded condition and all
-          four are the allowed continuation-line case ("Continue your
-          explanation, if it did not fit"). The other 20 were repaired on
-          September 3: the rewriter had appended "if you know it" / "or another
-          way to identify it" to breed, location and name attributes, which both
-          broke Rule 2 and produced broken word order once the subject moved to
-          the end of the sentence ("What is the location, if you know it of the
-          first firearm item?").
+  Rule 2  PASSES on wording — no question text or option label still shows a
+          field name. That wording lives in the hints files now, so a recompile
+          keeps it; it used to exist only inside the compiled flowchart, and the
+          first recompile turned 146 questions back into
+          "What is your person_asking_protection_mailing_zip_code?".
 
-          NOT verified: that every gate is a real question and every conditional
-          points at a field that exists. The gate structure has never been
-          audited — see Rule 2's "where the gate lives".
+          NOT verified: that every gate is a real question.
 
-  Rule 3  FAILS — zero multipleDropdownType nodes in the whole packet. Ten
-          repeated blocks are flat numbered questions:
+  Rule 3  PARTLY — five of DV-100's eight numbered families are now one
+          multipleDropdownType block each: firearms, animals, debts, expenses,
+          restraining orders. 62 flat fields became 5 questions.
+          Still flat, because each entry carries a checkbox or a yes/no pair and
+          per-entry choice fields do not yet honour the {n} token:
+            other_protected_person (DV-100 and DV-110), wireless_transfer_phone,
+            property_debt_special_finding_debt.
 
-            6  firearm_item              4  wireless_transfer_phone
-            4  other_protected_person    4  animal          (DV-110)
-            4  protected_animal          3  property_debt
-            4  abuse_expense             3  property_debt_payment
-            2  recent_restraining_order  2  ammunition_item
+  Rule 4a PASSES — marker fill, section-at-a-time, test mode:
+            DV-100  163/163 text   99/158 checkboxes
+            DV-109    6/17  text    0/13
+            DV-110   45/108 text    4/85
+          Every blank on DV-109 and DV-110 is a court field. pipeline-explain.js
+          reports zero defects and zero unmapped fields on all three.
+          Three PDFs are produced, one per form.
 
-          Every user is currently asked about six firearms and four animals.
+  Rule 4b PASSES — all 13 pages of DV-100, page 1 of DV-109 and page 1 of
+          DV-110 read against the blank form with every box carrying its own
+          field name. Tables land column by column: firearms
+          description/number/location, animals name/type/breed/colour, debts
+          pay-to/for/amount/due-date, expenses pay-to/for/amount, wireless
+          numbers, other protected people name/age/relationship/lives-with-you.
+          Exclusive choices tick one box, not all of them - items 3f, 4a, 6g,
+          8, 9, 12c and 28 were each ticking every option before the missing
+          groups were added.
+          NOT read: the court pages of DV-109 and DV-110, which are blank.
 
-  Rule 4a PASSES — maximum path, section-at-a-time, test mode:
-            DV-100  163/163 text   105/158 checkboxes
-            DV-109   17/17  text     9/13  checkboxes
-            DV-110   97/108 text    56/85  checkboxes
-          Unticked boxes are branches the answers ruled out. The 11 unfilled
-          DV-110 text fields are the Rule 1 violation above. Three PDFs are
-          produced, one per activated form.
+  Rule 5  PASSES — one group per form, named after it. DV-109's group is empty
+          because that form asks nothing of its own.
 
-  Rule 4b NOT DONE — the mapping has been verified by name only. No filled page
-          has been read against a blank form. This is the blocker.
+  Rule 6  PASSES — 24 of DV-109's 30 fields and 151 of DV-110's 193 are marked
+          courtUse and are never asked. DV-109 asks nothing the filer has not
+          already answered on DV-100; DV-110 asks ten questions, the physical
+          description police need.
 
-The packet is suitable for internal QA. It is not ready to file.
+The packet is ready for a human review of the flowchart. Before filing: run the
+minimum path and a typical path, finish Rule 3, and add DV-140 (Confidential
+Information for Law Enforcement), which DV-100 page 13 lists as required.
