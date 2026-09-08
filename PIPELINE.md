@@ -142,10 +142,16 @@ a filer who had just said it happened once.
 
 Run both. Neither is sufficient alone, and each takes a few seconds.
 
-Run each from a freshly loaded preview. The form restores its own saved draft
-on load, so a minimum path started on the page a maximum path just finished is
-measuring the maximum path's leftovers - it will report far more filled than
-the narrow path actually opens.
+Either can be run on a page the other has already filled. A fill clears the
+questions its path does not reach, the way the generated logic clears a question
+it closes, so a minimum run does not inherit a maximum run's answers - it used
+to, and reported nineteen ticked boxes on the run whose whole job is to show
+that unticked gates close their blocks.
+
+In question-at-a-time mode a minimum path leaves a handful of questions on
+screen that it says are not asked. The step navigator will not show an empty
+section, so it un-hides the first question in one rather than put a Next button
+under a blank screen. They stay empty, and nothing of theirs reaches the PDF.
 
 Fields the form validates - dates, zips, phones, amounts - keep valid data in
 either mode, because a marker there fails validation and stops the run.

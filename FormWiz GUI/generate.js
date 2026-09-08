@@ -217,17 +217,25 @@ function logicAlwaysVisibleInStackedMode(formQuestionStyle, questionId, logicRow
     const listedSet = new Set(listed);
     return allOptions.every(function(opt) { return listedSet.has(opt); });
 }
+// Where the area code and the rest of a number are kept, given the visible
+// field's id. Both the code that builds the pair and the code that fills it
+// go through here, because they used to derive it separately and disagreed.
+window.phoneSplitFieldIds = function(inputId) {
+    const id = String(inputId == null ? "" : inputId);
+    const match = id.match(/^(.*)_([0-9]+)$/);
+    const base = match ? match[1] : id;
+    const suffix = match ? "_" + match[2] : "";
+    return { code: base + "_code" + suffix, noCode: base + "_no_code" + suffix };
+};
 // Phone formatter: formats to (123)-456-7890 as user types
 window.updatePhoneSplitFields = function(inputEl) {
     if (!inputEl) return;
     const id = inputEl.id || inputEl.name;
     if (!id) return;
     const digits = (inputEl.value || "").replace(/\D/g, "").slice(0, 10);
-    const match = id.match(/^(.*)_([0-9]+)$/);
-    const base = match ? match[1] : id;
-    const suffix = match ? "_" + match[2] : "";
-    const codeField = document.getElementById(base + "_code" + suffix);
-    const noCodeField = document.getElementById(base + "_no_code" + suffix);
+    const names = window.phoneSplitFieldIds(id);
+    const codeField = document.getElementById(names.code);
+    const noCodeField = document.getElementById(names.noCode);
     if (!codeField && !noCodeField) return;
     const area = digits.slice(0, 3);
     const rest = digits.slice(3);
@@ -1309,16 +1317,28 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '    </style>',
     '    <script>',
     '      // Phone formatter: Phone Number',
+    '      // Where the area code and the rest of a number are kept. A phone box',
+    '      // inside a repeating block is one of two shapes - the entry number is',
+    '      // either appended to the name or substituted into the middle of it - so',
+    '      // whoever builds the pair and whoever fills it have to derive it the same',
+    '      // way. They did not: the builder appended the entry number to the raw',
+    '      // template name and produced wireless_transfer_phone_{n}_number_code_1,',
+    '      // an id with the token still in it that nothing ever wrote to.',
+    '      window.phoneSplitFieldIds = window.phoneSplitFieldIds || function(inputId) {',
+    '        const id = String(inputId == null ? "" : inputId);',
+    '        const match = id.match(/^(.*)_([0-9]+)$/);',
+    '        const base = match ? match[1] : id;',
+    '        const suffix = match ? "_" + match[2] : "";',
+    '        return { code: base + "_code" + suffix, noCode: base + "_no_code" + suffix };',
+    '      };',
     '      window.updatePhoneSplitFields = window.updatePhoneSplitFields || function(inputEl) {',
     '        if (!inputEl) return;',
     '        const id = inputEl.id || inputEl.name;',
     '        if (!id) return;',
     '        const digits = (inputEl.value || "").replace(/\\D/g, "").slice(0, 10);',
-    '        const match = id.match(/^(.*)_([0-9]+)$/);',
-    '        const base = match ? match[1] : id;',
-    '        const suffix = match ? "_" + match[2] : "";',
-    '        const codeField = document.getElementById(base + "_code" + suffix);',
-    '        const noCodeField = document.getElementById(base + "_no_code" + suffix);',
+    '        const names = window.phoneSplitFieldIds(id);',
+    '        const codeField = document.getElementById(names.code);',
+    '        const noCodeField = document.getElementById(names.noCode);',
     '        if (!codeField && !noCodeField) return;',
     '        const area = digits.slice(0, 3);',
     '        const rest = digits.slice(3);',
@@ -12060,6 +12080,8 @@ function showTextboxLabels(questionId, count){
                     prefillValue = field.prefill;
                 }
                 const safePrefill = prefillValue ? prefillValue.replace(/"/g, '&quot;') : '';
+                // From fieldId, which is what updatePhoneSplitFields will be handed.
+                const splitNames = window.phoneSplitFieldIds(fieldId);
                 inputDiv.innerHTML =
                   '<div class="address-field">' +
                     '<input type="tel"' +
@@ -12071,11 +12093,11 @@ function showTextboxLabels(questionId, count){
                     ' oninput="formatPhoneInput(this)"' +
                     ' value="' + safePrefill + '">' +
                     '<input type="hidden"' +
-                    ' id="' + field.nodeId + '_code_' + j + '"' +
-                    ' name="' + field.nodeId + '_code_' + j + '">' +
+                    ' id="' + splitNames.code + '"' +
+                    ' name="' + splitNames.code + '">' +
                     '<input type="hidden"' +
-                    ' id="' + field.nodeId + '_no_code_' + j + '"' +
-                    ' name="' + field.nodeId + '_no_code_' + j + '">' +
+                    ' id="' + splitNames.noCode + '"' +
+                    ' name="' + splitNames.noCode + '">' +
                   '</div>';
                 // Append all children (wrapper + input + hidden fields)
                 Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
@@ -19089,12 +19111,39 @@ function applySolvedPath(plan) {
   const model = plan.model;
   const touched = [];
 
+  // Hiding a question empties it, which is what the generated logic does when
+  // it closes one and what makes the fill decide the path rather than inherit
+  // it. The page restores its saved draft on load, so a minimum run on a page
+  // that has held a maximum run starts with every answer already in the fields;
+  // leaving them there kept satisfying the gates the narrow path had just
+  // closed, and the page re-opened "which orders are you asking for" as fast as
+  // this could shut it - nineteen boxes ticked on the run whose whole job is to
+  // leave them alone.
+  const cleared = [];
+  const clearQuestion = function (container) {
+    container.querySelectorAll('input, select, textarea').forEach(function (el) {
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        if (el.checked) { el.checked = false; cleared.push(el); }
+        return;
+      }
+      if (el.tagName === 'SELECT') {
+        if (el.selectedIndex !== 0) { el.selectedIndex = 0; cleared.push(el); }
+        return;
+      }
+      if (String(el.value || '') !== '') { el.value = ''; cleared.push(el); }
+    });
+    // The hidden boxes a dropdown answer mirrors into live outside the control
+    // that made them, and an unasked question must not print one.
+    container.querySelectorAll('[id^="dropdowntext_"]').forEach(function (wrap) { wrap.innerHTML = ''; });
+  };
+
   const setVisibility = function () {
     plan.ids.forEach(function (qid) {
       const container = document.getElementById('question-container-' + qid);
       if (!container) return;
-      if (plan.visible[qid]) container.classList.remove('hidden');
-      else container.classList.add('hidden');
+      if (plan.visible[qid]) { container.classList.remove('hidden'); return; }
+      if (!container.classList.contains('hidden')) container.classList.add('hidden');
+      clearQuestion(container);
     });
   };
 
@@ -19152,6 +19201,17 @@ function applySolvedPath(plan) {
   // 4. Those events re-ran the generated logic, which reaches the same
   //    conclusion the model did - but a hide path resets the dropdowns inside
   //    the question it closes, so say once more what is shown before filling.
+  setVisibility();
+
+  // 5. An emptied question has to be announced the same way an answered one is.
+  //    Each question watches the fields it is gated on, not the class on their
+  //    container, so clearing item 5 in silence left the question behind it
+  //    reading its own last verdict - visible, on the strength of an answer that
+  //    is no longer there - and everything behind that stayed open with it.
+  cleared.forEach(function (el) {
+    triggerFieldChange(el);
+    if (el.tagName === 'SELECT') triggerSelectSideEffects(el);
+  });
   setVisibility();
 }
 
@@ -19243,18 +19303,62 @@ function fillSolvedRemainder() {
 /**
  * What the page has undone since the path was written to it.
  *
- * Two kinds of drift, both caused by the same thing: a question that should
- * be on screen and is not, and a question that is on screen with the answer
- * it was given now gone.
+ * Three kinds of drift, all caused by the same thing: a question that should
+ * be on screen and is not, a question that is on screen with the answer it was
+ * given now gone, and a checkbox question ticked differently from the way the
+ * path ticked it.
+ *
+ * That third one was missing, and only the minimum path could show it: the
+ * page restores its saved draft after the fill has finished, which re-ticked
+ * all nineteen boxes of "which orders are you asking for" on the run whose
+ * whole job is to leave them alone. Nothing here noticed, so nothing put them
+ * back.
  */
+/**
+ * Sections in which the path leaves nothing to ask.
+ *
+ * Question-at-a-time mode will not show an empty section: refreshNav un-hides
+ * the first question in one rather than put a Next button under a blank screen.
+ * That is the page doing its job, not the path coming undone - but it looks
+ * exactly like drift, and on a minimum run seven closed sections meant every
+ * settle attempt was spent re-hiding questions the nav put straight back. The
+ * fill left them alone in the end and took eighteen seconds to decide to.
+ *
+ * They stay empty either way: nothing answers a question the path never
+ * reached, so nothing of theirs reaches the PDF.
+ */
+function solverEmptySections(plan) {
+  const closed = {};
+  plan.ids.forEach(function (qid) {
+    const container = document.getElementById('question-container-' + qid);
+    const section = container && container.closest('[id^="section"]');
+    if (!section) return;
+    if (closed[section.id] === undefined) closed[section.id] = true;
+    if (plan.visible[qid]) closed[section.id] = false;
+  });
+  return closed;
+}
+
 function solvedPathDrift(plan) {
   let drifted = 0;
+  const closedSections = solverEmptySections(plan);
   plan.ids.forEach(function (qid) {
     const container = document.getElementById('question-container-' + qid);
     if (!container) return;
-    if (plan.visible[qid] === container.classList.contains('hidden')) { drifted++; return; }
+    if (plan.visible[qid] === container.classList.contains('hidden')) {
+      const section = container.closest('[id^="section"]');
+      if (!plan.visible[qid] && section && closedSections[section.id]) return;
+      drifted++;
+      return;
+    }
     const given = plan.answers[qid];
-    if (given === undefined || given === 'x' || (given && given.has)) return;
+    if (given === undefined || given === 'x') return;
+    if (given && given.has) {
+      container.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(function (box) {
+        if (box.checked !== given.has(String(box.value || '').trim().toLowerCase())) drifted++;
+      });
+      return;
+    }
     const el = solverAnswerElement(qid, plan.model);
     if (el && String(el.value || '').trim() === '') drifted++;
   });
