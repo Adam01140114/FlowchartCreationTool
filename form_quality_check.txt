@@ -2,7 +2,7 @@ Form Quality Check
 ==================
 Last updated: September 8, 2026
 
-Six rules a generated form must satisfy before it ships. A form can pass the
+Seven rules a generated form must satisfy before it ships. A form can pass the
 compiler's `auditForm()` — clean geometry, no unreachable nodes, no overlaps —
 and still fail every one of these. The audit checks the chart. These check the
 form.
@@ -19,6 +19,7 @@ TABLE OF CONTENTS
   Rule 4 — The maximum path fills the right fields
   Rule 5 — Every form has exactly one group, named after the form
   Rule 6 — Ask only what the filer completes
+  Rule 7 — A form that asks nothing still ships
   Pre-ship checklist
   Current status: the DV packet
 
@@ -378,6 +379,57 @@ that police need to enforce the order, which appears on no other form.
 
 
 ================================================================================
+RULE 7 — A FORM THAT ASKS NOTHING STILL SHIPS
+================================================================================
+
+In a packet, a form can legitimately have no questions of its own, and that is a
+result to check rather than a bug to fix.
+
+DV-109 has exactly four fields the filer completes: the court's name and
+address, the case number, "Person Asking for Protection" and "Person to Be
+Restrained". Every one of those is an answer DV-100 already collects.
+dv-packet-connections.json renames them to DV-100's field names, the packet
+collapses the duplicates, DV-109's section ends up with zero questions - and the
+export drops it, because a step with nothing in it is a page the filer clicks
+Next through twice for a form they never fill.
+
+So the packet's progress bar reads DV-100, DV-110. There is no DV-109 step, and
+there should not be.
+
+WHAT MUST STILL BE TRUE
+
+The form is still produced and still filled. A form that asks nothing is not a
+form that was dropped:
+
+  - it stays in projectForms with its own pdfFile, and its activation still
+    decides whether it is produced
+  - Download PDFs produces it
+  - Preview PDFs lists it, so the filer can read it before filing
+  - its fields carry the answers that came from the earlier form
+
+HOW TO CHECK
+
+  node pipeline-fill.js --render
+
+and read that form's PDF. DV-109 on the last run:
+
+    6/17 text fields filled - court name, case number, both party names
+    11 blank - every one a court field: hearing date, department, room, the
+    judge's rulings, the clerk's certificate
+
+If the form comes back empty, the connections did not apply and the answers
+never reached it. If it does not come back at all, it was dropped rather than
+collapsed.
+
+WHAT FAILURE LOOKS LIKE
+
+Quiet. The interview looks shorter and cleaner, the filer never sees the form,
+and nothing says whether it was filled or forgotten. This is exactly how a
+missing PDF hides: Preview PDFs used to list the first form only, so DV-109 and
+DV-110 were about to be filed with no way to look at them first.
+
+
+================================================================================
 PRE-SHIP CHECKLIST
 ================================================================================
 
@@ -399,6 +451,8 @@ PRE-SHIP CHECKLIST
          No section name used by two forms.
   [ ] 6  Every field the form says the court completes is marked courtUse, and
          no question in that form asks for one.
+  [ ] 7  Every activated form produces a filled PDF and appears in Preview PDFs,
+         including any form whose questions all collapsed into an earlier one.
   [ ] -  Every dropdown shows its real options, never a silent Yes/No fallback.
   [ ] -  No two questions share a hiddenLogic nodeId.
 
@@ -453,6 +507,12 @@ Measured September 8, 2026, against dv-packet-project.json — 156 questions in
 
   Rule 5  PASSES — one group per form, named after it. DV-109's group is empty
           because that form asks nothing of its own.
+
+  Rule 7  PASSES — DV-109 asks nothing and has no step, and its PDF is still
+          produced, filled with the four values DV-100 collected, and listed in
+          Preview PDFs. That listing was the bug this rule was written from:
+          the preview offered the first form only, so two of the three forms
+          about to be filed could not be read first.
 
   Rule 6  PASSES — 24 of DV-109's 30 fields and 151 of DV-110's 193 are marked
           courtUse and are never asked. DV-109 asks nothing the filer has not

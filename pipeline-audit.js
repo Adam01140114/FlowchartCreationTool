@@ -254,6 +254,20 @@ async function main() {
     });
   });
 
+  // Rule 7: a form can legitimately ask nothing - every value it prints came
+  // from an earlier form - but it must still be produced. What makes that go
+  // wrong is silent: the form vanishes from the interview and nobody notices it
+  // also vanished from the output.
+  report.rule7 = forms.map((form) => ({
+    form: form.name,
+    asksNothing: form.asksNothing === true || form.lastSection < form.firstSection,
+    pdfFile: form.pdfFile || '',
+    alwaysIncluded: form.alwaysIncluded === true,
+    activatedBy: (gui.formActivations || [])
+      .filter((r) => r.targetForm === form.name)
+      .map((r) => (r.unconditional ? 'unconditionally' : r.optionLabel + ' on q' + r.questionId))
+  }));
+
   const groups = gui.groups || [];
   // A cover form whose every answer came from an earlier form asks nothing, so
   // its sections are dropped and its group is legitimately empty: there is no
@@ -307,6 +321,17 @@ async function main() {
     r.blocks.forEach((b) => console.log('      - ' + b.family
       + '  ' + b.entries + ' entries x ' + b.fieldsPerEntry + ' field(s) = ' + b.total + ' fields'));
   });
+  console.log('');
+  console.log('RULE 7 — a form that asks nothing still ships');
+  report.rule7.forEach((f) => {
+    const how = f.alwaysIncluded ? 'always included'
+      : (f.activatedBy.length ? 'activated ' + f.activatedBy.join(', ') : 'NOTHING ACTIVATES IT');
+    const verdict = (!f.pdfFile || (!f.alwaysIncluded && !f.activatedBy.length)) ? 'FAILS ' : '';
+    console.log('  ' + verdict + f.form.padEnd(8)
+      + (f.asksNothing ? 'asks nothing, ' : '')
+      + (f.pdfFile ? 'produces ' + f.pdfFile : 'HAS NO PDF') + ', ' + how);
+  });
+
   console.log('');
   console.log('ORDERING — no question waits on one that comes after it');
   if (!report.forwardRefs.length) console.log('  passes');
