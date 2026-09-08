@@ -218,6 +218,97 @@ function repointReferences(merged, replacement) {
   }
 
 /**
+ * Drop sections the packet no longer asks anything in.
+ *
+ * A cover form can be entirely made of answers another form already collected -
+ * DV-109 asks for the two party names and the court, all of which DV-100 asked
+ * first - and once those duplicates collapse, its section holds nothing. Left in
+ * place that is a progress step with no questions: the filer clicks Next twice
+ * through an empty page for a form they never have to fill. The form itself is
+ * still produced and still filled; it just has nothing to ask.
+ *
+ * Sections are renumbered, so everything that names a section by number moves
+ * with them.
+ */
+function dropEmptySections(merged) {
+  const kept = merged.sections.filter(function (s) { return (s.questions || []).length; });
+  if (kept.length === merged.sections.length) return [];
+
+  const removed = merged.sections.filter(function (s) { return !(s.questions || []).length; });
+  const renumber = new Map();
+  kept.forEach(function (section, i) {
+    renumber.set(String(section.sectionId), i + 1);
+    section.sectionId = i + 1;
+  });
+  merged.sections = kept;
+  merged.sectionCounter = kept.length + 1;
+
+  // "Jump to section N" has to follow the renumbering; "end" is a keyword.
+  kept.forEach(function (section) {
+    section.questions.forEach(function (q) {
+      if (!q.jump || !Array.isArray(q.jump.conditions)) return;
+      q.jump.conditions.forEach(function (c) {
+        if (String(c.to).toLowerCase() === 'end') return;
+        const to = renumber.get(String(c.to));
+        if (to) c.to = String(to);
+      });
+    });
+  });
+
+  (merged.projectForms || []).forEach(function (form) {
+    const ids = [];
+    for (let n = form.firstSection; n <= form.lastSection; n++) {
+      const to = renumber.get(String(n));
+      if (to) ids.push(to);
+    }
+    // A form with nothing left to ask keeps its place in the packet and its PDF;
+    // it simply owns no section, so navigation never lands in it.
+    form.firstSection = ids.length ? Math.min.apply(null, ids) : 0;
+    form.lastSection = ids.length ? Math.max.apply(null, ids) : -1;
+    form.asksNothing = ids.length === 0;
+  });
+
+  (merged.packetMirrors || []).forEach(function (m) {
+    const asked = renumber.get(String(m.askedInSection));
+    if (asked) m.askedInSection = asked;
+    (m.alsoAnswers || []).forEach(function (a) {
+      const to = renumber.get(String(a.section));
+      if (to) a.section = to;
+    });
+  });
+
+  const gone = new Set(removed.map(function (s) { return String(s.sectionName || '').trim(); }));
+  (merged.groups || []).forEach(function (g) {
+    g.sections = (g.sections || []).filter(function (name) { return !gone.has(String(name).trim()); });
+  });
+
+  return removed.map(function (s) { return s.sectionName; });
+}
+
+/**
+ * One form's groups, with the obvious default filled in.
+ *
+ * A group holds its sections by display name, and the packet's progress bar
+ * only shows group names when at least one group actually holds a section.
+ * Naming one group per form and never opening "Add Section to Group" is the
+ * natural way to use this, and it quietly produced a stepper labelled by
+ * section instead - so a form whose only group lists nothing gives that group
+ * the whole form. Two or more empty groups in one form say nothing about where
+ * the split falls, so those are left alone and reported instead.
+ */
+function groupsForForm(gui) {
+  const groups = (gui.groups || []).map(function (g) {
+    return { name: g.name || '', sections: (g.sections || []).slice() };
+  });
+  if (groups.length !== 1 || groups[0].sections.length) return groups;
+
+  groups[0].sections = (gui.sections || [])
+    .map(function (s) { return String(s.sectionName || '').trim(); })
+    .filter(Boolean);
+  return groups;
+}
+
+/**
  * Say why a packet's progress bar will fall back to section names.
  *
  * The stepper is group-based only when at least one group actually holds
@@ -333,12 +424,12 @@ function reportGroupProblems(merged) {
       // blocks by that id - two forms whose groups are both id 1 collapse into
       // one block, so the packet's progress bar lost a step per form. Renumber
       // in merge order, which also puts the steps in form order.
-      (gui.groups || []).forEach(function (group) {
+      groupsForForm(gui).forEach(function (group) {
         groupIdCounter += 1;
         merged.groups.push({
           groupId: groupIdCounter,
           name: group.name || ('Group ' + groupIdCounter),
-          sections: (group.sections || []).slice()
+          sections: group.sections
         });
       });
 
@@ -360,6 +451,12 @@ function reportGroupProblems(merged) {
     const collapsed = collapseSharedQuestions(merged);
     if (collapsed) {
       console.log('[project-gui] Collapsed ' + collapsed + ' repeated shared question(s)');
+    }
+
+    const emptied = dropEmptySections(merged);
+    if (emptied.length) {
+      console.log('[project-gui] Dropped ' + emptied.length + ' section(s) left with no questions: '
+        + emptied.join(', '));
     }
 
     reportGroupProblems(merged);
@@ -384,6 +481,23 @@ function reportGroupProblems(merged) {
     return text;
   }
 
+  /**
+   * The merged packet JSON, offered as text before anything is saved.
+   *
+   * The export walks every form with a settle delay between them, so the dialog
+   * takes the promise and fills itself in when it resolves.
+   */
+  function showExportProjectGuiJsonDialog() {
+    window.showExportDialog({
+      title: 'Export Project GUI JSON',
+      description: 'Every form in the project merged into one interview. '
+        + 'Copy it, or download it as a file.',
+      filename: 'project-gui.json',
+      text: function () { return exportProjectGuiJson(false); }
+    });
+  }
+
   window.buildProjectGuiJson = buildProjectGuiJson;
   window.exportProjectGuiJson = exportProjectGuiJson;
+  window.showExportProjectGuiJsonDialog = showExportProjectGuiJsonDialog;
 })();

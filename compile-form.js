@@ -124,8 +124,23 @@ const KNOWN_TYPES = new Set([
   'radio', 'email', 'phone', 'money', 'textarea', 'file'
 ]);
 
+/**
+ * Fields the court fills, not the filer.
+ *
+ * Every Judicial Council form in a packet says in print who completes what:
+ * DV-109 is "The person asking for a restraining order must complete items 1
+ * and 2. The court will complete the rest of this form", DV-110 the same for
+ * items 1, 2 and 3. A field marked courtUse in the field config is left on the
+ * PDF for the judge or clerk and never becomes a question - asking a survivor
+ * what the judge decided produces an answer they cannot know and a filed order
+ * that says the court ruled something it has not.
+ */
+function isCourtUse(field) {
+  return field.courtUse === true || field.courtUse === 'true';
+}
+
 function normalizeFields(schema) {
-  return (schema.fields || []).map((f, i) => ({
+  return (schema.fields || []).filter((f) => !isCourtUse(f)).map((f, i) => ({
     index: i,
     id: f.id || f.newName || `field_${i}`,
     nameId: f.newName || f.id || `field_${i}`,
@@ -154,9 +169,20 @@ function normalizeFields(schema) {
  */
 function applyMirrors(fields, hints) {
   const specs = hints.mirrors || [];
-  if (!specs.length) return fields;
-
   const dropped = new Set();
+
+  // Two AcroForm fields with the same name ARE one value - that is what a
+  // repeated name means in a PDF, and it is how a case number reaches all nine
+  // pages. They need no hint to say so, and before this the compiler asked for
+  // the same case number once per page.
+  const firstByName = new Map();
+  fields.forEach((f) => {
+    const seen = firstByName.get(f.nameId);
+    if (!seen) { firstByName.set(f.nameId, f); return; }
+    seen.mirrorTargets = (seen.mirrorTargets || [seen.id]).concat(f.id);
+    dropped.add(f.id);
+  });
+
   specs.forEach((spec) => {
     const members = (spec.members || [])
       .map((m) => fields.find((f) => f.id === m || f.nameId === m))
@@ -203,6 +229,11 @@ function detectGroups(fields, hints) {
       nameId: g.nameId || commonTokenPrefix(members.map((m) => m.id)) || slug(g.question || 'choice'),
       question: g.question || groupQuestion(g.nameId || commonTokenPrefix(members.map((m) => m.id))),
       members,
+      // The field name is a poor option label when the PDF encodes the answer in
+      // it: person_to_restrain_firearms_unknown_yes reads "Unknown yes", where
+      // the form says "I don't know". A labels array in the hint, one per member
+      // in order, says what the option should read.
+      labels: Array.isArray(g.labels) ? g.labels : null,
       multiSelect: g.multiSelect === true,
       source: 'hint'
     });
@@ -263,10 +294,48 @@ function optionLabel(field, groupNameId) {
 }
 
 /**
+ * Collapse a numbered family into one repeating block.
+ *
+ * A PDF that prints six firearm rows has six sets of fields, and asking about
+ * each in turn asks every filer about six firearms - four of which they do not
+ * have. One question ("how many?") followed by that many entry blocks is the
+ * same data and a fraction of the interview.
+ *
+ * The entry's fields keep the PDF's own naming through the {n} token, so entry
+ * 3 of firearm_item fills firearm_item_3_description rather than being renamed
+ * to suit the builder.
+ */
+function applyRepeats(fields, hints) {
+  const specs = hints.repeats || [];
+  if (!specs.length) return { fields, repeats: [] };
+
+  const absorbed = new Set();
+  const repeats = [];
+  specs.forEach((spec) => {
+    const pattern = new RegExp('^' + spec.nameId + '_(\\d+)_(.+)$');
+    const members = fields.filter((f) => pattern.test(f.nameId));
+    if (!members.length) return;
+    const entries = new Set(members.map((f) => Number(pattern.exec(f.nameId)[1])));
+    members.forEach((f) => absorbed.add(f.id));
+    repeats.push({
+      nameId: spec.nameId,
+      question: spec.question,
+      entryTitle: spec.entryTitle || '',
+      min: spec.min == null ? 0 : spec.min,
+      max: spec.max == null ? Math.max.apply(null, [...entries]) : spec.max,
+      // The first field of entry 1 anchors the block where the family started.
+      anchor: members[0],
+      fields: spec.fields
+    });
+  });
+  return { fields: fields.filter((f) => !absorbed.has(f.id)), repeats };
+}
+
+/**
  * Build the interview tree: a flat list of steps, where conditional fields are
  * nested as follow-ups under the option that enables them.
  */
-function buildInterview(fields, hints) {
+function buildInterview(fields, hints, repeats = []) {
   // hints may re-state a field's conditional (the payload often cannot express
   // "show when Partnership OR Trust OR LLC-P")
   fields.forEach((f) => {
@@ -291,6 +360,7 @@ function buildInterview(fields, hints) {
       options: spec.options || null,
       section: null,
       field: spec.field || null,
+      repeat: spec.repeat || null,
       origin: spec.origin || 'field'
     };
     stepOf.set(step.nameId, step);
@@ -388,6 +458,8 @@ function buildInterview(fields, hints) {
     : fields;
 
   const emittedGroups = new Set();
+  const emittedRepeats = new Set();
+  let lastIndex = -1;
 
   const choices = (hints.choices || []).slice();
 
@@ -420,6 +492,25 @@ function buildInterview(fields, hints) {
 
     const override = (hints.questions || {})[field.id] || (hints.questions || {})[field.nameId];
 
+    // 0. a numbered family stands in for all its fields, at the position the
+    //    first of them held, so the block is asked where the form asks it
+    const repeat = repeats.find((r) => r.anchor && r.anchor.index > lastIndex
+      && r.anchor.index < field.index);
+    if (repeat && !emittedRepeats.has(repeat)) {
+      emittedRepeats.add(repeat);
+      const step = makeStep({
+        nameId: repeat.nameId,
+        text: repeat.question,
+        type: 'multipleDropdownType',
+        options: [],
+        repeat: repeat,
+        origin: 'repeat'
+      });
+      place(step, hostFor(repeat.anchor));
+      notes.push(`repeat: ${repeat.nameId} -> "${repeat.question}" (up to ${repeat.max} entries)`);
+    }
+    lastIndex = field.index;
+
     // 1. exclusive / multi-select family -> one question with option nodes
     const group = groupOfField.get(field.id);
     if (group) {
@@ -429,8 +520,8 @@ function buildInterview(fields, hints) {
         nameId: group.nameId,
         text: group.question,
         type: group.multiSelect ? 'checkbox' : 'dropdown',
-        options: group.members.map((m) => ({
-          label: optionLabel(m, group.nameId),
+        options: group.members.map((m, i) => ({
+          label: (group.labels && group.labels[i]) || optionLabel(m, group.nameId),
           nameId: m.nameId,
           follow: []
         })),
@@ -517,6 +608,21 @@ function buildInterview(fields, hints) {
     place(step, host);
   });
 
+  repeats.forEach((repeat) => {
+    if (emittedRepeats.has(repeat)) return;
+    emittedRepeats.add(repeat);
+    const step = makeStep({
+      nameId: repeat.nameId,
+      text: repeat.question,
+      type: 'multipleDropdownType',
+      options: [],
+      repeat: repeat,
+      origin: 'repeat'
+    });
+    place(step, hostFor(repeat.anchor));
+    notes.push(`repeat: ${repeat.nameId} -> "${repeat.question}" (up to ${repeat.max} entries)`);
+  });
+
   return { steps, notes, groups };
 }
 
@@ -552,6 +658,16 @@ function assignSections(steps, fields, hints, sectionPrefs) {
     let cur = 0;
     steps.forEach((step) => {
       if (startAt.has(step.nameId)) cur = startAt.get(step.nameId);
+      // A repeating block stands in for a family of fields, and the section
+      // hint names those fields, not the block. Without this the block starts
+      // wherever the previous question left off - the firearms block landed in
+      // "Other Protected People" and left "Firearms" with nothing in it.
+      else if (step.repeat) {
+        const anchor = step.repeat.fields
+          .map((f) => step.repeat.nameId + '_1' + String(f.nameId).replace('{n}', ''))
+          .find((name) => startAt.has(name));
+        if (anchor) cur = startAt.get(anchor);
+      }
       walkSteps([step], (sub) => { sub.section = cur + 1; });
     });
     return hinted.length;
@@ -665,8 +781,9 @@ function createBuilder() {
     sources.forEach((s) => addEdge(s.id, target.id, 'funnel'));
   }
 
-  function addQuestion({ text, type, nameId, section, x, y, mirrorTargets }) {
+  function addQuestion({ text, type, nameId, section, x, y, mirrorTargets, minHeight }) {
     const box = fitBox(text, { minW: Q_W, minH: Q_H, maxW: Q_W });
+    if (minHeight) box.height = Math.max(box.height, minHeight);
     const stroke = sectionStyle(section);
     return addVertex({
       id: id(),
@@ -780,6 +897,36 @@ function createBuilder() {
  * relative to x=0 and then translated into a packed row, so side-by-side
  * follow-ups can never overlap (trainer rule 4.1).
  */
+/** Roughly what the editor will draw for a block of this many fields, rounded up. */
+function repeatHeight(repeat) {
+  return 260 + 140 * (repeat.fields || []).length;
+}
+
+/**
+ * Put a repeating block's entry template on the question cell.
+ *
+ * The editor and the exporter read these underscore properties: _twoNumbers is
+ * the min/max the "how many?" dropdown offers, _textboxes is one entry's fields,
+ * and _itemOrder is the order they appear in. Each field's nameId carries {n},
+ * so the exporter composes <block>_{n}_<field> and the generated form swaps in
+ * the entry number.
+ */
+function attachRepeat(cell, repeat) {
+  cell._twoNumbers = { first: String(repeat.min), second: String(repeat.max) };
+  cell._dropdownTitle = repeat.entryTitle || '';
+  cell._textboxes = repeat.fields.map((f) => ({
+    nameId: f.nameId,
+    label: f.label || '',
+    placeholder: f.label || '',
+    isAmountOption: f.type === 'amount',
+    prefill: '',
+    conditionalPrefills: []
+  }));
+  cell._itemOrder = repeat.fields.map((_, i) => ({ type: 'option', index: i }));
+  cell._locationIndex = null;
+  cell._dropdowns = [];
+}
+
 function layoutSequence(b, steps, startY, centerX) {
   let entry = null;
   let exits = null;   // [{ cell, origin }] — origin = option nameId this exit came from
@@ -809,10 +956,17 @@ function layoutSequence(b, steps, startY, centerX) {
       section: step.section || 1,
       x: centerX - Q_W / 2,
       y: qy,
+      // A repeating block draws as a table of its entry fields, and the editor
+      // resizes it to fit on import - keeping the centre, so a box laid out at
+      // question height grows upward over whatever sits above it and the editor
+      // then renumbers the two by vertical position. Reserving the room here
+      // keeps the block below the question that feeds it.
+      minHeight: step.repeat ? repeatHeight(step.repeat) : 0,
       // Set only on mirrored fields; every step carries its source field.
       mirrorTargets: step.field ? step.field.mirrorTargets : null
     });
     step.cell = q;
+    if (step.repeat) attachRepeat(q, step.repeat);
 
     if (!entry) entry = joinHub || q;
     if (incoming && incoming.length) {
@@ -873,8 +1027,9 @@ function layoutSequence(b, steps, startY, centerX) {
 
 function compile(schema, hints = {}) {
   const merged = Object.assign({}, schema.interview || {}, hints);
-  const fields = applyMirrors(normalizeFields(schema), merged);
-  const { steps, notes, groups } = buildInterview(fields, merged);
+  const mirrored = applyMirrors(normalizeFields(schema), merged);
+  const { fields, repeats } = applyRepeats(mirrored, merged);
+  const { steps, notes, groups } = buildInterview(fields, merged, repeats);
 
   const b = createBuilder();
   const sectionCount = assignSections(steps, fields, merged, b.sectionPrefs);
