@@ -36,6 +36,12 @@ let currentSectionNumber = 1;   // updated by navigateSection()
 // We also create a buffer to store our conditional-logic code
 // so we can insert it later in one <script> block.
 let logicScriptBuffer = "";
+// The interview as data: what each question is, what it offers, and what it
+// waits on. The generated page has always had this baked into closures, one
+// updateVisibility per question, so the only way to know how the form would
+// look after an answer was to apply it and watch the DOM settle. Emitting it
+// lets the debug fill work the path out in memory and write the result once.
+let formLogicModel = {};
 /*───────────────────────────────*
  * canonical sanitiser – visible
  * to all build-time code
@@ -595,6 +601,7 @@ hiddenLogicConfigs.length = 0;
 linkedFields.length = 0;
 linkedCheckboxes.length = 0;
 logicScriptBuffer = "";
+formLogicModel = {};
 // Get form name from the form name input field
 const formNameEl = document.getElementById('formNameInput');
 const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
@@ -5012,6 +5019,25 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
       }
       // end question container
       formHTML += "</div>";
+      // Recorded before the emit branches: a question the stacked-mode
+      // shortcut calls always-visible still has real conditions, and the
+      // solver needs them.
+      (function () {
+        const conds = [];
+        for (let lr = 0; lr < logicRows.length; lr++) {
+          const c = getLogicConditionFromRow(questionId, logicRows[lr], lr + 1);
+          if (!c) continue;
+          conds.push({ q: c.prevQuestion, a: c.prevAnswer, t: questionTypesMap[c.prevQuestion] || 'text' });
+        }
+        formLogicModel[questionId] = {
+          type: questionType,
+          nameId: questionNameIds[questionId] || ('answer' + questionId),
+          logic: logicEnabled ? conds : [],
+          alwaysVisibleStacked: !!alwaysVisibleStacked,
+          options: getDiscreteAnswersForQuestion(questionId)
+        };
+      })();
+
       // If logic is enabled, gather "multiple-OR" conditions
       if (logicEnabled && !alwaysVisibleStacked) {
         if (logicRows.length > 0) {
@@ -6940,6 +6966,7 @@ if (s > 1){
   // Define global variables early so they're available for all functions
   formHTML += `var questionSlugMap = ${JSON.stringify(questionSlugMap || {})};\n`;
   formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
+  formHTML += `window.__FORM_LOGIC__ = ${JSON.stringify(formLogicModel || {})};\n`;
   formHTML += `var linkedCheckboxes = ${JSON.stringify(linkedCheckboxes || [])};\n`;
   formHTML += `var inverseCheckboxes = ${JSON.stringify(inverseCheckboxes || [])};\n`;
   formHTML += `var checkboxRequiredMap = ${JSON.stringify(checkboxRequiredMap || {})};\n`;
@@ -18740,6 +18767,579 @@ function fallbackCopyToClipboard(text) {
   }
   document.body.removeChild(textArea);
 }
+
+// ---------------------------------------------------------------------------
+// The maximum path, worked out as data before anything is written to the page
+//
+// The page was its own model of the interview. Each question's conditions lived
+// inside its own updateVisibility closure, so the only way to learn what an
+// answer would reveal was to write it into the field, let every change handler
+// on the form re-read every field, and look at what moved. Scoring one dropdown
+// meant doing that once per option; a pass meant doing it once per dropdown.
+// That is why a packet the size of the DV set took minutes, and why four
+// attempts at trimming the per-round work each came out slower: the rounds were
+// the algorithm, and cheaper rounds only bought more of them.
+//
+// generate.js now emits the same conditions as data, so the path can be settled
+// in memory - answers and visibility over the questions rather than over every
+// field and its handlers - and written to the page once at the end.
+//
+// It also fixes something the DOM walk could not. In question-at-a-time mode
+// the step controller keeps every question but the current one display:none,
+// and isDebugFillEligible reads that as "not on screen", so the fill answered
+// only what the controller happened to be showing - most of the packet came
+// back blank from a run whose whole purpose is to leave nothing blank. The
+// solver never asks what is on screen.
+// ---------------------------------------------------------------------------
+
+/** Conditions that ask only that an answer exists, whatever it is. */
+const SOLVER_ANY = ['any text', 'any amount', 'any date'];
+
+function solverModel() {
+  return (typeof window !== 'undefined' && window.__FORM_LOGIC__) ? window.__FORM_LOGIC__ : {};
+}
+
+/**
+ * What each question is worth if the path reaches it: the fields inside it.
+ *
+ * Read from the page once, because the scorer has to weigh what the old one
+ * weighed - an option that opens a twelve-box block beats one that opens a
+ * single line. A repeating block's entries do not exist until a count is
+ * chosen, so it is priced at its own controls plus one for each entry it could
+ * open; without that, "one child" and "five children" score alike and the
+ * widest path takes whichever comes first.
+ */
+function solverFieldWeights(model) {
+  const weights = {};
+  Object.keys(model).forEach(function (qid) {
+    const container = document.getElementById('question-container-' + qid);
+    let n = container ? container.querySelectorAll('input, select, textarea').length : 1;
+    if (model[qid].type === 'numberedDropdown') {
+      let max = 0;
+      (model[qid].options || []).forEach(function (v) {
+        const k = parseInt(v, 10);
+        if (k > max) max = k;
+      });
+      n += max;
+    }
+    weights[qid] = n || 1;
+  });
+  return weights;
+}
+
+/**
+ * Is this question on screen, given the answers so far?
+ *
+ * The same test the generated updateVisibility makes, including the part that
+ * is easy to lose: a condition on a text or dropdown question counts only while
+ * that question is itself visible. Gates are transitive, so a block behind a
+ * "no" stays shut even though its own trigger still holds the value it was
+ * given before the "no" was chosen. Checkbox conditions carry no such
+ * requirement, and neither does this - it matches the emitted code rather than
+ * improving on it, or the solved path and the rendered form disagree.
+ */
+function solverVisible(qid, model, answers, cache, stack) {
+  if (cache[qid] !== undefined) return cache[qid];
+  const q = model[qid];
+  if (!q) return true;                       // not one of ours: never hidden
+  if (q.alwaysVisibleStacked || !q.logic.length) { cache[qid] = true; return true; }
+  // A question cannot be its own reason for being shown. Conditions run
+  // backwards through the interview so this should not arise, but a cycle here
+  // would be an unbounded recursion rather than a wrong answer.
+  if (stack[qid]) return false;
+  stack[qid] = true;
+  let match = false;
+  for (let i = 0; i < q.logic.length && !match; i++) {
+    const c = q.logic[i];
+    const want = String(c.a == null ? '' : c.a).trim().toLowerCase();
+    if (!want) continue;
+    if (c.t === 'checkbox') {
+      const picked = answers[c.q];
+      if (picked && picked.has && picked.has(want)) match = true;
+      continue;
+    }
+    if (c.t === 'fileUpload') continue;      // nothing is uploaded during a fill
+    if (!solverVisible(c.q, model, answers, cache, stack)) continue;
+    const val = answers[c.q];
+    if (typeof val !== 'string' || val.trim() === '') continue;
+    match = SOLVER_ANY.indexOf(want) !== -1 || val.trim().toLowerCase() === want;
+  }
+  stack[qid] = false;
+  cache[qid] = match;
+  return match;
+}
+
+/** Every question's visibility under one set of answers. */
+function solverVisibility(model, ids, answers) {
+  const cache = {}, stack = {}, out = {};
+  for (let i = 0; i < ids.length; i++) {
+    out[ids[i]] = solverVisible(ids[i], model, answers, cache, stack);
+  }
+  return out;
+}
+
+/** What turning each form on would put in front of the filer. */
+function solverFormWorth() {
+  const worth = {};
+  ((typeof getProjectForms === 'function') ? getProjectForms() : []).forEach(function (f) {
+    let total = 0;
+    for (let n = f.firstSection; n <= f.lastSection; n++) {
+      const sec = document.getElementById('section' + n);
+      if (sec) total += sec.querySelectorAll('input, select, textarea').length;
+    }
+    worth[f.name] = total;
+  });
+  return worth;
+}
+
+/**
+ * What the answers are worth in whole forms switched on.
+ *
+ * The scorer is greedy: it counts what an option reveals the instant it is
+ * picked, which is blind to an activation two questions away. "All Granted
+ * Until the Court Hearing" only reveals "Must DV-110 be served with this
+ * notice?", and the whole of DV-110 hangs off answering that Yes - so on the
+ * immediate count the branch that skips a third of the packet looked like the
+ * richer one. Price an activation at the size of the form it turns on, and pay
+ * it both when its option is chosen and when the choice has merely brought its
+ * gate question into view.
+ */
+function solverActivationBonus(answers, visible, formWorth) {
+  const rules = (typeof getFormActivations === 'function') ? getFormActivations() : [];
+  if (!rules.length) return 0;
+  let bonus = 0;
+  rules.forEach(function (rule) {
+    if (!rule || rule.unconditional || !rule.questionId) return;
+    const worth = formWorth[rule.targetForm] || 0;
+    if (!worth) return;
+    const label = String(rule.optionLabel == null ? '' : rule.optionLabel).trim().toLowerCase();
+    const given = answers[rule.questionId];
+    const chosen = (given && given.has) ? given.has(label)
+      : (typeof given === 'string' && given.trim().toLowerCase() === label);
+    if (chosen || visible[rule.questionId]) bonus += worth;
+  });
+  return bonus;
+}
+
+/**
+ * The answers one question can be given, minus the ones that end the run.
+ *
+ * An option wired to jump to the end, or to fire a hard alert, cuts the path
+ * short rather than widening it. The model does not carry either, so both are
+ * read off the element - once per question here, rather than once per option
+ * per pass as the DOM fill does.
+ */
+function solverOptionsFor(qid, model) {
+  const options = (model[qid].options || []).slice();
+  if (!options.length) return options;
+  const container = document.getElementById('question-container-' + qid);
+  if (!container) return options;
+  const el = container.querySelector('select')
+    || container.querySelector('input[type="checkbox"], input[type="radio"]');
+  if (!el) return options;
+  const kept = options.filter(function (v) {
+    if (typeof wouldOptionJumpToEnd === 'function' && wouldOptionJumpToEnd(el, v)) return false;
+    if (el.tagName === 'SELECT' && typeof wouldTriggerHardAlertOnSelect === 'function'
+      && wouldTriggerHardAlertOnSelect(el, v)) return false;
+    return true;
+  });
+  return kept.length ? kept : options;
+}
+
+/**
+ * Settle the whole interview: what is asked, and what each answer is.
+ *
+ * Answering one question reveals the next, so this is a fixed point like the
+ * DOM version - but over the model, where a round costs a few thousand
+ * comparisons instead of a few thousand DOM reads and handler calls, and where
+ * an answer the path has since shut behind a gate can simply be withdrawn.
+ */
+function solveFillPath(options) {
+  const minimum = !!(options && options.minimum);
+  const model = solverModel();
+  const ids = Object.keys(model);
+  if (!ids.length) return null;
+  const weights = solverFieldWeights(model);
+  const formWorth = solverFormWorth();
+  const answers = {};
+
+  const score = function (ans) {
+    const vis = solverVisibility(model, ids, ans);
+    let total = 0;
+    for (let i = 0; i < ids.length; i++) if (vis[ids[i]]) total += weights[ids[i]];
+    return total + solverActivationBonus(ans, vis, formWorth);
+  };
+
+  // Both lists are the DOM fill's, unchanged: the two runs have to answer the
+  // same way or the fast path is a different interview, not a faster one.
+  const preferred = minimum
+    ? ['no', "i don't know", 'i’t know', 'none', 'just this once']
+    : ['yes', 'llc', 'limited liability company', 'partnership', 'trust/estate', 'trust',
+      'other', 's corporation', 'c corporation', 'individual/sole proprietor', 'individual'];
+
+  const choose = function (qid) {
+    const q = model[qid];
+    const opts = solverOptionsFor(qid, model);
+
+    // A checkbox question is "mark all that apply", so the widest path marks
+    // them all - scoring them one at a time leaves a single box ticked and the
+    // PDF field behind each of the others empty. The narrowest marks none.
+    if (q.type === 'checkbox') {
+      const set = new Set();
+      if (!minimum) opts.forEach(function (v) { set.add(String(v).trim().toLowerCase()); });
+      return set;
+    }
+    if (!opts.length) return 'x';            // a written answer: present, that is all
+    if (q.type === 'numberedDropdown') {
+      return opts.reduce(function (a, b) {
+        const av = parseInt(a, 10) || 0, bv = parseInt(b, 10) || 0;
+        return minimum ? (bv < av ? b : a) : (bv > av ? b : a);
+      });
+    }
+    for (let p = 0; p < preferred.length; p++) {
+      const want = preferred[p];
+      const hit = opts.find(function (v) {
+        const t = String(v).trim().toLowerCase();
+        return t === want || t.indexOf(want) !== -1;
+      });
+      if (hit) return hit;
+    }
+    // Seeded with the last option and beaten only strictly, which is how the
+    // DOM fill broke a tie and therefore how this has to break one: on a
+    // question where no answer opens anything - "What is the other party's
+    // gender?" - every option scores the same, and the two fills would
+    // otherwise tick different boxes and look like they disagreed.
+    let best = opts[opts.length - 1];
+    answers[qid] = best;
+    let bestScore = score(answers);
+    opts.forEach(function (v) {
+      answers[qid] = v;
+      const s = score(answers);
+      if (minimum ? (s < bestScore) : (s > bestScore)) { bestScore = s; best = v; }
+    });
+    return best;
+  };
+
+  let visible = solverVisibility(model, ids, answers);
+  let rounds = 0;
+  // The cap is the length of the longest chain the interview could be, because
+  // that is what a chain here looks like: item 6 of DV-100 is thirteen questions
+  // each gated on the one before it. Re-reading visibility after every answer
+  // lets one round walk a chain end to end; a snapshot taken once per round
+  // advances it by a single link, and a fixed cap of forty then stopped halfway
+  // through the packet with fifty-eight questions never asked.
+  for (; rounds < ids.length + 8; rounds++) {
+    let changed = false;
+    for (let i = 0; i < ids.length; i++) {
+      const qid = ids[i];
+      if (!visible[qid] || answers[qid] !== undefined) continue;
+      answers[qid] = choose(qid);
+      visible = solverVisibility(model, ids, answers);
+      changed = true;
+    }
+    // A question the path has since closed keeps no answer: the form clears a
+    // hidden question's dropdown, and an answer left behind in the model would
+    // hold open a gate the filer never actually opened.
+    const after = solverVisibility(model, ids, answers);
+    for (let i = 0; i < ids.length; i++) {
+      if (!after[ids[i]] && answers[ids[i]] !== undefined) {
+        delete answers[ids[i]];
+        changed = true;
+      }
+    }
+    visible = solverVisibility(model, ids, answers);
+    if (!changed) break;
+  }
+  return { model: model, ids: ids, answers: answers, visible: visible, rounds: rounds };
+}
+
+/**
+ * Is this field one the fill should answer?
+ *
+ * The DOM fill asked the same question by walking every ancestor for a computed
+ * display, which is both the expensive way and the wrong one: in
+ * question-at-a-time mode the step controller keeps all but the current
+ * question display:none, so that test called almost the whole packet invisible
+ * and the fill skipped it. Conditional visibility is carried by the "hidden"
+ * class and nothing else; whether a question happens to be the step on screen
+ * has no bearing on whether it will be asked.
+ */
+function solverFieldEligible(el) {
+  if (!el || el.disabled || el.type === 'hidden') return false;
+  if (!el.id && !el.name) return false;
+  if (el.id && el.id.indexOf('debug') === 0) return false;
+  if (el.closest('#debugMenu')) return false;
+  return !el.closest('.hidden');
+}
+
+/** The control that holds a question's answer. */
+function solverAnswerElement(qid, model) {
+  return document.getElementById(model[qid].nameId) || document.getElementById('answer' + qid);
+}
+
+/**
+ * Write the solved path to the page.
+ *
+ * Values first and silently, then the visibility all of them imply, and only
+ * then the change events. In that order every handler that fires reads a form
+ * already in its final state, so nothing is hidden on the strength of an answer
+ * that has not been written yet and nothing has to be settled twice.
+ */
+function applySolvedPath(plan) {
+  const model = plan.model;
+  const touched = [];
+
+  const setVisibility = function () {
+    plan.ids.forEach(function (qid) {
+      const container = document.getElementById('question-container-' + qid);
+      if (!container) return;
+      if (plan.visible[qid]) container.classList.remove('hidden');
+      else container.classList.add('hidden');
+    });
+  };
+
+  // 1. Answers, without firing anything.
+  plan.ids.forEach(function (qid) {
+    const given = plan.answers[qid];
+    if (given === undefined) return;
+    const container = document.getElementById('question-container-' + qid);
+    if (!container) return;
+    // A checkbox question is set, not added to. The page restores a saved draft
+    // on load, so a box ticked by an earlier maximum run is still ticked when a
+    // minimum run starts - and a minimum run that leaves twenty-six boxes
+    // ticked is not measuring anything. What the path did not choose is cleared.
+    if (given && given.has) {
+      container.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(function (box) {
+        const wanted = given.has(String(box.value || '').trim().toLowerCase());
+        if (box.checked === wanted) return;
+        box.checked = wanted;
+        touched.push(box);
+      });
+      return;
+    }
+    // A written answer carries no value of its own: "present" is all the logic
+    // asked for, and the text sweep below writes something the field's own
+    // validation will accept.
+    if (given === 'x') return;
+    const el = solverAnswerElement(qid, model);
+    if (el && el.tagName === 'SELECT') {
+      el.value = given;
+      touched.push(el);
+      return;
+    }
+    const wanted = String(given).trim().toLowerCase();
+    const radios = container.querySelectorAll('input[type="radio"]');
+    for (let i = 0; i < radios.length; i++) {
+      if (String(radios[i].value || '').trim().toLowerCase() !== wanted) continue;
+      radios[i].checked = true;
+      touched.push(radios[i]);
+      return;
+    }
+    if (el) { el.value = given; touched.push(el); }
+  });
+
+  // 2. Visibility, straight from the model.
+  setVisibility();
+
+  // 3. One change per answered control, to build what the answers imply: the
+  //    entries of a repeating block, and the hidden checkbox each dropdown
+  //    answer mirrors into, which is what the PDF actually prints.
+  touched.forEach(function (el) {
+    triggerFieldChange(el);
+    if (el.tagName === 'SELECT') triggerSelectSideEffects(el);
+  });
+
+  // 4. Those events re-ran the generated logic, which reaches the same
+  //    conclusion the model did - but a hide path resets the dropdowns inside
+  //    the question it closes, so say once more what is shown before filling.
+  setVisibility();
+}
+
+/**
+ * Split every phone number into the area code and the rest.
+ *
+ * The PDF prints them in separate boxes, and the page fills those from an
+ * oninput handler on the visible field. Setting a value and firing input runs
+ * it, but a number that arrives inside a repeating entry is written before its
+ * hidden pair exists, so the handler finds nothing to write to and the two
+ * boxes stay blank. Doing it once at the end, when every entry has been built,
+ * catches all of them.
+ */
+function fillSolvedPhoneSplits() {
+  if (typeof window.updatePhoneSplitFields !== 'function') return;
+  document.querySelectorAll('input[type="tel"]').forEach(function (el) {
+    if (!(el.value || '').trim()) return;
+    try { window.updatePhoneSplitFields(el); } catch (e) { /* ignore */ }
+  });
+}
+
+/**
+ * Answer what the model does not describe: the fields inside a combined or
+ * repeating block.
+ *
+ * A repeat's entries do not exist until its count is answered, so they are not
+ * questions in the model and cannot be. They are also where most of a packet's
+ * boxes live, and they are ordinary controls once built - so one sweep over
+ * what is now visible finishes them.
+ */
+function fillSolvedRemainder() {
+  // Entry-level dropdowns, e.g. one child's relationship to the filer. The DOM
+  // fill scored these against the whole form like any other question, which
+  // cost more than everything else put together and decided nothing: an option
+  // inside an entry gates its own row at most.
+  const minimum = !!window.__FILL_MINIMUM__;
+  const preferred = minimum ? ['no', "i don't know", "i don’t know", 'none'] : ['yes', 'other'];
+  document.querySelectorAll('select').forEach(function (sel) {
+    if (!solverFieldEligible(sel) || (sel.value || '').trim()) return;
+    const opts = getSelectOptions(sel).filter(function (o) {
+      return !wouldOptionJumpToEnd(sel, o.value) && !wouldTriggerHardAlertOnSelect(sel, o.value);
+    });
+    if (!opts.length) return;
+    let pick = null;
+    for (let p = 0; p < preferred.length && !pick; p++) {
+      pick = opts.find(function (o) {
+        return (o.textContent || '').trim().toLowerCase().indexOf(preferred[p]) !== -1;
+      }) || null;
+    }
+    if (!pick) pick = minimum ? opts[0] : opts[opts.length - 1];
+    sel.value = pick.value;
+    triggerFieldChange(sel);
+    triggerSelectSideEffects(sel);
+  });
+
+  document.querySelectorAll('input[type="radio"]').forEach(function (r) {
+    if (!solverFieldEligible(r) || !r.name) return;
+    const group = document.getElementsByName(r.name);
+    for (let i = 0; i < group.length; i++) if (group[i].checked) return;
+    if (wouldOptionJumpToEnd(r, r.value)) return;
+    r.checked = true;
+    triggerFieldChange(r);
+  });
+
+  if (!minimum) {
+    document.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
+      if (!solverFieldEligible(cb) || cb.checked) return;
+      const container = cb.closest('.question-container');
+      if (container && container.querySelector('input[type="radio"]')) return;  // mark only one
+      if (wouldOptionJumpToEnd(cb, cb.value) || wouldTriggerHardAlertOnSelect(cb, cb.value)) return;
+      cb.checked = true;
+      triggerFieldChange(cb);
+    });
+  }
+
+  document.querySelectorAll('input, textarea').forEach(function (el) {
+    if (!solverFieldEligible(el)) return;
+    const type = (el.type || '').toLowerCase();
+    if (type === 'checkbox' || type === 'radio' || type === 'file') return;
+    if ((el.value || '').trim()) return;
+    el.value = getSampleFillValue(el);
+    triggerFieldChange(el);
+  });
+
+  fillSolvedPhoneSplits();
+}
+
+
+/**
+ * What the page has undone since the path was written to it.
+ *
+ * Two kinds of drift, both caused by the same thing: a question that should
+ * be on screen and is not, and a question that is on screen with the answer
+ * it was given now gone.
+ */
+function solvedPathDrift(plan) {
+  let drifted = 0;
+  plan.ids.forEach(function (qid) {
+    const container = document.getElementById('question-container-' + qid);
+    if (!container) return;
+    if (plan.visible[qid] === container.classList.contains('hidden')) { drifted++; return; }
+    const given = plan.answers[qid];
+    if (given === undefined || given === 'x' || (given && given.has)) return;
+    const el = solverAnswerElement(qid, plan.model);
+    if (el && String(el.value || '').trim() === '') drifted++;
+  });
+  return drifted;
+}
+
+/**
+ * Hold the solved path against the page's own deferred work.
+ *
+ * The generated page finishes autofilling on a timer after load, and that
+ * pass dispatches change on every field it touches. The logic those events
+ * re-run is order-dependent in one specific way: hiding a question clears the
+ * dropdowns inside it, and showing it again does not put them back. So a
+ * question that is hidden for one event and shown for the next loses its
+ * answer for good - a run that had just finished with 450 fields answered
+ * came back 300ms later to find 165 of them left and seventy questions shut.
+ *
+ * The eight-pass walk never saw this, because each pass repaired what the last
+ * disturbance had undone; that repair is a good part of what those ninety
+ * seconds bought. A solved fill is finished before the page has stopped
+ * moving, so it waits for quiet and puts back what moved. Three times at
+ * most: if the page is still drifting after that, it is not drift to wait out
+ * and the fill should say so rather than loop.
+ */
+async function settleSolvedPath(plan) {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    await new Promise(function (resolve) { setTimeout(resolve, 400); });
+    const drifted = solvedPathDrift(plan);
+    if (!drifted) return attempt - 1;
+    fillProgress({ text: 'Putting back ' + drifted + ' the page undid', percent: 90 });
+    applySolvedPath(plan);
+    fillSolvedRemainder();
+  }
+  return 3;
+}
+
+/**
+ * Fill the form from the solved path.
+ *
+ * Where the pass loop settles the page by re-answering it until it stops
+ * moving, this settles the model and then writes the answer down. The page is
+ * touched once per answer instead of once per option per pass.
+ */
+async function fillSolvedPath(options) {
+  const plan = solveFillPath({ minimum: !!(options && options.minimum) });
+  if (!plan) return null;
+  fillProgress({ text: 'Writing ' + Object.keys(plan.answers).length + ' answers', percent: 45 });
+  await fillYield();
+  applySolvedPath(plan);
+
+  fillProgress({ text: 'Filling the blocks they opened', percent: 75 });
+  await fillYield();
+  fillSolvedRemainder();
+
+  if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') createHiddenCheckboxesForAutofilledDropdowns();
+  if (typeof syncHiddenLogicForCheckboxQuestions === 'function') syncHiddenLogicForCheckboxQuestions();
+  if (typeof updateAllHiddenAddressFields === 'function') { try { updateAllHiddenAddressFields(); } catch (e) { /* ignore */ } }
+  if (typeof updateLinkedCheckboxes === 'function') { try { updateLinkedCheckboxes(); } catch (e) { /* ignore */ } }
+  if (typeof updateInverseCheckboxes === 'function') { try { updateInverseCheckboxes(); } catch (e) { /* ignore */ } }
+  if (typeof runAllHiddenCheckboxCalculations === 'function') runAllHiddenCheckboxCalculations();
+  if (typeof runAllHiddenTextCalculations === 'function') runAllHiddenTextCalculations();
+  document.dispatchEvent(new CustomEvent('questionVisibilityChanged', { detail: { sectionId: null } }));
+
+  fillProgress({ text: 'Waiting for the page to settle', percent: 88 });
+  await settleSolvedPath(plan);
+  return plan;
+}
+
+/**
+ * How many fields the fill answered.
+ *
+ * countExportableFields asks what is on screen, which in question-at-a-time
+ * mode is one question: a run that filled all 474 fields on the DV packet
+ * reported thirty-two, and the button said so.
+ */
+function countSolvedFields() {
+  let n = 0;
+  document.querySelectorAll('input, select, textarea').forEach(function (el) {
+    if (!solverFieldEligible(el)) return;
+    if (el.type === 'checkbox' || el.type === 'radio') { if (el.checked) n++; return; }
+    if ((el.value || '').trim()) n++;
+  });
+  return n;
+}
+
 // --- Fill maximum path (worst-case PDF field coverage) ---
 function isDebugFillEligible(el) {
   if (!el || el.disabled || el.type === 'hidden') return false;
@@ -19409,23 +20009,34 @@ async function fillMaximumPath(options) {
   await fillYield();
   const viewState = saveSectionViewState();
   try {
-    // Passes repeat because answering one question reveals the next. Once a
-    // pass changes nothing there is nothing left to reveal, and on a packet the
-    // size of DV-100 each pass costs minutes - so stop as soon as it settles
-    // rather than always paying for eight.
-    let settled = -1;
-    const passes = 8;
-    for (let pass = 1; pass <= passes; pass++) {
-      fillProgress({ text: 'Pass ' + pass + ' — starting', percent: 0 });
-      await fillMaximumPathPass(pass);
-      await new Promise(function(resolve) { setTimeout(resolve, 180); });
-      const filled = countExportableFields();
-      if (filled === settled) {
-        fillProgress({ text: 'Settled after ' + pass + ' pass' + (pass === 1 ? '' : 'es'),
-                       percent: 100 });
-        break;
+    // Solve the interview as data and write the answer down once. The walk
+    // below is what that replaced, and it stays for a form generated before
+    // generate.js emitted a logic model: such a page has the conditions only
+    // in its closures, so there is nothing to solve from.
+    const solvable = !!(window.__FORM_LOGIC__ && Object.keys(window.__FORM_LOGIC__).length);
+    if (solvable) {
+      fillProgress({ text: 'Working out the path', percent: 10 });
+      await fillYield();
+      await fillSolvedPath({ minimum: minimum });
+    } else {
+      // Passes repeat because answering one question reveals the next. Once a
+      // pass changes nothing there is nothing left to reveal, and on a packet the
+      // size of DV-100 each pass costs minutes - so stop as soon as it settles
+      // rather than always paying for eight.
+      let settled = -1;
+      const passes = 8;
+      for (let pass = 1; pass <= passes; pass++) {
+        fillProgress({ text: 'Pass ' + pass + ' — starting', percent: 0 });
+        await fillMaximumPathPass(pass);
+        await new Promise(function(resolve) { setTimeout(resolve, 180); });
+        const filled = countExportableFields();
+        if (filled === settled) {
+          fillProgress({ text: 'Settled after ' + pass + ' pass' + (pass === 1 ? '' : 'es'),
+                         percent: 100 });
+          break;
+        }
+        settled = filled;
       }
-      settled = filled;
     }
     if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
       createHiddenCheckboxesForAutofilledDropdowns();
@@ -19436,7 +20047,7 @@ async function fillMaximumPath(options) {
     if (typeof runAllHiddenTextCalculations === 'function') {
       runAllHiddenTextCalculations();
     }
-    const filledCount = countExportableFields();
+    const filledCount = solvable ? countSolvedFields() : countExportableFields();
     fillProgress({ text: filledCount + ' fields filled', percent: 100 });
     await new Promise(function (resolve) { setTimeout(resolve, 450); });
     if (btn) {

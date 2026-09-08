@@ -140,10 +140,40 @@ actually closes the block behind it. A form can pass the widest path and fail
 this one, which is how thirty questions about further abuse stayed on screen for
 a filer who had just said it happened once.
 
-Run both. Neither is sufficient alone, and the minimum path takes seconds.
+Run both. Neither is sufficient alone, and each takes a few seconds.
+
+Run each from a freshly loaded preview. The form restores its own saved draft
+on load, so a minimum path started on the page a maximum path just finished is
+measuring the maximum path's leftovers - it will report far more filled than
+the narrow path actually opens.
 
 Fields the form validates - dates, zips, phones, amounts - keep valid data in
 either mode, because a marker there fails validation and stops the run.
+
+### How a path is found
+
+Both modes solve the interview as data and then write the answer to the page
+once. `generate.js` emits every question's conditions as `window.__FORM_LOGIC__`
+alongside the closures that enforce them, and the fill settles answers and
+visibility against that model - a few thousand comparisons - before touching a
+field.
+
+It used to work the other way round: the page was the only model, so the only
+way to learn what an answer would reveal was to write it in and watch which
+handlers fired. Scoring one dropdown meant doing that once per option, and a
+pass meant doing it once per dropdown, over eight passes. On the DV packet that
+was 12,872 change events and a minute and a half, and it answered 215 of 474
+fields, because `isDebugFillEligible` asked what was on screen and in
+question-at-a-time mode that is one question. The same packet now settles in
+about three seconds and 200 events, with every field the path reaches answered.
+
+One thing the walk was doing by accident is now done on purpose. The page
+finishes autofilling on a timer after load, and those events re-run the
+conditional logic in an order that can hide a question for one event and show
+it for the next - and hiding a question clears the dropdowns inside it without
+putting them back. Each of the eight passes quietly repaired that. A solved
+fill is finished before the page has stopped moving, so it waits for quiet and
+puts back what moved, up to three times.
 
 ## Reading the result
 
