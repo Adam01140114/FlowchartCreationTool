@@ -294,6 +294,53 @@ function optionLabel(field, groupNameId) {
 }
 
 /**
+ * Ask an address as one question, not four.
+ *
+ * Street, city, state and ZIP are one thing a person knows and types in one go.
+ * Split across four questions they are four screens for one address, and the
+ * form loses the shape that makes it obvious what is being asked. A
+ * multipleTextboxes question puts the boxes together under one heading, and the
+ * exporter composes each box's id as <question nodeId>_<box nameId> - so the
+ * PDF fields it fills are exactly the ones the four questions filled.
+ *
+ * The parts keep their own PDF names, which is why the question's nameId is the
+ * family's shared prefix and each box is named by what is left.
+ */
+function applyCombines(fields, hints) {
+  const specs = hints.combines || [];
+  if (!specs.length) return { fields, combines: [] };
+
+  const combines = [];
+  const absorbed = new Set();
+  specs.forEach((spec) => {
+    const members = (spec.fields || [])
+      .map((f) => fields.find((x) => x.nameId === (f.field || f) || x.id === (f.field || f)))
+      .filter(Boolean);
+    if (members.length < 2) return;
+
+    const prefix = spec.nameId || commonTokenPrefix(members.map((m) => m.nameId));
+    if (!prefix) return;
+    members.forEach((m) => absorbed.add(m.id));
+    combines.push({
+      nameId: prefix,
+      question: spec.question,
+      anchor: members[0],
+      boxes: members.map((m, i) => {
+        const declared = (spec.fields || [])[i];
+        const suffix = m.nameId.indexOf(prefix + '_') === 0
+          ? m.nameId.slice(prefix.length + 1) : m.nameId;
+        return {
+          nameId: suffix,
+          label: (declared && declared.label) || titleCase(humanize(suffix)),
+          type: (declared && declared.type) || 'label'
+        };
+      })
+    });
+  });
+  return { fields: fields.filter((f) => !absorbed.has(f.id)), combines };
+}
+
+/**
  * Ask one thing at a time, and put the pieces back for the PDF.
  *
  * A PDF box labelled "Court name and street address" is one field, but it is
@@ -382,7 +429,7 @@ function applyRepeats(fields, hints) {
  * Build the interview tree: a flat list of steps, where conditional fields are
  * nested as follow-ups under the option that enables them.
  */
-function buildInterview(fields, hints, repeats = []) {
+function buildInterview(fields, hints, repeats = [], combines = []) {
   // hints may re-state a field's conditional (the payload often cannot express
   // "show when Partnership OR Trust OR LLC-P")
   fields.forEach((f) => {
@@ -408,6 +455,7 @@ function buildInterview(fields, hints, repeats = []) {
       section: null,
       field: spec.field || null,
       repeat: spec.repeat || null,
+      combine: spec.combine || null,
       origin: spec.origin || 'field'
     };
     stepOf.set(step.nameId, step);
@@ -506,6 +554,7 @@ function buildInterview(fields, hints, repeats = []) {
 
   const emittedGroups = new Set();
   const emittedRepeats = new Set();
+  const emittedCombines = new Set();
   let lastIndex = -1;
 
   const choices = (hints.choices || []).slice();
@@ -541,6 +590,22 @@ function buildInterview(fields, hints, repeats = []) {
 
     // 0. a numbered family stands in for all its fields, at the position the
     //    first of them held, so the block is asked where the form asks it
+    const combine = combines.find((c) => c.anchor && c.anchor.index > lastIndex
+      && c.anchor.index < field.index);
+    if (combine && !emittedCombines.has(combine)) {
+      emittedCombines.add(combine);
+      const step = makeStep({
+        nameId: combine.nameId,
+        text: combine.question,
+        type: 'multipleTextboxes',
+        options: [],
+        combine: combine,
+        origin: 'combine'
+      });
+      place(step, hostFor(combine.anchor));
+      notes.push(`combine: ${combine.boxes.length} fields -> "${combine.question}"`);
+    }
+
     const repeat = repeats.find((r) => r.anchor && r.anchor.index > lastIndex
       && r.anchor.index < field.index);
     if (repeat && !emittedRepeats.has(repeat)) {
@@ -655,6 +720,21 @@ function buildInterview(fields, hints, repeats = []) {
     place(step, host);
   });
 
+  combines.forEach((combine) => {
+    if (emittedCombines.has(combine)) return;
+    emittedCombines.add(combine);
+    const step = makeStep({
+      nameId: combine.nameId,
+      text: combine.question,
+      type: 'multipleTextboxes',
+      options: [],
+      combine: combine,
+      origin: 'combine'
+    });
+    place(step, hostFor(combine.anchor));
+    notes.push(`combine: ${combine.boxes.length} fields -> "${combine.question}"`);
+  });
+
   repeats.forEach((repeat) => {
     if (emittedRepeats.has(repeat)) return;
     emittedRepeats.add(repeat);
@@ -709,6 +789,12 @@ function assignSections(steps, fields, hints, sectionPrefs) {
       // hint names those fields, not the block. Without this the block starts
       // wherever the previous question left off - the firearms block landed in
       // "Other Protected People" and left "Firearms" with nothing in it.
+      else if (step.combine) {
+        const anchor = step.combine.boxes
+          .map((b) => step.combine.nameId + '_' + b.nameId)
+          .find((name) => startAt.has(name));
+        if (anchor) cur = startAt.get(anchor);
+      }
       else if (step.repeat) {
         const anchor = step.repeat.fields
           .map((f) => step.repeat.nameId + '_1' + String(f.nameId).replace('{n}', ''))
@@ -969,6 +1055,30 @@ function createBuilder() {
  * relative to x=0 and then translated into a packed row, so side-by-side
  * follow-ups can never overlap (trainer rule 4.1).
  */
+/**
+ * Put an address-style question's boxes on the cell.
+ *
+ * Same shape the editor writes when someone builds one by hand: _textboxes are
+ * the boxes, _itemOrder is the order they appear in. There is no entry count -
+ * this is one answer with several parts, not a list.
+ */
+function attachCombine(cell, combine) {
+  cell._textboxes = combine.boxes.map((b) => ({
+    nameId: b.nameId,
+    label: b.label,
+    placeholder: b.label,
+    isAmountOption: b.type === 'amount',
+    type: b.type === 'amount' ? undefined : b.type,
+    prefill: ''
+  }));
+  cell._itemOrder = combine.boxes.map((_, i) => ({ type: 'textbox', index: i }));
+}
+
+/** Roughly what the editor will draw for a question box of this many fields. */
+function combineHeight(combine) {
+  return 200 + 110 * (combine.boxes || []).length;
+}
+
 /** Roughly what the editor will draw for a block of this many fields, rounded up. */
 function repeatHeight(repeat) {
   return 260 + 140 * (repeat.fields || []).length;
@@ -991,6 +1101,9 @@ function attachRepeat(cell, repeat) {
     label: f.label || '',
     placeholder: f.label || '',
     isAmountOption: f.type === 'amount',
+    // A date column inside a block is still a date: carried through so the
+    // entry offers a date picker, the same as a date asked on its own.
+    type: (f.type && f.type !== 'amount' && f.type !== 'label') ? f.type : undefined,
     prefill: '',
     conditionalPrefills: []
   }));
@@ -1033,12 +1146,14 @@ function layoutSequence(b, steps, startY, centerX) {
       // question height grows upward over whatever sits above it and the editor
       // then renumbers the two by vertical position. Reserving the room here
       // keeps the block below the question that feeds it.
-      minHeight: step.repeat ? repeatHeight(step.repeat) : 0,
+      minHeight: step.repeat ? repeatHeight(step.repeat)
+        : (step.combine ? combineHeight(step.combine) : 0),
       // Set only on mirrored fields; every step carries its source field.
       mirrorTargets: step.field ? step.field.mirrorTargets : null
     });
     step.cell = q;
     if (step.repeat) attachRepeat(q, step.repeat);
+    if (step.combine) attachCombine(q, step.combine);
 
     if (!entry) entry = joinHub || q;
     if (incoming && incoming.length) {
@@ -1101,8 +1216,9 @@ function compile(schema, hints = {}) {
   const merged = Object.assign({}, schema.interview || {}, hints);
   const mirrored = applyMirrors(normalizeFields(schema), merged);
   const { fields: split, joins } = applySplits(mirrored, merged);
-  const { fields, repeats } = applyRepeats(split, merged);
-  const { steps, notes, groups } = buildInterview(fields, merged, repeats);
+  const { fields: combined, combines } = applyCombines(split, merged);
+  const { fields, repeats } = applyRepeats(combined, merged);
+  const { steps, notes, groups } = buildInterview(fields, merged, repeats, combines);
 
   const b = createBuilder();
   const sectionCount = assignSections(steps, fields, merged, b.sectionPrefs);

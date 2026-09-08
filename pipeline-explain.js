@@ -32,6 +32,10 @@ gui.sections.forEach((s) => (s.questions || []).forEach((q) => {
   questions.set(String(q.questionId), Object.assign({ section: s.sectionName }, q));
   if (q.nameId) byName.set(q.nameId, q);
   (((q.hiddenLogic || {}).configs) || []).forEach((h) => { if (h.nodeId) byName.set(h.nodeId, q); });
+  // A combined question posts one field per box, by the box's own id.
+  if (q.type === 'multipleTextboxes') {
+    (q.allFieldsInOrder || []).forEach((f) => { if (f.nodeId) byName.set(f.nodeId, q); });
+  }
   // A numbered block produces one field per entry; {n} says where the number goes.
   const max = parseInt(q.max, 10);
   if (q.type === 'numberedDropdown' && max > 0) {

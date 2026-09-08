@@ -302,6 +302,19 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
            'class="address-input"' + styleAttr + valueAttr + maxLengthAttr + inputModeAttr + eventHandlers + '>' +
            '</div>';
 }
+/**
+ * Is this the convenience field that holds street, city, state and zip as one
+ * string - the one this code created?
+ *
+ * The composer finds its target by name, and <base>_address is an ordinary PDF
+ * field name that a question is free to own. When it does, the element that
+ * name resolves to is the answer itself, and composing over it replaces what
+ * the person typed. So only a field this code created and marked is ever
+ * written to.
+ */
+function isComposedAddressField(el) {
+    return !!el && el.getAttribute('data-address-composite') === '1';
+}
 // Generate hidden address textboxes for numbered dropdown questions with location fields
 function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
     // Check if this question has location fields (Street, City, State, Zip)
@@ -313,6 +326,11 @@ function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
     }
     // Get the base field name from the question
     const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+    // Same rule as at generation time: if one of the question's own boxes is
+    // called <base>_address, that box owns the name.
+    if (allFieldsInOrder.some(field => field.nodeId === baseFieldName + '_address')) {
+        return;
+    }
     // Remove existing hidden address textboxes for this question
     for (let i = 1; i <= 10; i++) { // Check up to 10 entries
         const existingAddress = document.getElementById(baseFieldName + '_address_' + i);
@@ -328,6 +346,7 @@ function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
         addressInput.type = 'text';
         addressInput.id = addressId;
         addressInput.name = addressId;
+        addressInput.setAttribute('data-address-composite', '1');
         addressInput.style.display = 'none';
         // Add to hidden fields container
         const hiddenContainer = document.getElementById('hidden_pdf_fields');
@@ -345,7 +364,7 @@ function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, all
     // For single-entry questions (like multipleTextboxes), don't add number suffix
     const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + entryNumber;
     const addressInput = document.getElementById(addressId);
-    if (!addressInput) return;
+    if (!isComposedAddressField(addressInput)) return;
     // Function to update the address field
     const updateAddress = () => {
         // For single-entry questions, don't add number suffix to field IDs
@@ -419,6 +438,7 @@ function updateAllHiddenAddressFields() {
     // Find all hidden address textboxes
     const hiddenAddressFields = document.querySelectorAll('input[type="text"][id*="_address_"][style*="display: none"]');
     hiddenAddressFields.forEach(addressField => {
+        if (!isComposedAddressField(addressField)) return;
         const addressId = addressField.id;
         // Extract base field name and entry number from ID
         // Handle both numbered (_address_1) and single-entry (_address) patterns
@@ -3371,8 +3391,15 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
           if (hasLocationFields) {
               const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
               const addressId = baseFieldName + '_address';
-              // Add the hidden address input to the HTML string
-              formHTML += `<input type="text" id="${addressId}" name="${addressId}" style="display: none;">`;
+              // The convenience field that holds street, city, state and zip as
+              // one string. A question can own that name itself - a PDF box
+              // called <base>_address is ordinary - and then it is the
+              // question's field, not ours: two elements sharing an id means
+              // getElementById returns the empty one and the answer is lost.
+              const nameTaken = allFieldsInOrder.some(field => field.nodeId === addressId);
+              if (!nameTaken) {
+                formHTML += `<input type="text" id="${addressId}" name="${addressId}" data-address-composite="1" style="display: none;">`;
+              }
           }
           // Define location field names for visual separation
           const locationFields = ['Street', 'City', 'State', 'Zip'];
@@ -3550,8 +3577,14 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
                 entryContainer.appendChild(locationFieldDiv);
                 lastWasLocation = true;
               } else if (field.type === 'label') {
-                // For numbered dropdowns, append entry number to field ID
-                const fieldId = field.nodeId + '_' + j;
+                // A multipleTextboxes question has one entry, so there is no
+                // entry number to carry: the amount and phone branches below
+                // already name their fields by the plain nodeId, and a text box
+                // came out as <nodeId>_1 only because this branch was written
+                // for the numbered block. The plain id is what the PDF field is
+                // called, so an address asked as one question fills the same
+                // boxes as four separate questions did.
+                const fieldId = field.nodeId;
                 let prefillValue = field.prefill || '';
                 // Check for conditional prefills - for multipleTextboxes, j is always 1, so check for trigger "1"
                 if (field.conditionalPrefills && Array.isArray(field.conditionalPrefills)) {
@@ -3606,6 +3639,20 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
                   const brElement = document.createElement('br');
                   entryContainer.appendChild(brElement);
                 }
+            } else if (field.type === 'email' || field.type === 'number' || field.type === 'text') {
+              // A box whose type this generator does not draw used to fall
+              // through every branch and never be created at all - the field
+              // vanished from the form and from the PDF, quietly. Anything that
+              // is just a typed text box is drawn here, and anything unknown
+              // still lands in the text fallback below rather than disappearing.
+              const fieldId = field.nodeId;
+              const inputDiv = document.createElement('div');
+              const inputType = field.type === 'email' ? 'email'
+                : (field.type === 'number' ? 'number' : 'text');
+              inputDiv.innerHTML = '<div class="address-field">'
+                + '<input type="' + inputType + '" id="' + fieldId + '" name="' + fieldId + '"'
+                + ' placeholder="' + (field.label || '') + '" class="address-input"></div>';
+              Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
             } else if (field.type === 'phone') {
               const fieldId = field.nodeId;
               const inputDiv = document.createElement('div');
@@ -4339,7 +4386,16 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
                 dateDiv.appendChild(label);
                 dateDiv.appendChild(input);
                 entryContainer.appendChild(dateDiv);
-              } else {
+              } else if (field.nodeId) {
+                // Last resort: a field type nobody drew. A plain text box keeps
+                // the answer and the PDF field; the empty branch that used to be
+                // here dropped both without a word.
+                const fallback = document.createElement('div');
+                fallback.className = 'address-field';
+                fallback.innerHTML = '<input type="text" id="' + field.nodeId + '"'
+                  + ' name="' + field.nodeId + '" placeholder="' + (field.label || '')
+                  + '" class="address-input">';
+                entryContainer.appendChild(fallback);
               }
               lastWasLocation = isLocationField;
               firstField = false;
@@ -6877,6 +6933,11 @@ if (s > 1){
   `;
   formHTML += `
   // Address helper functions (must exist before conditional logic runs)
+  // Only a composed field - one this code created and marked - is ever written
+  // to; a question is free to own the name <base>_address itself.
+  function isComposedAddressField(el) {
+      return !!el && el.getAttribute('data-address-composite') === '1';
+  }
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
       const hasLocationFields = allFieldsInOrder.some(field =>
           ['Street', 'City', 'State', 'Zip'].includes(field.label)
@@ -6885,6 +6946,10 @@ if (s > 1){
           return;
       }
       const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+      // A box the question itself calls <base>_address owns that name.
+      if (allFieldsInOrder.some(field => field.nodeId === baseFieldName + '_address')) {
+          return;
+      }
       for (let i = 1; i <= 10; i++) {
           const existingAddress = document.getElementById(baseFieldName + '_address_' + i);
           if (existingAddress && existingAddress.type === 'text' && existingAddress.style.display === 'none') {
@@ -6897,6 +6962,7 @@ if (s > 1){
           addressInput.type = 'text';
           addressInput.id = addressId;
           addressInput.name = addressId;
+          addressInput.setAttribute('data-address-composite', '1');
           addressInput.style.display = 'none';
           const hiddenContainer = document.getElementById('hidden_pdf_fields');
           if (hiddenContainer) {
@@ -6910,7 +6976,7 @@ if (s > 1){
   function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, allFieldsInOrder, count = 1) {
       const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + entryNumber;
       const addressInput = document.getElementById(addressId);
-      if (!addressInput) return;
+      if (!isComposedAddressField(addressInput)) return;
       const updateAddress = () => {
           const streetFieldId = count === 1 ? baseFieldName + '_street' : baseFieldName + '_street_' + entryNumber;
           const cityFieldId = count === 1 ? baseFieldName + '_city' : baseFieldName + '_city_' + entryNumber;
@@ -6978,7 +7044,7 @@ if (s > 1){
       const questionNameIdsMap = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : {};
       const baseFieldName = questionNameIdsMap[questionId] || 'answer' + questionId;
       const addressField = document.getElementById(baseFieldName + '_address');
-      if (addressField) {
+      if (isComposedAddressField(addressField)) {
         const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
         locationFields.forEach(fieldType => {
           const fieldId = baseFieldName + '_' + fieldType;
@@ -18618,7 +18684,16 @@ function countExportableFields() {
 function countEligibleFields() {
   let count = 0;
   document.querySelectorAll('input, select, textarea').forEach(function(el) {
-    if (isDebugFillEligible(el)) count++;
+    // Deliberately not isDebugFillEligible: that walks every ancestor asking
+    // for computed styles, and this runs once per option of every dropdown -
+    // tens of thousands of style reads per question, which is what made the
+    // fill lock the tab up for minutes. Conditional visibility is carried by
+    // the "hidden" class, and that is all this comparison needs; whether the
+    // section happens to be on screen is the same for every option being
+    // compared, so it cannot change which one wins.
+    if (el.disabled || el.type === 'hidden') return;
+    if (el.closest('.hidden')) return;
+    count++;
   });
   return count;
 }
@@ -19002,12 +19077,80 @@ function fillVisibleCheckboxesAndRadios() {
     }
   });
 }
-function fillMaximumPathPass() {
-  revealAllForMaxFill();
-  document.querySelectorAll('select').forEach(function(select) {
-    if (!isDebugFillEligible(select)) return;
-    pickBestSelectValue(select);
+/**
+ * A progress panel for the debug fill.
+ *
+ * Scoring every option of every dropdown on a packet the size of DV-100 is
+ * minutes of work, and doing it in one synchronous run froze the tab and the
+ * machine with it - no cursor, no way to tell whether it had hung. The fill now
+ * gives the browser a frame between questions and says where it is.
+ */
+function fillProgress(state) {
+  let panel = document.getElementById('fillProgressPanel');
+  if (state === null) { if (panel) panel.remove(); return; }
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'fillProgressPanel';
+    panel.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:100002;'
+      + 'background:#12203a;color:#fff;padding:14px 20px;box-sizing:border-box;'
+      + 'font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;'
+      + 'font-size:14px;box-shadow:0 -4px 20px rgba(0,0,0,0.25);';
+    panel.innerHTML = '<div id="fillProgressText" style="margin-bottom:8px;"></div>'
+      + '<div style="height:6px;background:rgba(255,255,255,0.2);border-radius:3px;overflow:hidden;">'
+      + '<div id="fillProgressBar" style="height:100%;width:0;background:#7b5cff;'
+      + 'transition:width 0.15s linear;"></div></div>';
+    document.body.appendChild(panel);
+  }
+  const text = document.getElementById('fillProgressText');
+  const bar = document.getElementById('fillProgressBar');
+  if (text) text.textContent = state.text;
+  if (bar) bar.style.width = Math.max(0, Math.min(100, state.percent || 0)) + '%';
+}
+
+/**
+ * Hand the frame back so the page can paint and the pointer keeps moving.
+ *
+ * requestAnimationFrame is the right yield while the page is on screen and no
+ * yield at all while it is not - a hidden tab never gets a frame, and a fill
+ * left running in the background stopped dead on its first question. A timer is
+ * the obvious backstop, but a background tab clamps timers too, and a long fill
+ * left in another tab slows to a crawl. A message posted to ourselves is
+ * neither throttled nor tied to painting, so it keeps a hidden run at full
+ * speed. Race all three: whichever arrives first continues the run.
+ */
+function fillYield() {
+  return new Promise(function (resolve) {
+    let done = false;
+    const finish = function () { if (!done) { done = true; resolve(); } };
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(finish);
+    if (typeof MessageChannel === 'function') {
+      const channel = new MessageChannel();
+      channel.port1.onmessage = finish;
+      channel.port2.postMessage(0);
+    }
+    setTimeout(finish, 50);
   });
+}
+
+async function fillMaximumPathPass(pass, passes) {
+  revealAllForMaxFill();
+  const selects = [...document.querySelectorAll('select')].filter(isDebugFillEligible);
+  for (let i = 0; i < selects.length; i++) {
+    pickBestSelectValue(selects[i]);
+    // Every dropdown means scoring each of its options against the whole form,
+    // so this is where the time goes and where the page has to breathe.
+    if (i % 3 === 0) {
+      fillProgress({
+        text: 'Filling: pass ' + pass + ' of ' + passes + ' — question ' + (i + 1)
+          + ' of ' + selects.length,
+        percent: ((pass - 1) / passes + (i / Math.max(1, selects.length)) / passes) * 100
+      });
+      await fillYield();
+    }
+  }
+  fillProgress({ text: 'Filling: pass ' + pass + ' of ' + passes + ' — text fields and checkboxes',
+                 percent: (pass / passes) * 100 });
+  await fillYield();
   fillVisibleCheckboxesAndRadios();
   fillVisibleTextFields();
   if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
@@ -19045,8 +19188,9 @@ async function fillMaximumPath(options) {
     // size of DV-100 each pass costs minutes - so stop as soon as it settles
     // rather than always paying for eight.
     let settled = -1;
-    for (let pass = 0; pass < 8; pass++) {
-      fillMaximumPathPass();
+    const passes = 8;
+    for (let pass = 1; pass <= passes; pass++) {
+      await fillMaximumPathPass(pass, passes);
       await new Promise(function(resolve) { setTimeout(resolve, 180); });
       const filled = countExportableFields();
       if (filled === settled) break;
@@ -19080,6 +19224,7 @@ async function fillMaximumPath(options) {
       }, 2200);
     }
   } finally {
+    fillProgress(null);
     window.__MAX_FILL_IN_PROGRESS__ = false;
     window.__FILL_MARKER_VALUES__ = false;
     restoreSectionViewState(viewState);

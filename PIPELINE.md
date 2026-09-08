@@ -58,6 +58,29 @@ node carrying the separator; the generated form keeps a hidden field of the
 original name holding the parts joined in order, and that is what fills the PDF.
 Any field, any separator, any form - see rule 8.
 
+## Combining fields into one question, and typing them properly
+
+Fields that describe one subject are one question (rule 9), and a value is asked
+in the type it is (rule 10):
+
+```json
+"combines": [
+  { "question": "Where can the court send you papers?",
+    "fields": [
+      { "field": "person_asking_protection_mailing_address",  "label": "Street address" },
+      { "field": "person_asking_protection_mailing_city",     "label": "City" },
+      { "field": "person_asking_protection_mailing_state",    "label": "State" },
+      { "field": "person_asking_protection_mailing_zip_code", "label": "ZIP code" } ] } ],
+"questions": {
+  "person_to_restrain_date_of_birth": { "type": "date" },
+  "person_asking_protection_age":     { "type": "number" }
+}
+```
+
+A combine becomes a `multipleTextboxes` question whose boxes keep the PDF's own
+field names; a type becomes a date picker, a phone keypad, an email field or a
+number box. Types work inside combined and repeating questions too.
+
 ## Running it
 
 ```bash

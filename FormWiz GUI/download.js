@@ -903,14 +903,20 @@ function loadFormData(formData) {
 
                                         }
                                     }
-                                } else if (field.type === 'phone') {
-                                    // Add a phone field (reuse label UI and mark as phone)
+                                } else if (field.type === 'phone' || field.type === 'email'
+                                           || field.type === 'number' || field.type === 'text') {
+                                    // Typed text boxes all reuse the label UI and
+                                    // keep their type on the row. Anything not
+                                    // named here used to fall off the end of this
+                                    // chain: the field was not created, so it left
+                                    // the builder, the generated form and the PDF
+                                    // without a word - an email box simply gone.
                                     addTextboxLabel(question.questionId);
                                     const lastField = unifiedFieldsDiv.lastElementChild;
                                     if (lastField) {
                                         const fieldOrder = lastField.getAttribute('data-order');
-                                        // Mark the unified field as phone
-                                        lastField.setAttribute('data-type', 'phone');
+                                        // Keep the row's own type
+                                        lastField.setAttribute('data-type', field.type);
                                         const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
                                         const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
                                         if (labelTextEl) labelTextEl.textContent = field.label;
@@ -4307,7 +4313,8 @@ function exportForm(options) {
                             fieldData.prefill = prefillValue;
                         }
                         // Export conditional prefills for label, amount, currency, and phone fields
-                        if (fieldType === 'label' || fieldType === 'amount' || fieldType === 'currency' || fieldType === 'phone') {
+                        // Every typed text box carries its node id back out.
+                        if (['label', 'amount', 'currency', 'phone', 'email', 'number', 'text'].includes(fieldType)) {
                             const conditionalPrefillsData = field.getAttribute('data-conditional-prefills');
 
                             if (conditionalPrefillsData) {

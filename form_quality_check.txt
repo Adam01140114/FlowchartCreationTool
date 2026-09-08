@@ -2,7 +2,7 @@ Form Quality Check
 ==================
 Last updated: September 8, 2026
 
-Eight rules a generated form must satisfy before it ships. A form can pass the
+Ten rules a generated form must satisfy before it ships. A form can pass the
 compiler's `auditForm()` — clean geometry, no unreachable nodes, no overlaps —
 and still fail every one of these. The audit checks the chart. These check the
 form.
@@ -21,6 +21,8 @@ TABLE OF CONTENTS
   Rule 6 — Ask only what the filer completes
   Rule 7 — A form that asks nothing still ships
   Rule 8 — One question asks one thing
+  Rule 9 — Fields about one subject are one question
+  Rule 10 — Ask for a value in the type it is
   Pre-ship checklist
   Current status: the DV packet
 
@@ -487,6 +489,89 @@ often than right.
 
 
 ================================================================================
+RULE 9 — FIELDS ABOUT ONE SUBJECT ARE ONE QUESTION
+================================================================================
+
+An address is one thing a person types in one go:
+
+    What is your street address?     ->   Where can the court send you papers?
+    What is your city?                      Street address  [            ]
+    What is your state?                     City            [            ]
+    What is your ZIP Code?                  State           [ dropdown   ]
+                                            ZIP code        [            ]
+
+Four screens for one address is four chances to abandon the form, and it hides
+the shape of what is being asked. The same is true of any run of fields that
+describe one subject - a lawyer's name, bar number and firm; a phone, fax and
+email.
+
+This is the opposite of rule 8 and does not contradict it: rule 8 is about one
+BOX holding two answers, this is about one ANSWER split over several questions.
+Both end at the same place - the interview matches how a person thinks, and the
+PDF gets exactly the field values it had before.
+
+HOW IT IS BUILT
+
+A combines hint names the fields and what to call the question:
+
+    "combines": [
+      { "question": "Where can the court send you papers?",
+        "fields": [
+          { "field": "person_asking_protection_mailing_address",  "label": "Street address" },
+          { "field": "person_asking_protection_mailing_city",     "label": "City" },
+          { "field": "person_asking_protection_mailing_state",    "label": "State" },
+          { "field": "person_asking_protection_mailing_zip_code", "label": "ZIP code" } ] } ]
+
+The compiler emits a multipleTextboxes question whose nameId is the family's
+shared prefix, with one box per field named by what is left. The exporter
+composes each box's id as <question nameId>_<box nameId>, so the ids are exactly
+the PDF field names the separate questions filled. A box labelled State renders
+as a state dropdown, and Street/City/State/Zip get address formatting, for free.
+
+HOW TO CHECK
+
+  node pipeline-audit.js
+
+fails on three or more separate questions whose names share a prefix and read as
+an address; it reports other shared-prefix runs for a human to judge, because
+"name" and "age" share a prefix and are not one question.
+
+
+================================================================================
+RULE 10 — ASK FOR A VALUE IN THE TYPE IT IS
+================================================================================
+
+A date typed into a text box has no picker and no agreed format. A phone number
+has no keypad on a phone. An age accepts "Test Value".
+
+    What is your age?             number   ->  digits only
+    What is your date of birth?   date     ->  a date picker, one format
+    What is your telephone?       phone    ->  (555) 555-5555 as you type
+    What is your email address?   email    ->  the address keyboard, and a check
+
+Set it in the hints, on the field or on a box inside a combined or repeating
+question:
+
+    "questions": { "person_to_restrain_date_of_birth": { "type": "date" } }
+    "repeats":   [ { "fields": [ { "nameId": "{n}_due_date", "type": "date" } ] } ]
+
+WHAT THIS COSTS IF IGNORED
+
+The PDF still fills - a text box will happily post "2024-06-15" - so nothing in
+the audit trail looks wrong. What breaks is the person: a filer typing a date
+their own way, a phone number the court cannot dial, and no keyboard help on the
+device most of them are using.
+
+HOW TO CHECK
+
+  node pipeline-audit.js
+
+fails on a value question whose name says date, phone, email, age, count, years,
+months or yards and whose type is still text - inside combined and repeating
+questions as well as on its own.
+
+
+================================================================================
 PRE-SHIP CHECKLIST
 ================================================================================
 
@@ -513,6 +598,10 @@ PRE-SHIP CHECKLIST
   [ ] 8  No question asks for two things. Where a PDF field holds two, the
          interview splits it and the form rejoins it - checked in the filled PDF,
          not just in the JSON.
+  [ ] 9  Addresses and other one-subject field runs are one question, and their
+         boxes still fill the same PDF fields.
+  [ ] 10 Dates, phones, emails and numbers use their own question type, in
+         combined and repeating questions too.
   [ ] -  Every dropdown shows its real options, never a silent Yes/No fallback.
   [ ] -  No two questions share a hiddenLogic nodeId.
 
@@ -521,8 +610,11 @@ PRE-SHIP CHECKLIST
 CURRENT STATUS: THE DV PACKET
 ================================================================================
 
-Measured September 8, 2026, against dv-packet-project.json — 156 questions in
-12 sections, rebuilt from the field configs by the pipeline in PIPELINE.md.
+Measured September 8, 2026, against dv-packet-project.json — 147 questions in
+11 sections, rebuilt from the field configs by the pipeline in PIPELINE.md.
+Four of those questions are combined subjects, five are repeating blocks, and
+19 carry a type of their own: 6 date, 4 phone, 9 money, plus the email and
+number boxes inside the combined questions.
 
   Rule 1  PASSES — every filer field on all three forms is reachable.
           dv100 321/321, dv109 6/6, dv110 42/42. The eleven DV-110 fields that
@@ -563,6 +655,12 @@ Measured September 8, 2026, against dv-packet-project.json — 156 questions in
           Exclusive choices tick one box, not all of them - items 3f, 4a, 6g,
           8, 9, 12c and 28 were each ticking every option before the missing
           groups were added.
+          Page 1 also proves the combined and typed questions: the mailing
+          address writes street, city, state and zip to four separate boxes,
+          telephone and fax carry a phone value, the email box an address, age
+          a number and the date of birth a date. Of the 48 DV-100 values that
+          are not their own field name, 47 are those typed values and the last
+          is the court-name join.
           NOT read: the court pages of DV-109 and DV-110, which are blank.
 
   Rule 5  PASSES — one group per form, named after it. DV-109's group is empty
@@ -574,6 +672,21 @@ Measured September 8, 2026, against dv-packet-project.json — 156 questions in
           court_name_and_street_address, and the filled DV-100 shows
           "Superior Court of California, County of Alameda, 1225 Fallon Street,
           Oakland" in the court box.
+
+  Rule 9  PASSES — four subjects that were asked box by box are one question
+          each: the filer's mailing address, their lawyer's details, their
+          contact information, and the restrained person's address. Twenty
+          questions became four.
+
+          One of them found a real bug. The generated form composes a
+          convenience field called <base>_address out of street, city, state and
+          zip - and the mailing address question owns a PDF field of exactly
+          that name. The composer wrote "city, WY" over the street the filer
+          typed. A composed field is marked now, and only a marked field is ever
+          written to, so a question that owns the name keeps it.
+
+  Rule 10 PASSES — every date, telephone, email, money and count field is asked
+          in its own type, inside the combined and repeating questions too.
 
   Rule 7  PASSES — DV-109 asks nothing and has no step, and its PDF is still
           produced, filled with the four values DV-100 collected, and listed in

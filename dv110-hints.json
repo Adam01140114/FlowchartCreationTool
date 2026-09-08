@@ -33,22 +33,6 @@
       "text": "In a few words, how is the restrained person related to you? For example: spouse, former partner, parent.",
       "optional": true
     },
-    "restrained_person_street_address": {
-      "text": "What is the restrained person's street address, if you know it?",
-      "optional": true
-    },
-    "restrained_person_city": {
-      "text": "What city do they live in?",
-      "optional": true
-    },
-    "restrained_person_state": {
-      "text": "What state do they live in?",
-      "optional": true
-    },
-    "restrained_person_zip_code": {
-      "text": "What is their ZIP code?",
-      "optional": true
-    },
     "restrained_person_prohibited_items_details": {
       "text": "What firearms, firearm parts, or ammunition might the restrained person have? Include what you listed on DV-100, item 9.",
       "optional": true
@@ -376,6 +360,28 @@
     },
     "other_protected_people_yes_yes": {
       "text": "Does this order also protect other people, such as your children or family?"
+    },
+    "person_to_restrain_age": {
+      "type": "number"
+    },
+    "other_protected_person_1_age": {
+      "type": "number",
+      "text": "How old are they?"
+    },
+    "other_protected_person_2_age": {
+      "type": "number",
+      "text": "How old are they?"
+    },
+    "other_protected_person_3_age": {
+      "type": "number",
+      "text": "How old are they?"
+    },
+    "other_protected_person_4_age": {
+      "type": "number",
+      "text": "How old are they?"
+    },
+    "person_to_restrain_date_of_birth": {
+      "type": "date"
     }
   },
   "sections": [
@@ -443,6 +449,29 @@
           "nameId": "court_street_address",
           "label": "Court street address",
           "question": "What is the court's street address?"
+        }
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "Where does the restrained person live, if you know?",
+      "fields": [
+        {
+          "field": "restrained_person_street_address",
+          "label": "Street address"
+        },
+        {
+          "field": "restrained_person_city",
+          "label": "City"
+        },
+        {
+          "field": "restrained_person_state",
+          "label": "State"
+        },
+        {
+          "field": "restrained_person_zip_code",
+          "label": "ZIP code"
         }
       ]
     }

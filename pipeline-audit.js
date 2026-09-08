@@ -64,6 +64,11 @@ function postedNames(gui) {
         if (opt && typeof opt === 'object' && opt.nameId) return add(opt.nameId, q);
         add(q.nameId + '_' + slugOption(text), q);
       });
+      // A combined question posts one field per box, by the box's own id -
+      // there is one entry, so nothing is numbered.
+      if (q.type === 'multipleTextboxes') {
+        (q.allFieldsInOrder || []).forEach((f) => { if (f.nodeId) add(f.nodeId, q); });
+      }
       // A numbered block asks for entry 1..max. The field's own id says where
       // the number goes: {n} in the middle for a PDF that names its rows
       // firearm_item_3_description, appended otherwise.
@@ -256,6 +261,64 @@ async function main() {
     }
   }));
 
+  // Rule 9: fields that describe one subject are one question. An address asked
+  // as four questions is four screens for one thing a person types in one go,
+  // and the same is true of a lawyer's name, bar number and firm. The signal is
+  // a run of value questions whose field names share a prefix.
+  const combined = new Set();
+  (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
+    if (q.type === 'multipleTextboxes' && q.nodeId) combined.add(q.nodeId);
+  }));
+  const families = new Map();
+  (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
+    if (!VALUE_TYPES.has(q.type) || !q.nameId) return;
+    const parts = String(q.nameId).split('_');
+    if (parts.length < 2) return;
+    const prefix = parts.slice(0, -1).join('_');
+    if (!families.has(prefix)) families.set(prefix, []);
+    families.get(prefix).push(q.nameId);
+  }));
+  const ADDRESS_TAIL = /^(street|street_address|address|city|state|zip|zip_code|postal_code)$/;
+  report.rule9 = [];
+  families.forEach((members, prefix) => {
+    if (combined.has(prefix) || members.length < 3) return;
+    const tails = members.map((m) => m.slice(prefix.length + 1));
+    const address = tails.filter((t) => ADDRESS_TAIL.test(t)).length >= 3;
+    report.rule9.push({ prefix, members, address });
+  });
+
+  // Rule 10: ask for a value in the field type it is. A date typed into a text
+  // box has no picker and no format; a phone has no keypad on a phone.
+  const EXPECTED_TYPE = [
+    { test: /(^|_)(date_of_birth|dob)$/, type: 'date' },
+    { test: /(^|_)date$/, type: 'date' },
+    { test: /(^|_)(telephone|phone|phone_number|fax)$/, type: 'phone' },
+    { test: /(^|_)email(_address)?$/, type: 'email' },
+    { test: /(^|_)(age|count|years|months|yards)$/, type: 'number' }
+  ];
+  const TYPE_OK = { date: ['date'], phone: ['phone'], email: ['email'], number: ['money', 'number'] };
+  report.rule10 = [];
+  (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
+    if (!q.nameId || !VALUE_TYPES.has(q.type)) return;
+    const want = EXPECTED_TYPE.find((e) => e.test.test(q.nameId));
+    if (!want) return;
+    if ((TYPE_OK[want.type] || []).indexOf(q.type) === -1) {
+      report.rule10.push({ name: q.nameId, is: q.type, should: want.type, text: q.text });
+    }
+  }));
+  // A field inside a combined or repeating question carries its own type there.
+  (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
+    (q.allFieldsInOrder || []).forEach((f) => {
+      if (!f.nodeId) return;
+      const want = EXPECTED_TYPE.find((e) => e.test.test(f.nodeId));
+      if (!want) return;
+      const is = f.type === 'label' ? 'text' : f.type;
+      if ((TYPE_OK[want.type] || []).indexOf(is) === -1 && is !== want.type) {
+        report.rule10.push({ name: f.nodeId, is: is, should: want.type, text: '(inside "' + q.text + '")' });
+      }
+    });
+  }));
+
   // A question gated on one that comes later can never open: the form reveals
   // questions in order, so its trigger is still unanswered when it is passed.
   // This is how a numbered block that the editor renumbered ended up waiting on
@@ -354,6 +417,22 @@ async function main() {
     report.rule8.review.slice(0, 8).forEach((c) => console.log('      - ' + c.text));
     if (report.rule8.review.length > 8) console.log('      ... ' + (report.rule8.review.length - 8) + ' more');
   }
+
+  console.log('');
+  console.log('RULE 9 — fields about one subject are one question');
+  if (!report.rule9.length) {
+    console.log('  passes' + (combined.size ? '  (' + combined.size + ' combined question(s))' : ''));
+  }
+  report.rule9.forEach((f) => console.log('  ' + (f.address ? 'FAILS ' : 'review')
+    + '  ' + f.members.length + ' separate questions share "' + f.prefix + '": '
+    + f.members.map((m) => m.slice(f.prefix.length + 1)).join(', ')
+    + (f.address ? '  — this is an address' : '')));
+
+  console.log('');
+  console.log('RULE 10 — ask for a value in the type it is');
+  if (!report.rule10.length) console.log('  passes');
+  report.rule10.forEach((f) => console.log('  FAILS  ' + f.name + ' is ' + f.is
+    + ', should be ' + f.should + '   ' + (f.text || '')));
 
   console.log('');
   console.log('RULE 7 — a form that asks nothing still ships');

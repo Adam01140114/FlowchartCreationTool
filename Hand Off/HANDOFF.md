@@ -1,6 +1,6 @@
 # Flowchart Creation Tool — Agent Handoff
 
-**Date:** September 3, 2026  
+**Date:** September 8, 2026  
 **Repository:** https://github.com/Adam01140114/FlowchartCreationTool  
 **Branch:** `main`
 
@@ -94,7 +94,12 @@ Defaults:
 | `flowchart_ai_trainer_doc.txt` | AI trainer spec (duplicate in `Hand Off/`) |
 | `w9-flowchart.json` | Latest compiled W-9 flowchart |
 | `_w9_payload/` | W-9 logical schema (`field_config.txt`) |
-| `project-gui-export.js` | **Project-level GUI JSON** — merges every form, builds `projectForms` / `formActivations` / `packetMirrors` |
+| `project-gui-export.js` | **Project-level GUI JSON** — merges every form, builds `projectForms` / `formActivations` / `packetMirrors`, drops sections left empty |
+| `PIPELINE.md` | **Read first** — the packet pipeline, its artifacts, and the commands |
+| `pipeline-*.js` | audit, fill, explain, connect, sanitize, build-packet, harvest-text |
+| `dv-packet.spec.json` | what the DV packet is: form order, PDFs, connectors |
+| `dv-packet-connections.json` | which fields on different forms hold the same answer |
+| `io-dialogs.js` | copy-or-download / paste-or-upload dialogs (a copy lives in `FormWiz GUI/`) |
 | `dv-packet-project.json` | The DV packet project (DV-100 + DV-109 + DV-110). This is what `Import Project JSON` takes |
 | `dv-field-configs/` | **`id` → `newName` maps for the three DV PDFs.** Without these there are no sanitized PDFs and nothing fills |
 | `dv100.pdf` / `dv109.pdf` / `dv110.pdf` | Original Judicial Council forms (encrypted; qpdf decrypts them) |
@@ -140,7 +145,8 @@ Defaults:
 
 ### Form Debug Menu (Ctrl+Shift in preview)
 
-- **Fill maximum path** — fills form for worst-case PDF coverage: avoids jump-to-end and hard alerts, maxes numbered dropdowns, prefers branches that reveal more fields, 8 passes with hidden checkbox sync.
+- **Fill maximum path** — fills form for worst-case PDF coverage: avoids jump-to-end and hard alerts, maxes numbered dropdowns, prefers branches that reveal more fields, up to 8 passes (stops when a pass changes nothing), with a progress bar and a yield between questions so the tab stays alive.
+- **Fill marker values** — the same path with each field's own id as its value, so a rendered page can be read against the blank form. This is how rule 4b is done.
 
 ### Test deployment mode & dev server (September 2026 session)
 
@@ -271,6 +277,109 @@ Maximum path, one run, section-at-a-time + test:
 
 Unticked checkboxes are branches the answers ruled out (gender Nonbinary, so not
 male/female). **This is not production ready** — see section 8.
+
+---
+
+---
+
+## 5c. September 8, 2026 session — the packet pipeline, and what the DV packet was doing wrong
+
+The whole chain now runs as commands, and running it found that the packet was
+asking survivors the court's questions. Read `PIPELINE.md` first; it is the map.
+
+### The pipeline is scripted end to end
+
+| Command | What it does |
+|---------|--------------|
+| `node pipeline-connect.js` | applies `dv-packet-connections.json` — which fields on different forms hold the same answer |
+| `node pipeline-sanitize.js dv110` | rebuilds a sanitized PDF after a field-config edit |
+| `node compile-form.js <config> <out> --hints <hints>` | one form's flowchart |
+| `node pipeline-build-packet.js` | assembles the project: connectors, one group per form, each form's PDF |
+| `node pipeline-audit.js` | the static rules, per form |
+| `node pipeline-fill.js --render` | fills the PDFs from a captured answer set, reads every field back, renders pages |
+| `node pipeline-explain.js dv110` | why each empty field is empty: branch, court field, or defect |
+| `node pipeline-harvest-text.js old.json --write` | rescues authored question wording into the hints |
+
+The one browser step is Import Project JSON → Export Project GUI JSON, and the
+debug fill; `/api/dev-save` writes those artifacts back to the repo.
+
+### `courtUse` — the finding that mattered
+
+Every Judicial Council form prints who completes it. DV-109: *"The person asking
+for a restraining order must complete items 1 and 2. The court will complete the
+rest of this form."* DV-110 says the same for items 1, 2 and 3.
+
+The packet was asking 139 questions no filer can answer — what the judge decided
+about each order, the clerk's certificate, which forms to serve. Fields marked
+`"courtUse": true` in the field config never become questions. The packet went
+from 358 questions to about 145, and DV-109 now asks nothing of its own.
+
+### Ten rules, and the tooling that checks them
+
+`form_quality_check.txt` grew from four rules to ten. New since the last handoff:
+
+- **Rule 5** one group per form, named after the form
+- **Rule 6** ask only what the filer completes (`courtUse`)
+- **Rule 7** a form that asks nothing still ships — DV-109 has no step, and its
+  PDF must still be produced and listed in Preview PDFs
+- **Rule 8** one question asks one thing — a PDF box holding two answers is
+  asked as two questions and rejoined (`splits` hint + a joined linked-logic node)
+- **Rule 9** fields about one subject are one question — an address is one
+  question with four boxes (`combines` hint → `multipleTextboxes`)
+- **Rule 10** ask for a value in the type it is — date, phone, email, number
+
+Rules 1, 3, 5, 6, 7, 8, 9 and 10 are checked by `pipeline-audit.js`; rule 4 by
+`pipeline-fill.js` + `pipeline-explain.js` and a page-by-page read.
+
+### New compiler capabilities (all hint-driven, none form-specific)
+
+| Hint | Effect |
+|------|--------|
+| `courtUse` on a field config entry | never generate a question for it |
+| `splits` | one PDF field asked as several questions, rejoined with a separator |
+| `combines` | several PDF fields asked as one `multipleTextboxes` question |
+| `repeats` | a numbered family becomes one "how many?" block, `{n}` puts the entry number where the PDF wants it |
+| `questions[...].type` | date / phone / email / number instead of a text box |
+| `groups[...].labels` | option labels the field names cannot give |
+
+Same-named AcroForm fields now collapse to one question without a hint, and a
+section hint that names a family's first field places the block that replaced it.
+
+### Generated-form fixes worth knowing
+
+- **The debug fill was not maximal.** It scored options by counting fields that
+  already held a value, so revealing a follow-up scored zero. It now counts what
+  an answer puts on screen, shows a progress bar, and yields between questions —
+  the run used to freeze the tab for minutes.
+  The yield races a frame, a self-posted message and a 50 ms timer: a hidden tab
+  gets no frames and clamps timers, and a fill left in the background used to
+  stall for minutes at a time.
+- **Marker fill** (`Fill marker values`) writes each field's own id into it, so a
+  rendered page can be read against the blank form. That is rule 4b.
+- **A composed address overwrote a real answer.** The form builds a convenience
+  field `<base>_address` from street, city, state and zip. A question is free to
+  own that name — DV-100's mailing address does — and the composer was writing
+  "city, ST" over the street the filer typed. Composed fields carry
+  `data-address-composite` now, and nothing else is ever written to.
+- **`processAllPdfs` crashed** on four variables declared in another function, so
+  finishing a packet skipped later PDFs and never showed the completion screen.
+- **Preview PDFs listed only the first form** of a packet.
+- **Reserved names.** The form generates hidden `court_name`, `court_address`,
+  `form_zip`, `current_date` and friends. A question that claims one of those
+  names now wins, and the built-in is not emitted — two elements shared an id and
+  `getElementById` returned the empty one.
+- **Silent field loss.** A field type nobody drew (an `email` box inside a
+  combined question) was skipped on import and never rendered. Unknown types now
+  fall back to a text box.
+- **`{n}` in a node id** puts the entry number where the PDF wants it
+  (`firearm_item_3_description`), and `sanitizeNameId` keeps the braces.
+
+### Where the DV packet stands
+
+Rules 1, 2, 4a, 4b, 5, 6, 7, 8, 9, 10 pass. Rule 3 is five of eight numbered
+families; the other three carry per-entry checkboxes, which need `{n}` support in
+the entry-dropdown id paths. Before filing: run the minimum and typical paths,
+finish rule 3, and add DV-140, which DV-100 page 13 lists as required.
 
 ---
 

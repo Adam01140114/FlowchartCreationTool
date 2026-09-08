@@ -767,7 +767,8 @@
       "text": "What is your name?"
     },
     "person_asking_protection_age": {
-      "text": "How old are you?"
+      "text": "How old are you?",
+      "type": "number"
     },
     "person_to_restrain_full_name": {
       "text": "Who do you want protection from?"
@@ -775,11 +776,9 @@
     "court_name_and_street_address": {
       "text": "What is the court's name and street address?"
     },
-    "person_asking_protection_mailing_address": {
-      "text": "Where can the court send you papers?"
-    },
     "most_recent_abuse_date": {
-      "text": "When did the most recent abuse happen?"
+      "text": "When did the most recent abuse happen?",
+      "type": "date"
     },
     "most_recent_abuse_details": {
       "text": "What happened?"
@@ -788,13 +787,15 @@
       "text": "On what other dates did it happen?"
     },
     "different_abuse_incident_date": {
-      "text": "When did that earlier abuse happen?"
+      "text": "When did that earlier abuse happen?",
+      "type": "date"
     },
     "different_abuse_incident_details": {
       "text": "What happened that time?"
     },
     "other_abuse_incident_date": {
-      "text": "When did the other abuse happen?"
+      "text": "When did the other abuse happen?",
+      "type": "date"
     },
     "other_abuse_incident_details": {
       "text": "What happened then?"
@@ -818,61 +819,39 @@
       "text": "Why should the person pay these debts?"
     },
     "person_asking_protection_signature_date": {
-      "text": "What date are you signing?"
+      "text": "What date are you signing?",
+      "type": "date"
     },
     "person_asking_protection_signature_printed_name": {
       "text": "Print your name."
     },
     "additional_pages_count": {
-      "text": "How many extra pages are attached?"
+      "text": "How many extra pages are attached?",
+      "type": "number"
     },
     "case_number": {
       "text": "What is the case number?"
     },
-    "person_asking_protection_mailing_city": {
-      "text": "What is your city?"
-    },
-    "person_asking_protection_mailing_state": {
-      "text": "What is your state?"
-    },
-    "person_asking_protection_mailing_zip_code": {
-      "text": "What is your ZIP Code?"
-    },
     "provide_optional_contact_information": {
       "text": "Do you want to provide optional contact information?"
-    },
-    "person_asking_protection_telephone": {
-      "text": "What is your telephone?"
-    },
-    "person_asking_protection_fax": {
-      "text": "What is your fax?"
-    },
-    "person_asking_protection_email": {
-      "text": "What is your email Address?"
     },
     "has_lawyer": {
       "text": "Do you have a lawyer?"
     },
-    "person_asking_protection_lawyer_name": {
-      "text": "What is your lawyer name?"
-    },
-    "person_asking_protection_lawyer_state_bar_number": {
-      "text": "What is your state Bar Number?"
-    },
-    "person_asking_protection_lawyer_firm_name": {
-      "text": "What is your firm Name?"
-    },
     "lawyer_signature_date": {
-      "text": "What is your date?"
+      "text": "What is your date?",
+      "type": "date"
     },
     "lawyer_signature_printed_name": {
       "text": "What is your lawyer\u2019s name?"
     },
     "person_to_restrain_age": {
-      "text": "What is your age?"
+      "text": "About how old is the person you want protection from?",
+      "type": "number"
     },
     "person_to_restrain_date_of_birth": {
-      "text": "What is your date of birth?"
+      "text": "What is your date of birth?",
+      "type": "date"
     },
     "person_to_restrain_gender": {
       "text": "What is the gender of the person you want protection from?"
@@ -1019,7 +998,8 @@
       "text": "What is your full name?"
     },
     "other_protected_person_1_age": {
-      "text": "What is your age?"
+      "type": "number",
+      "text": "How old are they?"
     },
     "other_protected_person_1_relationship": {
       "text": "What is your relationship to you?"
@@ -1031,7 +1011,8 @@
       "text": "What is your full name?"
     },
     "other_protected_person_2_age": {
-      "text": "What is your age?"
+      "type": "number",
+      "text": "How old are they?"
     },
     "other_protected_person_2_relationship": {
       "text": "What is your relationship to you?"
@@ -1043,7 +1024,8 @@
       "text": "What is your full name?"
     },
     "other_protected_person_3_age": {
-      "text": "What is your age?"
+      "type": "number",
+      "text": "How old are they?"
     },
     "other_protected_person_3_relationship": {
       "text": "What is your relationship to you?"
@@ -1055,7 +1037,8 @@
       "text": "What is your full name?"
     },
     "other_protected_person_4_age": {
-      "text": "What is your age?"
+      "type": "number",
+      "text": "How old are they?"
     },
     "other_protected_person_4_relationship": {
       "text": "What is your relationship to you?"
@@ -1169,7 +1152,8 @@
       "text": "What is your breed, if known?"
     },
     "wireless_transfer_phone_1_number": {
-      "text": "What is your phone number including area code?"
+      "text": "What is your phone number including area code?",
+      "type": "phone"
     },
     "move_out_years_at_address": {
       "text": "What is your years?"
@@ -1205,7 +1189,8 @@
       "text": "What is your for?"
     },
     "stay_away_distance_other_yards": {
-      "text": "What is your other distance in yards?"
+      "type": "number",
+      "text": "How many yards must the person stay away?"
     },
     "protected_animal_2_name_or_id": {
       "text": "What is your name or other way to identify animal?"
@@ -1223,7 +1208,8 @@
       "text": "What is your of animal?"
     },
     "wireless_transfer_phone_2_number": {
-      "text": "What is your phone number including area code?"
+      "text": "What is your phone number including area code?",
+      "type": "phone"
     },
     "property_debt_2_amount": {
       "text": "What is your amount?"
@@ -1259,7 +1245,8 @@
       "text": "What is your name or other way to identify animal?"
     },
     "wireless_transfer_phone_3_number": {
-      "text": "What is your phone number including area code?"
+      "text": "What is your phone number including area code?",
+      "type": "phone"
     },
     "living_arrangement": {
       "text": "How close do you live to each other?"
@@ -1301,7 +1288,8 @@
       "text": "What is your color?"
     },
     "wireless_transfer_phone_4_number": {
-      "text": "What is your phone number including area code?"
+      "text": "What is your phone number including area code?",
+      "type": "phone"
     },
     "protected_animal_4_name_or_id": {
       "text": "What is your name or other way to identify animal?"
@@ -1340,7 +1328,8 @@
       "text": "What is your explain how the person made the debt or debts?"
     },
     "animal_stay_away_distance_other_yards": {
-      "text": "What is your other number of yards?"
+      "type": "number",
+      "text": "How many yards must the person stay away from the animals?"
     },
     "animal_order_no_harm_or_transfer": {
       "text": "Do not take, sell, hide, molest, attack, strike, threaten, harm, get rid of, transfer, or borrow against the animals?"
@@ -1586,7 +1575,8 @@
         },
         {
           "label": "Due date",
-          "nameId": "{n}_due_date"
+          "nameId": "{n}_due_date",
+          "type": "date"
         }
       ]
     },
@@ -1599,11 +1589,13 @@
       "fields": [
         {
           "label": "Date of the order",
-          "nameId": "{n}_date"
+          "nameId": "{n}_date",
+          "type": "date"
         },
         {
           "label": "Date it expires",
-          "nameId": "{n}_expiration_date"
+          "nameId": "{n}_expiration_date",
+          "type": "date"
         }
       ]
     }
@@ -1622,6 +1614,66 @@
           "nameId": "court_street_address",
           "label": "Court street address",
           "question": "What is the court's street address?"
+        }
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "Where can the court send you papers?",
+      "fields": [
+        {
+          "field": "person_asking_protection_mailing_address",
+          "label": "Street address"
+        },
+        {
+          "field": "person_asking_protection_mailing_city",
+          "label": "City"
+        },
+        {
+          "field": "person_asking_protection_mailing_state",
+          "label": "State"
+        },
+        {
+          "field": "person_asking_protection_mailing_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    },
+    {
+      "question": "Your lawyer's information, if you have one",
+      "fields": [
+        {
+          "field": "person_asking_protection_lawyer_name",
+          "label": "Lawyer's name"
+        },
+        {
+          "field": "person_asking_protection_lawyer_state_bar_number",
+          "label": "State bar number"
+        },
+        {
+          "field": "person_asking_protection_lawyer_firm_name",
+          "label": "Law firm name"
+        }
+      ]
+    },
+    {
+      "question": "How can the court reach you? (optional)",
+      "fields": [
+        {
+          "field": "person_asking_protection_telephone",
+          "label": "Phone number",
+          "type": "phone"
+        },
+        {
+          "field": "person_asking_protection_fax",
+          "label": "Fax number",
+          "type": "phone"
+        },
+        {
+          "field": "person_asking_protection_email",
+          "label": "Email address",
+          "type": "email"
         }
       ]
     }

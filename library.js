@@ -73,6 +73,15 @@ function isHardAlertNode(cell) {
 function isStatusNode(cell) {
   return cell && cell.style && cell.style.includes("nodeType=status");
 }
+/**
+ * Field types inside a question that carry through to the generated form as
+ * themselves. Anything else is a plain label, or an amount when it is flagged
+ * as one. A date inside a repeating block used to fall through to "label" and
+ * render as a text box, so the entry asked for a date and offered no date
+ * picker - and the same box outside a block did.
+ */
+const FIELD_TYPE_PASSTHROUGH = new Set(['phone', 'currency', 'date', 'email', 'number']);
+
 // Download utility moved to export.js module
 // Export functions moved to export.js module
 // Import a flowchart JSON file
@@ -613,13 +622,14 @@ window.exportGuiJson = function(download = true) {
           if ((item.type === 'option' || item.type === 'textbox') && cell._textboxes && cell._textboxes[item.index]) {
             const tb = cell._textboxes[item.index];
             const labelName = tb.nameId || "";
+            // The nameId composes the PDF field id; an explicit label is what
+            // the filer reads above the box.
+            const shownLabel = tb.label || labelName;
             // Use the actual nodeId (which may include _dup2) as the base for fieldNodeId
             const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
-            const fieldType = tb.type === 'phone'
-              ? 'phone'
-              : (tb.type === 'currency'
-                ? 'currency'
-                : (tb.isAmountOption ? "amount" : "label"));
+            const fieldType = FIELD_TYPE_PASSTHROUGH.has(tb.type)
+              ? tb.type
+              : (tb.isAmountOption ? "amount" : "label");
             console.log('[LIBRARY exportGuiJson] Field type determined', { 
               cellId: cell.id, 
               index: item.index, 
@@ -629,7 +639,7 @@ window.exportGuiJson = function(download = true) {
             });
             const fieldEntry = {
               type: fieldType,
-              label: labelName,
+              label: shownLabel,
               nodeId: fieldNodeId,
               order: orderIndex + 1
             };
@@ -1398,11 +1408,9 @@ window.exportGuiJson = function(download = true) {
             const effectiveNodeId = effectiveSanitizedPdfName ? `${effectiveSanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
             const fieldNodeId = effectiveSanitizedPdfName ? `${effectiveNodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
             // Check if this textbox is marked as an amount option, phone, or currency
-            const fieldType = tb.type === 'phone'
-              ? 'phone'
-              : (tb.type === 'currency'
-                ? 'currency'
-                : (tb.isAmountOption ? "amount" : "label"));
+            const fieldType = FIELD_TYPE_PASSTHROUGH.has(tb.type)
+              ? tb.type
+              : (tb.isAmountOption ? "amount" : "label");
             console.log('[LIBRARY exportGuiJson] Field type determined (fallback)', { 
               cellId: cell.id, 
               index, 
@@ -1964,11 +1972,9 @@ window.exportGuiJson = function(download = true) {
               // {n}_description so the entry number lands where the PDF wants
               // it. An explicit label says what to print above the box.
               const shownLabel = tb.label || labelName;
-              const fieldType = tb.type === 'phone'
-                ? 'phone'
-                : (tb.type === 'currency'
-                  ? 'currency'
-                  : (tb.isAmountOption === true ? "amount" : "label"));
+              const fieldType = FIELD_TYPE_PASSTHROUGH.has(tb.type)
+                ? tb.type
+                : (tb.isAmountOption === true ? "amount" : "label");
               console.log('[LIBRARY exportGuiJson multipleDropdownType] Field type determined (_itemOrder path)', { 
                 cellId: cell.id, 
                 index: item.index, 
@@ -2555,11 +2561,9 @@ window.exportGuiJson = function(download = true) {
           cell._textboxes.forEach((tb, index) => {
             const labelName = tb.nameId || tb.placeholder || "";
             const shownLabel = tb.label || labelName;
-            const fieldType = tb.type === 'phone'
-              ? 'phone'
-              : (tb.type === 'currency'
-                ? 'currency'
-                : (tb.isAmountOption === true ? "amount" : "label"));
+            const fieldType = FIELD_TYPE_PASSTHROUGH.has(tb.type)
+              ? tb.type
+              : (tb.isAmountOption === true ? "amount" : "label");
             console.log('[LIBRARY exportGuiJson multipleDropdownType] Field type determined (fallback path)', { 
               cellId: cell.id, 
               index, 
