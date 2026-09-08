@@ -47,6 +47,11 @@
         "denial_reason_no_reasonable_proof_of_abuse",
         "denial_reason_insufficient_incident_detail",
         "denial_reason_other"
+      ],
+      "labels": [
+        "The facts did not show reasonable proof of abuse",
+        "The request did not describe the incidents in enough detail",
+        "Another reason"
       ]
     }
   ],

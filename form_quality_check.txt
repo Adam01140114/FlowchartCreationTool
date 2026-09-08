@@ -622,10 +622,20 @@ number boxes inside the combined questions.
           firearm table on page 2, the "prohibited items" line in item 2, and
           the clerk's certificate on page 9.
 
-  Rule 2  PASSES on wording — no question text or option label still shows a
-          field name. That wording lives in the hints files now, so a recompile
-          keeps it; it used to exist only inside the compiled flowchart, and the
-          first recompile turned 146 questions back into
+  Rule 2  PASSES on wording, and the audit checks it now rather than the eye.
+          Question text was clean; option labels were not. Eight checkbox
+          questions were listing their PDF field names as the choices - "What
+          is your relationship to the person you want protection from?" offered
+          "relationship_have_children_together" and six more like it - because a
+          field config's `label` is usually the field's own name, and a
+          multi-select group had no labels of its own to override it. All eight
+          carry the wording from the printed form now, and the compiler treats a
+          lowercase underscore-joined token as no label at all, so a name cannot
+          reach a reader even when a hint is missing.
+
+          That wording lives in the hints files, so a recompile keeps it; it
+          used to exist only inside the compiled flowchart, and the first
+          recompile turned 146 questions back into
           "What is your person_asking_protection_mailing_zip_code?".
 
           NOT verified: that every gate is a real question.

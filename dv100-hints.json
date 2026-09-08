@@ -82,7 +82,7 @@
       ],
       "question": "Did anyone else see or hear the most recent abuse?",
       "labels": [
-        "I don\u2019t know",
+        "I don’t know",
         "No",
         "Yes"
       ]
@@ -120,7 +120,7 @@
       ],
       "question": "Did the police come?",
       "labels": [
-        "I don\u2019t know",
+        "I don’t know",
         "No",
         "Yes"
       ]
@@ -136,7 +136,7 @@
       "question": "How often has this abuse happened?",
       "labels": [
         "Just this once",
-        "2\u20135 times",
+        "2–5 times",
         "Weekly",
         "Other"
       ]
@@ -150,7 +150,7 @@
       ],
       "question": "Did anyone else see or hear this earlier abuse?",
       "labels": [
-        "I don\u2019t know",
+        "I don’t know",
         "No",
         "Yes"
       ]
@@ -188,7 +188,7 @@
       ],
       "question": "Did the police come that time?",
       "labels": [
-        "I don\u2019t know",
+        "I don’t know",
         "No",
         "Yes"
       ]
@@ -202,7 +202,7 @@
       ],
       "question": "Did anyone else see or hear this other abuse?",
       "labels": [
-        "I don\u2019t know",
+        "I don’t know",
         "No",
         "Yes"
       ]
@@ -240,7 +240,7 @@
       ],
       "question": "Did the police come then?",
       "labels": [
-        "I don\u2019t know",
+        "I don’t know",
         "No",
         "Yes"
       ]
@@ -256,7 +256,7 @@
       "question": "How often has this other abuse happened?",
       "labels": [
         "Just this once",
-        "2\u20135 times",
+        "2–5 times",
         "Weekly",
         "Other"
       ]
@@ -405,6 +405,15 @@
         "relationship_engaged_or_formerly_engaged",
         "relationship_related",
         "relationship_live_or_lived_together"
+      ],
+      "labels": [
+        "We have a child or children together",
+        "We are married or registered domestic partners",
+        "We used to be married or registered domestic partners",
+        "We are dating or used to date",
+        "We are or used to be engaged to be married",
+        "We are related",
+        "We live together or used to live together"
       ]
     },
     {
@@ -423,7 +432,7 @@
         "Brother, sister, sibling, stepsibling, or sibling in-law",
         "Child, stepchild, or legally adopted child",
         "Grandparent, step-grandparent, or grandparent-in-law",
-        "Child\u2019s spouse",
+        "Child’s spouse",
         "Grandchild, step-grandchild, or grandchild-in-law"
       ]
     },
@@ -438,6 +447,14 @@
         "other_court_case_guardianship_selected",
         "other_court_case_criminal_selected",
         "other_court_case_other_selected"
+      ],
+      "labels": [
+        "Custody",
+        "Divorce",
+        "Juvenile (child welfare or juvenile justice)",
+        "Guardianship",
+        "Criminal",
+        "Another kind of case"
       ]
     },
     {
@@ -464,6 +481,27 @@
         "batterer_intervention_program_order_requested",
         "wireless_phone_account_transfer_order_requested",
         "extend_service_deadline_requested"
+      ],
+      "labels": [
+        "Order to not abuse me",
+        "No-contact order",
+        "Stay-away order",
+        "Order to move out",
+        "Other orders",
+        "Child custody and visitation",
+        "Protect animals",
+        "Control of property",
+        "Health and other insurance",
+        "Record communications",
+        "Property restraint",
+        "Pay debts (bills) owed for property",
+        "Pay expenses caused by the abuse",
+        "Child support",
+        "Spousal support",
+        "Lawyer's fees and costs",
+        "Batterer intervention program",
+        "Transfer of wireless phone account",
+        "More time to give notice to the person"
       ]
     },
     {
@@ -479,6 +517,16 @@
         "stay_away_from_other_protected_people",
         "stay_away_from_childrens_school_or_childcare",
         "stay_away_from_other_place"
+      ],
+      "labels": [
+        "Me",
+        "My home",
+        "My school",
+        "My job or workplace",
+        "My vehicle",
+        "Each person I listed as protected",
+        "My children's school or childcare",
+        "Somewhere else"
       ]
     },
     {
@@ -520,6 +568,14 @@
         "move_out_right_to_live_pay_rent_or_mortgage",
         "move_out_right_to_live_with_children",
         "move_out_right_to_live_other"
+      ],
+      "labels": [
+        "I own the home",
+        "I have lived at this address for a while",
+        "My name is on the lease",
+        "I pay for some or all of the rent or mortgage",
+        "I live at this address with my children",
+        "Another reason"
       ]
     },
     {
@@ -531,6 +587,12 @@
         "animal_sole_possession_reason_i_care_for_animals",
         "animal_sole_possession_reason_i_purchased_animals",
         "animal_sole_possession_reason_other"
+      ],
+      "labels": [
+        "The person abuses the animals",
+        "I take care of these animals",
+        "I purchased these animals",
+        "Another reason"
       ]
     },
     {
@@ -567,6 +629,11 @@
         "property_debt_special_finding_debt_1",
         "property_debt_special_finding_debt_2",
         "property_debt_special_finding_debt_3"
+      ],
+      "labels": [
+        "The first debt listed above",
+        "The second debt listed above",
+        "The third debt listed above"
       ]
     },
     {
@@ -577,6 +644,11 @@
         "same_workplace_selected",
         "same_school_selected",
         "same_workplace_or_school_other"
+      ],
+      "labels": [
+        "We work together",
+        "We go to the same school",
+        "Something else"
       ]
     },
     {
@@ -628,7 +700,7 @@
       "question": "How often has the person you want protection from abused you like this?",
       "labels": [
         "Just this once",
-        "2\u20135 times",
+        "2–5 times",
         "Weekly",
         "Other"
       ]
@@ -639,13 +711,13 @@
       "conditional": {
         "onlyWhen": "relationship_have_children_together"
       },
-      "text": "What is your names of children?"
+      "text": "What are the names of your children together?"
     },
     "relationship_children_names_line_2": {
       "conditional": {
         "onlyWhen": "relationship_have_children_together"
       },
-      "text": "What is your names of children, continued?"
+      "text": "What are the rest of your children's names?"
     },
     "relationship_relative_parent_stepparent_parent_in_law": {
       "conditional": {
@@ -843,7 +915,7 @@
       "type": "date"
     },
     "lawyer_signature_printed_name": {
-      "text": "What is your lawyer\u2019s name?"
+      "text": "What is your lawyer’s name?"
     },
     "person_to_restrain_age": {
       "text": "About how old is the person you want protection from?",
@@ -938,7 +1010,7 @@
       "text": "Do you have a just this once?"
     },
     "different_abuse_incident_frequency_two_to_five": {
-      "text": "Do you have 2\u20135 times?"
+      "text": "Do you have 2–5 times?"
     },
     "different_abuse_incident_frequency_weekly": {
       "text": "Do you have a weekly?"
@@ -1053,7 +1125,7 @@
       "text": "What is your why these people need protection?"
     },
     "person_to_restrain_firearms_unknown": {
-      "text": "Do you have an i don\u2019t know?"
+      "text": "Do you have an i don’t know?"
     },
     "person_to_restrain_firearms_no": {
       "text": "Do you have a no?"

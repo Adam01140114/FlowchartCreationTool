@@ -1429,49 +1429,49 @@
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "relationship_have_children_together"
+            "answer": "We have a child or children together"
           },
           "hiddenLogic": {
             "enabled": true,
             "configs": [
               {
-                "trigger": "relationship_have_children_together",
+                "trigger": "We have a child or children together",
                 "type": "checkbox",
                 "nodeId": "relationship_have_children_together",
                 "textboxText": ""
               },
               {
-                "trigger": "relationship_current_spouses_or_domestic_partners",
+                "trigger": "We are married or registered domestic partners",
                 "type": "checkbox",
                 "nodeId": "relationship_current_spouses_or_domestic_partners",
                 "textboxText": ""
               },
               {
-                "trigger": "relationship_former_spouses_or_domestic_partners",
+                "trigger": "We used to be married or registered domestic partners",
                 "type": "checkbox",
                 "nodeId": "relationship_former_spouses_or_domestic_partners",
                 "textboxText": ""
               },
               {
-                "trigger": "relationship_dating_or_formerly_dated",
+                "trigger": "We are dating or used to date",
                 "type": "checkbox",
                 "nodeId": "relationship_dating_or_formerly_dated",
                 "textboxText": ""
               },
               {
-                "trigger": "relationship_engaged_or_formerly_engaged",
+                "trigger": "We are or used to be engaged to be married",
                 "type": "checkbox",
                 "nodeId": "relationship_engaged_or_formerly_engaged",
                 "textboxText": ""
               },
               {
-                "trigger": "relationship_related",
+                "trigger": "We are related",
                 "type": "checkbox",
                 "nodeId": "relationship_related",
                 "textboxText": ""
               },
               {
-                "trigger": "relationship_live_or_lived_together",
+                "trigger": "We live together or used to live together",
                 "type": "checkbox",
                 "nodeId": "relationship_live_or_lived_together",
                 "textboxText": ""
@@ -1536,56 +1536,56 @@
           },
           "options": [
             {
-              "label": "relationship_have_children_together",
-              "nameId": "relationship_to_person_to_restrain_relationship_have_children_together",
+              "label": "We have a child or children together",
+              "nameId": "relationship_to_person_to_restrain_we_have_a_child_or_children_together",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "relationship_current_spouses_or_domestic_partners",
-              "nameId": "relationship_to_person_to_restrain_relationship_current_spouses_or_domestic_partners",
+              "label": "We are married or registered domestic partners",
+              "nameId": "relationship_to_person_to_restrain_we_are_married_or_registered_domestic_partners",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "relationship_former_spouses_or_domestic_partners",
-              "nameId": "relationship_to_person_to_restrain_relationship_former_spouses_or_domestic_partners",
+              "label": "We used to be married or registered domestic partners",
+              "nameId": "relationship_to_person_to_restrain_we_used_to_be_married_or_registered_domestic_partners",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "relationship_dating_or_formerly_dated",
-              "nameId": "relationship_to_person_to_restrain_relationship_dating_or_formerly_dated",
+              "label": "We are dating or used to date",
+              "nameId": "relationship_to_person_to_restrain_we_are_dating_or_used_to_date",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "relationship_engaged_or_formerly_engaged",
-              "nameId": "relationship_to_person_to_restrain_relationship_engaged_or_formerly_engaged",
+              "label": "We are or used to be engaged to be married",
+              "nameId": "relationship_to_person_to_restrain_we_are_or_used_to_be_engaged_to_be_married",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "relationship_related",
-              "nameId": "relationship_to_person_to_restrain_relationship_related",
+              "label": "We are related",
+              "nameId": "relationship_to_person_to_restrain_we_are_related",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "relationship_live_or_lived_together",
-              "nameId": "relationship_to_person_to_restrain_relationship_live_or_lived_together",
+              "label": "We live together or used to live together",
+              "nameId": "relationship_to_person_to_restrain_we_live_together_or_used_to_live_together",
               "value": "",
               "hasAmount": false,
               "amountName": "",
@@ -1599,14 +1599,14 @@
         },
         {
           "questionId": 13,
-          "text": "What is your names of children?",
+          "text": "What are the names of your children together?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
                 "prevQuestion": "12",
-                "prevAnswer": "relationship_have_children_together"
+                "prevAnswer": "We have a child or children together"
               }
             ]
           },
@@ -1702,7 +1702,7 @@
             "conditions": [
               {
                 "prevQuestion": "12",
-                "prevAnswer": "relationship_related"
+                "prevAnswer": "We are related"
               }
             ]
           },
@@ -1833,7 +1833,7 @@
             "conditions": [
               {
                 "prevQuestion": "12",
-                "prevAnswer": "relationship_live_or_lived_together"
+                "prevAnswer": "We live together or used to live together"
               }
             ]
           },
@@ -1929,7 +1929,7 @@
         },
         {
           "questionId": 16,
-          "text": "What is your names of children, continued?",
+          "text": "What are the rest of your children's names?",
           "type": "text",
           "logic": {
             "enabled": true,
@@ -2042,19 +2042,19 @@
               },
               {
                 "prevQuestion": "12",
-                "prevAnswer": "relationship_current_spouses_or_domestic_partners"
+                "prevAnswer": "We are married or registered domestic partners"
               },
               {
                 "prevQuestion": "12",
-                "prevAnswer": "relationship_former_spouses_or_domestic_partners"
+                "prevAnswer": "We used to be married or registered domestic partners"
               },
               {
                 "prevQuestion": "12",
-                "prevAnswer": "relationship_dating_or_formerly_dated"
+                "prevAnswer": "We are dating or used to date"
               },
               {
                 "prevQuestion": "12",
-                "prevAnswer": "relationship_engaged_or_formerly_engaged"
+                "prevAnswer": "We are or used to be engaged to be married"
               },
               {
                 "prevQuestion": "14",
@@ -2416,43 +2416,43 @@
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "other_court_case_custody_selected"
+            "answer": "Custody"
           },
           "hiddenLogic": {
             "enabled": true,
             "configs": [
               {
-                "trigger": "other_court_case_custody_selected",
+                "trigger": "Custody",
                 "type": "checkbox",
                 "nodeId": "other_court_case_custody_selected",
                 "textboxText": ""
               },
               {
-                "trigger": "other_court_case_divorce_selected",
+                "trigger": "Divorce",
                 "type": "checkbox",
                 "nodeId": "other_court_case_divorce_selected",
                 "textboxText": ""
               },
               {
-                "trigger": "other_court_case_juvenile_selected",
+                "trigger": "Juvenile (child welfare or juvenile justice)",
                 "type": "checkbox",
                 "nodeId": "other_court_case_juvenile_selected",
                 "textboxText": ""
               },
               {
-                "trigger": "other_court_case_guardianship_selected",
+                "trigger": "Guardianship",
                 "type": "checkbox",
                 "nodeId": "other_court_case_guardianship_selected",
                 "textboxText": ""
               },
               {
-                "trigger": "other_court_case_criminal_selected",
+                "trigger": "Criminal",
                 "type": "checkbox",
                 "nodeId": "other_court_case_criminal_selected",
                 "textboxText": ""
               },
               {
-                "trigger": "other_court_case_other_selected",
+                "trigger": "Another kind of case",
                 "type": "checkbox",
                 "nodeId": "other_court_case_other_selected",
                 "textboxText": ""
@@ -2517,48 +2517,48 @@
           },
           "options": [
             {
-              "label": "other_court_case_custody_selected",
-              "nameId": "other_court_case_kinds_other_court_case_custody_selected",
+              "label": "Custody",
+              "nameId": "other_court_case_kinds_custody",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "other_court_case_divorce_selected",
-              "nameId": "other_court_case_kinds_other_court_case_divorce_selected",
+              "label": "Divorce",
+              "nameId": "other_court_case_kinds_divorce",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "other_court_case_juvenile_selected",
-              "nameId": "other_court_case_kinds_other_court_case_juvenile_selected",
+              "label": "Juvenile (child welfare or juvenile justice)",
+              "nameId": "other_court_case_kinds_juvenile_child_welfare_or_juvenile_justice",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "other_court_case_guardianship_selected",
-              "nameId": "other_court_case_kinds_other_court_case_guardianship_selected",
+              "label": "Guardianship",
+              "nameId": "other_court_case_kinds_guardianship",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "other_court_case_criminal_selected",
-              "nameId": "other_court_case_kinds_other_court_case_criminal_selected",
+              "label": "Criminal",
+              "nameId": "other_court_case_kinds_criminal",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "other_court_case_other_selected",
-              "nameId": "other_court_case_kinds_other_court_case_other_selected",
+              "label": "Another kind of case",
+              "nameId": "other_court_case_kinds_another_kind_of_case",
               "value": "",
               "hasAmount": false,
               "amountName": "",
@@ -2579,7 +2579,7 @@
             "conditions": [
               {
                 "prevQuestion": "20",
-                "prevAnswer": "other_court_case_juvenile_selected"
+                "prevAnswer": "Juvenile (child welfare or juvenile justice)"
               }
             ]
           },
@@ -2675,7 +2675,7 @@
             "conditions": [
               {
                 "prevQuestion": "20",
-                "prevAnswer": "other_court_case_guardianship_selected"
+                "prevAnswer": "Guardianship"
               }
             ]
           },
@@ -2771,7 +2771,7 @@
             "conditions": [
               {
                 "prevQuestion": "20",
-                "prevAnswer": "other_court_case_divorce_selected"
+                "prevAnswer": "Divorce"
               }
             ]
           },
@@ -2867,7 +2867,7 @@
             "conditions": [
               {
                 "prevQuestion": "20",
-                "prevAnswer": "other_court_case_custody_selected"
+                "prevAnswer": "Custody"
               }
             ]
           },
@@ -2963,7 +2963,7 @@
             "conditions": [
               {
                 "prevQuestion": "20",
-                "prevAnswer": "other_court_case_criminal_selected"
+                "prevAnswer": "Criminal"
               }
             ]
           },
@@ -3059,7 +3059,7 @@
             "conditions": [
               {
                 "prevQuestion": "20",
-                "prevAnswer": "other_court_case_other_selected"
+                "prevAnswer": "Another kind of case"
               }
             ]
           },
@@ -9196,121 +9196,121 @@
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "order_not_to_abuse_requested"
+            "answer": "Order to not abuse me"
           },
           "hiddenLogic": {
             "enabled": true,
             "configs": [
               {
-                "trigger": "order_not_to_abuse_requested",
+                "trigger": "Order to not abuse me",
                 "type": "checkbox",
                 "nodeId": "order_not_to_abuse_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "no_contact_order_requested",
+                "trigger": "No-contact order",
                 "type": "checkbox",
                 "nodeId": "no_contact_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "stay_away_order_requested",
+                "trigger": "Stay-away order",
                 "type": "checkbox",
                 "nodeId": "stay_away_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "move_out_order_requested",
+                "trigger": "Order to move out",
                 "type": "checkbox",
                 "nodeId": "move_out_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "other_orders_requested",
+                "trigger": "Other orders",
                 "type": "checkbox",
                 "nodeId": "other_orders_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "child_custody_and_visitation_order_requested",
+                "trigger": "Child custody and visitation",
                 "type": "checkbox",
                 "nodeId": "child_custody_and_visitation_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "protect_animals_order_requested",
+                "trigger": "Protect animals",
                 "type": "checkbox",
                 "nodeId": "protect_animals_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "control_of_property_order_requested",
+                "trigger": "Control of property",
                 "type": "checkbox",
                 "nodeId": "control_of_property_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "health_and_other_insurance_order_requested",
+                "trigger": "Health and other insurance",
                 "type": "checkbox",
                 "nodeId": "health_and_other_insurance_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "record_communications_order_requested",
+                "trigger": "Record communications",
                 "type": "checkbox",
                 "nodeId": "record_communications_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "property_restraint_order_requested",
+                "trigger": "Property restraint",
                 "type": "checkbox",
                 "nodeId": "property_restraint_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "pay_property_debts_order_requested",
+                "trigger": "Pay debts (bills) owed for property",
                 "type": "checkbox",
                 "nodeId": "pay_property_debts_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "pay_expenses_caused_by_abuse_order_requested",
+                "trigger": "Pay expenses caused by the abuse",
                 "type": "checkbox",
                 "nodeId": "pay_expenses_caused_by_abuse_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "child_support_order_requested",
+                "trigger": "Child support",
                 "type": "checkbox",
                 "nodeId": "child_support_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "spousal_support_order_requested",
+                "trigger": "Spousal support",
                 "type": "checkbox",
                 "nodeId": "spousal_support_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "lawyers_fees_and_costs_order_requested",
+                "trigger": "Lawyer's fees and costs",
                 "type": "checkbox",
                 "nodeId": "lawyers_fees_and_costs_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "batterer_intervention_program_order_requested",
+                "trigger": "Batterer intervention program",
                 "type": "checkbox",
                 "nodeId": "batterer_intervention_program_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "wireless_phone_account_transfer_order_requested",
+                "trigger": "Transfer of wireless phone account",
                 "type": "checkbox",
                 "nodeId": "wireless_phone_account_transfer_order_requested",
                 "textboxText": ""
               },
               {
-                "trigger": "extend_service_deadline_requested",
+                "trigger": "More time to give notice to the person",
                 "type": "checkbox",
                 "nodeId": "extend_service_deadline_requested",
                 "textboxText": ""
@@ -9375,152 +9375,152 @@
           },
           "options": [
             {
-              "label": "order_not_to_abuse_requested",
-              "nameId": "orders_requested_order_not_to_abuse_requested",
+              "label": "Order to not abuse me",
+              "nameId": "orders_requested_order_to_not_abuse_me",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "no_contact_order_requested",
-              "nameId": "orders_requested_no_contact_order_requested",
+              "label": "No-contact order",
+              "nameId": "orders_requested_no_contact_order",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "stay_away_order_requested",
-              "nameId": "orders_requested_stay_away_order_requested",
+              "label": "Stay-away order",
+              "nameId": "orders_requested_stay_away_order",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "move_out_order_requested",
-              "nameId": "orders_requested_move_out_order_requested",
+              "label": "Order to move out",
+              "nameId": "orders_requested_order_to_move_out",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "other_orders_requested",
-              "nameId": "orders_requested_other_orders_requested",
+              "label": "Other orders",
+              "nameId": "orders_requested_other_orders",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "child_custody_and_visitation_order_requested",
-              "nameId": "orders_requested_child_custody_and_visitation_order_requested",
+              "label": "Child custody and visitation",
+              "nameId": "orders_requested_child_custody_and_visitation",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "protect_animals_order_requested",
-              "nameId": "orders_requested_protect_animals_order_requested",
+              "label": "Protect animals",
+              "nameId": "orders_requested_protect_animals",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "control_of_property_order_requested",
-              "nameId": "orders_requested_control_of_property_order_requested",
+              "label": "Control of property",
+              "nameId": "orders_requested_control_of_property",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "health_and_other_insurance_order_requested",
-              "nameId": "orders_requested_health_and_other_insurance_order_requested",
+              "label": "Health and other insurance",
+              "nameId": "orders_requested_health_and_other_insurance",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "record_communications_order_requested",
-              "nameId": "orders_requested_record_communications_order_requested",
+              "label": "Record communications",
+              "nameId": "orders_requested_record_communications",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "property_restraint_order_requested",
-              "nameId": "orders_requested_property_restraint_order_requested",
+              "label": "Property restraint",
+              "nameId": "orders_requested_property_restraint",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "pay_property_debts_order_requested",
-              "nameId": "orders_requested_pay_property_debts_order_requested",
+              "label": "Pay debts (bills) owed for property",
+              "nameId": "orders_requested_pay_debts_bills_owed_for_property",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "pay_expenses_caused_by_abuse_order_requested",
-              "nameId": "orders_requested_pay_expenses_caused_by_abuse_order_requested",
+              "label": "Pay expenses caused by the abuse",
+              "nameId": "orders_requested_pay_expenses_caused_by_the_abuse",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "child_support_order_requested",
-              "nameId": "orders_requested_child_support_order_requested",
+              "label": "Child support",
+              "nameId": "orders_requested_child_support",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "spousal_support_order_requested",
-              "nameId": "orders_requested_spousal_support_order_requested",
+              "label": "Spousal support",
+              "nameId": "orders_requested_spousal_support",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "lawyers_fees_and_costs_order_requested",
-              "nameId": "orders_requested_lawyers_fees_and_costs_order_requested",
+              "label": "Lawyer's fees and costs",
+              "nameId": "orders_requested_lawyer_s_fees_and_costs",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "batterer_intervention_program_order_requested",
-              "nameId": "orders_requested_batterer_intervention_program_order_requested",
+              "label": "Batterer intervention program",
+              "nameId": "orders_requested_batterer_intervention_program",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "wireless_phone_account_transfer_order_requested",
-              "nameId": "orders_requested_wireless_phone_account_transfer_order_requested",
+              "label": "Transfer of wireless phone account",
+              "nameId": "orders_requested_transfer_of_wireless_phone_account",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "extend_service_deadline_requested",
-              "nameId": "orders_requested_extend_service_deadline_requested",
+              "label": "More time to give notice to the person",
+              "nameId": "orders_requested_more_time_to_give_notice_to_the_person",
               "value": "",
               "hasAmount": false,
               "amountName": "",
@@ -9541,79 +9541,79 @@
             "conditions": [
               {
                 "prevQuestion": "85",
-                "prevAnswer": "order_not_to_abuse_requested"
+                "prevAnswer": "Order to not abuse me"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "no_contact_order_requested"
+                "prevAnswer": "No-contact order"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "stay_away_order_requested"
+                "prevAnswer": "Stay-away order"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "move_out_order_requested"
+                "prevAnswer": "Order to move out"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "other_orders_requested"
+                "prevAnswer": "Other orders"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "child_custody_and_visitation_order_requested"
+                "prevAnswer": "Child custody and visitation"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "protect_animals_order_requested"
+                "prevAnswer": "Protect animals"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "control_of_property_order_requested"
+                "prevAnswer": "Control of property"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "health_and_other_insurance_order_requested"
+                "prevAnswer": "Health and other insurance"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "record_communications_order_requested"
+                "prevAnswer": "Record communications"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "property_restraint_order_requested"
+                "prevAnswer": "Property restraint"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "pay_property_debts_order_requested"
+                "prevAnswer": "Pay debts (bills) owed for property"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "pay_expenses_caused_by_abuse_order_requested"
+                "prevAnswer": "Pay expenses caused by the abuse"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "child_support_order_requested"
+                "prevAnswer": "Child support"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "spousal_support_order_requested"
+                "prevAnswer": "Spousal support"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "lawyers_fees_and_costs_order_requested"
+                "prevAnswer": "Lawyer's fees and costs"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "batterer_intervention_program_order_requested"
+                "prevAnswer": "Batterer intervention program"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "wireless_phone_account_transfer_order_requested"
+                "prevAnswer": "Transfer of wireless phone account"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "extend_service_deadline_requested"
+                "prevAnswer": "More time to give notice to the person"
               }
             ]
           },
@@ -9624,55 +9624,55 @@
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "stay_away_from_me"
+            "answer": "Me"
           },
           "hiddenLogic": {
             "enabled": true,
             "configs": [
               {
-                "trigger": "stay_away_from_me",
+                "trigger": "Me",
                 "type": "checkbox",
                 "nodeId": "stay_away_from_me",
                 "textboxText": ""
               },
               {
-                "trigger": "stay_away_from_my_home",
+                "trigger": "My home",
                 "type": "checkbox",
                 "nodeId": "stay_away_from_my_home",
                 "textboxText": ""
               },
               {
-                "trigger": "stay_away_from_my_school",
+                "trigger": "My school",
                 "type": "checkbox",
                 "nodeId": "stay_away_from_my_school",
                 "textboxText": ""
               },
               {
-                "trigger": "stay_away_from_my_workplace",
+                "trigger": "My job or workplace",
                 "type": "checkbox",
                 "nodeId": "stay_away_from_my_workplace",
                 "textboxText": ""
               },
               {
-                "trigger": "stay_away_from_my_vehicle",
+                "trigger": "My vehicle",
                 "type": "checkbox",
                 "nodeId": "stay_away_from_my_vehicle",
                 "textboxText": ""
               },
               {
-                "trigger": "stay_away_from_other_protected_people",
+                "trigger": "Each person I listed as protected",
                 "type": "checkbox",
                 "nodeId": "stay_away_from_other_protected_people",
                 "textboxText": ""
               },
               {
-                "trigger": "stay_away_from_childrens_school_or_childcare",
+                "trigger": "My children's school or childcare",
                 "type": "checkbox",
                 "nodeId": "stay_away_from_childrens_school_or_childcare",
                 "textboxText": ""
               },
               {
-                "trigger": "stay_away_from_other_place",
+                "trigger": "Somewhere else",
                 "type": "checkbox",
                 "nodeId": "stay_away_from_other_place",
                 "textboxText": ""
@@ -9737,64 +9737,64 @@
           },
           "options": [
             {
-              "label": "stay_away_from_me",
-              "nameId": "stay_away_targets_stay_away_from_me",
+              "label": "Me",
+              "nameId": "stay_away_targets_me",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "stay_away_from_my_home",
-              "nameId": "stay_away_targets_stay_away_from_my_home",
+              "label": "My home",
+              "nameId": "stay_away_targets_my_home",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "stay_away_from_my_school",
-              "nameId": "stay_away_targets_stay_away_from_my_school",
+              "label": "My school",
+              "nameId": "stay_away_targets_my_school",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "stay_away_from_my_workplace",
-              "nameId": "stay_away_targets_stay_away_from_my_workplace",
+              "label": "My job or workplace",
+              "nameId": "stay_away_targets_my_job_or_workplace",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "stay_away_from_my_vehicle",
-              "nameId": "stay_away_targets_stay_away_from_my_vehicle",
+              "label": "My vehicle",
+              "nameId": "stay_away_targets_my_vehicle",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "stay_away_from_other_protected_people",
-              "nameId": "stay_away_targets_stay_away_from_other_protected_people",
+              "label": "Each person I listed as protected",
+              "nameId": "stay_away_targets_each_person_i_listed_as_protected",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "stay_away_from_childrens_school_or_childcare",
-              "nameId": "stay_away_targets_stay_away_from_childrens_school_or_childcare",
+              "label": "My children's school or childcare",
+              "nameId": "stay_away_targets_my_children_s_school_or_childcare",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "stay_away_from_other_place",
-              "nameId": "stay_away_targets_stay_away_from_other_place",
+              "label": "Somewhere else",
+              "nameId": "stay_away_targets_somewhere_else",
               "value": "",
               "hasAmount": false,
               "amountName": "",
@@ -9815,35 +9815,35 @@
             "conditions": [
               {
                 "prevQuestion": "86",
-                "prevAnswer": "stay_away_from_me"
+                "prevAnswer": "Me"
               },
               {
                 "prevQuestion": "86",
-                "prevAnswer": "stay_away_from_my_home"
+                "prevAnswer": "My home"
               },
               {
                 "prevQuestion": "86",
-                "prevAnswer": "stay_away_from_my_school"
+                "prevAnswer": "My school"
               },
               {
                 "prevQuestion": "86",
-                "prevAnswer": "stay_away_from_my_workplace"
+                "prevAnswer": "My job or workplace"
               },
               {
                 "prevQuestion": "86",
-                "prevAnswer": "stay_away_from_my_vehicle"
+                "prevAnswer": "My vehicle"
               },
               {
                 "prevQuestion": "86",
-                "prevAnswer": "stay_away_from_other_protected_people"
+                "prevAnswer": "Each person I listed as protected"
               },
               {
                 "prevQuestion": "86",
-                "prevAnswer": "stay_away_from_childrens_school_or_childcare"
+                "prevAnswer": "My children's school or childcare"
               },
               {
                 "prevQuestion": "86",
-                "prevAnswer": "stay_away_from_other_place"
+                "prevAnswer": "Somewhere else"
               }
             ]
           },
@@ -10596,25 +10596,25 @@
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "same_workplace_selected"
+            "answer": "We work together"
           },
           "hiddenLogic": {
             "enabled": true,
             "configs": [
               {
-                "trigger": "same_workplace_selected",
+                "trigger": "We work together",
                 "type": "checkbox",
                 "nodeId": "same_workplace_selected",
                 "textboxText": ""
               },
               {
-                "trigger": "same_school_selected",
+                "trigger": "We go to the same school",
                 "type": "checkbox",
                 "nodeId": "same_school_selected",
                 "textboxText": ""
               },
               {
-                "trigger": "same_workplace_or_school_other",
+                "trigger": "Something else",
                 "type": "checkbox",
                 "nodeId": "same_workplace_or_school_other",
                 "textboxText": ""
@@ -10679,24 +10679,24 @@
           },
           "options": [
             {
-              "label": "same_workplace_selected",
-              "nameId": "same_workplace_or_school_kind_same_workplace_selected",
+              "label": "We work together",
+              "nameId": "same_workplace_or_school_kind_we_work_together",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "same_school_selected",
-              "nameId": "same_workplace_or_school_kind_same_school_selected",
+              "label": "We go to the same school",
+              "nameId": "same_workplace_or_school_kind_we_go_to_the_same_school",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "same_workplace_or_school_other",
-              "nameId": "same_workplace_or_school_kind_same_workplace_or_school_other",
+              "label": "Something else",
+              "nameId": "same_workplace_or_school_kind_something_else",
               "value": "",
               "hasAmount": false,
               "amountName": "",
@@ -10717,15 +10717,15 @@
             "conditions": [
               {
                 "prevQuestion": "94",
-                "prevAnswer": "same_workplace_selected"
+                "prevAnswer": "We work together"
               },
               {
                 "prevQuestion": "94",
-                "prevAnswer": "same_school_selected"
+                "prevAnswer": "We go to the same school"
               },
               {
                 "prevQuestion": "94",
-                "prevAnswer": "same_workplace_or_school_other"
+                "prevAnswer": "Something else"
               }
             ]
           },
@@ -11120,43 +11120,43 @@
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "move_out_right_to_live_owner"
+            "answer": "I own the home"
           },
           "hiddenLogic": {
             "enabled": true,
             "configs": [
               {
-                "trigger": "move_out_right_to_live_owner",
+                "trigger": "I own the home",
                 "type": "checkbox",
                 "nodeId": "move_out_right_to_live_owner",
                 "textboxText": ""
               },
               {
-                "trigger": "move_out_right_to_live_length_of_residence",
+                "trigger": "I have lived at this address for a while",
                 "type": "checkbox",
                 "nodeId": "move_out_right_to_live_length_of_residence",
                 "textboxText": ""
               },
               {
-                "trigger": "move_out_right_to_live_on_lease",
+                "trigger": "My name is on the lease",
                 "type": "checkbox",
                 "nodeId": "move_out_right_to_live_on_lease",
                 "textboxText": ""
               },
               {
-                "trigger": "move_out_right_to_live_pay_rent_or_mortgage",
+                "trigger": "I pay for some or all of the rent or mortgage",
                 "type": "checkbox",
                 "nodeId": "move_out_right_to_live_pay_rent_or_mortgage",
                 "textboxText": ""
               },
               {
-                "trigger": "move_out_right_to_live_with_children",
+                "trigger": "I live at this address with my children",
                 "type": "checkbox",
                 "nodeId": "move_out_right_to_live_with_children",
                 "textboxText": ""
               },
               {
-                "trigger": "move_out_right_to_live_other",
+                "trigger": "Another reason",
                 "type": "checkbox",
                 "nodeId": "move_out_right_to_live_other",
                 "textboxText": ""
@@ -11221,48 +11221,48 @@
           },
           "options": [
             {
-              "label": "move_out_right_to_live_owner",
-              "nameId": "move_out_right_to_live_move_out_right_to_live_owner",
+              "label": "I own the home",
+              "nameId": "move_out_right_to_live_i_own_the_home",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "move_out_right_to_live_length_of_residence",
-              "nameId": "move_out_right_to_live_move_out_right_to_live_length_of_residence",
+              "label": "I have lived at this address for a while",
+              "nameId": "move_out_right_to_live_i_have_lived_at_this_address_for_a_while",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "move_out_right_to_live_on_lease",
-              "nameId": "move_out_right_to_live_move_out_right_to_live_on_lease",
+              "label": "My name is on the lease",
+              "nameId": "move_out_right_to_live_my_name_is_on_the_lease",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "move_out_right_to_live_pay_rent_or_mortgage",
-              "nameId": "move_out_right_to_live_move_out_right_to_live_pay_rent_or_mortgage",
+              "label": "I pay for some or all of the rent or mortgage",
+              "nameId": "move_out_right_to_live_i_pay_for_some_or_all_of_the_rent_or_mortgage",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "move_out_right_to_live_with_children",
-              "nameId": "move_out_right_to_live_move_out_right_to_live_with_children",
+              "label": "I live at this address with my children",
+              "nameId": "move_out_right_to_live_i_live_at_this_address_with_my_children",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "move_out_right_to_live_other",
-              "nameId": "move_out_right_to_live_move_out_right_to_live_other",
+              "label": "Another reason",
+              "nameId": "move_out_right_to_live_another_reason",
               "value": "",
               "hasAmount": false,
               "amountName": "",
@@ -11283,27 +11283,27 @@
             "conditions": [
               {
                 "prevQuestion": "99",
-                "prevAnswer": "move_out_right_to_live_owner"
+                "prevAnswer": "I own the home"
               },
               {
                 "prevQuestion": "99",
-                "prevAnswer": "move_out_right_to_live_length_of_residence"
+                "prevAnswer": "I have lived at this address for a while"
               },
               {
                 "prevQuestion": "99",
-                "prevAnswer": "move_out_right_to_live_on_lease"
+                "prevAnswer": "My name is on the lease"
               },
               {
                 "prevQuestion": "99",
-                "prevAnswer": "move_out_right_to_live_pay_rent_or_mortgage"
+                "prevAnswer": "I pay for some or all of the rent or mortgage"
               },
               {
                 "prevQuestion": "99",
-                "prevAnswer": "move_out_right_to_live_with_children"
+                "prevAnswer": "I live at this address with my children"
               },
               {
                 "prevQuestion": "99",
-                "prevAnswer": "move_out_right_to_live_other"
+                "prevAnswer": "Another reason"
               }
             ]
           },
@@ -12447,31 +12447,31 @@
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "animal_sole_possession_reason_person_abuses_animals"
+            "answer": "The person abuses the animals"
           },
           "hiddenLogic": {
             "enabled": true,
             "configs": [
               {
-                "trigger": "animal_sole_possession_reason_person_abuses_animals",
+                "trigger": "The person abuses the animals",
                 "type": "checkbox",
                 "nodeId": "animal_sole_possession_reason_person_abuses_animals",
                 "textboxText": ""
               },
               {
-                "trigger": "animal_sole_possession_reason_i_care_for_animals",
+                "trigger": "I take care of these animals",
                 "type": "checkbox",
                 "nodeId": "animal_sole_possession_reason_i_care_for_animals",
                 "textboxText": ""
               },
               {
-                "trigger": "animal_sole_possession_reason_i_purchased_animals",
+                "trigger": "I purchased these animals",
                 "type": "checkbox",
                 "nodeId": "animal_sole_possession_reason_i_purchased_animals",
                 "textboxText": ""
               },
               {
-                "trigger": "animal_sole_possession_reason_other",
+                "trigger": "Another reason",
                 "type": "checkbox",
                 "nodeId": "animal_sole_possession_reason_other",
                 "textboxText": ""
@@ -12536,32 +12536,32 @@
           },
           "options": [
             {
-              "label": "animal_sole_possession_reason_person_abuses_animals",
-              "nameId": "animal_sole_possession_reasons_animal_sole_possession_reason_person_abuses_animals",
+              "label": "The person abuses the animals",
+              "nameId": "animal_sole_possession_reasons_the_person_abuses_the_animals",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "animal_sole_possession_reason_i_care_for_animals",
-              "nameId": "animal_sole_possession_reasons_animal_sole_possession_reason_i_care_for_animals",
+              "label": "I take care of these animals",
+              "nameId": "animal_sole_possession_reasons_i_take_care_of_these_animals",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "animal_sole_possession_reason_i_purchased_animals",
-              "nameId": "animal_sole_possession_reasons_animal_sole_possession_reason_i_purchased_animals",
+              "label": "I purchased these animals",
+              "nameId": "animal_sole_possession_reasons_i_purchased_these_animals",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "animal_sole_possession_reason_other",
-              "nameId": "animal_sole_possession_reasons_animal_sole_possession_reason_other",
+              "label": "Another reason",
+              "nameId": "animal_sole_possession_reasons_another_reason",
               "value": "",
               "hasAmount": false,
               "amountName": "",
@@ -12582,19 +12582,19 @@
             "conditions": [
               {
                 "prevQuestion": "111",
-                "prevAnswer": "animal_sole_possession_reason_person_abuses_animals"
+                "prevAnswer": "The person abuses the animals"
               },
               {
                 "prevQuestion": "111",
-                "prevAnswer": "animal_sole_possession_reason_i_care_for_animals"
+                "prevAnswer": "I take care of these animals"
               },
               {
                 "prevQuestion": "111",
-                "prevAnswer": "animal_sole_possession_reason_i_purchased_animals"
+                "prevAnswer": "I purchased these animals"
               },
               {
                 "prevQuestion": "111",
-                "prevAnswer": "animal_sole_possession_reason_other"
+                "prevAnswer": "Another reason"
               }
             ]
           },
@@ -13299,25 +13299,25 @@
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "property_debt_special_finding_debt_1"
+            "answer": "The first debt listed above"
           },
           "hiddenLogic": {
             "enabled": true,
             "configs": [
               {
-                "trigger": "property_debt_special_finding_debt_1",
+                "trigger": "The first debt listed above",
                 "type": "checkbox",
                 "nodeId": "property_debt_special_finding_debt_1",
                 "textboxText": ""
               },
               {
-                "trigger": "property_debt_special_finding_debt_2",
+                "trigger": "The second debt listed above",
                 "type": "checkbox",
                 "nodeId": "property_debt_special_finding_debt_2",
                 "textboxText": ""
               },
               {
-                "trigger": "property_debt_special_finding_debt_3",
+                "trigger": "The third debt listed above",
                 "type": "checkbox",
                 "nodeId": "property_debt_special_finding_debt_3",
                 "textboxText": ""
@@ -13382,24 +13382,24 @@
           },
           "options": [
             {
-              "label": "property_debt_special_finding_debt_1",
-              "nameId": "property_debt_special_finding_debts_property_debt_special_finding_debt_1",
+              "label": "The first debt listed above",
+              "nameId": "property_debt_special_finding_debts_the_first_debt_listed_above",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "property_debt_special_finding_debt_2",
-              "nameId": "property_debt_special_finding_debts_property_debt_special_finding_debt_2",
+              "label": "The second debt listed above",
+              "nameId": "property_debt_special_finding_debts_the_second_debt_listed_above",
               "value": "",
               "hasAmount": false,
               "amountName": "",
               "amountPlaceholder": ""
             },
             {
-              "label": "property_debt_special_finding_debt_3",
-              "nameId": "property_debt_special_finding_debts_property_debt_special_finding_debt_3",
+              "label": "The third debt listed above",
+              "nameId": "property_debt_special_finding_debts_the_third_debt_listed_above",
               "value": "",
               "hasAmount": false,
               "amountName": "",
@@ -13420,15 +13420,15 @@
             "conditions": [
               {
                 "prevQuestion": "119",
-                "prevAnswer": "property_debt_special_finding_debt_1"
+                "prevAnswer": "The first debt listed above"
               },
               {
                 "prevQuestion": "119",
-                "prevAnswer": "property_debt_special_finding_debt_2"
+                "prevAnswer": "The second debt listed above"
               },
               {
                 "prevQuestion": "119",
-                "prevAnswer": "property_debt_special_finding_debt_3"
+                "prevAnswer": "The third debt listed above"
               }
             ]
           },

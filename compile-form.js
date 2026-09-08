@@ -45,6 +45,20 @@ function humanize(s) {
   return String(s || '').replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+/**
+ * Is this "label" just the field's own name?
+ *
+ * A field config often carries `label` equal to the PDF field name, and that
+ * name then travels all the way to the page: an option a person has to choose
+ * between reading "relationship_have_children_together". A lowercase,
+ * underscore-joined token with no spaces is a name, not something written for
+ * a reader, so the compiler treats it as no label at all and falls back to the
+ * wording it would use for an unlabelled field.
+ */
+function isRawFieldName(text) {
+  return /^[a-z0-9]+(?:_[a-z0-9]+)+$/.test(String(text || '').trim());
+}
+
 /** PDF caption -> conversational stem. "Name (as shown on ...)" -> "Name" */
 function cleanLabel(label) {
   return String(label || '')
@@ -147,7 +161,9 @@ function normalizeFields(schema) {
     type: KNOWN_TYPES.has(String(f.type || '').toLowerCase())
       ? String(f.type).toLowerCase()
       : 'text',
-    label: f.label || humanize(f.id || f.newName || ''),
+    label: (f.label && !isRawFieldName(f.label))
+      ? f.label
+      : humanize(f.id || f.newName || ''),
     optional: f.optional === true || /\bif any\b|\boptional\b/i.test(f.label || ''),
     section: f.section,
     group: f.group || f.exclusiveGroup || f.radioGroup || null,
@@ -288,7 +304,7 @@ function detectGroups(fields, hints) {
 /** Strip a group's shared prefix off an option label when the label is empty. */
 function optionLabel(field, groupNameId) {
   const label = cleanLabel(field.label);
-  if (label) return label;
+  if (label && !isRawFieldName(label)) return label;
   const tail = field.id.startsWith(groupNameId) ? field.id.slice(groupNameId.length) : field.id;
   return titleCase(humanize(tail)) || field.id;
 }

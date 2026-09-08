@@ -240,6 +240,31 @@ async function main() {
     });
   }
 
+  // Rule 2 (wording): nothing a person reads is a field name.
+  //
+  // A field config usually carries `label` equal to the PDF field's name, and
+  // that name travels: a question reading "What is your
+  // person_asking_protection_mailing_zip_code?", or - the one that got through
+  // for longer - a checkbox list whose options were
+  // "relationship_have_children_together". Question text was already checked by
+  // eye; option labels were not, because they are one level down.
+  const RAW_NAME = /^[a-z0-9]+(?:_[a-z0-9]+)+$/;
+  report.rule2 = [];
+  (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
+    const text = String(q.text || '').trim();
+    if (RAW_NAME.test(text) || /[a-z0-9]_[a-z0-9]/.test(text)) {
+      report.rule2.push({ where: 'question text', nameId: q.nameId, shown: text });
+    }
+    const labels = q.labels || [];
+    (q.options || []).forEach((opt, i) => {
+      const raw = labels[i] && labels[i].label !== undefined ? labels[i].label : labels[i];
+      const shown = String((raw || (opt && opt.label !== undefined ? opt.label : opt)) || '').trim();
+      if (RAW_NAME.test(shown)) {
+        report.rule2.push({ where: 'option', nameId: q.nameId, shown, text: String(q.text || '') });
+      }
+    });
+  }));
+
   // Rule 8: one question asks one thing. Two signals, with different weight.
   // A field name that joins two nouns - court_name_and_street_address - is the
   // PDF telling you it holds two answers, and a question for it asks a person
@@ -395,6 +420,17 @@ async function main() {
       console.log('      placeholder-mapped in field config: ' + f.placeholderMapped.length);
     }
   });
+  console.log('');
+  console.log('RULE 2 — nothing a person reads is a field name');
+  if (!report.rule2.length) {
+    console.log('  passes');
+  } else {
+    console.log('  FAILS  ' + report.rule2.length + ' place(s) show a field name');
+    report.rule2.slice(0, 12).forEach((r) => console.log('      - ' + r.where + ': "'
+      + r.shown + '"' + (r.text ? '   in "' + r.text + '"' : '')));
+    if (report.rule2.length > 12) console.log('      ... ' + (report.rule2.length - 12) + ' more');
+  }
+
   console.log('');
   console.log('RULE 3 — repeated entries use a multipleDropdownType node');
   report.rule3.forEach((r) => {
