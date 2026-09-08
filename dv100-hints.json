@@ -611,18 +611,6 @@
     }
   ],
   "questions": {
-    "relationship_children_names_line_1": {
-      "conditional": {
-        "onlyWhen": "relationship_have_children_together"
-      },
-      "text": "What are the names of your children together?"
-    },
-    "relationship_children_names_line_2": {
-      "conditional": {
-        "onlyWhen": "relationship_have_children_together"
-      },
-      "text": "What are the rest of your children's names?"
-    },
     "relationship_relative_parent_stepparent_parent_in_law": {
       "conditional": {
         "onlyWhen": "relationship_related"
@@ -1147,7 +1135,8 @@
       "text": "What is your years?"
     },
     "move_out_right_to_live_other_explanation_line_1": {
-      "text": "What is your other explanation?"
+      "text": "How else do you have the right to live there?",
+      "type": "bigParagraph"
     },
     "stay_away_distance": {
       "text": "How far must the person stay away?",
@@ -1166,9 +1155,6 @@
     },
     "move_out_months_at_address": {
       "text": "What is your months?"
-    },
-    "move_out_right_to_live_other_explanation_line_2": {
-      "text": "What is your other explanation, continued?"
     },
     "property_debt_2_pay_to": {
       "text": "What is your pay to?"
@@ -1321,10 +1307,8 @@
       "text": "Do you have give me sole possession, care, and control of the animals?"
     },
     "animal_sole_possession_other_reason_line_1": {
-      "text": "What is your other reason?"
-    },
-    "animal_sole_possession_other_reason_line_2": {
-      "text": "What is your other reason, continued?"
+      "text": "Why else should you have the animals?",
+      "type": "bigParagraph"
     },
     "has_additional_pages": {
       "text": "Did you attach additional paper or forms?"
@@ -1815,6 +1799,30 @@
           "type": "phone"
         }
       ]
+    },
+    {
+      "nameId": "child_together",
+      "question": "How many children do you have together?",
+      "entryTitle": "Child",
+      "min": 1,
+      "max": 4,
+      "absorbs": [
+        "relationship_children_names_line_1",
+        "relationship_children_names_line_2"
+      ],
+      "joinInto": {
+        "field": "relationship_children_names_line_1",
+        "separator": ", "
+      },
+      "conditional": {
+        "onlyWhen": "relationship_have_children_together"
+      },
+      "fields": [
+        {
+          "label": "Child's name",
+          "nameId": "{n}_name"
+        }
+      ]
     }
   ],
   "splits": [
@@ -2125,6 +2133,22 @@
       "conditional": {
         "onlyWhen": "other_court_case_other_selected"
       }
+    }
+  ],
+  "continuations": [
+    {
+      "field": "move_out_right_to_live_other_explanation",
+      "keep": "move_out_right_to_live_other_explanation_line_1",
+      "drop": [
+        "move_out_right_to_live_other_explanation_line_2"
+      ]
+    },
+    {
+      "field": "animal_sole_possession_other_reason",
+      "keep": "animal_sole_possession_other_reason_line_1",
+      "drop": [
+        "animal_sole_possession_other_reason_line_2"
+      ]
     }
   ]
 }

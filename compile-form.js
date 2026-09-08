@@ -409,6 +409,33 @@ function applySplits(fields, hints) {
 }
 
 /**
+ * Drop the overflow lines of an answer that only looks like several questions.
+ *
+ * A form that rules two lines for one answer names them X_line_1 and X_line_2.
+ * They are not two facts: nobody knows in advance whether their answer needs
+ * the second line, and asking "what is your other explanation, continued?"
+ * makes a person invent a second half. Ask once, write line 1, and leave the
+ * rest of the ruled lines empty - which is what a paper filer does too.
+ *
+ * The dropped lines stay on the PDF and stay unfilled. The audit is told about
+ * them so rule 1 can account for them rather than call them unreachable.
+ */
+function applyContinuations(fields, hints) {
+  const specs = hints.continuations || [];
+  if (!specs.length) return { fields, continuations: [] };
+
+  const dropped = new Set();
+  const continuations = [];
+  specs.forEach((spec) => {
+    const drop = (spec.drop || []).filter((n) => fields.some((f) => f.nameId === n));
+    if (!drop.length) return;
+    drop.forEach((n) => dropped.add(n));
+    continuations.push({ keep: spec.keep, drop: drop });
+  });
+  return { fields: fields.filter((f) => !dropped.has(f.nameId)), continuations };
+}
+
+/**
  * The PDF field one entry of a repeating block fills.
  *
  * The block owns a prefix and each field states the rest, with {n} standing in
@@ -490,7 +517,18 @@ function applyRepeats(fields, hints) {
         if (field) members.push(field);
       });
     }
-    if (!members.length) return;
+
+    // A block can stand in for fields it is not named after. The PDF prints two
+    // ruled lines for "names of children together" and calls them
+    // relationship_children_names_line_1 and _line_2 - which is one answer
+    // overflowing, not two questions, and says nothing about how many children
+    // there are. "How many children do you have together?" then a name each is
+    // the same information, so the block absorbs both lines and its entries are
+    // joined into the first.
+    const absorbs = (spec.absorbs || []).map((n) => byName.get(n)).filter(Boolean);
+    absorbs.forEach((f) => absorbed.add(f.id));
+
+    if (!members.length && !absorbs.length) return;
     members.forEach((f) => absorbed.add(f.id));
 
     repeats.push({
@@ -500,8 +538,13 @@ function applyRepeats(fields, hints) {
       min: spec.min == null ? 0 : spec.min,
       max: max,
       // The first field of entry 1 anchors the block where the family started.
-      anchor: members[0],
+      // A block with no fields of its own is anchored by what it absorbs.
+      anchor: members[0] || absorbs[0],
       fields: spec.fields,
+      // Where the entries end up on the PDF, when they share one box, and the
+      // fields the block stood in for.
+      joinInto: spec.joinInto || null,
+      absorbs: (spec.absorbs || []).slice(),
       conditional: spec.conditional || declaredConditional(hints, spec.nameId)
     });
   });
@@ -1351,9 +1394,28 @@ function layoutSequence(b, steps, startY, centerX) {
 function compile(schema, hints = {}) {
   const merged = Object.assign({}, schema.interview || {}, hints);
   const mirrored = applyMirrors(normalizeFields(schema), merged);
-  const { fields: split, joins } = applySplits(mirrored, merged);
+  const { fields: kept, continuations } = applyContinuations(mirrored, merged);
+  const { fields: split, joins } = applySplits(kept, merged);
   const { fields: combined, combines } = applyCombines(split, merged);
   const { fields, repeats } = applyRepeats(combined, merged);
+
+  // A block whose entries share one PDF box joins them the way a split does -
+  // same linked-logic node, and the runtime already drops the empty ones, so
+  // three children out of a possible four produce three names and no stray
+  // separators.
+  repeats.forEach((r) => {
+    if (!r.joinInto || !r.joinInto.field) return;
+    const parts = [];
+    for (let n = 1; n <= r.max; n++) {
+      repeatTemplateNames(r).forEach((t) => parts.push(repeatFieldName(r.nameId, t, n)));
+    }
+    joins.push({
+      target: r.joinInto.field,
+      targets: [r.joinInto.field],
+      parts: parts,
+      join: r.joinInto.separator == null ? ', ' : r.joinInto.separator
+    });
+  });
   const { steps, notes, groups } = buildInterview(fields, merged, repeats, combines);
 
   const b = createBuilder();
@@ -1401,6 +1463,18 @@ function compile(schema, hints = {}) {
       pdfPrice: '0'
     }
   };
+
+  // The generated form records which PDF lines are an answer's overflow, so the
+  // audit can tell them from a field nothing asks for. A block that absorbed a
+  // family's lines and joins its entries into the first leaves the rest in the
+  // same position, so they are recorded the same way.
+  const overflow = continuations.slice();
+  repeats.forEach((r) => {
+    if (!r.joinInto || !(r.absorbs || []).length) return;
+    const drop = r.absorbs.filter((n) => n !== r.joinInto.field);
+    if (drop.length) overflow.push({ keep: r.joinInto.field, drop: drop });
+  });
+  if (overflow.length) flowchart.continuationLines = overflow;
 
   return { flowchart, notes, groups, steps, fields, sectionCount, moved };
 }

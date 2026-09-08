@@ -204,6 +204,14 @@ async function main() {
       continue;
     }
     const fields = await pdfFieldNames(pdfPath);
+    // An answer's overflow lines are not questions. The compiler records which
+    // ones it dropped; they stay on the PDF, unfilled, exactly as a paper filer
+    // leaves them when their answer fits on the first line.
+    const overflow = new Set();
+    try {
+      const chart = JSON.parse(fs.readFileSync(base + '-flowchart.json', 'utf8'));
+      (chart.continuationLines || []).forEach((c) => (c.drop || []).forEach((n) => overflow.add(n)));
+    } catch (e) { /* no flowchart beside the packet - nothing to exempt */ }
     const config = fs.existsSync(configPath) ? readFieldConfig(configPath) : [];
     const byName = new Map(config.map((c) => [c.name, c]));
 
@@ -212,7 +220,7 @@ async function main() {
     // the defect - so those are counted apart, in both directions.
     const courtUse = new Set(config.filter((c) => c.courtUse).map((c) => c.name));
     const filerFields = fields.filter((f) => !courtUse.has(f.name));
-    const unreachable = filerFields.filter((f) => !posted.has(f.name));
+    let unreachable = filerFields.filter((f) => !posted.has(f.name));
     // A court-use field can still receive a value: the packet asks the filer for
     // the firearms once on DV-100, and DV-110's proposed order repeats them by
     // name. That is a mirror, and the form itself asks for it ("Include
@@ -227,9 +235,13 @@ async function main() {
       && !askedButCourtUse.includes(f));
     const placeholders = config.filter(placeholderMapped);
 
+    const overflowFields = unreachable.filter((f) => overflow.has(f.name));
+    unreachable = unreachable.filter((f) => !overflow.has(f.name));
+
     report.forms.push({
       form: form.name,
       pdf: base + '.pdf',
+      overflowLines: overflowFields.map((f) => f.name),
       fields: fields.length,
       courtUse: fields.length - filerFields.length,
       filerFields: filerFields.length,
@@ -534,6 +546,12 @@ async function main() {
         + ' court field(s) prefilled from an earlier form: '
         + f.prefilledCourtUse.slice(0, 6).join(', ')
         + (f.prefilledCourtUse.length > 6 ? ', ...' : ''));
+    }
+    if ((f.overflowLines || []).length) {
+      // Named rather than passed over quietly: a blank here should be a blank
+      // because the answer fit on the first line, not because nobody asked.
+      console.log('      ' + f.overflowLines.length
+        + ' overflow line(s), left blank by design: ' + f.overflowLines.join(', '));
     }
     if (f.placeholderMapped.length) {
       console.log('      placeholder-mapped in field config: ' + f.placeholderMapped.length);

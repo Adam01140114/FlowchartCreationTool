@@ -185,12 +185,6 @@
     "stay_away_exception_applies": {
       "text": "Do you have an exception to Stay-Away Order?"
     },
-    "stay_away_exception_other_explanation_line_1": {
-      "text": "What is the other exception to the Stay-Away Order?"
-    },
-    "stay_away_exception_other_explanation_line_2": {
-      "text": "Continue the other Stay-Away exception, if it needs a second line."
-    },
     "move_out_order_ruling": {
       "text": "What did the judge decide about the Order to Move Out?"
     },

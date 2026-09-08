@@ -81,6 +81,7 @@ TABLE OF CONTENTS
   Rule 10 — Ask for a value in the type it is
   Rule 11 — A question says what to enter
   Rule 12 — A narrative box is asked as a narrative
+  Rule 13 — Ruled lines are one answer, not several questions
   Pre-ship checklist
   Current status: the DV packet
 
@@ -857,6 +858,71 @@ fails on any multi-line PDF box whose question is not a bigParagraph. It found
 one the day it was written: DV-110's prohibited-items box, asked as a one-liner.
 
 ================================================================================
+RULE 13 — RULED LINES ARE ONE ANSWER, NOT SEVERAL QUESTIONS
+================================================================================
+
+A form that rules two lines for one answer names them X_line_1 and X_line_2.
+They are not two facts, and asking for both produces this:
+
+    What are the names of your children together?      [ line_1 ]
+    What are the rest of your children's names?        [ line_2 ]
+
+Nobody knows in advance whether their answer needs the second line. The form
+has just asserted the filer has enough children to overflow one line, and then
+asked essentially the same question twice - a person with one child has to work
+out that the second box does not apply to them.
+
+ONE ANSWER, WRITTEN TO THE FIRST LINE
+
+Ask once and write line 1. The remaining lines stay on the PDF and stay empty,
+which is exactly what a paper filer does when their answer fits:
+
+    "continuations": [
+      { "field": "animal_sole_possession_other_reason",
+        "keep":  "animal_sole_possession_other_reason_line_1",
+        "drop":  ["animal_sole_possession_other_reason_line_2"] } ]
+
+Give the surviving question the whole answer's wording, and make it a
+bigParagraph (rule 12) - the ruled lines are the form telling you it expects
+more than a phrase.
+
+WHEN THE LINES ARE A LIST, COUNT THEM INSTEAD
+
+"Names of children together" is not prose overflowing; it is a list. Ask how
+many, collect one per entry, and join them into the first line:
+
+    { "nameId": "child_together",
+      "question": "How many children do you have together?",
+      "entryTitle": "Child", "min": 1, "max": 4,
+      "absorbs": ["relationship_children_names_line_1",
+                  "relationship_children_names_line_2"],
+      "joinInto": { "field": "relationship_children_names_line_1",
+                    "separator": ", " },
+      "fields": [ { "label": "Child's name", "nameId": "{n}_name" } ] }
+
+`absorbs` lets a block stand in for fields it is not named after - the block is
+called child_together and the PDF calls the boxes relationship_children_names_*.
+`joinInto` writes every entry into one box through the same linked-logic node a
+split uses, and the runtime drops the empty ones, so three children out of a
+possible four produce three names and no stray separators.
+
+THE DROPPED LINES ARE NOT UNREACHABLE
+
+Rule 1 would otherwise fail on them. The compiler records what it dropped in the
+flowchart's `continuationLines`, and the audit reports them as their own
+category:
+
+    3 overflow line(s), left blank by design: relationship_children_names_line_2,
+    move_out_right_to_live_other_explanation_line_2, ...
+
+Named rather than passed over quietly, because a blank there should be a blank
+because the answer fit - not because nobody asked.
+
+Do not do this to a family that only looks like overflow. Lines numbered 1..n
+that each hold a different fact are a repeating block (rule 3); the tell is
+whether the form gives them separate column headings.
+
+================================================================================
 PRE-SHIP CHECKLIST
 ================================================================================
 
@@ -891,6 +957,8 @@ PRE-SHIP CHECKLIST
          form lists the parts, they are named boxes joining back into the field.
   [ ] 12 Every multi-line PDF box is a bigParagraph question, and its wording
          carries the guidance the form prints beside the box.
+  [ ] 13 No X_line_1 / X_line_2 family is asked as two questions. Prose is asked
+         once and written to line 1; a list is counted and joined into it.
   [ ] 3  Every repeating block's entryTitle names the thing, singular, and the
          entries read "<Thing> #1", "<Thing> #2" in the generated form.
   [ ] LAST, AND NOT SKIPPABLE — node pipeline-review.js, read every question in
@@ -996,6 +1064,12 @@ number boxes inside the combined questions.
 
   Rule 5  PASSES — one group per form, named after it. DV-109's group is empty
           because that form asks nothing of its own.
+
+  Rule 13 PASSES - four families of ruled lines were asked as eight questions.
+          The children's names are a counted block now ("How many children do
+          you have together?", one name each, joined with ", " into line 1);
+          the other three are prose asked once. DV-110's pair needed nothing:
+          both lines are court fields.
 
   Rule 12 PASSES - 16 boxes the PDF marks multi-line were being asked in a
           one-line text field, the three abuse narratives among them. "What
