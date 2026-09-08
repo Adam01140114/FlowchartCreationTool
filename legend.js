@@ -256,6 +256,47 @@ function addSection(afterSectionNum) {
 /**
  * Updates the section legend UI based on current sectionPrefs.
  */
+/**
+ * Give sectionPrefs an entry for every section the canvas actually uses.
+ *
+ * getSection() treats a cell with no `section=` in its style as section 1, so a
+ * form can be full of section-1 nodes while sectionPrefs stays empty - which is
+ * exactly what a form added to a project starts as. Nothing then renders in the
+ * Section Names panel, and because "Add Section to Group" builds its dropdown
+ * from sectionPrefs, there is no section to add and no way to name one. The
+ * form looks broken with no error anywhere.
+ *
+ * Called after a flowchart loads. Existing entries are left untouched, so a
+ * section that has been named and coloured keeps both.
+ */
+function reconcileSectionPrefs() {
+  const graph = getGraph();
+  const sectionPrefs = getSectionPrefs();
+  if (!graph || !sectionPrefs) return;
+
+  const used = new Set();
+  const model = graph.getModel();
+  const parent = graph.getDefaultParent();
+  (model.getChildVertices(parent) || []).forEach(function (cell) {
+    const num = parseInt(getSection(cell), 10);
+    if (!isNaN(num) && num > 0) used.add(num);
+  });
+  // A form always has a first section, even before anything is placed on it.
+  used.add(1);
+
+  let added = 0;
+  Array.from(used).sort(function (a, b) { return a - b; }).forEach(function (num) {
+    if (sectionPrefs[num]) return;
+    sectionPrefs[num] = {
+      borderColor: getDefaultSectionColor(num),
+      name: "Enter section name"
+    };
+    added++;
+  });
+  if (added) updateSectionLegend();
+  return added;
+}
+
 function updateSectionLegend() {
   const sectionPrefs = getSectionPrefs();
   const legend = document.getElementById("sectionLegend");
@@ -562,6 +603,7 @@ window.getSection = getSection;
 window.deleteSection = deleteSection;
 window.addSection = addSection;
 window.updateSectionLegend = updateSectionLegend;
+window.reconcileSectionPrefs = reconcileSectionPrefs;
 window.highlightSectionInLegend = highlightSectionInLegend;
 window.rgbToHex = rgbToHex;
 window.reorderSections = reorderSections;

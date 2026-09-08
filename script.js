@@ -5404,15 +5404,18 @@ function setupAutosaveHooks() {
         window.pendingGroupsData = data.groups;
       }
     }
-    // Ensure section legend is updated after import
-    if (data && data.sectionPrefs) {
-      setTimeout(() => {
-        if (typeof window.updateSectionLegend === 'function') {
-          window.updateSectionLegend();
-        } else {
-        }
-      }, 100); // Small delay to ensure DOM is ready
-    }
+    // Ensure section legend is updated after import. This runs whether or not
+    // the payload carried sectionPrefs: a form can be full of section-1 nodes
+    // with an empty sectionPrefs, and reconciling is what puts the sections
+    // back in the panel so they can be named and grouped.
+    setTimeout(() => {
+      if (typeof window.reconcileSectionPrefs === 'function') {
+        window.reconcileSectionPrefs();
+      }
+      if (typeof window.updateSectionLegend === 'function') {
+        window.updateSectionLegend();
+      }
+    }, 100); // Small delay to ensure DOM is ready
     // Automatically reset PDF inheritance and Node IDs after flowchart loading
     // Note: This runs after the internal loadFlowchartData processes:
     // - 500ms: PDF properties propagation

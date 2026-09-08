@@ -541,6 +541,10 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '        .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }',
     '        .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }',
     '        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; pointer-events: auto !important; }',
+    '        .nav-context-menu { position: fixed; z-index: 10000; min-width: 168px; padding: 6px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 10px 28px rgba(15,23,42,0.18); font-family: inherit; }',
+    '        .nav-context-menu button { display: block; width: 100%; padding: 9px 12px; border: none; border-radius: 6px; background: none; color: #1f2937; font-size: 14px; text-align: left; cursor: pointer; }',
+    '        .nav-context-menu button:hover, .nav-context-menu button:focus { background: #eef2ff; outline: none; }',
+    '        .nav-context-menu .nav-context-hint { padding: 2px 12px 7px; color: #64748b; font-size: 11px; letter-spacing: 0.03em; text-transform: uppercase; }',
     '        .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }',
     '        .question-step-hidden { display: none !important; }',
     '        .section-form-card { background: linear-gradient(180deg, #f7fbff 0%, #eef5ff 100%); border: 1px solid #c5d9f7; border-radius: 24px; padding: 12px 12px 32px; max-width: 800px; margin: 0 auto 36px; box-shadow: 0 12px 32px rgba(30,73,150,0.10); }',
@@ -17812,6 +17816,72 @@ function syncHiddenLogicForCheckboxQuestions() {
       setHiddenLogicField(cfg, !!chosen[trigger]);
     });
   });
+}
+
+/**
+ * Right-click the Next arrow in test mode to jump straight to the end.
+ *
+ * QA needs the completion screen - Download PDFs, Preview PDFs, Download
+ * Payload - without clicking Next through twenty sections first. Test mode
+ * only: in production the same gesture must stay the browser's own menu, and a
+ * filer must never be able to skip the form.
+ */
+function isTestDeployment() {
+  return String(window.__FORM_DEPLOYMENT_STYLE__ || '').toLowerCase() === 'test';
+}
+
+function closeNavContextMenu() {
+  var existing = document.getElementById('navContextMenu');
+  if (existing) existing.remove();
+}
+
+function openNavContextMenu(x, y) {
+  closeNavContextMenu();
+  var menu = document.createElement('div');
+  menu.className = 'nav-context-menu';
+  menu.id = 'navContextMenu';
+
+  var hint = document.createElement('div');
+  hint.className = 'nav-context-hint';
+  hint.textContent = 'Test mode';
+  menu.appendChild(hint);
+
+  var skip = document.createElement('button');
+  skip.type = 'button';
+  skip.textContent = 'Skip to end';
+  skip.addEventListener('click', function () {
+    closeNavContextMenu();
+    if (typeof showThankYouMessage === 'function') showThankYouMessage();
+  });
+  menu.appendChild(skip);
+
+  document.body.appendChild(menu);
+
+  // Keep it on screen when the arrow sits near the right or bottom edge.
+  var rect = menu.getBoundingClientRect();
+  var left = Math.min(x, window.innerWidth - rect.width - 8);
+  var top = Math.min(y, window.innerHeight - rect.height - 8);
+  menu.style.left = Math.max(8, left) + 'px';
+  menu.style.top = Math.max(8, top) + 'px';
+  skip.focus();
+}
+
+if (typeof document !== 'undefined' && !window.__NAV_CONTEXT_MENU_BOUND__) {
+  window.__NAV_CONTEXT_MENU_BOUND__ = true;
+  document.addEventListener('contextmenu', function (e) {
+    var target = e.target && e.target.closest ? e.target.closest('.question-next') : null;
+    if (!target || !isTestDeployment()) return;
+    e.preventDefault();
+    openNavContextMenu(e.clientX, e.clientY);
+  });
+  document.addEventListener('click', function (e) {
+    var menu = document.getElementById('navContextMenu');
+    if (menu && !menu.contains(e.target)) closeNavContextMenu();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeNavContextMenu();
+  });
+  window.addEventListener('scroll', closeNavContextMenu, true);
 }
 
 function createHiddenCheckboxesForAutofilledDropdowns() {

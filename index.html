@@ -225,7 +225,11 @@
 
   <div class="button-bar">
     <button onclick="previewForm()">Preview Form</button><br>
-    <button onclick="showImportFlowchartModal()">Import Flowchart</button>
+    <!-- The single-form Import Flowchart / Export Flowchart JSON / Export GUI
+         JSON buttons were removed: they only ever see the form currently on the
+         canvas, so on a project they silently act on one form. The file input
+         stays because exportFlowchartJson() and importFlowchartJson() are still
+         called internally - the project export walks the forms through them. -->
     <input
       type="file"
       id="importFlowchartFile"
@@ -233,8 +237,6 @@
       onchange="importFlowchartJson(event)"
       style="display:none;"
     />
-    <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
-    <button onclick="showExportGuiJsonModal()">Export GUI JSON</button><br>
     <button onclick="exportProjectJson()">Export Project JSON</button>
     <button onclick="exportProjectGuiJson()">Export Project GUI JSON</button>
     <button onclick="document.getElementById('importProjectFile').click()">Import Project JSON</button>
