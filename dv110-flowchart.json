@@ -1940,5 +1940,11 @@
     "pdfName": "DV-110 Temporary Restraining Order",
     "pdfFile": "form.pdf",
     "pdfPrice": "0"
-  }
+  },
+  "alwaysShown": [
+    {
+      "question": "restrained_person_prohibited_items_details",
+      "why": "Item 2 of DV-110 is filled from DV-100 item 9 and does not depend on knowing an address."
+    }
+  ]
 }

@@ -7620,6 +7620,10 @@
             "enabled": true,
             "conditions": [
               {
+                "prevQuestion": "65",
+                "prevAnswer": "No"
+              },
+              {
                 "prevQuestion": "67",
                 "prevAnswer": "Yes"
               },
@@ -7725,10 +7729,6 @@
           "logic": {
             "enabled": true,
             "conditions": [
-              {
-                "prevQuestion": "65",
-                "prevAnswer": "No"
-              },
               {
                 "prevQuestion": "68",
                 "prevAnswer": "Any Text"
@@ -9027,10 +9027,6 @@
             "conditions": [
               {
                 "prevQuestion": "76",
-                "prevAnswer": "No"
-              },
-              {
-                "prevQuestion": "76",
                 "prevAnswer": "Yes"
               }
             ]
@@ -9243,6 +9239,10 @@
             "enabled": true,
             "conditions": [
               {
+                "prevQuestion": "76",
+                "prevAnswer": "No"
+              },
+              {
                 "prevQuestion": "77",
                 "prevAnswer": "Live together"
               },
@@ -9357,10 +9357,6 @@
           "logic": {
             "enabled": true,
             "conditions": [
-              {
-                "prevQuestion": "79",
-                "prevAnswer": "No"
-              },
               {
                 "prevQuestion": "79",
                 "prevAnswer": "Yes"
@@ -9493,6 +9489,10 @@
           "logic": {
             "enabled": true,
             "conditions": [
+              {
+                "prevQuestion": "79",
+                "prevAnswer": "No"
+              },
               {
                 "prevQuestion": "80",
                 "prevAnswer": "We work together"
@@ -10694,10 +10694,6 @@
               {
                 "prevQuestion": "91",
                 "prevAnswer": "Yes"
-              },
-              {
-                "prevQuestion": "91",
-                "prevAnswer": "No"
               }
             ]
           },
@@ -10901,6 +10897,10 @@
               {
                 "prevQuestion": "92",
                 "prevAnswer": "Other distance"
+              },
+              {
+                "prevQuestion": "91",
+                "prevAnswer": "No"
               }
             ]
           },
@@ -11111,10 +11111,6 @@
               {
                 "prevQuestion": "95",
                 "prevAnswer": "Yes"
-              },
-              {
-                "prevQuestion": "95",
-                "prevAnswer": "No"
               }
             ]
           },
@@ -11273,6 +11269,10 @@
               {
                 "prevQuestion": "96",
                 "prevAnswer": "Another reason"
+              },
+              {
+                "prevQuestion": "95",
+                "prevAnswer": "No"
               }
             ]
           },

@@ -200,6 +200,37 @@ option is also how the compiler rejoins a branch to the spine, and a question on
 the spine genuinely should always show. What must not be in that list is a
 follow-up the printed form qualifies - "Yes (If yes, describe gun or weapon)".
 
+BOTH SIDES OF A YES/NO IS NOT A GATE
+
+A follow-up conditioned on BOTH answers of a two-option gate is shown whatever
+the filer said. A gate with two answers exists precisely to branch, so listing
+both is either a missing gate or a condition that should not be there:
+
+    How close do you live to each other?   [when q76 = Yes  OR  q76 = No]
+
+That is what happened to "How close do you live to each other?" after "Do you
+and the person live together or live close to each other? No", and to "What do
+you share?" after "Do you have the same workplace or school? No". The form
+prints "Yes (If yes, check one)" and "Yes (If yes, check all that apply)" in
+both places. It was never arguable.
+
+    node pipeline-audit.js
+
+FAILS on this, and the failure cannot be waved away, because every case has to
+be resolved one way or the other. Some genuinely are the compiler rejoining a
+branch to the spine - the next item on the form, asked whatever the last answer
+was. Those are declared, with a reason:
+
+    "alwaysShown": [
+      { "question": "abuse_expense",
+        "why": "Item 23 follows item 22 whether or not a special finding was asked for." } ]
+
+Declaring is deliberate work. The alternative - a note saying "not a failure on
+its own" - is what let two real bugs sit unfixed among six harmless ones for
+three rounds of review, including one where they were noticed, called
+"arguably wrong", and left. Check the form before declaring: the wording beside
+the Yes usually settles it in one line.
+
 A GATE CAN BE RIGHT IN THE JSON AND STILL NOT HOLD
 
 In section and all modes a question whose condition reads "Any Text", or which
@@ -1009,6 +1040,8 @@ PRE-SHIP CHECKLIST
          line or optional detail inside an already-qualified block.
   [ ] 2  Every gate is a real question; every conditional points at a field that
          exists.
+  [ ] 2  No follow-up is shown on both Yes and No of its gate. Anything that
+         legitimately always shows is declared in alwaysShown with a reason.
   [ ] 3  No `<base>_<n>_<field>` group has more than one n. Each is one
          multipleDropdownType node with a sensible min/max.
   [ ] 4a Maximum path fills every reachable field; every blank is explained by a

@@ -1013,10 +1013,7 @@
     },
     "other_protected_people_reason_for_protection": {
       "text": "Why do these people need protection?",
-      "type": "bigParagraph",
-      "conditional": {
-        "onlyWhen": "other_protected_people_yes_yes"
-      }
+      "type": "bigParagraph"
     },
     "person_to_restrain_firearms_unknown": {
       "text": "Do you have an i don’t know?"
@@ -1201,7 +1198,10 @@
       "text": "What is your name or other way to identify animal?"
     },
     "living_arrangement": {
-      "text": "How close do you live to each other?"
+      "text": "How close do you live to each other?",
+      "conditional": {
+        "onlyWhen": "live_together_or_close_yes_yes"
+      }
     },
     "property_debt_3_for": {
       "text": "What is your for?"
@@ -1270,7 +1270,10 @@
       "text": "Do you know how the person made these debts?"
     },
     "animal_stay_away_distance": {
-      "text": "How far must the person stay away from the animals?"
+      "text": "How far must the person stay away from the animals?",
+      "conditional": {
+        "onlyWhen": "animal_order_stay_away_requested_yes"
+      }
     },
     "property_debt_how_made_explanation": {
       "text": "How did the person make the debt or debts?",
@@ -1485,6 +1488,16 @@
     "stay_away_targets": {
       "conditional": {
         "onlyWhen": "stay_away_order_requested"
+      }
+    },
+    "same_workplace_or_school_kind": {
+      "conditional": {
+        "onlyWhen": "same_workplace_or_school_yes"
+      }
+    },
+    "animal_sole_possession_reasons": {
+      "conditional": {
+        "onlyWhen": "animal_order_sole_possession_requested_yes"
       }
     }
   },
@@ -2165,6 +2178,36 @@
         "person_asking_protection_lawyer_name"
       ],
       "why": "The lawyer names themselves once, in their own block."
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "recent_restraining_orders",
+      "why": "Item 4 follows item 3 whatever the relationship was."
+    },
+    {
+      "question": "other_court_case_involvement",
+      "why": "Item 4b follows 4a whether or not there are restraining orders."
+    },
+    {
+      "question": "other_protected_people",
+      "why": "Item 8 follows item 7, regardless of the attached-page answer."
+    },
+    {
+      "question": "animal_order_sole_possession_requested_yes",
+      "why": "Item 16b(3) is a separate box in the same check-all-that-apply list as 16b(2)."
+    },
+    {
+      "question": "abuse_expense",
+      "why": "Item 23 follows item 22 whether or not a special finding was asked for."
+    },
+    {
+      "question": "child_support_situation",
+      "why": "Item 24 follows item 23 the same way."
+    },
+    {
+      "question": "other_protected_people_reason_for_protection",
+      "why": "Item 8(2) follows 8(1) inside the protect-others Yes branch; verified hidden when that answer is No."
     }
   ]
 }

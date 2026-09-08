@@ -346,6 +346,25 @@ async function main() {
       if (labels.length < 2) return;
       const chosen = new Set(answers);
       if (!labels.every((l) => chosen.has(l.toLowerCase()))) return;
+      // A two-option Yes/No gate covered on BOTH sides is never a rejoin. A
+      // gate with two answers exists precisely to branch, so listing both is
+      // either a missing gate or a condition that should not be there. This is
+      // reported separately from the multi-option case, and as a failure,
+      // because the multi-option note ("not a failure on its own") is what let
+      // "How close do you live to each other?" keep showing to a filer who had
+      // just said they do not live close.
+      const yesNo = labels.length === 2
+        && labels.every((l) => /^(yes|no)$/i.test(String(l).trim()));
+      if (yesNo) {
+        report.rule2yesno = report.rule2yesno || [];
+        report.rule2yesno.push({
+          question: q.nameId || q.nodeId || ('q' + q.questionId),
+          text: String(q.text || '').slice(0, 46),
+          gate: gate.nameId || gate.nodeId || ('q' + prev),
+          gateText: String(gate.text || '').slice(0, 44)
+        });
+        return;
+      }
       report.rule2gates.push({
         question: q.nameId || q.nodeId || ('q' + q.questionId),
         text: String(q.text || '').slice(0, 46),
@@ -573,6 +592,28 @@ async function main() {
     console.log('  FAILS  ' + report.rule2wording.length
       + ' question(s) hide a condition in the wording - each should be a gate plus a follow-up:');
     report.rule2wording.forEach((r) => console.log('      - ' + r.question + ': "' + r.text + '"'));
+  }
+  // Anything the author declared always-shown, with its reason, read out of the
+  // per-form flowcharts beside the packet.
+  const declared = new Map();
+  (gui.projectForms || []).forEach((f) => {
+    const base = String(f.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    try {
+      const chart = JSON.parse(fs.readFileSync(base + '-flowchart.json', 'utf8'));
+      (chart.alwaysShown || []).forEach((x) => declared.set(x.question, x.why || ''));
+    } catch (e) { /* no flowchart beside the packet */ }
+  });
+  const yesNoGates = (report.rule2yesno || []).filter((g) => !declared.has(g.question));
+  const yesNoDeclared = (report.rule2yesno || []).filter((g) => declared.has(g.question));
+  if (!yesNoGates.length) {
+    console.log('  gates: no follow-up is shown on both Yes and No'
+      + (yesNoDeclared.length ? '  (' + yesNoDeclared.length + ' declared always-shown)' : ''));
+  } else {
+    console.log('  FAILS  ' + yesNoGates.length
+      + ' follow-up(s) shown on BOTH Yes and No of their gate - that is no gate at all:');
+    yesNoGates.forEach((g) => console.log('      - ' + g.question
+      + '  <- both answers of "' + g.gateText + '"'));
+    console.log("      Fix the gate, or declare it in the hints alwaysShown, with a reason.");
   }
   const openGates = report.rule2gates || [];
   if (!openGates.length) {

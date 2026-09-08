@@ -1515,6 +1515,15 @@ function compile(schema, hints = {}) {
     if (drop.length) overflow.push({ keep: r.joinInto.field, drop: drop });
   });
   if (overflow.length) flowchart.continuationLines = overflow;
+  // Questions the author has looked at and declared unconditional. The audit
+  // fails on a follow-up shown on both Yes and No of its gate; some of those
+  // are the compiler rejoining a branch to the spine, where always-show is
+  // right. Saying so here is deliberate and reviewable - the alternative is a
+  // check that reports six harmless cases beside two real ones, which is a
+  // check people learn to scroll past.
+  const alwaysShown = (merged.alwaysShown || []).filter((a) => a && a.question);
+  if (alwaysShown.length) flowchart.alwaysShown = alwaysShown;
+
   if (autofills.length) {
     flowchart.autofilledFields = autofills.map((a) => ({ field: a.target, from: a.parts, why: a.why }));
   }
