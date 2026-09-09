@@ -13,11 +13,14 @@
     --ground: #f4f6f9;
     --accent: #2f6fed;
     --ok: #17845a;
+    --link: #7a4fd6;
+    --link-wash: rgba(122, 79, 214, .06);
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --ink: #e8ecf1; --muted: #98a3b3; --line: #2a3038;
       --paper: #1b1f25; --ground: #111418; --accent: #6f9dff; --ok: #46c391;
+      --link: #b18aff; --link-wash: rgba(177, 138, 255, .09);
     }
   }
   * { box-sizing: border-box; }
@@ -139,6 +142,18 @@
   .row.unexplained { background: rgba(192, 83, 47, .07); }
   .row.unexplained .k { color: #c0532f; font-weight: 650; }
   .ok { color: var(--ok); font-weight: 650; }
+  figure.linked { border-color: var(--link); box-shadow: 0 0 0 1px var(--link) inset; }
+  .link-bar {
+    display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap;
+    padding: 6px 10px; font-size: 11.5px; color: var(--link);
+    border-top: 1px dashed var(--link); background: var(--link-wash);
+  }
+  .link-bar b { font-weight: 700; }
+  .link-bar .to { color: var(--muted); }
+  .row .shared {
+    grid-column: 1 / -1; font-size: 11.5px; color: var(--link); padding-left: 2px;
+  }
+  .row .shared.caption { color: var(--muted); }
   .miss { color: #c0532f; font-weight: 650; }
   @media (prefers-color-scheme: dark) { .miss { color: #f08a63; } }
   .project-pick {
@@ -184,6 +199,8 @@
     font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
   #jsonText:focus { outline: none; }
+  .viewer-nav { display: flex; gap: 8px; align-items: center; }
+  dialog button[disabled] { opacity: .4; cursor: default; }
   dialog button {
     border: 1px solid var(--line); background: transparent; color: var(--ink);
     border-radius: 6px; padding: 4px 12px; cursor: pointer; font: inherit; font-size: 13px;
@@ -205,7 +222,14 @@
 
 <dialog id="viewer">
   <img id="viewerImg" alt="">
-  <div class="bar"><span id="viewerLabel"></span><button id="viewerClose">Close</button></div>
+  <div class="bar">
+    <span id="viewerLabel"></span>
+    <span class="viewer-nav">
+      <button id="viewerPrev" title="Previous page (←)">← Back</button>
+      <button id="viewerNext" title="Next page (→)">Next →</button>
+      <button id="viewerClose">Close</button>
+    </span>
+  </div>
 </dialog>
 
 <dialog id="jsonBox">
@@ -402,6 +426,7 @@ function copyPageButton(form, n) {
  */
 function pagePanel(form, n) {
   const wrap = el('details', { class: 'page' });
+  let sharedHere = [];
   const summary = el('summary', {}, [text('Field data'), el('span', {}, [text('reading…')])]);
   const rows = el('div', { class: 'rows' });
   wrap.append(summary, rows);
@@ -443,8 +468,20 @@ function pagePanel(form, n) {
       rows.appendChild(el('p', { class: 'empty' }, [text('No fields on this page.')]));
       return;
     }
+    const sharedBy = {};
+    sharedHere.forEach(function (s2) { sharedBy[s2.name] = s2; });
     s.blank.concat(s.real.filter(function (f) { return !isBlank(f); })).forEach(function (f) {
-      rows.appendChild(fieldRow(f, s.reasons));
+      const row = fieldRow(f, s.reasons);
+      const share = sharedBy[f.name];
+      if (share && share.to && share.to.length) {
+        row.appendChild(el('span', { class: 'shared' + (share.caption ? ' caption' : '') }, [text(
+          share.caption
+            ? 'the caption — printed on every page of the packet'
+            : '↔ also on ' + share.to.slice(0, 6).map(function (p) {
+                return p.form + ' p' + p.page; }).join(', ')
+              + (share.to.length > 6 ? ' and ' + (share.to.length - 6) + ' more' : ''))]));
+      }
+      rows.appendChild(row);
     });
   };
 
@@ -459,6 +496,10 @@ function pagePanel(form, n) {
   wrap.dataset.page = String(n);
   wrap.__paint = paint;
   wrap.__summarise = summarise;
+  wrap.__links = function (links) {
+    sharedHere = ((links && links[n]) || {}).fields || [];
+    paintLinks(wrap.parentNode, form, n, links);
+  };
   return wrap;
 }
 
@@ -469,11 +510,44 @@ function pagePanel(form, n) {
  * rather than sixty-six.
  */
 function summariseForm(name, stamp) {
-  return Promise.all([fieldsFor(name, stamp), whyFor(name, stamp)]).then(function (both) {
-    document.querySelectorAll('details.page[data-form="' + name + '"]').forEach(function (d) {
-      if (d.__summarise) d.__summarise(both[0], both[1]);
+  return Promise.all([fieldsFor(name, stamp), whyFor(name, stamp), linksFor(name, stamp)])
+    .then(function (all) {
+      document.querySelectorAll('details.page[data-form="' + name + '"]').forEach(function (d) {
+        if (d.__summarise) d.__summarise(all[0], all[1]);
+        if (d.__links) d.__links(all[2]);
+      });
     });
-  });
+}
+
+/**
+ * Say that this page is wired to others, and to which.
+ *
+ * A shared field name is how one answer reaches every form that prints it, and
+ * nothing on the page shows it - the connection is real, load-bearing and
+ * invisible. A page that shares something is outlined and names the forms; the
+ * field list then says which field goes where.
+ */
+function paintLinks(fig, form, page, links) {
+  const entry = (links && links[page]) || null;
+  const old = fig.querySelector('.link-bar');
+  if (old) old.remove();
+  fig.classList.remove('linked');
+  // The caption reaches every page by construction, so counting it would mark
+  // all thirty-three and separate nothing. Only a name that actually travels
+  // makes a page worth pointing at.
+  if (!entry || !entry.substantive) return;
+
+  const others = (entry.forms || []).filter(function (f) { return f !== form; });
+  fig.classList.add('linked');
+  const bar = el('div', { class: 'link-bar' }, [
+    el('b', {}, [text('↔ ' + entry.substantive
+      + (entry.substantive === 1 ? ' field shared with' : ' fields shared with'))]),
+    el('span', { class: 'to' }, [text(others.length
+      ? others.join(', ')
+      : 'other pages of this form')])
+  ]);
+  // Before the field panel, so it reads as a property of the page.
+  fig.insertBefore(bar, fig.querySelector('details.page'));
 }
 
 function isBlank(f) {
@@ -531,6 +605,19 @@ function fieldsFor(form, stamp) {
  * empties without saying which is which is how DV-105 page 6 reads as seventy
  * missing answers when it is one branch the filer did not take.
  */
+/** Which pages this one is wired to, cached per publish like the rest. */
+const linkCache = {};
+function linksFor(form, stamp) {
+  const key = form + '@' + stamp;
+  if (!linkCache[key]) {
+    linkCache[key] = fetch(ROOT + '/' + form + '/links.json?v=' + encodeURIComponent(stamp),
+      { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .catch(function () { return {}; });
+  }
+  return linkCache[key];
+}
+
 const whyCache = {};
 function whyFor(form, stamp) {
   const key = form + '@' + stamp;
@@ -789,14 +876,54 @@ function showJson(label, json) {
   area.select();
 }
 
-/* the lightbox */
+/*
+ * The lightbox, and moving between pages without leaving it.
+ *
+ * The order is the order on the page: every page of every form, DV-100 page 1
+ * through DV-110 page 9. Reading a filled packet means going through it front
+ * to back, and stopping at a form boundary to close, scroll and re-open would
+ * make thirty-three pages feel like five separate jobs.
+ *
+ * The ends are dead rather than wrapping. Wrapping from the last page to the
+ * first reads as a bug when you did not mean it, and a disabled button says
+ * plainly that this is the end of the packet.
+ */
 const viewer = document.getElementById('viewer');
-function open(img) {
+const viewerPrev = document.getElementById('viewerPrev');
+const viewerNext = document.getElementById('viewerNext');
+let viewerAt = -1;
+
+function viewerPages() {
+  return [].slice.call(document.querySelectorAll('#main img[data-form]'));
+}
+
+function showAt(index) {
+  const pages = viewerPages();
+  if (index < 0 || index >= pages.length) return;
+  const img = pages[index];
+  viewerAt = index;
   document.getElementById('viewerImg').src = img.getAttribute('src');
   document.getElementById('viewerLabel').textContent =
-    img.dataset.form + ' — page ' + img.dataset.page;
+    img.dataset.form + ' — page ' + img.dataset.page
+    + '   (' + (index + 1) + ' of ' + pages.length + ')';
+  viewerPrev.disabled = index === 0;
+  viewerNext.disabled = index === pages.length - 1;
+  // Keep the thumbnail behind the dialog in view, so closing leaves you where
+  // you got to rather than back where you started.
+  img.scrollIntoView({ block: 'center' });
+}
+
+function open(img) {
+  showAt(viewerPages().indexOf(img));
   viewer.showModal();
 }
+
+viewerPrev.addEventListener('click', () => showAt(viewerAt - 1));
+viewerNext.addEventListener('click', () => showAt(viewerAt + 1));
+viewer.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') { e.preventDefault(); showAt(viewerAt - 1); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); showAt(viewerAt + 1); }
+});
 document.getElementById('viewerClose').addEventListener('click', () => viewer.close());
 const jsonBox = document.getElementById('jsonBox');
 document.getElementById('jsonClose').addEventListener('click', () => jsonBox.close());

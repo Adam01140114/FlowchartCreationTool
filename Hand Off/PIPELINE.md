@@ -233,6 +233,22 @@ about page two - and a list that buries the empties reads as though everything
 is fine. DV-110 page 2 says "28 fields · 27 empty", which is exactly right for
 a page that belongs to the judge.
 
+A page wired to the rest of the packet is outlined and says so — "↔ 25 fields
+shared with DV100, DV101, DV105, DV109" — and each shared field names where
+else it appears. In this packet a shared name IS the wiring, so the connection
+is real, load-bearing and otherwise nowhere on the page.
+
+The caption is told apart from a link **without a list or a threshold**: a name
+on *every* page of every form that has it is the letterhead, and a name that
+reaches one page of four forms is an answer travelling. Counting the case
+number would mark all thirty-three pages and separate nothing; excluding it by
+name would be a rule about this packet. Eight of thirty-three pages carry real
+cross-form wiring, which is the number worth seeing.
+
+In the enlarged view, Back and Next walk all thirty-three pages in order across
+form boundaries, with the arrow keys too. The ends are dead rather than
+wrapping — wrapping from the last page to the first reads as a bug.
+
 Every page shows its verdict **closed**, so thirty-three pages can be skimmed
 and the one with something wrong stops you. The counts are the reason to open a
 page, so making you open it to see them is backwards.

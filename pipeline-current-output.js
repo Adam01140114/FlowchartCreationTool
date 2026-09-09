@@ -81,6 +81,78 @@ async function fieldsByPage(pdfFile) {
   return pages;
 }
 
+/**
+ * Which pages are wired to which.
+ *
+ * In this packet a shared field name IS the wiring: one answer fills every
+ * form that prints it, which is why a survivor types their abuser's name once
+ * rather than on all five forms. That makes it invisible - the connection is
+ * real, load-bearing, and nowhere on the page.
+ *
+ * So it is worked out here: for every field, everywhere else that same name
+ * appears. A page that shares nothing has no entry; a page that shares
+ * something says what, and where it goes.
+ *
+ * Repeats within one form count too - DV-105 prints the case number on all six
+ * pages, and knowing that one answer feeds all six is the same kind of fact as
+ * knowing it also feeds DV-100.
+ */
+function crossReference(everyForm) {
+  const where = {};
+  Object.keys(everyForm).forEach((form) => {
+    Object.keys(everyForm[form]).forEach((page) => {
+      everyForm[form][page].forEach((f) => {
+        if (f.kind === 'button') return;
+        (where[f.name] = where[f.name] || []).push({ form: form, page: Number(page) });
+      });
+    });
+  });
+
+  // The caption, told apart from a link without a list or a threshold.
+  //
+  // Every court page prints the case number in its header, so that one name
+  // reaches all thirty-three pages - and marking every page as linked to every
+  // other says nothing at all. What makes it the caption rather than a link is
+  // that it is on EVERY page of every form that has it. A name that reaches one
+  // page of four forms is an answer travelling; a name that reaches all of them
+  // is the letterhead.
+  const pagesPerForm = {};
+  Object.keys(everyForm).forEach((form) => {
+    pagesPerForm[form] = Object.keys(everyForm[form]).length;
+  });
+  const isCaption = (name) => {
+    const seen = {};
+    (where[name] || []).forEach((p) => { seen[p.form] = (seen[p.form] || 0) + 1; });
+    return Object.keys(seen).every((form) => seen[form] >= pagesPerForm[form]);
+  };
+
+  const out = {};
+  Object.keys(everyForm).forEach((form) => {
+    out[form] = {};
+    Object.keys(everyForm[form]).forEach((page) => {
+      const here = Number(page);
+      const shared = [];
+      const forms = new Set();
+      let substantive = 0;
+      everyForm[form][page].forEach((f) => {
+        if (f.kind === 'button') return;
+        const elsewhere = (where[f.name] || []).filter(
+          (p) => !(p.form === form && p.page === here));
+        if (!elsewhere.length) return;
+        const caption = isCaption(f.name);
+        if (!caption) {
+          substantive++;
+          elsewhere.forEach((p) => forms.add(p.form));
+        }
+        shared.push({ name: f.name, kind: f.kind, caption: caption, to: elsewhere });
+      });
+      out[form][page] = { fields: shared, substantive: substantive,
+        forms: Array.from(forms).sort() };
+    });
+  });
+  return out;
+}
+
 /** DV-100's images live in dv100-pages; the folder people say out loud is DV100. */
 function folderNameFor(base) {
   return base.toUpperCase();
@@ -136,6 +208,8 @@ async function main() {
 
   const lines = [];
   const manifest = { publishedAt: new Date().toISOString(), forms: [] };
+  // Kept so the pages can be cross-referenced once every form has been read.
+  const everyForm = {};
   let total = 0;
   for (const source of sources.sort()) {
     const base = source.replace(/-pages$/, '');
@@ -165,6 +239,7 @@ async function main() {
         if (f.kind === 'checkbox') { counts.checkbox++; if (f.value) counts.ticked++; }
         else { counts.text++; if (String(f.value).trim() !== '') counts.filled++; }
       }));
+      everyForm[folderNameFor(base)] = byPage;
       fs.writeFileSync(path.join(target, 'fields.json'), JSON.stringify(byPage, null, 1));
 
       // Why each blank is blank. A blank the answers account for and a blank
@@ -193,6 +268,16 @@ async function main() {
   const stamp = fs.existsSync(answers)
     ? fs.statSync(answers).mtime.toISOString()
     : new Date().toISOString();
+
+  // What each page shares with the rest of the packet.
+  const links = crossReference(everyForm);
+  Object.keys(links).forEach((form) => {
+    fs.writeFileSync(path.join(root, form, 'links.json'), JSON.stringify(links[form], null, 1));
+  });
+  manifest.forms.forEach((f) => {
+    const own = links[f.name] || {};
+    f.linkedPages = Object.keys(own).filter((n) => own[n].substantive > 0).length;
+  });
 
   manifest.projectId = projectId;
   fs.writeFileSync(path.join(root, 'README.txt'), [
