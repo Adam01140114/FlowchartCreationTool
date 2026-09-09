@@ -570,7 +570,7 @@ async function main() {
       // Named rather than passed over quietly: a blank here should be a blank
       // because the answer fit on the first line, not because nobody asked.
       console.log('      ' + f.overflowLines.length
-        + ' overflow line(s), left blank by design: ' + f.overflowLines.join(', '));
+        + ' overflow line(s), which no question fills directly - the filler spills a long answer onto them: ' + f.overflowLines.join(', '));
     }
     if (f.placeholderMapped.length) {
       console.log('      placeholder-mapped in field config: ' + f.placeholderMapped.length);

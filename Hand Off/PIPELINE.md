@@ -132,6 +132,38 @@ through an answer and prints which:
 A block on the spine keeps whatever the hint says, because there zero can be a
 real answer. A hint that sets `"min": 0` behind a gate is overridden, visibly.
 
+## A long answer runs onto the next ruled line
+
+A court form often prints two ruled lines for one answer and gives each its own
+field. The interview asks once, so only the first is submitted, and pdf-lib
+draws it at the size the field declares and clips whatever runs past the right
+edge - DV-100 item 16b(3) has 166pt of line and the answer wanted 226pt. The
+answer was on the page and unreadable, and the second ruled line the form
+printed for exactly this was left empty.
+
+`dev-server.js` now measures each answer against its own line and wraps the
+remainder onto the lines beneath it, and says so:
+
+```
+[edit_pdf] Edited_dv100.pdf: "animal_sole_possession_other_reason_line_1" ran past
+                             its ruled line; continued on ..._line_2
+```
+
+Which field continues which is read off the page, not off the names. A
+continuation is on the same page, sits below its line by no more than one line
+pitch, ends at the same right edge, is the same height, and has nothing in it.
+A fixed few-point tolerance is not enough for the vertical test: the gap is
+0.33pt on the animals pair and 3.42pt on the move-out pair, so it is measured
+against the line's own height, which is also what separates the next line from
+the one after it.
+
+Two things it deliberately does not do. An auto-sized field is left alone -
+there the layout shrinks the text to fit rather than clipping it, so there is
+no overflow to move. And nothing is ever dropped: if the answer outruns every
+line the form printed, the last one takes the remainder and clips exactly as
+before, because a form with two ruled lines cannot hold four lines of text and
+silently losing the end would be worse than showing it run out.
+
 ## Buttons that were printing words
 
 The sanitizer deletes push buttons, which is right for a control and wrong for

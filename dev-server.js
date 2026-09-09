@@ -164,6 +164,145 @@ function declaredFontSize(field) {
 }
 
 /**
+ * Lay a string across a row of lines of given widths.
+ *
+ * Greedy by words, the way any text layout does it. A single word too wide for
+ * an empty line is broken where it stops fitting rather than dropped - a field
+ * name pasted into an answer box has no spaces in it and would otherwise take
+ * a whole line and still be cut.
+ *
+ * The last line takes whatever is left, so nothing is ever thrown away: if the
+ * answer outruns every line the form printed, the last one clips exactly as it
+ * did before.
+ */
+function wrapAcrossLines(text, widths, font, size) {
+  const words = String(text).split(' ').filter((word) => word !== '');
+  const out = [];
+  let i = 0;
+  for (let line = 0; line < widths.length; line++) {
+    if (line === widths.length - 1) {
+      out.push(words.slice(i).join(' '));
+      i = words.length;
+      break;
+    }
+    let current = '';
+    while (i < words.length) {
+      const candidate = current ? current + ' ' + words[i] : words[i];
+      if (font.widthOfTextAtSize(candidate, size) <= widths[line]) {
+        current = candidate;
+        i++;
+        continue;
+      }
+      if (current) break;
+      let cut = words[i];
+      while (cut.length > 1 && font.widthOfTextAtSize(cut, size) > widths[line]) {
+        cut = cut.slice(0, -1);
+      }
+      current = cut;
+      words[i] = words[i].slice(cut.length);
+      break;
+    }
+    out.push(current);
+    if (i >= words.length) break;
+  }
+  while (out.length < widths.length) out.push('');
+  return out;
+}
+
+/**
+ * Put the rest of a long answer on the ruled line beneath it.
+ *
+ * A court form often prints two ruled lines for one answer and gives each its
+ * own field. DV-100 item 16b(3) is the case: animal_sole_possession_other_
+ * reason_line_1 is 166pt wide, the answer needs 226pt at the 11pt the field
+ * declares, and pdf-lib draws it and clips what runs past the right edge. The
+ * answer is on the page and unreadable, and the second ruled line the form
+ * printed for exactly this is left empty.
+ *
+ * Which field continues which is read off the page, not off the names. A
+ * continuation sits directly under its line, ends at the same right edge, is
+ * the same height, is on the same page, and has nothing in it. That is true of
+ * all three pairs on the DV-100 and does not depend on anyone having called
+ * them _line_1 and _line_2 - a form with three ruled lines chains all three.
+ *
+ * An auto-sized field is left alone. There the layout shrinks the text to fit
+ * rather than clipping it, so there is no overflow to move.
+ */
+function spillOntoContinuationLines(pdfDoc, form, body, font) {
+  const pageOfDict = new Map();
+  pdfDoc.getPages().forEach((page, index) => {
+    const annots = page.node.Annots();
+    if (!annots) return;
+    annots.asArray().forEach((ref) => {
+      const dict = pdfDoc.context.lookup(ref);
+      if (dict) pageOfDict.set(dict, index);
+    });
+  });
+
+  const lines = [];
+  form.getFields().forEach((field) => {
+    if (field.constructor.name !== 'PDFTextField') return;
+    try { if (field.isMultiline()) return; } catch (e) { return; }
+    let widget;
+    try { widget = field.acroField.getWidgets()[0]; } catch (e) { return; }
+    if (!widget) return;
+    const rect = widget.getRectangle();
+    let text = '';
+    try { text = field.getText() || ''; } catch (e) { text = ''; }
+    lines.push({
+      name: field.getName(), field,
+      page: pageOfDict.has(widget.dict) ? pageOfDict.get(widget.dict) : -1,
+      right: rect.x + rect.width, bottom: rect.y, top: rect.y + rect.height,
+      width: rect.width, height: rect.height,
+      filled: text.trim() !== ''
+    });
+  });
+
+  // pdf-lib insets the text a point from each edge and the border sits inside
+  // that, so a couple of points of the box are not available to draw in.
+  const room = (line) => line.width - 4;
+  const values = Object.assign({}, body);
+  const spilled = [];
+  const taken = new Set();
+
+  lines.forEach((line) => {
+    const value = body[line.name];
+    if (value === undefined || String(value).trim() === '') return;
+    const size = declaredFontSize(line.field);
+    if (!size) return;
+    if (font.widthOfTextAtSize(String(value), size) <= room(line)) return;
+
+    const chain = [line];
+    let current = line;
+    while (chain.length < 8) {
+      const next = lines.find((other) =>
+        other !== current && other.page === current.page && other.page >= 0
+        && !taken.has(other.name) && body[other.name] === undefined && !other.filled
+        // Below it, by no more than the pitch of one ruled line. A fixed
+        // tolerance of a few points is not enough: the gap between two rules
+        // is 0.33pt on the animals pair and 3.42pt on the move-out pair, and
+        // measuring it against the line's own height is what tells a next line
+        // apart from the one after that.
+        && other.top <= current.bottom + 2
+        && current.bottom - other.top <= current.height
+        && Math.abs(other.right - current.right) <= 3
+        && Math.abs(other.height - current.height) <= 2);
+      if (!next) break;
+      chain.push(next);
+      taken.add(next.name);
+      current = next;
+    }
+    if (chain.length < 2) return;
+
+    const pieces = wrapAcrossLines(String(value), chain.map(room), font, size);
+    chain.forEach((link, i) => { values[link.name] = pieces[i] || ''; });
+    spilled.push({ from: line.name, onto: chain.slice(1).map((link) => link.name) });
+  });
+
+  return { values, spilled };
+}
+
+/**
  * Put the first line of a multiline field on the rule the form printed.
  *
  * pdf-lib starts a multiline block one full line-height below the box's top
@@ -285,9 +424,14 @@ app.post('/edit_pdf', async (req, res) => {
 
     const fieldNames = new Set(form.getFields().map((field) => field.getName()));
 
+    const spill = spillOntoContinuationLines(pdfDoc, form, req.body || {}, helv);
+    spill.spilled.forEach((s) => console.log(
+      `[edit_pdf] ${outputName}: "${s.from}" ran past its ruled line; ` +
+      `continued on ${s.onto.join(', ')}`));
+
     form.getFields().forEach((field) => {
       const key = field.getName();
-      const value = req.body[key];
+      const value = spill.values[key];
       if (value === undefined) return;
 
       try {
