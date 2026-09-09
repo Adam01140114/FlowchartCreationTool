@@ -1634,6 +1634,18 @@
       "label": "property_debts_payment_reason"
     },
     {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].checkbox22b[0]",
+      "newName": "property_debt_special_finding_no",
+      "type": "checkbox",
+      "label": "property_debt_special_finding_no"
+    },
+    {
+      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].checkbox22b[1]",
+      "newName": "property_debt_special_finding_yes",
+      "type": "checkbox",
+      "label": "property_debt_special_finding_yes"
+    },
+    {
       "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption1[0]",
       "newName": "property_debt_special_finding_debt_1",
       "type": "checkbox",
@@ -1668,18 +1680,6 @@
       "newName": "property_debt_how_made_explanation",
       "type": "text",
       "label": "property_debt_how_made_explanation"
-    },
-    {
-      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].checkbox22b[0]",
-      "newName": "property_debt_special_finding_no",
-      "type": "checkbox",
-      "label": "property_debt_special_finding_no"
-    },
-    {
-      "id": "DV-100[0].Page10[0].List22[0].Li2[0].List[0].checkbox22b[1]",
-      "newName": "property_debt_special_finding_yes",
-      "type": "checkbox",
-      "label": "property_debt_special_finding_yes"
     },
     {
       "id": "DV-100[0].Page11[0].PxCaption[0].CaseNumber[0]",

@@ -993,37 +993,49 @@ function assignSections(steps, fields, hints, sectionPrefs) {
         name: sec.name || `Section ${i + 1}`
       };
     });
-    let cur = 0;
-    steps.forEach((step) => {
-      if (startAt.has(step.nameId)) cur = startAt.get(step.nameId);
-      // A repeating block stands in for a family of fields, and the section
-      // hint names those fields, not the block. Without this the block starts
-      // wherever the previous question left off - the firearms block landed in
-      // "Other Protected People" and left "Firearms" with nothing in it.
-      else if (step.combine) {
+    /**
+     * Which section a step opens, by any of the names a hint can use for it.
+     *
+     * A block, a combined question and a group each stand in for a family of
+     * fields, and a section hint names those fields rather than the question
+     * the compiler built out of them.
+     */
+    const startsSection = (step) => {
+      if (startAt.has(step.nameId)) return startAt.get(step.nameId);
+      if (step.combine) {
         const anchor = step.combine.boxes
           .map((b) => step.combine.nameId + '_' + b.nameId)
           .find((name) => startAt.has(name));
-        if (anchor) cur = startAt.get(anchor);
+        if (anchor !== undefined) return startAt.get(anchor);
       }
-      else if (step.repeat) {
+      if (step.repeat) {
         const anchor = repeatTemplateNames(step.repeat)
           .map((t) => repeatFieldName(step.repeat.nameId, t, 1))
           .find((name) => startAt.has(name));
-        if (anchor) cur = startAt.get(anchor);
+        if (anchor !== undefined) return startAt.get(anchor);
       }
-      // A group stands in for its member fields, and the section hint names
-      // those members rather than the group. Without this, gating a section's
-      // opening question emptied the section it opens: "Other Protected People"
-      // and "Firearms" both collapsed into "The Abuse" the moment their blocks
-      // moved under a Yes.
-      else if (step.options && step.options.length) {
-        const anchor = step.options
-          .map((o) => o.nameId)
-          .find((name) => name && startAt.has(name));
-        if (anchor) cur = startAt.get(anchor);
+      if (step.options && step.options.length) {
+        const anchor = step.options.map((o) => o.nameId).find((name) => name && startAt.has(name));
+        if (anchor !== undefined) return startAt.get(anchor);
       }
-      walkSteps([step], (sub) => { sub.section = cur + 1; });
+      return null;
+    };
+
+    // Walk every question in the order a filer meets it, branches included.
+    //
+    // This used to switch sections only on the spine, and hand a whole branch
+    // the section its top-level question was in. That held while a section
+    // opened with a question nothing gated. It stopped holding the moment
+    // DV-100's orders were gated on the order that asks for them: items 16
+    // through 28 moved inside the branches of one question, so "Animals,
+    // Property and Support" never got the chance to start and came out empty.
+    // A section is a run of questions the filer walks through; where the run
+    // sits in the graph is not the point.
+    let cur = 0;
+    walkSteps(steps, (step) => {
+      const at = startsSection(step);
+      if (at !== null) cur = at;
+      step.section = cur + 1;
     });
     return hinted.length;
   }

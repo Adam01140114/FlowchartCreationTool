@@ -630,6 +630,139 @@
           "nodeId": "person_asking_protection_mailing"
         },
         {
+          "questionId": 112,
+          "text": "Your lawyer's information",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "pdfName": "",
+            "pdfDisplayName": "",
+            "stripePriceId": "",
+            "conditions": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Lawyer's name",
+              "nodeId": "person_asking_protection_lawyer_name",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "State bar number",
+              "nodeId": "person_asking_protection_lawyer_state_bar_number",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Law firm name",
+              "nodeId": "person_asking_protection_lawyer_firm_name",
+              "order": 3,
+              "prefill": ""
+            }
+          ],
+          "textboxes": [
+            {
+              "label": "",
+              "nameId": "person_asking_protection_lawyer_name",
+              "placeholder": "name"
+            },
+            {
+              "label": "",
+              "nameId": "person_asking_protection_lawyer_state_bar_number",
+              "placeholder": "state_bar_number"
+            },
+            {
+              "label": "",
+              "nameId": "person_asking_protection_lawyer_firm_name",
+              "placeholder": "firm_name"
+            }
+          ],
+          "amounts": [],
+          "nodeId": "person_asking_protection_lawyer"
+        },
+        {
           "questionId": 113,
           "text": "How can the court reach you? (optional)",
           "type": "multipleTextboxes",
@@ -7974,8 +8107,45 @@
             ]
           },
           "jump": {
-            "enabled": false,
-            "conditions": []
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Order to not abuse me",
+                "to": "10"
+              },
+              {
+                "option": "No-contact order",
+                "to": "10"
+              },
+              {
+                "option": "Child custody and visitation",
+                "to": "10"
+              },
+              {
+                "option": "Health and other insurance",
+                "to": "10"
+              },
+              {
+                "option": "Record communications",
+                "to": "10"
+              },
+              {
+                "option": "Property restraint",
+                "to": "10"
+              },
+              {
+                "option": "Spousal support",
+                "to": "10"
+              },
+              {
+                "option": "Lawyer's fees and costs",
+                "to": "10"
+              },
+              {
+                "option": "Batterer intervention program",
+                "to": "10"
+              }
+            ]
           },
           "conditionalPDF": {
             "enabled": false,
@@ -8318,7 +8488,204 @@
           "nodeId": "orders_requested"
         },
         {
-          "questionId": 72,
+          "questionId": 73,
+          "text": "Which home must the person move out of?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Order to move out"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "move_out_home_address",
+          "placeholder": ""
+        },
+        {
+          "questionId": 74,
+          "text": "What other orders do you want?",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Other orders"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Any Text",
+                "to": "10"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "other_orders_description",
+          "placeholder": ""
+        },
+        {
+          "questionId": 75,
           "text": "What must the person stay away from?",
           "type": "checkbox",
           "logic": {
@@ -8521,136 +8888,12 @@
           "nodeId": "stay_away_targets"
         },
         {
-          "questionId": 73,
-          "text": "Where else must they stay away from?",
-          "type": "text",
+          "questionId": 83,
+          "text": "Why do you have the right to live there?",
+          "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
-              {
-                "prevQuestion": "72",
-                "prevAnswer": "Somewhere else"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "stay_away_other_place_description",
-          "placeholder": ""
-        },
-        {
-          "questionId": 74,
-          "text": "How far must the person stay away?",
-          "type": "dropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "72",
-                "prevAnswer": "Me"
-              },
-              {
-                "prevQuestion": "72",
-                "prevAnswer": "My home"
-              },
-              {
-                "prevQuestion": "72",
-                "prevAnswer": "My school"
-              },
-              {
-                "prevQuestion": "72",
-                "prevAnswer": "My job or workplace"
-              },
-              {
-                "prevQuestion": "72",
-                "prevAnswer": "My vehicle"
-              },
-              {
-                "prevQuestion": "72",
-                "prevAnswer": "Each person I listed as protected"
-              },
-              {
-                "prevQuestion": "72",
-                "prevAnswer": "My children's school or childcare"
-              },
               {
                 "prevQuestion": "73",
                 "prevAnswer": "Any Text"
@@ -8658,1247 +8901,25 @@
             ]
           },
           "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "100 yards",
-                "type": "checkbox",
-                "nodeId": "stay_away_distance_100_yards",
-                "textboxText": ""
-              },
-              {
-                "trigger": "Other distance",
-                "type": "checkbox",
-                "nodeId": "stay_away_distance_other",
-                "textboxText": ""
-              }
-            ]
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [
-            "100 yards",
-            "Other distance"
-          ],
-          "labels": [],
-          "nameId": "stay_away_distance",
-          "placeholder": ""
-        },
-        {
-          "questionId": 75,
-          "text": "How many yards must they stay away?",
-          "type": "money",
-          "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "74",
-                "prevAnswer": "Other distance"
+                "option": "I own the home",
+                "to": "10"
+              },
+              {
+                "option": "My name is on the lease",
+                "to": "10"
+              },
+              {
+                "option": "I pay for some or all of the rent or mortgage",
+                "to": "10"
+              },
+              {
+                "option": "I live at this address with my children",
+                "to": "10"
               }
             ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "stay_away_distance_other_yards",
-          "placeholder": ""
-        },
-        {
-          "questionId": 76,
-          "text": "Do you and the person you want protection from live together, or live close to each other?",
-          "type": "dropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Order to not abuse me"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "No-contact order"
-              },
-              {
-                "prevQuestion": "74",
-                "prevAnswer": "100 yards"
-              },
-              {
-                "prevQuestion": "74",
-                "prevAnswer": "Other distance"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Order to move out"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Other orders"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Child custody and visitation"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Protect animals"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Control of property"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Health and other insurance"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Record communications"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Property restraint"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Pay debts (bills) owed for property"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Pay expenses caused by the abuse"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Child support"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Spousal support"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Lawyer's fees and costs"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Batterer intervention program"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Transfer of wireless phone account"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "More time to give notice to the person"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "No",
-                "type": "checkbox",
-                "nodeId": "live_together_or_close_no_yes",
-                "textboxText": ""
-              },
-              {
-                "trigger": "Yes",
-                "type": "checkbox",
-                "nodeId": "live_together_or_close_yes_yes",
-                "textboxText": ""
-              }
-            ]
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [
-            "No",
-            "Yes"
-          ],
-          "labels": [],
-          "nameId": "live_together_or_close",
-          "placeholder": ""
-        },
-        {
-          "questionId": 77,
-          "text": "How close do you live to each other?",
-          "type": "dropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "76",
-                "prevAnswer": "Yes"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "Live together",
-                "type": "checkbox",
-                "nodeId": "living_arrangement_live_together",
-                "textboxText": ""
-              },
-              {
-                "trigger": "Live in the same building, but not in the same home",
-                "type": "checkbox",
-                "nodeId": "living_arrangement_same_building",
-                "textboxText": ""
-              },
-              {
-                "trigger": "Live in the same neighborhood",
-                "type": "checkbox",
-                "nodeId": "living_arrangement_same_neighborhood",
-                "textboxText": ""
-              },
-              {
-                "trigger": "Other",
-                "type": "checkbox",
-                "nodeId": "living_arrangement_other",
-                "textboxText": ""
-              }
-            ]
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [
-            "Live together",
-            "Live in the same building, but not in the same home",
-            "Live in the same neighborhood",
-            "Other"
-          ],
-          "labels": [],
-          "nameId": "living_arrangement",
-          "placeholder": ""
-        },
-        {
-          "questionId": 78,
-          "text": "How else do you live near each other?",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "77",
-                "prevAnswer": "Other"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "living_arrangement_other_description",
-          "placeholder": ""
-        },
-        {
-          "questionId": 79,
-          "text": "Do you and the person share a workplace or school?",
-          "type": "dropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "76",
-                "prevAnswer": "No"
-              },
-              {
-                "prevQuestion": "77",
-                "prevAnswer": "Live together"
-              },
-              {
-                "prevQuestion": "77",
-                "prevAnswer": "Live in the same building, but not in the same home"
-              },
-              {
-                "prevQuestion": "77",
-                "prevAnswer": "Live in the same neighborhood"
-              },
-              {
-                "prevQuestion": "78",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "No",
-                "type": "checkbox",
-                "nodeId": "same_workplace_or_school_no",
-                "textboxText": ""
-              },
-              {
-                "trigger": "Yes",
-                "type": "checkbox",
-                "nodeId": "same_workplace_or_school_yes",
-                "textboxText": ""
-              }
-            ]
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [
-            "No",
-            "Yes"
-          ],
-          "labels": [],
-          "nameId": "same_workplace_or_school",
-          "placeholder": ""
-        },
-        {
-          "questionId": 80,
-          "text": "What do you share?",
-          "type": "checkbox",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "79",
-                "prevAnswer": "Yes"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "We work together"
-          },
-          "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "We work together",
-                "type": "checkbox",
-                "nodeId": "same_workplace_selected",
-                "textboxText": ""
-              },
-              {
-                "trigger": "We go to the same school",
-                "type": "checkbox",
-                "nodeId": "same_school_selected",
-                "textboxText": ""
-              },
-              {
-                "trigger": "Something else",
-                "type": "checkbox",
-                "nodeId": "same_workplace_or_school_other",
-                "textboxText": ""
-              }
-            ]
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [
-            {
-              "label": "We work together",
-              "nameId": "same_workplace_or_school_kind_we_work_together",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            },
-            {
-              "label": "We go to the same school",
-              "nameId": "same_workplace_or_school_kind_we_go_to_the_same_school",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            },
-            {
-              "label": "Something else",
-              "nameId": "same_workplace_or_school_kind_something_else",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            }
-          ],
-          "labels": [],
-          "required": true,
-          "markOnlyOne": false,
-          "allAreRequired": false,
-          "nodeId": "same_workplace_or_school_kind"
-        },
-        {
-          "questionId": 81,
-          "text": "What is the name of the company you both work at?",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "80",
-                "prevAnswer": "We work together"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "same_workplace_company_name",
-          "placeholder": ""
-        },
-        {
-          "questionId": 82,
-          "text": "What is the name of the school you both go to?",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "80",
-                "prevAnswer": "We go to the same school"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "same_school_name",
-          "placeholder": ""
-        },
-        {
-          "questionId": 83,
-          "text": "What else do you share?",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "80",
-                "prevAnswer": "Something else"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "same_workplace_or_school_other_description",
-          "placeholder": ""
-        },
-        {
-          "questionId": 84,
-          "text": "Which home must the person move out of?",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "79",
-                "prevAnswer": "No"
-              },
-              {
-                "prevQuestion": "81",
-                "prevAnswer": "Any Text"
-              },
-              {
-                "prevQuestion": "82",
-                "prevAnswer": "Any Text"
-              },
-              {
-                "prevQuestion": "83",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "move_out_home_address",
-          "placeholder": ""
-        },
-        {
-          "questionId": 85,
-          "text": "Why do you have the right to live there?",
-          "type": "checkbox",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "84",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
           },
           "conditionalPDF": {
             "enabled": false,
@@ -10059,6 +9080,233 @@
           "nodeId": "move_out_right_to_live"
         },
         {
+          "questionId": 84,
+          "text": "Where else must they stay away from?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "75",
+                "prevAnswer": "Somewhere else"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "stay_away_other_place_description",
+          "placeholder": ""
+        },
+        {
+          "questionId": 85,
+          "text": "How far must the person stay away?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "75",
+                "prevAnswer": "Me"
+              },
+              {
+                "prevQuestion": "75",
+                "prevAnswer": "My home"
+              },
+              {
+                "prevQuestion": "75",
+                "prevAnswer": "My school"
+              },
+              {
+                "prevQuestion": "75",
+                "prevAnswer": "My job or workplace"
+              },
+              {
+                "prevQuestion": "75",
+                "prevAnswer": "My vehicle"
+              },
+              {
+                "prevQuestion": "75",
+                "prevAnswer": "Each person I listed as protected"
+              },
+              {
+                "prevQuestion": "75",
+                "prevAnswer": "My children's school or childcare"
+              },
+              {
+                "prevQuestion": "84",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "100 yards",
+                "type": "checkbox",
+                "nodeId": "stay_away_distance_100_yards",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Other distance",
+                "type": "checkbox",
+                "nodeId": "stay_away_distance_other",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "100 yards",
+            "Other distance"
+          ],
+          "labels": [],
+          "nameId": "stay_away_distance",
+          "placeholder": ""
+        },
+        {
           "questionId": 86,
           "text": "How many years have you lived at this address?",
           "type": "money",
@@ -10066,7 +9314,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "85",
+                "prevQuestion": "83",
                 "prevAnswer": "I have lived at this address for a while"
               }
             ]
@@ -10162,14 +9410,19 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "85",
+                "prevQuestion": "83",
                 "prevAnswer": "Another reason"
               }
             ]
           },
           "jump": {
-            "enabled": false,
-            "conditions": []
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Any Text",
+                "to": "10"
+              }
+            ]
           },
           "conditionalPDF": {
             "enabled": false,
@@ -10258,7 +9511,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "85",
+                "prevQuestion": "83",
                 "prevAnswer": "I have lived at this address for a while"
               }
             ]
@@ -10347,34 +9600,1761 @@
           "placeholder": ""
         },
         {
-          "questionId": 89,
-          "text": "What other orders do you want?",
-          "type": "bigParagraph",
+          "questionId": 91,
+          "text": "How many yards must they stay away?",
+          "type": "money",
           "logic": {
             "enabled": true,
             "conditions": [
               {
                 "prevQuestion": "85",
-                "prevAnswer": "I own the home"
+                "prevAnswer": "Other distance"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "stay_away_distance_other_yards",
+          "placeholder": ""
+        },
+        {
+          "questionId": 93,
+          "text": "Do you and the person you want protection from live together, or live close to each other?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "85",
+                "prevAnswer": "100 yards"
               },
               {
                 "prevQuestion": "85",
-                "prevAnswer": "I have lived at this address for a while"
+                "prevAnswer": "Other distance"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "No",
+                "type": "checkbox",
+                "nodeId": "live_together_or_close_no_yes",
+                "textboxText": ""
               },
               {
-                "prevQuestion": "85",
-                "prevAnswer": "My name is on the lease"
+                "trigger": "Yes",
+                "type": "checkbox",
+                "nodeId": "live_together_or_close_yes_yes",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "No",
+            "Yes"
+          ],
+          "labels": [],
+          "nameId": "live_together_or_close",
+          "placeholder": ""
+        },
+        {
+          "questionId": 96,
+          "text": "How close do you live to each other?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "93",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "Live together",
+                "type": "checkbox",
+                "nodeId": "living_arrangement_live_together",
+                "textboxText": ""
               },
               {
-                "prevQuestion": "85",
-                "prevAnswer": "I pay for some or all of the rent or mortgage"
+                "trigger": "Live in the same building, but not in the same home",
+                "type": "checkbox",
+                "nodeId": "living_arrangement_same_building",
+                "textboxText": ""
               },
               {
-                "prevQuestion": "85",
-                "prevAnswer": "I live at this address with my children"
+                "trigger": "Live in the same neighborhood",
+                "type": "checkbox",
+                "nodeId": "living_arrangement_same_neighborhood",
+                "textboxText": ""
               },
               {
-                "prevQuestion": "87",
+                "trigger": "Other",
+                "type": "checkbox",
+                "nodeId": "living_arrangement_other",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Live together",
+            "Live in the same building, but not in the same home",
+            "Live in the same neighborhood",
+            "Other"
+          ],
+          "labels": [],
+          "nameId": "living_arrangement",
+          "placeholder": ""
+        },
+        {
+          "questionId": 99,
+          "text": "How else do you live near each other?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "96",
+                "prevAnswer": "Other"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "living_arrangement_other_description",
+          "placeholder": ""
+        },
+        {
+          "questionId": 101,
+          "text": "Do you and the person share a workplace or school?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "93",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "96",
+                "prevAnswer": "Live together"
+              },
+              {
+                "prevQuestion": "96",
+                "prevAnswer": "Live in the same building, but not in the same home"
+              },
+              {
+                "prevQuestion": "96",
+                "prevAnswer": "Live in the same neighborhood"
+              },
+              {
+                "prevQuestion": "99",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "No",
+                "to": "10"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "No",
+                "type": "checkbox",
+                "nodeId": "same_workplace_or_school_no",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Yes",
+                "type": "checkbox",
+                "nodeId": "same_workplace_or_school_yes",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "No",
+            "Yes"
+          ],
+          "labels": [],
+          "nameId": "same_workplace_or_school",
+          "placeholder": ""
+        },
+        {
+          "questionId": 104,
+          "text": "What do you share?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "101",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "We work together"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "We work together",
+                "type": "checkbox",
+                "nodeId": "same_workplace_selected",
+                "textboxText": ""
+              },
+              {
+                "trigger": "We go to the same school",
+                "type": "checkbox",
+                "nodeId": "same_school_selected",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Something else",
+                "type": "checkbox",
+                "nodeId": "same_workplace_or_school_other",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            {
+              "label": "We work together",
+              "nameId": "same_workplace_or_school_kind_we_work_together",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "We go to the same school",
+              "nameId": "same_workplace_or_school_kind_we_go_to_the_same_school",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Something else",
+              "nameId": "same_workplace_or_school_kind_something_else",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false,
+          "allAreRequired": false,
+          "nodeId": "same_workplace_or_school_kind"
+        },
+        {
+          "questionId": 106,
+          "text": "What is the name of the company you both work at?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "104",
+                "prevAnswer": "We work together"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Any Text",
+                "to": "10"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "same_workplace_company_name",
+          "placeholder": ""
+        },
+        {
+          "questionId": 107,
+          "text": "What is the name of the school you both go to?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "104",
+                "prevAnswer": "We go to the same school"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Any Text",
+                "to": "10"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "same_school_name",
+          "placeholder": ""
+        },
+        {
+          "questionId": 108,
+          "text": "What else do you share?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "104",
+                "prevAnswer": "Something else"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Any Text",
+                "to": "10"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "same_workplace_or_school_other_description",
+          "placeholder": ""
+        }
+      ]
+    },
+    {
+      "sectionId": 9,
+      "sectionName": "Animals, Property and Support",
+      "questions": [
+        {
+          "questionId": 72,
+          "text": "How many wireless phone numbers do you want transferred to you?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Transfer of wireless phone account"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "min": "1",
+          "max": "4",
+          "nodeId": "wireless_transfer_phone",
+          "entryTitle": "Phone Number",
+          "allFieldsInOrder": [
+            {
+              "type": "checkbox",
+              "fieldName": "Whose number is it?",
+              "selectionType": "single",
+              "required": "required",
+              "options": [
+                {
+                  "text": "My number",
+                  "nodeId": "wireless_transfer_phone_{n}_is_my_number"
+                },
+                {
+                  "text": "Number of a child in my care",
+                  "nodeId": "wireless_transfer_phone_{n}_is_child_number"
+                }
+              ],
+              "order": 1
+            },
+            {
+              "type": "phone",
+              "label": "Phone number (including area code)",
+              "nodeId": "wireless_transfer_phone_{n}_number",
+              "order": 2,
+              "prefill": ""
+            }
+          ]
+        },
+        {
+          "questionId": 76,
+          "text": "Which property do you want control of?",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Control of property"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "control_of_property_description",
+          "placeholder": ""
+        },
+        {
+          "questionId": 77,
+          "text": "What is your child support situation?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Child support"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "I do not have a child support order and I want one",
+                "type": "checkbox",
+                "nodeId": "child_support_no_existing_order_want_one",
+                "textboxText": ""
+              },
+              {
+                "trigger": "I have a child support order and I want it changed",
+                "type": "checkbox",
+                "nodeId": "child_support_existing_order_want_changed",
+                "textboxText": ""
+              },
+              {
+                "trigger": "I now receive or have applied for TANF, Welfare, or CalWORKS",
+                "type": "checkbox",
+                "nodeId": "child_support_receive_or_applied_tanf_welfare_calworks",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "I do not have a child support order and I want one",
+            "I have a child support order and I want it changed",
+            "I now receive or have applied for TANF, Welfare, or CalWORKS"
+          ],
+          "labels": [],
+          "nameId": "child_support_situation",
+          "placeholder": ""
+        },
+        {
+          "questionId": 78,
+          "text": "Why do you need more time to serve the person?",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "More time to give notice to the person"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "extend_service_deadline_reason",
+          "placeholder": ""
+        },
+        {
+          "questionId": 79,
+          "text": "How many expenses caused by the abuse do you want the person to pay?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Pay expenses caused by the abuse"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "min": "1",
+          "max": "4",
+          "nodeId": "abuse_expense",
+          "entryTitle": "Expense",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Pay to",
+              "nodeId": "abuse_expense_{n}_pay_to",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "For what",
+              "nodeId": "abuse_expense_{n}_for",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "amount",
+              "label": "Amount",
+              "nodeId": "abuse_expense_{n}_amount",
+              "order": 3
+            }
+          ]
+        },
+        {
+          "questionId": 80,
+          "text": "How many animals do you want the order to protect?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Protect animals"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "min": "1",
+          "max": "4",
+          "nodeId": "protected_animal",
+          "entryTitle": "Animal",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Name (or another way to identify the animal)",
+              "nodeId": "protected_animal_{n}_name_or_id",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Type of animal",
+              "nodeId": "protected_animal_{n}_type",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Breed, if known",
+              "nodeId": "protected_animal_{n}_breed",
+              "order": 3,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Color",
+              "nodeId": "protected_animal_{n}_color",
+              "order": 4,
+              "prefill": ""
+            }
+          ]
+        },
+        {
+          "questionId": 81,
+          "text": "How many debts owed for property do you want the person to pay?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Pay debts (bills) owed for property"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "min": "1",
+          "max": "3",
+          "nodeId": "property_debt",
+          "entryTitle": "Debt",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Pay to",
+              "nodeId": "property_debt_{n}_pay_to",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "For what",
+              "nodeId": "property_debt_{n}_for",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "amount",
+              "label": "Amount",
+              "nodeId": "property_debt_{n}_amount",
+              "order": 3
+            },
+            {
+              "type": "date",
+              "label": "Due date",
+              "nodeId": "property_debt_{n}_due_date",
+              "order": 4,
+              "prefill": ""
+            }
+          ]
+        },
+        {
+          "questionId": 82,
+          "text": "Why do you want control of that property?",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "76",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -10459,144 +11439,19 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "other_orders_description",
+          "nameId": "control_of_property_reason",
           "placeholder": ""
-        }
-      ]
-    },
-    {
-      "sectionId": 9,
-      "sectionName": "Animals, Property and Support",
-      "questions": [
-        {
-          "questionId": 90,
-          "text": "How many animals do you want the order to protect?",
-          "type": "numberedDropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "89",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "min": "0",
-          "max": "4",
-          "nodeId": "protected_animal",
-          "entryTitle": "Animal",
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Name (or another way to identify the animal)",
-              "nodeId": "protected_animal_{n}_name_or_id",
-              "order": 1,
-              "prefill": ""
-            },
-            {
-              "type": "label",
-              "label": "Type of animal",
-              "nodeId": "protected_animal_{n}_type",
-              "order": 2,
-              "prefill": ""
-            },
-            {
-              "type": "label",
-              "label": "Breed, if known",
-              "nodeId": "protected_animal_{n}_breed",
-              "order": 3,
-              "prefill": ""
-            },
-            {
-              "type": "label",
-              "label": "Color",
-              "nodeId": "protected_animal_{n}_color",
-              "order": 4,
-              "prefill": ""
-            }
-          ]
         },
         {
-          "questionId": 91,
+          "questionId": 89,
           "text": "Do you want the judge to order the person to stay away from your animals?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "89",
-                "prevAnswer": "Any Text"
+                "prevQuestion": "71",
+                "prevAnswer": "Protect animals"
               }
             ]
           },
@@ -10691,14 +11546,213 @@
           "placeholder": ""
         },
         {
+          "questionId": 90,
+          "text": "Why should the person pay these debts?",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Pay debts (bills) owed for property"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "property_debts_payment_reason",
+          "placeholder": ""
+        },
+        {
           "questionId": 92,
+          "text": "Do you want a special finding that the abuse caused these debts?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "90",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "No",
+                "type": "checkbox",
+                "nodeId": "property_debt_special_finding_no",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Yes",
+                "type": "checkbox",
+                "nodeId": "property_debt_special_finding_yes",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "No",
+            "Yes"
+          ],
+          "labels": [],
+          "nameId": "property_debt_special_finding",
+          "placeholder": ""
+        },
+        {
+          "questionId": 94,
           "text": "How far must the person stay away from the animals?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "91",
+                "prevQuestion": "89",
                 "prevAnswer": "Yes"
               }
             ]
@@ -10794,14 +11848,147 @@
           "placeholder": ""
         },
         {
-          "questionId": 93,
+          "questionId": 95,
+          "text": "Which debts were caused by the abuse?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "92",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "The first debt listed above"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "The first debt listed above",
+                "type": "checkbox",
+                "nodeId": "property_debt_special_finding_debt_1",
+                "textboxText": ""
+              },
+              {
+                "trigger": "The second debt listed above",
+                "type": "checkbox",
+                "nodeId": "property_debt_special_finding_debt_2",
+                "textboxText": ""
+              },
+              {
+                "trigger": "The third debt listed above",
+                "type": "checkbox",
+                "nodeId": "property_debt_special_finding_debt_3",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            {
+              "label": "The first debt listed above",
+              "nameId": "property_debt_special_finding_debts_the_first_debt_listed_above",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "The second debt listed above",
+              "nameId": "property_debt_special_finding_debts_the_second_debt_listed_above",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "The third debt listed above",
+              "nameId": "property_debt_special_finding_debts_the_third_debt_listed_above",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false,
+          "allAreRequired": false,
+          "nodeId": "property_debt_special_finding_debts"
+        },
+        {
+          "questionId": 97,
           "text": "How many yards must they stay away from the animals?",
           "type": "money",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "92",
+                "prevQuestion": "94",
                 "prevAnswer": "Other distance"
               }
             ]
@@ -10890,22 +12077,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 94,
+          "questionId": 98,
           "text": "Do you want the judge to order the person not to harm, hide, or give away your animals?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "92",
+                "prevQuestion": "94",
                 "prevAnswer": "100 yards"
               },
               {
-                "prevQuestion": "92",
+                "prevQuestion": "94",
                 "prevAnswer": "Other distance"
               },
               {
-                "prevQuestion": "91",
+                "prevQuestion": "89",
                 "prevAnswer": "No"
               }
             ]
@@ -11001,18 +12188,225 @@
           "placeholder": ""
         },
         {
-          "questionId": 95,
+          "questionId": 100,
+          "text": "Do you know how the person made these debts?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "95",
+                "prevAnswer": "The first debt listed above"
+              },
+              {
+                "prevQuestion": "95",
+                "prevAnswer": "The second debt listed above"
+              },
+              {
+                "prevQuestion": "95",
+                "prevAnswer": "The third debt listed above"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "No",
+                "type": "checkbox",
+                "nodeId": "property_debt_how_made_known_no",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Yes",
+                "type": "checkbox",
+                "nodeId": "property_debt_how_made_known_yes",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "No",
+            "Yes"
+          ],
+          "labels": [],
+          "nameId": "property_debt_how_made_known",
+          "placeholder": ""
+        },
+        {
+          "questionId": 102,
+          "text": "How did the person make the debt or debts?",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "100",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "property_debt_how_made_explanation",
+          "placeholder": ""
+        },
+        {
+          "questionId": 103,
           "text": "Do you want the judge to give you sole care and control of your animals?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "94",
+                "prevQuestion": "98",
                 "prevAnswer": "Yes"
               },
               {
-                "prevQuestion": "94",
+                "prevQuestion": "98",
                 "prevAnswer": "No"
               }
             ]
@@ -11108,14 +12502,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 96,
+          "questionId": 105,
           "text": "Why should you have sole possession of the animals?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "95",
+                "prevQuestion": "103",
                 "prevAnswer": "Yes"
               }
             ]
@@ -11255,30 +12649,30 @@
           "nodeId": "animal_sole_possession_reasons"
         },
         {
-          "questionId": 97,
+          "questionId": 109,
           "text": "Why else should you have the animals?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "96",
+                "prevQuestion": "105",
                 "prevAnswer": "The person abuses the animals"
               },
               {
-                "prevQuestion": "96",
+                "prevQuestion": "105",
                 "prevAnswer": "I take care of these animals"
               },
               {
-                "prevQuestion": "96",
+                "prevQuestion": "105",
                 "prevAnswer": "I purchased these animals"
               },
               {
-                "prevQuestion": "96",
+                "prevQuestion": "105",
                 "prevAnswer": "Another reason"
               },
               {
-                "prevQuestion": "95",
+                "prevQuestion": "103",
                 "prevAnswer": "No"
               }
             ]
@@ -11365,1307 +12759,6 @@
           },
           "nameId": "animal_sole_possession_other_reason_line_1",
           "placeholder": ""
-        },
-        {
-          "questionId": 98,
-          "text": "Which property do you want control of?",
-          "type": "bigParagraph",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "97",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "control_of_property_description",
-          "placeholder": ""
-        },
-        {
-          "questionId": 99,
-          "text": "Why do you want control of that property?",
-          "type": "bigParagraph",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "98",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "control_of_property_reason",
-          "placeholder": ""
-        },
-        {
-          "questionId": 100,
-          "text": "Why do you need more time to serve the person?",
-          "type": "bigParagraph",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "99",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "extend_service_deadline_reason",
-          "placeholder": ""
-        },
-        {
-          "questionId": 101,
-          "text": "How many debts owed for property do you want the person to pay?",
-          "type": "numberedDropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "100",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "min": "0",
-          "max": "3",
-          "nodeId": "property_debt",
-          "entryTitle": "Debt",
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Pay to",
-              "nodeId": "property_debt_{n}_pay_to",
-              "order": 1,
-              "prefill": ""
-            },
-            {
-              "type": "label",
-              "label": "For what",
-              "nodeId": "property_debt_{n}_for",
-              "order": 2,
-              "prefill": ""
-            },
-            {
-              "type": "amount",
-              "label": "Amount",
-              "nodeId": "property_debt_{n}_amount",
-              "order": 3
-            },
-            {
-              "type": "date",
-              "label": "Due date",
-              "nodeId": "property_debt_{n}_due_date",
-              "order": 4,
-              "prefill": ""
-            }
-          ]
-        },
-        {
-          "questionId": 102,
-          "text": "Why should the person pay these debts?",
-          "type": "bigParagraph",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "100",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "property_debts_payment_reason",
-          "placeholder": ""
-        },
-        {
-          "questionId": 103,
-          "text": "Which debts were caused by the abuse?",
-          "type": "checkbox",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "102",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "The first debt listed above"
-          },
-          "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "The first debt listed above",
-                "type": "checkbox",
-                "nodeId": "property_debt_special_finding_debt_1",
-                "textboxText": ""
-              },
-              {
-                "trigger": "The second debt listed above",
-                "type": "checkbox",
-                "nodeId": "property_debt_special_finding_debt_2",
-                "textboxText": ""
-              },
-              {
-                "trigger": "The third debt listed above",
-                "type": "checkbox",
-                "nodeId": "property_debt_special_finding_debt_3",
-                "textboxText": ""
-              }
-            ]
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [
-            {
-              "label": "The first debt listed above",
-              "nameId": "property_debt_special_finding_debts_the_first_debt_listed_above",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            },
-            {
-              "label": "The second debt listed above",
-              "nameId": "property_debt_special_finding_debts_the_second_debt_listed_above",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            },
-            {
-              "label": "The third debt listed above",
-              "nameId": "property_debt_special_finding_debts_the_third_debt_listed_above",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            }
-          ],
-          "labels": [],
-          "required": true,
-          "markOnlyOne": false,
-          "allAreRequired": false,
-          "nodeId": "property_debt_special_finding_debts"
-        },
-        {
-          "questionId": 104,
-          "text": "Do you know how the person made these debts?",
-          "type": "dropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "103",
-                "prevAnswer": "The first debt listed above"
-              },
-              {
-                "prevQuestion": "103",
-                "prevAnswer": "The second debt listed above"
-              },
-              {
-                "prevQuestion": "103",
-                "prevAnswer": "The third debt listed above"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "No",
-                "type": "checkbox",
-                "nodeId": "property_debt_how_made_known_no",
-                "textboxText": ""
-              },
-              {
-                "trigger": "Yes",
-                "type": "checkbox",
-                "nodeId": "property_debt_how_made_known_yes",
-                "textboxText": ""
-              }
-            ]
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [
-            "No",
-            "Yes"
-          ],
-          "labels": [],
-          "nameId": "property_debt_how_made_known",
-          "placeholder": ""
-        },
-        {
-          "questionId": 105,
-          "text": "How did the person make the debt or debts?",
-          "type": "bigParagraph",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "104",
-                "prevAnswer": "Yes"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "property_debt_how_made_explanation",
-          "placeholder": ""
-        },
-        {
-          "questionId": 106,
-          "text": "Do you want a special finding that the abuse caused these debts?",
-          "type": "dropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "104",
-                "prevAnswer": "No"
-              },
-              {
-                "prevQuestion": "105",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "No",
-                "type": "checkbox",
-                "nodeId": "property_debt_special_finding_no",
-                "textboxText": ""
-              },
-              {
-                "trigger": "Yes",
-                "type": "checkbox",
-                "nodeId": "property_debt_special_finding_yes",
-                "textboxText": ""
-              }
-            ]
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [
-            "No",
-            "Yes"
-          ],
-          "labels": [],
-          "nameId": "property_debt_special_finding",
-          "placeholder": ""
-        },
-        {
-          "questionId": 107,
-          "text": "How many expenses caused by the abuse do you want the person to pay?",
-          "type": "numberedDropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "106",
-                "prevAnswer": "No"
-              },
-              {
-                "prevQuestion": "106",
-                "prevAnswer": "Yes"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "min": "0",
-          "max": "4",
-          "nodeId": "abuse_expense",
-          "entryTitle": "Expense",
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Pay to",
-              "nodeId": "abuse_expense_{n}_pay_to",
-              "order": 1,
-              "prefill": ""
-            },
-            {
-              "type": "label",
-              "label": "For what",
-              "nodeId": "abuse_expense_{n}_for",
-              "order": 2,
-              "prefill": ""
-            },
-            {
-              "type": "amount",
-              "label": "Amount",
-              "nodeId": "abuse_expense_{n}_amount",
-              "order": 3
-            }
-          ]
-        },
-        {
-          "questionId": 108,
-          "text": "What is your child support situation?",
-          "type": "dropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "106",
-                "prevAnswer": "No"
-              },
-              {
-                "prevQuestion": "106",
-                "prevAnswer": "Yes"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "I do not have a child support order and I want one",
-                "type": "checkbox",
-                "nodeId": "child_support_no_existing_order_want_one",
-                "textboxText": ""
-              },
-              {
-                "trigger": "I have a child support order and I want it changed",
-                "type": "checkbox",
-                "nodeId": "child_support_existing_order_want_changed",
-                "textboxText": ""
-              },
-              {
-                "trigger": "I now receive or have applied for TANF, Welfare, or CalWORKS",
-                "type": "checkbox",
-                "nodeId": "child_support_receive_or_applied_tanf_welfare_calworks",
-                "textboxText": ""
-              }
-            ]
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [
-            "I do not have a child support order and I want one",
-            "I have a child support order and I want it changed",
-            "I now receive or have applied for TANF, Welfare, or CalWORKS"
-          ],
-          "labels": [],
-          "nameId": "child_support_situation",
-          "placeholder": ""
-        },
-        {
-          "questionId": 109,
-          "text": "How many wireless phone numbers do you want transferred to you?",
-          "type": "numberedDropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "108",
-                "prevAnswer": "I do not have a child support order and I want one"
-              },
-              {
-                "prevQuestion": "108",
-                "prevAnswer": "I have a child support order and I want it changed"
-              },
-              {
-                "prevQuestion": "108",
-                "prevAnswer": "I now receive or have applied for TANF, Welfare, or CalWORKS"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "min": "0",
-          "max": "4",
-          "nodeId": "wireless_transfer_phone",
-          "entryTitle": "Phone Number",
-          "allFieldsInOrder": [
-            {
-              "type": "checkbox",
-              "fieldName": "Whose number is it?",
-              "selectionType": "single",
-              "required": "required",
-              "options": [
-                {
-                  "text": "My number",
-                  "nodeId": "wireless_transfer_phone_{n}_is_my_number"
-                },
-                {
-                  "text": "Number of a child in my care",
-                  "nodeId": "wireless_transfer_phone_{n}_is_child_number"
-                }
-              ],
-              "order": 1
-            },
-            {
-              "type": "phone",
-              "label": "Phone number (including area code)",
-              "nodeId": "wireless_transfer_phone_{n}_number",
-              "order": 2,
-              "prefill": ""
-            }
-          ]
         }
       ]
     },
@@ -12681,16 +12774,128 @@
             "enabled": true,
             "conditions": [
               {
+                "prevQuestion": "71",
+                "prevAnswer": "Order to not abuse me"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "No-contact order"
+              },
+              {
+                "prevQuestion": "101",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "106",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "107",
+                "prevAnswer": "Any Text"
+              },
+              {
                 "prevQuestion": "108",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "83",
+                "prevAnswer": "I own the home"
+              },
+              {
+                "prevQuestion": "83",
+                "prevAnswer": "I have lived at this address for a while"
+              },
+              {
+                "prevQuestion": "83",
+                "prevAnswer": "My name is on the lease"
+              },
+              {
+                "prevQuestion": "83",
+                "prevAnswer": "I pay for some or all of the rent or mortgage"
+              },
+              {
+                "prevQuestion": "83",
+                "prevAnswer": "I live at this address with my children"
+              },
+              {
+                "prevQuestion": "87",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "74",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Child custody and visitation"
+              },
+              {
+                "prevQuestion": "109",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "82",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Health and other insurance"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Record communications"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Property restraint"
+              },
+              {
+                "prevQuestion": "92",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "100",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "102",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Pay expenses caused by the abuse"
+              },
+              {
+                "prevQuestion": "77",
                 "prevAnswer": "I do not have a child support order and I want one"
               },
               {
-                "prevQuestion": "108",
+                "prevQuestion": "77",
                 "prevAnswer": "I have a child support order and I want it changed"
               },
               {
-                "prevQuestion": "108",
+                "prevQuestion": "77",
                 "prevAnswer": "I now receive or have applied for TANF, Welfare, or CalWORKS"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Spousal support"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Lawyer's fees and costs"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Batterer intervention program"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Transfer of wireless phone account"
+              },
+              {
+                "prevQuestion": "78",
+                "prevAnswer": "Any Text"
               }
             ]
           },
@@ -12785,16 +12990,128 @@
             "enabled": true,
             "conditions": [
               {
+                "prevQuestion": "71",
+                "prevAnswer": "Order to not abuse me"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "No-contact order"
+              },
+              {
+                "prevQuestion": "101",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "106",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "107",
+                "prevAnswer": "Any Text"
+              },
+              {
                 "prevQuestion": "108",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "83",
+                "prevAnswer": "I own the home"
+              },
+              {
+                "prevQuestion": "83",
+                "prevAnswer": "I have lived at this address for a while"
+              },
+              {
+                "prevQuestion": "83",
+                "prevAnswer": "My name is on the lease"
+              },
+              {
+                "prevQuestion": "83",
+                "prevAnswer": "I pay for some or all of the rent or mortgage"
+              },
+              {
+                "prevQuestion": "83",
+                "prevAnswer": "I live at this address with my children"
+              },
+              {
+                "prevQuestion": "87",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "74",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Child custody and visitation"
+              },
+              {
+                "prevQuestion": "109",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "82",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Health and other insurance"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Record communications"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Property restraint"
+              },
+              {
+                "prevQuestion": "92",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "100",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "102",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Pay expenses caused by the abuse"
+              },
+              {
+                "prevQuestion": "77",
                 "prevAnswer": "I do not have a child support order and I want one"
               },
               {
-                "prevQuestion": "108",
+                "prevQuestion": "77",
                 "prevAnswer": "I have a child support order and I want it changed"
               },
               {
-                "prevQuestion": "108",
+                "prevQuestion": "77",
                 "prevAnswer": "I now receive or have applied for TANF, Welfare, or CalWORKS"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Spousal support"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Lawyer's fees and costs"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Batterer intervention program"
+              },
+              {
+                "prevQuestion": "71",
+                "prevAnswer": "Transfer of wireless phone account"
+              },
+              {
+                "prevQuestion": "78",
+                "prevAnswer": "Any Text"
               }
             ]
           },
@@ -12887,144 +13204,6 @@
           "labels": [],
           "nameId": "has_lawyer",
           "placeholder": ""
-        },
-        {
-          "questionId": 112,
-          "text": "Your lawyer's information",
-          "type": "multipleTextboxes",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "111",
-                "prevAnswer": "Yes"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "pdfName": "",
-            "pdfDisplayName": "",
-            "stripePriceId": "",
-            "conditions": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Lawyer's name",
-              "nodeId": "person_asking_protection_lawyer_name",
-              "order": 1,
-              "prefill": ""
-            },
-            {
-              "type": "label",
-              "label": "State bar number",
-              "nodeId": "person_asking_protection_lawyer_state_bar_number",
-              "order": 2,
-              "prefill": ""
-            },
-            {
-              "type": "label",
-              "label": "Law firm name",
-              "nodeId": "person_asking_protection_lawyer_firm_name",
-              "order": 3,
-              "prefill": ""
-            }
-          ],
-          "textboxes": [
-            {
-              "label": "",
-              "nameId": "person_asking_protection_lawyer_name",
-              "placeholder": "name"
-            },
-            {
-              "label": "",
-              "nameId": "person_asking_protection_lawyer_state_bar_number",
-              "placeholder": "state_bar_number"
-            },
-            {
-              "label": "",
-              "nameId": "person_asking_protection_lawyer_firm_name",
-              "placeholder": "firm_name"
-            }
-          ],
-          "amounts": [],
-          "nodeId": "person_asking_protection_lawyer"
         }
       ]
     },
@@ -28595,7 +28774,7 @@
   "alertRules": [
     {
       "id": "alertRule0",
-      "alertNodeId": "776",
+      "alertNodeId": "768",
       "mode": "all",
       "message": "You do not qualify for this kind of restraining order unless you checked one of the other relationships listed above.",
       "conditions": [
@@ -28638,7 +28817,7 @@
     },
     {
       "id": "alertRule1",
-      "alertNodeId": "784",
+      "alertNodeId": "776",
       "mode": "all",
       "message": "A property restraint order is only available if you are married to or a registered domestic partner of the person you want protection from.",
       "conditions": [
@@ -28656,7 +28835,7 @@
     },
     {
       "id": "alertRule2",
-      "alertNodeId": "787",
+      "alertNodeId": "779",
       "mode": "all",
       "message": "Spousal support is only available if you are married to or a registered domestic partner of the person you want protection from.",
       "conditions": [
@@ -28674,7 +28853,7 @@
     },
     {
       "id": "alertRule3",
-      "alertNodeId": "790",
+      "alertNodeId": "782",
       "mode": "all",
       "message": "Child support is only available if you have a minor child with the person you want protection from.",
       "conditions": [

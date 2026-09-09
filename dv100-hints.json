@@ -750,27 +750,45 @@
       }
     },
     "move_out_home_address": {
-      "text": "Which home must the person move out of?"
+      "text": "Which home must the person move out of?",
+      "conditional": {
+        "onlyWhen": "move_out_order_requested"
+      }
     },
     "other_orders_description": {
       "text": "What other orders do you want?",
-      "type": "bigParagraph"
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "other_orders_requested"
+      }
     },
     "control_of_property_description": {
       "text": "Which property do you want control of?",
-      "type": "bigParagraph"
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "control_of_property_order_requested"
+      }
     },
     "control_of_property_reason": {
       "text": "Why do you want control of that property?",
-      "type": "bigParagraph"
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "control_of_property_order_requested"
+      }
     },
     "extend_service_deadline_reason": {
       "text": "Why do you need more time to serve the person?",
-      "type": "bigParagraph"
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "extend_service_deadline_requested"
+      }
     },
     "property_debts_payment_reason": {
       "text": "Why should the person pay these debts?",
-      "type": "bigParagraph"
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested"
+      }
     },
     "additional_pages_count": {
       "text": "How many extra pages are attached?",
@@ -1088,7 +1106,10 @@
       "text": "What is your pay to?"
     },
     "child_support_situation": {
-      "text": "What is your child support situation?"
+      "text": "What is your child support situation?",
+      "conditional": {
+        "onlyWhen": "child_support_order_requested"
+      }
     },
     "property_debt_1_for": {
       "text": "What is your for?"
@@ -1245,7 +1266,10 @@
       "text": "What is your amount?"
     },
     "same_workplace_or_school": {
-      "text": "Do you and the person share a workplace or school?"
+      "text": "Do you and the person share a workplace or school?",
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested"
+      }
     },
     "protected_animal_3_color": {
       "text": "What is your color?"
@@ -1254,7 +1278,10 @@
       "text": "What is your name or other way to identify animal?"
     },
     "property_debt_special_finding": {
-      "text": "Do you want a special finding that the abuse caused these debts?"
+      "text": "Do you want a special finding that the abuse caused these debts?",
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested"
+      }
     },
     "protected_animal_4_type": {
       "text": "What is your of animal?"
@@ -1287,7 +1314,10 @@
       "text": "Do you have stay away from the animals?"
     },
     "property_debt_how_made_known": {
-      "text": "Do you know how the person made these debts?"
+      "text": "Do you know how the person made these debts?",
+      "conditional": {
+        "onlyWhen": "property_debt_special_finding_yes"
+      }
     },
     "animal_stay_away_distance": {
       "text": "How far must the person stay away from the animals?",
@@ -1317,7 +1347,10 @@
     },
     "animal_sole_possession_other_reason_line_1": {
       "text": "Why else should you have the animals?",
-      "type": "bigParagraph"
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested"
+      }
     },
     "has_additional_pages": {
       "text": "Did you attach additional paper or forms?"
@@ -1335,13 +1368,22 @@
       }
     },
     "animal_order_stay_away_requested_yes": {
-      "text": "Do you want the judge to order the person to stay away from your animals?"
+      "text": "Do you want the judge to order the person to stay away from your animals?",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested"
+      }
     },
     "animal_order_no_harm_or_transfer_yes": {
-      "text": "Do you want the judge to order the person not to harm, hide, or give away your animals?"
+      "text": "Do you want the judge to order the person not to harm, hide, or give away your animals?",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested"
+      }
     },
     "animal_order_sole_possession_requested_yes": {
-      "text": "Do you want the judge to give you sole care and control of your animals?"
+      "text": "Do you want the judge to give you sole care and control of your animals?",
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested"
+      }
     },
     "recent_restraining_order": {
       "conditional": {
@@ -1358,7 +1400,11 @@
         "onlyWhen": "person_to_restrain_firearms_yes_yes"
       }
     },
-    "property_debt_special_finding_debts": {},
+    "property_debt_special_finding_debts": {
+      "conditional": {
+        "onlyWhen": "property_debt_special_finding_yes"
+      }
+    },
     "different_abuse_incident_frequency": {
       "text": "How often has this earlier abuse happened?",
       "conditional": {
@@ -1518,6 +1564,36 @@
     "animal_sole_possession_reasons": {
       "conditional": {
         "onlyWhen": "animal_order_sole_possession_requested_yes"
+      }
+    },
+    "protected_animal": {
+      "conditional": {
+        "onlyWhen": "protect_animals_order_requested"
+      }
+    },
+    "property_debt": {
+      "conditional": {
+        "onlyWhen": "pay_property_debts_order_requested"
+      }
+    },
+    "abuse_expense": {
+      "conditional": {
+        "onlyWhen": "pay_expenses_caused_by_abuse_order_requested"
+      }
+    },
+    "wireless_transfer_phone": {
+      "conditional": {
+        "onlyWhen": "wireless_phone_account_transfer_order_requested"
+      }
+    },
+    "move_out_right_to_live": {
+      "conditional": {
+        "onlyWhen": "move_out_order_requested"
+      }
+    },
+    "live_together_or_close": {
+      "conditional": {
+        "onlyWhen": "stay_away_order_requested"
       }
     }
   },

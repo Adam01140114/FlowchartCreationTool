@@ -15,7 +15,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { execFileSync } = require('child_process');
-const { PDFDocument, PDFName, PDFNumber } = require('pdf-lib');
+const { PDFDocument, PDFName, PDFNumber, StandardFonts, rgb } = require('pdf-lib');
 const { sanitizePdfFields } = require('./auto-form/pdf-field-sanitizer');
 
 const args = process.argv.slice(2);
@@ -141,6 +141,128 @@ async function applyRects(bytes, moved) {
   return doc.save();
 }
 
+/**
+ * Keep the words a push button was printing.
+ *
+ * The sanitizer deletes every push button, which is right for a control and
+ * wrong for the rest. DV-100 page 13 says "You must complete at least three
+ * additional forms: Form DV-110, Temporary Restraining Order ...", and DV-110
+ * there is a push button whose only job is to draw those six characters and
+ * link to the form. Delete it and the sentence goes out to a filer as "Form ,
+ * Temporary Restraining Order" - six numbers missing from the list of forms
+ * they are being told to file.
+ *
+ * The text is not in the appearance stream, which draws nothing; it is the
+ * button's /MK /CA caption, which a viewer paints. So it has to be drawn onto
+ * the page as real ink before the widget goes.
+ *
+ * Which buttons are words and which are controls is not a guess. A control
+ * carries /MK /BG, a background colour - that is what makes it look like a
+ * button rather than like text - and the Print, Save and Clear buttons all
+ * have one. The form numbers have none. The notice that says "please press the
+ * Clear This Form button" has none either, but it sits in the same strip as
+ * those coloured buttons and is about them, so a caption whose box shares a
+ * line with a control is dropped along with the controls it describes.
+ *
+ * Last: a form that already prints the caption in its page content would end
+ * up saying it twice, so a caption is only drawn where the page is bare.
+ */
+async function buttonCaptions(bytes) {
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  const doc = await pdfjs.getDocument({
+    data: new Uint8Array(bytes), isEvalSupported: false,
+    standardFontDataUrl: path.join(__dirname, 'node_modules', 'pdfjs-dist', 'standard_fonts') + path.sep,
+  }).promise;
+
+  const wanted = [];
+  for (let n = 1; n <= doc.numPages; n++) {
+    const page = await doc.getPage(n);
+    const printed = (await page.getTextContent()).items
+      .filter((i) => i.str && i.str.trim())
+      .map((i) => ({ str: i.str, left: i.transform[4], right: i.transform[4] + (i.width || 0), y: i.transform[5] }));
+
+    const buttons = (await page.getAnnotations())
+      .filter((a) => a.subtype === 'Widget' && a.pushButton);
+    const controls = buttons.filter((a) => a.backgroundColor);
+
+    buttons.forEach((a) => {
+      if (a.backgroundColor) return;                       // a control, not words
+      const caption = String(a.buttonValue || a.alternativeText || '').trim();
+      if (!caption) return;
+      const [x1, y1, x2, y2] = a.rect;
+      const left = Math.min(x1, x2), right = Math.max(x1, x2);
+      const bottom = Math.min(y1, y2), top = Math.max(y1, y2);
+
+      // in the strip of coloured buttons, so it is about them
+      const inControlStrip = controls.some((c) => {
+        const cb = Math.min(c.rect[1], c.rect[3]), ct = Math.max(c.rect[1], c.rect[3]);
+        return Math.min(top, ct) - Math.max(bottom, cb) > 0;
+      });
+      if (inControlStrip) return;
+
+      // The page already says it. This has to compare the words, not just ask
+      // whether something is in the way: a form number sits flush against the
+      // comma that follows it, and "," at x148-151 overlaps a box ending at 151.
+      // Testing for any overlap dropped CLETS-001, SER-001 and a URL on the
+      // strength of one comma and one full stop.
+      const under = printed
+        .filter((t) => t.y >= bottom - 2 && t.y <= top + 2
+          && Math.min(right, t.right) - Math.max(left, t.left) > 2)
+        .map((t) => t.str).join('');
+      const bare = (s) => s.replace(/\s+/g, '').toLowerCase();
+      if (bare(under).indexOf(bare(caption)) >= 0) return;
+
+      wanted.push({ page: n, caption, left, right, bottom, top, appearance: a.defaultAppearance || '' });
+    });
+  }
+  return wanted;
+}
+
+/** Draw those captions onto the rebuilt document as ordinary text. */
+async function drawCaptions(bytes, captions) {
+  if (!captions.length) return bytes;
+  const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+  const pages = doc.getPages();
+  const fonts = new Map();
+  const fontFor = async (appearance) => {
+    const bold = /bold/i.test(appearance);
+    const times = /times/i.test(appearance);
+    const key = (times ? 'times' : 'helv') + (bold ? '-bold' : '');
+    if (!fonts.has(key)) {
+      fonts.set(key, await doc.embedFont(times
+        ? (bold ? StandardFonts.TimesRomanBold : StandardFonts.TimesRoman)
+        : (bold ? StandardFonts.HelveticaBold : StandardFonts.Helvetica)));
+    }
+    return fonts.get(key);
+  };
+
+  for (const c of captions) {
+    const page = pages[c.page - 1];
+    if (!page) continue;
+    const font = await fontFor(c.appearance);
+
+    // The size and colour the button was going to be painted in.
+    const sizeMatch = /([\d.]+)\s+Tf/.exec(c.appearance);
+    let size = sizeMatch ? Number(sizeMatch[1]) : 0;
+    if (!size) size = Math.min(11, (c.top - c.bottom) * 0.8);
+    const rgbMatch = /([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+rg/.exec(c.appearance);
+    const grayMatch = /(?:^|\s)([\d.]+)\s+g(?:\s|$)/.exec(c.appearance);
+    const colour = rgbMatch
+      ? rgb(Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3]))
+      : rgb(Number(grayMatch ? grayMatch[1] : 0), Number(grayMatch ? grayMatch[1] : 0),
+            Number(grayMatch ? grayMatch[1] : 0));
+
+    // A push button centres its caption in its box, both ways.
+    let width;
+    try { width = font.widthOfTextAtSize(c.caption, size); }
+    catch (e) { continue; }                                 // a glyph this font has not got
+    const x = Math.max(c.left, c.left + ((c.right - c.left) - width) / 2);
+    const y = c.bottom + ((c.top - c.bottom) - size) / 2 + size * 0.22;
+    page.drawText(c.caption, { x, y, size, font, color: colour });
+  }
+  return doc.save();
+}
+
 async function names(bytes) {
   const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
   return doc.getForm().getFields().map((f) => f.getName());
@@ -152,7 +274,8 @@ async function main() {
     const config = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, base + '-field-config.json'), 'utf8'));
     const result = await sanitizePdfFields(decrypt(source), config);
     const moved = await unoverlapLabels(result.bytes);
-    const rebuilt = await applyRects(result.bytes, moved);
+    const captions = await buttonCaptions(decrypt(source));
+    const rebuilt = await drawCaptions(await applyRects(result.bytes, moved), captions);
     const after = result.fieldNames;
     const target = path.join(OUT_DIR, base + '.pdf');
     const before = fs.existsSync(target) ? await names(fs.readFileSync(target)) : [];
@@ -165,6 +288,8 @@ async function main() {
     added.forEach((n) => console.log('    + ' + n));
     removed.forEach((n) => console.log('    - ' + n));
     moved.forEach((m) => console.log('    box lowered off its own label: ' + m.name + ' (page ' + m.page + ', top ' + m.from + ' -> ' + m.to + ')'));
+    if (captions.length) console.log('    ' + captions.length + ' button caption(s) drawn as text: '
+      + captions.map((c) => c.caption).join(', ').slice(0, 160));
     if (!CHECK) {
       fs.writeFileSync(target, rebuilt);
       console.log('    written to ' + target);

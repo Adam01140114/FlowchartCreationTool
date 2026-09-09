@@ -93,6 +93,66 @@ document.querySelectorAll('.hidden-logic-config').length   // 299 for the DV pac
 and confirm the emitted HTML carries a non-empty `var hiddenLogicConfigs = [`.
 The editor's own **Preview Form** does this for you; a scripted export does not.
 
+## An order owns its questions
+
+A court form asks which orders you want, and then asks about each one. Those
+follow-ups belong to the order, and the option that asks for it is their gate:
+
+```json
+"questions": {
+  "protected_animal":  { "conditional": { "onlyWhen": "protect_animals_order_requested" } },
+  "animal_order_stay_away_requested_yes": { "conditional": { "onlyWhen": "protect_animals_order_requested" } }
+}
+```
+
+Gate the **whole run**, not its first question. Gating only the entry moved the
+block and left its tail on the spine, so "Why do you have the right to live
+there?" was still asked of a filer who never asked anyone to move out. A
+question that already waits on something inside its own run - the yardage waits
+on the stay-away answer - inherits the order through that parent and is left
+alone.
+
+Sections switch on any question in interview order, branches included, so a
+section may open inside a branch. It did not always: assignment used to run
+along the spine and hand each branch the section of its top-level question,
+which emptied "Animals, Property and Support" the moment items 16 through 28
+moved under the orders question.
+
+## A repeating block behind a gate starts at one
+
+"Does the person have firearms? Yes" is followed by "How many firearms do you
+know about?", and a spinner starting at zero offers a filer who just said yes
+the answer none. The compiler raises the minimum to one for any block reached
+through an answer and prints which:
+
+```
+ * gated block firearm_item -> minimum 1 entry (an answer already said there is at least one)
+```
+
+A block on the spine keeps whatever the hint says, because there zero can be a
+real answer. A hint that sets `"min": 0` behind a gate is overridden, visibly.
+
+## Buttons that were printing words
+
+The sanitizer deletes push buttons, which is right for a control and wrong for
+the rest. DV-100 page 13 lists the forms to file, and each form number is a push
+button whose caption is the only place those characters exist - deleting it
+printed "Form , *Temporary Restraining Order*". The caption is not in the
+appearance stream, which draws nothing; it is `/MK /CA`, which a viewer paints.
+So it is drawn onto the page as real ink before the widget goes:
+
+```
+    10 button caption(s) drawn as text: DV-110, DV-109, CLETS-001, DV-105, ...
+```
+
+The test is intrinsic, not a list. A control carries `/MK /BG`, a background
+colour - that is what makes it look like a button rather than like text - and
+Print, Save and Clear all have one. A caption with no background that shares a
+line with those coloured buttons is the notice about them, and goes too. And a
+caption is only drawn where the page does not already say it: that comparison is
+on the words, because a form number sits flush against the comma after it and
+testing for any overlap dropped three captions on the strength of one comma.
+
 ## A field box that covers the form's own label
 
 `pipeline-sanitize.js` lowers the top of any multi-line field whose rectangle
