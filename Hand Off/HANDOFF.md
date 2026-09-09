@@ -94,6 +94,26 @@ where it should be one *ascender*, so on a ruled form the printed rule strikes
 through the answer. See [`PDF-PAGE-AUDIT.md`](./PDF-PAGE-AUDIT.md), which is
 the only check that sees any of this.
 
+### Lay text out by the size of the box, not by the field's flag
+
+A PDF field's multiline flag says what a person is allowed to *type*. It says
+nothing about how much room the box has, and the two disagree more often than
+you would think: `extend_service_deadline_reason` on the DV-100 is flagged
+multiline and its rect is 12.00pt tall, while pdf-lib's multiline line box at
+11pt Helvetica is 12.21pt. The one line it draws does not fit, and the glyphs
+are clipped through the middle.
+
+So before drawing, compare the box against one line of the layout you are
+about to use, and fall back to single-line layout when it does not fit -
+single-line centres the text in whatever height there is. `dev-server.js`
+does this by turning the flag off for the length of one call and restoring
+it, so the saved document keeps the field as the form author declared it and
+only the appearance is drawn the other way.
+
+The general form of this rule: **a flag is a statement of intent and a
+rectangle is a fact.** Where a layout decision can be made from the geometry,
+make it from the geometry.
+
 ### In a packet, a shared field name *is* the wiring
 
 One payload fills every PDF, so a name present in two PDFs carries across.

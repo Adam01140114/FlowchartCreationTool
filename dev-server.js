@@ -198,19 +198,42 @@ function ruledLineTextAppearance(field, widget, font) {
   const wanted = lineHeight - ascender;
   if (!(wanted > 0)) return appearance;
 
+  const rectangle = widget.getRectangle();
+
+  // A box that is not as tall as one line of multiline text is a one-line box
+  // that happens to carry the multiline flag, and the paper form under it has
+  // ruled exactly one line. pdf-lib lays it out anyway, needs 12.21pt at 11pt
+  // Helvetica, is given 12.00pt, and the glyphs are clipped through the middle
+  // - which is how extend_service_deadline_reason printed on the DV-100.
+  //
+  // Single-line layout centres the text in whatever height there is, so it
+  // fits. Borrow it by turning the flag off for the length of one call: the
+  // field keeps its multiline flag in the saved document, and only the
+  // appearance is drawn the other way.
+  if (rectangle.height < lineHeight + 2) {
+    try {
+      field.disableMultiline();
+      const single = defaultTextFieldAppearanceProvider(field, widget, font);
+      return Array.isArray(single) ? single : appearance;
+    } catch (e) {
+      return appearance;
+    } finally {
+      field.enableMultiline();
+    }
+  }
+
   // Lift only into slack the box actually has. A box one line tall holds its
   // single line against the bottom already, and raising it pushes the glyphs
   // through the top edge, where the appearance is clipped and the text is cut
   // in half - which is what happened to the DV-100 item 21 explanation the
   // first time this ran. Lay the text out the way pdf-lib will to find out how
   // many lines it needs, and keep the block inside.
-  const rect = widget.getRectangle();
   const inset = 1;
   const bounds = {
     x: inset,
     y: inset,
-    width: rect.width - inset * 2,
-    height: rect.height - inset * 2,
+    width: rectangle.width - inset * 2,
+    height: rectangle.height - inset * 2,
   };
   let linesUsed = 1;
   try {

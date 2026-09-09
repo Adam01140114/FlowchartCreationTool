@@ -73,7 +73,7 @@ Each of these passed a field-value check and failed on the page.
 | `$100` in a column counting guns and rounds | A field was treated as money because its id contained `_amount`. The schema says `type: "amount"` vs `type: "label"`; the schema is now asked first. |
 | A printed rule struck through the answer | pdf-lib starts a multiline block one *line-height* below the top of the box where it should be one *ascender* — 12.21pt against 7.90pt at 11pt Helvetica. Fixed by `ruledLineTextAppearance` in `dev-server.js`. |
 | Text cut in half at the top of a short box | The lift above, applied to a box with no room for it. The fix clamps the lift to slack the box actually has. |
-| An answer clipped mid-glyph in a one-line box | The field's rect is 12.00pt and pdf-lib's line box for 11pt Helvetica is 12.21pt. Still open; inherent to pdf-lib's 1.2 leading. |
+| An answer clipped mid-glyph in a one-line box | The box is 12.00pt and pdf-lib's multiline line box at 11pt Helvetica is 12.21pt, so the only line it draws does not fit. Fixed: a box shorter than one line is drawn with single-line layout, which centres in whatever height there is. |
 | A repeating block's later rows simply absent | The interview allows more entries than the PDF has rows — the DV-100 asks for up to six firearms, the DV-110 table holds four. `/edit_pdf` now logs submitted values that matched no field, and flags the numbered ones. |
 
 ---
