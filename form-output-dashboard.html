@@ -304,6 +304,8 @@ function build(manifest) {
       dataPanel(form)
     ]);
     main.appendChild(section);
+    // The verdict for every page of this form, without waiting to be asked.
+    summariseForm(form.name, manifest.publishedAt);
   });
 }
 
@@ -400,31 +402,49 @@ function copyPageButton(form, n) {
  */
 function pagePanel(form, n) {
   const wrap = el('details', { class: 'page' });
-  const summary = el('summary', {}, [text('Field data'), el('span', {}, [text('')])]);
+  const summary = el('summary', {}, [text('Field data'), el('span', {}, [text('reading…')])]);
   const rows = el('div', { class: 'rows' });
   wrap.append(summary, rows);
 
-  const paint = function (fields, why) {
+  const readPage = function (fields, why) {
     const reasons = (why && why.fields) || {};
-    const mine = (fields && fields[n]) || [];
-    const real = mine.filter(function (f) { return f.kind !== 'button'; });
+    const real = ((fields && fields[n]) || []).filter(function (f) { return f.kind !== 'button'; });
     const blank = real.filter(isBlank);
     const unexplained = blank.filter(function (f) {
-      return f.kind !== 'checkbox' && reasons[f.name] && reasons[f.name].verdict === 'defect';
+      const r = reasons[f.name];
+      return f.kind !== 'checkbox' && r && (r.verdict === 'defect' || r.verdict === 'unmapped');
     });
+    return { reasons: reasons, real: real, blank: blank, unexplained: unexplained };
+  };
+
+  /**
+   * The verdict, without opening anything.
+   *
+   * The counts are the reason to open a page, so making you open it to see them
+   * is backwards - the whole point is to skim thirty-three pages and stop at the
+   * one with something wrong. The rows stay behind the click; the number does
+   * not.
+   */
+  const summarise = function (fields, why) {
+    const s = readPage(fields, why);
     // An empty field is only worth alarm when nothing accounts for it.
-    summary.lastChild.textContent = real.length + ' fields'
-      + (blank.length ? ' · ' + blank.length + ' empty' : '')
-      + (blank.length ? (unexplained.length
-          ? ' · ' + unexplained.length + ' unexplained' : ' · all accounted for') : '');
-    summary.lastChild.className = unexplained.length ? 'miss' : (blank.length ? 'ok' : '');
+    summary.lastChild.textContent = s.real.length + ' fields'
+      + (s.blank.length ? ' · ' + s.blank.length + ' empty' : '')
+      + (s.blank.length ? (s.unexplained.length
+          ? ' · ' + s.unexplained.length + ' unexplained' : ' · all accounted for') : '');
+    summary.lastChild.className = s.unexplained.length ? 'miss' : (s.blank.length ? 'ok' : '');
+  };
+
+  const paint = function (fields, why) {
+    summarise(fields, why);
+    const s = readPage(fields, why);
     rows.textContent = '';
-    if (!real.length) {
+    if (!s.real.length) {
       rows.appendChild(el('p', { class: 'empty' }, [text('No fields on this page.')]));
       return;
     }
-    blank.concat(real.filter(function (f) { return !isBlank(f); })).forEach(function (f) {
-      rows.appendChild(fieldRow(f, reasons));
+    s.blank.concat(s.real.filter(function (f) { return !isBlank(f); })).forEach(function (f) {
+      rows.appendChild(fieldRow(f, s.reasons));
     });
   };
 
@@ -438,7 +458,22 @@ function pagePanel(form, n) {
   wrap.dataset.form = form;
   wrap.dataset.page = String(n);
   wrap.__paint = paint;
+  wrap.__summarise = summarise;
   return wrap;
+}
+
+/**
+ * Fill in every page's verdict for one form, with a single pair of fetches.
+ *
+ * Both files are cached per publish, so thirty-three pages cost five requests
+ * rather than sixty-six.
+ */
+function summariseForm(name, stamp) {
+  return Promise.all([fieldsFor(name, stamp), whyFor(name, stamp)]).then(function (both) {
+    document.querySelectorAll('details.page[data-form="' + name + '"]').forEach(function (d) {
+      if (d.__summarise) d.__summarise(both[0], both[1]);
+    });
+  });
 }
 
 function isBlank(f) {
@@ -454,7 +489,8 @@ function fieldRow(f, why) {
     : (blank ? '(empty)' : String(f.value));
 
   const reason = blank && why ? why[f.name] : null;
-  const unexplained = blank && f.kind !== 'checkbox' && reason && reason.verdict === 'defect';
+  const unexplained = blank && f.kind !== 'checkbox' && reason
+    && (reason.verdict === 'defect' || reason.verdict === 'unmapped');
   const row = el('div', { class: 'row' + (blank ? ' blank' : '') + (unexplained ? ' unexplained' : '') }, [
     el('span', { class: 'k' }, [text(f.name)]),
     value
@@ -462,6 +498,11 @@ function fieldRow(f, why) {
   if (reason && reason.verdict === 'closed' && reason.gate) {
     row.appendChild(el('span', { class: 'why' }, [text(
       'closed by: ' + reason.gate + (reason.wanted ? '  —  needed "' + reason.wanted + '"' : ''))]));
+  } else if (reason && reason.verdict === 'court') {
+    row.appendChild(el('span', { class: 'why' }, [text('the court completes this')]));
+  } else if (reason && reason.verdict === 'overflow') {
+    row.appendChild(el('span', { class: 'why' }, [text(
+      'a continuation line — the answer fit on the line above')]));
   } else if (unexplained) {
     row.appendChild(el('span', { class: 'why' }, [text(
       'nothing accounts for this being empty')]));
@@ -703,6 +744,9 @@ async function poll() {
       // the values from the last one.
       document.querySelectorAll('details.data[open]').forEach(function (d) {
         loadFields(d.dataset.form, d.querySelector('.panes'), manifest.publishedAt);
+      });
+      (manifest.forms || []).forEach(function (f) {
+        summariseForm(f.name, manifest.publishedAt);
       });
       document.querySelectorAll('details.page[open]').forEach(function (d) {
         Promise.all([fieldsFor(d.dataset.form, manifest.publishedAt),

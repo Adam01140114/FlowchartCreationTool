@@ -233,6 +233,10 @@ about page two - and a list that buries the empties reads as though everything
 is fine. DV-110 page 2 says "28 fields · 27 empty", which is exactly right for
 a page that belongs to the judge.
 
+Every page shows its verdict **closed**, so thirty-three pages can be skimmed
+and the one with something wrong stops you. The counts are the reason to open a
+page, so making you open it to see them is backwards.
+
 Every blank says why it is blank. `pipeline-explain.js --json` is published
 beside the fields as `why.json`, so a page reads
 

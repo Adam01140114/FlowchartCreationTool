@@ -87,9 +87,20 @@ function gateChain(q, seen = new Set()) {
 const empty = readback.filter((f) => f.kind === 'text' && String(f.value).trim() === '');
 if (!args.includes('--json')) console.log(BASE + ': ' + empty.length + ' empty text field(s)\n');
 
-const verdicts = { branch: [], defect: [], unmapped: [], court: [] };
+// A ruled line that carries the rest of a long answer is not a field anything
+// asks for, and it is empty whenever the answer fits above it. The audit
+// already exempts these; without the same knowledge here they read as fields
+// nothing produces, which is the one verdict that means something is wrong.
+const overflow = new Set();
+try {
+  const chart = JSON.parse(fs.readFileSync(BASE + '-flowchart.json', 'utf8'));
+  (chart.continuationLines || []).forEach((c) => (c.drop || []).forEach((n) => overflow.add(n)));
+} catch (e) { /* no flowchart beside the packet */ }
+
+const verdicts = { branch: [], defect: [], unmapped: [], court: [], overflow: [] };
 empty.forEach((f) => {
   if (courtUse.has(f.name)) { verdicts.court.push({ field: f.name }); return; }
+  if (overflow.has(f.name)) { verdicts.overflow.push({ field: f.name }); return; }
   const q = byName.get(f.name);
   if (!q) { verdicts.unmapped.push({ field: f.name }); return; }
   const chain = gateChain(q);
@@ -117,12 +128,16 @@ if (args.includes('--json')) {
   });
   verdicts.unmapped.forEach((e) => { reason[e.field] = { verdict: 'unmapped' }; });
   verdicts.court.forEach((e) => { reason[e.field] = { verdict: 'court' }; });
+  verdicts.overflow.forEach((e) => {
+    reason[e.field] = { verdict: 'overflow',
+      question: 'the line above it held the whole answer' };
+  });
   console.log(JSON.stringify({
     form: BASE,
     counts: {
       empty: empty.length, closed: verdicts.branch.length,
       defect: verdicts.defect.length, unmapped: verdicts.unmapped.length,
-      court: verdicts.court.length
+      court: verdicts.court.length, overflow: verdicts.overflow.length
     },
     fields: reason
   }, null, 1));
@@ -148,6 +163,7 @@ show('BRANCH — a gate the answers closed', verdicts.branch, true);
 show('DEFECT — question exists, gates open, still empty', verdicts.defect, true);
 show('UNMAPPED — no question produces this field (rule 1)', verdicts.unmapped, false);
 console.log('LEFT FOR THE COURT — blank by design (' + verdicts.court.length + ')');
+show('OVERFLOW LINE — the answer fit on the line above', verdicts.overflow, false);
 if (verdicts.court.length) {
   console.log('  ' + verdicts.court.map((e) => e.field).join(', '));
 }
