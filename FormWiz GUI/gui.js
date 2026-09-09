@@ -5873,6 +5873,7 @@ function openLinkedFieldModal() {
     if (linkedFieldIdInput) {
         linkedFieldIdInput.value = '';
     }
+    setLinkedFieldJoinInputs(undefined);
     addLinkedFieldDropdown();
     addLinkedFieldDropdown();
     document.getElementById('linkedFieldModal').style.display = 'block';
@@ -5910,6 +5911,18 @@ function createLinkedFieldModal() {
             <div style="margin-bottom: 20px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: bold;">Linked Field ID:</label>
                 <input type="text" id="linkedFieldIdInput" placeholder="Enter linked field ID (e.g., linked_name_address)" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">
+                    <input type="checkbox" id="linkedFieldJoinEnabled" style="margin-right: 8px;">
+                    These boxes are parts of one PDF field
+                </label>
+                <input type="text" id="linkedFieldJoinInput" placeholder="Separator between the parts, e.g. a comma and a space" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                <p style="margin: 6px 0 0; color: #666; font-size: 0.85em;">
+                    Off, the boxes hold the same answer and the longest one is kept.
+                    On, they hold different halves of one PDF box and are joined in order -
+                    "Court name and street address" prints as one line and is asked as two questions.
+                </p>
             </div>
             <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
                 <button type="button" onclick="addLinkedFieldDropdown()" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
@@ -7540,11 +7553,21 @@ function finalizeLinkedField() {
         removeLinkedFieldDisplay(window.editingLinkedFieldId);
         window.editingLinkedFieldId = null;
     }
-    createLinkedFieldDisplay(selectedFields, linkedFieldId);
+    createLinkedFieldDisplay(selectedFields, linkedFieldId, readLinkedFieldJoinInputs());
     closeLinkedFieldModal();
 }
 // Create the linked field display
-function createLinkedFieldDisplay(selectedFields, linkedFieldId) {
+/**
+ * One linked-field entry in the builder.
+ *
+ * A separator makes this a join rather than a mirror: the boxes hold
+ * different halves of one PDF field instead of competing versions of the same
+ * answer. Editing a link removes the display and builds it again, so a join
+ * that is not carried through here comes back as a mirror - and the runtime
+ * then deletes the shorter half as a duplicate. A court name typed beside a
+ * longer street address vanished a tenth of a second after it was written.
+ */
+function createLinkedFieldDisplay(selectedFields, linkedFieldId, join) {
     const displayId = `linkedField${linkedFieldCounter++}`;
     const linkedFieldsContainer = ensureLinkedFieldsPanel();
     if (!linkedFieldsContainer) return;
@@ -7593,8 +7616,26 @@ function createLinkedFieldDisplay(selectedFields, linkedFieldId) {
     window.linkedFieldsConfig.push({
         id: displayId,
         linkedFieldId: linkedFieldId,
-        fields: selectedFields.map(config => config.selectedValue)
+        fields: selectedFields.map(config => config.selectedValue),
+        join: typeof join === 'string' ? join : undefined
     });
+}
+
+/** What the dialog says the separator is, or nothing at all for a mirror. */
+function readLinkedFieldJoinInputs() {
+    const enabled = document.getElementById('linkedFieldJoinEnabled');
+    if (!enabled || !enabled.checked) return undefined;
+    const value = document.getElementById('linkedFieldJoinInput');
+    return value ? value.value : '';
+}
+
+/** Show a link the way it is stored: a string is a join, absent is a mirror. */
+function setLinkedFieldJoinInputs(join) {
+    const enabled = document.getElementById('linkedFieldJoinEnabled');
+    const value = document.getElementById('linkedFieldJoinInput');
+    const isJoin = typeof join === 'string';
+    if (enabled) enabled.checked = isJoin;
+    if (value) value.value = isJoin ? join : '';
 }
 // Remove a linked field display
 function removeLinkedFieldDisplay(linkedFieldId) {
@@ -7634,6 +7675,7 @@ function editLinkedFieldDisplay(displayId) {
     if (linkedFieldIdInput) {
         linkedFieldIdInput.value = config.linkedFieldId || '';
     }
+    setLinkedFieldJoinInputs(config.join);
     // Create dropdowns for each field
     (config.fields || []).forEach(fieldId => {
         addLinkedFieldDropdown();
