@@ -19342,6 +19342,269 @@
               "height": 60
             },
             "_connectorTarget": "DV-109"
+          },
+          {
+            "id": "772",
+            "vertex": true,
+            "edge": false,
+            "value": "<div style=\"text-align:center;padding:6px;\"><strong>ALERT</strong><br><span style=\"font-size:12px;\">dv100_relationship_required</span></div>",
+            "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=alertNode;spacing=12;fontSize=14;align=center;verticalAlign=middle;strokeWidth=3;fillColor=#ffffff;fontColor=#1976d2;strokeColor=#1976d2;nodeId=dv100_relationship_required;",
+            "geometry": {
+              "x": 3600,
+              "y": 4340,
+              "width": 320,
+              "height": 130
+            },
+            "_questionText": "You do not qualify for this kind of restraining order unless you checked one of the other relationships listed above.",
+            "_alertText": "You do not qualify for this kind of restraining order unless you checked one of the other relationships listed above.",
+            "_alertMode": "all",
+            "_disqualifierId": "dv100_relationship_required"
+          },
+          {
+            "id": "773",
+            "vertex": false,
+            "edge": true,
+            "value": "",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;",
+            "source": "39",
+            "target": "772",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "774",
+            "vertex": false,
+            "edge": true,
+            "value": "NOT",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;alertNegate=1;dashed=1;strokeColor=#d32f2f;",
+            "source": "21",
+            "target": "772",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "775",
+            "vertex": false,
+            "edge": true,
+            "value": "NOT",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;alertNegate=1;dashed=1;strokeColor=#d32f2f;",
+            "source": "22",
+            "target": "772",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "776",
+            "vertex": false,
+            "edge": true,
+            "value": "NOT",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;alertNegate=1;dashed=1;strokeColor=#d32f2f;",
+            "source": "23",
+            "target": "772",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "777",
+            "vertex": false,
+            "edge": true,
+            "value": "NOT",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;alertNegate=1;dashed=1;strokeColor=#d32f2f;",
+            "source": "24",
+            "target": "772",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "778",
+            "vertex": false,
+            "edge": true,
+            "value": "NOT",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;alertNegate=1;dashed=1;strokeColor=#d32f2f;",
+            "source": "25",
+            "target": "772",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "779",
+            "vertex": false,
+            "edge": true,
+            "value": "NOT",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;alertNegate=1;dashed=1;strokeColor=#d32f2f;",
+            "source": "26",
+            "target": "772",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "780",
+            "vertex": true,
+            "edge": false,
+            "value": "<div style=\"text-align:center;padding:6px;\"><strong>ALERT</strong><br><span style=\"font-size:12px;\">dv100_property_restraint_requires_marriage</span></div>",
+            "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=alertNode;spacing=12;fontSize=14;align=center;verticalAlign=middle;strokeWidth=3;fillColor=#ffffff;fontColor=#1976d2;strokeColor=#1976d2;nodeId=dv100_property_restraint_requires_marriage;",
+            "geometry": {
+              "x": 3600,
+              "y": 25600,
+              "width": 320,
+              "height": 130
+            },
+            "_questionText": "A property restraint order is only available if you are married to or a registered domestic partner of the person you want protection from.",
+            "_alertText": "A property restraint order is only available if you are married to or a registered domestic partner of the person you want protection from.",
+            "_alertMode": "all",
+            "_disqualifierId": "dv100_property_restraint_requires_marriage"
+          },
+          {
+            "id": "781",
+            "vertex": false,
+            "edge": true,
+            "value": "",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;",
+            "source": "205",
+            "target": "780",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "782",
+            "vertex": false,
+            "edge": true,
+            "value": "NOT",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;alertNegate=1;dashed=1;strokeColor=#d32f2f;",
+            "source": "22",
+            "target": "780",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "783",
+            "vertex": true,
+            "edge": false,
+            "value": "<div style=\"text-align:center;padding:6px;\"><strong>ALERT</strong><br><span style=\"font-size:12px;\">dv100_spousal_support_requires_marriage</span></div>",
+            "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=alertNode;spacing=12;fontSize=14;align=center;verticalAlign=middle;strokeWidth=3;fillColor=#ffffff;fontColor=#1976d2;strokeColor=#1976d2;nodeId=dv100_spousal_support_requires_marriage;",
+            "geometry": {
+              "x": 3600,
+              "y": 25940,
+              "width": 320,
+              "height": 130
+            },
+            "_questionText": "Spousal support is only available if you are married to or a registered domestic partner of the person you want protection from.",
+            "_alertText": "Spousal support is only available if you are married to or a registered domestic partner of the person you want protection from.",
+            "_alertMode": "all",
+            "_disqualifierId": "dv100_spousal_support_requires_marriage"
+          },
+          {
+            "id": "784",
+            "vertex": false,
+            "edge": true,
+            "value": "",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;",
+            "source": "209",
+            "target": "783",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "785",
+            "vertex": false,
+            "edge": true,
+            "value": "NOT",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;alertNegate=1;dashed=1;strokeColor=#d32f2f;",
+            "source": "22",
+            "target": "783",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "786",
+            "vertex": true,
+            "edge": false,
+            "value": "<div style=\"text-align:center;padding:6px;\"><strong>ALERT</strong><br><span style=\"font-size:12px;\">dv100_child_support_requires_minor_child</span></div>",
+            "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=alertNode;spacing=12;fontSize=14;align=center;verticalAlign=middle;strokeWidth=3;fillColor=#ffffff;fontColor=#1976d2;strokeColor=#1976d2;nodeId=dv100_child_support_requires_minor_child;",
+            "geometry": {
+              "x": 3600,
+              "y": 26280,
+              "width": 320,
+              "height": 130
+            },
+            "_questionText": "Child support is only available if you have a minor child with the person you want protection from.",
+            "_alertText": "Child support is only available if you have a minor child with the person you want protection from.",
+            "_alertMode": "all",
+            "_disqualifierId": "dv100_child_support_requires_minor_child"
+          },
+          {
+            "id": "787",
+            "vertex": false,
+            "edge": true,
+            "value": "",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;",
+            "source": "208",
+            "target": "786",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          {
+            "id": "788",
+            "vertex": false,
+            "edge": true,
+            "value": "NOT",
+            "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;alertNegate=1;dashed=1;strokeColor=#d32f2f;",
+            "source": "21",
+            "target": "786",
+            "geometry": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
           }
         ],
         "sectionPrefs": {

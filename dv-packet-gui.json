@@ -14130,6 +14130,105 @@
       "join": ", "
     }
   ],
+  "alertRules": [
+    {
+      "id": "alertRule0",
+      "alertNodeId": "772",
+      "mode": "all",
+      "message": "You do not qualify for this kind of restraining order unless you checked one of the other relationships listed above.",
+      "conditions": [
+        {
+          "questionId": "15",
+          "op": "is",
+          "value": "No"
+        },
+        {
+          "questionId": "12",
+          "op": "isNot",
+          "value": "We have a child or children together"
+        },
+        {
+          "questionId": "12",
+          "op": "isNot",
+          "value": "We are married or registered domestic partners"
+        },
+        {
+          "questionId": "12",
+          "op": "isNot",
+          "value": "We used to be married or registered domestic partners"
+        },
+        {
+          "questionId": "12",
+          "op": "isNot",
+          "value": "We are dating or used to date"
+        },
+        {
+          "questionId": "12",
+          "op": "isNot",
+          "value": "We are or used to be engaged to be married"
+        },
+        {
+          "questionId": "12",
+          "op": "isNot",
+          "value": "We are related"
+        }
+      ]
+    },
+    {
+      "id": "alertRule1",
+      "alertNodeId": "780",
+      "mode": "all",
+      "message": "A property restraint order is only available if you are married to or a registered domestic partner of the person you want protection from.",
+      "conditions": [
+        {
+          "questionId": "71",
+          "op": "is",
+          "value": "Property restraint"
+        },
+        {
+          "questionId": "12",
+          "op": "isNot",
+          "value": "We are married or registered domestic partners"
+        }
+      ]
+    },
+    {
+      "id": "alertRule2",
+      "alertNodeId": "783",
+      "mode": "all",
+      "message": "Spousal support is only available if you are married to or a registered domestic partner of the person you want protection from.",
+      "conditions": [
+        {
+          "questionId": "71",
+          "op": "is",
+          "value": "Spousal support"
+        },
+        {
+          "questionId": "12",
+          "op": "isNot",
+          "value": "We are married or registered domestic partners"
+        }
+      ]
+    },
+    {
+      "id": "alertRule3",
+      "alertNodeId": "786",
+      "mode": "all",
+      "message": "Child support is only available if you have a minor child with the person you want protection from.",
+      "conditions": [
+        {
+          "questionId": "71",
+          "op": "is",
+          "value": "Child support"
+        },
+        {
+          "questionId": "12",
+          "op": "isNot",
+          "value": "We have a child or children together"
+        }
+      ]
+    }
+  ],
   "linkedCheckboxes": [],
   "inverseCheckboxes": [],
   "projectForms": [

@@ -96,6 +96,11 @@ forms.forEach((entry) => {
   const deadEnds = vertices.filter((c) => {
     const t = nodeType(c);
     if (t === 'end' || t === 'linkedLogic' || t === 'connector') return false;
+    // An alert says something and stops. It is terminal the way an End node is,
+    // and arrows point *into* it - one per condition - so having no way out is
+    // what a correctly wired alert looks like, not a stranded filer.
+    const q = attr(c, 'questionType');
+    if (q === 'alertNode' || q === 'hardAlertNode') return false;
     return !(outgoing.get(String(c.id)) || []).length;
   });
   if (deadEnds.length) {
