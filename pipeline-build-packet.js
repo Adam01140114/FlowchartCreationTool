@@ -25,6 +25,8 @@ const fs = require('fs');
 
 const SPEC = process.argv[2] || 'dv-packet.spec.json';
 const OUT = process.argv[3] || 'dv-packet-project.json';
+const DISQUALIFIERS = process.argv[4] || 'dv-packet-disqualifiers.json';
+const alerted = {};
 
 const CONNECTOR_STYLE = 'shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;'
   + 'nodeType=connector;spacing=12;fontSize=14;align=center;verticalAlign=middle;'
@@ -55,17 +57,43 @@ function usedSectionNames(flowchart) {
     .filter(Boolean);
 }
 
+/**
+ * Find the option cell for one answer to one question.
+ *
+ * A question does not always reach its options directly. An exclusive choice
+ * wires each option straight off the question, but a multi-select puts a merge
+ * hub in between - the layout needs somewhere for several checked boxes to
+ * rejoin - so "Child custody and visitation" sits one hop further out than
+ * "Yes" does. Hubs are transparent everywhere else in this pipeline and they
+ * are transparent here too, or a connector could only ever hang off a Yes/No.
+ */
 function optionCellFor(flowchart, questionNameId, answer) {
   const cells = flowchart.cells || [];
   const question = cells.find((c) => new RegExp('nodeId=' + questionNameId + ';').test(c.style || ''));
   if (!question) return null;
   const wanted = String(answer).trim().toLowerCase();
-  const edges = cells.filter((e) => e.edge && e.source === question.id);
-  for (const edge of edges) {
-    const target = cells.find((c) => c.id === edge.target);
-    if (!target) continue;
-    const text = String(target.value || '').replace(/<[^>]*>/g, '').trim().toLowerCase();
-    if (text === wanted) return target;
+  const byId = new Map(cells.map((c) => [c.id, c]));
+  const isHub = (c) => /nodeType=(mergeHub|hub)/.test(c.style || '');
+  const isOption = (c) => /nodeType=options/.test(c.style || '');
+
+  const seen = new Set([question.id]);
+  let frontier = [question.id];
+  for (let hop = 0; hop < 4 && frontier.length; hop++) {
+    const next = [];
+    for (const from of frontier) {
+      for (const edge of cells.filter((e) => e.edge && e.source === from)) {
+        const target = byId.get(edge.target);
+        if (!target || seen.has(target.id)) continue;
+        seen.add(target.id);
+        if (isOption(target)) {
+          const text = String(target.value || '').replace(/<[^>]*>/g, '').trim().toLowerCase();
+          if (text === wanted) return target;
+        } else if (isHub(target)) {
+          next.push(target.id);
+        }
+      }
+    }
+    frontier = next;
   }
   return null;
 }
@@ -94,6 +122,75 @@ function addConnector(flowchart, targetForm, from) {
     });
   }
   return id;
+}
+
+const ALERT_STYLE = 'shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;'
+  + 'nodeType=options;questionType=alertNode;spacing=12;fontSize=14;align=center;'
+  + 'verticalAlign=middle;strokeWidth=3;fillColor=#ffffff;fontColor=#1976d2;strokeColor=#1976d2;';
+const EDGE_STYLE = 'edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;';
+const NEGATE_STYLE = EDGE_STYLE + 'alertNegate=1;dashed=1;strokeColor=#d32f2f;';
+
+/**
+ * Turn each declared disqualifier into an alert node wired to the answers that
+ * trigger it.
+ *
+ * These were wired by hand once, into the built project rather than into
+ * anything the build reads - so the next rebuild silently dropped all four, and
+ * the packet went out with the rules declared and none of them implemented.
+ * That is the failure the disqualifiers file exists to prevent, so the build
+ * does the wiring now: dv-packet-disqualifiers.json is the source, and a
+ * condition that names an answer no question offers is an error, not a warning.
+ *
+ * A condition is an arrow. "is" points from the option that must be chosen;
+ * "isNot" and "noneOf" point from the options that must not be, marked NOT.
+ */
+function wireDisqualifiers(flowchart, formName, declared) {
+  const mine = declared.filter((d) => d.form === formName);
+  if (!mine.length) return 0;
+  const cells = flowchart.cells;
+
+  // A column to the right of everything else, so an alert never lands on top of
+  // a question the router already placed.
+  const vertices = cells.filter((c) => c.vertex && c.geometry);
+  const x = Math.max(...vertices.map((c) => c.geometry.x + (c.geometry.width || 0))) + 240;
+  let y = Math.min(...vertices.map((c) => c.geometry.y));
+
+  mine.forEach((d) => {
+    const id = nextId(cells);
+    cells.push({
+      id, vertex: true, edge: false,
+      value: '<div style="text-align:center;padding:6px;"><strong>ALERT</strong>'
+        + '<br><span style="font-size:12px;">' + d.id + '</span></div>',
+      style: ALERT_STYLE + 'nodeId=' + d.id + ';',
+      geometry: { x, y, width: 320, height: 130 },
+      _questionText: d.message,
+      _alertText: d.message,
+      _alertMode: d.mode === 'any' ? 'any' : 'all',
+      _disqualifierId: d.id
+    });
+    y += 260;
+
+    (d.when || []).forEach((condition) => {
+      const negated = condition.op === 'isNot' || Array.isArray(condition.noneOf);
+      const values = Array.isArray(condition.noneOf)
+        ? condition.noneOf
+        : (Array.isArray(condition.anyOf) ? condition.anyOf : [condition.value]);
+      values.forEach((value) => {
+        const option = optionCellFor(flowchart, condition.question, value);
+        if (!option) {
+          throw new Error(d.id + ': question "' + condition.question + '" has no answer "'
+            + value + '" to wire the alert to');
+        }
+        cells.push({
+          id: nextId(cells), vertex: false, edge: true, value: negated ? 'NOT' : '',
+          style: negated ? NEGATE_STYLE : EDGE_STYLE,
+          geometry: { x: 0, y: 0, width: 0, height: 0 },
+          source: option.id, target: id
+        });
+      });
+    });
+  });
+  return mine.length;
 }
 
 function main() {
@@ -131,6 +228,13 @@ function main() {
     });
   });
 
+  const declared = fs.existsSync(DISQUALIFIERS)
+    ? (JSON.parse(fs.readFileSync(DISQUALIFIERS, 'utf8')).disqualifiers || []) : [];
+  forms.forEach(({ entry, flowchart }) => {
+    const n = wireDisqualifiers(flowchart, entry.name, declared);
+    if (n) alerted[entry.name] = n;
+  });
+
   const project = {
     type: 'flowchart-project',
     version: 1,
@@ -149,6 +253,7 @@ function main() {
       + '  group "' + flowchart.groups[0].name + '" over ' + flowchart.groups[0].sections.length + ' section(s)'
       + '  pdf ' + entry.pdf
       + (connectors.length ? '  -> ' + connectors.map((c) => c._connectorTarget).join(', ') : ''));
+    if (alerted[entry.name]) console.log('      ' + alerted[entry.name] + ' disqualifier alert(s) wired from ' + DISQUALIFIERS);
     const unused = sectionNames(flowchart).filter((n) => !flowchart.groups[0].sections.includes(n));
     if (unused.length) console.log('      sections with no questions (dropped from the group): ' + unused.join(', '));
   });

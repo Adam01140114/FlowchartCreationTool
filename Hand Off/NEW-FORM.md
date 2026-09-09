@@ -167,7 +167,20 @@ non-zero when it does not.
 
 ### Drawing one
 
-Point more than one arrow at the same alert node. Each arrow is a condition:
+You do not have to. `pipeline-build-packet.js` reads
+`dv-packet-disqualifiers.json` and wires every declared disqualifier as it
+assembles the packet - one alert node per entry, one arrow per condition, `is`
+plain and `isNot`/`noneOf` marked NOT - and refuses to build if a condition
+names an answer no question offers. Declaring one is enough; the chart follows.
+
+This was not always so. The first four were drawn by hand into the built
+project, which is not a file the build reads, so the next `pipeline-build-packet`
+silently dropped all four and the packet went out with the rules declared and
+none of them wired - exactly the failure the disqualifiers file exists to
+prevent. Anything that must survive a rebuild belongs in a source the rebuild
+reads.
+
+To draw one by hand in the editor anyway: point more than one arrow at the same alert node. Each arrow is a condition:
 
 | Arrow from | Condition | Marked NOT |
 |---|---|---|

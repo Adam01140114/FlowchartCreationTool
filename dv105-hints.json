@@ -1,0 +1,1805 @@
+{
+  "_comment": "Interview knowledge the DV-105 field config cannot express. DV-105 is attached to DV-100 when the filer asks for child custody and visitation orders, so it is gated on that DV-100 answer and the caption and party names are answered there. The form's own structure is unusually explicit about its gates - item 10 'No visits' says 'Stop here', item 11 sends you to 12 or to 13 - and those are followed here. The two seven-day charts are asked one day at a time, each day one question with the six boxes that row prints, because 49 separate questions per chart is not an interview anyone finishes.",
+  "groups": [
+    {
+      "nameId": "dv105_your_relationship_to_children",
+      "question": "What is your relationship to the children?",
+      "members": [
+        "dv105_your_relationship_parent",
+        "dv105_your_relationship_legal_guardian",
+        "dv105_your_relationship_other"
+      ],
+      "labels": [
+        "Parent",
+        "Legal guardian",
+        "Other"
+      ]
+    },
+    {
+      "nameId": "dv105_their_relationship_to_children",
+      "question": "What is the other person's relationship to the children?",
+      "members": [
+        "dv105_their_relationship_parent",
+        "dv105_their_relationship_legal_guardian",
+        "dv105_their_relationship_other"
+      ],
+      "labels": [
+        "Parent",
+        "Legal guardian",
+        "Other"
+      ]
+    },
+    {
+      "nameId": "dv105_children_lived_together_five_years",
+      "question": "Have all the children lived together for the last five years?",
+      "members": [
+        "dv105_children_lived_together_five_years_yes",
+        "dv105_children_lived_together_five_years_no"
+      ],
+      "labels": [
+        "Yes",
+        "No"
+      ]
+    },
+    {
+      "nameId": "dv105_other_case",
+      "question": "Do you know about any other court case involving any of these children?",
+      "members": [
+        "dv105_other_case_no",
+        "dv105_other_case_yes"
+      ],
+      "labels": [
+        "No",
+        "Yes"
+      ]
+    },
+    {
+      "nameId": "dv105_other_case_kinds",
+      "question": "What kind of case is it?",
+      "multiSelect": true,
+      "members": [
+        "dv105_other_case_custody",
+        "dv105_other_case_divorce",
+        "dv105_other_case_juvenile",
+        "dv105_other_case_guardianship",
+        "dv105_other_case_criminal",
+        "dv105_other_case_other"
+      ],
+      "labels": [
+        "Custody",
+        "Divorce",
+        "Juvenile court (child welfare, juvenile justice)",
+        "Guardianship",
+        "Criminal",
+        "Another kind of case"
+      ]
+    },
+    {
+      "nameId": "dv105_current_custody_order",
+      "question": "Is there a custody or visitation order in effect now?",
+      "members": [
+        "dv105_current_custody_order_no",
+        "dv105_current_custody_order_yes"
+      ],
+      "labels": [
+        "No",
+        "Yes"
+      ]
+    },
+    {
+      "nameId": "dv105_other_guardian_role",
+      "question": "Are they a parent or a legal guardian?",
+      "members": [
+        "dv105_other_guardian_is_parent",
+        "dv105_other_guardian_is_legal_guardian"
+      ],
+      "labels": [
+        "Parent",
+        "Legal guardian"
+      ]
+    },
+    {
+      "nameId": "dv105_limit_travel",
+      "question": "Do you want to limit where the other person can travel with your children?",
+      "members": [
+        "dv105_limit_travel_no",
+        "dv105_limit_travel_yes"
+      ],
+      "labels": [
+        "No",
+        "Yes"
+      ]
+    },
+    {
+      "nameId": "dv105_limit_travel_places",
+      "question": "They must have written permission or a court order to take the children outside:",
+      "multiSelect": true,
+      "members": [
+        "dv105_limit_travel_county",
+        "dv105_limit_travel_california",
+        "dv105_limit_travel_other"
+      ],
+      "labels": [
+        "A county",
+        "California",
+        "Other places"
+      ]
+    },
+    {
+      "nameId": "dv105_records_access",
+      "question": "Do you want the other person to have access to the children's records or information?",
+      "members": [
+        "dv105_records_access_yes",
+        "dv105_records_access_no"
+      ],
+      "labels": [
+        "Yes",
+        "No"
+      ]
+    },
+    {
+      "nameId": "dv105_records_withheld_children",
+      "question": "Whose records should they not have access to?",
+      "members": [
+        "dv105_records_withheld_all_children",
+        "dv105_records_withheld_named_children"
+      ],
+      "labels": [
+        "All the children",
+        "Only some of the children"
+      ]
+    },
+    {
+      "nameId": "dv105_records_kinds",
+      "question": "Which records or information?",
+      "multiSelect": true,
+      "members": [
+        "dv105_records_medical",
+        "dv105_records_school",
+        "dv105_records_extracurricular",
+        "dv105_records_employment",
+        "dv105_records_other"
+      ],
+      "labels": [
+        "Medical, dental, and mental health",
+        "School and daycare",
+        "Extracurricular activity, including summer camps and sports teams",
+        "The child's employment, including volunteer and unpaid positions",
+        "Other"
+      ]
+    },
+    {
+      "nameId": "dv105_abduction_risk",
+      "question": "Do you believe the other person might abduct (kidnap) your children?",
+      "members": [
+        "dv105_abduction_risk_no",
+        "dv105_abduction_risk_yes"
+      ],
+      "labels": [
+        "No",
+        "Yes"
+      ]
+    },
+    {
+      "nameId": "dv105_custody_orders",
+      "question": "Do you want the judge to make child custody orders?",
+      "members": [
+        "dv105_custody_orders_no",
+        "dv105_custody_orders_yes"
+      ],
+      "labels": [
+        "No",
+        "Yes"
+      ]
+    },
+    {
+      "nameId": "dv105_legal_custody",
+      "question": "Who should make decisions about the children's health, education and welfare?",
+      "members": [
+        "dv105_legal_custody_sole_to_me",
+        "dv105_legal_custody_sole_to_them",
+        "dv105_legal_custody_joint",
+        "dv105_legal_custody_other"
+      ],
+      "labels": [
+        "Me alone",
+        "The other person alone",
+        "The two of us jointly",
+        "Something else"
+      ]
+    },
+    {
+      "nameId": "dv105_physical_custody",
+      "question": "Who should the children regularly live with?",
+      "members": [
+        "dv105_physical_custody_sole_to_me",
+        "dv105_physical_custody_sole_to_them",
+        "dv105_physical_custody_joint",
+        "dv105_physical_custody_other"
+      ],
+      "labels": [
+        "Me alone",
+        "The other person alone",
+        "The two of us jointly",
+        "Something else"
+      ]
+    },
+    {
+      "nameId": "dv105_visits",
+      "question": "Do you want the other person to have visits (parenting time) with the children?",
+      "members": [
+        "dv105_visits_none",
+        "dv105_visits_yes",
+        "dv105_visits_virtual_only"
+      ],
+      "labels": [
+        "No, I ask the judge to order no visits",
+        "Yes",
+        "Yes, but only virtual visits"
+      ]
+    },
+    {
+      "nameId": "dv105_visits_supervised",
+      "question": "Do you want the visits to be supervised (monitored) by a third party?",
+      "members": [
+        "dv105_visits_supervised_yes",
+        "dv105_visits_supervised_no"
+      ],
+      "labels": [
+        "Yes",
+        "No"
+      ]
+    },
+    {
+      "nameId": "dv105_supervisor",
+      "question": "Who do you want to supervise the visits?",
+      "members": [
+        "dv105_supervisor_professional",
+        "dv105_supervisor_nonprofessional"
+      ],
+      "labels": [
+        "A professional",
+        "Someone trusted, like a relative or friend"
+      ]
+    },
+    {
+      "nameId": "dv105_supervised_location",
+      "question": "Where should the visits happen?",
+      "members": [
+        "dv105_supervised_location_in_person",
+        "dv105_supervised_location_virtual",
+        "dv105_supervised_location_other"
+      ],
+      "labels": [
+        "In person at a safe location",
+        "Virtual (not in person)",
+        "Somewhere else"
+      ]
+    },
+    {
+      "nameId": "dv105_supervised_frequency",
+      "question": "How often and how long should the visits be?",
+      "members": [
+        "dv105_supervised_frequency_once_a_week",
+        "dv105_supervised_frequency_twice_a_week",
+        "dv105_supervised_frequency_other"
+      ],
+      "labels": [
+        "Once a week",
+        "Twice a week",
+        "Something else"
+      ]
+    },
+    {
+      "nameId": "dv105_supervised_schedule",
+      "question": "How often should that plan repeat?",
+      "members": [
+        "dv105_supervised_schedule_every_week",
+        "dv105_supervised_schedule_every_other_week",
+        "dv105_supervised_schedule_other"
+      ],
+      "labels": [
+        "Every week",
+        "Every other week",
+        "Something else"
+      ]
+    },
+    {
+      "nameId": "dv105_exchanges_supervised",
+      "question": "Do you want drop-off and pick-up to be supervised by a third party?",
+      "members": [
+        "dv105_exchanges_supervised_no",
+        "dv105_exchanges_supervised_yes"
+      ],
+      "labels": [
+        "No",
+        "Yes"
+      ]
+    },
+    {
+      "nameId": "dv105_exchange_supervisor",
+      "question": "Who do you want to supervise the exchanges?",
+      "members": [
+        "dv105_exchange_supervisor_professional",
+        "dv105_exchange_supervisor_nonprofessional"
+      ],
+      "labels": [
+        "A professional",
+        "Someone trusted, like a relative or friend"
+      ]
+    },
+    {
+      "nameId": "dv105_unsupervised_location",
+      "question": "Where should the visits happen?",
+      "members": [
+        "dv105_unsupervised_location_in_person",
+        "dv105_unsupervised_location_virtual",
+        "dv105_unsupervised_location_other"
+      ],
+      "labels": [
+        "In person at a safe location",
+        "Virtual (not in person)",
+        "Somewhere else"
+      ]
+    },
+    {
+      "nameId": "dv105_unsupervised_schedule",
+      "question": "How often should that plan repeat?",
+      "members": [
+        "dv105_unsupervised_schedule_every_week",
+        "dv105_unsupervised_schedule_every_other_week",
+        "dv105_unsupervised_schedule_other"
+      ],
+      "labels": [
+        "Every week",
+        "Every other week",
+        "Something else"
+      ]
+    },
+    {
+      "nameId": "dv105_child_home_1_lived_with",
+      "question": "Who did the children live with at their current address?",
+      "multiSelect": true,
+      "members": [
+        "dv105_child_home_1_lived_with_me",
+        "dv105_child_home_1_lived_with_restrained_person",
+        "dv105_child_home_1_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105_child_home_2_lived_with",
+      "question": "Who did the children live with there?",
+      "multiSelect": true,
+      "members": [
+        "dv105_child_home_2_lived_with_me",
+        "dv105_child_home_2_lived_with_restrained_person",
+        "dv105_child_home_2_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105_child_home_3_lived_with",
+      "question": "Who did the children live with there?",
+      "multiSelect": true,
+      "members": [
+        "dv105_child_home_3_lived_with_me",
+        "dv105_child_home_3_lived_with_restrained_person",
+        "dv105_child_home_3_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105_child_home_4_lived_with",
+      "question": "Who did the children live with there?",
+      "multiSelect": true,
+      "members": [
+        "dv105_child_home_4_lived_with_me",
+        "dv105_child_home_4_lived_with_restrained_person",
+        "dv105_child_home_4_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105_child_home_5_lived_with",
+      "question": "Who did the children live with there?",
+      "multiSelect": true,
+      "members": [
+        "dv105_child_home_5_lived_with_me",
+        "dv105_child_home_5_lived_with_restrained_person",
+        "dv105_child_home_5_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105_child_home_6_lived_with",
+      "question": "Who did the children live with there?",
+      "multiSelect": true,
+      "members": [
+        "dv105_child_home_6_lived_with_me",
+        "dv105_child_home_6_lived_with_restrained_person",
+        "dv105_child_home_6_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105_supervised_virtual_visit_days",
+      "question": "Which of those days should be virtual visits, rather than in person?",
+      "multiSelect": true,
+      "members": [
+        "dv105_supervised_visit_monday_virtual_visit",
+        "dv105_supervised_visit_tuesday_virtual_visit",
+        "dv105_supervised_visit_wednesday_virtual_visit",
+        "dv105_supervised_visit_thursday_virtual_visit",
+        "dv105_supervised_visit_friday_virtual_visit",
+        "dv105_supervised_visit_saturday_virtual_visit",
+        "dv105_supervised_visit_sunday_virtual_visit"
+      ],
+      "labels": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ]
+    },
+    {
+      "nameId": "dv105_unsupervised_virtual_visit_days",
+      "question": "Which of those days should be virtual visits, rather than in person?",
+      "multiSelect": true,
+      "members": [
+        "dv105_unsupervised_visit_monday_virtual_visit",
+        "dv105_unsupervised_visit_tuesday_virtual_visit",
+        "dv105_unsupervised_visit_wednesday_virtual_visit",
+        "dv105_unsupervised_visit_thursday_virtual_visit",
+        "dv105_unsupervised_visit_friday_virtual_visit",
+        "dv105_unsupervised_visit_saturday_virtual_visit",
+        "dv105_unsupervised_visit_sunday_virtual_visit"
+      ],
+      "labels": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ]
+    }
+  ],
+  "repeats": [
+    {
+      "nameId": "dv105_child",
+      "question": "How many children do you have with the person you want protection from?",
+      "entryTitle": "Child",
+      "min": 1,
+      "max": 4,
+      "fields": [
+        {
+          "label": "Child's name",
+          "nameId": "{n}_name"
+        },
+        {
+          "label": "Date of birth",
+          "nameId": "{n}_date_of_birth",
+          "type": "date"
+        }
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "Where do the children live now, and since when?",
+      "fields": [
+        {
+          "field": "dv105_child_home_1_from",
+          "label": "Living there since (month/year)"
+        },
+        {
+          "field": "dv105_child_home_1_city_and_state",
+          "label": "City and state"
+        },
+        {
+          "field": "dv105_child_home_1_other_relationship",
+          "label": "If someone else, their relationship to the child"
+        }
+      ]
+    },
+    {
+      "question": "Where did the children live before that?",
+      "fields": [
+        {
+          "field": "dv105_child_home_2_from",
+          "label": "From (month/year)"
+        },
+        {
+          "field": "dv105_child_home_2_until",
+          "label": "Until (month/year)"
+        },
+        {
+          "field": "dv105_child_home_2_city_and_state",
+          "label": "City and state"
+        },
+        {
+          "field": "dv105_child_home_2_other_relationship",
+          "label": "If someone else, their relationship to the child"
+        }
+      ]
+    },
+    {
+      "question": "And before that?",
+      "fields": [
+        {
+          "field": "dv105_child_home_3_from",
+          "label": "From (month/year)"
+        },
+        {
+          "field": "dv105_child_home_3_until",
+          "label": "Until (month/year)"
+        },
+        {
+          "field": "dv105_child_home_3_city_and_state",
+          "label": "City and state"
+        },
+        {
+          "field": "dv105_child_home_3_other_relationship",
+          "label": "If someone else, their relationship to the child"
+        }
+      ]
+    },
+    {
+      "question": "And before that?",
+      "fields": [
+        {
+          "field": "dv105_child_home_4_from",
+          "label": "From (month/year)"
+        },
+        {
+          "field": "dv105_child_home_4_until",
+          "label": "Until (month/year)"
+        },
+        {
+          "field": "dv105_child_home_4_city_and_state",
+          "label": "City and state"
+        },
+        {
+          "field": "dv105_child_home_4_other_relationship",
+          "label": "If someone else, their relationship to the child"
+        }
+      ]
+    },
+    {
+      "question": "And before that?",
+      "fields": [
+        {
+          "field": "dv105_child_home_5_from",
+          "label": "From (month/year)"
+        },
+        {
+          "field": "dv105_child_home_5_until",
+          "label": "Until (month/year)"
+        },
+        {
+          "field": "dv105_child_home_5_city_and_state",
+          "label": "City and state"
+        },
+        {
+          "field": "dv105_child_home_5_other_relationship",
+          "label": "If someone else, their relationship to the child"
+        }
+      ]
+    },
+    {
+      "question": "And before that?",
+      "fields": [
+        {
+          "field": "dv105_child_home_6_from",
+          "label": "From (month/year)"
+        },
+        {
+          "field": "dv105_child_home_6_until",
+          "label": "Until (month/year)"
+        },
+        {
+          "field": "dv105_child_home_6_city_and_state",
+          "label": "City and state"
+        },
+        {
+          "field": "dv105_child_home_6_other_relationship",
+          "label": "If someone else, their relationship to the child"
+        }
+      ]
+    },
+    {
+      "question": "Who should pay the professional supervisor's fees?",
+      "fields": [
+        {
+          "field": "dv105_supervisor_fees_me_percent",
+          "label": "My share (%)"
+        },
+        {
+          "field": "dv105_supervisor_fees_them_percent",
+          "label": "Their share (%)"
+        },
+        {
+          "field": "dv105_supervisor_fees_other_who",
+          "label": "Someone else (who)"
+        },
+        {
+          "field": "dv105_supervisor_fees_other_percent",
+          "label": "Their share (%)"
+        }
+      ]
+    },
+    {
+      "question": "Who should pay the professional supervisor's fees for exchanges?",
+      "fields": [
+        {
+          "field": "dv105_exchange_fees_me_percent",
+          "label": "My share (%)"
+        },
+        {
+          "field": "dv105_exchange_fees_them_percent",
+          "label": "Their share (%)"
+        },
+        {
+          "field": "dv105_exchange_fees_other_who",
+          "label": "Someone else (who)"
+        },
+        {
+          "field": "dv105_exchange_fees_other_percent",
+          "label": "Their share (%)"
+        }
+      ]
+    },
+    {
+      "question": "Monday: what should the supervised visit look like?",
+      "fields": [
+        {
+          "field": "dv105_supervised_visit_monday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_supervised_visit_monday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_supervised_visit_monday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_supervised_visit_monday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_supervised_visit_monday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_supervised_visit_monday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Tuesday: what should the supervised visit look like?",
+      "fields": [
+        {
+          "field": "dv105_supervised_visit_tuesday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_supervised_visit_tuesday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_supervised_visit_tuesday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_supervised_visit_tuesday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_supervised_visit_tuesday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_supervised_visit_tuesday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Wednesday: what should the supervised visit look like?",
+      "fields": [
+        {
+          "field": "dv105_supervised_visit_wednesday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_supervised_visit_wednesday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_supervised_visit_wednesday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_supervised_visit_wednesday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_supervised_visit_wednesday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_supervised_visit_wednesday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Thursday: what should the supervised visit look like?",
+      "fields": [
+        {
+          "field": "dv105_supervised_visit_thursday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_supervised_visit_thursday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_supervised_visit_thursday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_supervised_visit_thursday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_supervised_visit_thursday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_supervised_visit_thursday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Friday: what should the supervised visit look like?",
+      "fields": [
+        {
+          "field": "dv105_supervised_visit_friday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_supervised_visit_friday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_supervised_visit_friday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_supervised_visit_friday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_supervised_visit_friday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_supervised_visit_friday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Saturday: what should the supervised visit look like?",
+      "fields": [
+        {
+          "field": "dv105_supervised_visit_saturday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_supervised_visit_saturday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_supervised_visit_saturday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_supervised_visit_saturday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_supervised_visit_saturday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_supervised_visit_saturday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Sunday: what should the supervised visit look like?",
+      "fields": [
+        {
+          "field": "dv105_supervised_visit_sunday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_supervised_visit_sunday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_supervised_visit_sunday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_supervised_visit_sunday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_supervised_visit_sunday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_supervised_visit_sunday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Monday: what should the visit look like?",
+      "fields": [
+        {
+          "field": "dv105_unsupervised_visit_monday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_unsupervised_visit_monday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_unsupervised_visit_monday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_monday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_unsupervised_visit_monday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_monday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Tuesday: what should the visit look like?",
+      "fields": [
+        {
+          "field": "dv105_unsupervised_visit_tuesday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_unsupervised_visit_tuesday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_unsupervised_visit_tuesday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_tuesday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_unsupervised_visit_tuesday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_tuesday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Wednesday: what should the visit look like?",
+      "fields": [
+        {
+          "field": "dv105_unsupervised_visit_wednesday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_unsupervised_visit_wednesday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_unsupervised_visit_wednesday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_wednesday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_unsupervised_visit_wednesday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_wednesday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Thursday: what should the visit look like?",
+      "fields": [
+        {
+          "field": "dv105_unsupervised_visit_thursday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_unsupervised_visit_thursday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_unsupervised_visit_thursday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_thursday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_unsupervised_visit_thursday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_thursday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Friday: what should the visit look like?",
+      "fields": [
+        {
+          "field": "dv105_unsupervised_visit_friday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_unsupervised_visit_friday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_unsupervised_visit_friday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_friday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_unsupervised_visit_friday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_friday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Saturday: what should the visit look like?",
+      "fields": [
+        {
+          "field": "dv105_unsupervised_visit_saturday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_unsupervised_visit_saturday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_unsupervised_visit_saturday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_saturday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_unsupervised_visit_saturday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_saturday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    },
+    {
+      "question": "Sunday: what should the visit look like?",
+      "fields": [
+        {
+          "field": "dv105_unsupervised_visit_sunday_start",
+          "label": "Start"
+        },
+        {
+          "field": "dv105_unsupervised_visit_sunday_end",
+          "label": "End, if it applies"
+        },
+        {
+          "field": "dv105_unsupervised_visit_sunday_person_to_bring_dropoff",
+          "label": "Who brings the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_sunday_location_dropoff",
+          "label": "Drop-off location"
+        },
+        {
+          "field": "dv105_unsupervised_visit_sunday_person_to_bring_pickup",
+          "label": "Who collects the children"
+        },
+        {
+          "field": "dv105_unsupervised_visit_sunday_location_pickup",
+          "label": "Pick-up location"
+        }
+      ]
+    }
+  ],
+  "questions": {
+    "person_asking_protection_name": {
+      "text": "What is your name?"
+    },
+    "person_to_restrain_full_name": {
+      "text": "Who do you want protection from?"
+    },
+    "dv105_your_relationship_other_description": {
+      "text": "Describe your relationship to the children.",
+      "conditional": {
+        "onlyWhen": "dv105_your_relationship_other"
+      }
+    },
+    "dv105_their_relationship_other_description": {
+      "text": "Describe their relationship to the children.",
+      "conditional": {
+        "onlyWhen": "dv105_their_relationship_other"
+      }
+    },
+    "dv105_children_additional_list_attached": {
+      "text": "Do you have more children to list on a separate page?"
+    },
+    "dv105_child_home_1_address_private": {
+      "text": "Is the current address private (confidential)?",
+      "conditional": {
+        "onlyWhen": "dv105_children_lived_together_five_years_yes"
+      }
+    },
+    "dv105_other_case_custody_details": {
+      "text": "The custody case: where was it filed, what year, and what is the case number?",
+      "conditional": {
+        "onlyWhen": "dv105_other_case_custody"
+      }
+    },
+    "dv105_other_case_divorce_details": {
+      "text": "The divorce case: where was it filed, what year, and what is the case number?",
+      "conditional": {
+        "onlyWhen": "dv105_other_case_divorce"
+      }
+    },
+    "dv105_other_case_juvenile_details": {
+      "text": "The juvenile case: where was it filed, what year, and what is the case number?",
+      "conditional": {
+        "onlyWhen": "dv105_other_case_juvenile"
+      }
+    },
+    "dv105_other_case_guardianship_details": {
+      "text": "The guardianship case: where was it filed, what year, and what is the case number?",
+      "conditional": {
+        "onlyWhen": "dv105_other_case_guardianship"
+      }
+    },
+    "dv105_other_case_criminal_details": {
+      "text": "The criminal case: where was it filed, what year, and what is the case number?",
+      "conditional": {
+        "onlyWhen": "dv105_other_case_criminal"
+      }
+    },
+    "dv105_other_case_other_details": {
+      "text": "The other case: where was it filed, what year, and what is the case number?",
+      "conditional": {
+        "onlyWhen": "dv105_other_case_other"
+      }
+    },
+    "dv105_current_custody_order_terms": {
+      "text": "What did the judge order?",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "dv105_current_custody_order_yes"
+      }
+    },
+    "dv105_current_custody_order_change_reason": {
+      "text": "Why do you want to change that order?",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "dv105_current_custody_order_yes"
+      }
+    },
+    "dv105_other_guardian_name": {
+      "text": "If there is another parent or legal guardian besides you and the other person, what is their name?",
+      "optional": true
+    },
+    "dv105_limit_travel_county_name": {
+      "text": "Which county?",
+      "conditional": {
+        "onlyWhen": "dv105_limit_travel_county"
+      }
+    },
+    "dv105_limit_travel_other_places": {
+      "text": "Which other places?",
+      "conditional": {
+        "onlyWhen": "dv105_limit_travel_other"
+      }
+    },
+    "dv105_records_withheld_children_names": {
+      "text": "Which children?",
+      "conditional": {
+        "onlyWhen": "dv105_records_withheld_named_children"
+      }
+    },
+    "dv105_records_other_description": {
+      "text": "What other records or information?",
+      "conditional": {
+        "onlyWhen": "dv105_records_other"
+      }
+    },
+    "dv105_legal_custody_other_description": {
+      "text": "Describe the legal custody you want.",
+      "conditional": {
+        "onlyWhen": "dv105_legal_custody_other"
+      }
+    },
+    "dv105_physical_custody_other_description": {
+      "text": "Describe the physical custody you want.",
+      "conditional": {
+        "onlyWhen": "dv105_physical_custody_other"
+      }
+    },
+    "dv105_supervisor_professional_name": {
+      "text": "What is the professional's name, if you know it?",
+      "optional": true,
+      "conditional": {
+        "onlyWhen": "dv105_supervisor_professional"
+      }
+    },
+    "dv105_supervisor_nonprofessional_name": {
+      "text": "What is their name?",
+      "conditional": {
+        "onlyWhen": "dv105_supervisor_nonprofessional"
+      }
+    },
+    "dv105_supervisor_nonprofessional_agreed": {
+      "text": "Have they agreed to supervise the visits?",
+      "conditional": {
+        "onlyWhen": "dv105_supervisor_nonprofessional"
+      }
+    },
+    "dv105_supervised_location_other_description": {
+      "text": "Where should the visits happen?",
+      "conditional": {
+        "onlyWhen": "dv105_supervised_location_other"
+      }
+    },
+    "dv105_supervised_frequency_once_a_week_hours": {
+      "text": "How many hours?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "dv105_supervised_frequency_once_a_week"
+      }
+    },
+    "dv105_supervised_frequency_twice_a_week_hours": {
+      "text": "How many hours each visit?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "dv105_supervised_frequency_twice_a_week"
+      }
+    },
+    "dv105_supervised_frequency_other_description": {
+      "text": "How often and how long should the visits be?",
+      "conditional": {
+        "onlyWhen": "dv105_supervised_frequency_other"
+      }
+    },
+    "dv105_supervised_use_schedule_chart": {
+      "text": "Do you want to set out a week-by-week schedule?",
+      "conditional": {
+        "onlyWhen": "dv105_visits_supervised_yes"
+      }
+    },
+    "dv105_supervised_schedule_other_description": {
+      "text": "How often should the plan repeat?",
+      "conditional": {
+        "onlyWhen": "dv105_supervised_schedule_other"
+      }
+    },
+    "dv105_supervised_start_date": {
+      "text": "When should the visits start?",
+      "type": "date",
+      "conditional": {
+        "onlyWhen": "dv105_visits_supervised_yes"
+      }
+    },
+    "dv105_exchange_supervisor_professional_name": {
+      "text": "What is the professional's name, if you know it?",
+      "optional": true,
+      "conditional": {
+        "onlyWhen": "dv105_exchange_supervisor_professional"
+      }
+    },
+    "dv105_exchange_supervisor_nonprofessional_name": {
+      "text": "What is their name?",
+      "conditional": {
+        "onlyWhen": "dv105_exchange_supervisor_nonprofessional"
+      }
+    },
+    "dv105_exchange_supervisor_nonprofessional_agreed": {
+      "text": "Have they agreed to supervise the exchanges?",
+      "conditional": {
+        "onlyWhen": "dv105_exchange_supervisor_nonprofessional"
+      }
+    },
+    "dv105_unsupervised_location_other_description": {
+      "text": "Where should the visits happen?",
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_location_other"
+      }
+    },
+    "dv105_unsupervised_visit_details": {
+      "text": "When should the visits happen, how often, and who is responsible for transporting the children?",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_words"
+      }
+    },
+    "dv105_unsupervised_schedule_other_description": {
+      "text": "How often should the plan repeat?",
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_schedule_other"
+      }
+    },
+    "dv105_unsupervised_start_date": {
+      "text": "When should the visits start?",
+      "type": "date",
+      "conditional": {
+        "onlyWhen": "dv105_visits_supervised_no"
+      }
+    },
+    "dv105_child_home_1": {
+      "conditional": {
+        "onlyWhen": "dv105_children_lived_together_five_years_yes"
+      }
+    },
+    "dv105_child_home_1_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105_children_lived_together_five_years_yes"
+      }
+    },
+    "dv105_child_home_2": {
+      "conditional": {
+        "onlyWhen": "dv105_child_home_2_asked_yes"
+      }
+    },
+    "dv105_child_home_2_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105_child_home_2_asked_yes"
+      }
+    },
+    "dv105_child_home_3": {
+      "conditional": {
+        "onlyWhen": "dv105_child_home_3_asked_yes"
+      }
+    },
+    "dv105_child_home_3_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105_child_home_3_asked_yes"
+      }
+    },
+    "dv105_child_home_4": {
+      "conditional": {
+        "onlyWhen": "dv105_child_home_4_asked_yes"
+      }
+    },
+    "dv105_child_home_4_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105_child_home_4_asked_yes"
+      }
+    },
+    "dv105_child_home_5": {
+      "conditional": {
+        "onlyWhen": "dv105_child_home_5_asked_yes"
+      }
+    },
+    "dv105_child_home_5_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105_child_home_5_asked_yes"
+      }
+    },
+    "dv105_child_home_6": {
+      "conditional": {
+        "onlyWhen": "dv105_child_home_6_asked_yes"
+      }
+    },
+    "dv105_child_home_6_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105_child_home_6_asked_yes"
+      }
+    },
+    "dv105_other_case_kinds": {
+      "conditional": {
+        "onlyWhen": "dv105_other_case_yes"
+      }
+    },
+    "dv105_limit_travel_places": {
+      "conditional": {
+        "onlyWhen": "dv105_limit_travel_yes"
+      }
+    },
+    "dv105_records_withheld_children": {
+      "conditional": {
+        "onlyWhen": "dv105_records_access_no"
+      }
+    },
+    "dv105_records_kinds": {
+      "conditional": {
+        "onlyWhen": "dv105_records_access_no"
+      }
+    },
+    "dv105_legal_custody": {
+      "conditional": {
+        "onlyWhen": "dv105_custody_orders_yes"
+      }
+    },
+    "dv105_physical_custody": {
+      "conditional": {
+        "onlyWhen": "dv105_custody_orders_yes"
+      }
+    },
+    "dv105_supervisor": {
+      "conditional": {
+        "onlyWhen": "dv105_visits_supervised_yes"
+      }
+    },
+    "dv105_supervised_location": {
+      "conditional": {
+        "onlyWhen": "dv105_visits_supervised_yes"
+      }
+    },
+    "dv105_supervised_frequency": {
+      "conditional": {
+        "onlyWhen": "dv105_visits_supervised_yes"
+      }
+    },
+    "dv105_supervisor_fees": {
+      "conditional": {
+        "onlyWhen": "dv105_supervisor_professional"
+      }
+    },
+    "dv105_supervised_visit_monday": {
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      }
+    },
+    "dv105_supervised_visit_tuesday": {
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      }
+    },
+    "dv105_supervised_visit_wednesday": {
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      }
+    },
+    "dv105_supervised_visit_thursday": {
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      }
+    },
+    "dv105_supervised_visit_friday": {
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      }
+    },
+    "dv105_supervised_visit_saturday": {
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      }
+    },
+    "dv105_supervised_visit_sunday": {
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      }
+    },
+    "dv105_supervised_virtual_visit_days": {
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      }
+    },
+    "dv105_supervised_schedule": {
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      }
+    },
+    "dv105_exchanges_supervised": {
+      "conditional": {
+        "onlyWhen": "dv105_visits_supervised_no"
+      }
+    },
+    "dv105_unsupervised_location": {
+      "conditional": {
+        "onlyWhen": "dv105_visits_supervised_no"
+      }
+    },
+    "dv105_exchange_supervisor": {
+      "conditional": {
+        "onlyWhen": "dv105_exchanges_supervised_yes"
+      }
+    },
+    "dv105_exchange_fees": {
+      "conditional": {
+        "onlyWhen": "dv105_exchange_supervisor_professional"
+      }
+    },
+    "dv105_unsupervised_visit_monday": {
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      }
+    },
+    "dv105_unsupervised_visit_tuesday": {
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      }
+    },
+    "dv105_unsupervised_visit_wednesday": {
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      }
+    },
+    "dv105_unsupervised_visit_thursday": {
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      }
+    },
+    "dv105_unsupervised_visit_friday": {
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      }
+    },
+    "dv105_unsupervised_visit_saturday": {
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      }
+    },
+    "dv105_unsupervised_visit_sunday": {
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      }
+    },
+    "dv105_unsupervised_virtual_visit_days": {
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      }
+    },
+    "dv105_unsupervised_schedule": {
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      }
+    },
+    "case_number": {
+      "text": "What is the case number?"
+    }
+  },
+  "sections": [
+    {
+      "name": "The Children",
+      "fields": [
+        "case_number",
+        "person_asking_protection_name",
+        "dv105_your_relationship_to_children",
+        "dv105_your_relationship_other_description",
+        "person_to_restrain_full_name",
+        "dv105_their_relationship_to_children",
+        "dv105_their_relationship_other_description",
+        "dv105_child",
+        "dv105_children_additional_list_attached"
+      ]
+    },
+    {
+      "name": "Where the Children Have Lived",
+      "fields": [
+        "dv105_children_lived_together_five_years",
+        "dv105_child_home_1_from",
+        "dv105_child_home_1_lived_with",
+        "dv105_child_home_1_address_private",
+        "dv105_child_home_2_asked",
+        "dv105_child_home_2_from",
+        "dv105_child_home_2_lived_with",
+        "dv105_child_home_3_asked",
+        "dv105_child_home_3_from",
+        "dv105_child_home_3_lived_with",
+        "dv105_child_home_4_asked",
+        "dv105_child_home_4_from",
+        "dv105_child_home_4_lived_with",
+        "dv105_child_home_5_asked",
+        "dv105_child_home_5_from",
+        "dv105_child_home_5_lived_with",
+        "dv105_child_home_6_asked",
+        "dv105_child_home_6_from",
+        "dv105_child_home_6_lived_with"
+      ]
+    },
+    {
+      "name": "Other Court Cases",
+      "fields": [
+        "dv105_other_case",
+        "dv105_other_case_kinds",
+        "dv105_other_case_custody_details",
+        "dv105_other_case_divorce_details",
+        "dv105_other_case_juvenile_details",
+        "dv105_other_case_guardianship_details",
+        "dv105_other_case_criminal_details",
+        "dv105_other_case_other_details",
+        "dv105_current_custody_order",
+        "dv105_current_custody_order_terms",
+        "dv105_current_custody_order_change_reason",
+        "dv105_other_guardian_name",
+        "dv105_other_guardian_role"
+      ]
+    },
+    {
+      "name": "Protecting the Children",
+      "fields": [
+        "dv105_limit_travel",
+        "dv105_limit_travel_places",
+        "dv105_limit_travel_county_name",
+        "dv105_limit_travel_other_places",
+        "dv105_records_access",
+        "dv105_records_withheld_children",
+        "dv105_records_withheld_children_names",
+        "dv105_records_kinds",
+        "dv105_records_other_description",
+        "dv105_abduction_risk"
+      ]
+    },
+    {
+      "name": "Custody",
+      "fields": [
+        "dv105_custody_orders",
+        "dv105_legal_custody",
+        "dv105_legal_custody_other_description",
+        "dv105_physical_custody",
+        "dv105_physical_custody_other_description"
+      ]
+    },
+    {
+      "name": "Visits",
+      "fields": [
+        "dv105_visits",
+        "dv105_visits_supervised",
+        "dv105_supervisor",
+        "dv105_supervisor_professional_name",
+        "dv105_supervisor_fees_me_percent",
+        "dv105_supervisor_nonprofessional_name",
+        "dv105_supervisor_nonprofessional_agreed",
+        "dv105_supervised_location",
+        "dv105_supervised_location_other_description",
+        "dv105_supervised_frequency",
+        "dv105_supervised_frequency_once_a_week_hours",
+        "dv105_supervised_frequency_twice_a_week_hours",
+        "dv105_supervised_frequency_other_description",
+        "dv105_supervised_use_schedule_chart",
+        "dv105_supervised_visit_monday_start",
+        "dv105_supervised_visit_tuesday_start",
+        "dv105_supervised_visit_wednesday_start",
+        "dv105_supervised_visit_thursday_start",
+        "dv105_supervised_visit_friday_start",
+        "dv105_supervised_visit_saturday_start",
+        "dv105_supervised_visit_sunday_start",
+        "dv105_supervised_virtual_visit_days",
+        "dv105_supervised_schedule",
+        "dv105_supervised_schedule_other_description",
+        "dv105_supervised_start_date",
+        "dv105_exchanges_supervised",
+        "dv105_exchange_supervisor",
+        "dv105_exchange_supervisor_professional_name",
+        "dv105_exchange_fees_me_percent",
+        "dv105_exchange_supervisor_nonprofessional_name",
+        "dv105_exchange_supervisor_nonprofessional_agreed",
+        "dv105_unsupervised_location",
+        "dv105_unsupervised_location_other_description",
+        "dv105_unsupervised_plan_format",
+        "dv105_unsupervised_visit_details",
+        "dv105_unsupervised_visit_monday_start",
+        "dv105_unsupervised_visit_tuesday_start",
+        "dv105_unsupervised_visit_wednesday_start",
+        "dv105_unsupervised_visit_thursday_start",
+        "dv105_unsupervised_visit_friday_start",
+        "dv105_unsupervised_visit_saturday_start",
+        "dv105_unsupervised_visit_sunday_start",
+        "dv105_unsupervised_virtual_visit_days",
+        "dv105_unsupervised_schedule",
+        "dv105_unsupervised_schedule_other_description",
+        "dv105_unsupervised_start_date"
+      ]
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "dv105_visits_supervised",
+      "why": "Item 11 follows item 10 for both 'Yes' and 'Yes, but only virtual visits'. A gate names one option, so gating on 'Yes' alone would never ask a filer who chose virtual-only whether the visits should be supervised, and items 12 and 13 would both be skipped. Over-asking after 'No visits' is the safer error - the form itself tells that filer to stop."
+    },
+    {
+      "question": "dv105_abduction_risk",
+      "why": "Item 8 is asked whatever was answered about travel or records."
+    },
+    {
+      "question": "dv105_custody_orders",
+      "why": "Item 9 opens the custody section and does not depend on anything above it."
+    },
+    {
+      "question": "dv105_children_lived_together_five_years",
+      "why": "Item 4a opens its own section. It follows the \"more children on a separate page\" box only because that box is the last thing item 3 asks, and it is asked whichever way that one was answered."
+    },
+    {
+      "question": "dv105_child_home_1_lived_with",
+      "why": "Every row of the table asks who the children lived with, including the rows that follow the confidential-address box. That box is about the current address only."
+    },
+    {
+      "question": "dv105_supervised_location",
+      "why": "Item 12b is asked of everyone in item 12. It follows \"have they agreed to supervise?\" only because that is the last thing 12a asks of a nonprofessional supervisor."
+    },
+    {
+      "question": "dv105_unsupervised_location",
+      "why": "Item 13b, the same: it follows the last question of 13a and does not depend on it."
+    },
+    {
+      "question": "dv105_child_home_2_asked",
+      "why": "Whether there is an earlier address does not depend on whether the current one is confidential. It follows that box only because the box is the last thing the first row asks."
+    }
+  ],
+  "choices": [
+    {
+      "nameId": "dv105_unsupervised_plan_format",
+      "question": "How do you want to describe the parenting time you want them to have?",
+      "before": "dv105_unsupervised_visit_details",
+      "onlyWhen": "dv105_visits_supervised_no",
+      "options": [
+        {
+          "label": "In my own words",
+          "nameId": "dv105_unsupervised_plan_format_words"
+        },
+        {
+          "label": "On a week-by-week chart",
+          "nameId": "dv105_unsupervised_plan_format_chart"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105_child_home_2_asked",
+      "question": "Did the children live somewhere else in the last five years?",
+      "before": "dv105_child_home_2_lived_with_me",
+      "onlyWhen": "dv105_children_lived_together_five_years_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105_child_home_2_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105_child_home_2_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105_child_home_3_asked",
+      "question": "And somewhere else before that?",
+      "before": "dv105_child_home_3_lived_with_me",
+      "onlyWhen": "dv105_child_home_2_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105_child_home_3_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105_child_home_3_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105_child_home_4_asked",
+      "question": "And somewhere else before that?",
+      "before": "dv105_child_home_4_lived_with_me",
+      "onlyWhen": "dv105_child_home_3_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105_child_home_4_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105_child_home_4_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105_child_home_5_asked",
+      "question": "And somewhere else before that?",
+      "before": "dv105_child_home_5_lived_with_me",
+      "onlyWhen": "dv105_child_home_4_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105_child_home_5_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105_child_home_5_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105_child_home_6_asked",
+      "question": "And somewhere else before that?",
+      "before": "dv105_child_home_6_lived_with_me",
+      "onlyWhen": "dv105_child_home_5_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105_child_home_6_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105_child_home_6_asked_no"
+        }
+      ]
+    }
+  ]
+}

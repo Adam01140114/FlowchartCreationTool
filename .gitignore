@@ -74,3 +74,8 @@ firebase.json
 # Pipeline run artifacts (filled PDFs, page renders, captured answers)
 pipeline-out/
 pipeline-answers.json
+
+# Generated test forms and fill artifacts
+FormWiz GUI/*-test.html
+pipeline-answers.json
+pipeline-out/

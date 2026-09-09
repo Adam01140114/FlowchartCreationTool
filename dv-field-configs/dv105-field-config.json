@@ -6,7 +6,7 @@
       "id": "DV-105[0].Page1[0].RightCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number (page 1)"
     },
     {
       "id": "DV-105[0].Page1[0].List1[0].TextField2[0]",
@@ -136,261 +136,261 @@
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf1[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf1[0]",
+      "newName": "dv105_child_home_1_from",
       "type": "text",
-      "label": ""
+      "label": "Lived there from (month/year)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf2[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf2[0]",
+      "newName": "dv105_child_home_1_city_and_state",
       "type": "text",
-      "label": ""
+      "label": "City and state"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[0]",
+      "newName": "dv105_child_home_1_lived_with_me",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with me"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[1]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[1]",
+      "newName": "dv105_child_home_1_lived_with_restrained_person",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with the person in 2"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[2]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[2]",
+      "newName": "dv105_child_home_1_lived_with_other",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with someone else"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField1[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField1[0]",
+      "newName": "dv105_child_home_1_other_relationship",
       "type": "text",
-      "label": ""
+      "label": "Their relationship to the child"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].chb1[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].chb1[0]",
+      "newName": "dv105_child_home_1_address_private",
       "type": "checkbox",
-      "label": ""
+      "label": "This address is private (list the state only)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf3[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf3[0]",
+      "newName": "dv105_child_home_2_from",
       "type": "text",
-      "label": ""
+      "label": "Lived there from (month/year)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf4[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf4[0]",
+      "newName": "dv105_child_home_2_until",
       "type": "text",
-      "label": ""
+      "label": "Until (month/year)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf6[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf6[0]",
+      "newName": "dv105_child_home_2_city_and_state",
       "type": "text",
-      "label": ""
+      "label": "City and state"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[0]",
+      "newName": "dv105_child_home_2_lived_with_me",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with me"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[1]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[1]",
+      "newName": "dv105_child_home_2_lived_with_restrained_person",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with the person in 2"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[2]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[2]",
+      "newName": "dv105_child_home_2_lived_with_other",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with someone else"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField2[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField2[0]",
+      "newName": "dv105_child_home_2_other_relationship",
       "type": "text",
-      "label": ""
+      "label": "Their relationship to the child"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf7[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf7[0]",
+      "newName": "dv105_child_home_3_from",
       "type": "text",
-      "label": ""
+      "label": "Lived there from (month/year)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf8[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf8[0]",
+      "newName": "dv105_child_home_3_until",
       "type": "text",
-      "label": ""
+      "label": "Until (month/year)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf9[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf9[0]",
+      "newName": "dv105_child_home_3_city_and_state",
       "type": "text",
-      "label": ""
+      "label": "City and state"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[0]",
+      "newName": "dv105_child_home_3_lived_with_me",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with me"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[1]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[1]",
+      "newName": "dv105_child_home_3_lived_with_restrained_person",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with the person in 2"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[2]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[2]",
+      "newName": "dv105_child_home_3_lived_with_other",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with someone else"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField3[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField3[0]",
+      "newName": "dv105_child_home_3_other_relationship",
       "type": "text",
-      "label": ""
+      "label": "Their relationship to the child"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf10[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf10[0]",
+      "newName": "dv105_child_home_4_from",
       "type": "text",
-      "label": ""
+      "label": "Lived there from (month/year)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf11[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf11[0]",
+      "newName": "dv105_child_home_4_until",
       "type": "text",
-      "label": ""
+      "label": "Until (month/year)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf12[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf12[0]",
+      "newName": "dv105_child_home_4_city_and_state",
       "type": "text",
-      "label": ""
+      "label": "City and state"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[0]",
+      "newName": "dv105_child_home_4_lived_with_me",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with me"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[1]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[1]",
+      "newName": "dv105_child_home_4_lived_with_restrained_person",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with the person in 2"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[2]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[2]",
+      "newName": "dv105_child_home_4_lived_with_other",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with someone else"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField4[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField4[0]",
+      "newName": "dv105_child_home_4_other_relationship",
       "type": "text",
-      "label": ""
+      "label": "Their relationship to the child"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf13[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf13[0]",
+      "newName": "dv105_child_home_5_from",
       "type": "text",
-      "label": ""
+      "label": "Lived there from (month/year)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf14[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf14[0]",
+      "newName": "dv105_child_home_5_until",
       "type": "text",
-      "label": ""
+      "label": "Until (month/year)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf15[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf15[0]",
+      "newName": "dv105_child_home_5_city_and_state",
       "type": "text",
-      "label": ""
+      "label": "City and state"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[0]",
+      "newName": "dv105_child_home_5_lived_with_me",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with me"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[1]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[1]",
+      "newName": "dv105_child_home_5_lived_with_restrained_person",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with the person in 2"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[2]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[2]",
+      "newName": "dv105_child_home_5_lived_with_other",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with someone else"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField5[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField5[0]",
+      "newName": "dv105_child_home_5_other_relationship",
       "type": "text",
-      "label": ""
+      "label": "Their relationship to the child"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf16[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf16[0]",
+      "newName": "dv105_child_home_6_from",
       "type": "text",
-      "label": ""
+      "label": "Lived there from (month/year)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf17[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf17[0]",
+      "newName": "dv105_child_home_6_until",
       "type": "text",
-      "label": ""
+      "label": "Until (month/year)"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf18[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf18[0]",
+      "newName": "dv105_child_home_6_city_and_state",
       "type": "text",
-      "label": ""
+      "label": "City and state"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[0]",
+      "newName": "dv105_child_home_6_lived_with_me",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with me"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[1]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[1]",
+      "newName": "dv105_child_home_6_lived_with_restrained_person",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with the person in 2"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[2]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[2]",
+      "newName": "dv105_child_home_6_lived_with_other",
       "type": "checkbox",
-      "label": ""
+      "label": "Lived with someone else"
     },
     {
       "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField6[0]",
-      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField6[0]",
+      "newName": "dv105_child_home_6_other_relationship",
       "type": "text",
-      "label": ""
+      "label": "Their relationship to the child"
     },
     {
       "id": "DV-105[0].Page2[0].Caption[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number (page 2)"
     },
     {
       "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].ChoiceInvolv1[0]",
@@ -522,7 +522,7 @@
       "id": "DV-105[0].Page3[0].Caption[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number (page 3)"
     },
     {
       "id": "DV-105[0].Page3[0].List6[0].item6NY[0]",
@@ -648,7 +648,7 @@
       "id": "DV-105[0].Page4[0].Captio[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number (page 4)"
     },
     {
       "id": "DV-105[0].Page4[0].List9[0].ChoiceItem9YesNo[0]",
@@ -756,7 +756,7 @@
       "id": "DV-105[0].Page5[0].Caption[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number (page 5)"
     },
     {
       "id": "DV-105[0].Page5[0].List12[0].List[0].Li1[0].List[0].Li1[0].choiceItem12a[0]",
@@ -1204,123 +1204,126 @@
     },
     {
       "id": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Print[0]",
-      "newName": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Print[0]",
+      "newName": "dv105_print_button",
       "type": "button",
-      "label": ""
+      "label": "Form button - not a question",
+      "courtUse": true
     },
     {
       "id": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Save[0]",
-      "newName": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Save[0]",
+      "newName": "dv105_save_button",
       "type": "button",
-      "label": ""
+      "label": "Form button - not a question",
+      "courtUse": true
     },
     {
       "id": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Reset[0]",
-      "newName": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Reset[0]",
+      "newName": "dv105_reset_button",
       "type": "button",
-      "label": ""
+      "label": "Form button - not a question",
+      "courtUse": true
     },
     {
       "id": "DV-105[0].Page6[0].Caption[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number (page 6)"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].ChoiceItem13aNoYes[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].ChoiceItem13aNoYes[0]",
+      "newName": "dv105_exchanges_supervised_no",
       "type": "checkbox",
-      "label": ""
+      "label": "No"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].ChoiceItem13aNoYes[1]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].ChoiceItem13aNoYes[1]",
+      "newName": "dv105_exchanges_supervised_yes",
       "type": "checkbox",
-      "label": ""
+      "label": "Yes"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].ChoiceItem13aSupervExch[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].ChoiceItem13aSupervExch[0]",
+      "newName": "dv105_exchange_supervisor_professional",
       "type": "checkbox",
-      "label": ""
+      "label": "Professional"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].TextField2[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].TextField2[0]",
+      "newName": "dv105_exchange_supervisor_professional_name",
       "type": "text",
-      "label": ""
+      "label": "Professional name"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField1[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField1[0]",
+      "newName": "dv105_exchange_fees_me_percent",
       "type": "text",
-      "label": ""
+      "label": "Fees paid by me (%)"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField2[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField2[0]",
+      "newName": "dv105_exchange_fees_them_percent",
       "type": "text",
-      "label": ""
+      "label": "Fees paid by person in 2 (%)"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].TextField3[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].TextField3[0]",
+      "newName": "dv105_exchange_fees_other_who",
       "type": "text",
-      "label": ""
+      "label": "Fees paid by other (who)"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField3[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField3[0]",
+      "newName": "dv105_exchange_fees_other_percent",
       "type": "text",
-      "label": ""
+      "label": "Fees paid by other (%)"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].ChoiceItem13aSupervExch[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].ChoiceItem13aSupervExch[0]",
+      "newName": "dv105_exchange_supervisor_nonprofessional",
       "type": "checkbox",
-      "label": ""
+      "label": "Nonprofessional"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].t2[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].t2[0]",
+      "newName": "dv105_exchange_supervisor_nonprofessional_name",
       "type": "text",
-      "label": ""
+      "label": "Name"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].CheckBoxRightCaption[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].CheckBoxRightCaption[0]",
+      "newName": "dv105_exchange_supervisor_nonprofessional_agreed",
       "type": "checkbox",
-      "label": ""
+      "label": "They have agreed to supervise exchanges"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[0]",
+      "newName": "dv105_unsupervised_location_in_person",
       "type": "checkbox",
-      "label": ""
+      "label": "In person at a safe location"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[1]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[1]",
+      "newName": "dv105_unsupervised_location_virtual",
       "type": "checkbox",
-      "label": ""
+      "label": "Virtual visit"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[2]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[2]",
+      "newName": "dv105_unsupervised_location_other",
       "type": "checkbox",
-      "label": ""
+      "label": "Other"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].TextField2[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].TextField2[0]",
+      "newName": "dv105_unsupervised_location_other_description",
       "type": "text",
-      "label": ""
+      "label": "Other (describe)"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].TextField1[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].TextField1[0]",
+      "newName": "dv105_unsupervised_visit_details",
       "type": "text",
-      "label": ""
+      "label": "When visits happen, how often, and who transports the children"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf1[0]",
@@ -1618,33 +1621,33 @@
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[0]",
+      "newName": "dv105_unsupervised_schedule_every_week",
       "type": "checkbox",
-      "label": ""
+      "label": "Every week"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[1]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[1]",
+      "newName": "dv105_unsupervised_schedule_every_other_week",
       "type": "checkbox",
-      "label": ""
+      "label": "Every other week"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[2]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[2]",
+      "newName": "dv105_unsupervised_schedule_other",
       "type": "checkbox",
-      "label": ""
+      "label": "Other"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].othertf[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].othertf[0]",
+      "newName": "dv105_unsupervised_schedule_other_description",
       "type": "text",
-      "label": ""
+      "label": "Other (describe)"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].TextField2[0]",
-      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].TextField2[0]",
+      "newName": "dv105_unsupervised_start_date",
       "type": "text",
-      "label": ""
+      "label": "Start date for visits"
     }
   ]
 }

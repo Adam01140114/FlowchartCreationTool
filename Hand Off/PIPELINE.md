@@ -51,6 +51,7 @@ How to wire one: [`NEW-FORM.md`](./NEW-FORM.md), "Disqualifying factors".
 | `<form>-hints.json` | interview knowledge the field config cannot express: question wording, option labels, exclusive groups, sections | you |
 | `<form>-flowchart.json` | the compiled flowchart | `compile-form.js` |
 | `dv-packet.spec.json` | the packet: form order, PDFs, connectors | you |
+| `dv-packet-disqualifiers.json` | the answer combinations that rule a filer out | you |
 | `dv-packet-project.json` | the project the editor opens | `pipeline-build-packet.js` |
 | `dv-packet-gui.json` | every form merged into one interview | the editor's **Export Project GUI JSON** |
 | `pipeline-answers.json` | what a debug fill answered | the generated form |
@@ -66,6 +67,47 @@ A field marked `"courtUse": true` in the field config never becomes a question.
 It stays on the PDF, blank, for the judge or clerk. This is not a cosmetic
 choice: asking a survivor what the judge decided produces an answer they cannot
 know and a filed order that says the court ruled something it has not.
+
+## Generating the form: wait for the builder before reading it back
+
+`loadFormData` restores each question's hidden-logic rows on per-question
+`setTimeout(..., 50)` timers, and `getFormHTML` reads those rows back out of the
+builder DOM. Call `getFormHTML` too soon and the page is emitted with
+`var hiddenLogicConfigs = []`.
+
+That is not a small loss. Hidden logic is how an exclusive choice reaches its
+PDF checkbox: the config maps the option's label to the option's own field name.
+Without it the runtime falls back to a box named `<question>_<slug(label)>`, so
+"Someone trusted, like a relative or friend" posts
+`dv105_supervisor_someone_trusted_like_a_relative_or_friend` and the field
+`dv105_supervisor_nonprofessional` is never ticked. The interview looks right,
+the payload looks full, `pipeline-audit` passes, and the printed form has empty
+boxes - fifteen groups on DV-100 alone.
+
+So after loading, wait, and check before generating:
+
+```js
+document.querySelectorAll('.hidden-logic-config').length   // 299 for the DV packet
+```
+
+and confirm the emitted HTML carries a non-empty `var hiddenLogicConfigs = [`.
+The editor's own **Preview Form** does this for you; a scripted export does not.
+
+## A field box that covers the form's own label
+
+`pipeline-sanitize.js` lowers the top of any multi-line field whose rectangle
+covers text the page has already printed, and says so:
+
+```
+    box lowered off its own label: dv101_abuse_1_injuries (page 1, top 224 -> 213)
+```
+
+DV-101 item 3e is the case: the widget starts eight points above the label it
+belongs to, so anything drawing from the top of the box prints the answer
+straight through the words "Describe any injuries:". The value is right, the
+field name is right, and the page is unreadable - only the page-image audit
+finds it. The correction belongs in the sanitized PDF, not in the filler, so
+every consumer sees the same rectangle.
 
 ## Splitting a field that holds two answers
 
@@ -116,7 +158,7 @@ number box. Types work inside combined and repeating questions too.
 ```bash
 # 1. cross-form identity, then rebuild the PDFs whose field names changed
 node pipeline-connect.js
-node pipeline-sanitize.js dv109 dv110
+node pipeline-sanitize.js dv100 dv101 dv105 dv109 dv110
 
 # 2. what the paper form says disqualifies a filer, and whether it is wired
 node pipeline-disqualifiers.js --scan     # leads, per form, per page
@@ -124,7 +166,8 @@ node pipeline-disqualifiers.js            # what is declared
 
 # 3. compile each form, then assemble the packet
 node compile-form.js dv-field-configs/dv100-field-config.json dv100-flowchart.json --hints dv100-hints.json
-node pipeline-build-packet.js
+#   ... and one line per form: dv101, dv105, dv109, dv110
+node pipeline-build-packet.js   # also wires every declared disqualifier as an alert node
 
 # 4. open dv-packet-project.json in the editor (Import Project JSON),
 #    then Export Project GUI JSON -> dv-packet-gui.json
@@ -146,7 +189,7 @@ node pipeline-review.js
 # 8. look at the filled PDFs, page by page. Also not optional: every check
 #    above reads data, and a field can hold the right string and still
 #    print in the wrong place. See Hand Off/PDF-PAGE-AUDIT.md.
-node audit-pdf-pages.js ./audit 1.6 dv100-filled.pdf dv109-filled.pdf dv110-filled.pdf
+node audit-pdf-pages.js ./audit 1.6 dv100-filled.pdf dv101-filled.pdf dv105-filled.pdf \n                                  dv109-filled.pdf dv110-filled.pdf
 ```
 
 ## The last step: read it

@@ -2060,7 +2060,15 @@ window.exportGuiJson = function(download = true) {
       if (question.image) {
         delete question.image;
       }
-      // For all checkbox questions, remove nameId/placeholder
+      // A checkbox question has no single input to name, so the runtime must
+      // not see a nameId - each option carries its own. But the question is
+      // still a thing the flowchart named, and dropping the name entirely left
+      // it addressable only as "q149": nothing downstream could refer to it, so
+      // an author could not declare one always-shown and the audit reported a
+      // gate failure that had no way to be answered. Keep the identity under
+      // nodeId, which is read-only everywhere and already carries the same name
+      // for combined and repeating questions.
+      if (question.nameId && !question.nodeId) question.nodeId = question.nameId;
       delete question.nameId;
       delete question.placeholder;
     }

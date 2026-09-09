@@ -1,0 +1,209 @@
+{
+  "_comment": "Interview knowledge the DV-101 field config cannot express. DV-101 is the overflow attachment for DV-100's description of abuse: DV-100 holds three incidents and says 'check this box if you need more space', and this form holds two more. So the whole form is gated on that DV-100 answer, and the caption and party names are answered there too - a filer states them once on the DV-100 and never sees them again. What DV-101 does ask that DV-100 never does is what the police did: whether they came, whether they issued an Emergency Protective Order, and who that order protects.",
+  "groups": [
+    {
+      "nameId": "dv101_abuse_1_police_came",
+      "question": "Did the police or other law enforcement come?",
+      "members": [
+        "dv101_abuse_1_police_came_yes",
+        "dv101_abuse_1_police_came_no"
+      ],
+      "labels": [
+        "Yes",
+        "No"
+      ]
+    },
+    {
+      "nameId": "dv101_abuse_1_epo_given",
+      "question": "Did they give you or the other person an Emergency Protective Order?",
+      "members": [
+        "dv101_abuse_1_epo_given_yes",
+        "dv101_abuse_1_epo_given_no",
+        "dv101_abuse_1_epo_given_unknown"
+      ],
+      "labels": [
+        "Yes",
+        "No",
+        "I don't know"
+      ]
+    },
+    {
+      "nameId": "dv101_abuse_1_epo_protects",
+      "question": "Who does that Emergency Protective Order protect?",
+      "members": [
+        "dv101_abuse_1_epo_protects_you",
+        "dv101_abuse_1_epo_protects_restrained_person"
+      ],
+      "labels": [
+        "You",
+        "The person you want protection from"
+      ]
+    },
+    {
+      "nameId": "dv101_abuse_2_police_came",
+      "question": "Did the police or other law enforcement come that time?",
+      "members": [
+        "dv101_abuse_2_police_came_yes",
+        "dv101_abuse_2_police_came_no"
+      ],
+      "labels": [
+        "Yes",
+        "No"
+      ]
+    },
+    {
+      "nameId": "dv101_abuse_2_epo_given",
+      "question": "Did they give you or the other person an Emergency Protective Order?",
+      "members": [
+        "dv101_abuse_2_epo_given_yes",
+        "dv101_abuse_2_epo_given_no",
+        "dv101_abuse_2_epo_given_unknown"
+      ],
+      "labels": [
+        "Yes",
+        "No",
+        "I don't know"
+      ]
+    },
+    {
+      "nameId": "dv101_abuse_2_epo_protects",
+      "question": "Who does that Emergency Protective Order protect?",
+      "members": [
+        "dv101_abuse_2_epo_protects_you",
+        "dv101_abuse_2_epo_protects_restrained_person"
+      ],
+      "labels": [
+        "You",
+        "The person you want protection from"
+      ]
+    }
+  ],
+  "questions": {
+    "person_asking_protection_name": {
+      "text": "Who is asking for protection?"
+    },
+    "person_to_restrain_full_name": {
+      "text": "Who do you want protection from?"
+    },
+    "dv101_abuse_1_date": {
+      "text": "When did this abuse happen?",
+      "type": "date"
+    },
+    "dv101_abuse_1_witnesses": {
+      "text": "Who else was there?",
+      "optional": true,
+      "type": "bigParagraph"
+    },
+    "dv101_abuse_1_description": {
+      "text": "Describe how the person abused you or your children.",
+      "type": "bigParagraph"
+    },
+    "dv101_abuse_1_weapon_description": {
+      "text": "Describe any use or threatened use of guns or other weapons.",
+      "type": "bigParagraph",
+      "optional": true
+    },
+    "dv101_abuse_1_injuries": {
+      "text": "Describe any injuries.",
+      "type": "bigParagraph",
+      "optional": true
+    },
+    "dv101_abuse_1_epo_given": {
+      "conditional": {
+        "onlyWhen": "dv101_abuse_1_police_came_yes"
+      }
+    },
+    "dv101_abuse_1_epo_protects": {
+      "conditional": {
+        "onlyWhen": "dv101_abuse_1_epo_given_yes"
+      }
+    },
+    "dv101_abuse_2_date": {
+      "text": "When did that abuse happen?",
+      "type": "date"
+    },
+    "dv101_abuse_2_witnesses": {
+      "text": "Who else was there?",
+      "optional": true,
+      "type": "bigParagraph"
+    },
+    "dv101_abuse_2_description": {
+      "text": "Describe how the person abused you or your children that time.",
+      "type": "bigParagraph"
+    },
+    "dv101_abuse_2_weapon_description": {
+      "text": "Describe any use or threatened use of guns or other weapons.",
+      "type": "bigParagraph",
+      "optional": true
+    },
+    "dv101_abuse_2_injuries": {
+      "text": "Describe any injuries.",
+      "type": "bigParagraph",
+      "optional": true
+    },
+    "dv101_abuse_2_epo_given": {
+      "conditional": {
+        "onlyWhen": "dv101_abuse_2_police_came_yes"
+      }
+    },
+    "dv101_abuse_2_epo_protects": {
+      "conditional": {
+        "onlyWhen": "dv101_abuse_2_epo_given_yes"
+      }
+    },
+    "dv101_further_abuse_description": {
+      "text": "Is there any other abuse you want the judge to know about?",
+      "type": "bigParagraph",
+      "optional": true
+    },
+    "dv101_additional_pages_attached": {
+      "text": "Do you need still more space, on a separate sheet?"
+    },
+    "case_number": {
+      "text": "What is the case number?"
+    }
+  },
+  "sections": [
+    {
+      "name": "More About the Abuse",
+      "fields": [
+        "case_number",
+        "person_asking_protection_name",
+        "person_to_restrain_full_name",
+        "dv101_abuse_1_date",
+        "dv101_abuse_1_witnesses",
+        "dv101_abuse_1_description",
+        "dv101_abuse_1_weapon_description",
+        "dv101_abuse_1_injuries",
+        "dv101_abuse_1_police_came",
+        "dv101_abuse_1_epo_given",
+        "dv101_abuse_1_epo_protects"
+      ]
+    },
+    {
+      "name": "Another Incident",
+      "fields": [
+        "dv101_abuse_2_date",
+        "dv101_abuse_2_witnesses",
+        "dv101_abuse_2_description",
+        "dv101_abuse_2_weapon_description",
+        "dv101_abuse_2_injuries",
+        "dv101_abuse_2_police_came",
+        "dv101_abuse_2_epo_given",
+        "dv101_abuse_2_epo_protects",
+        "dv101_further_abuse_description",
+        "dv101_additional_pages_attached"
+      ]
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "dv101_abuse_1_police_came",
+      "why": "Item 3f is asked about every incident, whatever the answers above it were."
+    },
+    {
+      "question": "dv101_abuse_2_police_came",
+      "why": "Item 4f, the same."
+    }
+  ]
+}
