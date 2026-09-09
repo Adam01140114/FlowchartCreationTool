@@ -409,6 +409,13 @@ function reportGroupProblems(merged) {
     if (!forms.length) throw new Error('This project has no forms.');
 
     const startIndex = window.currentFormIndex;
+    // Read before the walk. switchToProjectForm captures the canvas back into
+    // the slot it leaves, and that capture rebuilds the flowchart from cells -
+    // so anything the compiler wrote beside them is gone by the time the loop
+    // comes back round.
+    const computedBefore = forms.map(function (f) {
+      return (f.flowchart && f.flowchart.computedFields) || [];
+    });
     const perForm = [];
 
     for (let i = 0; i < forms.length; i++) {
@@ -416,7 +423,12 @@ function reportGroupProblems(merged) {
       await wait(LOAD_SETTLE_MS);
       perForm.push({
         name: forms[i].name || ('Form ' + (i + 1)),
-        gui: JSON.parse(window.exportGuiJson(false))
+        gui: JSON.parse(window.exportGuiJson(false)),
+        // exportGuiJson describes the questions; the page count and the
+        // computed fields are properties of the form itself, so they are
+        // taken from the flowchart the project is holding.
+        flowchart: forms[i].flowchart || null,
+        computedFields: computedBefore[i]
       });
     }
 
@@ -483,7 +495,10 @@ function reportGroupProblems(merged) {
         // form's pdfOutputName, so without carrying the name per form the
         // packet finished by producing one PDF and silently dropping the rest.
         pdfFile: gui.pdfOutputName || gui.defaultPDFName || '',
-        pdfName: gui.defaultPDFName || entry.name
+        pdfName: gui.defaultPDFName || entry.name,
+        // What this form adds to the pile a filer hands in.
+        pdfPages: (entry.flowchart && entry.flowchart.defaultPdfProperties
+          && entry.flowchart.defaultPdfProperties.pdfPages) || 0
       });
 
       merged.sections = merged.sections.concat(gui.sections || []);
@@ -537,6 +552,12 @@ function reportGroupProblems(merged) {
     merged.formName = (document.getElementById('projectNameInput') || {}).value
       || merged.formName || 'Project';
     merged.projectForms = ranges;
+    // Fields the form asks for that no question can answer, gathered from
+    // every form in the packet.
+    merged.computedFields = perForm.reduce(function (all, entry) {
+      const own = entry.computedFields || [];
+      return all.concat(own);
+    }, []);
     merged.formActivations = buildActivations(questionsByForm, questionOffsets, formIdentity);
 
     // Must run after every form is merged, so a value shared by forms one and

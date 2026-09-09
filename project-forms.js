@@ -52,6 +52,16 @@
     }
     const slot = window.projectForms[window.currentFormIndex];
     if (slot) {
+      // The canvas is the authority on cells and sections, and on nothing
+      // else. A compiled flowchart also carries what the questions cannot say
+      // - the continuation lines, the always-shown declarations, the computed
+      // fields - and rebuilding the slot from the canvas quietly threw all of
+      // it away the first time the project was walked. Keep whatever the slot
+      // had that the canvas does not produce.
+      const kept = slot.flowchart || {};
+      Object.keys(kept).forEach(function (key) {
+        if (!(key in flowchart)) flowchart[key] = kept[key];
+      });
       slot.flowchart = flowchart;
       slot.name = name;
     }

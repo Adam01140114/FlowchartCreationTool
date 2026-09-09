@@ -9491,6 +9491,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var hiddenLogicConfigs = ${JSON.stringify(hiddenLogicConfigs || [])};\n`;
   formHTML += `var linkedFields = ${JSON.stringify(linkedFields || [])};\n`;
   formHTML += `var alertRules = ${JSON.stringify(window.alertRulesConfig || [])};\n`;
+  formHTML += `var computedFields = ${JSON.stringify(window.computedFieldsConfig || [])};\n`;
   formHTML += `var isHandlingLink = false;\n`;
   // Dynamic conditional logic for business type question to show county question
   formHTML += `
@@ -14212,6 +14213,88 @@ function isFormActivated(form){
 }
 
 /**
+ * Is this form an attachment the filer is adding, rather than one that always
+ * travels with the packet?
+ *
+ * The distinction is already in the activation rules and needs no new flag: a
+ * form switched on unconditionally is filed alongside - DV-109 and DV-110 go
+ * with every request - and a form switched on by an answer is one the filer
+ * chose to attach. DV-101 and DV-105 both say so on their own first page:
+ * "This form is attached to form DV-100."
+ */
+function isAttachmentForm(form){
+    if (!form || form.alwaysIncluded) return false;
+    var rules = getFormActivations().filter(function(r){ return activationNamesForm(r, form); });
+    if (!rules.length) return false;
+    for (var i = 0; i < rules.length; i++){
+        if (rules[i].unconditional) return false;
+    }
+    return true;
+}
+
+/** Has this question been answered yes? */
+function computedFieldSaysYes(nameId){
+    var el = document.getElementById(nameId);
+    if (el){
+        if (el.type === "checkbox" || el.type === "radio") return !!el.checked;
+        return String(el.value || "").trim().toLowerCase() === "yes";
+    }
+    var box = document.getElementById(nameId + "_yes");
+    return !!(box && box.checked);
+}
+
+/** Park a computed value where the payload will pick it up like any answer. */
+function writeComputedField(nameId, value){
+    var el = document.getElementById(nameId);
+    if (!el){
+        el = document.createElement("input");
+        el.type = "text";
+        el.id = nameId;
+        el.name = nameId;
+        el.style.display = "none";
+        el.setAttribute("data-computed", "1");
+        var host = document.getElementById("hidden_pdf_fields") || document.getElementById("customForm");
+        if (!host) return;
+        host.appendChild(el);
+    }
+    el.value = String(value);
+}
+
+/**
+ * Work out the fields the form asks for that the filer cannot know.
+ *
+ * DV-100 item 32 - "enter the number of extra pages attached to this form" -
+ * was a question, and a question there gets a guess. The debug fill answered
+ * 100. A filer would answer something too, and a wrong number on a filed court
+ * document is worse than a blank one.
+ *
+ * It is not unknowable, only unknown to the person holding the pen: it is the
+ * length of the attachments they are filing plus the separate sheets they have
+ * already told the form they are adding. The packet knows both - the page
+ * counts are read from the PDFs when the packet is built, and which
+ * attachments are switched on is the same answer that decides whether their
+ * questions get asked at all.
+ */
+function applyComputedFields(){
+    var rules = (typeof computedFields !== "undefined" && computedFields) ? computedFields : [];
+    if (!rules.length) return;
+    rules.forEach(function(rule){
+        if (!rule || !rule.nameId) return;
+        var total = 0;
+        if (rule.pagesOfAttachedForms){
+            getProjectForms().forEach(function(form){
+                if (!isAttachmentForm(form) || !isFormActivated(form)) return;
+                total += Number(form.pdfPages) || 0;
+            });
+        }
+        (rule.onePageEachWhenYes || []).forEach(function(nameId){
+            if (computedFieldSaysYes(nameId)) total += 1;
+        });
+        writeComputedField(rule.nameId, total);
+    });
+}
+
+/**
  * Where to go after the last section of a form: the first section of the next
  * activated form, or "end". Returns null when this is not a form boundary, so
  * ordinary section-to-section navigation is untouched.
@@ -14235,6 +14318,7 @@ function nextSectionAcrossForms(currentSection){
 function handleNext(currentSection){
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
+    applyComputedFields();
     /* remember the place we're leaving - push BEFORE evaluating jumps */
     sectionStack.push(currentSection);
     let nextSection = currentSection + 1;
@@ -14395,6 +14479,7 @@ function navigateSection(sectionNumber, isBackNavigation = false){
         form.style.display   = 'none';
         thankYou.style.display = 'block';
         currentSectionNumber = 'end';
+        applyComputedFields();
         updateProgressBar();
         scrollFormToTop();
         return;

@@ -3038,6 +3038,7 @@ function loadFormData(formData) {
     // could hold one; the flowchart is where they are authored and this is
     // only a stop on the way to the generated form.
     window.alertRulesConfig = Array.isArray(formData.alertRules) ? formData.alertRules : [];
+    window.computedFieldsConfig = Array.isArray(formData.computedFields) ? formData.computedFields : [];
     // Load linked fields
     if (formData.linkedFields && formData.linkedFields.length > 0) {
         // Initialize linked fields configuration
@@ -3210,6 +3211,9 @@ function exportForm(options) {
                 formData.checklistItems.push(itemText);
             }
         });
+    }
+    if (Array.isArray(window.computedFieldsConfig) && window.computedFieldsConfig.length > 0) {
+        formData.computedFields = window.computedFieldsConfig;
     }
     if (Array.isArray(window.alertRulesConfig) && window.alertRulesConfig.length > 0) {
         formData.alertRules = window.alertRulesConfig;

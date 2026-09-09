@@ -790,10 +790,6 @@
         "onlyWhen": "pay_property_debts_order_requested"
       }
     },
-    "additional_pages_count": {
-      "text": "How many extra pages are attached?",
-      "type": "number"
-    },
     "case_number": {
       "text": "What is the case number?"
     },
@@ -1610,9 +1606,6 @@
         "person_asking_protection_telephone",
         "person_asking_protection_fax",
         "person_asking_protection_email",
-        "person_asking_protection_lawyer_name",
-        "person_asking_protection_lawyer_state_bar_number",
-        "person_asking_protection_lawyer_firm_name",
         "court_name_and_street_address",
         "court_name",
         "court_street_address",
@@ -1708,7 +1701,10 @@
     {
       "name": "Signatures",
       "fields": [
-        "additional_pages_count",
+        "has_lawyer",
+        "person_asking_protection_lawyer_name",
+        "person_asking_protection_lawyer_state_bar_number",
+        "person_asking_protection_lawyer_firm_name",
         "person_asking_protection_signature_date",
         "person_asking_protection_signature_printed_name",
         "lawyer_signature_date",
@@ -2305,5 +2301,16 @@
       "question": "other_protected_people_reason_for_protection",
       "why": "Item 8(2) follows 8(1) inside the protect-others Yes branch; verified hidden when that answer is No."
     }
-  ]
+  ],
+  "computed": {
+    "additional_pages_count": {
+      "_why": "DV-100 item 32 asks for the number of extra pages attached. A filer cannot count them and the debug fill answered 100. The packet knows: the pages of every attachment being filed, plus one for each separate sheet already promised.",
+      "pagesOfAttachedForms": true,
+      "onePageEachWhenYes": [
+        "other_protected_people_additional_list_attached_yes",
+        "dv101_additional_pages_attached",
+        "dv105_children_additional_list_attached"
+      ]
+    }
+  }
 }

@@ -279,17 +279,19 @@
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].TextField[0]",
-      "newName": "firearm_item_1_description",
+      "newName": "dv110_firearm_item_1_description",
       "type": "text",
       "label": "firearm item 1 description",
-      "courtUse": true
+      "courtUse": true,
+      "courtSeparatedFrom": "firearm_item_1_description"
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].TextField1[0]",
-      "newName": "firearm_item_1_location",
+      "newName": "dv110_firearm_item_1_location",
       "type": "text",
       "label": "firearm item 1 location",
-      "courtUse": true
+      "courtUse": true,
+      "courtSeparatedFrom": "firearm_item_1_location"
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li1[0].Choice[0]",
@@ -307,17 +309,19 @@
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].TextField[0]",
-      "newName": "firearm_item_2_description",
+      "newName": "dv110_firearm_item_2_description",
       "type": "text",
       "label": "firearm item 2 description",
-      "courtUse": true
+      "courtUse": true,
+      "courtSeparatedFrom": "firearm_item_2_description"
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].TextField1[0]",
-      "newName": "firearm_item_2_location",
+      "newName": "dv110_firearm_item_2_location",
       "type": "text",
       "label": "firearm item 2 location",
-      "courtUse": true
+      "courtUse": true,
+      "courtSeparatedFrom": "firearm_item_2_location"
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li2[0].Choice[0]",
@@ -335,17 +339,19 @@
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].TextField[0]",
-      "newName": "firearm_item_3_description",
+      "newName": "dv110_firearm_item_3_description",
       "type": "text",
       "label": "firearm item 3 description",
-      "courtUse": true
+      "courtUse": true,
+      "courtSeparatedFrom": "firearm_item_3_description"
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].TextField1[0]",
-      "newName": "firearm_item_3_location",
+      "newName": "dv110_firearm_item_3_location",
       "type": "text",
       "label": "firearm item 3 location",
-      "courtUse": true
+      "courtUse": true,
+      "courtSeparatedFrom": "firearm_item_3_location"
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li3[0].Choice[0]",
@@ -363,17 +369,19 @@
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].TextField[0]",
-      "newName": "firearm_item_4_description",
+      "newName": "dv110_firearm_item_4_description",
       "type": "text",
       "label": "firearm item 4 description",
-      "courtUse": true
+      "courtUse": true,
+      "courtSeparatedFrom": "firearm_item_4_description"
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].TextField1[0]",
-      "newName": "firearm_item_4_location",
+      "newName": "dv110_firearm_item_4_location",
       "type": "text",
       "label": "firearm item 4 location",
-      "courtUse": true
+      "courtUse": true,
+      "courtSeparatedFrom": "firearm_item_4_location"
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].Li1[0].Lista[0].Li4[0].Choice[0]",
@@ -656,10 +664,11 @@
     },
     {
       "id": "DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb4[0]",
-      "newName": "stay_away_from_other_protected_people",
+      "newName": "dv110_stay_away_from_other_protected_people",
       "type": "checkbox",
       "label": "stay_away_from_other_protected_people",
-      "courtUse": true
+      "courtUse": true,
+      "courtSeparatedFrom": "stay_away_from_other_protected_people"
     },
     {
       "id": "DV-110[0].Page4[0].List12[0].Li1[0].FieldName_cb5[0]",

@@ -132,6 +132,64 @@ through an answer and prints which:
 A block on the spine keeps whatever the hint says, because there zero can be a
 real answer. A hint that sets `"min": 0` behind a gate is overridden, visibly.
 
+## A field the form asks for and the filer cannot know
+
+DV-100 item 32 - "enter the number of extra pages attached to this form" - was
+a question, and a question there gets a guess. The debug fill answered 100. A
+filer would answer something too, and a wrong number on a filed court document
+is worse than a blank one.
+
+It is not unknowable, only unknown to the person holding the pen. Declare it in
+the hints and no question is generated; the form works it out when it posts:
+
+```json
+"computed": {
+  "additional_pages_count": {
+    "pagesOfAttachedForms": true,
+    "onePageEachWhenYes": [
+      "other_protected_people_additional_list_attached_yes",
+      "dv101_additional_pages_attached",
+      "dv105_children_additional_list_attached" ] } }
+```
+
+Nothing here is a number someone typed. Page counts are read from the PDFs when
+the packet is built (`pdfPages` on each form), and which attachments are on is
+the same answer that decides whether their questions get asked at all. An
+attachment is a form switched on **conditionally** - DV-109 and DV-110 are
+switched on unconditionally and travel with the packet rather than being
+attached to it, which is the distinction the activation rules already draw.
+The maximum path gives 11: DV-101 (2) + DV-105 (6) + three separate sheets.
+
+It crosses four layers, so a change to any of them has to keep all four:
+`compile-form.js` drops the field and records it, `pipeline-build-packet.js`
+counts the pages, `project-gui-export.js` merges it, and the generated form
+evaluates it in `applyComputedFields()`.
+
+One thing this turned up: `captureCurrentForm` rebuilt a project slot from the
+canvas, and the canvas knows about cells and sections and nothing else - so the
+first walk of a project silently threw away the continuation lines, the
+always-shown declarations and the computed fields. It now keeps whatever the
+slot had that the canvas does not produce.
+
+## A court field must not share a filer's name
+
+Sharing a name is how this packet wires one answer into every form that prints
+it, which makes an accidental share indistinguishable from a deliberate one.
+There is one kind that is never deliberate.
+
+DV-110 says the filer completes items 1, 2 and 3 and the court completes the
+rest. Its item 6 is a court **finding** - "The court finds that you have the
+following prohibited items" - and its field for the first firearm was called
+`firearm_item_1_description`, the same as the box on DV-100 where the filer
+lists what they believe the person has. The filer's claim was posted straight
+into the judge's finding, and the same for item 12a's stay-away grant. Nine
+fields, and the filled order read as though the court had already decided.
+
+`pipeline-connect.js` now enforces the inverse of its own rule: a `courtUse`
+field may not carry a name that a filer field somewhere in the packet also
+carries. Where it does, the court's copy is renamed with its own form in front
+and the answer stops reaching it. `--check` exits non-zero while any remain.
+
 ## A long answer runs onto the next ruled line
 
 A court form often prints two ruled lines for one answer and gives each its own

@@ -22,6 +22,8 @@
  * Usage: node pipeline-build-packet.js [spec.json] [out.json]
  */
 const fs = require('fs');
+const path = require('path');
+const OUT_DIR = 'FormWiz GUI';
 
 const SPEC = process.argv[2] || 'dv-packet.spec.json';
 const OUT = process.argv[3] || 'dv-packet-project.json';
@@ -31,6 +33,25 @@ const alerted = {};
 const CONNECTOR_STYLE = 'shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;'
   + 'nodeType=connector;spacing=12;fontSize=14;align=center;verticalAlign=middle;'
   + 'fillColor=#fff3cd;fontColor=#7a5c00;strokeColor=#e0a800;strokeWidth=3;';
+
+/**
+ * How many pages a form has, read from the PDF rather than written down.
+ *
+ * DV-100 item 32 asks how many extra pages are attached, and the answer is the
+ * length of the attachments. Counting them here means the number cannot go
+ * stale when a form is revised.
+ */
+async function pageCount(pdfFile) {
+  const { PDFDocument } = require('pdf-lib');
+  for (const file of [path.join(OUT_DIR, pdfFile), pdfFile]) {
+    if (!fs.existsSync(file)) continue;
+    try {
+      const doc = await PDFDocument.load(fs.readFileSync(file), { ignoreEncryption: true });
+      return doc.getPageCount();
+    } catch (e) { /* the unsanitized original is encrypted; try the next one */ }
+  }
+  return 0;
+}
 
 const nextId = (cells) => String(Math.max(0, ...cells
   .map((c) => parseInt(c.id, 10)).filter((n) => !isNaN(n))) + 1);
@@ -193,9 +214,10 @@ function wireDisqualifiers(flowchart, formName, declared) {
   return mine.length;
 }
 
-function main() {
+async function main() {
   const spec = JSON.parse(fs.readFileSync(SPEC, 'utf8'));
-  const forms = spec.forms.map((entry) => {
+  const forms = [];
+  for (const entry of spec.forms) {
     const flowchart = JSON.parse(fs.readFileSync(entry.flowchart, 'utf8'));
     // The form's identity, not its PDF's title. The editor renames a project
     // slot from this every time it loads the form, and a connector points at
@@ -206,13 +228,14 @@ function main() {
     flowchart.defaultPdfProperties = {
       pdfName: entry.title || entry.name,
       pdfFile: entry.pdf,
-      pdfPrice: String(entry.price == null ? 0 : entry.price)
+      pdfPrice: String(entry.price == null ? 0 : entry.price),
+      pdfPages: await pageCount(entry.pdf)
     };
     // Rule 5: exactly one group per form, named after the form, holding the
     // sections that actually carry a question.
     flowchart.groups = [{ groupId: 1, name: entry.name, sections: usedSectionNames(flowchart) }];
-    return { entry, flowchart };
-  });
+    forms.push({ entry, flowchart });
+  }
 
   forms.forEach(({ entry, flowchart }) => {
     (entry.activates || []).forEach((activation) => {
@@ -259,4 +282,4 @@ function main() {
   });
 }
 
-main();
+main().catch((e) => { console.error(e); process.exit(1); });

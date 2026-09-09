@@ -55,9 +55,69 @@ Object.entries(spec.canonical || {}).forEach(([canonical, byForm]) => {
   });
 });
 
+/* ------------------------------------------------------------------ */
+/* the inverse rule: a court field must not share a filer's name       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Sharing a name is how this packet wires one answer into every form that
+ * prints it - which makes an accidental share indistinguishable from a
+ * deliberate one, and there is one kind that is never deliberate.
+ *
+ * DV-110 says the filer completes items 1, 2 and 3 and the court completes the
+ * rest. Its item 6 is a court FINDING - "The court finds that you have the
+ * following prohibited items" - and its field for the first firearm was called
+ * firearm_item_1_description, the same as the box on DV-100 where the filer
+ * lists what they believe the person has. So the filer's claim was posted
+ * straight into the judge's finding, and the same for item 12a's stay-away
+ * grant. Nine fields, and the filled order read as though the court had already
+ * decided.
+ *
+ * A field the form says the court completes is marked courtUse, so the rule
+ * needs no list: a courtUse field may not carry a name that a filer field
+ * somewhere in the packet also carries. Where it does, the court's copy is
+ * renamed with its own form in front, and the answer stops reaching it.
+ */
+function separateCourtFieldsFromFilerFields(spec, load, check) {
+  const forms = (spec.forms || Object.keys(spec.canonical || {}).reduce((all, key) => {
+    Object.keys(spec.canonical[key]).forEach((f) => { if (!all.includes(f)) all.push(f); });
+    return all;
+  }, [])).slice();
+
+  const filerNames = new Set();
+  forms.forEach((form) => {
+    load(form).data.fields.forEach((f) => { if (!f.courtUse) filerNames.add(f.newName); });
+  });
+
+  let renamed = 0;
+  forms.forEach((form) => {
+    const entry = load(form);
+    entry.data.fields.forEach((f) => {
+      if (!f.courtUse || !filerNames.has(f.newName)) return;
+      const separated = form + '_' + f.newName;
+      console.log('  ' + form + ': court field ' + f.newName + '  ->  ' + separated
+        + '   (a filer answers a field of that name)');
+      f.courtSeparatedFrom = f.newName;
+      f.newName = separated;
+      entry.changed += 1;
+      renamed += 1;
+    });
+  });
+  if (renamed) {
+    console.log(renamed + ' court field(s) separated from a filer field of the same name'
+      + (check ? ' (check only)' : ''));
+  }
+  return renamed;
+}
+
+const CONFIG_FORMS = ['dv100', 'dv101', 'dv105', 'dv109', 'dv110'];
+const separated = separateCourtFieldsFromFilerFields(
+  Object.assign({ forms: CONFIG_FORMS }, spec), load, CHECK);
+
 configs.forEach((entry, form) => {
   if (!CHECK) fs.writeFileSync(entry.file, JSON.stringify(entry.data, null, 2));
   console.log(form + ': ' + entry.changed + ' field(s) renamed' + (CHECK ? ' (check only)' : ''));
 });
 if (missing) process.exitCode = 1;
+if (CHECK && separated) process.exitCode = 1;
 console.log(CHECK ? '\ncheck only — nothing written' : '\nnow re-run pipeline-sanitize.js for the forms above');

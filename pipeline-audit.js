@@ -208,9 +208,14 @@ async function main() {
     // ones it dropped; they stay on the PDF, unfilled, exactly as a paper filer
     // leaves them when their answer fits on the first line.
     const overflow = new Set();
+    // A computed field is not unreachable, it is unasked on purpose: the form
+    // works it out rather than making the filer guess. DV-100 item 32 wants the
+    // number of extra pages attached, and counting them is the packet's job.
+    const computed = new Set();
     try {
       const chart = JSON.parse(fs.readFileSync(base + '-flowchart.json', 'utf8'));
       (chart.continuationLines || []).forEach((c) => (c.drop || []).forEach((n) => overflow.add(n)));
+      (chart.computedFields || []).forEach((c) => { if (c && c.nameId) computed.add(c.nameId); });
     } catch (e) { /* no flowchart beside the packet - nothing to exempt */ }
     const config = fs.existsSync(configPath) ? readFieldConfig(configPath) : [];
     const byName = new Map(config.map((c) => [c.name, c]));
@@ -235,6 +240,8 @@ async function main() {
       && !askedButCourtUse.includes(f));
     const placeholders = config.filter(placeholderMapped);
 
+    const computedFields = unreachable.filter((f) => computed.has(f.name));
+    unreachable = unreachable.filter((f) => !computed.has(f.name));
     const overflowFields = unreachable.filter((f) => overflow.has(f.name));
     unreachable = unreachable.filter((f) => !overflow.has(f.name));
 
@@ -242,6 +249,7 @@ async function main() {
       form: form.name,
       pdf: base + '.pdf',
       overflowLines: overflowFields.map((f) => f.name),
+      computedFields: computedFields.map((f) => f.name),
       fields: fields.length,
       courtUse: fields.length - filerFields.length,
       filerFields: filerFields.length,
@@ -571,6 +579,8 @@ async function main() {
       // because the answer fit on the first line, not because nobody asked.
       console.log('      ' + f.overflowLines.length
         + ' overflow line(s), which no question fills directly - the filler spills a long answer onto them: ' + f.overflowLines.join(', '));
+    if ((f.computedFields || []).length) console.log('      ' + f.computedFields.length
+      + ' computed field(s), which the form works out rather than asking: ' + f.computedFields.join(', '));
     }
     if (f.placeholderMapped.length) {
       console.log('      placeholder-mapped in field config: ' + f.placeholderMapped.length);

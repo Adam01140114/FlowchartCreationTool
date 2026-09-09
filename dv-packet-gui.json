@@ -631,139 +631,6 @@
         },
         {
           "questionId": 112,
-          "text": "Your lawyer's information",
-          "type": "multipleTextboxes",
-          "logic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "pdfName": "",
-            "pdfDisplayName": "",
-            "stripePriceId": "",
-            "conditions": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Lawyer's name",
-              "nodeId": "person_asking_protection_lawyer_name",
-              "order": 1,
-              "prefill": ""
-            },
-            {
-              "type": "label",
-              "label": "State bar number",
-              "nodeId": "person_asking_protection_lawyer_state_bar_number",
-              "order": 2,
-              "prefill": ""
-            },
-            {
-              "type": "label",
-              "label": "Law firm name",
-              "nodeId": "person_asking_protection_lawyer_firm_name",
-              "order": 3,
-              "prefill": ""
-            }
-          ],
-          "textboxes": [
-            {
-              "label": "",
-              "nameId": "person_asking_protection_lawyer_name",
-              "placeholder": "name"
-            },
-            {
-              "label": "",
-              "nameId": "person_asking_protection_lawyer_state_bar_number",
-              "placeholder": "state_bar_number"
-            },
-            {
-              "label": "",
-              "nameId": "person_asking_protection_lawyer_firm_name",
-              "placeholder": "firm_name"
-            }
-          ],
-          "amounts": [],
-          "nodeId": "person_asking_protection_lawyer"
-        },
-        {
-          "questionId": 113,
           "text": "How can the court reach you? (optional)",
           "type": "multipleTextboxes",
           "logic": {
@@ -12768,222 +12635,6 @@
       "questions": [
         {
           "questionId": 110,
-          "text": "How many extra pages are attached?",
-          "type": "money",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Order to not abuse me"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "No-contact order"
-              },
-              {
-                "prevQuestion": "101",
-                "prevAnswer": "No"
-              },
-              {
-                "prevQuestion": "106",
-                "prevAnswer": "Any Text"
-              },
-              {
-                "prevQuestion": "107",
-                "prevAnswer": "Any Text"
-              },
-              {
-                "prevQuestion": "108",
-                "prevAnswer": "Any Text"
-              },
-              {
-                "prevQuestion": "83",
-                "prevAnswer": "I own the home"
-              },
-              {
-                "prevQuestion": "83",
-                "prevAnswer": "I have lived at this address for a while"
-              },
-              {
-                "prevQuestion": "83",
-                "prevAnswer": "My name is on the lease"
-              },
-              {
-                "prevQuestion": "83",
-                "prevAnswer": "I pay for some or all of the rent or mortgage"
-              },
-              {
-                "prevQuestion": "83",
-                "prevAnswer": "I live at this address with my children"
-              },
-              {
-                "prevQuestion": "87",
-                "prevAnswer": "Any Text"
-              },
-              {
-                "prevQuestion": "74",
-                "prevAnswer": "Any Text"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Child custody and visitation"
-              },
-              {
-                "prevQuestion": "109",
-                "prevAnswer": "Any Text"
-              },
-              {
-                "prevQuestion": "82",
-                "prevAnswer": "Any Text"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Health and other insurance"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Record communications"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Property restraint"
-              },
-              {
-                "prevQuestion": "92",
-                "prevAnswer": "No"
-              },
-              {
-                "prevQuestion": "100",
-                "prevAnswer": "No"
-              },
-              {
-                "prevQuestion": "102",
-                "prevAnswer": "Any Text"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Pay expenses caused by the abuse"
-              },
-              {
-                "prevQuestion": "77",
-                "prevAnswer": "I do not have a child support order and I want one"
-              },
-              {
-                "prevQuestion": "77",
-                "prevAnswer": "I have a child support order and I want it changed"
-              },
-              {
-                "prevQuestion": "77",
-                "prevAnswer": "I now receive or have applied for TANF, Welfare, or CalWORKS"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Spousal support"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Lawyer's fees and costs"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Batterer intervention program"
-              },
-              {
-                "prevQuestion": "71",
-                "prevAnswer": "Transfer of wireless phone account"
-              },
-              {
-                "prevQuestion": "78",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
-          "nameId": "additional_pages_count",
-          "placeholder": ""
-        },
-        {
-          "questionId": 111,
           "text": "Do you have a lawyer?",
           "type": "dropdown",
           "logic": {
@@ -13204,6 +12855,144 @@
           "labels": [],
           "nameId": "has_lawyer",
           "placeholder": ""
+        },
+        {
+          "questionId": 111,
+          "text": "Your lawyer's information",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "110",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "pdfName": "",
+            "pdfDisplayName": "",
+            "stripePriceId": "",
+            "conditions": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Lawyer's name",
+              "nodeId": "person_asking_protection_lawyer_name",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "State bar number",
+              "nodeId": "person_asking_protection_lawyer_state_bar_number",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Law firm name",
+              "nodeId": "person_asking_protection_lawyer_firm_name",
+              "order": 3,
+              "prefill": ""
+            }
+          ],
+          "textboxes": [
+            {
+              "label": "",
+              "nameId": "person_asking_protection_lawyer_name",
+              "placeholder": "name"
+            },
+            {
+              "label": "",
+              "nameId": "person_asking_protection_lawyer_state_bar_number",
+              "placeholder": "state_bar_number"
+            },
+            {
+              "label": "",
+              "nameId": "person_asking_protection_lawyer_firm_name",
+              "placeholder": "firm_name"
+            }
+          ],
+          "amounts": [],
+          "nodeId": "person_asking_protection_lawyer"
         }
       ]
     },
@@ -13212,7 +13001,7 @@
       "sectionName": "More About the Abuse",
       "questions": [
         {
-          "questionId": 117,
+          "questionId": 116,
           "text": "When did this abuse happen?",
           "type": "date",
           "logic": {
@@ -13308,8 +13097,104 @@
           "placeholder": ""
         },
         {
-          "questionId": 118,
+          "questionId": 117,
           "text": "Who else was there?",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "116",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv101_abuse_1_witnesses",
+          "placeholder": ""
+        },
+        {
+          "questionId": 118,
+          "text": "Describe how the person abused you or your children.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
@@ -13400,12 +13285,12 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv101_abuse_1_witnesses",
+          "nameId": "dv101_abuse_1_description",
           "placeholder": ""
         },
         {
           "questionId": 119,
-          "text": "Describe how the person abused you or your children.",
+          "text": "Describe any use or threatened use of guns or other weapons.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
@@ -13496,12 +13381,12 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv101_abuse_1_description",
+          "nameId": "dv101_abuse_1_weapon_description",
           "placeholder": ""
         },
         {
           "questionId": 120,
-          "text": "Describe any use or threatened use of guns or other weapons.",
+          "text": "Describe any injuries.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
@@ -13592,114 +13477,18 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv101_abuse_1_weapon_description",
-          "placeholder": ""
-        },
-        {
-          "questionId": 121,
-          "text": "Describe any injuries.",
-          "type": "bigParagraph",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "120",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
           "nameId": "dv101_abuse_1_injuries",
           "placeholder": ""
         },
         {
-          "questionId": 122,
+          "questionId": 121,
           "text": "Did the police or other law enforcement come?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "121",
+                "prevQuestion": "120",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -13795,14 +13584,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 123,
+          "questionId": 122,
           "text": "Did they give you or the other person an Emergency Protective Order?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "122",
+                "prevQuestion": "121",
                 "prevAnswer": "Yes"
               }
             ]
@@ -13905,14 +13694,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 124,
+          "questionId": 123,
           "text": "Who does that Emergency Protective Order protect?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "123",
+                "prevQuestion": "122",
                 "prevAnswer": "Yes"
               }
             ]
@@ -14014,30 +13803,30 @@
       "sectionName": "Another Incident",
       "questions": [
         {
-          "questionId": 125,
+          "questionId": 124,
           "text": "When did that abuse happen?",
           "type": "date",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "124",
+                "prevQuestion": "123",
                 "prevAnswer": "You"
               },
               {
-                "prevQuestion": "124",
+                "prevQuestion": "123",
                 "prevAnswer": "The person you want protection from"
               },
               {
-                "prevQuestion": "123",
+                "prevQuestion": "122",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "123",
+                "prevQuestion": "122",
                 "prevAnswer": "I don't know"
               },
               {
-                "prevQuestion": "122",
+                "prevQuestion": "121",
                 "prevAnswer": "No"
               }
             ]
@@ -14126,8 +13915,104 @@
           "placeholder": ""
         },
         {
-          "questionId": 126,
+          "questionId": 125,
           "text": "Who else was there?",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "124",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv101_abuse_2_witnesses",
+          "placeholder": ""
+        },
+        {
+          "questionId": 126,
+          "text": "Describe how the person abused you or your children that time.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
@@ -14218,12 +14103,12 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv101_abuse_2_witnesses",
+          "nameId": "dv101_abuse_2_description",
           "placeholder": ""
         },
         {
           "questionId": 127,
-          "text": "Describe how the person abused you or your children that time.",
+          "text": "Describe any use or threatened use of guns or other weapons.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
@@ -14314,12 +14199,12 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv101_abuse_2_description",
+          "nameId": "dv101_abuse_2_weapon_description",
           "placeholder": ""
         },
         {
           "questionId": 128,
-          "text": "Describe any use or threatened use of guns or other weapons.",
+          "text": "Describe any injuries.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
@@ -14410,114 +14295,18 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv101_abuse_2_weapon_description",
-          "placeholder": ""
-        },
-        {
-          "questionId": 129,
-          "text": "Describe any injuries.",
-          "type": "bigParagraph",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "128",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
           "nameId": "dv101_abuse_2_injuries",
           "placeholder": ""
         },
         {
-          "questionId": 130,
+          "questionId": 129,
           "text": "Did the police or other law enforcement come that time?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "129",
+                "prevQuestion": "128",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -14613,14 +14402,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 131,
+          "questionId": 130,
           "text": "Did they give you or the other person an Emergency Protective Order?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "130",
+                "prevQuestion": "129",
                 "prevAnswer": "Yes"
               }
             ]
@@ -14723,14 +14512,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 132,
+          "questionId": 131,
           "text": "Who does that Emergency Protective Order protect?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "131",
+                "prevQuestion": "130",
                 "prevAnswer": "Yes"
               }
             ]
@@ -14826,30 +14615,30 @@
           "placeholder": ""
         },
         {
-          "questionId": 133,
+          "questionId": 132,
           "text": "Is there any other abuse you want the judge to know about?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "132",
+                "prevQuestion": "131",
                 "prevAnswer": "You"
               },
               {
-                "prevQuestion": "132",
+                "prevQuestion": "131",
                 "prevAnswer": "The person you want protection from"
               },
               {
-                "prevQuestion": "131",
+                "prevQuestion": "130",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "131",
+                "prevQuestion": "130",
                 "prevAnswer": "I don't know"
               },
               {
-                "prevQuestion": "130",
+                "prevQuestion": "129",
                 "prevAnswer": "No"
               }
             ]
@@ -14938,14 +14727,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 134,
+          "questionId": 133,
           "text": "Do you need still more space, on a separate sheet?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "133",
+                "prevQuestion": "132",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -15056,7 +14845,7 @@
       "sectionName": "The Children",
       "questions": [
         {
-          "questionId": 137,
+          "questionId": 136,
           "text": "What is your relationship to the children?",
           "type": "dropdown",
           "logic": {
@@ -15166,14 +14955,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 138,
+          "questionId": 137,
           "text": "Describe your relationship to the children.",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "137",
+                "prevQuestion": "136",
                 "prevAnswer": "Other"
               }
             ]
@@ -15262,7 +15051,7 @@
           "placeholder": ""
         },
         {
-          "questionId": 140,
+          "questionId": 139,
           "text": "What is the other person's relationship to the children?",
           "type": "dropdown",
           "logic": {
@@ -15372,14 +15161,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 141,
+          "questionId": 140,
           "text": "Describe their relationship to the children.",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "140",
+                "prevQuestion": "139",
                 "prevAnswer": "Other"
               }
             ]
@@ -15468,22 +15257,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 142,
+          "questionId": 141,
           "text": "How many children do you have with the person you want protection from?",
           "type": "numberedDropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "140",
+                "prevQuestion": "139",
                 "prevAnswer": "Parent"
               },
               {
-                "prevQuestion": "140",
+                "prevQuestion": "139",
                 "prevAnswer": "Legal guardian"
               },
               {
-                "prevQuestion": "141",
+                "prevQuestion": "140",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -15581,22 +15370,22 @@
           ]
         },
         {
-          "questionId": 143,
+          "questionId": 142,
           "text": "Do you have more children to list on a separate page?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "140",
+                "prevQuestion": "139",
                 "prevAnswer": "Parent"
               },
               {
-                "prevQuestion": "140",
+                "prevQuestion": "139",
                 "prevAnswer": "Legal guardian"
               },
               {
-                "prevQuestion": "141",
+                "prevQuestion": "140",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -15698,18 +15487,18 @@
       "sectionName": "Where the Children Have Lived",
       "questions": [
         {
-          "questionId": 144,
+          "questionId": 143,
           "text": "Have all the children lived together for the last five years?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "143",
+                "prevQuestion": "142",
                 "prevAnswer": "Yes"
               },
               {
-                "prevQuestion": "143",
+                "prevQuestion": "142",
                 "prevAnswer": "No"
               }
             ]
@@ -15805,14 +15594,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 145,
+          "questionId": 144,
           "text": "Where do the children live now, and since when?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "144",
+                "prevQuestion": "143",
                 "prevAnswer": "Yes"
               }
             ]
@@ -15943,14 +15732,14 @@
           "nodeId": "dv105_child_home_1"
         },
         {
-          "questionId": 146,
+          "questionId": 145,
           "text": "Who did the children live with at their current address?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "144",
+                "prevQuestion": "143",
                 "prevAnswer": "Yes"
               }
             ]
@@ -16076,22 +15865,22 @@
           "nodeId": "dv105_child_home_1_lived_with"
         },
         {
-          "questionId": 147,
+          "questionId": 146,
           "text": "Is the current address private (confidential)?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "146",
+                "prevQuestion": "145",
                 "prevAnswer": "Me"
               },
               {
-                "prevQuestion": "146",
+                "prevQuestion": "145",
                 "prevAnswer": "The other person"
               },
               {
-                "prevQuestion": "146",
+                "prevQuestion": "145",
                 "prevAnswer": "Someone else"
               }
             ]
@@ -16187,18 +15976,18 @@
           "placeholder": ""
         },
         {
-          "questionId": 148,
+          "questionId": 147,
           "text": "Did the children live somewhere else in the last five years?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "147",
+                "prevQuestion": "146",
                 "prevAnswer": "Yes"
               },
               {
-                "prevQuestion": "147",
+                "prevQuestion": "146",
                 "prevAnswer": "No"
               }
             ]
@@ -16294,14 +16083,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 149,
+          "questionId": 148,
           "text": "Where did the children live before that?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "148",
+                "prevQuestion": "147",
                 "prevAnswer": "Yes"
               }
             ]
@@ -16444,14 +16233,14 @@
           "nodeId": "dv105_child_home_2"
         },
         {
-          "questionId": 150,
+          "questionId": 149,
           "text": "Who did the children live with there?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "148",
+                "prevQuestion": "147",
                 "prevAnswer": "Yes"
               }
             ]
@@ -16577,22 +16366,22 @@
           "nodeId": "dv105_child_home_2_lived_with"
         },
         {
-          "questionId": 151,
+          "questionId": 150,
           "text": "And somewhere else before that?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "150",
+                "prevQuestion": "149",
                 "prevAnswer": "Me"
               },
               {
-                "prevQuestion": "150",
+                "prevQuestion": "149",
                 "prevAnswer": "The other person"
               },
               {
-                "prevQuestion": "150",
+                "prevQuestion": "149",
                 "prevAnswer": "Someone else"
               }
             ]
@@ -16688,14 +16477,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 152,
+          "questionId": 151,
           "text": "And before that?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "151",
+                "prevQuestion": "150",
                 "prevAnswer": "Yes"
               }
             ]
@@ -16838,14 +16627,14 @@
           "nodeId": "dv105_child_home_3"
         },
         {
-          "questionId": 153,
+          "questionId": 152,
           "text": "Who did the children live with there?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "151",
+                "prevQuestion": "150",
                 "prevAnswer": "Yes"
               }
             ]
@@ -16971,22 +16760,22 @@
           "nodeId": "dv105_child_home_3_lived_with"
         },
         {
-          "questionId": 154,
+          "questionId": 153,
           "text": "And somewhere else before that?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "153",
+                "prevQuestion": "152",
                 "prevAnswer": "Me"
               },
               {
-                "prevQuestion": "153",
+                "prevQuestion": "152",
                 "prevAnswer": "The other person"
               },
               {
-                "prevQuestion": "153",
+                "prevQuestion": "152",
                 "prevAnswer": "Someone else"
               }
             ]
@@ -17082,14 +16871,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 155,
+          "questionId": 154,
           "text": "And before that?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "154",
+                "prevQuestion": "153",
                 "prevAnswer": "Yes"
               }
             ]
@@ -17232,14 +17021,14 @@
           "nodeId": "dv105_child_home_4"
         },
         {
-          "questionId": 156,
+          "questionId": 155,
           "text": "Who did the children live with there?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "154",
+                "prevQuestion": "153",
                 "prevAnswer": "Yes"
               }
             ]
@@ -17365,22 +17154,22 @@
           "nodeId": "dv105_child_home_4_lived_with"
         },
         {
-          "questionId": 157,
+          "questionId": 156,
           "text": "And somewhere else before that?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "156",
+                "prevQuestion": "155",
                 "prevAnswer": "Me"
               },
               {
-                "prevQuestion": "156",
+                "prevQuestion": "155",
                 "prevAnswer": "The other person"
               },
               {
-                "prevQuestion": "156",
+                "prevQuestion": "155",
                 "prevAnswer": "Someone else"
               }
             ]
@@ -17476,14 +17265,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 158,
+          "questionId": 157,
           "text": "And before that?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "157",
+                "prevQuestion": "156",
                 "prevAnswer": "Yes"
               }
             ]
@@ -17626,14 +17415,14 @@
           "nodeId": "dv105_child_home_5"
         },
         {
-          "questionId": 159,
+          "questionId": 158,
           "text": "Who did the children live with there?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "157",
+                "prevQuestion": "156",
                 "prevAnswer": "Yes"
               }
             ]
@@ -17759,22 +17548,22 @@
           "nodeId": "dv105_child_home_5_lived_with"
         },
         {
-          "questionId": 160,
+          "questionId": 159,
           "text": "And somewhere else before that?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "159",
+                "prevQuestion": "158",
                 "prevAnswer": "Me"
               },
               {
-                "prevQuestion": "159",
+                "prevQuestion": "158",
                 "prevAnswer": "The other person"
               },
               {
-                "prevQuestion": "159",
+                "prevQuestion": "158",
                 "prevAnswer": "Someone else"
               }
             ]
@@ -17870,14 +17659,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 161,
+          "questionId": 160,
           "text": "And before that?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "160",
+                "prevQuestion": "159",
                 "prevAnswer": "Yes"
               }
             ]
@@ -18020,14 +17809,14 @@
           "nodeId": "dv105_child_home_6"
         },
         {
-          "questionId": 162,
+          "questionId": 161,
           "text": "Who did the children live with there?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "160",
+                "prevQuestion": "159",
                 "prevAnswer": "Yes"
               }
             ]
@@ -18159,46 +17948,46 @@
       "sectionName": "Other Court Cases",
       "questions": [
         {
-          "questionId": 163,
+          "questionId": 162,
           "text": "Do you know about any other court case involving any of these children?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "162",
+                "prevQuestion": "161",
                 "prevAnswer": "Me"
               },
               {
-                "prevQuestion": "162",
+                "prevQuestion": "161",
                 "prevAnswer": "The other person"
               },
               {
-                "prevQuestion": "162",
+                "prevQuestion": "161",
                 "prevAnswer": "Someone else"
               },
               {
-                "prevQuestion": "160",
+                "prevQuestion": "159",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "157",
+                "prevQuestion": "156",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "154",
+                "prevQuestion": "153",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "151",
+                "prevQuestion": "150",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "148",
+                "prevQuestion": "147",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "144",
+                "prevQuestion": "143",
                 "prevAnswer": "No"
               }
             ]
@@ -18294,14 +18083,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 164,
+          "questionId": 163,
           "text": "What kind of case is it?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "163",
+                "prevQuestion": "162",
                 "prevAnswer": "Yes"
               }
             ]
@@ -18469,14 +18258,14 @@
           "nodeId": "dv105_other_case_kinds"
         },
         {
-          "questionId": 165,
+          "questionId": 164,
           "text": "The juvenile case: where was it filed, what year, and what is the case number?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "164",
+                "prevQuestion": "163",
                 "prevAnswer": "Juvenile court (child welfare, juvenile justice)"
               }
             ]
@@ -18565,14 +18354,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 166,
+          "questionId": 165,
           "text": "The guardianship case: where was it filed, what year, and what is the case number?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "164",
+                "prevQuestion": "163",
                 "prevAnswer": "Guardianship"
               }
             ]
@@ -18661,14 +18450,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 167,
+          "questionId": 166,
           "text": "The divorce case: where was it filed, what year, and what is the case number?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "164",
+                "prevQuestion": "163",
                 "prevAnswer": "Divorce"
               }
             ]
@@ -18757,14 +18546,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 168,
+          "questionId": 167,
           "text": "The custody case: where was it filed, what year, and what is the case number?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "164",
+                "prevQuestion": "163",
                 "prevAnswer": "Custody"
               }
             ]
@@ -18853,14 +18642,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 169,
+          "questionId": 168,
           "text": "The criminal case: where was it filed, what year, and what is the case number?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "164",
+                "prevQuestion": "163",
                 "prevAnswer": "Criminal"
               }
             ]
@@ -18949,14 +18738,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 170,
+          "questionId": 169,
           "text": "The other case: where was it filed, what year, and what is the case number?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "164",
+                "prevQuestion": "163",
                 "prevAnswer": "Another kind of case"
               }
             ]
@@ -19045,26 +18834,18 @@
           "placeholder": ""
         },
         {
-          "questionId": 171,
+          "questionId": 170,
           "text": "Is there a custody or visitation order in effect now?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "163",
+                "prevQuestion": "162",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "168",
-                "prevAnswer": "Any Text"
-              },
-              {
                 "prevQuestion": "167",
-                "prevAnswer": "Any Text"
-              },
-              {
-                "prevQuestion": "165",
                 "prevAnswer": "Any Text"
               },
               {
@@ -19072,11 +18853,19 @@
                 "prevAnswer": "Any Text"
               },
               {
-                "prevQuestion": "169",
+                "prevQuestion": "164",
                 "prevAnswer": "Any Text"
               },
               {
-                "prevQuestion": "170",
+                "prevQuestion": "165",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "168",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "169",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -19172,14 +18961,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 172,
+          "questionId": 171,
           "text": "What did the judge order?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "171",
+                "prevQuestion": "170",
                 "prevAnswer": "Yes"
               }
             ]
@@ -19268,14 +19057,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 173,
+          "questionId": 172,
           "text": "Why do you want to change that order?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "172",
+                "prevQuestion": "171",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -19364,18 +19153,18 @@
           "placeholder": ""
         },
         {
-          "questionId": 174,
+          "questionId": 173,
           "text": "If there is another parent or legal guardian besides you and the other person, what is their name?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "171",
+                "prevQuestion": "170",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "173",
+                "prevQuestion": "172",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -19464,14 +19253,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 175,
+          "questionId": 174,
           "text": "Are they a parent or a legal guardian?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "174",
+                "prevQuestion": "173",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -19573,18 +19362,18 @@
       "sectionName": "Protecting the Children",
       "questions": [
         {
-          "questionId": 176,
+          "questionId": 175,
           "text": "Do you want to limit where the other person can travel with your children?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "175",
+                "prevQuestion": "174",
                 "prevAnswer": "Parent"
               },
               {
-                "prevQuestion": "175",
+                "prevQuestion": "174",
                 "prevAnswer": "Legal guardian"
               }
             ]
@@ -19680,14 +19469,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 177,
+          "questionId": 176,
           "text": "They must have written permission or a court order to take the children outside:",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "176",
+                "prevQuestion": "175",
                 "prevAnswer": "Yes"
               }
             ]
@@ -19813,14 +19602,14 @@
           "nodeId": "dv105_limit_travel_places"
         },
         {
-          "questionId": 178,
+          "questionId": 177,
           "text": "Which county?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "177",
+                "prevQuestion": "176",
                 "prevAnswer": "A county"
               }
             ]
@@ -19909,14 +19698,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 179,
+          "questionId": 178,
           "text": "Which other places?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "177",
+                "prevQuestion": "176",
                 "prevAnswer": "Other places"
               }
             ]
@@ -20005,26 +19794,26 @@
           "placeholder": ""
         },
         {
-          "questionId": 180,
+          "questionId": 179,
           "text": "Do you want the other person to have access to the children's records or information?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "176",
+                "prevQuestion": "175",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "178",
+                "prevQuestion": "177",
                 "prevAnswer": "Any Text"
               },
               {
-                "prevQuestion": "177",
+                "prevQuestion": "176",
                 "prevAnswer": "California"
               },
               {
-                "prevQuestion": "179",
+                "prevQuestion": "178",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -20120,14 +19909,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 181,
+          "questionId": 180,
           "text": "Whose records should they not have access to?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "180",
+                "prevQuestion": "179",
                 "prevAnswer": "No"
               }
             ]
@@ -20223,14 +20012,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 182,
+          "questionId": 181,
           "text": "Which children?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "181",
+                "prevQuestion": "180",
                 "prevAnswer": "Only some of the children"
               }
             ]
@@ -20319,18 +20108,18 @@
           "placeholder": ""
         },
         {
-          "questionId": 183,
+          "questionId": 182,
           "text": "Which records or information?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "181",
+                "prevQuestion": "180",
                 "prevAnswer": "All the children"
               },
               {
-                "prevQuestion": "182",
+                "prevQuestion": "181",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -20484,14 +20273,14 @@
           "nodeId": "dv105_records_kinds"
         },
         {
-          "questionId": 184,
+          "questionId": 183,
           "text": "What other records or information?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "183",
+                "prevQuestion": "182",
                 "prevAnswer": "Other"
               }
             ]
@@ -20580,34 +20369,34 @@
           "placeholder": ""
         },
         {
-          "questionId": 185,
+          "questionId": 184,
           "text": "Do you believe the other person might abduct (kidnap) your children?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "180",
+                "prevQuestion": "179",
                 "prevAnswer": "Yes"
               },
               {
-                "prevQuestion": "183",
+                "prevQuestion": "182",
                 "prevAnswer": "Medical, dental, and mental health"
               },
               {
-                "prevQuestion": "183",
+                "prevQuestion": "182",
                 "prevAnswer": "School and daycare"
               },
               {
-                "prevQuestion": "183",
+                "prevQuestion": "182",
                 "prevAnswer": "Extracurricular activity, including summer camps and sports teams"
               },
               {
-                "prevQuestion": "183",
+                "prevQuestion": "182",
                 "prevAnswer": "The child's employment, including volunteer and unpaid positions"
               },
               {
-                "prevQuestion": "184",
+                "prevQuestion": "183",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -20709,18 +20498,18 @@
       "sectionName": "Custody",
       "questions": [
         {
-          "questionId": 186,
+          "questionId": 185,
           "text": "Do you want the judge to make child custody orders?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "185",
+                "prevQuestion": "184",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "185",
+                "prevQuestion": "184",
                 "prevAnswer": "Yes"
               }
             ]
@@ -20816,14 +20605,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 187,
+          "questionId": 186,
           "text": "Who should make decisions about the children's health, education and welfare?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "186",
+                "prevQuestion": "185",
                 "prevAnswer": "Yes"
               }
             ]
@@ -20933,14 +20722,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 188,
+          "questionId": 187,
           "text": "Describe the legal custody you want.",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "187",
+                "prevQuestion": "186",
                 "prevAnswer": "Something else"
               }
             ]
@@ -21029,26 +20818,26 @@
           "placeholder": ""
         },
         {
-          "questionId": 189,
+          "questionId": 188,
           "text": "Who should the children regularly live with?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "187",
+                "prevQuestion": "186",
                 "prevAnswer": "Me alone"
               },
               {
-                "prevQuestion": "187",
+                "prevQuestion": "186",
                 "prevAnswer": "The other person alone"
               },
               {
-                "prevQuestion": "187",
+                "prevQuestion": "186",
                 "prevAnswer": "The two of us jointly"
               },
               {
-                "prevQuestion": "188",
+                "prevQuestion": "187",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -21158,14 +20947,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 190,
+          "questionId": 189,
           "text": "Describe the physical custody you want.",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "189",
+                "prevQuestion": "188",
                 "prevAnswer": "Something else"
               }
             ]
@@ -21260,30 +21049,30 @@
       "sectionName": "Visits",
       "questions": [
         {
-          "questionId": 191,
+          "questionId": 190,
           "text": "Do you want the other person to have visits (parenting time) with the children?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "186",
+                "prevQuestion": "185",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "189",
+                "prevQuestion": "188",
                 "prevAnswer": "Me alone"
               },
               {
-                "prevQuestion": "189",
+                "prevQuestion": "188",
                 "prevAnswer": "The other person alone"
               },
               {
-                "prevQuestion": "189",
+                "prevQuestion": "188",
                 "prevAnswer": "The two of us jointly"
               },
               {
-                "prevQuestion": "190",
+                "prevQuestion": "189",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -21386,22 +21175,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 192,
+          "questionId": 191,
           "text": "Do you want the visits to be supervised (monitored) by a third party?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "191",
+                "prevQuestion": "190",
                 "prevAnswer": "No, I ask the judge to order no visits"
               },
               {
-                "prevQuestion": "191",
+                "prevQuestion": "190",
                 "prevAnswer": "Yes"
               },
               {
-                "prevQuestion": "191",
+                "prevQuestion": "190",
                 "prevAnswer": "Yes, but only virtual visits"
               }
             ]
@@ -21497,14 +21286,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 193,
+          "questionId": 192,
           "text": "Who do you want to supervise the visits?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "192",
+                "prevQuestion": "191",
                 "prevAnswer": "Yes"
               }
             ]
@@ -21600,14 +21389,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 194,
+          "questionId": 193,
           "text": "Do you want drop-off and pick-up to be supervised by a third party?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "192",
+                "prevQuestion": "191",
                 "prevAnswer": "No"
               }
             ]
@@ -21703,14 +21492,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 195,
+          "questionId": 194,
           "text": "What is the professional's name, if you know it?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "193",
+                "prevQuestion": "192",
                 "prevAnswer": "A professional"
               }
             ]
@@ -21799,14 +21588,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 196,
+          "questionId": 195,
           "text": "What is their name?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "193",
+                "prevQuestion": "192",
                 "prevAnswer": "Someone trusted, like a relative or friend"
               }
             ]
@@ -21895,14 +21684,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 197,
+          "questionId": 196,
           "text": "Who do you want to supervise the exchanges?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "194",
+                "prevQuestion": "193",
                 "prevAnswer": "Yes"
               }
             ]
@@ -21998,14 +21787,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 198,
+          "questionId": 197,
           "text": "Who should pay the professional supervisor's fees?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "195",
+                "prevQuestion": "194",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -22148,14 +21937,14 @@
           "nodeId": "dv105_supervisor_fees"
         },
         {
-          "questionId": 199,
+          "questionId": 198,
           "text": "Have they agreed to supervise the visits?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "196",
+                "prevQuestion": "195",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -22251,14 +22040,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 200,
+          "questionId": 199,
           "text": "What is the professional's name, if you know it?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "197",
+                "prevQuestion": "196",
                 "prevAnswer": "A professional"
               }
             ]
@@ -22347,14 +22136,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 201,
+          "questionId": 200,
           "text": "What is their name?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "197",
+                "prevQuestion": "196",
                 "prevAnswer": "Someone trusted, like a relative or friend"
               }
             ]
@@ -22443,14 +22232,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 202,
+          "questionId": 201,
           "text": "Who should pay the professional supervisor's fees for exchanges?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "200",
+                "prevQuestion": "199",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -22593,14 +22382,14 @@
           "nodeId": "dv105_exchange_fees"
         },
         {
-          "questionId": 203,
+          "questionId": 202,
           "text": "Have they agreed to supervise the exchanges?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "201",
+                "prevQuestion": "200",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -22696,22 +22485,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 204,
+          "questionId": 203,
           "text": "Where should the visits happen?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "195",
+                "prevQuestion": "194",
                 "prevAnswer": "Any Text"
               },
               {
-                "prevQuestion": "199",
+                "prevQuestion": "198",
                 "prevAnswer": "Yes"
               },
               {
-                "prevQuestion": "199",
+                "prevQuestion": "198",
                 "prevAnswer": "No"
               }
             ]
@@ -22814,26 +22603,26 @@
           "placeholder": ""
         },
         {
-          "questionId": 205,
+          "questionId": 204,
           "text": "Where should the visits happen?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "194",
+                "prevQuestion": "193",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "200",
+                "prevQuestion": "199",
                 "prevAnswer": "Any Text"
               },
               {
-                "prevQuestion": "203",
+                "prevQuestion": "202",
                 "prevAnswer": "Yes"
               },
               {
-                "prevQuestion": "203",
+                "prevQuestion": "202",
                 "prevAnswer": "No"
               }
             ]
@@ -22936,14 +22725,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 206,
+          "questionId": 205,
           "text": "Where should the visits happen?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "204",
+                "prevQuestion": "203",
                 "prevAnswer": "Somewhere else"
               }
             ]
@@ -23032,22 +22821,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 207,
+          "questionId": 206,
           "text": "How often and how long should the visits be?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "204",
+                "prevQuestion": "203",
                 "prevAnswer": "In person at a safe location"
               },
               {
-                "prevQuestion": "204",
+                "prevQuestion": "203",
                 "prevAnswer": "Virtual (not in person)"
               },
               {
-                "prevQuestion": "206",
+                "prevQuestion": "205",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -23150,14 +22939,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 208,
+          "questionId": 207,
           "text": "Where should the visits happen?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "205",
+                "prevQuestion": "204",
                 "prevAnswer": "Somewhere else"
               }
             ]
@@ -23246,22 +23035,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 209,
+          "questionId": 208,
           "text": "How do you want to describe the parenting time you want them to have?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "205",
+                "prevQuestion": "204",
                 "prevAnswer": "In person at a safe location"
               },
               {
-                "prevQuestion": "205",
+                "prevQuestion": "204",
                 "prevAnswer": "Virtual (not in person)"
               },
               {
-                "prevQuestion": "208",
+                "prevQuestion": "207",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -23357,14 +23146,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 210,
+          "questionId": 209,
           "text": "How many hours?",
           "type": "money",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "207",
+                "prevQuestion": "206",
                 "prevAnswer": "Once a week"
               }
             ]
@@ -23453,14 +23242,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 211,
+          "questionId": 210,
           "text": "How many hours each visit?",
           "type": "money",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "207",
+                "prevQuestion": "206",
                 "prevAnswer": "Twice a week"
               }
             ]
@@ -23549,14 +23338,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 212,
+          "questionId": 211,
           "text": "How often and how long should the visits be?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "207",
+                "prevQuestion": "206",
                 "prevAnswer": "Something else"
               }
             ]
@@ -23645,22 +23434,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 213,
+          "questionId": 212,
           "text": "Do you want to set out a week-by-week schedule?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "207",
+                "prevQuestion": "206",
                 "prevAnswer": "Once a week"
               },
               {
-                "prevQuestion": "207",
+                "prevQuestion": "206",
                 "prevAnswer": "Twice a week"
               },
               {
-                "prevQuestion": "212",
+                "prevQuestion": "211",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -23756,14 +23545,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 214,
+          "questionId": 213,
           "text": "Monday: what should the visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "209",
+                "prevQuestion": "208",
                 "prevAnswer": "On a week-by-week chart"
               }
             ]
@@ -23930,14 +23719,14 @@
           "nodeId": "dv105_unsupervised_visit_monday"
         },
         {
-          "questionId": 215,
+          "questionId": 214,
           "text": "When should the visits happen, how often, and who is responsible for transporting the children?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "209",
+                "prevQuestion": "208",
                 "prevAnswer": "In my own words"
               }
             ]
@@ -24026,14 +23815,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 216,
+          "questionId": 215,
           "text": "Monday: what should the supervised visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "213",
+                "prevQuestion": "212",
                 "prevAnswer": "Yes"
               }
             ]
@@ -24200,14 +23989,14 @@
           "nodeId": "dv105_supervised_visit_monday"
         },
         {
-          "questionId": 217,
+          "questionId": 216,
           "text": "Which of those days should be virtual visits, rather than in person?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "209",
+                "prevQuestion": "208",
                 "prevAnswer": "On a week-by-week chart"
               }
             ]
@@ -24389,14 +24178,14 @@
           "nodeId": "dv105_unsupervised_virtual_visit_days"
         },
         {
-          "questionId": 218,
+          "questionId": 217,
           "text": "Which of those days should be virtual visits, rather than in person?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "213",
+                "prevQuestion": "212",
                 "prevAnswer": "Yes"
               }
             ]
@@ -24578,38 +24367,38 @@
           "nodeId": "dv105_supervised_virtual_visit_days"
         },
         {
-          "questionId": 219,
+          "questionId": 218,
           "text": "Tuesday: what should the visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -24776,38 +24565,38 @@
           "nodeId": "dv105_unsupervised_visit_tuesday"
         },
         {
-          "questionId": 220,
+          "questionId": 219,
           "text": "Tuesday: what should the supervised visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -24974,38 +24763,38 @@
           "nodeId": "dv105_supervised_visit_tuesday"
         },
         {
-          "questionId": 221,
+          "questionId": 220,
           "text": "Wednesday: what should the visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -25172,38 +24961,38 @@
           "nodeId": "dv105_unsupervised_visit_wednesday"
         },
         {
-          "questionId": 222,
+          "questionId": 221,
           "text": "Wednesday: what should the supervised visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -25370,38 +25159,38 @@
           "nodeId": "dv105_supervised_visit_wednesday"
         },
         {
-          "questionId": 223,
+          "questionId": 222,
           "text": "Thursday: what should the visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -25568,38 +25357,38 @@
           "nodeId": "dv105_unsupervised_visit_thursday"
         },
         {
-          "questionId": 224,
+          "questionId": 223,
           "text": "Thursday: what should the supervised visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -25766,38 +25555,38 @@
           "nodeId": "dv105_supervised_visit_thursday"
         },
         {
-          "questionId": 225,
+          "questionId": 224,
           "text": "Friday: what should the visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -25964,38 +25753,38 @@
           "nodeId": "dv105_unsupervised_visit_friday"
         },
         {
-          "questionId": 226,
+          "questionId": 225,
           "text": "Friday: what should the supervised visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -26162,38 +25951,38 @@
           "nodeId": "dv105_supervised_visit_friday"
         },
         {
-          "questionId": 227,
+          "questionId": 226,
           "text": "Saturday: what should the visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -26360,38 +26149,38 @@
           "nodeId": "dv105_unsupervised_visit_saturday"
         },
         {
-          "questionId": 228,
+          "questionId": 227,
           "text": "Saturday: what should the supervised visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -26558,38 +26347,38 @@
           "nodeId": "dv105_supervised_visit_saturday"
         },
         {
-          "questionId": 229,
+          "questionId": 228,
           "text": "Sunday: what should the visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -26756,38 +26545,38 @@
           "nodeId": "dv105_unsupervised_visit_sunday"
         },
         {
-          "questionId": 230,
+          "questionId": 229,
           "text": "Sunday: what should the supervised visit look like?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -26954,38 +26743,38 @@
           "nodeId": "dv105_supervised_visit_sunday"
         },
         {
-          "questionId": 231,
+          "questionId": 230,
           "text": "How often should that plan repeat?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "217",
+                "prevQuestion": "216",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -27088,38 +26877,38 @@
           "placeholder": ""
         },
         {
-          "questionId": 232,
+          "questionId": 231,
           "text": "How often should that plan repeat?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Monday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Tuesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Wednesday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Thursday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Friday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Saturday"
               },
               {
-                "prevQuestion": "218",
+                "prevQuestion": "217",
                 "prevAnswer": "Sunday"
               }
             ]
@@ -27222,6 +27011,102 @@
           "placeholder": ""
         },
         {
+          "questionId": 232,
+          "text": "How often should the plan repeat?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "230",
+                "prevAnswer": "Something else"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv105_unsupervised_schedule_other_description",
+          "placeholder": ""
+        },
+        {
           "questionId": 233,
           "text": "How often should the plan repeat?",
           "type": "text",
@@ -27314,126 +27199,30 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv105_unsupervised_schedule_other_description",
-          "placeholder": ""
-        },
-        {
-          "questionId": 234,
-          "text": "How often should the plan repeat?",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "232",
-                "prevAnswer": "Something else"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
           "nameId": "dv105_supervised_schedule_other_description",
           "placeholder": ""
         },
         {
-          "questionId": 235,
+          "questionId": 234,
           "text": "When should the visits start?",
           "type": "date",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "215",
+                "prevQuestion": "214",
                 "prevAnswer": "Any Text"
               },
               {
-                "prevQuestion": "231",
+                "prevQuestion": "230",
                 "prevAnswer": "Every week"
               },
               {
-                "prevQuestion": "231",
+                "prevQuestion": "230",
                 "prevAnswer": "Every other week"
               },
               {
-                "prevQuestion": "233",
+                "prevQuestion": "232",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -27527,26 +27316,26 @@
           "placeholder": ""
         },
         {
-          "questionId": 236,
+          "questionId": 235,
           "text": "When should the visits start?",
           "type": "date",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "232",
+                "prevQuestion": "231",
                 "prevAnswer": "Every week"
               },
               {
-                "prevQuestion": "232",
+                "prevQuestion": "231",
                 "prevAnswer": "Every other week"
               },
               {
-                "prevQuestion": "234",
+                "prevQuestion": "233",
                 "prevAnswer": "Any Text"
               },
               {
-                "prevQuestion": "213",
+                "prevQuestion": "212",
                 "prevAnswer": "No"
               }
             ]
@@ -27646,7 +27435,7 @@
       "sectionName": "Restrained Person's Description",
       "questions": [
         {
-          "questionId": 250,
+          "questionId": 249,
           "text": "About how tall is the restrained person?",
           "type": "text",
           "logic": {
@@ -27742,8 +27531,104 @@
           "placeholder": ""
         },
         {
-          "questionId": 251,
+          "questionId": 250,
           "text": "About how much does the restrained person weigh?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "249",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "restrained_person_weight",
+          "placeholder": ""
+        },
+        {
+          "questionId": 251,
+          "text": "What color is the restrained person's hair?",
           "type": "text",
           "logic": {
             "enabled": true,
@@ -27834,114 +27719,18 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "restrained_person_weight",
-          "placeholder": ""
-        },
-        {
-          "questionId": 252,
-          "text": "What color is the restrained person's hair?",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "251",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          },
           "nameId": "restrained_person_hair_color",
           "placeholder": ""
         },
         {
-          "questionId": 253,
+          "questionId": 252,
           "text": "What color are the restrained person's eyes?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "252",
+                "prevQuestion": "251",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -28035,7 +27824,7 @@
           "placeholder": ""
         },
         {
-          "questionId": 255,
+          "questionId": 254,
           "text": "In a few words, how is the restrained person related to you? For example: spouse, former partner, parent.",
           "type": "text",
           "logic": {
@@ -28131,14 +27920,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 256,
+          "questionId": 255,
           "text": "Do you know where the restrained person lives?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "255",
+                "prevQuestion": "254",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -28234,14 +28023,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 257,
+          "questionId": 256,
           "text": "Where does the restrained person live?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "256",
+                "prevQuestion": "255",
                 "prevAnswer": "Yes"
               }
             ]
@@ -28384,18 +28173,18 @@
           "nodeId": "restrained_person"
         },
         {
-          "questionId": 258,
+          "questionId": 257,
           "text": "What firearms, firearm parts, or ammunition might the restrained person have? Include what you listed on DV-100, item 9.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "256",
+                "prevQuestion": "255",
                 "prevAnswer": "Yes"
               },
               {
-                "prevQuestion": "256",
+                "prevQuestion": "255",
                 "prevAnswer": "No"
               }
             ]
@@ -28490,14 +28279,14 @@
       "sectionName": "Other People This Order Protects",
       "questions": [
         {
-          "questionId": 259,
+          "questionId": 258,
           "text": "Does this order also protect other people, such as your children or family?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "258",
+                "prevQuestion": "257",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -28648,7 +28437,7 @@
   ],
   "hiddenFields": [],
   "sectionCounter": 21,
-  "questionCounter": 262,
+  "questionCounter": 261,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "DV-100",
@@ -28774,7 +28563,7 @@
   "alertRules": [
     {
       "id": "alertRule0",
-      "alertNodeId": "768",
+      "alertNodeId": "766",
       "mode": "all",
       "message": "You do not qualify for this kind of restraining order unless you checked one of the other relationships listed above.",
       "conditions": [
@@ -28817,7 +28606,7 @@
     },
     {
       "id": "alertRule1",
-      "alertNodeId": "776",
+      "alertNodeId": "774",
       "mode": "all",
       "message": "A property restraint order is only available if you are married to or a registered domestic partner of the person you want protection from.",
       "conditions": [
@@ -28835,7 +28624,7 @@
     },
     {
       "id": "alertRule2",
-      "alertNodeId": "779",
+      "alertNodeId": "777",
       "mode": "all",
       "message": "Spousal support is only available if you are married to or a registered domestic partner of the person you want protection from.",
       "conditions": [
@@ -28853,7 +28642,7 @@
     },
     {
       "id": "alertRule3",
-      "alertNodeId": "782",
+      "alertNodeId": "780",
       "mode": "all",
       "message": "Child support is only available if you have a minor child with the person you want protection from.",
       "conditions": [
@@ -28881,6 +28670,7 @@
       "alwaysIncluded": true,
       "pdfFile": "dv100.pdf",
       "pdfName": "DV-100 Request for Domestic Violence Restraining Order",
+      "pdfPages": 13,
       "asksNothing": false
     },
     {
@@ -28891,6 +28681,7 @@
       "alwaysIncluded": false,
       "pdfFile": "dv101.pdf",
       "pdfName": "DV-101 Description of Abuse",
+      "pdfPages": 2,
       "asksNothing": false
     },
     {
@@ -28901,6 +28692,7 @@
       "alwaysIncluded": false,
       "pdfFile": "dv105.pdf",
       "pdfName": "DV-105 Request for Child Custody and Visitation Orders",
+      "pdfPages": 6,
       "asksNothing": false
     },
     {
@@ -28911,6 +28703,7 @@
       "alwaysIncluded": false,
       "pdfFile": "dv109.pdf",
       "pdfName": "DV-109 Notice of Court Hearing",
+      "pdfPages": 3,
       "asksNothing": true
     },
     {
@@ -28921,7 +28714,20 @@
       "alwaysIncluded": false,
       "pdfFile": "dv110.pdf",
       "pdfName": "DV-110 Temporary Restraining Order",
+      "pdfPages": 9,
       "asksNothing": false
+    }
+  ],
+  "computedFields": [
+    {
+      "nameId": "additional_pages_count",
+      "_why": "DV-100 item 32 asks for the number of extra pages attached. A filer cannot count them and the debug fill answered 100. The packet knows: the pages of every attachment being filed, plus one for each separate sheet already promised.",
+      "pagesOfAttachedForms": true,
+      "onePageEachWhenYes": [
+        "other_protected_people_additional_list_attached_yes",
+        "dv101_additional_pages_attached",
+        "dv105_children_additional_list_attached"
+      ]
     }
   ],
   "formActivations": [
@@ -28963,6 +28769,21 @@
       "questionId": 1,
       "alsoAnswers": [
         {
+          "questionId": 236,
+          "section": 19
+        },
+        {
+          "questionId": 241,
+          "section": 20
+        }
+      ]
+    },
+    {
+      "nameId": "court_street_address",
+      "askedInSection": 1,
+      "questionId": 2,
+      "alsoAnswers": [
+        {
           "questionId": 237,
           "section": 19
         },
@@ -28973,10 +28794,18 @@
       ]
     },
     {
-      "nameId": "court_street_address",
+      "nameId": "case_number",
       "askedInSection": 1,
-      "questionId": 2,
+      "questionId": 3,
       "alsoAnswers": [
+        {
+          "questionId": 113,
+          "section": 11
+        },
+        {
+          "questionId": 134,
+          "section": 13
+        },
         {
           "questionId": 238,
           "section": 19
@@ -28988,9 +28817,9 @@
       ]
     },
     {
-      "nameId": "case_number",
+      "nameId": "person_asking_protection_name",
       "askedInSection": 1,
-      "questionId": 3,
+      "questionId": 4,
       "alsoAnswers": [
         {
           "questionId": 114,
@@ -29011,16 +28840,16 @@
       ]
     },
     {
-      "nameId": "person_asking_protection_name",
-      "askedInSection": 1,
-      "questionId": 4,
+      "nameId": "person_to_restrain_full_name",
+      "askedInSection": 2,
+      "questionId": 7,
       "alsoAnswers": [
         {
           "questionId": 115,
           "section": 11
         },
         {
-          "questionId": 136,
+          "questionId": 138,
           "section": 13
         },
         {
@@ -29034,35 +28863,12 @@
       ]
     },
     {
-      "nameId": "person_to_restrain_full_name",
-      "askedInSection": 2,
-      "questionId": 7,
-      "alsoAnswers": [
-        {
-          "questionId": 116,
-          "section": 11
-        },
-        {
-          "questionId": 139,
-          "section": 13
-        },
-        {
-          "questionId": 241,
-          "section": 19
-        },
-        {
-          "questionId": 246,
-          "section": 20
-        }
-      ]
-    },
-    {
       "nameId": "person_to_restrain_age",
       "askedInSection": 2,
       "questionId": 8,
       "alsoAnswers": [
         {
-          "questionId": 248,
+          "questionId": 247,
           "section": 20
         }
       ]
@@ -29073,7 +28879,7 @@
       "questionId": 9,
       "alsoAnswers": [
         {
-          "questionId": 249,
+          "questionId": 248,
           "section": 20
         }
       ]
@@ -29084,7 +28890,7 @@
       "questionId": 10,
       "alsoAnswers": [
         {
-          "questionId": 247,
+          "questionId": 246,
           "section": 20
         }
       ]
@@ -29095,7 +28901,7 @@
       "questionId": 11,
       "alsoAnswers": [
         {
-          "questionId": 254,
+          "questionId": 253,
           "section": 20
         }
       ]
@@ -29106,7 +28912,7 @@
       "questionId": 66,
       "alsoAnswers": [
         {
-          "questionId": 260,
+          "questionId": 259,
           "section": 20
         }
       ]
@@ -29117,7 +28923,7 @@
       "questionId": 67,
       "alsoAnswers": [
         {
-          "questionId": 261,
+          "questionId": 260,
           "section": 20
         }
       ]

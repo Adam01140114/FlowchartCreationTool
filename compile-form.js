@@ -177,6 +177,24 @@ function isCourtUse(field) {
   return field.courtUse === true || field.courtUse === 'true';
 }
 
+/**
+ * A field the form asks for and the filer cannot know.
+ *
+ * DV-100 item 32 is the case: "If you used additional paper or forms, enter the
+ * number of extra pages attached to this form." Asked as a question it gets a
+ * guess, and a guess on a filed court document is worse than a blank - the
+ * debug fill answered it 100. But it is not unknowable, only unknown to the
+ * person: it is the pages of the attachments they are filing plus the separate
+ * sheets they have already said they would add, and the packet knows both.
+ *
+ * So a computed field generates no question, exactly as a courtUse field does,
+ * and the form works the number out at the moment it posts.
+ */
+function computedFieldsFrom(hints) {
+  const declared = hints.computed || {};
+  return Object.keys(declared).map((nameId) => Object.assign({ nameId }, declared[nameId]));
+}
+
 function normalizeFields(schema) {
   return (schema.fields || []).filter((f) => !isCourtUse(f)).map((f, i) => ({
     index: i,
@@ -1490,7 +1508,10 @@ function layoutSequence(b, steps, startY, centerX) {
 function compile(schema, hints = {}) {
   unreviewedWording.length = 0;
   const merged = Object.assign({}, schema.interview || {}, hints);
-  const mirrored = applyMirrors(normalizeFields(schema), merged);
+  const computed = computedFieldsFrom(merged);
+  const computedNames = new Set(computed.map((c) => c.nameId));
+  const mirrored = applyMirrors(
+    normalizeFields(schema).filter((f) => !computedNames.has(f.nameId)), merged);
   const { fields: kept, continuations } = applyContinuations(mirrored, merged);
   const { fields: asked, autofills } = applyAutofill(kept, merged);
   const { fields: split, joins } = applySplits(asked, merged);
@@ -1576,6 +1597,11 @@ function compile(schema, hints = {}) {
     if (drop.length) overflow.push({ keep: r.joinInto.field, drop: drop });
   });
   if (overflow.length) flowchart.continuationLines = overflow;
+  if (computed.length) {
+    flowchart.computedFields = computed;
+    computed.forEach((c) => notes.push(
+      'computed field ' + c.nameId + ' -> no question; the form works it out'));
+  }
   // Questions the author has looked at and declared unconditional. The audit
   // fails on a follow-up shown on both Yes and No of its gate; some of those
   // are the compiler rejoining a branch to the spine, where always-show is
