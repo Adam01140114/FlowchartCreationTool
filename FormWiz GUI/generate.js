@@ -6497,7 +6497,7 @@ if (s > 1){
             // Check alert logic for the current question before navigating
             // Rules first: they speak about several questions at once, so the
             // one being left is not necessarily the one that decides.
-            if (typeof checkAlertRules === 'function' && checkAlertRules()) {
+            if (typeof checkAlertRules === 'function' && checkAlertRules(activeContainer)) {
               return;
             }
             if (activeContainer && typeof checkAlertLogic === 'function') {
@@ -13932,7 +13932,39 @@ function alertConditionHolds(condition) {
  * half-finished form does not accuse the filer of not qualifying before they
  * have had the chance to answer.
  */
-function checkAlertRules() {
+/**
+ * Is any of this rule's questions inside what the filer is leaving?
+ *
+ * Without this a rule is tested on every Next, and one about a question in
+ * section 8 goes off while the filer is still in section 3 - told they cannot
+ * have a property restraint order before they have been asked which orders
+ * they want. A rule belongs to the place its questions are answered.
+ *
+ * The scope is whatever the form calls a step: one question when the form is
+ * asked a question at a time, a whole section when it is asked a section at a
+ * time. Both are handled by asking whether the scope contains the question.
+ */
+function alertRuleTouches(rule, scope) {
+  if (!scope) return true;
+  // The last of the rule's questions, in the order the filer meets them.
+  // Any of them is too loose: the property-restraint rule mentions both the
+  // orders question in section 8 and the relationship question in section 3,
+  // so "touches this step" fired it in section 3 as well - before the filer
+  // had been asked which orders they wanted. The deciding answer is the last
+  // one given, and that is where the alert belongs.
+  const all = Array.prototype.slice.call(
+    document.querySelectorAll('[id^="question-container-"]'));
+  let last = null;
+  let lastAt = -1;
+  (rule.conditions || []).forEach(function (condition) {
+    const el = document.getElementById('question-container-' + condition.questionId);
+    const at = el ? all.indexOf(el) : -1;
+    if (at > lastAt) { lastAt = at; last = el; }
+  });
+  return !!last && scope.contains(last);
+}
+
+function checkAlertRules(leaving) {
   const rules = (typeof alertRules !== 'undefined' && alertRules)
     ? alertRules : (window.alertRules || []);
   if (!rules.length) return false;
@@ -13940,6 +13972,7 @@ function checkAlertRules() {
     const rule = rules[i];
     const conditions = (rule && rule.conditions) || [];
     if (!conditions.length) continue;
+    if (!alertRuleTouches(rule, leaving)) continue;
 
     const reachable = conditions.every(function (condition) {
       return !!document.getElementById('question-container-' + condition.questionId);

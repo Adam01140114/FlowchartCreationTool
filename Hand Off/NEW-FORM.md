@@ -209,6 +209,11 @@ leaves a section. Ops are `is`, `isNot`, `answered`, `notAnswered`.
 
 Two behaviours worth knowing:
 
+- **A rule fires where its last question is answered**, not wherever the filer
+  happens to press Next. The property-restraint rule mentions the orders
+  question in section 8 and the relationship question in section 3; without
+  this it went off in section 3, telling the filer they could not have an order
+  they had not been offered yet. The deciding answer is the last one given.
 - A rule is only tested once **every** question it mentions exists on the
   page, so a half-finished form does not accuse the filer of not qualifying
   before they have had a chance to answer.
