@@ -16,6 +16,7 @@ what a good interview looks like. This document is about the artifacts.
 | `<form>-hints.json` | **You, and this is the work** | Everything about the interview a field list cannot express |
 | `<form>-flowchart.json` | `compile-form.js` | Generated. Do not hand-edit |
 | `<packet>.spec.json` | You, once per packet | Form order, PDFs, connectors between forms |
+| `<packet>-disqualifiers.json` | You, from the PDF text | Which combinations of answers rule the filer out |
 
 The compiler is deterministic. Two agents with the same hints file produce the
 same flowchart. **All of the judgment lives in the hints file** — which is why
@@ -151,6 +152,19 @@ relationship boxes. A per-question alert cannot say it - it can only speak
 about the question that owns the option pointing at it, and its conditions
 are OR-ed.
 
+### Finding them
+
+```bash
+node pipeline-disqualifiers.js --scan
+```
+
+reads the packet's PDFs and prints every sentence that sounds like a
+disqualifier, with the form and page - "you do not qualify unless", "only if
+you are married", "you must be". Each is a lead, not a rule: decide which
+fields it is about, write it into `<packet>-disqualifiers.json`, and wire an
+alert node for it. `--check` then verifies the wiring exists and exits
+non-zero when it does not.
+
 ### Drawing one
 
 Point more than one arrow at the same alert node. Each arrow is a condition:
@@ -167,7 +181,15 @@ Once an alert has two or more arrows it shows a selector: **fires when
 ALL / ANY of N conditions hold**. ALL is the default and is what a
 disqualifying factor almost always wants.
 
-So item 3g is: an arrow from the household gate's **No** option, plus an
+A warning the DV-100 itself supplies: item 3g's gate lives **inside** the
+relationship question - it is only asked because "We live together or used to
+live together" was ticked. So "nothing is answered here" is never true, and
+the arrow-from-the-question-marked-NOT shorthand is the wrong condition. What
+disqualifies is that none of the *other six* is ticked, which is six arrows
+from six options, each marked NOT. Read the gate's wording before reaching
+for the shorthand.
+
+So a gate that is a question of its own is: an arrow from that gate's **No** option, plus an
 arrow from the relationships **question** marked NOT, with the alert set to
 ALL.
 

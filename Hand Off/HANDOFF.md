@@ -554,7 +554,12 @@ Before calling a form done:
    `pipeline-audit.js` only finds what it was taught to find, so a green audit
    is not evidence the form is right. See the opening section of
    `form_quality_check.txt`.
-8. **Look at the filled PDF, page by page — always, and last.**
+8. `node pipeline-disqualifiers.js --check` — every combination of answers
+   the paper form says disqualifies a filer has an alert node behind it.
+   The compiler cannot infer these and the interview audit cannot see them;
+   see [`PIPELINE.md`](./PIPELINE.md) for the artifact and
+   [`NEW-FORM.md`](./NEW-FORM.md) for how one is wired.
+9. **Look at the filled PDF, page by page — always, and last.**
    `node audit-pdf-pages.js ./audit 1.6 dv100-filled.pdf ...`, then read every
    PNG. Steps 1-7 all read data: the DOM, the payload, the field dictionary. A
    field can hold exactly the right string and still print in the wrong place,
@@ -753,6 +758,7 @@ Ordered by what actually blocks shipping the DV packet.
 | `flowchart_ai_trainer_doc.txt` | Full AI trainer spec — **read before editing flowcharts** |
 | `PIPELINE.md` | The packet pipeline: artifacts, commands, the two fill modes |
 | `PDF-PAGE-AUDIT.md` | **The last check before shipping** — render the filled PDF and read it |
+| `pipeline-disqualifiers.js` | *(repo root)* Scans the PDFs for disqualifying language and checks each declared one is wired |
 | `NEW-FORM.md` | **Taking on a new form** — the four artifacts, and writing a hints file |
 | `form_quality_check.txt` | The ten rules `pipeline-audit.js` enforces, and why each exists |
 | `flowchartfeatures.txt` | Feature reference for the editor |

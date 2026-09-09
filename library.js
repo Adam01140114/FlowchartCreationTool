@@ -15,11 +15,10 @@ function isPdfNode(cell) {
  * made the alert enumerate as one of that question's checkboxes, and the form
  * grew an option called "fires when ALL of 2 conditions hold".
  */
-function isOptions(cell) {
-  if (!cell || !cell.style || !cell.style.includes("nodeType=options")) return false;
-  return !cell.style.includes("questionType=alertNode")
-    && !cell.style.includes("questionType=hardAlertNode");
-}
+// Deliberately not defined here. `script.js` defines isOptions and index.html
+// loads it after this file, so a copy here is dead code that silently diverges:
+// the one this file used to carry did not accept amount or image options, and
+// nobody noticed because it never ran. One definition, in script.js.
 function isMergeHub(cell) {
   return !!(cell && cell.style && cell.style.includes("nodeType=mergeHub"));
 }

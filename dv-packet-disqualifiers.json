@@ -1,0 +1,71 @@
+{
+  "_comment": "form_disqualifiers for the DV packet: the combinations of answers that rule a filer out, or that make an order unavailable to them. A court form does not only ask questions, it also says when the answers disqualify - and nothing in a field list records that. Each entry here becomes an alert node in the flowchart, with one arrow per condition; run `node pipeline-disqualifiers.js --check` to see which are wired up. Found by `--scan`, which reads the PDFs for sentences of the form 'you do not qualify unless', 'only if you', 'you must be'.",
+
+  "forms": [
+    { "name": "DV-100", "pdf": "dv100.pdf" },
+    { "name": "DV-109", "pdf": "dv109.pdf" },
+    { "name": "DV-110", "pdf": "dv110.pdf" }
+  ],
+
+  "disqualifiers": [
+    {
+      "id": "dv100_relationship_required",
+      "form": "DV-100",
+      "item": "3g",
+      "mode": "all",
+      "message": "You do not qualify for this kind of restraining order unless you checked one of the other relationships listed above.",
+      "source": "If no, you do not qualify for this kind of restraining order unless you checked one of the other relationships listed above.",
+      "_note": "The gate lives inside the relationship question - it is only asked because 'We live together or used to live together' was ticked - so 'nothing is answered here' is never true and cannot be the condition. What disqualifies is that none of the other six is ticked, which is six isNot conditions.",
+      "when": [
+        { "question": "relationship_lived_together_as_family", "op": "is", "value": "No" },
+        {
+          "question": "relationship_to_person_to_restrain",
+          "noneOf": [
+            "We have a child or children together",
+            "We are married or registered domestic partners",
+            "We used to be married or registered domestic partners",
+            "We are dating or used to date",
+            "We are or used to be engaged to be married",
+            "We are related"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dv100_property_restraint_requires_marriage",
+      "form": "DV-100",
+      "item": "20",
+      "mode": "all",
+      "message": "A property restraint order is only available if you are married to or a registered domestic partner of the person you want protection from.",
+      "source": "Property Restraint (only if you are married or a registered domestic partner with the person in 2.)",
+      "when": [
+        { "question": "orders_requested", "op": "is", "value": "Property restraint" },
+        { "question": "relationship_to_person_to_restrain", "op": "isNot", "value": "We are married or registered domestic partners" }
+      ]
+    },
+    {
+      "id": "dv100_spousal_support_requires_marriage",
+      "form": "DV-100",
+      "item": "25",
+      "mode": "all",
+      "message": "Spousal support is only available if you are married to or a registered domestic partner of the person you want protection from.",
+      "source": "Spousal Support (You must be married or a registered domestic partner with person in 2.)",
+      "when": [
+        { "question": "orders_requested", "op": "is", "value": "Spousal support" },
+        { "question": "relationship_to_person_to_restrain", "op": "isNot", "value": "We are married or registered domestic partners" }
+      ]
+    },
+    {
+      "id": "dv100_child_support_requires_minor_child",
+      "form": "DV-100",
+      "item": "24",
+      "mode": "all",
+      "message": "Child support is only available if you have a minor child with the person you want protection from.",
+      "source": "Child Support (this applies only if you have a minor child with the person in 2)",
+      "when": [
+        { "question": "orders_requested", "op": "is", "value": "Child support" },
+        { "question": "relationship_to_person_to_restrain", "op": "isNot", "value": "We have a child or children together" }
+      ]
+    }
+  ]
+}

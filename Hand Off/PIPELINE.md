@@ -12,6 +12,36 @@ be re-run on its own and the result is reproducible rather than remembered.
                                                     HTML form ──┴──► filled PDFs
 ```
 
+## What disqualifies a filer
+
+A court form does not only ask questions. It also says when the answers rule
+the filer out - "you do not qualify unless", "only if you are married",
+"this applies only if you have a minor child". Nothing in a field list
+records that, the compiler cannot infer it, and left undeclared it is
+invisible to every other step: the filer discovers it at the courthouse.
+
+So it gets its own artifact next to `form_connections`:
+`dv-packet-disqualifiers.json`, and a step that keeps it honest.
+
+```bash
+node pipeline-disqualifiers.js --scan     # read the PDFs for the language
+node pipeline-disqualifiers.js            # list what has been declared
+node pipeline-disqualifiers.js --check    # is each one actually wired up?
+```
+
+`--scan` prints sentences that sound like a disqualifier, with form and page.
+They are leads, not rules: a person decides which fields each one is about.
+On the DV packet it finds five in the DV-100 and one in the DV-109 - the
+DV-109 lead is a service deadline rather than a disqualifier, which is why
+the step stops at printing.
+
+`--check` compares each declared disqualifier against the alert rules in the
+exported packet GUI JSON and exits non-zero when one has no alert behind it.
+That is the half that matters. A disqualifier written down and never wired
+up is worse than one nobody wrote down, because it looks handled.
+
+How to wire one: [`NEW-FORM.md`](./NEW-FORM.md), "Disqualifying factors".
+
 ## The artifacts
 
 | File | What it holds | Who writes it |
@@ -88,27 +118,32 @@ number box. Types work inside combined and repeating questions too.
 node pipeline-connect.js
 node pipeline-sanitize.js dv109 dv110
 
-# 2. compile each form, then assemble the packet
+# 2. what the paper form says disqualifies a filer, and whether it is wired
+node pipeline-disqualifiers.js --scan     # leads, per form, per page
+node pipeline-disqualifiers.js            # what is declared
+
+# 3. compile each form, then assemble the packet
 node compile-form.js dv-field-configs/dv100-field-config.json dv100-flowchart.json --hints dv100-hints.json
 node pipeline-build-packet.js
 
-# 3. open dv-packet-project.json in the editor (Import Project JSON),
+# 4. open dv-packet-project.json in the editor (Import Project JSON),
 #    then Export Project GUI JSON -> dv-packet-gui.json
 
-# 4. audit the static rules - the chart, then the interview it exports to
+# 5. audit the static rules - the chart, the disqualifiers, then the interview
 node pipeline-audit-flowchart.js
 node pipeline-audit.js
+node pipeline-disqualifiers.js --check    # every declared one has an alert
 
-# 5. fill the form (debug menu: Ctrl+Shift, then "Fill maximum path"),
+# 6. fill the form (debug menu: Ctrl+Shift, then "Fill maximum path"),
 #    save the answers, and produce the PDFs
 node pipeline-fill.js --render
 node pipeline-explain.js dv110
 
-# 6. read the interview yourself. This step is not optional and no packet
+# 7. read the interview yourself. This step is not optional and no packet
 #    ships without it - the audit only catches what it was taught to catch.
 node pipeline-review.js
 
-# 7. look at the filled PDFs, page by page. Also not optional: every check
+# 8. look at the filled PDFs, page by page. Also not optional: every check
 #    above reads data, and a field can hold the right string and still
 #    print in the wrong place. See Hand Off/PDF-PAGE-AUDIT.md.
 node audit-pdf-pages.js ./audit 1.6 dv100-filled.pdf dv109-filled.pdf dv110-filled.pdf
