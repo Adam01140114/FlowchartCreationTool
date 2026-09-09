@@ -14327,6 +14327,45 @@ function resetHiddenQuestionsToDefaults(sectionNumber) {
  *  navigateSection(sectionNumber)
  *  – shows exactly one section (or Thank‑you) and records history
  *-----------------------------------------------------------------*/
+/*------------------------------------------------------------------
+ *  scrollFormToTop()
+ *  - one section at a time means the next section opens where the last
+ *    one ended, which on a long section is halfway down a page the filer
+ *    has already read. They press Next and appear to be mid-question.
+ *    So every move between sections starts at the top, forward or back.
+ *
+ *    The page is not always the thing that scrolls: the form can sit in a
+ *    container with its own overflow, and scrolling the window alone
+ *    leaves that container where it was. Both are reset.
+ *-----------------------------------------------------------------*/
+function scrollFormToTop(){
+    // Instant, not smooth. The section that was on screen is gone, so gliding
+    // through it animates content the filer is no longer reading - and a
+    // smooth scroll is silently a no-op wherever reduced motion is set, which
+    // is the case in a headless browser and on a lot of real machines. An
+    // unconditional jump is both the better behaviour and the one that works.
+    //
+    // Which box actually scrolls depends on the page: the generated form sets
+    // overflow on BODY, a host page may put the form in a container of its
+    // own, and the document element scrolls when neither does. Reset all of
+    // them rather than guessing.
+    try {
+        var form = document.getElementById("customForm");
+        var node = form ? form.parentElement : null;
+        while (node){
+            if (node.scrollTop) node.scrollTop = 0;
+            node = node.parentElement;
+        }
+    } catch (e) { /* a detached form is not worth failing over */ }
+    try {
+        if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+        if (document.documentElement) document.documentElement.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
+    } catch (e) { /* ditto */ }
+    if (typeof window.scrollTo === "function"){
+        try { window.scrollTo(0, 0); } catch (e) { /* ditto */ }
+    }
+}
 function navigateSection(sectionNumber, isBackNavigation = false){
     const sections  = document.querySelectorAll('.section');
     const form      = document.getElementById('customForm');
@@ -14352,6 +14391,7 @@ function navigateSection(sectionNumber, isBackNavigation = false){
         thankYou.style.display = 'block';
         currentSectionNumber = 'end';
         updateProgressBar();
+        scrollFormToTop();
         return;
     }
     /* ── corrected bounds check ────────────────────────────── */
@@ -14370,6 +14410,7 @@ function navigateSection(sectionNumber, isBackNavigation = false){
     resetHiddenQuestionsToDefaults(sectionNumber);
     }
     updateProgressBar();
+    scrollFormToTop();
 }
 /*------------------------------------------------------------------
  *  goBack()

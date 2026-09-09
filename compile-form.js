@@ -805,8 +805,10 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
         repeat: repeat,
         origin: 'repeat'
       });
-      place(step, hostFor(repeat.conditional ? { conditional: repeat.conditional } : repeat.anchor));
-      notes.push(`repeat: ${repeat.nameId} -> "${repeat.question}" (up to ${repeat.max} entries)`);
+      const repeatHost = hostFor(repeat.conditional ? { conditional: repeat.conditional } : repeat.anchor);
+      raiseMinimumForGatedBlock(repeat, repeatHost, notes);
+      place(step, repeatHost);
+      notes.push(`repeat: ${repeat.nameId} -> "${repeat.question}" (${repeat.min} to ${repeat.max} entries)`);
     }
     lastIndex = field.index;
 
@@ -933,11 +935,33 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
       repeat: repeat,
       origin: 'repeat'
     });
-    place(step, hostFor(repeat.conditional ? { conditional: repeat.conditional } : repeat.anchor));
-    notes.push(`repeat: ${repeat.nameId} -> "${repeat.question}" (up to ${repeat.max} entries)`);
+    const repeatHost = hostFor(repeat.conditional ? { conditional: repeat.conditional } : repeat.anchor);
+    raiseMinimumForGatedBlock(repeat, repeatHost, notes);
+    place(step, repeatHost);
+    notes.push(`repeat: ${repeat.nameId} -> "${repeat.question}" (${repeat.min} to ${repeat.max} entries)`);
   });
 
   return { steps, notes, groups };
+}
+
+/**
+ * A block nobody reaches without saying it exists holds at least one entry.
+ *
+ * "Does the person have firearms? Yes" is followed by "How many firearms do you
+ * know about?", and that spinner started at zero - offering a filer who has just
+ * said yes the answer none, and a filer who takes it an empty block and a form
+ * that contradicts itself two questions apart. The gate is the assertion; the
+ * count only says how many.
+ *
+ * So the minimum is raised to one for any repeating block that is reached
+ * through an answer, and left alone for one on the spine, where zero can be a
+ * real answer.
+ */
+function raiseMinimumForGatedBlock(repeat, host, notes) {
+  if (!host || repeat.min >= 1) return;
+  repeat.min = 1;
+  notes.push('gated block ' + repeat.nameId + ' -> minimum 1 entry'
+    + ' (an answer already said there is at least one)');
 }
 
 /* ------------------------------------------------------------------ */
