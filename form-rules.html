@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Form Pipeline Rules</title>
+<style>
+  :root {
+    --ink: #16191d; --muted: #6b7785; --line: #e4e8ee; --paper: #fff;
+    --ground: #f4f6f9; --accent: #2f6fed; --mark: #fff3c4; --markline: #e8b93b;
+    --tag-interview: #2f6fed; --tag-packet: #7a4fd6; --tag-page: #17845a; --tag-process: #b8632a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #e8ecf1; --muted: #98a3b3; --line: #2a3038; --paper: #1b1f25;
+      --ground: #111418; --accent: #6f9dff; --mark: #3a3114; --markline: #b9922c;
+      --tag-interview: #6f9dff; --tag-packet: #b18aff; --tag-page: #46c391; --tag-process: #e0975a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font: 15px/1.62 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    position: sticky; top: 0; z-index: 30; background: var(--paper);
+    border-bottom: 1px solid var(--line); padding: 13px 24px;
+    display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+  }
+  h1 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .spacer { margin-left: auto; }
+  .btn {
+    text-decoration: none; font-size: 13px; font-weight: 600; color: var(--ink);
+    border: 1px solid var(--line); border-radius: 8px; padding: 6px 13px; background: transparent;
+    cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.08); color: #fff; }
+  #q {
+    font: inherit; font-size: 13px; padding: 6px 11px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--ground); color: var(--ink); width: 210px;
+  }
+  .wrap { display: flex; gap: 28px; max-width: 1280px; margin: 0 auto; padding: 26px 24px 80px; }
+  aside {
+    width: 250px; flex: none; position: sticky; top: 74px; align-self: flex-start;
+    max-height: calc(100vh - 100px); overflow-y: auto;
+  }
+  aside h3 {
+    margin: 16px 0 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+  }
+  aside h3:first-child { margin-top: 0; }
+  aside a {
+    display: block; text-decoration: none; color: var(--muted); font-size: 13px;
+    padding: 3px 8px; border-radius: 6px; border-left: 2px solid transparent;
+  }
+  aside a:hover { color: var(--accent); background: var(--paper); }
+  main { flex: 1; min-width: 0; }
+  .group-head {
+    margin: 34px 0 14px; padding-bottom: 7px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .group-head:first-child { margin-top: 0; }
+  .group-head h2 { margin: 0; font-size: 15px; font-weight: 650; }
+  .group-head p { margin: 0; color: var(--muted); font-size: 13px; }
+  article {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 11px;
+    padding: 18px 20px; margin-bottom: 14px; scroll-margin-top: 84px;
+    transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
+  }
+  article:target, article.lit {
+    border-color: var(--markline); background: var(--mark);
+    box-shadow: 0 0 0 4px rgba(232, 185, 59, .22);
+  }
+  .rule-head { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
+  .num {
+    font-size: 11px; font-weight: 750; letter-spacing: .05em; color: #fff;
+    background: var(--tag); border-radius: 5px; padding: 2px 7px; white-space: nowrap;
+  }
+  .rule-head h4 { margin: 0; font-size: 15px; font-weight: 650; flex: 1; min-width: 200px; }
+  .copy {
+    border: 1px solid var(--line); background: transparent; color: var(--muted);
+    border-radius: 6px; font: inherit; font-size: 11px; padding: 2px 8px; cursor: pointer;
+  }
+  .copy:hover { color: var(--accent); border-color: var(--accent); }
+  .says { margin: 10px 0 0; }
+  .why, .by { margin: 9px 0 0; font-size: 13.5px; color: var(--muted); }
+  .why b, .by b { color: var(--ink); font-weight: 650; }
+  code {
+    font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: var(--ground); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px;
+  }
+  .none { color: var(--muted); padding: 30px 0; }
+  @media (max-width: 900px) { aside { display: none; } .wrap { padding: 20px 16px 60px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Form Pipeline Rules</h1>
+  <span class="sub" id="count"></span>
+  <span class="spacer"></span>
+  <input id="q" type="search" placeholder="Filter rules…" autocomplete="off">
+  <a class="btn primary" href="form-output-dashboard.html">🖼️ Page images →</a>
+</header>
+
+<div class="wrap">
+  <aside id="toc"></aside>
+  <main id="main"></main>
+</div>
+
+<script>
+/*
+ * Every rule this pipeline enforces, in one place, each one addressable.
+ *
+ * The point of the anchors is conversational: "what rule is this?" should be
+ * answerable with a link that opens here, scrolls to the rule and lights it up,
+ * rather than with a paragraph that has to be trusted. So each rule has a
+ * stable id that never changes once published - renaming one would break every
+ * link already sent - and the Copy link button hands you that address.
+ *
+ * Each entry says three separate things, and they are not interchangeable:
+ * what the rule requires, the specific failure that caused it to be written,
+ * and what actually checks it. A rule with no checker is a preference.
+ */
+const GROUPS = [
+  { id: 'interview', name: 'The interview', tag: 'var(--tag-interview)',
+    blurb: 'What gets asked, and how.' },
+  { id: 'packet', name: 'The packet', tag: 'var(--tag-packet)',
+    blurb: 'Several forms behaving as one.' },
+  { id: 'page', name: 'The printed page', tag: 'var(--tag-page)',
+    blurb: 'What the filer actually hands in.' },
+  { id: 'process', name: 'Working on it', tag: 'var(--tag-process)',
+    blurb: 'How a change gets made and checked.' },
+];
+
+const RULES = [
+  /* ---------------- the interview ---------------- */
+  { id: 'every-field-reachable', group: 'interview', num: 'Rule 1',
+    title: 'Every PDF field is reachable',
+    says: 'Every fillable field on the PDF must be reachable from something the form posts. A field nothing can fill is a blank on a filed document.',
+    why: 'Exceptions are declared, not assumed: a court field, an overflow line, or a computed field is exempt and says so by name in the audit output.',
+    by: 'pipeline-audit.js — RULE 1' },
+
+  { id: 'no-field-names-on-screen', group: 'interview', num: 'Rule 2',
+    title: 'Nothing a person reads is a field name',
+    says: 'No question text, option label or placeholder may be a raw PDF field name. Wording is authored in the hints, not derived from the schema.',
+    why: 'The audit once passed a packet that asked "Do you have a dV 100[0].Page4[0]...?" — which is why reading the interview is a required step and not a formality.',
+    by: 'pipeline-audit.js — RULE 2, plus pipeline-review.js and a human read' },
+
+  { id: 'repeats-are-blocks', group: 'interview', num: 'Rule 3',
+    title: 'Repeated entries use a block, not flat questions',
+    says: 'A numbered family of PDF fields becomes one "how many?" block whose entries carry {n}, never a run of near-identical questions.',
+    why: 'Six firearms asked as eighteen questions is eighteen screens for one table.',
+    by: 'pipeline-audit.js — RULE 3; the repeats hint' },
+
+  { id: 'gated-block-starts-at-one', group: 'interview', num: 'Rule',
+    title: 'A repeating block behind a gate starts at one entry',
+    says: 'If a block is only reached by answering something, its minimum is one. A block on the spine keeps whatever the hint says, because there zero can be a real answer.',
+    why: '"Does the person have firearms? Yes" was followed by a spinner starting at zero — offering a filer who just said yes the answer none, and a form that contradicts itself two questions apart.',
+    by: 'compile-form.js — raiseMinimumForGatedBlock, which prints every block it raises' },
+
+  { id: 'an-order-owns-its-questions', group: 'interview', num: 'Rule',
+    title: 'An order owns its questions',
+    says: 'When a form asks which orders you want and then asks about each one, those follow-ups gate on the option that asks for it — the whole run, not just its first question.',
+    why: 'Gating only the entry moved each block and left its tail on the spine, so "Why do you have the right to live there?" was still asked of a filer who never asked anyone to move out.',
+    by: 'the conditional hints; visible in pipeline-review.js as what each question waits on' },
+
+  { id: 'computed-not-guessed', group: 'interview', num: 'Rule',
+    title: 'A field the filer cannot know is computed, not asked',
+    says: 'If the packet can work a value out, it does. Declaring a field computed generates no question and the form fills it when it posts.',
+    why: 'DV-100 item 32 asks how many extra pages are attached. Asked as a question it gets a guess — the debug fill answered 100 — and a wrong number on a filed court document is worse than a blank one.',
+    by: 'the computed hint; pipeline-audit.js lists them as exempt from Rule 1' },
+
+  { id: 'one-question-one-thing', group: 'interview', num: 'Rule 8',
+    title: 'One question asks one thing',
+    says: 'A PDF box holding two answers is asked as two questions and rejoined on the way out.',
+    why: 'A single box wanting a name and a date gets one of them.',
+    by: 'pipeline-audit.js — RULE 8; the splits hint' },
+
+  { id: 'one-subject-one-question', group: 'interview', num: 'Rule 9',
+    title: 'Fields about one subject are one question',
+    says: 'An address is one question with four boxes, not four questions.',
+    why: 'Split apart, four screens ask for one address and the shape that made it obvious is gone.',
+    by: 'pipeline-audit.js — RULE 9; the combines hint' },
+
+  { id: 'ask-in-the-right-type', group: 'interview', num: 'Rule 10',
+    title: 'Ask for a value in the type it is',
+    says: 'Dates get a date picker, phones a keypad, money a number box.',
+    why: 'A date typed free-hand arrives in a format the PDF was not expecting.',
+    by: 'pipeline-audit.js — RULE 10; questions[...].type' },
+
+  { id: 'say-what-to-enter', group: 'interview', num: 'Rule 11',
+    title: 'A question says what to enter',
+    says: 'The wording tells the filer what belongs in the box.',
+    why: 'A label lifted from a field name tells them nothing.',
+    by: 'pipeline-audit.js — RULE 11' },
+
+  { id: 'narrative-asked-as-narrative', group: 'interview', num: 'Rule 12',
+    title: 'A narrative box is asked as a narrative',
+    says: 'A multi-line PDF box is asked with a multi-line question.',
+    why: 'A one-line question under a ten-line box invites an answer that will not fit.',
+    by: 'pipeline-audit.js — RULE 12' },
+
+  { id: 'a-gate-must-gate', group: 'interview', num: 'Rule',
+    title: 'A gate that shows its follow-up on both answers is not a gate',
+    says: 'A follow-up shown on Yes and on No must either be fixed or declared always-shown with a written reason.',
+    why: 'It reads as a gate and gates nothing, so nobody notices the block it was supposed to control is always on.',
+    by: 'pipeline-audit.js — the gates check; the alwaysShown hint carries the reason' },
+
+  { id: 'disqualifiers-are-declared', group: 'interview', num: 'Rule',
+    title: 'What disqualifies a filer is declared and wired',
+    says: 'Every "you do not qualify unless" sentence on the paper form is written down in the disqualifiers file, and every declared one has an alert node behind it.',
+    why: 'A rule written down and never wired up is worse than one nobody wrote down, because it looks handled.',
+    by: 'dv-packet-disqualifiers.json; pipeline-build-packet.js wires them; pipeline-disqualifiers.js --check' },
+
+  /* ---------------- the packet ---------------- */
+  { id: 'court-use', group: 'packet', num: 'Rule 6',
+    title: 'Ask only what the filer completes',
+    says: 'Every Judicial Council form prints who completes what. A field marked courtUse never becomes a question and stays blank for the judge or clerk.',
+    why: 'Asking a survivor what the judge decided produces an answer they cannot know and a filed order that says the court ruled something it has not. This took the packet from 358 questions to about 145.',
+    by: 'courtUse in the field config; pipeline-audit.js counts them separately' },
+
+  { id: 'court-field-not-filer-name', group: 'packet', num: 'Rule',
+    title: 'A court field must not share a filer’s name',
+    says: 'A courtUse field may not carry a name that a filer field somewhere in the packet also carries. Where it does, the court’s copy is renamed with its own form in front.',
+    why: 'DV-110 item 6 is a court finding, and its firearm field was called firearm_item_1_description — the same as the DV-100 box where the filer lists what they believe. The filer’s claim was posted straight into the judge’s finding. Nine fields.',
+    by: 'pipeline-connect.js — exits non-zero from --check while any remain' },
+
+  { id: 'shared-name-is-the-wiring', group: 'packet', num: 'Rule',
+    title: 'A shared field name is the wiring',
+    says: 'One answer fills every form that prints it, by giving those fields the same canonical name. The connections file records which are the same answer.',
+    why: 'Without it the interview asks three times and a survivor retypes their abuser’s name on every form.',
+    by: 'dv-packet-connections.json; pipeline-connect.js' },
+
+  { id: 'one-group-per-form', group: 'packet', num: 'Rule 5',
+    title: 'One group per form, named after the form',
+    says: 'Exactly one group per form, named after it, holding the sections that carry a question.',
+    why: 'The progress bar counts forms rather than sections.',
+    by: 'pipeline-audit.js — RULE 5' },
+
+  { id: 'silent-form-still-ships', group: 'packet', num: 'Rule 7',
+    title: 'A form that asks nothing still ships',
+    says: 'DV-109 asks the filer nothing of its own, and its PDF must still be produced and offered.',
+    why: 'A form with no questions is easy to drop from the output and nobody sees it missing until filing.',
+    by: 'pipeline-audit.js — RULE 7' },
+
+  { id: 'sections-follow-the-filer', group: 'packet', num: 'Rule',
+    title: 'Sections switch in the order the filer meets them',
+    says: 'Section assignment walks every question in interview order, branches included, so a section may open inside a branch.',
+    why: 'Assignment used to run along the spine and hand each branch its parent’s section, which emptied "Animals, Property and Support" the moment items 16 to 28 moved under the orders question.',
+    by: 'compile-form.js — assignSections; the packet build reports any section dropped for being empty' },
+
+  { id: 'survive-a-rebuild', group: 'packet', num: 'Rule',
+    title: 'Anything that must survive a rebuild lives in a source the rebuild reads',
+    says: 'If a build regenerates an artifact, nothing hand-added to that artifact survives. Put it in an input.',
+    why: 'The first four disqualifier alerts were drawn by hand into the built project. The next rebuild dropped all four and the packet went out with the rules declared and none of them wired — the exact failure the disqualifiers file exists to prevent.',
+    by: 'pipeline-build-packet.js wires them from the declaration each time' },
+
+  /* ---------------- the printed page ---------------- */
+  { id: 'fill-and-read-back', group: 'page', num: 'Rule 4',
+    title: 'Fill the packet and read the PDFs back',
+    says: 'Post a captured answer set exactly as the form does, keep the filled PDFs, and check every field the answers reached carries a value. A blank is allowed only when an answer ruled it out, and that has to be shown.',
+    why: 'A field whose question exists, whose gates are all open, and which is still empty is a defect, not a branch.',
+    by: 'pipeline-fill.js and pipeline-explain.js — DEFECT count must be zero' },
+
+  { id: 'look-at-every-page', group: 'page', num: 'Rule',
+    title: 'Look at every page as an image',
+    says: 'Render every page of every filled PDF and read the images against the blank form. Not optional, and last.',
+    why: 'Every other check reads data. A field can hold exactly the right string and still print in the wrong place — the value lives in the field dictionary and the ink comes from the appearance stream. DV-101 printing an answer through the words "Describe any injuries:" passed every data-level check.',
+    by: 'pipeline-fill.js --render, then a page-by-page read' },
+
+  { id: 'publish-the-pages', group: 'page', num: 'Rule',
+    title: 'Publish the pages you looked at',
+    says: 'Every full pass ends by copying the exact images the audit read into Current Form Output/, one folder per form. The folder is replaced, never merged.',
+    why: 'Describing what you saw asks the reader to take your word for it. A leftover page from an older run is worse than no page, because it looks current and is not.',
+    by: 'pipeline-current-output.js; form-output-dashboard.html watches the folder' },
+
+  { id: 'long-answer-next-line', group: 'page', num: 'Rule',
+    title: 'A long answer runs onto the next ruled line',
+    says: 'When an answer is wider than its line, the remainder wraps onto the ruled lines beneath it. The continuation is found by geometry, not by field names.',
+    why: 'DV-100 item 16b(3) has 166pt of line and the answer wanted 226pt, so it was drawn and clipped while the second ruled line the form printed for exactly this sat empty.',
+    by: 'dev-server.js — spillOntoContinuationLines, which logs every spill' },
+
+  { id: 'box-must-not-cover-its-label', group: 'page', num: 'Rule',
+    title: 'A field box must not cover the form’s own label',
+    says: 'A multi-line field whose rectangle covers text the page already printed has its top lowered when the PDF is sanitized.',
+    why: 'DV-101 item 3e starts eight points above the label it belongs to, so the answer printed straight through the words "Describe any injuries:". Only the page image finds it.',
+    by: 'pipeline-sanitize.js — reports every box it lowers' },
+
+  { id: 'buttons-keep-their-words', group: 'page', num: 'Rule',
+    title: 'A button that was printing words keeps them',
+    says: 'A push button with no background colour is text the page needs; its caption is drawn as ink before the widget is dropped. One with a background colour is a control and goes.',
+    why: 'DV-100 page 13 lists the forms you must file, and each form number was a push button. Deleting them printed "Form , Temporary Restraining Order" — a survivor told to file a form the page no longer names.',
+    by: 'pipeline-sanitize.js — reports every caption it draws' },
+
+  { id: 'one-line-box-is-one-line', group: 'page', num: 'Rule',
+    title: 'A box one line tall is laid out as one line',
+    says: 'A field carrying the multiline flag in a box shorter than one line of multiline text borrows the single-line layout, which fits.',
+    why: 'pdf-lib needs 12.21pt at 11pt Helvetica, the box gives 12.00pt, and the glyphs are clipped through the middle.',
+    by: 'dev-server.js — ruledLineTextAppearance' },
+
+  /* ---------------- working on it ---------------- */
+  { id: 'read-the-interview', group: 'process', num: 'Rule',
+    title: 'Read the whole interview before shipping',
+    says: 'Print the interview in the order a person meets it, read all of it, then answer the form in the preview and check that saying No to a gate really does remove the block behind it.',
+    why: 'The audit is a regression test for defects that already happened once. It reported zero failures on a packet that asked thirty questions about further abuse of a filer who had just said it happened once.',
+    by: 'pipeline-review.js — required, not a review of last resort' },
+
+  { id: 'wait-for-the-builder', group: 'process', num: 'Rule',
+    title: 'Wait for the builder before reading it back',
+    says: 'loadFormData restores hidden logic on per-question timers. Give it time and check the count before calling getFormHTML.',
+    why: 'Read too early and the page is emitted with no hidden logic, so every exclusive choice falls back to a label-derived checkbox name that matches no PDF field. The interview looks right, the payload looks full, the audit passes, and the printed boxes are empty — fifteen groups on DV-100 alone.',
+    by: 'count .hidden-logic-config in the builder, and grep the emitted HTML for a non-empty hiddenLogicConfigs' },
+
+  { id: 'restart-the-server-in-place', group: 'process', num: 'Rule',
+    title: 'Restart the dev server in place',
+    says: 'When dev-server.js changes, kill the process on 8080 and start it again on 8080. Never a second port.',
+    why: 'A second port means the browser tab, the preview and every pipeline default keep talking to the stale server, so what you see is not what just changed.',
+    by: 'convention' },
+
+  { id: 'prefer-geometry', group: 'process', num: 'Rule',
+    title: 'Prefer geometry to names',
+    says: 'Where a PDF’s own names carry no meaning, decide from the rectangles: which label belongs to which box, which line continues which, which button is a control.',
+    why: 'Judicial Council field names are laid down by the authoring tool. Guessing which "tf" is Start is how a form prints the end time in the start column, and nothing downstream catches it.',
+    by: 'pipeline-field-labels.js and the geometry tests in the sanitizer and filler' },
+
+  { id: 'no-hard-coding', group: 'process', num: 'Rule',
+    title: 'Every rule is general, never written for one form',
+    says: 'New behaviour is driven by declarations and by what can be measured, not by a list of field names for the form in front of you.',
+    why: 'The packet is going to keep growing. A fix that names DV-100 fields is a fix that has to be written again for the next form.',
+    by: 'review; every rule here states the signal it keys on' },
+];
+
+const byId = Object.fromEntries(GROUPS.map((g) => [g.id, g]));
+const slug = (id) => 'rule-' + id;
+
+function render(filter) {
+  const main = document.getElementById('main');
+  const toc = document.getElementById('toc');
+  main.textContent = ''; toc.textContent = '';
+  const needle = (filter || '').trim().toLowerCase();
+  let shown = 0;
+
+  GROUPS.forEach((group) => {
+    const rules = RULES.filter((r) => r.group === group.id).filter((r) =>
+      !needle || (r.title + ' ' + r.says + ' ' + r.why + ' ' + r.by + ' ' + r.num)
+        .toLowerCase().includes(needle));
+    if (!rules.length) return;
+    shown += rules.length;
+
+    const head = document.createElement('div');
+    head.className = 'group-head';
+    head.innerHTML = '<h2></h2><p></p>';
+    head.querySelector('h2').textContent = group.name;
+    head.querySelector('p').textContent = group.blurb;
+    main.appendChild(head);
+
+    const tocHead = document.createElement('h3');
+    tocHead.textContent = group.name;
+    toc.appendChild(tocHead);
+
+    rules.forEach((rule) => {
+      const link = document.createElement('a');
+      link.href = '#' + slug(rule.id);
+      link.textContent = rule.title;
+      toc.appendChild(link);
+
+      const art = document.createElement('article');
+      art.id = slug(rule.id);
+      art.style.setProperty('--tag', group.tag);
+
+      const h = document.createElement('div');
+      h.className = 'rule-head';
+      const num = document.createElement('span');
+      num.className = 'num'; num.textContent = rule.num;
+      const title = document.createElement('h4'); title.textContent = rule.title;
+      const copy = document.createElement('button');
+      copy.className = 'copy'; copy.textContent = 'Copy link';
+      copy.addEventListener('click', () => {
+        const url = location.origin + location.pathname + '#' + slug(rule.id);
+        navigator.clipboard.writeText(url).then(
+          () => { copy.textContent = 'Copied'; setTimeout(() => copy.textContent = 'Copy link', 1400); },
+          () => { copy.textContent = url; }
+        );
+      });
+      h.append(num, title, copy);
+
+      const says = document.createElement('p'); says.className = 'says'; says.textContent = rule.says;
+      const why = document.createElement('p'); why.className = 'why';
+      why.innerHTML = '<b>Why:</b> '; why.append(document.createTextNode(rule.why));
+      const by = document.createElement('p'); by.className = 'by';
+      by.innerHTML = '<b>Checked by:</b> '; by.append(document.createTextNode(rule.by));
+
+      art.append(h, says, why, by);
+      main.appendChild(art);
+    });
+  });
+
+  if (!shown) main.appendChild(Object.assign(document.createElement('p'),
+    { className: 'none', textContent: 'No rule matches that.' }));
+  document.getElementById('count').textContent =
+    shown + (needle ? ' of ' + RULES.length : '') + ' rules';
+}
+
+/**
+ * Take the reader to the rule the link names and make it obvious which one it is.
+ *
+ * :target alone is not enough - it survives only until the next click anywhere,
+ * and a link sent in conversation has to still be pointing at something when
+ * the reader looks up from scrolling.
+ */
+function lightUp() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id) return;
+  const el = document.getElementById(id);
+  if (!el) return;
+  document.querySelectorAll('article.lit').forEach((a) => a.classList.remove('lit'));
+  el.classList.add('lit');
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => el.scrollIntoView({ block: 'start' }), 500);
+}
+
+document.getElementById('q').addEventListener('input', (e) => {
+  render(e.target.value);
+  if (!e.target.value) lightUp();
+});
+window.addEventListener('hashchange', lightUp);
+
+render('');
+lightUp();
+</script>
+</body>
+</html>

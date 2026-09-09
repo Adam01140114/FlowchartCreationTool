@@ -132,6 +132,27 @@ through an answer and prints which:
 A block on the spine keeps whatever the hint says, because there zero can be a
 real answer. A hint that sets `"min": 0` behind a gate is overridden, visibly.
 
+## The rules, one page, each one addressable
+
+```
+http://127.0.0.1:8080/form-rules.html
+http://127.0.0.1:8080/form-rules.html#rule-court-field-not-filer-name
+```
+
+Every rule this pipeline enforces, grouped into the interview, the packet, the
+printed page and working on it. Each entry says three separate things and they
+are not interchangeable: what the rule requires, the specific failure that
+caused it to be written, and what actually checks it. A rule with no checker is
+a preference.
+
+Each rule has a stable id, so "what rule is this?" can be answered with a link
+that opens the page, scrolls to the rule and lights it up rather than with a
+paragraph that has to be trusted. **Those ids never change once published** -
+renaming one breaks every link already sent. Add rules; do not rename them.
+The Copy link button on each rule hands you its address.
+
+The rules page and the page-image dashboard link to each other, top right.
+
 ## Publish the pages you looked at
 
 The page-image audit is the last and least skippable step, and describing what

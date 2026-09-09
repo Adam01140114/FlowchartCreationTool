@@ -45,6 +45,12 @@
     padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line);
   }
   nav a:hover { color: var(--accent); border-color: var(--accent); }
+  .btn-rules {
+    text-decoration: none; font-size: 13px; font-weight: 600;
+    background: var(--accent); color: #fff; border: 1px solid var(--accent);
+    border-radius: 8px; padding: 6px 13px; white-space: nowrap;
+  }
+  .btn-rules:hover { filter: brightness(1.08); }
   main { padding: 24px; max-width: 1600px; margin: 0 auto; }
   section { margin-bottom: 40px; scroll-margin-top: 80px; }
   .form-head {
@@ -91,6 +97,7 @@
   <h1>Current Form Output</h1>
   <span class="stamp" id="stamp"><span class="dot" id="dot"></span>loading…</span>
   <nav id="nav"></nav>
+  <a class="btn-rules" href="form-rules.html">📏 Rules →</a>
 </header>
 
 <main id="main">
