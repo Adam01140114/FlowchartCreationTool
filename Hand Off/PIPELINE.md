@@ -107,6 +107,11 @@ node pipeline-explain.js dv110
 # 6. read the interview yourself. This step is not optional and no packet
 #    ships without it - the audit only catches what it was taught to catch.
 node pipeline-review.js
+
+# 7. look at the filled PDFs, page by page. Also not optional: every check
+#    above reads data, and a field can hold the right string and still
+#    print in the wrong place. See Hand Off/PDF-PAGE-AUDIT.md.
+node audit-pdf-pages.js ./audit 1.6 dv100-filled.pdf dv109-filled.pdf dv110-filled.pdf
 ```
 
 ## The last step: read it
@@ -121,6 +126,25 @@ regression test for defects that already happened once; it reported zero
 failures on a packet that asked "Do you have a dV 100[0].Page4[0]...?" and that
 asked thirty questions about further abuse of a filer who had just said it
 happened once. Both were obvious on one read.
+
+## And then look at the pages
+
+Reading the interview checks the questions. It cannot check the answers that
+come out the other end, because the interview is HTML and the deliverable is a
+PDF. A field can hold exactly the right string and still print in the wrong
+place, or print the form’s own decoration back at it - the value lives in the
+field dictionary and the ink comes from the appearance stream.
+
+So: fill the packet, render every page of every filled PDF, and read the
+images. `node audit-pdf-pages.js <out-dir> 1.6 <filled.pdf ...>`.
+
+A DV packet is 25 pages. The defects found this way - a court printed with a
+street and no name, `Amount: $ $100`, a ruled line struck through an answer -
+were each on exactly one of them, and each was found after the audit and a
+field-by-field value check both reported nothing wrong.
+
+Full procedure, and what a legitimate blank looks like on a Judicial Council
+form: [`PDF-PAGE-AUDIT.md`](./PDF-PAGE-AUDIT.md).
 
 ## The two fill modes
 

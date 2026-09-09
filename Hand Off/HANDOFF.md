@@ -25,7 +25,7 @@ The form is the deliverable. A broken dropdown in Preview Form is as serious as 
 
 ## 2. Required reading: trainer document
 
-**Primary spec:** [`flowchart_ai_trainer_doc.txt`](./flowchart_ai_trainer_doc.txt) (copy included in this folder; also at repo root `flowchart_ai_trainer_doc.txt`).
+**Primary spec:** [`flowchart_ai_trainer_doc.txt`](./flowchart_ai_trainer_doc.txt). This folder is now the only copy — the duplicate at the repo root has been removed so there is one place to edit.
 
 That file defines:
 
@@ -37,6 +37,90 @@ That file defines:
 - **Preview Form audit:** every dropdown must list flowchart option labels — empty options must not silently become Yes/No
 
 Treat the trainer doc as the source of truth for flowchart bot behavior.
+
+---
+
+## 2b. Rules the code does not state
+
+These are the things that cost a session each to learn. None of them can be
+worked out by reading the source, because in every case the code looks
+reasonable and the data is what carries the meaning.
+
+### A linked field means two different things, and only the separator says which
+
+A `linkedFields` entry with a `join` is a **join**: its boxes hold different
+halves of one PDF field, concatenated in field order. The same entry *without*
+a `join` is a **mirror**: its boxes are the same answer asked in branches that
+exclude one another, so only one is ever on screen.
+
+Nothing else distinguishes them. A join that loses its separator on the way to
+the page therefore reads as a mirror, and the runtime keeps "the longest" box.
+On the DV-100 that meant `court_name` (10 characters) losing to
+`court_street_address` (20), so the caption printed a court with a street and
+no name — and the box on screen still looked right, because only the PDF field
+was wrong.
+
+The runtime now infers a join when a link has no separator but its on-screen
+boxes hold *different* answers, and says so in the console. Do not rely on
+that: **set the separator in the builder.** The inference exists to stop a
+stale form record destroying answers, not as the way links are meant to work.
+
+### The schema decides what a field is; the name is only a guess
+
+A textbox in `allFieldsInOrder` carries `type: "amount"` or `type: "label"`.
+That is authoritative. Name-based guessing (`id.includes('_amount')`) is a
+fallback for fields built before the flag existed, and it is wrong often
+enough to matter: the DV-100 firearms table asks for a "Number or amount" of
+guns and rounds, which ends in `_amount` and is not money.
+
+### A currency symbol is decoration, not data
+
+A money box shows `$` so the filer can see what the box is for. The PDF prints
+its own `$` beside the field. Send the symbol and the court form reads
+`Amount: $ $100`. `pdfValueForField` strips a leading symbol on the way out,
+and only when the rest is a plain number — an answer that merely starts with
+one is somebody's text and is passed through.
+
+### The value in a PDF field is not the ink on the page
+
+The value lives in the field dictionary; the ink comes from the appearance
+stream. Every check that reads values passes on a form that prints wrongly.
+pdf-lib starts a multiline block one *line-height* below the top of the box
+where it should be one *ascender*, so on a ruled form the printed rule strikes
+through the answer. See [`PDF-PAGE-AUDIT.md`](./PDF-PAGE-AUDIT.md), which is
+the only check that sees any of this.
+
+### In a packet, a shared field name *is* the wiring
+
+One payload fills every PDF, so a name present in two PDFs carries across.
+Thirty-three names are shared between DV-100 and DV-110, and that is how the
+DV-110 gets the case number, the parties, the protected people and the firearm
+rows. There is no way to tell a deliberate share from an accidental collision
+from inside the code. If a value lands somewhere it should not, **rename it in
+the field config** — do not add a special case.
+
+### A repeating block can outgrow the PDF it feeds
+
+The DV-100 asks for up to six firearms; the DV-110 table holds four. Entries
+five and six have nowhere to land and vanish without an error. `/edit_pdf`
+now logs submitted values that matched no field and flags the numbered ones,
+which is what this looks like from the outside. Check the `_twoNumbers`
+maximum on a repeating question against the row count in every PDF it feeds.
+
+### `generate.js` emits the form as one enormous template literal
+
+Roughly lines 14000-21500. Inside that region backticks, `${` and backslashes
+are consumed before they reach the browser. Edits there must avoid all three,
+use `.indexOf()`/`.endsWith()` rather than regex, and be checked before they
+are written — an edit that looks right in the file produces broken JavaScript
+in the generated HTML, and it only shows when a form is opened. `syntax.txt`
+in this folder has the detail.
+
+### A green audit is not evidence
+
+Said in several places in this folder because it keeps being the thing that
+goes wrong. `pipeline-audit.js` finds what it was taught to find. Every defect
+listed above was found *after* a clean audit run.
 
 ---
 
@@ -91,11 +175,10 @@ Defaults:
 | `compile-form-schema.js` | Schema → W-9 flowchart JSON (layout + routing + audit) |
 | `dev-server.js` | **Default `npm start` server** — static files + `/edit_pdf` + `/api/test-payload` |
 | `payload-html.js` | Sanitizes HTML for test-payload zip folders |
-| `flowchart_ai_trainer_doc.txt` | AI trainer spec (duplicate in `Hand Off/`) |
 | `w9-flowchart.json` | Latest compiled W-9 flowchart |
 | `_w9_payload/` | W-9 logical schema (`field_config.txt`) |
 | `project-gui-export.js` | **Project-level GUI JSON** — merges every form, builds `projectForms` / `formActivations` / `packetMirrors`, drops sections left empty |
-| `PIPELINE.md` | **Read first** — the packet pipeline, its artifacts, and the commands |
+| `audit-pdf-pages.js` | Renders a filled PDF to page images — see `Hand Off/PDF-PAGE-AUDIT.md` |
 | `pipeline-*.js` | audit, fill, explain, connect, sanitize, build-packet, harvest-text |
 | `dv-packet.spec.json` | what the DV packet is: form order, PDFs, connectors |
 | `dv-packet-connections.json` | which fields on different forms hold the same answer |
@@ -424,12 +507,19 @@ Before calling a form done:
 4. In DevTools Network, confirm `POST /edit_pdf?pdf=W9.pdf` body includes keys matching PDF AcroForm names (`taxpayer_name`, `tax_classification_individual`, etc.).
 5. Compiler `auditForm()` output if using `compile-form-schema.js`.
 6. `node pipeline-audit-flowchart.js` — the chart itself: reachability, dead ends, stray options, duplicate nodeIds, overlaps, and any node showing a raw field name. The interview audit cannot see these.
-7. **Read the interview yourself — always, and last.** `node pipeline-review.js`
+7. **Read the interview yourself.** `node pipeline-review.js`
    prints every question in the order a person meets it; read all of them, then
    answer each gate No in the preview and confirm the block behind it goes away.
    `pipeline-audit.js` only finds what it was taught to find, so a green audit
    is not evidence the form is right. See the opening section of
    `form_quality_check.txt`.
+8. **Look at the filled PDF, page by page — always, and last.**
+   `node audit-pdf-pages.js ./audit 1.6 dv100-filled.pdf ...`, then read every
+   PNG. Steps 1-7 all read data: the DOM, the payload, the field dictionary. A
+   field can hold exactly the right string and still print in the wrong place,
+   or print the form's own decoration back at it. Everything in
+   [`PDF-PAGE-AUDIT.md`](./PDF-PAGE-AUDIT.md) was found this way *after* the
+   checks above came back clean.
 
 ### Wiring a compiled form to its PDF (do not skip the field config)
 
@@ -618,7 +708,20 @@ Ordered by what actually blocks shipping the DV packet.
 
 | File | Description |
 |------|-------------|
-| `HANDOFF.md` | This document |
+| `HANDOFF.md` | This document — start here |
 | `flowchart_ai_trainer_doc.txt` | Full AI trainer spec — **read before editing flowcharts** |
+| `PIPELINE.md` | The packet pipeline: artifacts, commands, the two fill modes |
+| `PDF-PAGE-AUDIT.md` | **The last check before shipping** — render the filled PDF and read it |
+| `form_quality_check.txt` | The ten rules `pipeline-audit.js` enforces, and why each exists |
+| `flowchartfeatures.txt` | Feature reference for the editor |
+| `syntax.txt` | The `generate.js` template-literal hazard — read before editing it |
+| `save.txt` | Preserving data through all three save paths |
+| `dropdown-conversion-instructions.txt` | Standard → searchable dropdowns |
+| `section_cleanup_test.md` | Section renumbering when a section empties |
+| `html_explanation.txt` | HTML editing inside the editor |
+| `system-prompt.txt` | Prompt used for PDF field analysis / renaming |
+| `README-MODULAR.md` | Module structure of the editor |
+| `FIREBASE_SETUP.md` | Firebase config for the generated forms |
+| `documentation.txt`, `fixit.txt` | Older notes, kept for history |
 
 Good luck. Prefer a longer U-shaped detour over a short line through a node — for both wires and skip logic.
