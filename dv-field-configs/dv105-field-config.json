@@ -1,0 +1,1650 @@
+{
+  "formTitle": "DV-105 Request for Child Custody and Visitation Orders",
+  "_comment": "Names outside the two seven-day charts are mapped by hand from the printed items. The charts are generated from page geometry: their AcroForm names (tf1, tf3, dropoff1, tf2, tf4, tf6 for Monday) carry no order, and only the widget rectangles say which column is Start and which is End. Fields left with their own id as newName are ones nothing has been decided about yet - they survive the sanitizer and print nothing.",
+  "fields": [
+    {
+      "id": "DV-105[0].Page1[0].RightCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List1[0].TextField2[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Your name"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List1[0].CheckBoxitem1Relation[0]",
+      "newName": "dv105_your_relationship_parent",
+      "type": "checkbox",
+      "label": "Parent"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List1[0].CheckBoxitem1Relation[1]",
+      "newName": "dv105_your_relationship_legal_guardian",
+      "type": "checkbox",
+      "label": "Legal guardian"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List1[0].CheckBoxitem1Relation[2]",
+      "newName": "dv105_your_relationship_other",
+      "type": "checkbox",
+      "label": "Other"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List1[0].TextField[0]",
+      "newName": "dv105_your_relationship_other_description",
+      "type": "text",
+      "label": "Other (describe)"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List2[0].TextField2[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "Their name"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List2[0].CheckBoxitem2relation[0]",
+      "newName": "dv105_their_relationship_parent",
+      "type": "checkbox",
+      "label": "Parent"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List2[0].CheckBoxitem2relation[1]",
+      "newName": "dv105_their_relationship_legal_guardian",
+      "type": "checkbox",
+      "label": "Legal guardian"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List2[0].CheckBoxitem2relation[2]",
+      "newName": "dv105_their_relationship_other",
+      "type": "checkbox",
+      "label": "Other"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List2[0].TextField[0]",
+      "newName": "dv105_their_relationship_other_description",
+      "type": "text",
+      "label": "Other (describe)"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List3[0].List[0].Li1[0].TextField1[0]",
+      "newName": "dv105_child_1_name",
+      "type": "text",
+      "label": "Child's name"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List3[0].List[0].Li1[0].TextField35[0]",
+      "newName": "dv105_child_1_date_of_birth",
+      "type": "text",
+      "label": "Date of birth"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List3[0].List[0].Li2[0].TextField2[0]",
+      "newName": "dv105_child_2_name",
+      "type": "text",
+      "label": "Child's name"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List3[0].List[0].Li2[0].TextField36[0]",
+      "newName": "dv105_child_2_date_of_birth",
+      "type": "text",
+      "label": "Date of birth"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List3[0].List[0].Li3[0].TextField3[0]",
+      "newName": "dv105_child_3_name",
+      "type": "text",
+      "label": "Child's name"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List3[0].List[0].Li3[0].TextField37[0]",
+      "newName": "dv105_child_3_date_of_birth",
+      "type": "text",
+      "label": "Date of birth"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List3[0].List[0].Li4[0].TextField38[0]",
+      "newName": "dv105_child_4_date_of_birth",
+      "type": "text",
+      "label": "Date of birth"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List3[0].List[0].Li4[0].TextField34[0]",
+      "newName": "dv105_child_4_name",
+      "type": "text",
+      "label": "Child's name"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List3[0].CheckBoxRightCaption[0]",
+      "newName": "dv105_children_additional_list_attached",
+      "type": "checkbox",
+      "label": "More children on a separate page"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li1[0].Choice1[0]",
+      "newName": "dv105_children_lived_together_five_years_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li1[0].Choice1[1]",
+      "newName": "dv105_children_lived_together_five_years_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf1[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf1[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf2[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf2[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[1]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[1]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[2]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW8[2]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField1[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField1[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].chb1[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].chb1[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf3[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf3[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf4[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf4[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf6[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf6[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[1]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[1]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[2]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW9[2]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField2[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField2[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf7[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf7[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf8[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf8[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf9[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf9[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[1]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[1]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[2]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW10[2]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField3[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField3[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf10[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf10[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf11[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf11[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf12[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf12[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[1]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[1]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[2]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW11[2]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField4[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField4[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf13[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf13[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf14[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf14[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf15[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf15[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[1]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[1]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[2]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW12[2]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField5[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField5[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf16[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf16[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf17[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf17[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf18[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].tf18[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[1]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[1]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[2]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].ChoiceChildLiveW13[2]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField6[0]",
+      "newName": "DV-105[0].Page1[0].List4[0].List[0].Li2[0].TextField6[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page2[0].Caption[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].ChoiceInvolv1[0]",
+      "newName": "dv105_other_case_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].ChoiceInvolv1[1]",
+      "newName": "dv105_other_case_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].CheckBox1[0]",
+      "newName": "dv105_other_case_custody",
+      "type": "checkbox",
+      "label": "Custody"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].TextField1[0]",
+      "newName": "dv105_other_case_custody_details",
+      "type": "text",
+      "label": "Custody case - where filed, year, case number"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].CheckBox2[0]",
+      "newName": "dv105_other_case_divorce",
+      "type": "checkbox",
+      "label": "Divorce"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].TextField2[0]",
+      "newName": "dv105_other_case_divorce_details",
+      "type": "text",
+      "label": "Divorce case - where filed, year, case number"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].CheckBox3[0]",
+      "newName": "dv105_other_case_juvenile",
+      "type": "checkbox",
+      "label": "Juvenile court"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].TextField3[0]",
+      "newName": "dv105_other_case_juvenile_details",
+      "type": "text",
+      "label": "Juvenile case - where filed, year, case number"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].CheckBox4[0]",
+      "newName": "dv105_other_case_guardianship",
+      "type": "checkbox",
+      "label": "Guardianship"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].TextField4[0]",
+      "newName": "dv105_other_case_guardianship_details",
+      "type": "text",
+      "label": "Guardianship case - where filed, year, case number"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].CheckBox5[0]",
+      "newName": "dv105_other_case_criminal",
+      "type": "checkbox",
+      "label": "Criminal"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].TextField5[0]",
+      "newName": "dv105_other_case_criminal_details",
+      "type": "text",
+      "label": "Criminal case - where filed, year, case number"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].CheckBox6[0]",
+      "newName": "dv105_other_case_other",
+      "type": "checkbox",
+      "label": "Other kind of case"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li1[0].TextField6[0]",
+      "newName": "dv105_other_case_other_details",
+      "type": "text",
+      "label": "Other case - where filed, year, case number"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li2[0].ChoiceCustody[0]",
+      "newName": "dv105_current_custody_order_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li2[0].ChoiceCustody[1]",
+      "newName": "dv105_current_custody_order_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li2[0].#area[0].TextField1[0]",
+      "newName": "dv105_current_custody_order_terms",
+      "type": "text",
+      "label": "What did the judge order?"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li2[0].TextField2[0]",
+      "newName": "dv105_current_custody_order_change_reason",
+      "type": "text",
+      "label": "Why do you want to change the order?"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li3[0].TextField2[0]",
+      "newName": "dv105_other_guardian_name",
+      "type": "text",
+      "label": "Name"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li3[0].PartentLG[0]",
+      "newName": "dv105_other_guardian_is_parent",
+      "type": "checkbox",
+      "label": "Parent"
+    },
+    {
+      "id": "DV-105[0].Page2[0].List5[0].List[0].Li3[0].PartentLG[1]",
+      "newName": "dv105_other_guardian_is_legal_guardian",
+      "type": "checkbox",
+      "label": "Legal guardian"
+    },
+    {
+      "id": "DV-105[0].Page3[0].Caption[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List6[0].item6NY[0]",
+      "newName": "dv105_limit_travel_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List6[0].item6NY[1]",
+      "newName": "dv105_limit_travel_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List6[0].item6cb1[0]",
+      "newName": "dv105_limit_travel_county",
+      "type": "checkbox",
+      "label": "The county of"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List6[0].item6tf1[0]",
+      "newName": "dv105_limit_travel_county_name",
+      "type": "text",
+      "label": "County"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List6[0].item6cb2[0]",
+      "newName": "dv105_limit_travel_california",
+      "type": "checkbox",
+      "label": "California"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List6[0].item6cb3[0]",
+      "newName": "dv105_limit_travel_other",
+      "type": "checkbox",
+      "label": "Other places"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List6[0].item6tf2[0]",
+      "newName": "dv105_limit_travel_other_places",
+      "type": "text",
+      "label": "Other places"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List7[0].ChoiceItem7[0]",
+      "newName": "dv105_records_access_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List7[0].ChoiceItem7[1]",
+      "newName": "dv105_records_access_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List7[0].List[0].LI1[0].CheckBoxRightCaptionitem7a[0]",
+      "newName": "dv105_records_withheld_all_children",
+      "type": "checkbox",
+      "label": "All the children"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List7[0].List[0].LI1[0].CheckBoxRightCaptionitem7a[1]",
+      "newName": "dv105_records_withheld_named_children",
+      "type": "checkbox",
+      "label": "Only the children listed here"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List7[0].List[0].LI1[0].TextField[0]",
+      "newName": "dv105_records_withheld_children_names",
+      "type": "text",
+      "label": "Which children"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List7[0].List[0].Li2[0].CheckBoxRightCaption[0]",
+      "newName": "dv105_records_medical",
+      "type": "checkbox",
+      "label": "Medical, dental, and mental health"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List7[0].List[0].Li2[0].CheckBoxRightCaptionitem7b[0]",
+      "newName": "dv105_records_school",
+      "type": "checkbox",
+      "label": "School and daycare"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List7[0].List[0].Li2[0].CheckBoxRightCaption2[0]",
+      "newName": "dv105_records_extracurricular",
+      "type": "checkbox",
+      "label": "Extracurricular activity"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List7[0].List[0].Li2[0].CheckBoxRightCaption3[0]",
+      "newName": "dv105_records_employment",
+      "type": "checkbox",
+      "label": "Child's employment"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List7[0].List[0].Li2[0].TextField[0]",
+      "newName": "dv105_records_other_description",
+      "type": "text",
+      "label": "Other (describe)"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List7[0].List[0].Li2[0].CheckBoxRightCaption3[1]",
+      "newName": "dv105_records_other",
+      "type": "checkbox",
+      "label": "Other"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List8[0].kidnap[0]",
+      "newName": "dv105_abduction_risk_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-105[0].Page3[0].List8[0].kidnap[1]",
+      "newName": "dv105_abduction_risk_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-105[0].Page4[0].Captio[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].ChoiceItem9YesNo[0]",
+      "newName": "dv105_custody_orders_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].ChoiceItem9YesNo[1]",
+      "newName": "dv105_custody_orders_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].YesSub[0].CheckBoxRightCaptionItem9[0]",
+      "newName": "dv105_legal_custody_sole_to_me",
+      "type": "checkbox",
+      "label": "Sole to me"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].YesSub[0].CheckBoxRightCaptionItem9[1]",
+      "newName": "dv105_legal_custody_sole_to_them",
+      "type": "checkbox",
+      "label": "Sole to person in 2"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].YesSub[0].CheckBoxRightCaptionItem9[2]",
+      "newName": "dv105_legal_custody_joint",
+      "type": "checkbox",
+      "label": "Jointly"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].YesSub[0].CheckBoxRightCaptionItem9[3]",
+      "newName": "dv105_legal_custody_other",
+      "type": "checkbox",
+      "label": "Other"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].YesSub[0].TextField1[0]",
+      "newName": "dv105_legal_custody_other_description",
+      "type": "text",
+      "label": "Other (describe)"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].YesSub[0].CheckBoxRightCaptionItem9PhyCust[0]",
+      "newName": "dv105_physical_custody_sole_to_me",
+      "type": "checkbox",
+      "label": "Sole to me"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].YesSub[0].CheckBoxRightCaptionItem9PhyCust[1]",
+      "newName": "dv105_physical_custody_sole_to_them",
+      "type": "checkbox",
+      "label": "Sole to person in 2"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].YesSub[0].CheckBoxRightCaptionItem9PhyCust[2]",
+      "newName": "dv105_physical_custody_joint",
+      "type": "checkbox",
+      "label": "Jointly"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].YesSub[0].CheckBoxRightCaptionItem9PhyCust[3]",
+      "newName": "dv105_physical_custody_other",
+      "type": "checkbox",
+      "label": "Other"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List9[0].YesSub[0].TextField2[0]",
+      "newName": "dv105_physical_custody_other_description",
+      "type": "text",
+      "label": "Other (describe)"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List10[0].ChoiceItem10[0]",
+      "newName": "dv105_visits_none",
+      "type": "checkbox",
+      "label": "No visits"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List10[0].ChoiceItem10[1]",
+      "newName": "dv105_visits_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List10[0].ChoiceItem10[2]",
+      "newName": "dv105_visits_virtual_only",
+      "type": "checkbox",
+      "label": "Yes, but only virtual visits"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List11[0].ChoiceItem11[0]",
+      "newName": "dv105_visits_supervised_yes",
+      "type": "checkbox",
+      "label": "Yes"
+    },
+    {
+      "id": "DV-105[0].Page4[0].List11[0].ChoiceItem11[1]",
+      "newName": "dv105_visits_supervised_no",
+      "type": "checkbox",
+      "label": "No"
+    },
+    {
+      "id": "DV-105[0].Page5[0].Caption[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li1[0].List[0].Li1[0].choiceItem12a[0]",
+      "newName": "dv105_supervisor_professional",
+      "type": "checkbox",
+      "label": "Professional"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li1[0].List[0].Li1[0].TextField2[0]",
+      "newName": "dv105_supervisor_professional_name",
+      "type": "text",
+      "label": "Professional name"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li1[0].List[0].Li1[0].NumericField1[0]",
+      "newName": "dv105_supervisor_fees_me_percent",
+      "type": "text",
+      "label": "Fees paid by me (%)"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li1[0].List[0].Li1[0].NumericField2[0]",
+      "newName": "dv105_supervisor_fees_them_percent",
+      "type": "text",
+      "label": "Fees paid by person in 2 (%)"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li1[0].List[0].Li1[0].TextField3[0]",
+      "newName": "dv105_supervisor_fees_other_who",
+      "type": "text",
+      "label": "Fees paid by other (who)"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li1[0].List[0].Li1[0].NumericField3[0]",
+      "newName": "dv105_supervisor_fees_other_percent",
+      "type": "text",
+      "label": "Fees paid by other (%)"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li1[0].List[0].Li2[0].choiceItem12a[0]",
+      "newName": "dv105_supervisor_nonprofessional",
+      "type": "checkbox",
+      "label": "Nonprofessional"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li1[0].List[0].Li2[0].t2[0]",
+      "newName": "dv105_supervisor_nonprofessional_name",
+      "type": "text",
+      "label": "Name"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li1[0].List[0].Li2[0].CheckBoxRightCaption[0]",
+      "newName": "dv105_supervisor_nonprofessional_agreed",
+      "type": "checkbox",
+      "label": "They have agreed to supervise"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li2[0].CheckBoxRightCaptionItem12b[0]",
+      "newName": "dv105_supervised_location_in_person",
+      "type": "checkbox",
+      "label": "In person at a safe location"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li2[0].CheckBoxRightCaptionItem12b[1]",
+      "newName": "dv105_supervised_location_virtual",
+      "type": "checkbox",
+      "label": "Virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li2[0].CheckBoxRightCaptionItem12b[2]",
+      "newName": "dv105_supervised_location_other",
+      "type": "checkbox",
+      "label": "Other"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li2[0].TextField2[0]",
+      "newName": "dv105_supervised_location_other_description",
+      "type": "text",
+      "label": "Other (describe)"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].CheckBoxRightCaptionItem12c[0]",
+      "newName": "dv105_supervised_frequency_once_a_week",
+      "type": "checkbox",
+      "label": "Once a week"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].TextField1[0]",
+      "newName": "dv105_supervised_frequency_once_a_week_hours",
+      "type": "text",
+      "label": "Number of hours"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].CheckBoxRightCaptionItem12c[1]",
+      "newName": "dv105_supervised_frequency_twice_a_week",
+      "type": "checkbox",
+      "label": "Twice a week"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].t3[0]",
+      "newName": "dv105_supervised_frequency_twice_a_week_hours",
+      "type": "text",
+      "label": "Number of hours each visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].CheckBoxRightCaptionItem12c[2]",
+      "newName": "dv105_supervised_frequency_other",
+      "type": "checkbox",
+      "label": "Other"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].TextField3[0]",
+      "newName": "dv105_supervised_frequency_other_description",
+      "type": "text",
+      "label": "Other (describe)"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].CheckBoxRightCaptionItem12c[3]",
+      "newName": "dv105_supervised_use_schedule_chart",
+      "type": "checkbox",
+      "label": "Use the chart below for a schedule"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf1[0]",
+      "newName": "dv105_supervised_visit_monday_start",
+      "type": "text",
+      "label": "Monday start"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb1[0]",
+      "newName": "dv105_supervised_visit_monday_virtual_visit",
+      "type": "checkbox",
+      "label": "Monday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf3[0]",
+      "newName": "dv105_supervised_visit_monday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Monday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].dropoff1[0]",
+      "newName": "dv105_supervised_visit_monday_location_dropoff",
+      "type": "text",
+      "label": "Monday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf2[0]",
+      "newName": "dv105_supervised_visit_monday_end",
+      "type": "text",
+      "label": "Monday end"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf4[0]",
+      "newName": "dv105_supervised_visit_monday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Monday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf6[0]",
+      "newName": "dv105_supervised_visit_monday_location_pickup",
+      "type": "text",
+      "label": "Monday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf7[0]",
+      "newName": "dv105_supervised_visit_tuesday_start",
+      "type": "text",
+      "label": "Tuesday start"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb2[0]",
+      "newName": "dv105_supervised_visit_tuesday_virtual_visit",
+      "type": "checkbox",
+      "label": "Tuesday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf9[0]",
+      "newName": "dv105_supervised_visit_tuesday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Tuesday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].dropoff2[0]",
+      "newName": "dv105_supervised_visit_tuesday_location_dropoff",
+      "type": "text",
+      "label": "Tuesday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf8[0]",
+      "newName": "dv105_supervised_visit_tuesday_end",
+      "type": "text",
+      "label": "Tuesday end"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf10[0]",
+      "newName": "dv105_supervised_visit_tuesday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Tuesday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf12[0]",
+      "newName": "dv105_supervised_visit_tuesday_location_pickup",
+      "type": "text",
+      "label": "Tuesday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf13[0]",
+      "newName": "dv105_supervised_visit_wednesday_start",
+      "type": "text",
+      "label": "Wednesday start"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb3[0]",
+      "newName": "dv105_supervised_visit_wednesday_virtual_visit",
+      "type": "checkbox",
+      "label": "Wednesday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf14[0]",
+      "newName": "dv105_supervised_visit_wednesday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Wednesday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].dropoff3[0]",
+      "newName": "dv105_supervised_visit_wednesday_location_dropoff",
+      "type": "text",
+      "label": "Wednesday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf15[0]",
+      "newName": "dv105_supervised_visit_wednesday_end",
+      "type": "text",
+      "label": "Wednesday end"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf16[0]",
+      "newName": "dv105_supervised_visit_wednesday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Wednesday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf18[0]",
+      "newName": "dv105_supervised_visit_wednesday_location_pickup",
+      "type": "text",
+      "label": "Wednesday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf19[0]",
+      "newName": "dv105_supervised_visit_thursday_start",
+      "type": "text",
+      "label": "Thursday start"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb4[0]",
+      "newName": "dv105_supervised_visit_thursday_virtual_visit",
+      "type": "checkbox",
+      "label": "Thursday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf20[0]",
+      "newName": "dv105_supervised_visit_thursday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Thursday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].dropoff4[0]",
+      "newName": "dv105_supervised_visit_thursday_location_dropoff",
+      "type": "text",
+      "label": "Thursday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf21[0]",
+      "newName": "dv105_supervised_visit_thursday_end",
+      "type": "text",
+      "label": "Thursday end"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf22[0]",
+      "newName": "dv105_supervised_visit_thursday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Thursday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf24[0]",
+      "newName": "dv105_supervised_visit_thursday_location_pickup",
+      "type": "text",
+      "label": "Thursday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf25[0]",
+      "newName": "dv105_supervised_visit_friday_start",
+      "type": "text",
+      "label": "Friday start"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb5[0]",
+      "newName": "dv105_supervised_visit_friday_virtual_visit",
+      "type": "checkbox",
+      "label": "Friday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf26[0]",
+      "newName": "dv105_supervised_visit_friday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Friday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].dropoff5[0]",
+      "newName": "dv105_supervised_visit_friday_location_dropoff",
+      "type": "text",
+      "label": "Friday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf27[0]",
+      "newName": "dv105_supervised_visit_friday_end",
+      "type": "text",
+      "label": "Friday end"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf28[0]",
+      "newName": "dv105_supervised_visit_friday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Friday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf30[0]",
+      "newName": "dv105_supervised_visit_friday_location_pickup",
+      "type": "text",
+      "label": "Friday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf31[0]",
+      "newName": "dv105_supervised_visit_saturday_start",
+      "type": "text",
+      "label": "Saturday start"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb6[0]",
+      "newName": "dv105_supervised_visit_saturday_virtual_visit",
+      "type": "checkbox",
+      "label": "Saturday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf32[0]",
+      "newName": "dv105_supervised_visit_saturday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Saturday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].dropoff6[0]",
+      "newName": "dv105_supervised_visit_saturday_location_dropoff",
+      "type": "text",
+      "label": "Saturday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf33[0]",
+      "newName": "dv105_supervised_visit_saturday_end",
+      "type": "text",
+      "label": "Saturday end"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf34[0]",
+      "newName": "dv105_supervised_visit_saturday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Saturday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf36[0]",
+      "newName": "dv105_supervised_visit_saturday_location_pickup",
+      "type": "text",
+      "label": "Saturday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf37[0]",
+      "newName": "dv105_supervised_visit_sunday_start",
+      "type": "text",
+      "label": "Sunday start"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb7[0]",
+      "newName": "dv105_supervised_visit_sunday_virtual_visit",
+      "type": "checkbox",
+      "label": "Sunday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf38[0]",
+      "newName": "dv105_supervised_visit_sunday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Sunday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].dropoff7[0]",
+      "newName": "dv105_supervised_visit_sunday_location_dropoff",
+      "type": "text",
+      "label": "Sunday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf39[0]",
+      "newName": "dv105_supervised_visit_sunday_end",
+      "type": "text",
+      "label": "Sunday end"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf41[0]",
+      "newName": "dv105_supervised_visit_sunday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Sunday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf42[0]",
+      "newName": "dv105_supervised_visit_sunday_location_pickup",
+      "type": "text",
+      "label": "Sunday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].CheckBoxRightCaption12b[0]",
+      "newName": "dv105_supervised_schedule_every_week",
+      "type": "checkbox",
+      "label": "Every week"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].CheckBoxRightCaption12b[1]",
+      "newName": "dv105_supervised_schedule_every_other_week",
+      "type": "checkbox",
+      "label": "Every other week"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].CheckBoxRightCaption12b[2]",
+      "newName": "dv105_supervised_schedule_other",
+      "type": "checkbox",
+      "label": "Other"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].othertf[0]",
+      "newName": "dv105_supervised_schedule_other_description",
+      "type": "text",
+      "label": "Other (describe)"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].TextField2[0]",
+      "newName": "dv105_supervised_start_date",
+      "type": "text",
+      "label": "Start date for visits"
+    },
+    {
+      "id": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Print[0]",
+      "newName": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Print[0]",
+      "type": "button",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Save[0]",
+      "newName": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Save[0]",
+      "type": "button",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Reset[0]",
+      "newName": "DV-105[0].#pageSet[0].LastPage[0].#area[0].Reset[0]",
+      "type": "button",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].Caption[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].ChoiceItem13aNoYes[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].ChoiceItem13aNoYes[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].ChoiceItem13aNoYes[1]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].ChoiceItem13aNoYes[1]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].ChoiceItem13aSupervExch[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].ChoiceItem13aSupervExch[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].TextField2[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].TextField2[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField1[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField1[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField2[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField2[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].TextField3[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].TextField3[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField3[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li1[0].NumericField3[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].ChoiceItem13aSupervExch[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].ChoiceItem13aSupervExch[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].t2[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].t2[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].CheckBoxRightCaption[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li1[0].List[0].Li2[0].CheckBoxRightCaption[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[1]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[1]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[2]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].Item13b1[2]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].TextField2[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li1[0].TextField2[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].TextField1[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].TextField1[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf1[0]",
+      "newName": "dv105_unsupervised_visit_monday_start",
+      "type": "text",
+      "label": "Monday start"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb1[0]",
+      "newName": "dv105_unsupervised_visit_monday_virtual_visit",
+      "type": "checkbox",
+      "label": "Monday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf2[0]",
+      "newName": "dv105_unsupervised_visit_monday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Monday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].dropoff1[0]",
+      "newName": "dv105_unsupervised_visit_monday_location_dropoff",
+      "type": "text",
+      "label": "Monday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf3[0]",
+      "newName": "dv105_unsupervised_visit_monday_end",
+      "type": "text",
+      "label": "Monday end"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf4[0]",
+      "newName": "dv105_unsupervised_visit_monday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Monday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf6[0]",
+      "newName": "dv105_unsupervised_visit_monday_location_pickup",
+      "type": "text",
+      "label": "Monday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf7[0]",
+      "newName": "dv105_unsupervised_visit_tuesday_start",
+      "type": "text",
+      "label": "Tuesday start"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb2[0]",
+      "newName": "dv105_unsupervised_visit_tuesday_virtual_visit",
+      "type": "checkbox",
+      "label": "Tuesday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf8[0]",
+      "newName": "dv105_unsupervised_visit_tuesday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Tuesday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].dropoff2[0]",
+      "newName": "dv105_unsupervised_visit_tuesday_location_dropoff",
+      "type": "text",
+      "label": "Tuesday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf9[0]",
+      "newName": "dv105_unsupervised_visit_tuesday_end",
+      "type": "text",
+      "label": "Tuesday end"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf10[0]",
+      "newName": "dv105_unsupervised_visit_tuesday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Tuesday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf12[0]",
+      "newName": "dv105_unsupervised_visit_tuesday_location_pickup",
+      "type": "text",
+      "label": "Tuesday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf13[0]",
+      "newName": "dv105_unsupervised_visit_wednesday_start",
+      "type": "text",
+      "label": "Wednesday start"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb3[0]",
+      "newName": "dv105_unsupervised_visit_wednesday_virtual_visit",
+      "type": "checkbox",
+      "label": "Wednesday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf14[0]",
+      "newName": "dv105_unsupervised_visit_wednesday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Wednesday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].dropoff3[0]",
+      "newName": "dv105_unsupervised_visit_wednesday_location_dropoff",
+      "type": "text",
+      "label": "Wednesday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf15[0]",
+      "newName": "dv105_unsupervised_visit_wednesday_end",
+      "type": "text",
+      "label": "Wednesday end"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf16[0]",
+      "newName": "dv105_unsupervised_visit_wednesday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Wednesday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf18[0]",
+      "newName": "dv105_unsupervised_visit_wednesday_location_pickup",
+      "type": "text",
+      "label": "Wednesday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf19[0]",
+      "newName": "dv105_unsupervised_visit_thursday_start",
+      "type": "text",
+      "label": "Thursday start"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb4[0]",
+      "newName": "dv105_unsupervised_visit_thursday_virtual_visit",
+      "type": "checkbox",
+      "label": "Thursday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf20[0]",
+      "newName": "dv105_unsupervised_visit_thursday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Thursday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].dropoff4[0]",
+      "newName": "dv105_unsupervised_visit_thursday_location_dropoff",
+      "type": "text",
+      "label": "Thursday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf21[0]",
+      "newName": "dv105_unsupervised_visit_thursday_end",
+      "type": "text",
+      "label": "Thursday end"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf22[0]",
+      "newName": "dv105_unsupervised_visit_thursday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Thursday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf24[0]",
+      "newName": "dv105_unsupervised_visit_thursday_location_pickup",
+      "type": "text",
+      "label": "Thursday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf25[0]",
+      "newName": "dv105_unsupervised_visit_friday_start",
+      "type": "text",
+      "label": "Friday start"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb5[0]",
+      "newName": "dv105_unsupervised_visit_friday_virtual_visit",
+      "type": "checkbox",
+      "label": "Friday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf26[0]",
+      "newName": "dv105_unsupervised_visit_friday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Friday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].dropoff5[0]",
+      "newName": "dv105_unsupervised_visit_friday_location_dropoff",
+      "type": "text",
+      "label": "Friday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf27[0]",
+      "newName": "dv105_unsupervised_visit_friday_end",
+      "type": "text",
+      "label": "Friday end"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf28[0]",
+      "newName": "dv105_unsupervised_visit_friday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Friday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf30[0]",
+      "newName": "dv105_unsupervised_visit_friday_location_pickup",
+      "type": "text",
+      "label": "Friday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf31[0]",
+      "newName": "dv105_unsupervised_visit_saturday_start",
+      "type": "text",
+      "label": "Saturday start"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb6[0]",
+      "newName": "dv105_unsupervised_visit_saturday_virtual_visit",
+      "type": "checkbox",
+      "label": "Saturday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf32[0]",
+      "newName": "dv105_unsupervised_visit_saturday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Saturday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].dropoff6[0]",
+      "newName": "dv105_unsupervised_visit_saturday_location_dropoff",
+      "type": "text",
+      "label": "Saturday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf33[0]",
+      "newName": "dv105_unsupervised_visit_saturday_end",
+      "type": "text",
+      "label": "Saturday end"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf34[0]",
+      "newName": "dv105_unsupervised_visit_saturday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Saturday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf36[0]",
+      "newName": "dv105_unsupervised_visit_saturday_location_pickup",
+      "type": "text",
+      "label": "Saturday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf38[0]",
+      "newName": "dv105_unsupervised_visit_sunday_start",
+      "type": "text",
+      "label": "Sunday start"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb7[0]",
+      "newName": "dv105_unsupervised_visit_sunday_virtual_visit",
+      "type": "checkbox",
+      "label": "Sunday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf39[0]",
+      "newName": "dv105_unsupervised_visit_sunday_person_to_bring_dropoff",
+      "type": "text",
+      "label": "Sunday person to bring dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].dropoff7[0]",
+      "newName": "dv105_unsupervised_visit_sunday_location_dropoff",
+      "type": "text",
+      "label": "Sunday location dropoff"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf40[0]",
+      "newName": "dv105_unsupervised_visit_sunday_end",
+      "type": "text",
+      "label": "Sunday end"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf41[0]",
+      "newName": "dv105_unsupervised_visit_sunday_person_to_bring_pickup",
+      "type": "text",
+      "label": "Sunday person to bring pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf42[0]",
+      "newName": "dv105_unsupervised_visit_sunday_location_pickup",
+      "type": "text",
+      "label": "Sunday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[0]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[1]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[1]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[2]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[2]",
+      "type": "checkbox",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].othertf[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].othertf[0]",
+      "type": "text",
+      "label": ""
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].TextField2[0]",
+      "newName": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].TextField2[0]",
+      "type": "text",
+      "label": ""
+    }
+  ]
+}

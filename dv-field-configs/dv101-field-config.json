@@ -1,0 +1,45 @@
+{
+  "formTitle": "DV-101 Description of Abuse",
+  "_comment": "DV-101 is the overflow attachment for DV-100's abuse description: two more incidents beyond the three DV-100 holds, each with the police / Emergency Protective Order questions DV-100 never asks. The caption and the two party names carry the DV-100 names so one answer fills all of them. The seven checkboxes in each block are Option_cb[0..6] in the order the form prints them - police Yes, police No, EPO Yes, EPO No, EPO don't know, EPO protects you, EPO protects the restrained person.",
+  "fields": [
+    { "id": "DV-101[0].Page1[0].P1Caption[0].Stamp_court_case[0].CaseNumber_ft[0]", "newName": "case_number", "type": "text", "label": "Case number" },
+    { "id": "DV-101[0].Page1[0].Item1[0].ProtectedFullName_ft[0]", "newName": "person_asking_protection_name", "type": "text", "label": "Name of person asking for protection" },
+    { "id": "DV-101[0].Page1[0].Item2[0].ProtectedFullName_ft[0]", "newName": "person_to_restrain_full_name", "type": "text", "label": "Name of person you want protection from" },
+
+    { "id": "DV-101[0].Page1[0].List3[0].Lia[0].RestrainedCity_ft[0]", "newName": "dv101_abuse_1_date", "type": "text", "label": "Date of abuse" },
+    { "id": "DV-101[0].Page1[0].List3[0].Lib[0].who_ft[0]", "newName": "dv101_abuse_1_witnesses", "type": "text", "label": "Who was there?" },
+    { "id": "DV-101[0].Page1[0].List3[0].Lib[0].TextField2[0]", "newName": "dv101_abuse_1_description", "type": "text", "label": "Describe how the person abused you or your children" },
+    { "id": "DV-101[0].Page1[0].List3[0].Lid[0].TextField2[0]", "newName": "dv101_abuse_1_weapon_description", "type": "text", "label": "Any use or threatened use of guns or other weapons" },
+    { "id": "DV-101[0].Page1[0].List3[0].Lie[0].TextField2[0]", "newName": "dv101_abuse_1_injuries", "type": "text", "label": "Describe any injuries" },
+    { "id": "DV-101[0].Page1[0].List3[0].Lif[0].Option_cb[0]", "newName": "dv101_abuse_1_police_came_yes", "type": "checkbox", "label": "Police came - Yes" },
+    { "id": "DV-101[0].Page1[0].List3[0].Lif[0].Option_cb[1]", "newName": "dv101_abuse_1_police_came_no", "type": "checkbox", "label": "Police came - No" },
+    { "id": "DV-101[0].Page1[0].List3[0].Lif[0].Option_cb[2]", "newName": "dv101_abuse_1_epo_given_yes", "type": "checkbox", "label": "Emergency Protective Order given - Yes" },
+    { "id": "DV-101[0].Page1[0].List3[0].Lif[0].Option_cb[3]", "newName": "dv101_abuse_1_epo_given_no", "type": "checkbox", "label": "Emergency Protective Order given - No" },
+    { "id": "DV-101[0].Page1[0].List3[0].Lif[0].Option_cb[4]", "newName": "dv101_abuse_1_epo_given_unknown", "type": "checkbox", "label": "Emergency Protective Order given - I don't know" },
+    { "id": "DV-101[0].Page1[0].List3[0].Lif[0].Option_cb[5]", "newName": "dv101_abuse_1_epo_protects_you", "type": "checkbox", "label": "The order protects you" },
+    { "id": "DV-101[0].Page1[0].List3[0].Lif[0].Option_cb[6]", "newName": "dv101_abuse_1_epo_protects_restrained_person", "type": "checkbox", "label": "The order protects the person you want protection from" },
+
+    { "id": "DV-101[0].Page2[0].PXCaption[0].CaseNumber_ft[0]", "newName": "case_number", "type": "text", "label": "Case number" },
+
+    { "id": "DV-101[0].Page2[0].List4[0].Lia[0].RestrainedCity_ft[0]", "newName": "dv101_abuse_2_date", "type": "text", "label": "Date of abuse" },
+    { "id": "DV-101[0].Page2[0].List4[0].Lib[0].#area[0].who_ft[0]", "newName": "dv101_abuse_2_witnesses", "type": "text", "label": "Who was there?" },
+    { "id": "DV-101[0].Page2[0].List4[0].Lic[0].TextField2[0]", "newName": "dv101_abuse_2_description", "type": "text", "label": "Describe how the person abused you or your children" },
+    { "id": "DV-101[0].Page2[0].List4[0].Lid[0].TextField2[0]", "newName": "dv101_abuse_2_weapon_description", "type": "text", "label": "Any use or threatened use of guns or other weapons" },
+    { "id": "DV-101[0].Page2[0].List4[0].Lie[0].TextField2[0]", "newName": "dv101_abuse_2_injuries", "type": "text", "label": "Describe any injuries" },
+    { "id": "DV-101[0].Page2[0].List4[0].Lif[0].Option_cb[0]", "newName": "dv101_abuse_2_police_came_yes", "type": "checkbox", "label": "Police came - Yes" },
+    { "id": "DV-101[0].Page2[0].List4[0].Lif[0].Option_cb[1]", "newName": "dv101_abuse_2_police_came_no", "type": "checkbox", "label": "Police came - No" },
+    { "id": "DV-101[0].Page2[0].List4[0].Lif[0].Option_cb[2]", "newName": "dv101_abuse_2_epo_given_yes", "type": "checkbox", "label": "Emergency Protective Order given - Yes" },
+    { "id": "DV-101[0].Page2[0].List4[0].Lif[0].Option_cb[3]", "newName": "dv101_abuse_2_epo_given_no", "type": "checkbox", "label": "Emergency Protective Order given - No" },
+    { "id": "DV-101[0].Page2[0].List4[0].Lif[0].Option_cb[4]", "newName": "dv101_abuse_2_epo_given_unknown", "type": "checkbox", "label": "Emergency Protective Order given - I don't know" },
+    { "id": "DV-101[0].Page2[0].List4[0].Lif[0].Option_cb[5]", "newName": "dv101_abuse_2_epo_protects_you", "type": "checkbox", "label": "The order protects you" },
+    { "id": "DV-101[0].Page2[0].List4[0].Lif[0].Option_cb[6]", "newName": "dv101_abuse_2_epo_protects_restrained_person", "type": "checkbox", "label": "The order protects the person you want protection from" },
+
+    { "id": "DV-101[0].Page2[0].Item5[0].TextField2[0]", "newName": "dv101_further_abuse_description", "type": "text", "label": "Describe abuse to you or your children" },
+    { "id": "DV-101[0].Page2[0].Item5[0].FieldName_cb[0]", "newName": "dv101_additional_pages_attached", "type": "checkbox", "label": "Check here if you need more space" },
+
+    { "id": "DV-101[0].#pageSet[0].MPLast[0].#area[0].Print_bt[0]", "newName": "DV-101[0].#pageSet[0].MPLast[0].#area[0].Print_bt[0]", "type": "button", "label": "Print" },
+    { "id": "DV-101[0].#pageSet[0].MPLast[0].#area[0].Save_bt[0]", "newName": "DV-101[0].#pageSet[0].MPLast[0].#area[0].Save_bt[0]", "type": "button", "label": "Save" },
+    { "id": "DV-101[0].#pageSet[0].MPLast[0].#area[0].Reset_bt[0]", "newName": "DV-101[0].#pageSet[0].MPLast[0].#area[0].Reset_bt[0]", "type": "button", "label": "Reset" },
+    { "id": "DV-101[0].#pageSet[0].MPLast[0].#area[0].T23[0]", "newName": "DV-101[0].#pageSet[0].MPLast[0].#area[0].T23[0]", "type": "button", "label": "Unlabelled button" }
+  ]
+}

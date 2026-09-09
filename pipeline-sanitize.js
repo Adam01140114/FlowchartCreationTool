@@ -24,11 +24,41 @@ const FORMS = args.filter((a) => !a.startsWith('--'));
 const OUT_DIR = 'FormWiz GUI';
 const CONFIG_DIR = 'dv-field-configs';
 
+/**
+ * Where qpdf is, whether or not somebody put it on PATH.
+ *
+ * The Windows installer does not add itself to PATH, so `qpdf` is present and
+ * unreachable - and the failure reads as "qpdf is not installed", which sends
+ * the next person off to install it again.
+ */
+function qpdfCommand() {
+  try {
+    execFileSync('qpdf', ['--version'], { stdio: 'ignore' });
+    return 'qpdf';
+  } catch (e) { /* not on PATH; look where the installers put it */ }
+
+  const roots = [process.env['ProgramFiles'], process.env['ProgramFiles(x86)']].filter(Boolean);
+  for (const root of roots) {
+    let entries = [];
+    try {
+      entries = fs.readdirSync(root).filter((d) => d.toLowerCase().startsWith('qpdf'));
+    } catch (e) { continue; }
+    for (const dir of entries) {
+      const exe = path.join(root, dir, 'bin', 'qpdf.exe');
+      if (fs.existsSync(exe)) return exe;
+    }
+  }
+  throw new Error(
+    'qpdf not found. These PDFs ship encrypted and pdf-lib cannot open one.\n'
+    + 'Install it (winget install QPDF.QPDF) or put qpdf on PATH.'
+  );
+}
+
 /** qpdf strips the owner password these forms ship with; pdf-lib cannot. */
 function decrypt(source) {
   const tmp = path.join(os.tmpdir(), 'pipeline-' + path.basename(source));
   try {
-    execFileSync('qpdf', ['--decrypt', '--password=', source, tmp], { stdio: 'ignore' });
+    execFileSync(qpdfCommand(), ['--decrypt', '--password=', source, tmp], { stdio: 'ignore' });
   } catch (err) {
     // qpdf exits 3 on warnings it also repairs; only a missing output is fatal.
     if (!fs.existsSync(tmp)) throw err;
