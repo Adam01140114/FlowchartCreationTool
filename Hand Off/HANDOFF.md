@@ -38,6 +38,10 @@ That file defines:
 
 Treat the trainer doc as the source of truth for flowchart bot behavior.
 
+For a form this repo has never seen, read [`NEW-FORM.md`](./NEW-FORM.md)
+alongside it: the trainer doc says what a good interview looks like, and that one
+says which artifacts you write and which are generated.
+
 ---
 
 ## 2b. Rules the code does not state
@@ -712,6 +716,7 @@ Ordered by what actually blocks shipping the DV packet.
 | `flowchart_ai_trainer_doc.txt` | Full AI trainer spec — **read before editing flowcharts** |
 | `PIPELINE.md` | The packet pipeline: artifacts, commands, the two fill modes |
 | `PDF-PAGE-AUDIT.md` | **The last check before shipping** — render the filled PDF and read it |
+| `NEW-FORM.md` | **Taking on a new form** — the four artifacts, and writing a hints file |
 | `form_quality_check.txt` | The ten rules `pipeline-audit.js` enforces, and why each exists |
 | `flowchartfeatures.txt` | Feature reference for the editor |
 | `syntax.txt` | The `generate.js` template-literal hazard — read before editing it |
