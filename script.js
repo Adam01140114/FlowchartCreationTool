@@ -1885,8 +1885,24 @@ function autoUpdateNodeIdBasedOnLabel(cell) {
   return;
 }
   // isQuestion function moved to questions.js module
+/**
+ * A real answer option, and not a node that merely borrows the styling.
+ *
+ * Alert nodes are built as nodeType=options with questionType=alertNode, so the
+ * plain style test says yes to them. That went unnoticed while the only arrow
+ * into an alert came from an option. An arrow drawn from a question straight to
+ * an alert - which is how "none of these is ticked" is expressed - made the
+ * alert enumerate as one of that question's checkboxes, and the generated form
+ * grew an option called "fires when ALL of 2 conditions hold".
+ *
+ * This definition is the one that runs: library.js declares the same function
+ * and script.js is loaded after it, so this one wins for both files.
+ */
 function isOptions(cell) {
-  return cell && cell.style && (
+  if (!cell || !cell.style) return false;
+  if (cell.style.includes("questionType=alertNode")) return false;
+  if (cell.style.includes("questionType=hardAlertNode")) return false;
+  return (
     cell.style.includes("nodeType=options") ||
     cell.style.includes("questionType=amountOption") ||
     cell.style.includes("questionType=imageOption")
@@ -6481,6 +6497,18 @@ function updateAlertNodeCell(cell) {
   let htmlContent = '<div style="padding: 8px; text-align: center; border: 3px solid; border-image: repeating-linear-gradient(45deg, #000000, #000000 5px, #ff0000 5px, #ff0000 10px) 3;">';
   htmlContent += '<div style="font-weight: bold; color: #d32f2f; margin-bottom: 4px; font-size: 16px;">âš ï¸ ALERT</div>';
   htmlContent += `<input type="text" value="${escapeAttr(alertText)}" style="width: 90%; color: #333; font-size: 14px; font-weight: bold; text-align: center; border: 1px solid #ccc; border-radius: 3px; padding: 2px 4px; background: white; outline: none;" onblur="window.updateAlertNodeField('${cell.id}', this.value)" onkeypress="if(event.keyCode===13)this.blur()" />`;
+  // How several arrows into this alert combine. Only shown once there is more
+  // than one, because with a single arrow the two modes mean the same thing and
+  // an extra control would be noise.
+  const incoming = (graph.getIncomingEdges(cell) || []).length;
+  if (incoming > 1) {
+    const mode = cell._alertMode === 'any' ? 'any' : 'all';
+    htmlContent += `<div style="margin-top: 6px; font-size: 12px; color: #333;">fires when `
+      + `<select style="font-size: 12px; padding: 1px 2px;" onchange="window.updateAlertNodeMode('${cell.id}', this.value)">`
+      + `<option value="all"${mode === 'all' ? ' selected' : ''}>ALL</option>`
+      + `<option value="any"${mode === 'any' ? ' selected' : ''}>ANY</option>`
+      + `</select> of ${incoming} conditions hold</div>`;
+  }
   htmlContent += '</div>';
   graph.getModel().beginUpdate();
   try {
@@ -6498,6 +6526,14 @@ window.updateAlertNodeField = function(cellId, value) {
   cell._questionText = value;
   cell._alertText = value;
   // Don't call updateAlertNodeCell here to avoid re-rendering while typing
+};
+/** ALL means every arrow into this alert must hold; ANY means one is enough. */
+window.updateAlertNodeMode = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isAlertNode(cell)) return;
+  cell._alertMode = value === 'any' ? 'any' : 'all';
+  updateAlertNodeCell(cell);
+  if (typeof window.requestAutosave === 'function') window.requestAutosave();
 };
 // Hard Alert Node functions
 function isHardAlertNode(cell) {

@@ -5,9 +5,20 @@
 function isPdfNode(cell) {
   return cell && cell.style && cell.style.includes("nodeType=pdfNode");
 }
-// Helper function to check if a cell is an options node
+/**
+ * A real answer option, and not a node that merely borrows the styling.
+ *
+ * Alert nodes are built as nodeType=options with questionType=alertNode, so
+ * they answer yes to the plain style test. That went unnoticed while the only
+ * arrow into an alert came from an option; an arrow drawn from a question
+ * straight to an alert - which is how "none of these is ticked" is expressed -
+ * made the alert enumerate as one of that question's checkboxes, and the form
+ * grew an option called "fires when ALL of 2 conditions hold".
+ */
 function isOptions(cell) {
-  return cell && cell.style && cell.style.includes("nodeType=options");
+  if (!cell || !cell.style || !cell.style.includes("nodeType=options")) return false;
+  return !cell.style.includes("questionType=alertNode")
+    && !cell.style.includes("questionType=hardAlertNode");
 }
 function isMergeHub(cell) {
   return !!(cell && cell.style && cell.style.includes("nodeType=mergeHub"));
@@ -72,6 +83,120 @@ function isHardAlertNode(cell) {
 }
 function isStatusNode(cell) {
   return cell && cell.style && cell.style.includes("nodeType=status");
+}
+
+/** An edge the operator has marked NOT, so its condition is the negative one. */
+function isNegatedEdge(edge) {
+  return !!(edge && edge.style && edge.style.includes("alertNegate=1"));
+}
+
+/**
+ * Every arrow that reaches this node, with the edge kept.
+ *
+ * `getLogicalIncomingEdges` returns synthetic {source, target} pairs and drops
+ * the edge itself, which is where the NOT marker lives. Merge hubs are walked
+ * through the same way, and the marker on any edge along the path counts - a
+ * hub is a wire, not a decision.
+ */
+function incomingEdgesThroughHubs(cell) {
+  const found = [];
+  const seenHubs = new Set();
+  const queue = [{ cell: cell, negated: false }];
+  while (queue.length) {
+    const step = queue.shift();
+    getMxIncoming(step.cell).forEach((edge) => {
+      const source = edge.source;
+      if (!source) return;
+      const negated = step.negated || isNegatedEdge(edge);
+      if (isMergeHub(source)) {
+        if (!seenHubs.has(source.id)) {
+          seenHubs.add(source.id);
+          queue.push({ cell: source, negated: negated });
+        }
+        return;
+      }
+      found.push({ source: source, negated: negated });
+    });
+  }
+  return found;
+}
+
+/** The plain text of a cell, with any HTML the editor wrapped it in removed. */
+function cellPlainText(cell) {
+  if (!cell || !cell.value) return "";
+  const temp = document.createElement("div");
+  temp.innerHTML = cell.value;
+  return (temp.textContent || temp.innerText || "").trim();
+}
+
+/**
+ * Alert rules: an alert that depends on more than one answer.
+ *
+ * The per-question `alertLogic` can only speak about the question that owns the
+ * option pointing at the alert, and its conditions are OR-ed. That cannot say
+ * the thing a disqualifying factor needs to say, which is usually of the form
+ * "they answered No to this *and* chose nothing at all over there" - two
+ * different questions, joined by AND, with one of them negative.
+ *
+ * So an alert node with more than one arrow into it becomes a rule of its own,
+ * carrying its conditions and how to combine them. What each arrow means:
+ *
+ *   from an option    - that option is chosen        (NOT: it is not chosen)
+ *   from a question   - that question is answered    (NOT: nothing chosen)
+ *
+ * A question with checkboxes counts as answered when any box is ticked, so an
+ * arrow drawn from the question itself and marked NOT is "none of these".
+ *
+ * An alert node with a single arrow is left to the old path untouched, so no
+ * existing flowchart changes behaviour.
+ */
+function buildAlertRules(vertices) {
+  const rules = [];
+  vertices.filter(isAlertNode).forEach((alertCell) => {
+    const sources = incomingEdgesThroughHubs(alertCell);
+    const mode = alertCell._alertMode === "any" ? "any" : "all";
+    // One arrow is the old single-condition alert; leave it where it was.
+    if (sources.length < 2 && alertCell._alertMode === undefined) return;
+
+    const conditions = [];
+    sources.forEach((entry) => {
+      const source = entry.source;
+      if (isOptions(source)) {
+        // The question that offers this option is the one to read.
+        const owners = getLogicalIncomingEdges(source)
+          .map((e) => e.source)
+          .filter((c) => c && isQuestion(c));
+        const owner = owners[0];
+        if (!owner || !owner._questionId) return;
+        conditions.push({
+          questionId: String(owner._questionId),
+          op: entry.negated ? "isNot" : "is",
+          value: cellPlainText(source),
+        });
+        return;
+      }
+      if (isQuestion(source) && source._questionId) {
+        conditions.push({
+          questionId: String(source._questionId),
+          op: entry.negated ? "notAnswered" : "answered",
+        });
+      }
+    });
+
+    if (conditions.length < 2) return;
+
+    let message = alertCell._questionText || alertCell._alertText || "";
+    if (!message) message = cellPlainText(alertCell).replace(/^⚠️?\s*ALERT\s*/i, "").trim();
+
+    rules.push({
+      id: "alertRule" + rules.length,
+      alertNodeId: String(alertCell.id),
+      mode: mode,
+      message: message,
+      conditions: conditions,
+    });
+  });
+  return rules;
 }
 /**
  * Field types inside a question that carry through to the generated form as
@@ -334,6 +459,11 @@ window.exportGuiJson = function(download = true) {
   const questionIdMap = new Map();
   const optionCellMap = new Map();
   const vertices = graph.getChildVertices(graph.getDefaultParent());
+  // Alerts that depend on more than one answer - see buildAlertRules. Computed
+  // here because the per-question loop below has to know which alert nodes it
+  // should leave alone.
+  const alertRules = buildAlertRules(vertices);
+  const multiConditionAlertNodes = new Set(alertRules.map(r => r.alertNodeId));
   const questions = vertices.filter(cell => isQuestion(cell));
   // Collect sanitized PDF prefixes from all PDF nodes to help strip prefixes when setting is off
   const pdfPrefixes = new Set();
@@ -2979,7 +3109,8 @@ window.exportGuiJson = function(download = true) {
           if (optionOutgoingEdges) {
             for (const optionEdge of optionOutgoingEdges) {
               const targetCell = optionEdge.target;
-              if (targetCell && isAlertNode(targetCell)) {
+              if (targetCell && isAlertNode(targetCell)
+                  && !multiConditionAlertNodes.has(String(targetCell.id))) {
                 // This question's option leads to an alert node
                 question.alertLogic.enabled = true;
                 // Extract alert text from the alert node's HTML content
@@ -3723,6 +3854,7 @@ window.exportGuiJson = function(download = true) {
     additionalPDFs: [],
     checklistItems: [],
     linkedFields: linkedFields,
+    alertRules: alertRules,
     linkedCheckboxes: [
       // Linked checkboxes from GUI editor (window.linkedCheckboxesConfig)
       ...(window.linkedCheckboxesConfig || []).map(c => ({

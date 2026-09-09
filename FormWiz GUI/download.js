@@ -3033,6 +3033,11 @@ function loadFormData(formData) {
             }
         });
     }
+    // Alert rules travel whole. They describe answers across several
+    // questions, so there is no per-question control in this builder that
+    // could hold one; the flowchart is where they are authored and this is
+    // only a stop on the way to the generated form.
+    window.alertRulesConfig = Array.isArray(formData.alertRules) ? formData.alertRules : [];
     // Load linked fields
     if (formData.linkedFields && formData.linkedFields.length > 0) {
         // Initialize linked fields configuration
@@ -3205,6 +3210,9 @@ function exportForm(options) {
                 formData.checklistItems.push(itemText);
             }
         });
+    }
+    if (Array.isArray(window.alertRulesConfig) && window.alertRulesConfig.length > 0) {
+        formData.alertRules = window.alertRulesConfig;
     }
     // Collect all linked fields
     if (window.linkedFieldsConfig && window.linkedFieldsConfig.length > 0) {

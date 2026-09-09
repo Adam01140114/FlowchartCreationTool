@@ -114,6 +114,23 @@ The general form of this rule: **a flag is a statement of intent and a
 rectangle is a fact.** Where a layout decision can be made from the geometry,
 make it from the geometry.
 
+### A node can borrow another node's styling, and predicates believe it
+
+An alert node is built as `nodeType=options;questionType=alertNode`, so
+`isOptions()` says yes to it. That was harmless while the only arrow into an
+alert came from an option. The moment an arrow was drawn from a *question*
+to an alert, the alert enumerated as one of that question's checkboxes and
+the generated form grew an option called "fires when ALL of 2 conditions
+hold".
+
+Worse, there are **two** definitions of `isOptions` - one in `library.js` and
+one in `script.js` - and `script.js` is loaded second, so its definition wins
+for both files. Fixing the one in `library.js` changed nothing at all.
+
+Before trusting a predicate like this, check whether the node types it should
+exclude share a style token with the ones it should accept, and **grep for
+other definitions of the same function name** before editing one.
+
 ### In a packet, a shared field name *is* the wiring
 
 One payload fills every PDF, so a name present in two PDFs carries across.

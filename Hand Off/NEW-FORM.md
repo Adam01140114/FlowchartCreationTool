@@ -135,6 +135,64 @@ unconditionally. Each needs a `why` naming the item number on the form.
 
 ---
 
+## Disqualifying factors: alerts that depend on several answers
+
+Court forms are full of conditions of the shape "you do not qualify unless".
+The DV-100 item 3g is the canonical one:
+
+> Have you lived together as a family or household (more than just
+> roommates)? ☐ Yes ☐ No
+> *(If no, you do not qualify for this kind of restraining order unless you
+> checked one of the other relationships listed above.)*
+
+That is two questions joined by AND, and one of them is negative: the filer
+answered **No** to the household gate *and* ticked **none** of the six
+relationship boxes. A per-question alert cannot say it - it can only speak
+about the question that owns the option pointing at it, and its conditions
+are OR-ed.
+
+### Drawing one
+
+Point more than one arrow at the same alert node. Each arrow is a condition:
+
+| Arrow from | Condition | Marked NOT |
+|---|---|---|
+| an option | that option is chosen | that option is *not* chosen |
+| a question | that question is answered | **nothing** is chosen in it |
+
+Mark an arrow NOT by right-clicking it and choosing **Toggle NOT (alert
+condition)**. It turns red and dashed and is labelled `NOT`.
+
+Once an alert has two or more arrows it shows a selector: **fires when
+ALL / ANY of N conditions hold**. ALL is the default and is what a
+disqualifying factor almost always wants.
+
+So item 3g is: an arrow from the household gate's **No** option, plus an
+arrow from the relationships **question** marked NOT, with the alert set to
+ALL.
+
+### What it compiles to
+
+```json
+{ "id": "alertRule0", "mode": "all",
+  "message": "You do not qualify for this kind of restraining order unless ...",
+  "conditions": [
+    { "questionId": "2", "op": "is", "value": "No" },
+    { "questionId": "1", "op": "notAnswered" } ] }
+```
+
+It lands in the GUI JSON as a top-level `alertRules` array, travels through
+the builder untouched, and is tested by `checkAlertRules()` when the filer
+leaves a section. Ops are `is`, `isNot`, `answered`, `notAnswered`.
+
+Two behaviours worth knowing:
+
+- A rule is only tested once **every** question it mentions exists on the
+  page, so a half-finished form does not accuse the filer of not qualifying
+  before they have had a chance to answer.
+- An alert node with a **single** arrow is left on the old per-question path
+  and behaves exactly as it always did. Nothing existing changes.
+
 ## 4. Compile, assemble, and check
 
 Follow [`PIPELINE.md`](./PIPELINE.md) from step 2. Then the checks, in order,

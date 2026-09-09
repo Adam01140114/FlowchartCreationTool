@@ -6495,6 +6495,11 @@ if (s > 1){
             }
 
             // Check alert logic for the current question before navigating
+            // Rules first: they speak about several questions at once, so the
+            // one being left is not necessarily the one that decides.
+            if (typeof checkAlertRules === 'function' && checkAlertRules()) {
+              return;
+            }
             if (activeContainer && typeof checkAlertLogic === 'function') {
               // Get the question ID from the active container
               const questionId = activeContainer.getAttribute('data-question-id');
@@ -9485,6 +9490,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns || [])};\n`;
   formHTML += `var hiddenLogicConfigs = ${JSON.stringify(hiddenLogicConfigs || [])};\n`;
   formHTML += `var linkedFields = ${JSON.stringify(linkedFields || [])};\n`;
+  formHTML += `var alertRules = ${JSON.stringify(window.alertRulesConfig || [])};\n`;
   formHTML += `var isHandlingLink = false;\n`;
   // Dynamic conditional logic for business type question to show county question
   formHTML += `
@@ -13851,6 +13857,114 @@ function reportLinkedFieldShapes() {
     + ' generate again.');
 }
 
+
+/**
+ * What a question currently holds, whatever kind of question it is.
+ *
+ * Read from the question container rather than by element id, because a
+ * checkbox question is not one element: each option is its own input, named
+ * after the option text rather than after anything the flowchart knows. The
+ * container is the one handle that is the same for every question type.
+ *
+ * Returns the answers as text - a checked box contributes both its value and
+ * its label, since which of the two carries the option wording depends on how
+ * the question was generated.
+ */
+function alertQuestionAnswers(questionId) {
+  const container = document.getElementById('question-container-' + questionId);
+  if (!container) return [];
+  const answers = [];
+  const add = function (text) {
+    const value = String(text === null || text === undefined ? '' : text).trim();
+    if (value) answers.push(value);
+  };
+  container.querySelectorAll('input, select, textarea').forEach(function (el) {
+    if (el.disabled) return;
+    if (el.type === 'checkbox' || el.type === 'radio') {
+      if (!el.checked) return;
+      add(el.value);
+      const label = el.closest('label')
+        || (el.id ? container.querySelector('label[for="' + el.id + '"]') : null);
+      if (label) add(label.textContent);
+      return;
+    }
+    if (el.tagName === 'SELECT') {
+      add(el.value);
+      const chosen = el.options[el.selectedIndex];
+      if (chosen) add(chosen.textContent);
+      return;
+    }
+    add(el.value);
+  });
+  return answers;
+}
+
+/** Does a question hold this particular answer? */
+function alertAnswerMatches(questionId, wanted) {
+  const target = String(wanted === null || wanted === undefined ? '' : wanted).trim().toLowerCase();
+  if (!target) return false;
+  return alertQuestionAnswers(questionId).some(function (answer) {
+    return answer.toLowerCase() === target;
+  });
+}
+
+/** One condition of an alert rule, as it stands right now. */
+function alertConditionHolds(condition) {
+  if (!condition || !condition.questionId) return false;
+  const op = condition.op || 'is';
+  if (op === 'answered') return alertQuestionAnswers(condition.questionId).length > 0;
+  if (op === 'notAnswered') return alertQuestionAnswers(condition.questionId).length === 0;
+  const matches = alertAnswerMatches(condition.questionId, condition.value);
+  return op === 'isNot' ? !matches : matches;
+}
+
+/**
+ * Alerts that depend on more than one answer.
+ *
+ * A disqualifying factor is rarely about one question. "You do not qualify
+ * unless you checked one of the other relationships" is true only when the
+ * filer answered No to living together as a household *and* ticked none of the
+ * six relationship boxes - two questions, joined by AND, one of them negative.
+ * The per-question alertLogic can say none of that, so a rule carries its own
+ * conditions and how to combine them.
+ *
+ * A rule is only tested once every question it mentions has been reached, so a
+ * half-finished form does not accuse the filer of not qualifying before they
+ * have had the chance to answer.
+ */
+function checkAlertRules() {
+  const rules = (typeof alertRules !== 'undefined' && alertRules)
+    ? alertRules : (window.alertRules || []);
+  if (!rules.length) return false;
+  for (let i = 0; i < rules.length; i++) {
+    const rule = rules[i];
+    const conditions = (rule && rule.conditions) || [];
+    if (!conditions.length) continue;
+
+    const reachable = conditions.every(function (condition) {
+      return !!document.getElementById('question-container-' + condition.questionId);
+    });
+    if (!reachable) continue;
+
+    const results = conditions.map(alertConditionHolds);
+    const fires = rule.mode === 'any'
+      ? results.some(Boolean)
+      : results.every(Boolean);
+
+    if (fires && rule.message) {
+      console.log('[alert rules] ' + (rule.id || 'rule') + ' fired ('
+        + (rule.mode === 'any' ? 'any' : 'all') + ' of ' + conditions.length + '): '
+        + conditions.map(function (c, n) {
+            return (c.op || 'is') + ' ' + c.questionId
+              + (c.value ? ' = ' + c.value : '')
+              + ' -> ' + results[n];
+          }).join(' | '));
+      showAlert(rule.message);
+      return true;
+    }
+  }
+  return false;
+}
 // Function to set up linked fields event listeners
 function setupLinkedFields() {
     if (!linkedFields || linkedFields.length === 0) return;

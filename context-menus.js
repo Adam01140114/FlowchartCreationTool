@@ -15,6 +15,7 @@ let deleteNode, copyNodeButton, jumpNode, yesNoNode, changeType, calcTypeBtn, su
 let regularOptionType, imageOptionType, amountOptionType, notesNodeType, alertNodeType, checklistNodeType, endNodeType;
 let notesBoldButton, notesFontButton, notesCopyButton, notesDeleteButton;
 let newSectionButton, untangleEdge, changeEdgeStyle, disableDragEdge, deleteEdge, edgeStyleCurved, edgeStyleDirect;
+let toggleEdgeNegate;
 let disableDragNode;
 let placeQuestionNode, placeOptionNode, placeSampleQuestionNode, placeMiscellaneousNode;
 // Initialize DOM element references
@@ -54,6 +55,7 @@ function initializeContextMenuElements() {
   changeEdgeStyle = document.getElementById('changeEdgeStyle');
   disableDragEdge = document.getElementById('disableDragEdge');
   deleteEdge = document.getElementById('deleteEdge');
+  toggleEdgeNegate = document.getElementById('toggleEdgeNegate');
   edgeStyleCurved = document.getElementById('edgeStyleCurved');
   edgeStyleDirect = document.getElementById('edgeStyleDirect');
   disableDragNode = document.getElementById('disableDragNode');
@@ -1036,6 +1038,37 @@ function setupContextMenuEventListeners(graph) {
         if (typeof window.requestAutosave === 'function') {
           window.requestAutosave();
         }
+      }
+      hideContextMenu();
+    });
+  }
+  if (toggleEdgeNegate) {
+    toggleEdgeNegate.addEventListener('click', function() {
+      const selectedCells = graph.getSelectionCells();
+      if (selectedCells.length === 1 && selectedCells[0].edge) {
+        const edge = selectedCells[0];
+        // An alert condition reads the arrow it came in on. Marked NOT, the
+        // condition becomes the negative one: an option that is *not* chosen,
+        // or a question with nothing chosen at all. That is what a
+        // disqualifying factor usually needs - "and you ticked none of these".
+        let style = edge.style || "";
+        const negated = style.indexOf("alertNegate=1") !== -1;
+        graph.getModel().beginUpdate();
+        try {
+          if (negated) {
+            style = style.split("alertNegate=1;").join("").split("alertNegate=1").join("");
+            graph.getModel().setStyle(edge, style);
+            graph.getModel().setValue(edge, "");
+          } else {
+            if (style && style.charAt(style.length - 1) !== ";") style += ";";
+            style += "alertNegate=1;dashed=1;strokeColor=#d32f2f;";
+            graph.getModel().setStyle(edge, style);
+            graph.getModel().setValue(edge, "NOT");
+          }
+        } finally {
+          graph.getModel().endUpdate();
+        }
+        if (typeof window.requestAutosave === "function") window.requestAutosave();
       }
       hideContextMenu();
     });
