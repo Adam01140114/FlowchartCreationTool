@@ -180,6 +180,7 @@
       type: 'flowchart-project',
       version: PROJECT_VERSION,
       projectId: currentProjectId(true),
+      fieldCapacity: window.fieldCapacity || {},
       exportedAt: new Date().toISOString(),
       currentFormIndex: window.currentFormIndex,
       forms: window.projectForms.map(function (f) {
@@ -251,6 +252,7 @@
 
     // The file first, then whatever this browser was last working on.
     rememberProjectId(String(data.projectId || '').trim() || currentProjectId(true));
+    window.fieldCapacity = data.fieldCapacity || {};
     window.projectForms = data.forms.map(function (f, i) {
       const flowchart = f.flowchart || blankFlowchart();
       return { name: f.name || flowchart.formName || ('Form ' + (i + 1)), flowchart: flowchart };

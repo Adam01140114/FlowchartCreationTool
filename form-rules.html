@@ -277,6 +277,18 @@ const RULES = [
     why: 'Describing what you saw asks the reader to take your word for it. A leftover page from an older run is worse than no page, because it looks current and is not.',
     by: 'pipeline-current-output.js; form-output-dashboard.html watches the folder' },
 
+  { id: 'know-what-a-box-holds', group: 'page', num: 'Rule',
+    title: 'Know what a box holds, and stop there',
+    says: 'Every PDF box is measured and the interview is given the limit, as a maxlength on the input. A box with continuation lines is measured across the whole chain.',
+    why: 'All 465 text fields declare a fixed font size, so a value wider than its box is drawn and then clipped — the answer is on the page and unreadable, and nothing upstream knows, because the DOM and the payload both have the whole string. A filer stopped at the point of typing can shorten what they meant to say; one truncated afterwards cannot.',
+    by: 'pipeline-capacity.js measures; the maximum path fills every measured box to exactly its capacity so the rendered page shows whether it stops cleanly' },
+
+  { id: 'validated-shapes-are-not-padded', group: 'page', num: 'Rule',
+    title: 'A field whose content has a shape is never padded',
+    says: 'A ZIP, a date, a phone, a percentage or an age is filled with a real value of that shape and neither capped-to-fill nor marker-filled.',
+    why: 'A ZIP padded to eleven characters is not a longer ZIP, it is a wrong one, and the page would be testing the wrong thing. Both the marker fill and the capacity padding ask the same question, so the test lives once and they cannot drift.',
+    by: 'hasValidatedShape() in the generated runtime, used by getSampleFillValue and padToCapacity' },
+
   { id: 'long-answer-next-line', group: 'page', num: 'Rule',
     title: 'A long answer runs onto the next ruled line',
     says: 'When an answer is wider than its line, the remainder wraps onto the ruled lines beneath it. The continuation is found by geometry, not by field names.',

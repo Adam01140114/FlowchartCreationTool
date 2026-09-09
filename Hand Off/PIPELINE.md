@@ -362,6 +362,48 @@ field may not carry a name that a filer field somewhere in the packet also
 carries. Where it does, the court's copy is renamed with its own form in front
 and the answer stops reaching it. `--check` exits non-zero while any remain.
 
+## Know what a box holds, and stop there
+
+Every text field on these forms declares a fixed font size — 10pt or 11pt, not
+one of the 465 is auto-sizing — so a value wider than its box is drawn and then
+clipped. The answer is on the page and unreadable, and nothing upstream knows:
+the DOM has the whole string, the payload has the whole string, only the ink is
+short.
+
+```bash
+node pipeline-capacity.js        # measures every box into dv-packet-capacity.json
+node pipeline-build-packet.js    # carries the measurements into the project
+```
+
+The number travels project JSON → GUI JSON → generated form, and lands as
+`maxlength` on the input. That is the only place a limit helps: a filer stopped
+at the point of typing can shorten what they meant to say, and one truncated
+afterwards cannot. A box with continuation lines is measured across the whole
+chain, because the filler spills onto them.
+
+**A character count is an approximation, and the docs should say so.** These are
+proportional fonts — at 11pt Helvetica a `W` is 10.38pt and an `i` is 2.44pt, so
+no single number is right for every string. The reference width is measured from
+a corpus of what people actually write on these forms (names, streets, cities,
+dates, short sentences) rather than from English prose, which runs narrower and
+would spend its error in the direction that clips. Answers in block capitals are
+the case that can still run long.
+
+Two things are deliberately left alone. A field whose **content** has a shape —
+a ZIP, a date, a phone, a percentage — is never padded or capped-to-fill: a ZIP
+padded to eleven characters is not a longer ZIP, it is a wrong one. And the
+continuation chain comes from the compiler's own `continuationLines`, not from
+geometry: the filler can find them by shape because it also checks the next line
+is empty, and without that check the same rule chained an age box to whatever
+sat under it and awarded it a hundred characters.
+
+**The maximum path fills every measured box to exactly its capacity**, so the
+rendered page answers the only question that matters — does the text stop
+cleanly at the edge, or is it cut through? "Test Value" in a box that holds
+fifty-seven characters proves nothing about the fifty-eighth. The minimum path
+is left alone, because there the question is what happens when people answer as
+little as they can.
+
 ## A long answer runs onto the next ruled line
 
 A court form often prints two ruled lines for one answer and gives each its own
@@ -481,6 +523,7 @@ number box. Types work inside combined and repeating questions too.
 # 1. cross-form identity, then rebuild the PDFs whose field names changed
 node pipeline-connect.js
 node pipeline-sanitize.js dv100 dv101 dv105 dv109 dv110
+node pipeline-capacity.js     # what each box holds, once the PDFs are final
 
 # 2. what the paper form says disqualifies a filer, and whether it is wired
 node pipeline-disqualifiers.js --scan     # leads, per form, per page

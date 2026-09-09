@@ -9498,6 +9498,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var alertRules = ${JSON.stringify(window.alertRulesConfig || [])};\n`;
   formHTML += `var computedFields = ${JSON.stringify(window.computedFieldsConfig || [])};\n`;
   formHTML += `var projectId = ${JSON.stringify(window.projectIdConfig || '')};\n`;
+  formHTML += `var fieldCapacity = ${JSON.stringify(window.fieldCapacityConfig || {})};\n`;
   formHTML += `window.__PROJECT_ID__ = projectId;\n`;
   formHTML += `var isHandlingLink = false;\n`;
   // Dynamic conditional logic for business type question to show county question
@@ -14282,6 +14283,60 @@ function writeComputedField(nameId, value){
  * attachments are switched on is the same answer that decides whether their
  * questions get asked at all.
  */
+/**
+ * Stop an answer before it runs off the paper.
+ *
+ * Every text field on these forms declares a fixed font size, so a value wider
+ * than its box is drawn and then clipped: the answer is on the page and
+ * unreadable, and nothing before the ink knew. pipeline-capacity.js measures
+ * what each box holds and the limit is put on the input, which is the only
+ * place it helps - a filer who is stopped at the point of typing can shorten
+ * what they meant to say, and one who is truncated afterwards cannot.
+ *
+ * A box with continuation lines beneath it is measured across the whole chain,
+ * because the filler spills onto them.
+ */
+function applyFieldCapacities(root){
+    var caps = (typeof fieldCapacity !== "undefined" && fieldCapacity) ? fieldCapacity : null;
+    if (!caps) return 0;
+    var scope = root && root.querySelectorAll ? root : document;
+    var applied = 0;
+    var boxes = scope.querySelectorAll("input[type=text], input:not([type]), textarea");
+    Array.prototype.forEach.call(boxes, function(el){
+        var name = el.name || el.id;
+        if (!name) return;
+        var cap = caps[name];
+        if (!cap || cap < 1) return;
+        if (String(el.getAttribute("maxlength") || "") === String(cap)) return;
+        el.setAttribute("maxlength", String(cap));
+        el.setAttribute("data-capacity", String(cap));
+        applied++;
+    });
+    return applied;
+}
+
+/**
+ * The form builds inputs as it goes - an entry block appears when a count is
+ * chosen, a follow-up when a gate opens - so applying the caps once at load
+ * would leave every field created later without one.
+ */
+function watchForNewFields(){
+    applyFieldCapacities(document);
+    if (typeof MutationObserver !== "function") return;
+    var pending = false;
+    var observer = new MutationObserver(function(){
+        if (pending) return;
+        pending = true;
+        setTimeout(function(){ pending = false; applyFieldCapacities(document); }, 60);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", watchForNewFields);
+} else {
+    watchForNewFields();
+}
+
 function applyComputedFields(){
     // Which project produced this run. It has no PDF field and is meant not to
     // - it rides along in the answers so the publish step knows whose output
@@ -19975,7 +20030,7 @@ function fillSolvedRemainder(plan) {
     if (!solverFieldEligible(el) || owned.has(el)) return;
     const type = (el.type || '').toLowerCase();
     if (type === 'checkbox' || type === 'radio' || type === 'file') return;
-    const value = getSampleFillValue(el);
+    const value = padToCapacity(el, getSampleFillValue(el), !!window.__FILL_MINIMUM__);
     // Settling re-runs this sweep, so say nothing when there is nothing to say.
     if (String(el.value || '') === String(value)) return;
     el.value = value;
@@ -20292,14 +20347,28 @@ function triggerSelectSideEffects(select) {
  * is. Fields the form validates - zip, phone, date, number - still get valid
  * data, because a marker there fails validation and blocks the run.
  */
+/**
+ * A box whose CONTENT has a shape, whatever its input type says.
+ *
+ * A ZIP code is five digits in an ordinary text box, and a marker or a padded
+ * value in it is not a ZIP code - it is nonsense that happens to be the right
+ * length. Both the marker fill and the capacity padding have to leave these
+ * alone, and they have to agree about which they are, so the test lives once.
+ */
+function hasValidatedShape(el) {
+  const id = (el.id || el.name || '').toLowerCase();
+  const type = (el.type || '').toLowerCase();
+  return type === 'date' || type === 'number' || type === 'email'
+    || type === 'tel' || id.indexOf('zip') !== -1 || id.indexOf('phone') !== -1
+    || id.indexOf('date') !== -1 || id.indexOf('amount') !== -1
+    || id.indexOf('percent') !== -1 || id.indexOf('_state') !== -1
+    || id.indexOf('age') !== -1;
+}
+
 function getSampleFillValue(el) {
   const id = (el.id || el.name || '').toLowerCase();
   if (window.__FILL_MARKER_VALUES__ && el.tagName !== 'SELECT') {
-    const type = (el.type || '').toLowerCase();
-    const validated = type === 'date' || type === 'number' || type === 'email'
-      || type === 'tel' || id.indexOf('zip') !== -1 || id.indexOf('phone') !== -1
-      || id.indexOf('date') !== -1 || id.indexOf('amount') !== -1;
-    if (!validated) return el.id || el.name || 'marker';
+    if (!hasValidatedShape(el)) return el.id || el.name || 'marker';
   }
   if (el.type === 'email' || id.indexOf('email') !== -1) return 'test@example.com';
   if (el.type === 'tel' || id.indexOf('phone') !== -1 || id.indexOf('tel') !== -1) return '(555) 555-5555';
@@ -20318,6 +20387,39 @@ function getSampleFillValue(el) {
   if (id.indexOf('fatca') !== -1) return 'A';
   if (el.tagName === 'TEXTAREA') return 'Maximum path test content for PDF export coverage.';
   return 'Test Value';
+}
+
+/**
+ * On the widest path, fill a measured box to exactly what it will hold.
+ *
+ * The point of the maximum path is to find out what breaks when everything is
+ * answered, and "Test Value" in a box that holds fifty-seven characters proves
+ * nothing about the fifty-eighth. Filled to the brim, the rendered page answers
+ * the only question that matters: does it stop cleanly at the edge, or is it
+ * cut through?
+ *
+ * The filler is left alone anywhere there is no measurement, and on the minimum
+ * path, where the question is what happens when people answer as little as they
+ * can.
+ */
+function padToCapacity(el, value, minimum) {
+  if (minimum) return value;
+  var cap = Number(el.getAttribute('data-capacity') || 0);
+  if (!cap || cap < 4) return value;
+  // A ZIP padded to eleven characters is not a longer ZIP, it is a wrong one,
+  // and the page would be testing the wrong thing.
+  if (hasValidatedShape(el)) return value;
+  var text = String(value == null ? '' : value);
+  if (text.length >= cap) return text.slice(0, cap);
+  // Words rather than one long run, so the wrap in a multi-line box is real.
+  var filler = ' abcdefghij klmnopqrst uvwxyz 0123456789';
+  var out = text;
+  while (out.length < cap) out += filler;
+  // End on the exact count, and never on a trailing space, which would hide
+  // whether the last visible character reached the edge.
+  out = out.slice(0, cap);
+  if (out.charAt(out.length - 1) === ' ') out = out.slice(0, -1) + 'x';
+  return out;
 }
 /**
  * Make every section active for the duration of a debug fill.
@@ -20676,7 +20778,7 @@ function fillVisibleTextFields() {
     const type = (el.type || '').toLowerCase();
     if (type === 'checkbox' || type === 'radio' || type === 'file') return;
     if (!(el.value || '').trim()) {
-      el.value = getSampleFillValue(el);
+      el.value = padToCapacity(el, getSampleFillValue(el), !!window.__FILL_MINIMUM__);
       triggerFieldChange(el);
     }
   });
@@ -20955,6 +21057,9 @@ async function fillMaximumPathPass(pass) {
  * screen for a filer who had said it happened once.
  */
 async function fillMaximumPath(options) {
+  // A field created since the last sweep has no cap yet, and the fill is about
+  // to ask every box how much it holds.
+  if (typeof applyFieldCapacities === 'function') applyFieldCapacities(document);
   const markers = !!(options && options.markers);
   const minimum = !!(options && options.minimum);
   window.__FILL_MARKER_VALUES__ = markers;

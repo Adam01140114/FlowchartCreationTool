@@ -269,10 +269,19 @@ async function main() {
     projectId = 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   }
 
+  // What each PDF box can hold, measured by pipeline-capacity.js. The
+  // interview is the only place a limit does any good: stopping someone at the
+  // point of typing beats truncating them afterwards, or clipping the ink.
+  let fieldCapacity = {};
+  try {
+    fieldCapacity = JSON.parse(fs.readFileSync('dv-packet-capacity.json', 'utf8')).fields || {};
+  } catch (e) { /* not measured yet - run pipeline-capacity.js */ }
+
   const project = {
     type: 'flowchart-project',
     version: 1,
     projectId: projectId,
+    fieldCapacity: fieldCapacity,
     exportedAt: new Date().toISOString(),
     projectName: spec.project || 'Packet',
     currentFormIndex: 0,
@@ -280,7 +289,8 @@ async function main() {
   };
   fs.writeFileSync(OUT, JSON.stringify(project, null, 2));
 
-  console.log('packet: ' + OUT + '   project ' + projectId);
+  console.log('packet: ' + OUT + '   project ' + projectId
+    + '   ' + Object.keys(fieldCapacity).length + ' measured box(es)');
   forms.forEach(({ entry, flowchart }) => {
     const questions = (flowchart.cells || []).filter((c) => /nodeType=question/.test(c.style || '')).length;
     const connectors = (flowchart.cells || []).filter((c) => /nodeType=connector/.test(c.style || ''));

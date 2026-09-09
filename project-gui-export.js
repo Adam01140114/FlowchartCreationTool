@@ -551,6 +551,7 @@ function reportGroupProblems(merged) {
     merged.questionCounter = questionOffset + 1;
     merged.formName = (document.getElementById('projectNameInput') || {}).value
       || merged.formName || 'Project';
+    merged.fieldCapacity = window.fieldCapacity || {};
     merged.projectId = (typeof window.currentProjectId === 'function')
       ? window.currentProjectId(true) : (window.projectId || '');
     merged.projectForms = ranges;
