@@ -34,9 +34,38 @@
     return 'p_' + stamp + salt;
   }
 
+  const PROJECT_ID_KEY = 'flowchart.projectId';
+
+  /**
+   * Remember it across reloads.
+   *
+   * The editor restores its last project on load, and a payload saved before
+   * ids existed carries none - so every reload minted a new one, the View PDF
+   * Output link changed under the operator, and it pointed at a folder no run
+   * had ever written. An id that changes by itself is not an id.
+   *
+   * The order is: what the file says, then what this browser last used, then a
+   * new one. A file with an id always wins, so opening someone else's project
+   * does not quietly adopt yours.
+   */
+  function rememberedProjectId() {
+    try { return window.localStorage.getItem(PROJECT_ID_KEY) || ''; }
+    catch (e) { return ''; }
+  }
+
+  function rememberProjectId(id) {
+    if (!id) return id;
+    window.projectId = id;
+    try { window.localStorage.setItem(PROJECT_ID_KEY, id); } catch (e) { /* private mode */ }
+    return id;
+  }
+
   function currentProjectId(create) {
-    if (!window.projectId && create !== false) window.projectId = newProjectId();
-    return window.projectId || '';
+    if (window.projectId) return window.projectId;
+    const remembered = rememberedProjectId();
+    if (remembered) return rememberProjectId(remembered);
+    if (create === false) return '';
+    return rememberProjectId(newProjectId());
   }
   // Loading is asynchronous inside the editor; leave time before reading back.
   const LOAD_SETTLE_MS = 1200;
@@ -220,8 +249,8 @@
       throw new Error('Not a project file: expected a "forms" array.');
     }
 
-    // Read it from the file, or mint one for a project that has never had it.
-    window.projectId = String(data.projectId || '').trim() || newProjectId();
+    // The file first, then whatever this browser was last working on.
+    rememberProjectId(String(data.projectId || '').trim() || currentProjectId(true));
     window.projectForms = data.forms.map(function (f, i) {
       const flowchart = f.flowchart || blankFlowchart();
       return { name: f.name || flowchart.formName || ('Form ' + (i + 1)), flowchart: flowchart };
@@ -285,7 +314,7 @@
       const flowchart = f.flowchart || blankFlowchart();
       return { name: f.name || flowchart.formName || ('Form ' + (i + 1)), flowchart: flowchart };
     });
-    window.projectId = String(data.projectId || '').trim() || window.projectId || newProjectId();
+    rememberProjectId(String(data.projectId || '').trim() || currentProjectId(true));
     const idx = Number(data.currentFormIndex);
     window.currentFormIndex = (idx >= 0 && idx < window.projectForms.length) ? idx : 0;
     if (projectNameInput() && data.projectName) projectNameInput().value = data.projectName;

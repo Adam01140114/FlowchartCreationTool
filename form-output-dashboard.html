@@ -138,6 +138,27 @@
     font: inherit; font-size: 12.5px; padding: 5px 9px; border-radius: 8px;
     border: 1px solid var(--line); background: var(--ground); color: var(--ink);
   }
+  .nothing { max-width: 640px; margin: 40px auto; }
+  .nothing h2 { margin: 0 0 10px; font-size: 17px; font-weight: 650; }
+  .nothing p { margin: 0 0 10px; color: var(--muted); }
+  .nothing code {
+    font: 12.5px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px;
+  }
+  .nothing pre {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 9px;
+    padding: 12px 14px; overflow-x: auto; margin: 0 0 18px;
+    font: 12.5px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .others { display: grid; gap: 8px; margin-bottom: 14px; }
+  .others a {
+    display: flex; justify-content: space-between; gap: 12px; text-decoration: none;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 9px;
+    padding: 10px 13px; color: var(--ink);
+  }
+  .others a:hover { border-color: var(--accent); color: var(--accent); }
+  .others span { color: var(--muted); font-size: 12.5px; }
+  .nothing .hint { font-size: 13px; }
   .empty { color: var(--muted); padding: 40px 0; text-align: center; }
   dialog {
     border: none; border-radius: 12px; padding: 0; max-width: 96vw; max-height: 96vh;
@@ -520,6 +541,57 @@ function setStatus(state, label) {
   document.getElementById('stamp').lastChild.nodeValue = label;
 }
 
+/**
+ * Say what is missing and what to do about it.
+ *
+ * A project id that no run has written is not an error, it is a project that
+ * has not been through the loop yet - most often because the editor is holding
+ * a different project from the one that was published. Naming both, and
+ * linking the ones that do have output, turns a dead end into a next step.
+ */
+async function showNothingPublished() {
+  const main = document.getElementById('main');
+  if (main.dataset.state === 'empty') return;
+  main.dataset.state = 'empty';
+  main.textContent = '';
+
+  const box = el('div', { class: 'nothing' });
+  box.appendChild(el('h2', {}, [text('No pages published for this project')]));
+  box.appendChild(el('p', {}, [
+    text('This dashboard is showing '),
+    el('code', {}, [text(PROJECT || '(no project)')]),
+    text(', and no run has written any output under it.')
+  ]));
+  box.appendChild(el('p', {}, [text('Run a pass for it:')]));
+  box.appendChild(el('pre', {}, [text(
+    'node pipeline-fill.js --render\nnode pipeline-current-output.js')]));
+
+  let index = [];
+  try {
+    const res = await fetch(OUTPUT_ROOT + '/index.json?t=' + Date.now(), { cache: 'no-store' });
+    if (res.ok) index = await res.json();
+  } catch (e) { /* nothing published at all */ }
+  const others = index.filter(function (p) { return p && p.id !== PROJECT; });
+
+  if (others.length) {
+    box.appendChild(el('p', {}, [text('Or open a project that has output:')]));
+    const list = el('div', { class: 'others' });
+    others.forEach(function (p) {
+      const a = el('a', { href: '?project=' + encodeURIComponent(p.id) }, [
+        el('strong', {}, [text(p.id)]),
+        el('span', {}, [text(p.pages + ' pages · ' + (p.forms || []).join(', '))])
+      ]);
+      list.appendChild(a);
+    });
+    box.appendChild(list);
+    box.appendChild(el('p', { class: 'hint' }, [text(
+      'Seeing a project you did not expect usually means the editor is holding a '
+      + 'different one. Import that project\u2019s JSON and press View PDF Output again.')]));
+  }
+
+  main.appendChild(box);
+}
+
 /** Offer what has been published, when the link did not say. */
 async function offerProjects() {
   let index = [];
@@ -559,6 +631,7 @@ async function poll() {
     const fresh = manifest.publishedAt !== currentStamp;
     currentStamp = manifest.publishedAt;
 
+    document.getElementById('main').dataset.state = '';
     const next = JSON.stringify(manifest.forms);
     if (next !== shape) { shape = next; build(manifest); }
     else if (fresh) {
@@ -581,7 +654,8 @@ async function poll() {
   } catch (err) {
     missCount++;
     if (missCount > 1) {
-      setStatus('gone', 'no manifest — run: node pipeline-current-output.js');
+      setStatus('gone', 'nothing published for this project yet');
+      showNothingPublished();
     }
   }
 }

@@ -124,6 +124,15 @@ async function main() {
   fs.rmSync(root, { recursive: true, force: true });
   fs.mkdirSync(root, { recursive: true });
 
+  // Output used to live at the top level, before it was filed under a project.
+  // Those leftovers look like a project's folder to anyone reading the
+  // directory and are not one, so they go the first time a project publishes.
+  fs.readdirSync(TO).forEach((name) => {
+    if (name === 'index.json' || name.startsWith('p_')) return;
+    fs.rmSync(path.join(TO, name), { recursive: true, force: true });
+    console.log('  removed pre-project leftover: ' + name);
+  });
+
   const lines = [];
   const manifest = { publishedAt: new Date().toISOString(), forms: [] };
   let total = 0;

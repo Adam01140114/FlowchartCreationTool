@@ -178,6 +178,18 @@ and **View PDF Output** on the flowchart page opens that project's dashboard:
 http://127.0.0.1:8080/form-output-dashboard.html?project=p_mtumpmov7t2gh0
 ```
 
+The id resolves in one order and it matters: **what the file says, then what
+this browser last used, then a new one.** A file with an id always wins, so
+opening someone else's project does not quietly adopt yours; and the browser's
+memory covers the editor restoring a project saved before ids existed, which
+otherwise minted a fresh id on every reload and moved the link out from under
+you. An id that changes by itself is not an id.
+
+Opening a project with no output says so, gives the command, and lists the
+projects that do have output. A dashboard that only says "no manifest" is a
+dead end, and the usual cause is worth naming: the editor is holding a
+different project from the one that was published.
+
 Import a different project, press the button, and you land on its output rather
 than on whatever ran last. Arriving without a `?project=` shows the most recent
 and offers a picker; arriving with one always shows that one, because a link
