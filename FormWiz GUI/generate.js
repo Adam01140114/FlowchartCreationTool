@@ -13650,12 +13650,50 @@ function updateLinkedFields() {
 
                 }
             } else {
-                // Fall back to longest text
-
-                const longestTextbox = textboxesWithContent.reduce((longest, current) => 
-                    current.value.length > longest.value.length ? current : longest
-                );
-                hiddenField.value = longestTextbox.value.trim();
+                // Boxes holding different answers are not one answer typed twice.
+                //
+                // A mirror fills every one of its boxes with the same text, so
+                // collapsing duplicates leaves exactly one value and this reads it
+                // out unchanged. Two or more values that differ can only be the
+                // parts of one PDF field whose separator was lost between the
+                // builder and this page - and "keep the longest" then prints the
+                // court's street address and throws its name away, which is what
+                // emptied court_name_and_street_address on the DV packet.
+                //
+                // Prefer the boxes that are on screen. A branch not taken is emptied
+                // elsewhere, but only after a delay, and a stale value from one must
+                // not be joined into the answer in the meantime.
+                const onScreen = textboxesWithContent.filter(function (tb) {
+                    const container = tb.closest('.question-container');
+                    return !container || !container.classList.contains('hidden');
+                });
+                const sourceBoxes = onScreen.length ? onScreen : textboxesWithContent;
+                const distinctValues = [];
+                sourceBoxes.forEach(function (tb) {
+                    const v = tb.value.trim();
+                    if (distinctValues.indexOf(v) === -1) distinctValues.push(v);
+                });
+                if (distinctValues.length === 1) {
+                    hiddenField.value = distinctValues[0];
+                } else {
+                    const separator = typeof linkedField.join === 'string'
+                        ? linkedField.join
+                        : ', ';
+                    hiddenField.value = distinctValues.join(separator);
+                    if (typeof linkedField.join !== 'string') {
+                        window.__fwJoinInferred = window.__fwJoinInferred || {};
+                        if (!window.__fwJoinInferred[linkedFieldId]) {
+                            window.__fwJoinInferred[linkedFieldId] = true;
+                            console.warn('[linked fields] ' + linkedFieldId
+                                + ' has no separator, but ' + distinctValues.length
+                                + ' of its boxes hold different answers, so they are parts of'
+                                + ' one PDF field rather than copies of one answer. Joining'
+                                + ' them in field order: ' + JSON.stringify(hiddenField.value)
+                                + '. Set the separator on this link in the builder to say so'
+                                + ' outright.');
+                        }
+                    }
+                }
 
                 if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
