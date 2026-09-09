@@ -32,6 +32,10 @@
     border-bottom: 1px solid var(--line);
   }
   h1 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
+  .sub-project {
+    font: 11.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px;
+  }
   .stamp { color: var(--muted); font-size: 13px; }
   .dot {
     display: inline-block; width: 7px; height: 7px; border-radius: 50%;
@@ -114,6 +118,20 @@
     font: inherit; font-size: 12px; padding: 3px 8px; border-radius: 6px; width: 130px;
     border: 1px solid var(--line); background: var(--ground); color: var(--ink);
   }
+  figure > details.page { border-top: 1px solid var(--line); }
+  figure > details.page > summary {
+    cursor: pointer; padding: 6px 10px; font-size: 11.5px; color: var(--muted);
+    list-style: none; display: flex; justify-content: space-between; gap: 8px;
+  }
+  figure > details.page > summary::-webkit-details-marker { display: none; }
+  figure > details.page > summary:hover { color: var(--accent); }
+  figure > details.page .rows { max-height: 260px; border-top: 1px solid var(--line); }
+  .miss { color: #c0532f; font-weight: 650; }
+  @media (prefers-color-scheme: dark) { .miss { color: #f08a63; } }
+  .project-pick {
+    font: inherit; font-size: 12.5px; padding: 5px 9px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--ground); color: var(--ink);
+  }
   .empty { color: var(--muted); padding: 40px 0; text-align: center; }
   dialog {
     border: none; border-radius: 12px; padding: 0; max-width: 96vw; max-height: 96vh;
@@ -134,6 +152,7 @@
 <body>
 <header>
   <h1>Current Form Output</h1>
+  <span class="sub-project" id="projectLabel"></span>
   <span class="stamp" id="stamp"><span class="dot" id="dot"></span>loading…</span>
   <nav id="nav"></nav>
   <a class="btn-rules" href="form-rules.html">📏 Rules →</a>
@@ -163,8 +182,20 @@
  * position and flash every image, which is exactly what you do not want while
  * you are reading one.
  */
-const ROOT = 'Current Form Output';
+/*
+ * Which project's output this page is showing.
+ *
+ * A link handed out for one project has to keep pointing at that project, so
+ * the id comes from the URL and nothing else decides it. Without one the page
+ * offers what has been published, most recent first, and follows the reader's
+ * choice - which is what you want when you arrive without a link, and never
+ * what you want when you arrived with one.
+ */
+const OUTPUT_ROOT = 'Current Form Output';
 const EVERY_MS = 3000;
+const params = new URLSearchParams(location.search);
+let PROJECT = params.get('project') || '';
+let ROOT = OUTPUT_ROOT + (PROJECT ? '/' + PROJECT : '');
 
 let shape = '';
 let missCount = 0;
@@ -210,7 +241,8 @@ function build(manifest) {
         el('figcaption', {}, [
           text('Page ' + n),
           el('span', {}, [text(form.name)])
-        ])
+        ]),
+        pagePanel(form.name, n)
       ]));
     }
 
@@ -224,6 +256,79 @@ function build(manifest) {
     ]);
     main.appendChild(section);
   });
+}
+
+/**
+ * The fields printed on one page, and what each of them holds.
+ *
+ * Tied to the page rather than to the form, because a blank is a fact about a
+ * place on paper: "item 6 is empty" is a sentence about page two. Empty fields
+ * are listed first and marked, since a field nobody filled is the one worth
+ * looking at and a list that buries it reads as though everything is fine.
+ */
+function pagePanel(form, n) {
+  const wrap = el('details', { class: 'page' });
+  const summary = el('summary', {}, [text('Field data'), el('span', {}, [text('')])]);
+  const rows = el('div', { class: 'rows' });
+  wrap.append(summary, rows);
+
+  const paint = function (fields) {
+    const mine = (fields && fields[n]) || [];
+    const real = mine.filter(function (f) { return f.kind !== 'button'; });
+    const blank = real.filter(isBlank);
+    summary.lastChild.textContent = real.length + ' fields'
+      + (blank.length ? ' · ' + blank.length + ' empty' : '');
+    summary.lastChild.className = blank.length ? 'miss' : '';
+    rows.textContent = '';
+    if (!real.length) {
+      rows.appendChild(el('p', { class: 'empty' }, [text('No fields on this page.')]));
+      return;
+    }
+    blank.concat(real.filter(function (f) { return !isBlank(f); })).forEach(function (f) {
+      rows.appendChild(fieldRow(f));
+    });
+  };
+
+  let paintedFor = null;
+  wrap.addEventListener('toggle', function () {
+    if (!wrap.open || paintedFor === currentStamp) return;
+    paintedFor = currentStamp;
+    fieldsFor(form, currentStamp).then(paint);
+  });
+  wrap.dataset.form = form;
+  wrap.dataset.page = String(n);
+  wrap.__paint = paint;
+  return wrap;
+}
+
+function isBlank(f) {
+  return f.kind === 'checkbox' ? f.value !== true
+    : String(f.value == null ? '' : f.value).trim() === '';
+}
+
+function fieldRow(f) {
+  const blank = isBlank(f);
+  const value = el('span', { class: 'v' + (f.kind === 'checkbox' ? (f.value ? ' on' : ' off') : '') });
+  value.textContent = f.kind === 'checkbox'
+    ? (f.value ? 'ticked' : 'not ticked')
+    : (blank ? '(empty)' : String(f.value));
+  return el('div', { class: 'row' + (blank ? ' blank' : '') }, [
+    el('span', { class: 'k' }, [text(f.name)]),
+    value
+  ]);
+}
+
+/** One fetch of a form's field data per publish, shared by its pages. */
+const fieldCache = {};
+function fieldsFor(form, stamp) {
+  const key = form + '@' + stamp;
+  if (!fieldCache[key]) {
+    fieldCache[key] = fetch(ROOT + '/' + form + '/fields.json?v=' + encodeURIComponent(stamp),
+      { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .catch(function () { return {}; });
+  }
+  return fieldCache[key];
 }
 
 /**
@@ -263,10 +368,15 @@ function dataPanel(form) {
 
 async function loadFields(name, panes, stamp) {
   try {
-    const res = await fetch(ROOT + '/' + name + '/fields.json?v=' + encodeURIComponent(stamp),
-      { cache: 'no-store' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const fields = await res.json();
+    const byPage = await fieldsFor(name, stamp);
+    // Flattened for the form-level view, in page order, buttons dropped.
+    const fields = Object.keys(byPage)
+      .sort(function (a, b) { return Number(a) - Number(b); })
+      .reduce(function (all, n) {
+        return all.concat(byPage[n].filter(function (f) { return f.kind !== 'button'; })
+          .map(function (f) { return Object.assign({ page: Number(n) }, f); }));
+      }, []);
+    if (!fields.length) throw new Error('no fields');
     panes.textContent = '';
     panes.appendChild(pane('Text fields',
       fields.filter(function (f) { return f.kind !== 'checkbox'; }), false));
@@ -291,19 +401,13 @@ function pane(title, fields, isCheckbox) {
       rows.appendChild(el('p', { class: 'empty' }, [text('Nothing matches.')]));
       return;
     }
-    shown.forEach(function (f) {
-      const raw = f.value;
-      const on = raw === true || raw === 'on' || raw === 'Yes';
-      const blank = !isCheckbox && String(raw == null ? '' : raw).trim() === '';
-      const value = el('span', { class: 'v' + (isCheckbox ? (on ? ' on' : ' off') : '') });
-      value.textContent = isCheckbox
-        ? (on ? 'ticked' : 'not ticked')
-        : (blank ? '(empty)' : String(raw));
-      rows.appendChild(el('div', { class: 'row' + (blank ? ' blank' : '') }, [
-        el('span', { class: 'k' }, [text(f.name)]),
-        value
-      ]));
-    });
+    // Empty first: a field nobody filled is the one worth looking at.
+    shown.slice().sort(function (a, b) { return (isBlank(b) ? 0 : 1) - (isBlank(a) ? 0 : 1); })
+      .forEach(function (f) {
+        const row = fieldRow(f);
+        if (f.page) row.querySelector('.k').textContent = 'p' + f.page + '  ' + f.name;
+        rows.appendChild(row);
+      });
   };
 
   const filter = el('input', { class: 'filter', type: 'search', placeholder: 'filter…' });
@@ -329,6 +433,35 @@ function setStatus(state, label) {
   document.getElementById('stamp').lastChild.nodeValue = label;
 }
 
+/** Offer what has been published, when the link did not say. */
+async function offerProjects() {
+  let index = [];
+  try {
+    const res = await fetch(OUTPUT_ROOT + '/index.json?t=' + Date.now(), { cache: 'no-store' });
+    if (res.ok) index = await res.json();
+  } catch (e) { /* nothing published yet */ }
+  if (!index.length) return false;
+
+  if (!PROJECT) {
+    PROJECT = index[0].id;
+    ROOT = OUTPUT_ROOT + '/' + PROJECT;
+    history.replaceState(null, '', '?project=' + encodeURIComponent(PROJECT));
+  }
+  if (index.length > 1) {
+    const pick = el('select', { class: 'project-pick', title: 'Published projects' });
+    index.forEach(function (p) {
+      const opt = el('option', { value: p.id }, [text(p.id + '  ·  ' + p.pages + ' pages')]);
+      if (p.id === PROJECT) opt.setAttribute('selected', 'selected');
+      pick.appendChild(opt);
+    });
+    pick.addEventListener('change', function () {
+      location.search = '?project=' + encodeURIComponent(pick.value);
+    });
+    document.getElementById('stamp').after(pick);
+  }
+  return true;
+}
+
 async function poll() {
   try {
     const res = await fetch(ROOT + '/manifest.json?t=' + Date.now(), { cache: 'no-store' });
@@ -348,8 +481,12 @@ async function poll() {
       document.querySelectorAll('details.data[open]').forEach(function (d) {
         loadFields(d.dataset.form, d.querySelector('.panes'), manifest.publishedAt);
       });
+      document.querySelectorAll('details.page[open]').forEach(function (d) {
+        fieldsFor(d.dataset.form, manifest.publishedAt).then(d.__paint);
+      });
     }
 
+    document.getElementById('projectLabel').textContent = manifest.projectId || PROJECT || '';
     const when = new Date(manifest.publishedAt);
     const age = Math.round((Date.now() - when.getTime()) / 1000);
     setStatus(age > 3600 ? 'stale' : '',
@@ -379,8 +516,11 @@ function open(img) {
 document.getElementById('viewerClose').addEventListener('click', () => viewer.close());
 viewer.addEventListener('click', (e) => { if (e.target === viewer) viewer.close(); });
 
-poll();
-setInterval(poll, EVERY_MS);
+(async function start() {
+  await offerProjects();
+  await poll();
+  setInterval(poll, EVERY_MS);
+})();
 </script>
 </body>
 </html>

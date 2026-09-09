@@ -3039,6 +3039,7 @@ function loadFormData(formData) {
     // only a stop on the way to the generated form.
     window.alertRulesConfig = Array.isArray(formData.alertRules) ? formData.alertRules : [];
     window.computedFieldsConfig = Array.isArray(formData.computedFields) ? formData.computedFields : [];
+    window.projectIdConfig = String(formData.projectId || '');
     // Load linked fields
     if (formData.linkedFields && formData.linkedFields.length > 0) {
         // Initialize linked fields configuration
@@ -3211,6 +3212,9 @@ function exportForm(options) {
                 formData.checklistItems.push(itemText);
             }
         });
+    }
+    if (window.projectIdConfig) {
+        formData.projectId = window.projectIdConfig;
     }
     if (Array.isArray(window.computedFieldsConfig) && window.computedFieldsConfig.length > 0) {
         formData.computedFields = window.computedFieldsConfig;

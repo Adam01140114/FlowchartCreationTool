@@ -12,6 +12,32 @@
   'use strict';
 
   const PROJECT_VERSION = 1;
+
+  /**
+   * The project's own name for itself, and the reason it needs one.
+   *
+   * Everything downstream of the editor - the GUI export, the generated form,
+   * the filled PDFs, the published page images - belongs to one project, and
+   * until now nothing said which. Two projects open in two tabs wrote over the
+   * same output folder and the second one to run won.
+   *
+   * So a project carries an id from the moment it is first exported, and every
+   * step after that passes it along rather than inventing its own. It survives
+   * import and export because it is read from the file when there is one and
+   * only minted when there is not - a project that has been through the loop
+   * once keeps the same id for the life of the file, which is what makes the
+   * View PDF Output link stable.
+   */
+  function newProjectId() {
+    const stamp = Date.now().toString(36);
+    const salt = Math.random().toString(36).slice(2, 8);
+    return 'p_' + stamp + salt;
+  }
+
+  function currentProjectId(create) {
+    if (!window.projectId && create !== false) window.projectId = newProjectId();
+    return window.projectId || '';
+  }
   // Loading is asynchronous inside the editor; leave time before reading back.
   const LOAD_SETTLE_MS = 1200;
 
@@ -124,6 +150,7 @@
     const payload = {
       type: 'flowchart-project',
       version: PROJECT_VERSION,
+      projectId: currentProjectId(true),
       exportedAt: new Date().toISOString(),
       currentFormIndex: window.currentFormIndex,
       forms: window.projectForms.map(function (f) {
@@ -193,6 +220,8 @@
       throw new Error('Not a project file: expected a "forms" array.');
     }
 
+    // Read it from the file, or mint one for a project that has never had it.
+    window.projectId = String(data.projectId || '').trim() || newProjectId();
     window.projectForms = data.forms.map(function (f, i) {
       const flowchart = f.flowchart || blankFlowchart();
       return { name: f.name || flowchart.formName || ('Form ' + (i + 1)), flowchart: flowchart };
@@ -240,6 +269,7 @@
       return { name: f.name || '', flowchart: f.flowchart || blankFlowchart() };
     });
     data.currentFormIndex = window.currentFormIndex;
+    data.projectId = currentProjectId(true);
     data.projectName = projectNameInput() ? projectNameInput().value.trim() : '';
     return data;
   }
@@ -255,6 +285,7 @@
       const flowchart = f.flowchart || blankFlowchart();
       return { name: f.name || flowchart.formName || ('Form ' + (i + 1)), flowchart: flowchart };
     });
+    window.projectId = String(data.projectId || '').trim() || window.projectId || newProjectId();
     const idx = Number(data.currentFormIndex);
     window.currentFormIndex = (idx >= 0 && idx < window.projectForms.length) ? idx : 0;
     if (projectNameInput() && data.projectName) projectNameInput().value = data.projectName;
@@ -352,6 +383,20 @@
   window.nextProjectForm = nextForm;
   window.switchToProjectForm = switchToForm;
   window.captureCurrentProjectForm = captureCurrentForm;
+  window.currentProjectId = currentProjectId;
+
+  /**
+   * Open the page images for THIS project.
+   *
+   * The link carries the project's id, so importing a different project and
+   * pressing the button again lands on that project's output rather than on
+   * whatever ran last.
+   */
+  window.viewPdfOutput = function () {
+    const id = currentProjectId(true);
+    window.open('form-output-dashboard.html' + (id ? '?project=' + encodeURIComponent(id) : ''),
+      '_blank');
+  };
   window.exportProjectJson = exportProjectJson;
   window.showExportProjectJsonDialog = showExportProjectJsonDialog;
   window.showImportProjectJsonDialog = showImportProjectJsonDialog;

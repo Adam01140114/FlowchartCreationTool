@@ -551,6 +551,8 @@ function reportGroupProblems(merged) {
     merged.questionCounter = questionOffset + 1;
     merged.formName = (document.getElementById('projectNameInput') || {}).value
       || merged.formName || 'Project';
+    merged.projectId = (typeof window.currentProjectId === 'function')
+      ? window.currentProjectId(true) : (window.projectId || '');
     merged.projectForms = ranges;
     // Fields the form asks for that no question can answer, gathered from
     // every form in the packet.

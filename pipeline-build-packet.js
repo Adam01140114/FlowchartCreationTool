@@ -258,9 +258,21 @@ async function main() {
     if (n) alerted[entry.name] = n;
   });
 
+  // The project's own name for itself, kept across rebuilds: the published
+  // page images live under it, so a new id every build would orphan the link
+  // that was handed out for the last one.
+  let projectId = '';
+  try {
+    projectId = String(JSON.parse(fs.readFileSync(OUT, 'utf8')).projectId || '');
+  } catch (e) { /* first build, or an older file without one */ }
+  if (!projectId) {
+    projectId = 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
   const project = {
     type: 'flowchart-project',
     version: 1,
+    projectId: projectId,
     exportedAt: new Date().toISOString(),
     projectName: spec.project || 'Packet',
     currentFormIndex: 0,
@@ -268,7 +280,7 @@ async function main() {
   };
   fs.writeFileSync(OUT, JSON.stringify(project, null, 2));
 
-  console.log('packet: ' + OUT);
+  console.log('packet: ' + OUT + '   project ' + projectId);
   forms.forEach(({ entry, flowchart }) => {
     const questions = (flowchart.cells || []).filter((c) => /nodeType=question/.test(c.style || '')).length;
     const connectors = (flowchart.cells || []).filter((c) => /nodeType=connector/.test(c.style || ''));

@@ -153,6 +153,36 @@ The Copy link button on each rule hands you its address.
 
 The rules page and the page-image dashboard link to each other, top right.
 
+## A project knows its own name
+
+Every project JSON carries a `projectId`, minted once and preserved from then
+on. It survives import and export because it is read from the file when there
+is one and only minted when there is not, so a project that has been round the
+loop keeps the same id for the life of the file.
+
+It travels: project JSON -> merged GUI JSON -> the generated form -> the
+answers payload (as `__projectId`, which no PDF has a field for) -> the
+published folder. So the output lives under the project that produced it:
+
+```
+Current Form Output/
+  index.json                 what has been published, most recent first
+  p_mtumpmov7t2gh0/
+    manifest.json  README.txt
+    DV100/  page-01.png ...  fields.json
+```
+
+and **View PDF Output** on the flowchart page opens that project's dashboard:
+
+```
+http://127.0.0.1:8080/form-output-dashboard.html?project=p_mtumpmov7t2gh0
+```
+
+Import a different project, press the button, and you land on its output rather
+than on whatever ran last. Arriving without a `?project=` shows the most recent
+and offers a picker; arriving with one always shows that one, because a link
+handed out for a project has to keep pointing at it.
+
 ## Publish the pages you looked at
 
 The page-image audit is the last and least skippable step, and describing what
@@ -183,6 +213,13 @@ seconds, so a pass run in the terminal appears in the browser without a reload:
 ```
 http://127.0.0.1:8080/form-output-dashboard.html
 ```
+
+Every page image carries its own **Field data** panel: which fields print on
+that page and what each holds, **empty ones first and counted in the summary**.
+A blank is a fact about a place on paper - "item 6 is empty" is a sentence
+about page two - and a list that buries the empties reads as though everything
+is fine. DV-110 page 2 says "28 fields · 27 empty", which is exactly right for
+a page that belongs to the judge.
 
 Each form also carries a **PDF Data** panel, collapsed: one list of every text
 field with its name and value, one of every checkbox with ticked or not ticked,

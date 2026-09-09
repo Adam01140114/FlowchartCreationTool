@@ -9497,6 +9497,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var linkedFields = ${JSON.stringify(linkedFields || [])};\n`;
   formHTML += `var alertRules = ${JSON.stringify(window.alertRulesConfig || [])};\n`;
   formHTML += `var computedFields = ${JSON.stringify(window.computedFieldsConfig || [])};\n`;
+  formHTML += `var projectId = ${JSON.stringify(window.projectIdConfig || '')};\n`;
+  formHTML += `window.__PROJECT_ID__ = projectId;\n`;
   formHTML += `var isHandlingLink = false;\n`;
   // Dynamic conditional logic for business type question to show county question
   formHTML += `
@@ -14281,6 +14283,12 @@ function writeComputedField(nameId, value){
  * questions get asked at all.
  */
 function applyComputedFields(){
+    // Which project produced this run. It has no PDF field and is meant not to
+    // - it rides along in the answers so the publish step knows whose output
+    // folder to write, which is the whole point of the project carrying an id.
+    if (typeof projectId !== "undefined" && projectId) {
+        writeComputedField("__projectId", projectId);
+    }
     var rules = (typeof computedFields !== "undefined" && computedFields) ? computedFields : [];
     if (!rules.length) return;
     rules.forEach(function(rule){
