@@ -126,6 +126,12 @@
   figure > details.page > summary::-webkit-details-marker { display: none; }
   figure > details.page > summary:hover { color: var(--accent); }
   figure > details.page .rows { max-height: 260px; border-top: 1px solid var(--line); }
+  figcaption .copy-page {
+    border: 1px solid var(--line); background: transparent; color: var(--muted);
+    border-radius: 6px; font: inherit; font-size: 11px; padding: 1px 7px; cursor: pointer;
+  }
+  figcaption .copy-page:hover { color: var(--accent); border-color: var(--accent); }
+  figcaption .copy-page.done { color: var(--ok); border-color: var(--ok); }
   .miss { color: #c0532f; font-weight: 650; }
   @media (prefers-color-scheme: dark) { .miss { color: #f08a63; } }
   .project-pick {
@@ -143,6 +149,13 @@
     display: flex; justify-content: space-between; align-items: center;
     padding: 8px 14px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line);
   }
+  #jsonBox { width: min(760px, 94vw); }
+  #jsonText {
+    display: block; width: 100%; height: 62vh; border: none; resize: none; padding: 14px;
+    background: var(--paper); color: var(--ink);
+    font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  #jsonText:focus { outline: none; }
   dialog button {
     border: 1px solid var(--line); background: transparent; color: var(--ink);
     border-radius: 6px; padding: 4px 12px; cursor: pointer; font: inherit; font-size: 13px;
@@ -165,6 +178,14 @@
 <dialog id="viewer">
   <img id="viewerImg" alt="">
   <div class="bar"><span id="viewerLabel"></span><button id="viewerClose">Close</button></div>
+</dialog>
+
+<dialog id="jsonBox">
+  <textarea id="jsonText" spellcheck="false" readonly></textarea>
+  <div class="bar">
+    <span id="jsonLabel"></span>
+    <span>Selected — press Ctrl+C &nbsp; <button id="jsonClose">Close</button></span>
+  </div>
 </dialog>
 
 <script>
@@ -240,7 +261,7 @@ function build(manifest) {
         img,
         el('figcaption', {}, [
           text('Page ' + n),
-          el('span', {}, [text(form.name)])
+          copyPageButton(form.name, n)
         ]),
         pagePanel(form.name, n)
       ]));
@@ -256,6 +277,72 @@ function build(manifest) {
     ]);
     main.appendChild(section);
   });
+}
+
+/**
+ * Hand the whole page over as JSON: which form, which page, and every field on
+ * it with its value.
+ *
+ * Blanks are included deliberately, and so is the count of them. The reason to
+ * copy a page is usually to ask a question about it, and "these four are empty"
+ * is the question - a payload listing only what was filled answers a different
+ * one and looks reassuring while doing it.
+ *
+ * Buttons are left out. They are not fields anybody fills; they are the Print
+ * and Save controls and the form-number links, and including them would pad
+ * every page with rows nobody can act on.
+ */
+function pageDataFor(form, page, byPage) {
+  const fields = ((byPage && byPage[page]) || [])
+    .filter(function (f) { return f.kind !== 'button'; })
+    .map(function (f) { return { name: f.name, kind: f.kind, value: f.value }; });
+  const counts = { fields: fields.length, empty: 0, text: 0, filled: 0, checkbox: 0, ticked: 0 };
+  fields.forEach(function (f) {
+    if (isBlank(f)) counts.empty++;
+    if (f.kind === 'checkbox') { counts.checkbox++; if (f.value === true) counts.ticked++; }
+    else { counts.text++; if (!isBlank(f)) counts.filled++; }
+  });
+  return {
+    project: PROJECT || null,
+    form: form,
+    page: page,
+    publishedAt: currentStamp || null,
+    counts: counts,
+    fields: fields
+  };
+}
+
+function copyPageButton(form, n) {
+  const btn = el('button', { class: 'copy-page', type: 'button',
+    title: 'Copy this page as JSON, blank fields included' });
+  btn.textContent = 'Copy page data';
+  btn.addEventListener('click', async function (e) {
+    e.stopPropagation();
+    const byPage = await fieldsFor(form, currentStamp);
+    const json = JSON.stringify(pageDataFor(form, n, byPage), null, 2);
+    const done = function (ok) {
+      btn.textContent = ok ? 'Copied' : 'Press Ctrl+C';
+      btn.className = 'copy-page' + (ok ? ' done' : '');
+      setTimeout(function () {
+        btn.textContent = 'Copy page data'; btn.className = 'copy-page';
+      }, 1600);
+    };
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(json);
+      ok = true;
+    } catch (err) {
+      ok = false;
+    }
+    if (ok) { done(true); return; }
+    // Clipboard access can be refused - an unfocused tab, a browser that wants
+    // a gesture it did not see. Put the text on screen, selected, and say so.
+    // The old fallback removed the textarea it had just selected, so the
+    // message said press Ctrl+C over a selection that no longer existed.
+    showJson(form + ' — page ' + n, json);
+    done(false);
+  });
+  return btn;
 }
 
 /**
@@ -505,6 +592,20 @@ function describeAge(seconds) {
   return Math.round(seconds / 3600) + ' h ago';
 }
 
+/**
+ * Last resort for the clipboard: show the text, selected, and let the keyboard
+ * do it. Anything that promises a copy it did not make is worse than asking.
+ */
+function showJson(label, json) {
+  const dlg = document.getElementById('jsonBox');
+  const area = document.getElementById('jsonText');
+  document.getElementById('jsonLabel').textContent = label;
+  area.value = json;
+  dlg.showModal();
+  area.focus();
+  area.select();
+}
+
 /* the lightbox */
 const viewer = document.getElementById('viewer');
 function open(img) {
@@ -514,6 +615,9 @@ function open(img) {
   viewer.showModal();
 }
 document.getElementById('viewerClose').addEventListener('click', () => viewer.close());
+const jsonBox = document.getElementById('jsonBox');
+document.getElementById('jsonClose').addEventListener('click', () => jsonBox.close());
+jsonBox.addEventListener('click', (e) => { if (e.target === jsonBox) jsonBox.close(); });
 viewer.addEventListener('click', (e) => { if (e.target === viewer) viewer.close(); });
 
 (async function start() {

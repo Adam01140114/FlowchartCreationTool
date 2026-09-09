@@ -221,6 +221,24 @@ about page two - and a list that buries the empties reads as though everything
 is fine. DV-110 page 2 says "28 fields · 27 empty", which is exactly right for
 a page that belongs to the judge.
 
+Each page also has a **Copy page data** button, which hands the page over as
+JSON — form, page, project, the publish timestamp, counts, and every field with
+its value:
+
+```json
+{ "project": "p_...", "form": "DV110", "page": 2,
+  "counts": { "fields": 28, "empty": 27, "text": 21, "filled": 1,
+              "checkbox": 7, "ticked": 0 },
+  "fields": [ { "name": "restrained_person_has_prohibited_items_yes",
+                "kind": "checkbox", "value": false }, ... ] }
+```
+
+Blanks are in it, and so is the count of them: the reason to copy a page is
+usually to ask a question about it, and "these four are empty" is the question.
+Buttons are left out — the Print and Save controls and the form-number links are
+not fields anybody fills. If the clipboard is refused, the JSON opens in a
+dialog, selected, rather than the button claiming a copy it did not make.
+
 Each form also carries a **PDF Data** panel, collapsed: one list of every text
 field with its name and value, one of every checkbox with ticked or not ticked,
 both filterable. The images show where a value printed; this shows what the
