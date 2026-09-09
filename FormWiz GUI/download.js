@@ -224,6 +224,39 @@ function hideFormBuilderImportLoadingDeferred() {
         });
     });
 }
+/**
+ * Say so when a loaded form holds a link that has lost its separator.
+ *
+ * A link with a separator is a join - its boxes hold different halves of one
+ * PDF field. A link without one is a mirror, and the generated form empties
+ * all but the longest of a mirror about 100ms after they are filled. Nothing
+ * distinguishes the two but the separator, so a form record saved before the
+ * builder learned to keep it comes back as a set of mirrors and silently
+ * deletes answers - court_name disappearing because court_street_address is
+ * the longer of the two.
+ *
+ * The generated form says this too, but by then the operator has already
+ * saved and generated. Saying it on load is where it can still be acted on.
+ */
+function warnAboutLinksMissingSeparators(linkedFields) {
+    const suspect = (linkedFields || []).filter(function (link) {
+        return typeof link.join !== "string"
+            && Array.isArray(link.fields) && link.fields.length > 1;
+    });
+    if (!suspect.length) return;
+    console.warn("[linked fields] " + suspect.length + " of " + linkedFields.length
+        + " link(s) in this form have two or more boxes and no separator. The"
+        + " generated form will read them as copies of one answer and empty all"
+        + " but the longest shortly after they are filled.");
+    suspect.forEach(function (link) {
+        console.warn("   " + link.linkedFieldId + "  =  longest of  "
+            + link.fields.join(" , "));
+    });
+    console.warn("   If those are different questions sharing one PDF field, this"
+        + " form record predates the fix that keeps the separator. Re-import the"
+        + " GUI JSON, or set the separator on each link and save.");
+}
+
 function loadFormData(formData) {
     // Per-question work that walks the whole form is deferred while this is
     // set; see addQuestion. Cleared in the finally below so a failed import
@@ -3009,6 +3042,7 @@ function loadFormData(formData) {
             // Create the linked field display
             createLinkedFieldDisplayFromImport(linkedField);
         });
+        warnAboutLinksMissingSeparators(formData.linkedFields);
     }
     // Load linked checkboxes
     if (formData.linkedCheckboxes && formData.linkedCheckboxes.length > 0) {
