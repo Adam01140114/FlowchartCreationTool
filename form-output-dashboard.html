@@ -75,6 +75,45 @@
     padding: 7px 10px; font-size: 12px; color: var(--muted);
     border-top: 1px solid var(--line); display: flex; justify-content: space-between;
   }
+  details.data { margin-top: 14px; }
+  details.data > summary {
+    cursor: pointer; font-size: 13px; font-weight: 650; color: var(--muted);
+    padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--paper); list-style: none; display: flex; gap: 10px; align-items: center;
+  }
+  details.data > summary::-webkit-details-marker { display: none; }
+  details.data > summary::before { content: "\25B8"; font-size: 11px; }
+  details.data[open] > summary::before { content: "\25BE"; }
+  details.data > summary:hover { color: var(--accent); border-color: var(--accent); }
+  .pill {
+    font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px;
+    border: 1px solid var(--line); color: var(--muted);
+  }
+  .panes { display: grid; gap: 14px; margin-top: 12px; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+  .pane { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .pane h3 {
+    margin: 0; padding: 9px 12px; font-size: 12px; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .rows { max-height: 340px; overflow: auto; }
+  .row {
+    display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 10px;
+    padding: 5px 12px; border-bottom: 1px solid var(--line); align-items: baseline;
+  }
+  .row:last-child { border-bottom: none; }
+  .row .k {
+    font: 11.5px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: var(--muted); overflow-wrap: anywhere;
+  }
+  .row .v { font-size: 12.5px; overflow-wrap: anywhere; }
+  .row.blank .v { color: var(--muted); font-style: italic; }
+  .row .v.on { color: var(--ok); font-weight: 650; }
+  .row .v.off { color: var(--muted); }
+  .filter {
+    font: inherit; font-size: 12px; padding: 3px 8px; border-radius: 6px; width: 130px;
+    border: 1px solid var(--line); background: var(--ground); color: var(--ink);
+  }
   .empty { color: var(--muted); padding: 40px 0; text-align: center; }
   dialog {
     border: none; border-radius: 12px; padding: 0; max-width: 96vw; max-height: 96vh;
@@ -129,6 +168,7 @@ const EVERY_MS = 3000;
 
 let shape = '';
 let missCount = 0;
+let currentStamp = '';
 
 const el = (tag, attrs, kids) => {
   const node = document.createElement(tag);
@@ -174,14 +214,106 @@ function build(manifest) {
       ]));
     }
 
-    main.appendChild(el('section', { id: form.name }, [
+    const section = el('section', { id: form.name }, [
       el('div', { class: 'form-head' }, [
         el('h2', {}, [text(form.name)]),
         el('span', { class: 'count' }, [text(form.pages + ' page' + (form.pages === 1 ? '' : 's'))])
       ]),
-      grid
-    ]));
+      grid,
+      dataPanel(form)
+    ]);
+    main.appendChild(section);
   });
+}
+
+/**
+ * What the PDF ended up holding, beside the pictures of it.
+ *
+ * The images show where a value printed and this shows what the field is
+ * called and what is in it - the other half of reading an output, and the half
+ * you cannot get by looking at a page. Checkboxes and text boxes are kept
+ * apart because the questions you ask of them are different: a checkbox is
+ * ticked or it is not, and a text box is right, wrong, or empty.
+ *
+ * It is collapsed by default. Thirty-two fields is a list; three hundred and
+ * twenty-one is a wall, and the pages are what you came to look at.
+ */
+function dataPanel(form) {
+  const counts = form.fields || { text: 0, checkbox: 0, ticked: 0, filled: 0 };
+  const wrap = el('details', { class: 'data' });
+  const summary = el('summary', {}, [
+    text('PDF Data'),
+    el('span', { class: 'pill' }, [text(counts.text + ' text · ' + counts.filled + ' filled')]),
+    el('span', { class: 'pill' }, [text(counts.checkbox + ' checkboxes · ' + counts.ticked + ' ticked')])
+  ]);
+  const panes = el('div', { class: 'panes' });
+  panes.appendChild(el('p', { class: 'empty' }, [text('Loading field values…')]));
+  wrap.append(summary, panes);
+
+  // Only fetched when it is opened, and only once per publish.
+  let loadedFor = null;
+  wrap.addEventListener('toggle', function () {
+    if (!wrap.open || loadedFor === currentStamp) return;
+    loadedFor = currentStamp;
+    loadFields(form.name, panes, currentStamp);
+  });
+  wrap.dataset.form = form.name;
+  return wrap;
+}
+
+async function loadFields(name, panes, stamp) {
+  try {
+    const res = await fetch(ROOT + '/' + name + '/fields.json?v=' + encodeURIComponent(stamp),
+      { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const fields = await res.json();
+    panes.textContent = '';
+    panes.appendChild(pane('Text fields',
+      fields.filter(function (f) { return f.kind !== 'checkbox'; }), false));
+    panes.appendChild(pane('Checkboxes',
+      fields.filter(function (f) { return f.kind === 'checkbox'; }), true));
+  } catch (err) {
+    panes.textContent = '';
+    panes.appendChild(el('p', { class: 'empty' },
+      [text('No field data — re-run node pipeline-current-output.js')]));
+  }
+}
+
+function pane(title, fields, isCheckbox) {
+  const rows = el('div', { class: 'rows' });
+  const draw = function (needle) {
+    rows.textContent = '';
+    const shown = fields.filter(function (f) {
+      return !needle || f.name.toLowerCase().indexOf(needle) >= 0
+        || String(f.value == null ? '' : f.value).toLowerCase().indexOf(needle) >= 0;
+    });
+    if (!shown.length) {
+      rows.appendChild(el('p', { class: 'empty' }, [text('Nothing matches.')]));
+      return;
+    }
+    shown.forEach(function (f) {
+      const raw = f.value;
+      const on = raw === true || raw === 'on' || raw === 'Yes';
+      const blank = !isCheckbox && String(raw == null ? '' : raw).trim() === '';
+      const value = el('span', { class: 'v' + (isCheckbox ? (on ? ' on' : ' off') : '') });
+      value.textContent = isCheckbox
+        ? (on ? 'ticked' : 'not ticked')
+        : (blank ? '(empty)' : String(raw));
+      rows.appendChild(el('div', { class: 'row' + (blank ? ' blank' : '') }, [
+        el('span', { class: 'k' }, [text(f.name)]),
+        value
+      ]));
+    });
+  };
+
+  const filter = el('input', { class: 'filter', type: 'search', placeholder: 'filter…' });
+  filter.addEventListener('input', function () { draw(filter.value.trim().toLowerCase()); });
+  draw('');
+
+  return el('div', { class: 'pane' }, [
+    el('h3', {}, [text(title + ' (' + fields.length + ')'), filter]),
+    rows
+  ]);
 }
 
 /** Same pictures, newer bytes: swap the stamp without touching the layout. */
@@ -204,9 +336,19 @@ async function poll() {
     const manifest = await res.json();
     missCount = 0;
 
+    const fresh = manifest.publishedAt !== currentStamp;
+    currentStamp = manifest.publishedAt;
+
     const next = JSON.stringify(manifest.forms);
     if (next !== shape) { shape = next; build(manifest); }
-    else refreshImages(manifest.publishedAt);
+    else if (fresh) {
+      refreshImages(manifest.publishedAt);
+      // A panel left open should follow the new run rather than keep showing
+      // the values from the last one.
+      document.querySelectorAll('details.data[open]').forEach(function (d) {
+        loadFields(d.dataset.form, d.querySelector('.panes'), manifest.publishedAt);
+      });
+    }
 
     const when = new Date(manifest.publishedAt);
     const age = Math.round((Date.now() - when.getTime()) / 1000);

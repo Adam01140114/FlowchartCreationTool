@@ -74,7 +74,28 @@ function main() {
       fs.copyFileSync(path.join(FROM, source, file), path.join(target, 'page-' + n + '.png'));
     });
     total += pages.length;
-    manifest.forms.push({ name: folderNameFor(base), pages: pages.length });
+
+    // What the PDF actually ended up holding, beside the pictures of it. The
+    // images show where a value printed; this shows what the field is called
+    // and what is in it, which is the other half of reading an output and the
+    // half you cannot get by looking.
+    const readback = path.join(FROM, base + '-readback.json');
+    let counts = { text: 0, checkbox: 0, ticked: 0, filled: 0 };
+    if (fs.existsSync(readback)) {
+      const fields = JSON.parse(fs.readFileSync(readback, 'utf8'));
+      fields.forEach((f) => {
+        if (f.kind === 'checkbox') {
+          counts.checkbox++;
+          if (f.value === true || f.value === 'on' || f.value === 'Yes') counts.ticked++;
+        } else {
+          counts.text++;
+          if (String(f.value == null ? '' : f.value).trim() !== '') counts.filled++;
+        }
+      });
+      fs.writeFileSync(path.join(target, 'fields.json'), JSON.stringify(fields, null, 1));
+    }
+
+    manifest.forms.push({ name: folderNameFor(base), pages: pages.length, fields: counts });
     lines.push('  ' + folderNameFor(base).padEnd(8) + pages.length + ' page(s)');
     console.log('  ' + folderNameFor(base).padEnd(8) + pages.length + ' page(s)');
   });

@@ -184,6 +184,16 @@ seconds, so a pass run in the terminal appears in the browser without a reload:
 http://127.0.0.1:8080/form-output-dashboard.html
 ```
 
+Each form also carries a **PDF Data** panel, collapsed: one list of every text
+field with its name and value, one of every checkbox with ticked or not ticked,
+both filterable. The images show where a value printed; this shows what the
+field is called and what is in it, which is the half you cannot get by looking
+at a page. It is fetched only when opened, and re-read when a new pass lands
+under an open panel.
+
+The flowchart page has a **View PDF Output** button above Clear that opens the
+dashboard in its own tab.
+
 It polls two different things. The manifest says which forms exist and how many
 pages each has, and the layout is rebuilt only when that changes - rebuilding
 every three seconds would throw away the scroll position and flash every image
