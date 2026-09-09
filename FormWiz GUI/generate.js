@@ -323,9 +323,16 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     return namePart;
 }
 // Helper function to create styled address input
-function createAddressInput(id, label, index, type = 'text', prefill = '') {
+function createAddressInput(id, label, index, type = 'text', prefill = '', isAmountOption) {
     // Check if this is an amount field (ends with _amount or label contains "amount")
-    const isAmountField = id.includes('_amount') || (label && label.toLowerCase().includes('amount'));
+    // The schema is asked first, because a name is a weak guess about meaning.
+    // "Number or amount" on the DV-100 firearms table counts guns and rounds
+    // and is declared isAmountOption: false, but its id ends in _amount, so the
+    // guess alone printed "$100" against a column that is not money. The guess
+    // still stands in for fields built before the flag existed.
+    const isAmountField = (typeof isAmountOption === 'boolean')
+      ? isAmountOption
+      : (id.includes('_amount') || (label && label.toLowerCase().includes('amount')));
     // For amount fields, use text type with currency formatting instead of number type
     const inputType = isAmountField ? 'text' : (type === 'number' ? 'number' : 'text');
     const placeholder = label; // Remove the index number from placeholder
@@ -2587,7 +2594,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                               value = formatDateForServer(value);
                             }
                             if (value && value.trim() !== '') {
-                              fd.append(element.name, value);
+                              fd.append(element.name, pdfValueForField(value));
                             }
                           }
                         }
@@ -2727,7 +2734,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                               value = formatDateForServer(value);
                             }
                             if (value && value.trim() !== '') {
-                              fd.append(element.name, value);
+                              fd.append(element.name, pdfValueForField(value));
                               collectedFields[element.name] = value;
                             }
                           }
@@ -3705,7 +3712,7 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
                 } else {
                   // Use regular input for other fields
                   const inputDiv = document.createElement('div');
-                  const inputHTML = createAddressInput(fieldId, field.label, j, 'text', prefillValue);
+                  const inputHTML = createAddressInput(fieldId, field.label, j, 'text', prefillValue, (field.type ? field.type === 'amount' : field.isAmountOption));
                   inputDiv.innerHTML = inputHTML;
                   entryContainer.appendChild(inputDiv.firstElementChild);
                   // Verify the input was created with correct value
@@ -3726,7 +3733,7 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
                         prefillValue = replaceUrlParametersInText(matchingConditional.value);
                     }
                 }
-                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number', prefillValue);
+                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number', prefillValue, (field.type ? field.type === 'amount' : field.isAmountOption));
                 entryContainer.appendChild(inputDiv.firstElementChild);
                 // Add a <br> after the Zip input only if there are more fields after it
                 const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
@@ -7070,6 +7077,30 @@ if (s > 1){
   formHTML += `window.fileUploadQuestions = ${JSON.stringify(fileUploadQuestions || [])};\n`;
   formHTML += `window.latexPreviewQuestions = ${JSON.stringify(latexPreviewQuestions || [])};\n`;
   formHTML += `window.pdfPreviewQuestions = ${JSON.stringify(pdfPreviewQuestions || [])};\n`;
+  // A money box shows its own currency symbol so the filer can see what the
+  // box is for. The PDF prints a symbol of its own beside the field, so
+  // sending ours as well is what put "Amount: $ $100" on the DV-100. Strip a
+  // leading symbol on the way out, and only when the rest is a plain number:
+  // free text that happens to start with one is somebody's answer, not a
+  // format, and is passed through untouched.
+  formHTML += `
+  window.pdfValueForField = window.pdfValueForField || function (value) {
+    var text = (value === null || value === undefined) ? '' : String(value);
+    var trimmed = text.trim();
+    if (!trimmed) return text;
+    var symbols = '$' + String.fromCharCode(163) + String.fromCharCode(8364) + String.fromCharCode(165);
+    if (symbols.indexOf(trimmed.charAt(0)) === -1) return text;
+    var rest = trimmed.slice(1).trim();
+    var digits = 0;
+    for (var i = 0; i < rest.length; i++) {
+      var ch = rest.charAt(i);
+      if (ch >= '0' && ch <= '9') { digits++; continue; }
+      if (ch === ',' || ch === '.') continue;
+      return text;
+    }
+    return digits ? rest : text;
+  };
+  `;
   // Ensure formatCurrencyInput function is always available for amount and currency fields
   formHTML += `
   window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
@@ -9275,9 +9306,16 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
   if (window.__addressHelpersInjected) return;
   window.__addressHelpersInjected = true;
   // Create stylized address <input>
-  window.createAddressInput = function(id, label, index, type = 'text', prefill = '') {
+  window.createAddressInput = function(id, label, index, type = 'text', prefill = '', isAmountOption) {
     // Check if this is an amount field (ends with _amount or label contains "amount")
-    const isAmountField = id.includes('_amount') || (label && label.toLowerCase().includes('amount'));
+    // The schema is asked first, because a name is a weak guess about meaning.
+    // "Number or amount" on the DV-100 firearms table counts guns and rounds
+    // and is declared isAmountOption: false, but its id ends in _amount, so the
+    // guess alone printed "$100" against a column that is not money. The guess
+    // still stands in for fields built before the flag existed.
+    const isAmountField = (typeof isAmountOption === 'boolean')
+      ? isAmountOption
+      : (id.includes('_amount') || (label && label.toLowerCase().includes('amount')));
     // For amount fields, use text type with currency formatting instead of number type
     const inputType = isAmountField ? 'text' : ((type === 'number') ? 'number' : 'text');
     const placeholder = label;
@@ -12114,7 +12152,7 @@ function showTextboxLabels(questionId, count){
                 } else {
                     // Use regular input for other fields
                     const inputDiv = document.createElement('div');
-                    const inputHTML = createAddressInput(fieldId, field.label, j, 'text', prefillValue);
+                    const inputHTML = createAddressInput(fieldId, field.label, j, 'text', prefillValue, (field.type ? field.type === 'amount' : field.isAmountOption));
                     inputDiv.innerHTML = inputHTML;
                     entryContainer.appendChild(inputDiv.firstElementChild);
                     // Verify the input was created with correct value (after a slight delay)
@@ -12225,7 +12263,7 @@ function showTextboxLabels(questionId, count){
                         prefillValue = replaceUrlParametersInText(matchingConditional.value);
                     }
                 }
-                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number', prefillValue);
+                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number', prefillValue, (field.type ? field.type === 'amount' : field.isAmountOption));
                 entryContainer.appendChild(inputDiv.firstElementChild);
                 // Add a <br> after the Zip input only if there are more fields after it
                 const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
@@ -15144,7 +15182,7 @@ async function previewPdf(baseName, isUploaded, isLatex, isPdfPreview, questionI
                         value = formatDateForServer(value);
                     }
                     if (value && value.trim() !== '') {
-                        fd.append(element.name, value);
+                        fd.append(element.name, pdfValueForField(value));
                     }
                 }
             }
@@ -15380,7 +15418,7 @@ async function editAndDownloadPDF (pdfName) {
                     }
                     // Include ALL fields with values, including hidden ones
                     if (value && value.trim() !== '') {
-                        fd.append(element.name, value);
+                        fd.append(element.name, pdfValueForField(value));
 
                     } else {
 
@@ -18200,9 +18238,16 @@ if (typeof handleNext === 'function') {
         }
     });
 // Helper function to create styled address input
-function createAddressInput(id, label, index, type = 'text', prefill = '') {
+function createAddressInput(id, label, index, type = 'text', prefill = '', isAmountOption) {
     // Check if this is an amount field (ends with _amount or label contains "amount")
-    const isAmountField = id.includes('_amount') || (label && label.toLowerCase().includes('amount'));
+    // The schema is asked first, because a name is a weak guess about meaning.
+    // "Number or amount" on the DV-100 firearms table counts guns and rounds
+    // and is declared isAmountOption: false, but its id ends in _amount, so the
+    // guess alone printed "$100" against a column that is not money. The guess
+    // still stands in for fields built before the flag existed.
+    const isAmountField = (typeof isAmountOption === 'boolean')
+      ? isAmountOption
+      : (id.includes('_amount') || (label && label.toLowerCase().includes('amount')));
     // For amount fields, use text type with currency formatting instead of number type
     const inputType = isAmountField ? 'text' : (type === 'number' ? 'number' : 'text');
     const placeholder = label; // Remove the index number from placeholder

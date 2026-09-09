@@ -10,7 +10,15 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const JSZip = require('jszip');
-const { PDFDocument, StandardFonts } = require('pdf-lib');
+const {
+  PDFDocument,
+  StandardFonts,
+  defaultTextFieldAppearanceProvider,
+  pushGraphicsState,
+  popGraphicsState,
+  translate,
+  layoutMultilineText,
+} = require('pdf-lib');
 const { preparePayloadHtml, sanitizePayloadFolderName } = require('./payload-html');
 require('dotenv').config();
 const { registerAutoFormRoutes } = require('./auto-form/routes');
@@ -134,6 +142,96 @@ function findPdfFile(targetFile) {
   return null;
 }
 
+/**
+ * The size a field was told to draw its text at, or null when it is auto.
+ *
+ * Read out of the field's default-appearance string, the /Helvetica 11 Tf in
+ * "0 g\n/Helvetica 11 Tf". pdf-lib 1.17 has no accessor for it, and an
+ * auto-sized field has 0 there, which means the layout picks the size itself.
+ */
+function declaredFontSize(field) {
+  let da;
+  try {
+    da = field.acroField.getDefaultAppearance();
+  } catch (e) {
+    return null;
+  }
+  if (!da) return null;
+  const match = String(da).match(/([\d.]+)\s+Tf/);
+  if (!match) return null;
+  const size = parseFloat(match[1]);
+  return size > 0 ? size : null;
+}
+
+/**
+ * Put the first line of a multiline field on the rule the form printed.
+ *
+ * pdf-lib starts a multiline block one full line-height below the box's top
+ * edge, which is a line-height rather than an ascender: the glyphs land about
+ * (leading + descender) too low, and on a ruled form the printed rule crosses
+ * them. On the DV-100 abuse-description boxes that is 12.21pt against an
+ * ascender of 7.90pt - the text sat 4.3pt low and the rule struck through it.
+ *
+ * Only the first baseline is wrong in a fixed way, so only that is corrected:
+ * every line is lifted by the same amount. The gap between lines still comes
+ * from the font rather than from the rules on the page, so a long answer will
+ * still drift against them - a form is free to rule its lines at any pitch and
+ * nothing in the PDF says what that pitch is.
+ *
+ * An auto-sized field is left alone: the size is chosen inside the layout, so
+ * there is no size here to compute a lift from.
+ */
+function ruledLineTextAppearance(field, widget, font) {
+  const appearance = defaultTextFieldAppearanceProvider(field, widget, font);
+  if (!Array.isArray(appearance)) return appearance;
+  let multiline = false;
+  try {
+    multiline = field.isMultiline();
+  } catch (e) {
+    return appearance;
+  }
+  if (!multiline) return appearance;
+  const size = declaredFontSize(field);
+  if (!size) return appearance;
+  const lineHeight = font.heightAtSize(size) * 1.2;
+  const ascender = font.heightAtSize(size, { descender: false });
+  const wanted = lineHeight - ascender;
+  if (!(wanted > 0)) return appearance;
+
+  // Lift only into slack the box actually has. A box one line tall holds its
+  // single line against the bottom already, and raising it pushes the glyphs
+  // through the top edge, where the appearance is clipped and the text is cut
+  // in half - which is what happened to the DV-100 item 21 explanation the
+  // first time this ran. Lay the text out the way pdf-lib will to find out how
+  // many lines it needs, and keep the block inside.
+  const rect = widget.getRectangle();
+  const inset = 1;
+  const bounds = {
+    x: inset,
+    y: inset,
+    width: rect.width - inset * 2,
+    height: rect.height - inset * 2,
+  };
+  let linesUsed = 1;
+  try {
+    linesUsed = Math.max(
+      1,
+      layoutMultilineText(field.getText() || '', {
+        alignment: field.getAlignment(),
+        fontSize: size,
+        font,
+        bounds,
+      }).lines.length
+    );
+  } catch (e) {
+    return appearance;
+  }
+  const slack = bounds.height - lineHeight * linesUsed;
+  const lift = Math.min(wanted, Math.max(0, slack));
+  if (!(lift > 0)) return appearance;
+  return [pushGraphicsState(), translate(0, lift), ...appearance, popGraphicsState()];
+}
+
 app.post('/edit_pdf', async (req, res) => {
   try {
     let pdfBytes;
@@ -162,6 +260,8 @@ app.post('/edit_pdf', async (req, res) => {
     const form = pdfDoc.getForm();
     const helv = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
+    const fieldNames = new Set(form.getFields().map((field) => field.getName()));
+
     form.getFields().forEach((field) => {
       const key = field.getName();
       const value = req.body[key];
@@ -182,7 +282,7 @@ app.post('/edit_pdf', async (req, res) => {
             break;
           case 'PDFTextField':
             field.setText(String(value));
-            field.updateAppearances(helv);
+            field.updateAppearances(helv, ruledLineTextAppearance);
             break;
           default:
             if (typeof field.setText === 'function') {
@@ -197,6 +297,23 @@ app.post('/edit_pdf', async (req, res) => {
         console.warn(`Field ${key}:`, error.message);
       }
     });
+
+    // An answer sent to a PDF that has no field of that name is simply lost.
+    // That is normal for the interview's own working fields, and it is not
+    // normal when a repeating block can produce more entries than the form has
+    // rows: the DV-100 asks for up to six firearms and the DV-110 table holds
+    // four, so entries five and six went nowhere and nothing said so.
+    const unmatched = Object.keys(req.body || {}).filter((key) => !fieldNames.has(key));
+    if (unmatched.length) {
+      const numbered = unmatched.filter((key) => /_\d+(_|$)/.test(key));
+      console.log(
+        `[edit_pdf] ${outputName}: ${unmatched.length} submitted value(s) had no field ` +
+        `in this PDF` + (numbered.length ? ` (${numbered.length} of them numbered, ` +
+          `which is what an overflowing repeating block looks like)` : '')
+      );
+      if (numbered.length) console.log(`[edit_pdf]   numbered: ${numbered.join(
+)}`);
+    }
 
     const edited = await pdfDoc.save();
     res
