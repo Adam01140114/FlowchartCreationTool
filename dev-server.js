@@ -300,6 +300,28 @@ app.post('/api/dev-save', (req, res) => {
   }
 });
 
+/**
+ * Save generated form HTML next to the builder, so a generated page can be
+ * opened as a real document with its own console rather than only inside an
+ * about:srcdoc iframe. Dev-only: the name is reduced to a bare filename
+ * under "FormWiz GUI", so it cannot be steered outside the repo.
+ */
+app.post('/api/dev-save-html', (req, res) => {
+  const name = path.basename(String((req.body && req.body.name) || ''));
+  if (!name.endsWith(String.fromCharCode(46)+'html') || name.length < 6) {
+    return res.status(400).json({ error: 'name must be a plain .html filename' });
+  }
+  const html = String((req.body && req.body.html) || '');
+  if (!html.trim()) return res.status(400).json({ error: 'no html' });
+  const target = path.join(FORM_WIZ_DIR, name);
+  try {
+    fs.writeFileSync(target, html);
+    res.json({ saved: name, bytes: fs.statSync(target).size });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const autoFormStatus = registerAutoFormRoutes(app);
 
 app.use(express.static(ROOT));
