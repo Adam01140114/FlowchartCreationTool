@@ -6935,7 +6935,7 @@ if (s > 1){
   // Close the form & add the thank-you message
   formHTML += [
     "</form>",
-    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><span style="font-size: 0.75em; color: #666;">Your paperwork is now ready, please proceed to checkout</span><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><div id="pdfDevTools" style="display: ' + (showPdfDevTools ? 'block' : 'none') + ';"><button id="downloadPdfBtn" onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDFs</button><br><br><button id="previewPdfsBtn" onclick="showPreviewPdfsModal()" style="font-size: 1.2em;">Preview PDFs</button><br><br><button id="downloadPayloadBtn" onclick="downloadTestPayload()" style="font-size: 1.2em;">Download Payload</button><br><br></div><div id="productionCheckoutTools" style="display: ' + (showProductionCheckout ? 'block' : 'none') + ';"><button onclick="showCartModal()" style="font-size: 1.2em;">Checkout</button><br><br><button onclick="window.location.href=\'/Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div></div>',
+    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><span style="font-size: 0.75em; color: #666;">Your paperwork is now ready, please proceed to checkout</span><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><div id="pdfDevTools" style="display: ' + (showPdfDevTools ? 'block' : 'none') + ';"><button id="downloadPdfBtn" onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDFs</button><br><br><button id="previewPdfsBtn" onclick="showPreviewPdfsModal()" style="font-size: 1.2em;">Preview PDFs</button><br><br><button id="downloadPayloadBtn" onclick="downloadTestPayload()" style="font-size: 1.2em;">Download Payload</button><br><br><button id="restartFormBtn" onclick="restartForm()" style="font-size: 1.2em;">Restart Form</button><br><br></div><div id="productionCheckoutTools" style="display: ' + (showProductionCheckout ? 'block' : 'none') + ';"><button onclick="showCartModal()" style="font-size: 1.2em;">Checkout</button><br><br><button onclick="window.location.href=\'/Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div></div>',
     "</div>",
     "</section>",
     "</div>",
@@ -14288,6 +14288,11 @@ function handleNext(currentSection){
  *    that are hidden due to conditional logic
  *-----------------------------------------------------------------*/
 function resetHiddenQuestionsToDefaults(sectionNumber) {
+    // Restart Form goes back to read the answers, not to clear them. Without
+    // this, returning to section 1 wipes every question a gate is currently
+    // hiding - which after a debug fill is a good part of what you came back
+    // to look at.
+    if (window.__fwKeepAnswersOnNavigate) return;
     // Get the current section
     const currentSection = document.getElementById('section' + sectionNumber);
     if (!currentSection) {
@@ -14436,6 +14441,27 @@ function goBack(){
         }
     }
     updateProgressBar();
+}
+/*------------------------------------------------------------------
+ *  restartForm()
+ *  - back to the first section with every answer still in place.
+ *
+ *    A test-mode button. You finish the form, look at the PDFs it
+ *    produced, and want to see what you actually typed that produced
+ *    them. Clearing the form would answer a different question, so
+ *    this only navigates: nothing is written, reset or submitted.
+ *
+ *    The history stack is emptied because there is nothing behind the
+ *    first section to go back to, and leaving it would send Back to
+ *    whichever section was on it when the form finished.
+ *-----------------------------------------------------------------*/
+function restartForm(){
+    if (typeof sectionStack !== "undefined" && sectionStack && sectionStack.length){
+        sectionStack.length = 0;
+    }
+    window.__fwKeepAnswersOnNavigate = true;
+    try { navigateSection(1); }
+    finally { window.__fwKeepAnswersOnNavigate = false; }
 }
 /*──────────────── helpers ───────────────*/
 function setCurrentDate () {
