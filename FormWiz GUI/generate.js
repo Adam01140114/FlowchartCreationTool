@@ -18604,6 +18604,9 @@ function createAddressInput(id, label, index, type = 'text', prefill = '', isAmo
         <button id="fillMinimumPathBtn" style="background: linear-gradient(90deg, #7b5cff 0%, #b06ab3 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(123, 92, 255, 0.35);">
           🌱 Fill minimum path
         </button>
+        <button id="clearAllAnswersBtn" style="background: linear-gradient(90deg, #6b7785 0%, #99a3ad 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(107, 119, 133, 0.35);">
+          🧹 Clear All
+        </button>
         </div>
       </div>
     </div>
@@ -20356,6 +20359,64 @@ function resyncConditionalLogic() {
   }
 }
 
+/**
+ * Empty the form and start again at the first section.
+ *
+ * The counterpart to the two debug fills: they are how you get a form full of
+ * answers, and this is how you get back to an empty one without reloading and
+ * losing the generated page. It is a debug action, so it asks nothing and
+ * keeps nothing.
+ *
+ * Clearing the values is only half of it. A form that has been filled is also
+ * a form whose conditional logic has run - questions revealed, entry blocks
+ * built out to six rows, mirror checkboxes created for the PDF - and none of
+ * that comes undone just because the boxes are blank. So every control is
+ * fired once after it is emptied, which runs the same handlers that built all
+ * of it and lets them take it back down.
+ *
+ * The date at the top of the form is set by the page rather than by anyone
+ * answering, and it carries data-protected to say so. It is left alone here
+ * for the same reason the autofill leaves it alone.
+ */
+function clearAllAnswers(){
+    var form = document.getElementById("customForm");
+    if (!form) return;
+    var controls = [].slice.call(form.querySelectorAll("input, textarea, select"))
+        .concat([].slice.call(document.querySelectorAll(
+            "input[form='customForm'], textarea[form='customForm'], select[form='customForm']")));
+    var hidden = document.getElementById("hidden_pdf_fields");
+    if (hidden) controls = controls.concat([].slice.call(hidden.querySelectorAll("input, textarea, select")));
+
+    var cleared = [];
+    controls.forEach(function(el){
+        if (!el || el.disabled) return;
+        if (el.getAttribute("data-protected") === "true") return;
+        if (el.type === "checkbox" || el.type === "radio"){
+            if (!el.checked) return;
+            el.checked = false;
+        } else {
+            if (String(el.value || "") === "") return;
+            el.value = "";
+        }
+        cleared.push(el);
+    });
+
+    // Let the handlers that built the revealed questions, the entry rows and
+    // the hidden mirrors run again now that there is nothing to build them from.
+    cleared.forEach(function(el){
+        try {
+            triggerFieldChange(el);
+            if (el.tagName === "SELECT") triggerSelectSideEffects(el);
+        } catch (e) { /* one stubborn field should not stop the rest */ }
+    });
+
+    if (typeof setCurrentDate === "function") setCurrentDate();
+    if (typeof applyComputedFields === "function") applyComputedFields();
+    if (typeof sectionStack !== "undefined" && sectionStack) sectionStack.length = 0;
+    navigateSection(1);
+    return cleared.length;
+}
+
 function saveSectionViewState() {
   return {
     style: (typeof window !== 'undefined' && window.__FORM_QUESTION_STYLE__)
@@ -21072,6 +21133,13 @@ document.getElementById('fillMaximumPathBtn').addEventListener('click', function
 // widest path can never show.
 document.getElementById('fillMinimumPathBtn').addEventListener('click', function() {
   fillMaximumPath({ markers: true, minimum: true });
+});
+// Back to an empty form without reloading the page, so the next path can be
+// walked from the same generated HTML.
+document.getElementById('clearAllAnswersBtn').addEventListener('click', function() {
+  var n = clearAllAnswers();
+  console.log('[debug] cleared ' + n + ' answer(s)');
+  hideDebugMenu();
 });
 // Function to create Form Name input field (to be called from the form editor interface)
 function createFormNameInput() {
