@@ -2018,9 +2018,14 @@ questionSlugMap[questionId] = slug;
       // Even if it's the first question in a section, if it has conditional logic, it must wait for conditions
       const shouldBeHidden = logicEnabled && !alwaysVisibleStacked;
       const hiddenClass = shouldBeHidden ? ' hidden' : "";
+      // Say so in the markup as well as in the class. The class is what the
+      // page looks like right now and is rewritten every time an answer
+      // changes; this is what the question IS, and it is how Clear All knows
+      // which questions to put back.
+      const conditionalAttr = shouldBeHidden ? ' data-conditional="1"' : "";
       const stepHiddenClass = (formQuestionStyle === 'question' && qIdx !== 0) ? " question-step-hidden" : "";
 
-      formHTML += `<div id="question-container-${questionId}" data-question-id="${questionId}" class="question-container question-item${hiddenClass}${stepHiddenClass}" data-section="${s}" data-question-index="${qIdx + 1}"${questionTypeAttr}>`;
+      formHTML += `<div id="question-container-${questionId}" data-question-id="${questionId}" class="question-container question-item${hiddenClass}${stepHiddenClass}" data-section="${s}" data-question-index="${qIdx + 1}"${conditionalAttr}${questionTypeAttr}>`;
       // Check if info box is enabled
       const infoBoxEnabled = qBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false;
       let infoBoxText = "";
@@ -20378,6 +20383,40 @@ function resyncConditionalLogic() {
  * answering, and it carries data-protected to say so. It is left alone here
  * for the same reason the autofill leaves it alone.
  */
+/**
+ * What a freshly loaded page keeps hidden.
+ *
+ * Two things decide it and neither is enough on its own. The generator marks a
+ * question that has a rule, because such a question waits for its rule before
+ * showing - that is data-conditional. But a page also settles on load, and a
+ * handful end up hidden for reasons the markup does not carry: four of them on
+ * the DV packet. So the set is both: what the generator marked, and what the
+ * page had hidden once it had finished loading and before anyone answered
+ * anything.
+ */
+var fwInitialHidden = null;
+function rememberFreshPageVisibility(){
+    if (fwInitialHidden) return;
+    fwInitialHidden = [];
+    document.querySelectorAll(".question-container.hidden").forEach(function(el){
+        if (el.id) fwInitialHidden.push(el.id);
+    });
+}
+if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", rememberFreshPageVisibility);
+} else {
+    rememberFreshPageVisibility();
+}
+
+function hideEverythingAFreshPageHides(){
+    document.querySelectorAll('.question-container[data-conditional="1"]')
+        .forEach(function(el){ el.classList.add("hidden"); });
+    (fwInitialHidden || []).forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.classList.add("hidden");
+    });
+}
+
 function clearAllAnswers(){
     var form = document.getElementById("customForm");
     if (!form) return;
@@ -20403,12 +20442,31 @@ function clearAllAnswers(){
 
     // Let the handlers that built the revealed questions, the entry rows and
     // the hidden mirrors run again now that there is nothing to build them from.
+    //
     cleared.forEach(function(el){
         try {
             triggerFieldChange(el);
             if (el.tagName === "SELECT") triggerSelectSideEffects(el);
         } catch (e) { /* one stubborn field should not stop the rest */ }
     });
+
+    // Then put the conditional questions back where a freshly loaded page has
+    // them: hidden. Re-firing the triggers reveals what the answers justify but
+    // does not reliably take back what earlier answers revealed - a rule is
+    // wired to its own trigger, so a gate that was already empty never runs,
+    // and firing every control instead is worse still, because an empty value
+    // matches some rules and opens more than it closes. The generator marks a
+    // question that starts hidden, and that mark is the answer: a question with
+    // a rule is hidden until its rule says otherwise, which is exactly the
+    // state this button is trying to get back to.
+    hideEverythingAFreshPageHides();
+    // Again once the page has settled. Firing a control does not finish when
+    // the call returns: some of the handlers debounce, so a question hidden
+    // here is shown again a moment later by work the clear itself started.
+    // Twice more, at the next tick and after the debounces, is enough - and
+    // re-hiding something already hidden costs nothing.
+    setTimeout(hideEverythingAFreshPageHides, 0);
+    setTimeout(hideEverythingAFreshPageHides, 400);
 
     if (typeof setCurrentDate === "function") setCurrentDate();
     if (typeof applyComputedFields === "function") applyComputedFields();
@@ -20946,6 +21004,12 @@ async function fillMaximumPath(options) {
     }
     if (typeof runAllHiddenTextCalculations === 'function') {
       runAllHiddenTextCalculations();
+    }
+    // The derived fields too. These are written on the way through the form,
+    // and a debug fill does not walk it - so without this a payload taken
+    // straight after a fill carries every answer and no page count.
+    if (typeof applyComputedFields === 'function') {
+      applyComputedFields();
     }
     const filledCount = solvable ? countSolvedFields() : countExportableFields();
     fillProgress({ text: filledCount + ' fields filled', percent: 100 });

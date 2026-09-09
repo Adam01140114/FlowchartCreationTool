@@ -79,3 +79,6 @@ pipeline-answers.json
 FormWiz GUI/*-test.html
 pipeline-answers.json
 pipeline-out/
+
+# Published page images - regenerate with pipeline-current-output.js
+Current Form Output/

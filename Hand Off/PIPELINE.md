@@ -132,6 +132,43 @@ through an answer and prints which:
 A block on the spine keeps whatever the hint says, because there zero can be a
 real answer. A hint that sets `"min": 0` behind a gate is overridden, visibly.
 
+## Publish the pages you looked at
+
+The page-image audit is the last and least skippable step, and describing what
+you saw asks the reader to take your word for it. Every full pass ends by
+copying the exact images the audit read into one folder:
+
+```bash
+node pipeline-fill.js --render
+node pipeline-current-output.js
+```
+
+```
+Current Form Output/
+  DV100/  page-01.png ... page-13.png
+  DV101/  page-01.png  page-02.png
+  ...
+  manifest.json   what the dashboard polls
+  README.txt      when, and from which answers
+```
+
+The folder is replaced rather than merged: a leftover page from an older run is
+worse than no page, because it looks current and is not. Page numbers are
+zero-padded so ten sorts after nine.
+
+`form-output-dashboard.html` shows the whole folder and re-reads it every three
+seconds, so a pass run in the terminal appears in the browser without a reload:
+
+```
+http://127.0.0.1:8080/form-output-dashboard.html
+```
+
+It polls two different things. The manifest says which forms exist and how many
+pages each has, and the layout is rebuilt only when that changes - rebuilding
+every three seconds would throw away the scroll position and flash every image
+while you are reading one. The publish timestamp goes on each image URL, so the
+browser fetches the new bytes for a page whose name did not change.
+
 ## A field the form asks for and the filer cannot know
 
 DV-100 item 32 - "enter the number of extra pages attached to this form" - was
