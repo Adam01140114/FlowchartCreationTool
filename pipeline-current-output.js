@@ -21,6 +21,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const args = process.argv.slice(2);
 const flag = (name, fallback) => {
@@ -165,6 +166,19 @@ async function main() {
         else { counts.text++; if (String(f.value).trim() !== '') counts.filled++; }
       }));
       fs.writeFileSync(path.join(target, 'fields.json'), JSON.stringify(byPage, null, 1));
+
+      // Why each blank is blank. A blank the answers account for and a blank
+      // nobody can explain look identical on a page, and only one of them is a
+      // defect - so the page should be able to say which it is looking at
+      // rather than leaving a reader to count empties and worry.
+      try {
+        const out = execFileSync(process.execPath,
+          ['pipeline-explain.js', base, '--json'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+        fs.writeFileSync(path.join(target, 'why.json'), out);
+      } catch (e) {
+        // A non-zero exit means it found a defect and still printed the JSON.
+        if (e && e.stdout) fs.writeFileSync(path.join(target, 'why.json'), e.stdout);
+      }
     }
 
     manifest.forms.push({ name: folderNameFor(base), pages: pages.length, fields: counts });

@@ -132,6 +132,13 @@
   }
   figcaption .copy-page:hover { color: var(--accent); border-color: var(--accent); }
   figcaption .copy-page.done { color: var(--ok); border-color: var(--ok); }
+  .row .why {
+    grid-column: 1 / -1; font-size: 11.5px; color: var(--muted);
+    padding-left: 2px; margin-top: 1px;
+  }
+  .row.unexplained { background: rgba(192, 83, 47, .07); }
+  .row.unexplained .k { color: #c0532f; font-weight: 650; }
+  .ok { color: var(--ok); font-weight: 650; }
   .miss { color: #c0532f; font-weight: 650; }
   @media (prefers-color-scheme: dark) { .miss { color: #f08a63; } }
   .project-pick {
@@ -313,13 +320,29 @@ function build(manifest) {
  * and Save controls and the form-number links, and including them would pad
  * every page with rows nobody can act on.
  */
-function pageDataFor(form, page, byPage) {
+function pageDataFor(form, page, byPage, why) {
+  const reasons = (why && why.fields) || {};
   const fields = ((byPage && byPage[page]) || [])
     .filter(function (f) { return f.kind !== 'button'; })
-    .map(function (f) { return { name: f.name, kind: f.kind, value: f.value }; });
-  const counts = { fields: fields.length, empty: 0, text: 0, filled: 0, checkbox: 0, ticked: 0 };
+    .map(function (f) {
+      const row = { name: f.name, kind: f.kind, value: f.value };
+      const reason = isBlank(f) ? reasons[f.name] : null;
+      // Why it is empty travels with it: the copied page is usually the start
+      // of a question about a blank, and the answer is often already known.
+      if (reason && reason.verdict === 'closed') {
+        row.emptyBecause = reason.gate
+          ? (reason.gate + (reason.wanted ? ' — needed "' + reason.wanted + '"' : ''))
+          : 'an answer closed this branch';
+      } else if (reason && reason.verdict === 'defect') {
+        row.emptyBecause = 'UNEXPLAINED';
+      }
+      return row;
+    });
+  const counts = { fields: fields.length, empty: 0, unexplained: 0, text: 0, filled: 0,
+    checkbox: 0, ticked: 0 };
   fields.forEach(function (f) {
     if (isBlank(f)) counts.empty++;
+    if (f.emptyBecause === 'UNEXPLAINED') counts.unexplained++;
     if (f.kind === 'checkbox') { counts.checkbox++; if (f.value === true) counts.ticked++; }
     else { counts.text++; if (!isBlank(f)) counts.filled++; }
   });
@@ -340,7 +363,8 @@ function copyPageButton(form, n) {
   btn.addEventListener('click', async function (e) {
     e.stopPropagation();
     const byPage = await fieldsFor(form, currentStamp);
-    const json = JSON.stringify(pageDataFor(form, n, byPage), null, 2);
+    const why = await whyFor(form, currentStamp);
+    const json = JSON.stringify(pageDataFor(form, n, byPage, why), null, 2);
     const done = function (ok) {
       btn.textContent = ok ? 'Copied' : 'Press Ctrl+C';
       btn.className = 'copy-page' + (ok ? ' done' : '');
@@ -380,20 +404,27 @@ function pagePanel(form, n) {
   const rows = el('div', { class: 'rows' });
   wrap.append(summary, rows);
 
-  const paint = function (fields) {
+  const paint = function (fields, why) {
+    const reasons = (why && why.fields) || {};
     const mine = (fields && fields[n]) || [];
     const real = mine.filter(function (f) { return f.kind !== 'button'; });
     const blank = real.filter(isBlank);
+    const unexplained = blank.filter(function (f) {
+      return f.kind !== 'checkbox' && reasons[f.name] && reasons[f.name].verdict === 'defect';
+    });
+    // An empty field is only worth alarm when nothing accounts for it.
     summary.lastChild.textContent = real.length + ' fields'
-      + (blank.length ? ' · ' + blank.length + ' empty' : '');
-    summary.lastChild.className = blank.length ? 'miss' : '';
+      + (blank.length ? ' · ' + blank.length + ' empty' : '')
+      + (blank.length ? (unexplained.length
+          ? ' · ' + unexplained.length + ' unexplained' : ' · all accounted for') : '');
+    summary.lastChild.className = unexplained.length ? 'miss' : (blank.length ? 'ok' : '');
     rows.textContent = '';
     if (!real.length) {
       rows.appendChild(el('p', { class: 'empty' }, [text('No fields on this page.')]));
       return;
     }
     blank.concat(real.filter(function (f) { return !isBlank(f); })).forEach(function (f) {
-      rows.appendChild(fieldRow(f));
+      rows.appendChild(fieldRow(f, reasons));
     });
   };
 
@@ -401,7 +432,8 @@ function pagePanel(form, n) {
   wrap.addEventListener('toggle', function () {
     if (!wrap.open || paintedFor === currentStamp) return;
     paintedFor = currentStamp;
-    fieldsFor(form, currentStamp).then(paint);
+    Promise.all([fieldsFor(form, currentStamp), whyFor(form, currentStamp)])
+      .then(function (both) { paint(both[0], both[1]); });
   });
   wrap.dataset.form = form;
   wrap.dataset.page = String(n);
@@ -414,16 +446,27 @@ function isBlank(f) {
     : String(f.value == null ? '' : f.value).trim() === '';
 }
 
-function fieldRow(f) {
+function fieldRow(f, why) {
   const blank = isBlank(f);
   const value = el('span', { class: 'v' + (f.kind === 'checkbox' ? (f.value ? ' on' : ' off') : '') });
   value.textContent = f.kind === 'checkbox'
     ? (f.value ? 'ticked' : 'not ticked')
     : (blank ? '(empty)' : String(f.value));
-  return el('div', { class: 'row' + (blank ? ' blank' : '') }, [
+
+  const reason = blank && why ? why[f.name] : null;
+  const unexplained = blank && f.kind !== 'checkbox' && reason && reason.verdict === 'defect';
+  const row = el('div', { class: 'row' + (blank ? ' blank' : '') + (unexplained ? ' unexplained' : '') }, [
     el('span', { class: 'k' }, [text(f.name)]),
     value
   ]);
+  if (reason && reason.verdict === 'closed' && reason.gate) {
+    row.appendChild(el('span', { class: 'why' }, [text(
+      'closed by: ' + reason.gate + (reason.wanted ? '  —  needed "' + reason.wanted + '"' : ''))]));
+  } else if (unexplained) {
+    row.appendChild(el('span', { class: 'why' }, [text(
+      'nothing accounts for this being empty')]));
+  }
+  return row;
 }
 
 /** One fetch of a form's field data per publish, shared by its pages. */
@@ -437,6 +480,26 @@ function fieldsFor(form, stamp) {
       .catch(function () { return {}; });
   }
   return fieldCache[key];
+}
+
+/**
+ * Why each blank is blank.
+ *
+ * An empty field on a court form is either an answer having closed the branch
+ * it belongs to, or a defect - and on the page they look the same. Counting
+ * empties without saying which is which is how DV-105 page 6 reads as seventy
+ * missing answers when it is one branch the filer did not take.
+ */
+const whyCache = {};
+function whyFor(form, stamp) {
+  const key = form + '@' + stamp;
+  if (!whyCache[key]) {
+    whyCache[key] = fetch(ROOT + '/' + form + '/why.json?v=' + encodeURIComponent(stamp),
+      { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .catch(function () { return { fields: {} }; });
+  }
+  return whyCache[key];
 }
 
 /**
@@ -642,7 +705,9 @@ async function poll() {
         loadFields(d.dataset.form, d.querySelector('.panes'), manifest.publishedAt);
       });
       document.querySelectorAll('details.page[open]').forEach(function (d) {
-        fieldsFor(d.dataset.form, manifest.publishedAt).then(d.__paint);
+        Promise.all([fieldsFor(d.dataset.form, manifest.publishedAt),
+                     whyFor(d.dataset.form, manifest.publishedAt)])
+          .then(function (both) { d.__paint(both[0], both[1]); });
       });
     }
 

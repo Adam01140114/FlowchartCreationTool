@@ -233,6 +233,23 @@ about page two - and a list that buries the empties reads as though everything
 is fine. DV-110 page 2 says "28 fields · 27 empty", which is exactly right for
 a page that belongs to the judge.
 
+Every blank says why it is blank. `pipeline-explain.js --json` is published
+beside the fields as `why.json`, so a page reads
+
+```
+Field data      71 fields · 70 empty · all accounted for
+```
+
+in green, and each empty field names the answer that closed it. A page with a
+blank nothing accounts for says **"n unexplained"** in red and marks the rows.
+
+This is the distinction that matters and the one a page cannot show on its own:
+an empty field is either a branch the filer did not take or a defect, and they
+look identical printed. DV-105 page 6 is seventy empty fields and entirely
+correct — the filer chose supervised visits at item 11, so item 12 is filled and
+the form says in print "If you completed 12, you are done. Do not complete 13."
+Counting empties without saying which kind they are turns that into an alarm.
+
 Each page also has a **Copy page data** button, which hands the page over as
 JSON — form, page, project, the publish timestamp, counts, and every field with
 its value:

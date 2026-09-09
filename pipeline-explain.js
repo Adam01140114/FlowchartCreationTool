@@ -85,7 +85,7 @@ function gateChain(q, seen = new Set()) {
 }
 
 const empty = readback.filter((f) => f.kind === 'text' && String(f.value).trim() === '');
-console.log(BASE + ': ' + empty.length + ' empty text field(s)\n');
+if (!args.includes('--json')) console.log(BASE + ': ' + empty.length + ' empty text field(s)\n');
 
 const verdicts = { branch: [], defect: [], unmapped: [], court: [] };
 empty.forEach((f) => {
@@ -97,6 +97,37 @@ empty.forEach((f) => {
   const entry = { field: f.name, question: q.text, questionId: q.questionId, chain, closed };
   (closed ? verdicts.branch : verdicts.defect).push(entry);
 });
+
+// Machine-readable, for anything that wants to show the reason rather than
+// print it: a blank the answers account for and a blank nobody can explain
+// look identical on a page, and only one of them is a defect.
+if (args.includes('--json')) {
+  const reason = {};
+  verdicts.branch.forEach((e) => {
+    reason[e.field] = e.closed ? {
+      verdict: 'closed',
+      question: e.question || '',
+      gate: e.closed.gate || '',
+      wanted: e.closed.wanted || '',
+      given: e.closed.given == null ? null : String(e.closed.given)
+    } : { verdict: 'closed', question: e.question || '' };
+  });
+  verdicts.defect.forEach((e) => {
+    reason[e.field] = { verdict: 'defect', question: e.question || '' };
+  });
+  verdicts.unmapped.forEach((e) => { reason[e.field] = { verdict: 'unmapped' }; });
+  verdicts.court.forEach((e) => { reason[e.field] = { verdict: 'court' }; });
+  console.log(JSON.stringify({
+    form: BASE,
+    counts: {
+      empty: empty.length, closed: verdicts.branch.length,
+      defect: verdicts.defect.length, unmapped: verdicts.unmapped.length,
+      court: verdicts.court.length
+    },
+    fields: reason
+  }, null, 1));
+  process.exit(verdicts.defect.length ? 1 : 0);
+}
 
 const show = (title, list, withChain) => {
   console.log(title + ' (' + list.length + ')');
