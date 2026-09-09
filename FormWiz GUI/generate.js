@@ -13702,30 +13702,34 @@ function clearInactiveLinkedFields() {
                     tb.value = '';
                 }
             });
-            // If multiple visible textboxes have content, keep only the longest one
+            // Several visible boxes holding different answers is not a duplicate.
+            //
+            // A mirror's boxes sit in branches that exclude one another, so only one
+            // of them is ever on screen and the hidden ones are emptied above. Two of
+            // them visible at once means the link is not really a mirror - nearly
+            // always a join whose separator was lost on the way to this page - and
+            // "keep the longest" then deletes a real answer. That is what took
+            // court_name: ten characters losing to court_street_address's twenty, a
+            // tenth of a second after it was written, with nothing on screen to say so.
+            //
+            // So say what is happening and leave the answers where they are. The PDF
+            // is unaffected either way - updateLinkedFields already writes the longest
+            // of them into the target, and a real mirror's boxes hold the same text,
+            // so the longest is that same text. Deleting only ever loses something.
             const visibleTextboxesWithContent = visibleTextboxes.filter(tb => tb.value.trim() !== '');
-            const hasVisibleDateInputs = visibleTextboxesWithContent.some(tb => tb.type === 'date');
             if (visibleTextboxesWithContent.length > 1) {
-                if (linkedFieldId === 'public_date' || hasVisibleDateInputs) {
-                    return;
+                window.__fwMirrorWarned = window.__fwMirrorWarned || {};
+                if (!window.__fwMirrorWarned[linkedFieldId]) {
+                    window.__fwMirrorWarned[linkedFieldId] = true;
+                    console.warn('[linked fields] ' + linkedFieldId + ' is a mirror, but '
+                        + visibleTextboxesWithContent.length
+                        + ' of its boxes are on screen at once: '
+                        + visibleTextboxesWithContent.map(function (tb) {
+                            return tb.id + '=' + JSON.stringify(tb.value);
+                          }).join(', ')
+                        + '. Keeping all of them. If these are parts of one PDF field, the'
+                        + ' separator was lost before this form was generated.');
                 }
-                const longestTextbox = visibleTextboxesWithContent.reduce((longest, current) => 
-                    current.value.length > longest.value.length ? current : longest
-                );
-                // Clear all other visible textboxes that aren't the longest
-                visibleTextboxes.forEach(tb => {
-                    if (tb !== longestTextbox && tb.value.trim() !== '') {
-                        // The one place an answer disappears without anybody asking.
-                        console.warn('[linked fields] emptying ' + tb.id
-                            + ' (' + JSON.stringify(tb.value) + ') because the mirror ' + linkedFieldId
-                            + ' keeps the longest, which is ' + longestTextbox.id
-                            + ' (' + JSON.stringify(longestTextbox.value) + ').');
-                        if (isTargetLinkedField || isTargetPublicDateLinkedField || tb.id.indexOf('are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim') !== -1) {
-
-                        }
-                        tb.value = '';
-                    }
-                });
             }
         });
     }, 100); // 100ms delay to avoid interfering with typing
