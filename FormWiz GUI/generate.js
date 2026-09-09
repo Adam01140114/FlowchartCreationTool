@@ -13715,6 +13715,11 @@ function clearInactiveLinkedFields() {
                 // Clear all other visible textboxes that aren't the longest
                 visibleTextboxes.forEach(tb => {
                     if (tb !== longestTextbox && tb.value.trim() !== '') {
+                        // The one place an answer disappears without anybody asking.
+                        console.warn('[linked fields] emptying ' + tb.id
+                            + ' (' + JSON.stringify(tb.value) + ') because the mirror ' + linkedFieldId
+                            + ' keeps the longest, which is ' + longestTextbox.id
+                            + ' (' + JSON.stringify(longestTextbox.value) + ').');
                         if (isTargetLinkedField || isTargetPublicDateLinkedField || tb.id.indexOf('are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim') !== -1) {
 
                         }
@@ -13725,9 +13730,51 @@ function clearInactiveLinkedFields() {
         });
     }, 100); // 100ms delay to avoid interfering with typing
 }
+/**
+ * Report every linked field as this form has understood it.
+ *
+ * A link with a separator is a join: its boxes hold different halves of one
+ * PDF field. A link without one is a mirror: its boxes hold the same answer,
+ * and clearInactiveLinkedFields keeps the longest and empties the rest. The
+ * only thing telling them apart is the separator, so a join that lost it on
+ * the way here reads as a mirror and starts deleting answers a tenth of a
+ * second after they are written. Nothing on screen says so, which is why it
+ * is worth saying here.
+ */
+function reportLinkedFieldShapes() {
+  const links = (typeof linkedFields !== 'undefined' && linkedFields)
+    ? linkedFields : (window.linkedFields || []);
+  if (!links.length) return;
+  const suspect = [];
+  console.groupCollapsed('[linked fields] ' + links.length + ' link(s)');
+  links.forEach(function (link) {
+    const fields = Array.isArray(link.fields) ? link.fields : [];
+    if (typeof link.join === 'string') {
+      console.log('JOIN   ' + link.linkedFieldId + '  =  ' + fields.join(' + ')
+        + '   separator ' + JSON.stringify(link.join));
+      return;
+    }
+    console.log('MIRROR ' + link.linkedFieldId + '  =  longest of  ' + fields.join(' , '));
+    if (fields.length > 1) suspect.push(link);
+  });
+  console.groupEnd();
+  if (!suspect.length) return;
+  console.warn('[linked fields] ' + suspect.length + ' link(s) hold two or more boxes with no'
+    + ' separator, so this form reads them as copies of one answer and empties'
+    + ' all but the longest about 100ms after they are filled.');
+  suspect.forEach(function (link) {
+    console.warn('   ' + link.linkedFieldId + ' keeps the longest of: '
+      + (link.fields || []).join(' , '));
+  });
+  console.warn('   If those are different questions sharing one PDF field, the separator'
+    + ' was lost before this form was generated. Re-import the GUI JSON and'
+    + ' generate again.');
+}
+
 // Function to set up linked fields event listeners
 function setupLinkedFields() {
     if (!linkedFields || linkedFields.length === 0) return;
+    reportLinkedFieldShapes();
     // Use event delegation to handle dynamically created textboxes
     document.addEventListener('input', function(event) {
         if (event.target.tagName === 'INPUT' && event.target.type === 'text') {
@@ -19231,11 +19278,57 @@ function solveFillPath(options) {
  * class and nothing else; whether a question happens to be the step on screen
  * has no bearing on whether it will be asked.
  */
+/**
+ * Fields whose value the form works out, rather than the filer.
+ *
+ * A linked field's target holds its parts joined together, a composed address
+ * holds its street, city, state and zip, and a calculation holds its result.
+ * Every one of them is rewritten by the form whenever its inputs change, and
+ * every one of them looks like an ordinary display:none text input to a sweep
+ * over the DOM - so the debug fill wrote a marker over each, and all twelve
+ * joined boxes on the DV packet printed the marker instead of the answer.
+ *
+ * Rebuilt per sweep rather than once: a repeating block creates new targets
+ * when its count is answered, which happens while the fill is running.
+ */
+function solverComputedFieldIds() {
+  if (window.__fwComputedIds) return window.__fwComputedIds;
+  const ids = new Set();
+  const links = (typeof linkedFields !== 'undefined' && linkedFields)
+    ? linkedFields : (window.linkedFields || []);
+  links.forEach(function (link) {
+    if (link && link.linkedFieldId) ids.add(link.linkedFieldId);
+  });
+  const calcs = (typeof hiddenTextCalculations !== 'undefined' && hiddenTextCalculations)
+    ? hiddenTextCalculations : (window.hiddenTextCalculations || []);
+  calcs.forEach(function (calc) {
+    if (!calc || !calc.hiddenFieldName) return;
+    ids.add(calc.hiddenFieldName);
+    ids.add(calc.hiddenFieldName + '_breakdown');
+  });
+  document.querySelectorAll('[data-address-composite="1"]').forEach(function (el) {
+    if (el.id) ids.add(el.id);
+  });
+  window.__fwComputedIds = ids;
+  return ids;
+}
+
+/** Forget the set, because the page has just grown or lost some of them. */
+function forgetComputedFieldIds() { window.__fwComputedIds = null; }
+
+/** Is this field written by the form rather than answered by the filer? */
+function isComputedFillField(el) {
+  if (!el) return false;
+  if (el.getAttribute && el.getAttribute('data-address-composite') === '1') return true;
+  return !!(el.id && solverComputedFieldIds().has(el.id));
+}
+
 function solverFieldEligible(el) {
   if (!el || el.disabled || el.type === 'hidden') return false;
   if (!el.id && !el.name) return false;
   if (el.id && el.id.indexOf('debug') === 0) return false;
   if (el.closest('#debugMenu')) return false;
+  if (isComputedFillField(el)) return false;
   return !el.closest('.hidden');
 }
 
@@ -19396,6 +19489,7 @@ function fillSolvedPhoneSplits() {
  * what is now visible finishes them.
  */
 function fillSolvedRemainder(plan) {
+  forgetComputedFieldIds();
   // What the plan decided, and therefore what it owns. Everything else on the
   // screen belongs to this sweep - including a box that already holds
   // something, which on a signed-in page is whatever the saved draft held. A
@@ -19660,6 +19754,7 @@ function isDebugFillEligible(el) {
   if (!el.id && !el.name) return false;
   if (el.id === 'debugSearch' || el.id === 'debugTypeFilter' || (el.id && el.id.indexOf('debug') === 0)) return false;
   if (el.closest('#debugMenu')) return false;
+  if (isComputedFillField(el)) return false;
   const maxFill = !!window.__MAX_FILL_IN_PROGRESS__;
   let node = el;
   while (node && node !== document.body) {
@@ -20359,6 +20454,7 @@ async function fillMaximumPath(options) {
   }
   window.isInitialAutofill = true;
   window.__MAX_FILL_IN_PROGRESS__ = true;
+  forgetComputedFieldIds();
   // Set for the life of the page, not the life of the fill: what this has to
   // stop is a restore that has not arrived yet.
   window.__fwDebugFillRan = true;
