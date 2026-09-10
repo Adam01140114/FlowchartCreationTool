@@ -380,6 +380,24 @@ const RULES = [
     by: 'dev-server.js — ruledLineTextAppearance' },
 
   /* ---------------- working on it ---------------- */
+  { id: 'the-paper-is-on-screen', group: 'process',
+    title: 'The paper is on screen beside the flowchart',
+    says: 'The Default PDF Properties panel renders the form it names, page by page, with a View Fullscreen button. Selecting a node lights up the box on the paper that node fills, jumping to the page that box is on and naming the field in full.',
+    why: 'A question in the editor is a rectangle with a name on it, and the thing that name refers to is a box on a court form the author cannot see. Whether this is the question that prints in item 7, whether the box is a line or a paragraph, whether two questions point at the same box - all of it was knowable only by opening the PDF separately and hunting for the field by eye. A name that matches nothing on the PDF says so in red, which is the cheapest possible check that a node is wired to something real.',
+    by: 'pdf-preview.js — rendered to a canvas, not an iframe, because the highlight needs the widget rectangles drawn over the page' },
+
+  { id: 'no-redraw-can-cause-its-own-redraw', group: 'process',
+    title: 'Nothing that resizes may be watched for resizing',
+    says: 'The preview measures its width from the panel around it and redraws on window resize, never on a ResizeObserver watching the box the canvas is in.',
+    why: 'The canvas is what makes the box tall enough to need a scrollbar, and the scrollbar is what makes the box narrower - so a redraw sized to the box changed the width the next redraw would use. It ran forever and took the editor’s main thread with it. A redraw that can be caused by its own last redraw is a loop looking for somewhere to happen.',
+    by: 'pdf-preview.js — fitWidth() reads the panel; the window is the only thing here whose size is not an effect of the drawing' },
+
+  { id: 'nothing-renders-to-a-hidden-tab', group: 'process',
+    title: 'Nothing renders to a tab nobody is looking at',
+    says: 'The preview defers drawing while document.hidden, and draws what it deferred on visibilitychange. The highlight is still positioned, because the viewport is computed before the render.',
+    why: 'pdf.js drives a canvas render from requestAnimationFrame, and a hidden tab is served no frames - so the render starts, paints part of the page, and never finishes or settles its promise. Left to run, that is a task that never clears and a preview stuck half-drawn from the moment the editor is opened in a background tab.',
+    by: 'pdf-preview.js — the document.hidden check in draw(), and the visibilitychange listener' },
+
   { id: 'read-the-interview', group: 'process', num: 'Rule',
     title: 'Read the whole interview before shipping',
     says: 'Print the interview in the order a person meets it, read all of it, then answer the form in the preview and check that saying No to a gate really does remove the block behind it.',

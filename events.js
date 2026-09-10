@@ -228,6 +228,11 @@ function setupGraphEventListeners(graph) {
     if (typeof window.autoSelectConnectingEdges === 'function') {
       window.autoSelectConnectingEdges();
     }
+    // And light up the box on the paper that this node fills, which is the
+    // one thing about a node the flowchart cannot show.
+    if (typeof window.pdfPreviewHighlightCell === 'function') {
+      window.pdfPreviewHighlightCell(graph.getSelectionCell());
+    }
     // Highlight the section in the legend if a cell is selected
     const selectedCell = graph.getSelectionCell();
     if (selectedCell) {

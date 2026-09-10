@@ -353,6 +353,24 @@
       <input type="text" id="defaultPdfPriceInput" placeholder="Enter default PDF price" 
              value="" oninput="updateDefaultPdfProperties()">
     </div>
+
+    <!-- The paper this flowchart fills. Selecting a node lights up the box
+         it writes into - see pdf-preview.js. -->
+    <div class="pdf-preview-head">
+      <label>Preview</label>
+      <button type="button" id="pdfPreviewFullscreen">View Fullscreen</button>
+    </div>
+    <div id="pdfPreviewNote" class="pdf-preview-note" hidden></div>
+    <div id="pdfPreviewFieldLabel" class="pdf-preview-field" hidden></div>
+    <div id="pdfPreviewStage" hidden>
+      <canvas id="pdfPreviewCanvas"></canvas>
+      <div id="pdfPreviewLayer"></div>
+    </div>
+    <div class="pdf-preview-nav">
+      <button type="button" id="pdfPreviewPrev">&larr;</button>
+      <span id="pdfPreviewPage">&nbsp;</span>
+      <button type="button" id="pdfPreviewNext">&rarr;</button>
+    </div>
   </div>
 
   </div><!-- /#formPanel -->
@@ -762,5 +780,6 @@
 <script src="project-forms.js"></script>
 <script src="connector-nodes.js"></script>
 <script src="project-gui-export.js"></script>
+<script src="pdf-preview.js"></script>
 </body>
 </html>

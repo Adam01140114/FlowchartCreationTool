@@ -398,6 +398,10 @@ function updateDefaultPdfPropertiesUI() {
   if (nameInput) nameInput.value = defaultPdfProperties.pdfName || "";
   if (fileInput) fileInput.value = defaultPdfProperties.pdfFile || "";
   if (priceInput) priceInput.value = defaultPdfProperties.pdfPrice || "";
+  // Setting .value fires no event, so the preview beneath these inputs would
+  // sit on the last form's PDF - or on none at all, which is what switching
+  // between the forms of a project looked like.
+  if (typeof window.pdfPreviewLoad === 'function') window.pdfPreviewLoad();
 }
 /**
  * Update Default PDF Properties from UI inputs

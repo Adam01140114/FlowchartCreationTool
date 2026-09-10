@@ -153,6 +153,39 @@ The Copy link button on each rule hands you its address.
 
 The rules page and the page-image dashboard link to each other, top right.
 
+## The paper is on screen, and a node points at a box on it
+
+Under **Default PDF Properties** the editor renders the form that panel names,
+page by page, with a **View Fullscreen** button. Select a node and the box it
+fills lights up: the preview jumps to the page that box is on, outlines it, and
+prints the field name in full above the page. A node whose name matches nothing
+on the PDF says so in red.
+
+That last part is the cheapest check in the whole pipeline that a node is wired
+to something real, and until now it took an audit run to find out.
+
+It is drawn to a canvas rather than shown in an `<iframe>` because the highlight
+needs the widget rectangles, which means reading the annotations and drawing
+over them. `pdf-preview.js` indexes every widget by name on load - one name can
+be printed on several pages, and the view goes to the first.
+
+Three things about it are worth keeping in mind if it is ever touched:
+
+- **Its width comes from the panel, never from the box the canvas sits in.** The
+  canvas is what makes that box tall enough to need a scrollbar, and the
+  scrollbar is what makes it narrower, so a redraw sized to the box changed the
+  width the next redraw would use. It ran forever and took the editor's main
+  thread with it.
+- **It does not render to a hidden tab.** pdf.js drives a canvas render from
+  `requestAnimationFrame`, and a hidden tab is served no frames, so the render
+  paints part of the page and never settles its promise. It defers, and draws on
+  `visibilitychange`. The highlight still lands, because the viewport is computed
+  before the render.
+- **Loading is debounced.** Exporting the project GUI JSON walks every form,
+  which rewrites these inputs five times in a row; reading thirteen pages of
+  annotations five times to end up back where it started is seconds spent on a
+  panel nobody is looking at.
+
 ## A project knows its own name
 
 Every project JSON carries a `projectId`, minted once and preserved from then
