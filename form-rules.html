@@ -216,6 +216,24 @@ const RULES = [
     by: 'dv-packet-disqualifiers.json; pipeline-build-packet.js wires them; pipeline-disqualifiers.js --check' },
 
   /* ---------------- the packet ---------------- */
+  { id: 'overflow-brings-in-the-form', group: 'packet', num: 'Rule',
+    title: 'Running out of space is what brings in the continuation form',
+    says: 'A form is never asked whether the filer needs more space. The box is measured, and past what it prints the attachment box is ticked, the continuation form switches on, and the remainder is carried onto it. Both ends of the link are dropped from the interview.',
+    why: 'DV-100 item 7 ends with "Check this box if you need more space to describe the abuse. You can use form DV-101" — which asks someone to predict, before they have written a word, whether what they are about to say fits in a box whose size they cannot see. Nobody knows that. They need more space exactly when they have used more than the box holds, and the box has been measured.',
+    by: 'the overflow block in the hints; compile-form.js drops both ends; applyOverflowLinks and overflowSplit in the generated runtime' },
+
+  { id: 'the-continuation-carries-the-remainder', group: 'packet', num: 'Rule',
+    title: 'The continuation carries the remainder, not a copy',
+    says: 'The first box keeps what it can print and the continuation takes the rest, so the two read as one passage. The limit the filer meets is the sum of what the two boxes hold.',
+    why: 'The intent was to put the whole answer on DV-101 so the attachment reads on its own, and the paper does not allow it: DV-100 item 7 holds 1115 characters and DV-101 item 5, the box that continues it, holds 387. Copying the whole answer would print a clipped one, and a court document that is unreadable at the bottom is worse than one that is split. Nothing is lost and nothing is cut.',
+    by: 'overflowSplit() — one function for both readers, because a split computed twice drops a word between the two pages or prints it on both' },
+
+  { id: 'a-condition-lives-in-the-style', group: 'packet', num: 'Rule',
+    title: 'A connector’s condition lives in its style',
+    says: 'Whatever decides a connector — the option chosen, or the field ticked — is written into the connector cell’s style string, beside connectorTarget.',
+    why: 'The editor rebuilds a slot from the canvas, and a property set on the cell does not survive that round trip. Set as _activateWhenTicked the DV-101 rule exported as unconditional: true, which reads as "always file DV-101" — the same class of loss already fixed once for flowchart-level keys. Anything that must survive a rebuild has to live somewhere the rebuild reads.',
+    by: 'pipeline-build-packet.js writes it; connector-nodes.js reads either' },
+
   { id: 'court-use', group: 'packet', num: 'Rule 6',
     title: 'Ask only what the filer completes',
     says: 'Every Judicial Council form prints who completes what. A field marked courtUse never becomes a question and stays blank for the judge or clerk.',
@@ -283,6 +301,24 @@ const RULES = [
     why: 'All 465 text fields declare a fixed font size, so a value wider than its box is drawn and then clipped — the answer is on the page and unreadable, and nothing upstream knows, because the DOM and the payload both have the whole string. A filer stopped at the point of typing can shorten what they meant to say; one truncated afterwards cannot.',
     by: 'pipeline-capacity.js measures; the maximum path fills every measured box to exactly its capacity so the rendered page shows whether it stops cleanly' },
 
+  { id: 'measure-with-the-thing-that-draws', group: 'page', num: 'Rule',
+    title: 'Measure a box with the code that draws it',
+    says: 'A capacity is found by laying the text out with pdf-lib’s own layoutMultilineText and bisecting for the longest run that stays inside the box — over the lines the form actually ruled, using the exact string the fill will write, marker included.',
+    why: 'Four separate attempts to predict that layout were each wrong by about a line, and a line is the whole answer: width ÷ average character ignores that words do not split, so DV-101 item 5 measured 400 and printed about 350; a wrap written by hand fitted 98 characters to a line of DV-100 item 14 where pdf-lib fitted 94; box height ÷ font line height gave DV-101 item 4c nineteen lines against seventeen rules; and a plain prefix of the sample is not the string that gets written, because [end] replaces the last five characters and lengthens the closing word. Close is no use — the point of the number is that the text stops inside the box.',
+    by: 'pipeline-capacity.js — charsThatLayOut and fillOfLength; verified by filling every wrapping box to capacity and finding none over and none under' },
+
+  { id: 'fill-with-the-text-that-was-measured', group: 'page', num: 'Rule',
+    title: 'Fill with the text the capacity was measured from',
+    says: 'pipeline-capacity.js and fillToLength() in the generated runtime share one filler text verbatim, and a box that wraps is filled with it from its first word rather than from a per-field sample value.',
+    why: 'A capacity is a promise about some particular text, because these are proportional fonts and no count is right for every string. In a box that wraps, the words before the padding decide where every later line breaks — so measuring against one sample and filling with another gives up the only guarantee the number can offer, and even one leading space moves every break after it. Whether a box wraps is what the measurement says, not what the control looks like: dv101_abuse_1_witnesses is a plain input on the page and two ruled lines on the paper.',
+    by: 'the shared FILLER text; the __wraps map inside fieldCapacity, which rides along with the measurement rather than being threaded through five files' },
+
+  { id: 'a-narrow-box-still-gets-a-limit', group: 'page', num: 'Rule',
+    title: 'A box too narrow for a word still gets a limit',
+    says: 'When no whole word fits on a line, the line is measured in characters instead. No text box is left unmeasured.',
+    why: 'Fitting whole words returned zero for DV-110’s State box, zero was read as "not measured", and the field was left with no cap at all — so Wyoming printed as Wyor with nothing to say so. The narrowest box is the one that most needs the limit.',
+    by: 'pipeline-capacity.js — charsThatFit; the State box holds four characters, which is a fact about the paper that the dropdown of full state names still has to answer' },
+
   { id: 'validated-shapes-are-not-padded', group: 'page', num: 'Rule',
     title: 'A field whose content has a shape is never padded',
     says: 'A ZIP, a date, a phone, a percentage or an age is filled with a real value of that shape and neither capped-to-fill nor marker-filled.',
@@ -291,9 +327,15 @@ const RULES = [
 
   { id: 'text-sits-on-the-ruled-lines', group: 'page', num: 'Rule',
     title: 'Multi-line text is laid on the lines the form ruled',
-    says: 'A multi-line box is laid out at the pitch the form ruled it, not at the font’s line height. The pitch is the box height divided by the number of lines it holds.',
-    why: 'DV-100 item 17b is 52.4pt holding four lines, so the form ruled them 13.1pt apart against pdf-lib’s 12.21pt — 0.89pt a line, and by the fourth line the text sat on the rules. It needs no graphics parsing because a ruled box is ruled evenly, so the count that decides the pitch is the same one the printer used.',
-    by: 'dev-server.js — ruledPitchAppearance; visible only by filling every box to capacity and reading the page' },
+    says: 'The rules are read out of the page’s content stream and each baseline is put 1.6pt above one of them. Only the evenly spaced run of rules inside a box counts, and a rule on the box’s bottom edge counts.',
+    why: 'Dividing the box height by the lines it holds is close, and close compounds: DV-101 item 5 is 60.4pt over four lines, which gives 15.1pt against a real 14.0, so the first line cleared its rule and the fourth was struck through. The two filters are earned as well — a widget’s rectangle is not drawn to the ruled area, so DV-101 item 3d covered the label rule of item 3e below it and printed one sentence over another, and DV-105 item 5b is drawn so its last rule is the box’s bottom edge, which a one-point margin threw away.',
+    by: 'ruled-lines.js parses the content stream; dev-server.js harvests once per fill and lays the baselines. Where the rules cannot be read the old estimate still runs' },
+
+  { id: 'a-line-with-nowhere-to-go-says-so', group: 'page', num: 'Rule',
+    title: 'A line that will not print says so',
+    says: 'When a value lays out into more lines than the box has rules, the fill logs the field, the lines it needs and the lines it has. A clean run logs none.',
+    why: 'Text laid out past the last rule is written below the box and clipped. The value is complete in the AcroForm, the payload is complete, and only the ink is short — so every check that reads data passes and the paper is wrong. Whoever is filling the packet deserves to be told which box it was.',
+    by: 'dev-server.js — ruledPitchAppearance; six boxes were dropping a line before the measurement was fixed, and none are now' },
 
   { id: 'long-answer-next-line', group: 'page', num: 'Rule',
     title: 'A long answer runs onto the next ruled line',

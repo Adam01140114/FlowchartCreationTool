@@ -24,6 +24,48 @@ const {
   degrees,
 } = require('pdf-lib');
 const { preparePayloadHtml, sanitizePayloadFolderName } = require('./payload-html');
+const ruledLines = require('./ruled-lines');
+
+/**
+ * The printed rules of the document being filled, for the length of one fill.
+ *
+ * pdf-lib calls an appearance provider synchronously, so the page content
+ * cannot be parsed from inside it. It is read once before the fill loop and
+ * parked here instead. The loop that reads it does not await, so no two fills
+ * can see each other's.
+ */
+let currentRules = null;
+
+/**
+ * Which page each widget is on.
+ *
+ * Keyed by the annotation dictionary itself: a widget is handed to the
+ * appearance provider as a dict with no reference attached, and pdf-lib's
+ * context returns the same object for the same reference every time, so
+ * identity is the one thing the two sides share.
+ */
+function widgetPages(pdfDoc) {
+  const byDict = new Map();
+  pdfDoc.getPages().forEach((page, index) => {
+    const annots = page.node.Annots();
+    if (!annots) return;
+    annots.asArray().forEach((ref) => {
+      const dict = pdfDoc.context.lookup(ref);
+      if (dict) byDict.set(dict, index);
+    });
+  });
+  return byDict;
+}
+
+/** The rules inside one widget's rectangle, top to bottom. */
+function rulesUnder(widget) {
+  if (!currentRules || !widget || !widget.dict) return [];
+  const index = currentRules.pageOf.get(widget.dict);
+  if (index === undefined) return [];
+  const page = currentRules.pages[index];
+  if (!page) return [];
+  return ruledLines.linesInBox(page, widget.getRectangle());
+}
 require('dotenv').config();
 const { registerAutoFormRoutes } = require('./auto-form/routes');
 
@@ -327,13 +369,24 @@ function spillOntoContinuationLines(pdfDoc, form, body, font) {
 function ruledPitchAppearance(field, widget, font, size) {
   const rectangle = widget.getRectangle();
   const lineHeight = font.heightAtSize(size) * 1.2;
-  const lines = Math.floor((rectangle.height - 2) / lineHeight);
+
+  // The rules the form printed, if they can be read. Their pitch is the
+  // form's own and needs no inferring - which matters because inferring it
+  // was wrong by more than a point on DV-101 item 5: the box divided by the
+  // lines that fit gives 15.1pt against a real 14.0, so the first line
+  // cleared its rule, the second touched it and the fourth was struck
+  // through. Reading them is exact, and exact for any form rather than for
+  // the ones whose height happens to divide.
+  const printed = rulesUnder(widget);
+  const lines = printed.length >= 2
+    ? printed.length
+    : Math.floor((rectangle.height - 2) / lineHeight);
   if (lines < 2) return null;
 
   const pitch = rectangle.height / lines;
   // Only worth doing when the paper and the font actually disagree; below a
   // quarter point the correction is noise and the default is fine.
-  if (Math.abs(pitch - lineHeight) < 0.25) return null;
+  if (printed.length < 2 && Math.abs(pitch - lineHeight) < 0.25) return null;
 
   let text = "";
   try { text = field.getText() || ""; } catch (e) { return null; }
@@ -351,9 +404,27 @@ function ruledPitchAppearance(field, widget, font, size) {
 
   // The ascender clears the rule; a little more keeps the descenders of one
   // line off the rule of the next.
+  // A line that has nowhere to go is drawn nowhere, and says so.
+  //
+  // Text laid out past the last rule is written below the box and clipped:
+  // the value is complete in the AcroForm, the payload is complete, and only
+  // the ink is short - so every check that reads data passes and the paper is
+  // wrong. Whoever is filling this deserves to be told which box it was.
+  if (laid.lines.length > lines) {
+    console.log('[edit_pdf] "' + field.getName() + '" needs '
+      + laid.lines.length + ' lines and the box has ' + lines
+      + '; the last ' + (laid.lines.length - lines) + ' will not print');
+  }
+
   const ascender = font.heightAtSize(size, { descender: false });
+  // A baseline sits just above its rule - far enough that the rule is not
+  // touching the glyphs, close enough that the text is clearly written on
+  // that line rather than floating between two.
+  const SIT = 1.6;
   const restack = laid.lines.slice(0, lines).map((line, i) => Object.assign({}, line, {
-    y: rectangle.height - (i + 1) * pitch + (pitch - ascender) / 2 + 0.6,
+    y: printed.length >= 2
+      ? printed[i] - rectangle.y + SIT
+      : rectangle.height - (i + 1) * pitch + (pitch - ascender) / 2 + 0.6,
   }));
 
   // Two arguments, and the font named the way the appearance stream names it:
@@ -501,6 +572,13 @@ app.post('/edit_pdf', async (req, res) => {
     const helv = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
     const fieldNames = new Set(form.getFields().map((field) => field.getName()));
+
+    // Read the printed rules before the fill loop, which is synchronous and
+    // so cannot do it itself.
+    currentRules = {
+      pages: await ruledLines.harvest(pdfBytes, outputName),
+      pageOf: widgetPages(pdfDoc),
+    };
 
     const spill = spillOntoContinuationLines(pdfDoc, form, req.body || {}, helv);
     spill.spilled.forEach((s) => console.log(

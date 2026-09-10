@@ -416,6 +416,9 @@ function reportGroupProblems(merged) {
     const computedBefore = forms.map(function (f) {
       return (f.flowchart && f.flowchart.computedFields) || [];
     });
+    const overflowBefore = forms.map(function (f) {
+      return (f.flowchart && f.flowchart.overflowLinks) || [];
+    });
     const perForm = [];
 
     for (let i = 0; i < forms.length; i++) {
@@ -428,7 +431,8 @@ function reportGroupProblems(merged) {
         // computed fields are properties of the form itself, so they are
         // taken from the flowchart the project is holding.
         flowchart: forms[i].flowchart || null,
-        computedFields: computedBefore[i]
+        computedFields: computedBefore[i],
+        overflowLinks: overflowBefore[i]
       });
     }
 
@@ -557,6 +561,9 @@ function reportGroupProblems(merged) {
     merged.projectForms = ranges;
     // Fields the form asks for that no question can answer, gathered from
     // every form in the packet.
+    merged.overflowLinks = perForm.reduce(function (all, entry) {
+      return all.concat((entry.overflowLinks) || []);
+    }, []);
     merged.computedFields = perForm.reduce(function (all, entry) {
       const own = entry.computedFields || [];
       return all.concat(own);

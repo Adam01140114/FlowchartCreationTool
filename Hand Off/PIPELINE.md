@@ -383,11 +383,49 @@ chain, because the filler spills onto them.
 
 **A character count is an approximation, and the docs should say so.** These are
 proportional fonts — at 11pt Helvetica a `W` is 10.38pt and an `i` is 2.44pt, so
-no single number is right for every string. The reference width is measured from
-a corpus of what people actually write on these forms (names, streets, cities,
-dates, short sentences) rather than from English prose, which runs narrower and
-would spend its error in the direction that clips. Answers in block capitals are
-the case that can still run long.
+no single number is right for every string. The number says how much of *one*
+text fits: a corpus of what people actually write on these forms (names,
+streets, cities, dates, short sentences) rather than English prose, which runs
+narrower and would spend its error in the direction that clips. Answers in block
+capitals are the case that can still run long.
+
+**It is measured by laying the text out, not by dividing by an average.** An
+average is what a character costs; it is not what a line holds, because a word
+does not split across a line break and every line therefore ends early by part
+of a word. Worse, the measurement has to agree with the thing that draws — so it
+calls pdf-lib's own `layoutMultilineText` and bisects for the longest run that
+stays inside the box. Four separate attempts at predicting that layout were each
+wrong by about one line:
+
+| what was measured | what was drawn | result |
+| --- | --- | --- |
+| width ÷ average character | pdf-lib wraps on words | DV-101 item 5 measured 400, printed ~350 |
+| a wrap written here | pdf-lib's wrap | DV-100 item 14: 98 chars/line here, 94 there |
+| box height ÷ font line height | the rules the form printed | DV-101 item 4c: 19 lines measured, 17 ruled |
+| a plain prefix of the sample | the sample with `[end]` welded on | the marker lengthens the last word by five characters |
+
+So the capacity is the length of the string the fill will actually write,
+counted over the lines the form actually ruled. `pipeline-capacity.js` and
+`fillToLength()` in `FormWiz GUI/generate.js` therefore share one filler text
+verbatim — the runtime is emitted as a template literal and can require nothing,
+so the two copies are kept in step by hand and each names the other.
+
+**A box too narrow for a whole word still gets a limit.** Fitting whole words
+returned zero for DV-110's `State` box, which was read as "not measured" and
+left uncapped — so "Wyoming" printed as "Wyor" with nothing to say so. A line
+that takes no word now takes as many characters as fit and ends the run. (That
+box holds four characters, which is a fact about the paper: a state chosen from
+a dropdown of full names cannot fit it, and the mapping wants deciding.)
+
+**Which boxes wrap travels with the measurement**, under a reserved `__wraps`
+key inside `fieldCapacity`, because whether a box wraps is part of measuring it
+and a second map would have to be threaded by hand through the project file,
+the editor, the GUI export, the builder's round trip and the emitted runtime.
+The maximum path uses it to decide whether to keep its sample seed: in a box
+that wraps, the words before the padding decide where every later line breaks,
+so the fill has to be the text the capacity was measured from. Keying that off
+`<textarea>` was wrong — `dv101_abuse_1_witnesses` is a plain input on the page
+and two ruled lines on the paper.
 
 Two things are deliberately left alone. A field whose **content** has a shape —
 a ZIP, a date, a phone, a percentage — is never padded or capped-to-fill: a ZIP
@@ -403,9 +441,12 @@ those look identical; the marker settles it at a glance. It earned its keep
 immediately — the first run printed `uvwxyz[en` on DV-100 item 16b, which is
 how the chain allowance below was found.
 
-A chain of ruled lines loses a word at each join: capacity is counted in
-characters and spent in words, and a word will not split across a line, so
-summing the lines exactly over-counts.
+The two halves of an overflow carry different markers — **`[cont]`** on the box
+that continues and **`[end]`** on the one that finishes — so a page audit can
+see both ends of the split printed in full.
+
+A chain of ruled lines is wrapped as one run of lines rather than summed box by
+box, so the part-word lost at each break is counted once, where it happens.
 
 **The maximum path fills every measured box to exactly its capacity**, so the
 rendered page answers the only question that matters — does the text stop
@@ -421,13 +462,96 @@ the paper is ruled at whatever pitch the form chose. DV-100 item 17b is a 52.4pt
 box holding four lines, so the form ruled them 13.1pt apart: 0.89pt a line, and
 by the fourth line the text has moved 3.6pt and sits on the rules.
 
-The pitch needs no graphics parsing, because **a ruled box is ruled evenly**: it
-is the box height divided by the number of lines the box holds — the same count
-the form's printer used to decide how many rules to draw. It lands on them by
-construction and keeps working on a form nobody has seen.
+Dividing the box height by the number of lines it holds is close, and close
+compounds. DV-101 item 5 is 60.4pt over four lines, which gives 15.1pt against a
+real pitch of 14.0: the first line cleared its rule, the second touched it, and
+the fourth was struck through.
 
-Filling every box to capacity is what made this visible. With one short line in
-a four-line box there was nothing to drift.
+So **the rules are read rather than inferred**. `ruled-lines.js` walks the
+page's content stream, keeps every horizontal segment (stroked lines and
+rectangles filled thin enough to read as one), and returns the ones inside a
+given box. `dev-server.js` harvests them once per fill — the appearance provider
+is called synchronously and cannot parse anything itself — and puts each
+baseline 1.6pt above its rule.
+
+Two filters earn their place:
+
+- **Only the evenly spaced run counts.** A widget's rectangle is not drawn to
+  the ruled area and often reaches past it. DV-101 item 3d's box covers the
+  label rule of item 3e below it, and both run its full width; counted as
+  writing lines they gave the box six lines where it has four, and two
+  baselines landed 4.7pt apart — one sentence printed over another. A form rules
+  a box at one pitch, so the longest consecutive run sharing the commonest gap
+  is the box.
+- **A rule on the bottom edge is a writing line.** Both DV-105 item 5b boxes are
+  drawn so their last rule is the box's bottom edge, and a one-point margin threw
+  it away, so the answer stopped on the third of four lines. Nothing here can be
+  the widget's own border: a widget draws its border in its appearance stream,
+  and this reads the page's content.
+
+Where the rules cannot be read the old height-divided-by-lines estimate still
+runs, so a form that defeats the parser is no worse off than before.
+
+**A line with nowhere to go now says so.** Text laid out past the last rule is
+written below the box and clipped: the value is complete in the AcroForm, the
+payload is complete, and only the ink is short — so every check that reads data
+passes and the paper is wrong. `dev-server` logs the field, the lines it needs
+and the lines it has. A clean run prints none.
+
+Filling every box to capacity is what made all of this visible. With one short
+line in a four-line box there was nothing to drift.
+
+## Running out of space is what brings in the continuation form
+
+DV-100 item 7 ends with *"Check this box if you need more space to describe the
+abuse. You can use form DV-101"* — and asked as a question, that is asking
+someone to predict, before they have written a word, whether what they are about
+to say will fit in a box whose size they cannot see. Nobody knows that.
+
+They need more space exactly when they have used more than the box holds, and
+the box has been measured. So the question is gone. Both ends of the link are
+dropped from the interview by the compiler, and the form simply notices:
+
+```json
+"overflow": {
+  "other_abuse_incident_details": {
+    "form": "DV-101",
+    "field": "dv101_further_abuse_description",
+    "marks": "other_abuse_incident_additional_space_attached_yes"
+  }
+}
+```
+
+Past the printable length the attachment box is ticked, DV-101 switches on, and
+what the first box cannot print is carried onto DV-101 item 5. The limit the
+filer meets is the sum of what the two boxes hold — 1115 + 387 — which is the
+extra space, honestly counted.
+
+**The continuation carries the remainder, not a copy.** The intent was to put
+the whole answer on DV-101 so the attachment reads on its own, and the paper
+does not allow it: DV-100 item 7 holds 1115 characters and DV-101 item 5, the
+box that continues it, holds 387. Copying the whole answer there would print a
+clipped one, and a court document that is unreadable at the bottom is worse than
+one that is split. The two boxes read as one passage instead, nothing is lost,
+and nothing is cut. `overflowSplit()` is one function for both readers — the
+live form writing the tail as it is typed, and the payload trimming the head on
+the way out — because a split computed twice drops a word between the two pages
+or prints it on both.
+
+Three things had to be got right for this to work at all, and each looked like
+the feature not working:
+
+- The condition lives in the **connector cell's style**, beside
+  `connectorTarget`. Set as a property on the cell it did not survive the
+  editor's canvas round trip, and the rule exported as `unconditional: true`.
+- `applyFieldCapacities` runs again every time the form grows a field, and put
+  the narrow cap back within a frame of `applyOverflowLinks` removing it. A box
+  that can spill is now skipped by that sweep.
+- The maximum path has to **go over the edge on purpose**. Stopping at what the
+  box prints leaves the continuation form switched off and its page blank, and
+  the value is built so the split lands exactly on the two boxes' limits rather
+  than wherever a word boundary falls — letting it fall put ten characters more
+  on DV-101 than DV-101 holds, which is testing the overflow by overflowing.
 
 ## A long answer runs onto the next ruled line
 
@@ -569,7 +693,7 @@ node pipeline-disqualifiers.js --check    # every declared one has an alert
 
 # 6. fill the form (debug menu: Ctrl+Shift, then "Fill maximum path"),
 #    save the answers, and produce the PDFs
-node pipeline-fill.js --render
+node pipeline-fill.js --render   # every form in the packet, not a list kept here
 node pipeline-explain.js dv110
 
 # 7. read the interview yourself. This step is not optional and no packet

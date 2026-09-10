@@ -28,6 +28,8 @@
  */
 const fs = require('fs');
 const path = require('path');
+const ruledLines = require('./ruled-lines');
+const { layoutMultilineText, TextAlignment } = require('pdf-lib');
 
 const args = process.argv.slice(2);
 const flag = (n, d) => { const i = args.indexOf('--' + n); return i >= 0 ? args[i + 1] : d; };
@@ -53,9 +55,151 @@ const CORPUS = [
   'Brother, sister, sibling, stepsibling, or sibling in-law',
 ];
 
-async function referenceCharWidth(font, size) {
-  const text = CORPUS.join(' ');
-  return font.widthOfTextAtSize(text, size) / text.length;
+/**
+ * The text a capacity is a promise about, and the text a maximum-path fill
+ * writes. They have to be the same string.
+ *
+ * A capacity says how much of *some* text fits, because these are
+ * proportional fonts and no count is right for every string. Measuring
+ * against one sample and filling with another gives up the one guarantee the
+ * number can offer: DV-100 item 14 was measured at 888 characters of this
+ * corpus and filled with 887 characters that began with a different
+ * sentence, which shifted every line break after it and needed a tenth line
+ * in a box that draws nine.
+ *
+ * Kept in step by hand with `filler` in fillToLength(), FormWiz GUI/generate.js.
+ * That copy lives inside the emitted runtime, which cannot require anything.
+ */
+const FILLER = ' Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue'
+  + ' Los Angeles 90210 06-15-2024 He came to my work and would not leave'
+  + ' until security asked him to go. She has been the only one caring for'
+  + ' the children since March.';
+// Long enough to overflow the tallest box in the packet several times over.
+const SAMPLE = FILLER.repeat(60).replace(/^ +/, '');
+
+/**
+ * How many characters of representative text fit on a given run of lines.
+ *
+ * Measured by laying the words out the way a PDF viewer will, rather than by
+ * dividing the width by an average character. The average is what a character
+ * costs; it is not what a line holds, because a word does not split across a
+ * line break and every line therefore ends early by part of a word. Over the
+ * four lines of DV-101 item 5 that was the difference between the measured
+ * 400 characters and the 350-odd that actually printed - so the box was
+ * filled to its measured capacity and the last words were clipped off the
+ * page, which is the exact failure the measurement exists to prevent.
+ *
+ * The text is the corpus, repeated: these are proportional fonts, so no count
+ * is right for every string, and the honest thing is to say which strings it
+ * is right for.
+ */
+function charsThatFit(font, size, widths) {
+  // A box drawn as one block is measured by the very function that draws it.
+  //
+  // Wrapping it here independently was close but not equal - pdf-lib fitted
+  // about 94 characters to a line of DV-100 item 14 where this fitted 98, so
+  // the box was measured at nine lines' worth of text, laid out into ten, and
+  // the tenth was drawn below the last rule where nothing is shown. Close is
+  // no use: the whole point of the number is that the text stops inside the
+  // box, and the only wrap that can promise that is the one that happens.
+  const uniform = widths.length > 1 && widths.every((w) => w === widths[0]);
+  if (uniform) return charsThatLayOut(font, size, widths[0], widths.length);
+  const words = SAMPLE.split(' ');
+  let used = 0;
+  let w = 0;
+  for (const width of widths) {
+    let line = '';
+    while (w < words.length) {
+      const next = line ? line + ' ' + words[w] : words[w];
+      if (font.widthOfTextAtSize(next, size) > width) break;
+      line = next;
+      w++;
+    }
+    if (!line) {
+      // A line too narrow for a whole word still holds characters, and a box
+      // that holds no whole word is the one that most needs a limit: DV-110's
+      // "State" box fits four characters, was measured at zero, was therefore
+      // left uncapped, and printed "Wyoming" as "Wyor" with nothing to say so.
+      //
+      // A word broken across a line break would be wrong, so this ends the run
+      // - nothing after it can be reached anyway.
+      const rest = words[w] || '';
+      let take = 0;
+      while (take < rest.length
+        && font.widthOfTextAtSize(rest.slice(0, take + 1), size) <= width) take++;
+      used += take;
+      return used;   // no separator follows: the word simply stops
+    }
+    used += line.length + 1;   // the space or break that follows it
+  }
+  return Math.max(0, used - 1);
+}
+
+/**
+ * The longest run of the sample that pdf-lib lays out within `lines` lines.
+ *
+ * Found by bisection rather than by reimplementing the layout, because the
+ * layout is the thing being predicted and any second implementation of it is
+ * a second chance to be slightly wrong.
+ */
+/**
+ * The string a maximum-path fill of length `n` actually writes.
+ *
+ * Mirrors fillToLength() in FormWiz GUI/generate.js, which cannot be shared:
+ * it lives inside the runtime that file emits as one template literal, and
+ * that runtime requires nothing. Keep the two in step.
+ *
+ * The marker is why this is needed rather than a plain slice. A fill ends in
+ * [end], which replaces the last five characters of the run - so the closing
+ * word is not the word the corpus has there, it is a partial word with a
+ * marker welded on, and an unbreakable token five characters longer than the
+ * one measured. That was worth a whole extra line in six boxes.
+ */
+function fillOfLength(length, mark) {
+  if (length < mark.length + 4) return SAMPLE.slice(0, length);
+  const room = length - mark.length;
+  let out = FILLER.replace(/^ +/, '');
+  while (out.length < room) out += FILLER;
+  out = out.slice(0, room);
+  if (out.charAt(out.length - 1) === ' ') out = out.slice(0, -1) + 'x';
+  return out + mark;
+}
+
+function charsThatLayOut(font, size, width, lines) {
+  // Both markers, because neither is the safe one. They are different lengths,
+  // so each leaves the run ending on a different character, and the last
+  // partial word breaks differently: at 877 characters DV-100 item 14 closed
+  // with [cont] in nine lines and with [end] in ten. A capacity has to hold
+  // whichever marker the fill happens to use.
+  const laysOut = (text) => layoutMultilineText(text, {
+    alignment: TextAlignment.Left,
+    fontSize: size,
+    font,
+    bounds: { x: 0, y: 0, width, height: 1e6 },
+  }).lines.length;
+  const fits = (n) => {
+    if (n <= 0) return true;
+    try {
+      return laysOut(fillOfLength(n, '[cont]')) <= lines
+        && laysOut(fillOfLength(n, '[end]')) <= lines;
+    } catch (err) {
+      // A layout that cannot be computed is a length that does not fit. A
+      // missing binding is a bug, and used to look exactly the same:
+      // layoutMultilineText was destructured inside main(), so every call here
+      // threw a ReferenceError, every length "did not fit", and all 33
+      // multi-line boxes quietly lost their capacity.
+      if (err instanceof ReferenceError || err instanceof TypeError) throw err;
+      return false;
+    }
+  };
+  let low = 0;
+  let high = Math.min(SAMPLE.length, Math.ceil(width / 2) * lines + 32);
+  if (fits(high)) return high;
+  while (low + 1 < high) {
+    const mid = Math.floor((low + high) / 2);
+    if (fits(mid)) low = mid; else high = mid;
+  }
+  return low;
 }
 
 /** The size a field declares, or null when it leaves it to the layout. */
@@ -92,7 +236,7 @@ function declaredContinuations(base) {
 }
 
 async function main() {
-  const { PDFDocument, StandardFonts } = require('pdf-lib');
+  const { PDFDocument, StandardFonts, layoutMultilineText, TextAlignment } = require('pdf-lib');
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
 
   const bases = FORMS.length ? FORMS : fs.readdirSync(PDF_DIR)
@@ -102,6 +246,11 @@ async function main() {
   const helv = await metrics.embedFont(StandardFonts.Helvetica);
 
   const capacity = {};
+  // Boxes whose text runs over more than one line. Which line a word lands on
+  // depends on every word before it, so a fill for one of these is only within
+  // its capacity if it is the text the capacity was measured from - see the
+  // note on FILLER above, and padToCapacity in FormWiz GUI/generate.js.
+  const wraps = {};
   const report = [];
 
   for (const base of bases) {
@@ -146,30 +295,46 @@ async function main() {
 
     // pdf-lib insets by a point each side and the border sits inside that.
     const PAD = 4;
-    const holds = (box, size, perChar) => {
+    // The rules the form printed, which is what the fill lays text on.
+    const rules = await ruledLines.harvest(bytes, file);
+
+    /**
+     * The width of every line a box offers, top to bottom.
+     *
+     * The count comes from the form's own rules wherever they can be read,
+     * because that is the count dev-server draws on. Dividing the height by
+     * the font's line height instead gave DV-101 item 4c nineteen lines
+     * against seventeen rules, so the box was measured two lines larger than
+     * it prints and the last of the answer - the [end] marker included - was
+     * laid out below the bottom rule and never drawn.
+     */
+    const lineWidths = (box, size) => {
       const usable = box.width - PAD;
-      if (usable <= 0) return 0;
-      const perLine = Math.max(0, Math.floor(usable / perChar));
-      if (!box.multiline) return perLine;
+      if (usable <= 0) return [];
+      if (!box.multiline) return [usable];
+      const printed = ruledLines.linesInBox(rules[box.page - 1], {
+        x: box.left, y: box.bottom, width: box.width, height: box.height,
+      });
       const lineHeight = helv.heightAtSize(size) * 1.2;
-      const lines = Math.max(1, Math.floor((box.height - 2) / lineHeight));
-      return perLine * lines;
+      const lines = printed.length >= 2
+        ? printed.length
+        : Math.max(1, Math.floor((box.height - 2) / lineHeight));
+      return new Array(lines).fill(usable);
     };
 
     for (const box of boxes) {
       const size = sizes[box.name] || 11;
-      const perChar = await referenceCharWidth(helv, size);
       const chain = (chains[box.name] || [])
         .map((n) => (byName[n] || [])[0]).filter(Boolean);
-      let chars = holds(box, size, perChar);
-      // Every join costs a word. Capacity is counted in characters and spent in
-      // words: a word will not split across a line, so each line but the last
-      // ends early by up to most of a word. Summing the lines exactly is what
-      // pushed the [end] marker off the second ruled line of DV-100 item 16b.
-      const WORD = 9;
-      chain.forEach((c) => { chars += Math.max(0, holds(c, size, perChar) - WORD); });
-      if (chain.length) chars = Math.max(0, chars - WORD);
+      // The box and the lines it spills onto are one run of lines, so they
+      // are wrapped as one - which costs a part-word at every line break,
+      // the box's own and the chain's alike, with nothing to subtract by
+      // hand afterwards.
+      let widths = lineWidths(box, size);
+      chain.forEach((c) => { widths = widths.concat(lineWidths(c, size)); });
+      const chars = charsThatFit(helv, size, widths);
       if (!chars) continue;
+      if (widths.length > 1) wraps[box.name] = widths.length;
 
       // A field printed more than once must fit in the smallest of its boxes.
       if (capacity[box.name] === undefined || chars < capacity[box.name]) {
@@ -186,8 +351,9 @@ async function main() {
   const names = Object.keys(capacity).sort();
   fs.writeFileSync(OUT, JSON.stringify({
     measuredAt: new Date().toISOString(),
-    reference: 'Helvetica, average character width over a corpus of form answers',
+    reference: 'Helvetica, laid out over a corpus of form answers',
     fields: capacity,
+    wraps: wraps,
   }, null, 1));
 
   report.slice(0, 6).forEach((line) => console.log(line));

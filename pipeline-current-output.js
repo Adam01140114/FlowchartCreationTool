@@ -269,8 +269,47 @@ async function main() {
     ? fs.statSync(answers).mtime.toISOString()
     : new Date().toISOString();
 
+  // Which fields switch another form on. A shared name says an answer travels;
+  // a connector says the answer decides whether a whole form is filed at all -
+  // DV-100 item 15 is the box that brings DV-105 into the packet, and nothing
+  // on the printed page distinguishes it from any other tick.
+  let activations = [];
+  try {
+    activations = JSON.parse(fs.readFileSync('dv-packet-gui.json', 'utf8')).formActivations || [];
+  } catch (e) { /* no export beside the packet */ }
+  const connectorFor = {};
+  activations.forEach((a) => {
+    if (!a || a.unconditional) return;
+    // Both names, not the first that exists. A checkbox option carries its own
+    // field name and a Yes/No carries the question's, and which of the two the
+    // PDF field is called differs by question - indexing only the option missed
+    // the DV-101 connector entirely.
+    [a.optionNameId, a.questionNameId].forEach((name) => {
+      if (!name) return;
+      const list = connectorFor[name] = connectorFor[name] || [];
+      if (list.some((h) => h.to === a.targetForm)) return;
+      list.push({ to: a.targetForm, answer: a.optionLabel || '' });
+    });
+  });
+
   // What each page shares with the rest of the packet.
   const links = crossReference(everyForm);
+  // A connector is recorded against the option's own name and against the
+  // question that owns it, because a checkbox option carries its own field name
+  // and a Yes/No records the question's.
+  Object.keys(links).forEach((form) => {
+    Object.keys(links[form]).forEach((page) => {
+      const found = [];
+      (everyForm[form][page] || []).forEach((f) => {
+        const hits = connectorFor[f.name]
+          || connectorFor[String(f.name).replace(/_(yes|no)$/, '')];
+        if (!hits) return;
+        hits.forEach((h) => found.push({ name: f.name, to: h.to, answer: h.answer,
+          on: f.kind === 'checkbox' ? !!f.value : String(f.value || '') !== '' }));
+      });
+      links[form][page].connectors = found;
+    });
+  });
   Object.keys(links).forEach((form) => {
     fs.writeFileSync(path.join(root, form, 'links.json'), JSON.stringify(links[form], null, 1));
   });

@@ -154,6 +154,13 @@
     grid-column: 1 / -1; font-size: 11.5px; color: var(--link); padding-left: 2px;
   }
   .row .shared.caption { color: var(--muted); }
+  .connector-bar {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline;
+    padding: 5px 10px 7px; font-size: 11.5px; color: var(--link);
+    background: var(--link-wash);
+  }
+  .connector-bar b { font-weight: 700; }
+  .connector-bar .off { color: var(--muted); }
   .miss { color: #c0532f; font-weight: 650; }
   @media (prefers-color-scheme: dark) { .miss { color: #f08a63; } }
   .project-pick {
@@ -200,8 +207,13 @@
   }
   #jsonText:focus { outline: none; }
   .viewer-nav { display: flex; gap: 8px; align-items: center; }
-  #viewer { display: flex; flex-direction: column; max-height: 96vh; }
-  #viewerImg { max-height: 62vh; }
+  /* The page is the thing being read, so it keeps its full height and the
+     dialog scrolls. Squeezing it to fit the data panels underneath made the
+     one thing you opened the viewer for the smallest thing in it. */
+  #viewer { display: flex; flex-direction: column; max-height: 96vh; overflow: hidden; }
+  #viewerScroll { overflow-y: auto; }
+  #viewerImg { max-height: none; width: min(900px, 92vw); height: auto; }
+  #viewer .bar { position: sticky; bottom: 0; z-index: 2; background: var(--paper); }
   .viewer-data {
     display: grid; gap: 12px; padding: 12px 14px 16px; overflow-y: auto;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -210,7 +222,13 @@
   .viewer-data .pane { background: var(--paper); }
   .viewer-data .rows { max-height: 22vh; }
   .viewer-data .pane.links h3 { color: var(--link); }
+  /* Back and Next are what you press over and over, so they look like it. */
+  dialog button.step {
+    border: 2px solid var(--ink); font-weight: 700; padding: 4px 14px;
+  }
+  dialog button.step:hover:not([disabled]) { background: var(--ink); color: var(--paper); }
   dialog button[disabled] { opacity: .4; cursor: default; }
+  #viewerPdf { display: block; width: min(900px, 92vw); height: 78vh; border: none; background: #fff; }
   dialog button {
     border: 1px solid var(--line); background: transparent; color: var(--ink);
     border-radius: 6px; padding: 4px 12px; cursor: pointer; font: inherit; font-size: 13px;
@@ -231,17 +249,21 @@
 </main>
 
 <dialog id="viewer">
-  <img id="viewerImg" alt="">
+  <div id="viewerScroll">
+    <img id="viewerImg" alt="">
+    <iframe id="viewerPdf" title="PDF" hidden></iframe>
+    <div id="viewerData" class="viewer-data"></div>
+  </div>
   <div class="bar">
     <span id="viewerLabel"></span>
     <span class="viewer-nav">
-      <button id="viewerPrev" title="Previous page (←)">← Back</button>
-      <button id="viewerNext" title="Next page (→)">Next →</button>
+      <button id="viewerPrev" class="step" title="Previous page (←)">← Back</button>
+      <button id="viewerNext" class="step" title="Next page (→)">Next →</button>
       <button id="viewerCopy" title="Copy this page as JSON">Copy data</button>
+      <button id="viewerPdfToggle" title="Show the PDF itself">View PDF</button>
       <button id="viewerClose">Close</button>
     </span>
   </div>
-  <div id="viewerData" class="viewer-data"></div>
 </dialog>
 
 <dialog id="jsonBox">
@@ -541,25 +563,44 @@ function summariseForm(name, stamp) {
  */
 function paintLinks(fig, form, page, links) {
   const entry = (links && links[page]) || null;
-  const old = fig.querySelector('.link-bar');
-  if (old) old.remove();
+  fig.querySelectorAll('.link-bar, .connector-bar').forEach(function (n) { n.remove(); });
   fig.classList.remove('linked');
+  if (!entry) return;
+  const anchor = fig.querySelector('details.page');
+
+  // A connector before a shared name, because it is the stronger claim: a
+  // shared name carries an answer to a form that is being filed anyway, and a
+  // connector decides whether that form is filed at all.
+  //
+  // It is also independent of sharing, which is why this comes first. DV-100
+  // page 5 is the page that brings in DV-101 and shares nothing else, so
+  // returning early on "no shared fields" hid the one connector on the packet
+  // that the overflow rule exists to trigger.
+  (entry.connectors || []).forEach(function (c) {
+    fig.classList.add('linked');
+    fig.insertBefore(el('div', { class: 'connector-bar' }, [
+      el('b', {}, [text('⇒ brings in ' + c.to)]),
+      el('span', { class: c.on ? '' : 'off' }, [text(
+        c.name + (c.answer ? ' = "' + c.answer + '"' : '')
+        + (c.on ? '' : ' — not chosen in this run'))])
+    ]), anchor);
+  });
+
   // The caption reaches every page by construction, so counting it would mark
   // all thirty-three and separate nothing. Only a name that actually travels
   // makes a page worth pointing at.
-  if (!entry || !entry.substantive) return;
+  if (!entry.substantive) return;
 
   const others = (entry.forms || []).filter(function (f) { return f !== form; });
   fig.classList.add('linked');
-  const bar = el('div', { class: 'link-bar' }, [
+  // Before the field panel, so it reads as a property of the page.
+  fig.insertBefore(el('div', { class: 'link-bar' }, [
     el('b', {}, [text('↔ ' + entry.substantive
       + (entry.substantive === 1 ? ' field shared with' : ' fields shared with'))]),
     el('span', { class: 'to' }, [text(others.length
       ? others.join(', ')
       : 'other pages of this form')])
-  ]);
-  // Before the field panel, so it reads as a property of the page.
-  fig.insertBefore(bar, fig.querySelector('details.page'));
+  ]), anchor);
 }
 
 function isBlank(f) {
@@ -921,6 +962,9 @@ function showAt(index) {
   viewerPrev.disabled = index === 0;
   viewerNext.disabled = index === pages.length - 1;
   paintViewerData(img.dataset.form, Number(img.dataset.page));
+  if (showingPdf) loadViewerPdf();
+  const scroller = document.getElementById('viewerScroll');
+  if (scroller) scroller.scrollTop = 0;
   // Keep the thumbnail behind the dialog in view, so closing leaves you where
   // you got to rather than back where you started.
   img.scrollIntoView({ block: 'center' });
@@ -985,8 +1029,19 @@ function paintViewerData(form, page) {
         conn.appendChild(row);
       });
     }
+    // Connectors first: they are about whether a form exists at all.
+    (linkEntry.connectors || []).forEach(function (c) {
+      const row = el('div', { class: 'row' }, [
+        el('span', { class: 'k' }, [text(c.name)]),
+        el('span', { class: 'v' + (c.on ? ' on' : ' off') }, [text(c.on ? 'chosen' : 'not chosen')])
+      ]);
+      row.appendChild(el('span', { class: 'shared' }, [text(
+        '⇒ brings in ' + c.to + (c.answer ? '  (when "' + c.answer + '")' : ''))]));
+      conn.insertBefore(row, conn.firstChild);
+    });
+    const total = shared.length + (linkEntry.connectors || []).length;
     host.appendChild(el('div', { class: 'pane links' }, [
-      el('h3', {}, [text('Form connections (' + shared.length + ')')]), conn
+      el('h3', {}, [text('Form connections (' + total + ')')]), conn
     ]));
   });
 }
@@ -995,6 +1050,40 @@ function open(img) {
   showAt(viewerPages().indexOf(img));
   viewer.showModal();
 }
+
+/**
+ * The picture, or the document itself.
+ *
+ * A rendered page is what you skim; the PDF is what you reach for when you
+ * want to select the text, zoom without it going soft, or check that the
+ * viewer everyone else will use shows the same thing. Same page either way -
+ * the PDF opens at the page you were looking at.
+ */
+let showingPdf = false;
+function setViewerMode(pdf) {
+  showingPdf = !!pdf;
+  const img = document.getElementById('viewerImg');
+  const frame = document.getElementById('viewerPdf');
+  const btn = document.getElementById('viewerPdfToggle');
+  img.hidden = showingPdf;
+  frame.hidden = !showingPdf;
+  btn.textContent = showingPdf ? 'View image' : 'View PDF';
+  if (showingPdf) loadViewerPdf(); else frame.removeAttribute('src');
+}
+
+function loadViewerPdf() {
+  const page = viewerPages()[viewerAt];
+  if (!page) return;
+  // The filled PDFs sit beside the images the audit published.
+  const url = 'pipeline-out/' + page.dataset.form.toLowerCase() + '-filled.pdf'
+    + '#page=' + page.dataset.page;
+  const frame = document.getElementById('viewerPdf');
+  if (frame.getAttribute('src') !== url) frame.setAttribute('src', url);
+}
+
+document.getElementById('viewerPdfToggle').addEventListener('click', function () {
+  setViewerMode(!showingPdf);
+});
 
 document.getElementById('viewerCopy').addEventListener('click', async function () {
   const img = viewerPages()[viewerAt];
@@ -1007,6 +1096,9 @@ document.getElementById('viewerCopy').addEventListener('click', async function (
   const data = pageDataFor(form, n, byPage, why);
   // The wiring travels with it: a page copied out of the viewer should carry
   // everything the viewer was showing.
+  data.connectors = ((links && links[n] && links[n].connectors) || []).map(function (c) {
+    return { name: c.name, bringsIn: c.to, whenAnswer: c.answer, chosen: !!c.on };
+  });
   data.connections = ((links && links[n] && links[n].fields) || []).map(function (s) {
     return { name: s.name, caption: !!s.caption,
       to: s.to.map(function (p) { return p.form + ' p' + p.page; }) };

@@ -151,11 +151,6 @@
         "onlyWhen": "dv101_abuse_2_epo_given_yes"
       }
     },
-    "dv101_further_abuse_description": {
-      "text": "Is there any other abuse you want the judge to know about?",
-      "type": "bigParagraph",
-      "optional": true
-    },
     "dv101_additional_pages_attached": {
       "text": "Do you need still more space, on a separate sheet?"
     },
@@ -205,5 +200,9 @@
       "question": "dv101_abuse_2_police_came",
       "why": "Item 4f, the same."
     }
-  ]
+  ],
+  "overflowTargets": [
+    "dv101_further_abuse_description"
+  ],
+  "_overflowNote": "dv101_further_abuse_description is where DV-100 item 7f spills when it outgrows its box, so DV-101 no longer asks about it - see the overflow declaration in dv100-hints.json."
 }

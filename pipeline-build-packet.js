@@ -247,7 +247,21 @@ async function main() {
         throw new Error(entry.name + ': no option "' + activation.isAnswer + '" under question "'
           + activation.whenQuestion + '" to hang the ' + target + ' connector on');
       }
-      addConnector(flowchart, target, option);
+      const id = addConnector(flowchart, target, option);
+      // A form can also arrive because a field got ticked rather than because a
+      // question was answered - which is how an attachment that exists to hold
+      // an overflow comes in, since nobody is asked whether they need it.
+      if (activation && activation.whenFieldTicked) {
+        const cell = flowchart.cells.find((c) => c.id === id);
+        // In the style, not on the cell. The editor rebuilds a slot from the
+        // canvas and an underscore property does not survive that - which is
+        // why connectorTarget lives in the style too, and why this has to.
+        if (cell) {
+          cell._activateWhenTicked = activation.whenFieldTicked;
+          cell.style += 'activateWhenTicked='
+            + encodeURIComponent(activation.whenFieldTicked) + ';';
+        }
+      }
     });
   });
 
@@ -272,9 +286,20 @@ async function main() {
   // What each PDF box can hold, measured by pipeline-capacity.js. The
   // interview is the only place a limit does any good: stopping someone at the
   // point of typing beats truncating them afterwards, or clipping the ink.
+  //
+  // Which boxes wrap rides along under a reserved key rather than as a second
+  // map, because a second map would have to be threaded by hand through the
+  // project file, the editor, the GUI export, the builder's round trip and the
+  // emitted runtime - five places to add one fact per field, and five places
+  // for it to be dropped. It is part of the same measurement, so it travels
+  // with it. No PDF field is named __wraps.
   let fieldCapacity = {};
   try {
-    fieldCapacity = JSON.parse(fs.readFileSync('dv-packet-capacity.json', 'utf8')).fields || {};
+    const measured = JSON.parse(fs.readFileSync('dv-packet-capacity.json', 'utf8'));
+    fieldCapacity = measured.fields || {};
+    if (measured.wraps && Object.keys(measured.wraps).length) {
+      fieldCapacity.__wraps = measured.wraps;
+    }
   } catch (e) { /* not measured yet - run pipeline-capacity.js */ }
 
   const project = {
@@ -290,7 +315,8 @@ async function main() {
   fs.writeFileSync(OUT, JSON.stringify(project, null, 2));
 
   console.log('packet: ' + OUT + '   project ' + projectId
-    + '   ' + Object.keys(fieldCapacity).length + ' measured box(es)');
+    + '   ' + Object.keys(fieldCapacity).filter((k) => k !== '__wraps').length
+    + ' measured box(es)');
   forms.forEach(({ entry, flowchart }) => {
     const questions = (flowchart.cells || []).filter((c) => /nodeType=question/.test(c.style || '')).length;
     const connectors = (flowchart.cells || []).filter((c) => /nodeType=connector/.test(c.style || ''));

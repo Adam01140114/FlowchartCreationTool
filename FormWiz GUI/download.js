@@ -3039,6 +3039,7 @@ function loadFormData(formData) {
     // only a stop on the way to the generated form.
     window.alertRulesConfig = Array.isArray(formData.alertRules) ? formData.alertRules : [];
     window.computedFieldsConfig = Array.isArray(formData.computedFields) ? formData.computedFields : [];
+    window.overflowLinksConfig = Array.isArray(formData.overflowLinks) ? formData.overflowLinks : [];
     window.projectIdConfig = String(formData.projectId || '');
     window.fieldCapacityConfig = formData.fieldCapacity || {};
     // Load linked fields
@@ -3219,6 +3220,9 @@ function exportForm(options) {
     }
     if (window.fieldCapacityConfig && Object.keys(window.fieldCapacityConfig).length) {
         formData.fieldCapacity = window.fieldCapacityConfig;
+    }
+    if (Array.isArray(window.overflowLinksConfig) && window.overflowLinksConfig.length > 0) {
+        formData.overflowLinks = window.overflowLinksConfig;
     }
     if (Array.isArray(window.computedFieldsConfig) && window.computedFieldsConfig.length > 0) {
         formData.computedFields = window.computedFieldsConfig;

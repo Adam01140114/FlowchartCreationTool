@@ -2,20 +2,51 @@
   "project": "DV Restraining Order Packet",
   "_comment": "Each Judicial Council form prints who completes it. DV-100 is the request and the filer completes all of it. DV-109 and DV-110 say the filer completes only items 1-2 and 1-3; the rest is the court's, and those fields are marked courtUse in the field configs so no question is ever generated for them. DV-100, DV-109 and DV-110 are always filed together, so those connectors are unconditional. DV-101 and DV-105 are attachments: the form itself says when to attach it, and the connector asks the same question the form does. DV-101 hangs off item 3's 'Do you need more space to describe the abuse?', and DV-105 off the 'Child custody and visitation' box in the list of orders requested - so a filer who wants neither never sees either interview.",
   "forms": [
-    { "name": "DV-100", "title": "DV-100 Request for Domestic Violence Restraining Order",
-      "flowchart": "dv100-flowchart.json", "pdf": "dv100.pdf",
+    {
+      "name": "DV-100",
+      "title": "DV-100 Request for Domestic Violence Restraining Order",
+      "flowchart": "dv100-flowchart.json",
+      "pdf": "dv100.pdf",
       "activates": [
-        { "form": "DV-101", "whenQuestion": "other_abuse_incident_additional_space_attached_yes", "isAnswer": "Yes" },
-        { "form": "DV-105", "whenQuestion": "orders_requested", "isAnswer": "Child custody and visitation" },
+        {
+          "form": "DV-101",
+          "whenFieldTicked": "other_abuse_incident_additional_space_attached_yes",
+          "_why": "DV-101 continues item 7f. Nobody is asked whether they need it: the box is ticked when the description outgrows its own, so the connector waits on the field rather than on an answer."
+        },
+        {
+          "form": "DV-105",
+          "whenQuestion": "orders_requested",
+          "isAnswer": "Child custody and visitation"
+        },
         "DV-109"
-      ] },
-    { "name": "DV-101", "title": "DV-101 Description of Abuse",
-      "flowchart": "dv101-flowchart.json", "pdf": "dv101.pdf" },
-    { "name": "DV-105", "title": "DV-105 Request for Child Custody and Visitation Orders",
-      "flowchart": "dv105-flowchart.json", "pdf": "dv105.pdf" },
-    { "name": "DV-109", "title": "DV-109 Notice of Court Hearing",
-      "flowchart": "dv109-flowchart.json", "pdf": "dv109.pdf", "activates": ["DV-110"] },
-    { "name": "DV-110", "title": "DV-110 Temporary Restraining Order",
-      "flowchart": "dv110-flowchart.json", "pdf": "dv110.pdf" }
+      ]
+    },
+    {
+      "name": "DV-101",
+      "title": "DV-101 Description of Abuse",
+      "flowchart": "dv101-flowchart.json",
+      "pdf": "dv101.pdf"
+    },
+    {
+      "name": "DV-105",
+      "title": "DV-105 Request for Child Custody and Visitation Orders",
+      "flowchart": "dv105-flowchart.json",
+      "pdf": "dv105.pdf"
+    },
+    {
+      "name": "DV-109",
+      "title": "DV-109 Notice of Court Hearing",
+      "flowchart": "dv109-flowchart.json",
+      "pdf": "dv109.pdf",
+      "activates": [
+        "DV-110"
+      ]
+    },
+    {
+      "name": "DV-110",
+      "title": "DV-110 Temporary Restraining Order",
+      "flowchart": "dv110-flowchart.json",
+      "pdf": "dv110.pdf"
+    }
   ]
 }

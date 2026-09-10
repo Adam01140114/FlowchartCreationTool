@@ -212,11 +212,23 @@ async function main() {
     // works it out rather than making the filer guess. DV-100 item 32 wants the
     // number of extra pages attached, and counting them is the packet's job.
     const computed = new Set();
+    // Neither end of an overflow link is a question either. The box that says
+    // an attachment is coming is ticked by the writing, and the continuation
+    // form's box holds what the writing spilled - so both are filled, and
+    // neither is asked. Reported as "no question" they read as two defects.
+    const spill = new Set();
     try {
       const chart = JSON.parse(fs.readFileSync(base + '-flowchart.json', 'utf8'));
       (chart.continuationLines || []).forEach((c) => (c.drop || []).forEach((n) => overflow.add(n)));
       (chart.computedFields || []).forEach((c) => { if (c && c.nameId) computed.add(c.nameId); });
     } catch (e) { /* no flowchart beside the packet - nothing to exempt */ }
+    try {
+      const gui = JSON.parse(fs.readFileSync(GUI, 'utf8'));
+      (gui.overflowLinks || []).forEach((o) => {
+        if (o && o.marks) spill.add(o.marks);
+        if (o && o.field) spill.add(o.field);
+      });
+    } catch (e) { /* no overflow links declared */ }
     const config = fs.existsSync(configPath) ? readFieldConfig(configPath) : [];
     const byName = new Map(config.map((c) => [c.name, c]));
 
@@ -244,6 +256,8 @@ async function main() {
     unreachable = unreachable.filter((f) => !computed.has(f.name));
     const overflowFields = unreachable.filter((f) => overflow.has(f.name));
     unreachable = unreachable.filter((f) => !overflow.has(f.name));
+    const spillFields = unreachable.filter((f) => spill.has(f.name));
+    unreachable = unreachable.filter((f) => !spill.has(f.name));
 
     report.forms.push({
       form: form.name,
@@ -255,6 +269,7 @@ async function main() {
       filerFields: filerFields.length,
       text: fields.filter((f) => f.kind === 'text').length,
       checkboxes: fields.filter((f) => f.kind === 'checkbox').length,
+      spillFields: spillFields.map((f) => f.name),
       reachable: filerFields.length - unreachable.length,
       unreachable: unreachable.map((f) => ({
         name: f.name, kind: f.kind,
@@ -532,7 +547,23 @@ async function main() {
     alwaysIncluded: form.alwaysIncluded === true,
     activatedBy: (gui.formActivations || [])
       .filter((r) => r.targetForm === form.name)
-      .map((r) => (r.unconditional ? 'unconditionally' : r.optionLabel + ' on q' + r.questionId))
+      // Three shapes, not one. A connector can hang on an option chosen in a
+      // question, or on a field being ticked with no question behind it at
+      // all - which is how an overflow brings in its continuation form. Only
+      // the first has a label and a question number, so the other printed as
+      // "activated null on qundefined".
+      .map((r) => {
+        if (r.unconditional) return 'unconditionally';
+        // A connector whose owning question could not be resolved to a number
+        // still names the option the page renders, and that is what the
+        // runtime matches on - so say that rather than "qundefined".
+        if (r.optionLabel) {
+          return '"' + r.optionLabel + '"'
+            + (r.questionId ? ' on q' + r.questionId
+               : r.optionNameId ? ' (' + r.optionNameId + ')' : '');
+        }
+        return 'when ' + (r.optionNameId || 'an unnamed field') + ' is ticked';
+      })
   }));
 
   const groups = gui.groups || [];
@@ -579,9 +610,13 @@ async function main() {
       // because the answer fit on the first line, not because nobody asked.
       console.log('      ' + f.overflowLines.length
         + ' overflow line(s), which no question fills directly - the filler spills a long answer onto them: ' + f.overflowLines.join(', '));
+    }
+    // Outside the block above, not inside it. Nested there, a form with no
+    // overflow lines never reported its computed fields at all.
     if ((f.computedFields || []).length) console.log('      ' + f.computedFields.length
       + ' computed field(s), which the form works out rather than asking: ' + f.computedFields.join(', '));
-    }
+    if ((f.spillFields || []).length) console.log('      ' + f.spillFields.length
+      + ' overflow link end(s), filled by the writing rather than by a question: ' + f.spillFields.join(', '));
     if (f.placeholderMapped.length) {
       console.log('      placeholder-mapped in field config: ' + f.placeholderMapped.length);
     }

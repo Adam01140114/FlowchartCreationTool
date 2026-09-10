@@ -190,6 +190,26 @@ function isCourtUse(field) {
  * So a computed field generates no question, exactly as a courtUse field does,
  * and the form works the number out at the moment it posts.
  */
+/**
+ * An answer that outgrows its box brings in the form that continues it.
+ *
+ * DV-100 item 7 ends with "Check this box if you need more space to describe
+ * the abuse. You can use form DV-101" - and asking that as a question is asking
+ * someone to predict, before they have written anything, whether what they are
+ * about to say will fit in a box whose size they cannot see. The answer is
+ * knowable without asking: they need more space exactly when they have used
+ * more than the box holds.
+ *
+ * So the connection is made by the writing rather than by a question. Past the
+ * measured capacity the box grows, the attachment is switched on, and the whole
+ * description is carried onto the continuation form while the first box keeps
+ * what it can print.
+ */
+function overflowLinksFrom(hints) {
+  const declared = hints.overflow || {};
+  return Object.keys(declared).map((nameId) => Object.assign({ nameId }, declared[nameId]));
+}
+
 function computedFieldsFrom(hints) {
   const declared = hints.computed || {};
   return Object.keys(declared).map((nameId) => Object.assign({ nameId }, declared[nameId]));
@@ -1509,7 +1529,14 @@ function compile(schema, hints = {}) {
   unreviewedWording.length = 0;
   const merged = Object.assign({}, schema.interview || {}, hints);
   const computed = computedFieldsFrom(merged);
+  const overflowLinks = overflowLinksFrom(merged);
   const computedNames = new Set(computed.map((c) => c.nameId));
+  // Neither end of an overflow link is a question any more. The box that says
+  // an attachment is coming is ticked by the writing, and the continuation
+  // form's box holds what the writing spilled - asking about either would put
+  // a filer's answer in competition with the form's own.
+  overflowLinks.forEach((o) => { if (o.marks) computedNames.add(o.marks); });
+  (merged.overflowTargets || []).forEach((name) => computedNames.add(name));
   const mirrored = applyMirrors(
     normalizeFields(schema).filter((f) => !computedNames.has(f.nameId)), merged);
   const { fields: kept, continuations } = applyContinuations(mirrored, merged);
@@ -1597,6 +1624,11 @@ function compile(schema, hints = {}) {
     if (drop.length) overflow.push({ keep: r.joinInto.field, drop: drop });
   });
   if (overflow.length) flowchart.continuationLines = overflow;
+  if (overflowLinks.length) {
+    flowchart.overflowLinks = overflowLinks;
+    overflowLinks.forEach((o) => notes.push(
+      'overflow link ' + o.nameId + ' -> ' + o.form + ' when it outgrows its box'));
+  }
   if (computed.length) {
     flowchart.computedFields = computed;
     computed.forEach((c) => notes.push(

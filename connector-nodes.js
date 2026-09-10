@@ -155,11 +155,19 @@
         // unconditionally - the way to say two forms always travel together.
         const option = sourceOf(c);
         const owner = option ? sourceOf(option) : null;
+        // A connector can also wait on a plain field rather than on an option.
+        // DV-101 arrives because the description outgrew its box, and the box
+        // that records it is ticked by the writing rather than answered - so
+        // there is no option node to hang the connector on, and the field
+        // itself is the condition.
+        const ticked = c._activateWhenTicked
+          || decodeTarget((/activateWhenTicked=([^;]*)/.exec(c.style || '') || [])[1] || '')
+          || '';
         out.push({
           fromForm: slot.name || ('Form ' + (formIndex + 1)),
           fromFormIndex: formIndex,
-          unconditional: !option,
-          optionNodeId: option ? (option._nameId || option.id) : null,
+          unconditional: !option && !ticked,
+          optionNodeId: option ? (option._nameId || option.id) : (ticked || null),
           optionLabel: option ? String(option.value || '').replace(/<[^>]*>/g, '').trim() : null,
           // Per-form question number, renumbered on export; the project export
           // shifts it into the merged numbering.

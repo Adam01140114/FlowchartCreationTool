@@ -1351,12 +1351,6 @@
     "has_additional_pages": {
       "text": "Did you attach additional paper or forms?"
     },
-    "other_abuse_incident_additional_space_attached_yes": {
-      "text": "Do you need more space to describe the abuse? You can attach form DV-101 or a separate sheet.",
-      "conditional": {
-        "onlyWhen": "has_other_abuse"
-      }
-    },
     "other_protected_people_additional_list_attached_yes": {
       "text": "Do you need to list more people on a separate page?",
       "conditional": {
@@ -1591,6 +1585,9 @@
       "conditional": {
         "onlyWhen": "stay_away_order_requested"
       }
+    },
+    "other_abuse_incident_additional_space_attached_yes": {
+      "courtUse": false
     }
   },
   "sections": [
@@ -2311,6 +2308,14 @@
         "dv101_additional_pages_attached",
         "dv105_children_additional_list_attached"
       ]
+    }
+  },
+  "overflow": {
+    "other_abuse_incident_details": {
+      "_why": "DV-100 item 7 ends with \"Check this box if you need more space to describe the abuse. You can use form DV-101\" - which asks a filer to predict, before writing a word, whether what they are about to say fits in a box whose size they cannot see. They need more space exactly when they have used more than the box holds, and the box has been measured.",
+      "form": "DV-101",
+      "field": "dv101_further_abuse_description",
+      "marks": "other_abuse_incident_additional_space_attached_yes"
     }
   }
 }

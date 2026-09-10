@@ -2599,7 +2599,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                               value = formatDateForServer(value);
                             }
                             if (value && value.trim() !== '') {
-                              fd.append(element.name, pdfValueForField(value));
+                              fd.append(element.name, pdfValueForNamedField(element.name, value));
                             }
                           }
                         }
@@ -2739,7 +2739,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                               value = formatDateForServer(value);
                             }
                             if (value && value.trim() !== '') {
-                              fd.append(element.name, pdfValueForField(value));
+                              fd.append(element.name, pdfValueForNamedField(element.name, value));
                               collectedFields[element.name] = value;
                             }
                           }
@@ -7094,6 +7094,14 @@ if (s > 1){
   // free text that happens to start with one is somebody's answer, not a
   // format, and is passed through untouched.
   formHTML += `
+  // An answer that spilled onto a continuation form posts only what its own box
+  // can print. Wrapped here so every payload builder gets it without four
+  // separate edits, and so the two can never disagree.
+  window.pdfValueForNamedField = function (name, value) {
+    var trimmed = (typeof overflowPostValue === "function")
+      ? overflowPostValue(name, value) : value;
+    return window.pdfValueForField(trimmed);
+  };
   window.pdfValueForField = window.pdfValueForField || function (value) {
     var text = (value === null || value === undefined) ? '' : String(value);
     var trimmed = text.trim();
@@ -9499,6 +9507,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var computedFields = ${JSON.stringify(window.computedFieldsConfig || [])};\n`;
   formHTML += `var projectId = ${JSON.stringify(window.projectIdConfig || '')};\n`;
   formHTML += `var fieldCapacity = ${JSON.stringify(window.fieldCapacityConfig || {})};\n`;
+  formHTML += `var overflowLinks = ${JSON.stringify(window.overflowLinksConfig || [])};\n`;
   formHTML += `window.__PROJECT_ID__ = projectId;\n`;
   formHTML += `var isHandlingLink = false;\n`;
   // Dynamic conditional logic for business type question to show county question
@@ -14307,6 +14316,15 @@ function applyFieldCapacities(root){
         if (!name) return;
         var cap = caps[name];
         if (!cap || cap < 1) return;
+        // A box that can spill onto a continuation form was given its own
+        // wider limit by applyOverflowLinks, and this sweep runs again every
+        // time the form grows a field. Putting the narrow cap back would undo
+        // it within a frame - which is how the maximum path came to stop at
+        // exactly the printable length and never trigger the attachment.
+        if (el.hasAttribute("data-overflow-room")) {
+            el.setAttribute("data-capacity", String(cap));
+            return;
+        }
         if (String(el.getAttribute("maxlength") || "") === String(cap)) return;
         el.setAttribute("maxlength", String(cap));
         el.setAttribute("data-capacity", String(cap));
@@ -14321,13 +14339,19 @@ function applyFieldCapacities(root){
  * would leave every field created later without one.
  */
 function watchForNewFields(){
-    applyFieldCapacities(document);
+    var sweep = function(){
+        applyFieldCapacities(document);
+        // Widening a box that spills is part of measuring it, not a separate
+        // step: the wider limit is what the capacity means for that field.
+        if (typeof applyOverflowLinks === "function") applyOverflowLinks();
+    };
+    sweep();
     if (typeof MutationObserver !== "function") return;
     var pending = false;
     var observer = new MutationObserver(function(){
         if (pending) return;
         pending = true;
-        setTimeout(function(){ pending = false; applyFieldCapacities(document); }, 60);
+        setTimeout(function(){ pending = false; sweep(); }, 60);
     });
     observer.observe(document.body, { childList: true, subtree: true });
 }
@@ -14335,6 +14359,144 @@ if (document.readyState === "loading"){
     document.addEventListener("DOMContentLoaded", watchForNewFields);
 } else {
     watchForNewFields();
+}
+
+/**
+ * Let the writing decide whether a continuation form is needed.
+ *
+ * DV-100 item 7 ends with "Check this box if you need more space to describe
+ * the abuse. You can use form DV-101" - and asked as a question that is asking
+ * someone to predict, before they have written a word, whether what they are
+ * about to say fits in a box whose size they cannot see. Nobody knows that.
+ * They need more space exactly when they have used more than the box holds,
+ * and the box has been measured, so the form can simply notice.
+ *
+ * Past the cap the box stops enforcing one, the attachment is switched on, and
+ * the whole description is carried to the continuation form. What stays behind
+ * is what the first box can actually print - so the paper is right and nothing
+ * the filer wrote is lost.
+ */
+function overflowSourceEl(link){
+    return document.getElementById(link.nameId)
+        || document.querySelector('[name="' + link.nameId + '"]');
+}
+
+/**
+ * Where the first box stops and the continuation form takes over.
+ *
+ * One function because there are two readers and they must not disagree: the
+ * live form writes the tail onto the continuation as it is typed, and the
+ * payload trims the head on the way out. A split computed twice would drop a
+ * word between the two pages or print it on both.
+ *
+ * The cut lands on a word boundary where there is one near enough, so the
+ * first box ends on a whole word with room visibly to spare - which is what a
+ * clean stop looks like, and what tells a reader it was not clipped.
+ */
+function overflowSplit(value, cap){
+    var text = String(value == null ? "" : value);
+    if (!cap || text.length <= cap) return { head: text, tail: "" };
+    var at = cap;
+    var space = text.slice(0, cap).lastIndexOf(" ");
+    if (space > cap * 0.6) at = space;
+    return { head: text.slice(0, at), tail: text.slice(at).replace(/^ +/, "") };
+}
+
+function applyOverflowLinks(){
+    var links = (typeof overflowLinks !== "undefined" && overflowLinks) ? overflowLinks : [];
+    if (!links.length) return;
+    links.forEach(function(link){
+        var el = overflowSourceEl(link);
+        if (!el) return;
+
+        // A box that can spill is never capped: the cap is what decides the
+        // spill, not what prevents it.
+        var caps = (typeof fieldCapacity !== "undefined" && fieldCapacity)
+            ? fieldCapacity : {};
+        var cap = Number(el.getAttribute("data-capacity") || 0)
+            || Number(caps[link.nameId] || 0);
+        if (!cap) return;
+
+        // How much more space the continuation actually is.
+        //
+        // The intent was to carry the whole answer over, so the attachment
+        // reads on its own. The paper does not allow it: DV-100 item 7 holds
+        // 1152 characters and DV-101 item 5, the box that continues it, holds
+        // 400. Copying the whole answer there would print a clipped one, and
+        // a court document that is unreadable at the bottom is worse than one
+        // that is split. So the continuation carries the part the first box
+        // could not print, the two boxes read as one passage, and the limit
+        // the filer meets is the sum of what the two of them hold - which is
+        // the extra space, honestly counted.
+        var room = cap + Number(caps[link.field] || 0);
+        el.setAttribute("data-overflow-cap", String(cap));
+        el.setAttribute("data-overflow-room", String(room));
+        if (String(el.getAttribute("maxlength") || "") !== String(room)) {
+            el.setAttribute("maxlength", String(room));
+        }
+
+        var full = String(el.value || "");
+        var split = overflowSplit(full, cap);
+        var over = !!split.tail;
+
+        // The box that says an attachment is coming. No question makes it any
+        // more - it is ticked by the writing - so the form creates it, the same
+        // way it creates the boxes a dropdown answer mirrors into. The
+        // activation rule finds it by name and the PDF gets its tick.
+        if (link.marks){
+            var mark = document.getElementById(link.marks);
+            if (!mark){
+                mark = document.createElement("input");
+                mark.type = "checkbox";
+                mark.id = link.marks;
+                mark.name = link.marks;
+                mark.style.display = "none";
+                var host = document.getElementById("hidden_pdf_fields")
+                    || document.getElementById("customForm");
+                if (host) host.appendChild(mark);
+            }
+            if (mark && mark.checked !== over){
+                mark.checked = over;
+                triggerFieldChange(mark);
+            }
+        }
+
+        // The continuation form gets the whole account, so it reads on its own.
+        var target = link.field ? document.getElementById(link.field) : null;
+        if (!target && link.field){
+            target = document.createElement("textarea");
+            target.id = link.field;
+            target.name = link.field;
+            target.style.display = "none";
+            var host2 = document.getElementById("hidden_pdf_fields")
+                || document.getElementById("customForm");
+            if (host2) host2.appendChild(target);
+        }
+        if (target && String(target.value || "") !== split.tail){
+            target.value = split.tail;
+            triggerFieldChange(target);
+        }
+    });
+}
+
+/**
+ * Cut the source back to what its box prints, at the moment of posting.
+ *
+ * The filer keeps seeing everything they wrote - truncating the textarea under
+ * their hands would read as the form eating their words - so the trim happens
+ * on the way out, and only because the continuation form is carrying the whole
+ * thing. The cut lands on a word boundary where it can.
+ */
+function overflowPostValue(name, value){
+    var links = (typeof overflowLinks !== "undefined" && overflowLinks) ? overflowLinks : [];
+    for (var i = 0; i < links.length; i++){
+        if (links[i].nameId !== name) continue;
+        var el = overflowSourceEl(links[i]);
+        var cap = el ? Number(el.getAttribute("data-overflow-cap") || 0) : 0;
+        if (!cap) return value;
+        return overflowSplit(value, cap).head;
+    }
+    return value;
 }
 
 function applyComputedFields(){
@@ -14386,6 +14548,7 @@ function nextSectionAcrossForms(currentSection){
 function handleNext(currentSection){
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
+    applyOverflowLinks();
     applyComputedFields();
     /* remember the place we're leaving - push BEFORE evaluating jumps */
     sectionStack.push(currentSection);
@@ -14547,6 +14710,7 @@ function navigateSection(sectionNumber, isBackNavigation = false){
         form.style.display   = 'none';
         thankYou.style.display = 'block';
         currentSectionNumber = 'end';
+        applyOverflowLinks();
         applyComputedFields();
         updateProgressBar();
         scrollFormToTop();
@@ -15549,7 +15713,7 @@ async function previewPdf(baseName, isUploaded, isLatex, isPdfPreview, questionI
                         value = formatDateForServer(value);
                     }
                     if (value && value.trim() !== '') {
-                        fd.append(element.name, pdfValueForField(value));
+                        fd.append(element.name, pdfValueForNamedField(element.name, value));
                     }
                 }
             }
@@ -15785,7 +15949,7 @@ async function editAndDownloadPDF (pdfName) {
                     }
                     // Include ALL fields with values, including hidden ones
                     if (value && value.trim() !== '') {
-                        fd.append(element.name, pdfValueForField(value));
+                        fd.append(element.name, pdfValueForNamedField(element.name, value));
 
                     } else {
 
@@ -20402,33 +20566,103 @@ function getSampleFillValue(el) {
  * path, where the question is what happens when people answer as little as they
  * can.
  */
-function padToCapacity(el, value, minimum) {
-  if (minimum) return value;
-  var cap = Number(el.getAttribute('data-capacity') || 0);
-  if (!cap || cap < 4) return value;
-  // A ZIP padded to eleven characters is not a longer ZIP, it is a wrong one,
-  // and the page would be testing the wrong thing.
-  if (hasValidatedShape(el)) return value;
-  // The last thing in the box says so.
+/**
+ * Fill a box to a length with something that reads as words and says where
+ * it stopped.
+ *
+ * A filled box that stops mid-word could be the capacity working or the ink
+ * being clipped, and on a rendered page those look the same. Ending every
+ * capacity fill with a marker settles it at a glance: if the marker is on the
+ * paper the box held everything it was given, and if it is missing or half
+ * drawn the measurement is wrong.
+ */
+function fillToLength(seed, length, mark) {
+  // A seed is kept only where it costs nothing. In a box that wraps, the
+  // words before the padding decide where every later line breaks, so a fill
+  // that opens with a sentence the measurement never saw is measuring one
+  // layout and printing another - which is how DV-100 item 14 came to need a
+  // tenth line in a nine-line box. Where the sample is the whole content,
+  // the fill is exactly the text the box was measured against.
+  var text = String(seed == null ? '' : seed);
+  if (length < mark.length + 4) return text.slice(0, length);
+  var room = length - mark.length;
+  // The same words the capacity was measured against.
   //
-  // A filled box that stops mid-word could be the capacity working or the ink
-  // being clipped, and on a rendered page those look the same. Ending every
-  // capacity fill with a marker settles it at a glance: if [end] is on the
-  // paper the box held everything it was given, and if it is missing or half
-  // drawn the measurement is wrong.
-  var MARK = '[end]';
-  if (cap < MARK.length + 4) return String(value == null ? '' : value).slice(0, cap);
-  var room = cap - MARK.length;
-  var text = String(value == null ? '' : value);
-  // Words rather than one long run, so the wrap in a multi-line box is real.
-  var filler = ' abcdefghij klmnopqrst uvwxyz 0123456789';
-  var out = text;
+  // These are proportional fonts, so a capacity is only ever a promise about
+  // some kind of text, and pipeline-capacity.js says which kind: a corpus of
+  // the names, streets, dates and short sentences these forms collect. Filling
+  // with a different alphabet tests a different promise - ' abcdefghij
+  // klmnopqrst uvwxyz 0123456789' runs about 5% wider than the corpus, so
+  // every box filled to its measured capacity clipped, and the [end] marker
+  // that exists to show a clean stop was itself the thing cut off.
+  var filler = ' Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue'
+    + ' Los Angeles 90210 06-15-2024 He came to my work and would not leave'
+    + ' until security asked him to go. She has been the only one caring for'
+    + ' the children since March.';
+  // With no seed the run starts at the filler's first word, not at its
+  // separating space - so it is character-for-character the prefix of SAMPLE
+  // that pipeline-capacity.js measured. One leading space is enough to move
+  // every line break after it.
+  var out = text || filler.replace(/^ +/, '');
   while (out.length < room) out += filler;
   out = out.slice(0, room);
   // Never end the body on a space, which would hide where the text really got
   // to, and keep one before the marker so it reads as its own word.
   if (out.charAt(out.length - 1) === ' ') out = out.slice(0, -1) + 'x';
-  return out + MARK;
+  return out + mark;
+}
+
+/**
+ * On the widest path, fill a measured box to exactly what it will hold.
+ *
+ * The point of the maximum path is to find out what breaks when everything is
+ * answered, and "Test Value" in a box that holds fifty-seven characters proves
+ * nothing about the fifty-eighth. Filled to the brim, the rendered page answers
+ * the only question that matters: does it stop cleanly at the edge, or is it
+ * cut through?
+ *
+ * The filler is left alone anywhere there is no measurement, and on the minimum
+ * path, where the question is what happens when people answer as little as they
+ * can.
+ */
+function padToCapacity(el, value, minimum) {
+  if (minimum) return value;
+  var cap = Number(el.getAttribute('data-capacity') || 0);
+  var room = Number(el.getAttribute('data-overflow-room') || 0);
+  if (!cap || cap < 4) return value;
+  // A ZIP padded to eleven characters is not a longer ZIP, it is a wrong one,
+  // and the page would be testing the wrong thing.
+  if (hasValidatedShape(el)) return value;
+
+  // A box that spills is filled past its own edge on purpose. Stopping at what
+  // it prints would leave the continuation form switched off and its page
+  // blank, and the one thing the maximum path exists to show is what happens
+  // when every branch is taken.
+  //
+  // The value is built so that overflowSplit cuts it exactly where the two
+  // boxes end: a first part one character under the print cap, the space the
+  // split looks for, then a second part the length of the continuation box.
+  // Padding to the pair's total and letting the split find its own word
+  // boundary put ten characters more on DV-101 than DV-101 holds - the run
+  // would have been testing the overflow by overflowing.
+  //
+  // Each half carries its own marker, so a page audit can see both: [cont]
+  // at the bottom of the first box says it printed everything before the
+  // break, and [end] on the continuation says the rest arrived.
+  // A box that wraps is filled with the sample itself, from its first word.
+  //
+  // Whether it wraps is what the measurement says, not what the control looks
+  // like: dv101_abuse_1_witnesses is a plain input on the page and two ruled
+  // lines on the paper, so keying this off TEXTAREA kept a seed that shifted
+  // the wrap and pushed a third line into a two-line box.
+  var wraps = (typeof fieldCapacity !== 'undefined' && fieldCapacity
+    && fieldCapacity.__wraps) || {};
+  var seed = wraps[el.name] || wraps[el.id] ? '' : value;
+  if (room > cap) {
+    var head = fillToLength(seed, cap - 1, '[cont]');
+    return head + ' ' + fillToLength('', room - cap, '[end]');
+  }
+  return fillToLength(seed, cap, '[end]');
 }
 /**
  * Make every section active for the duration of a debug fill.
@@ -21130,6 +21364,9 @@ async function fillMaximumPath(options) {
     // The derived fields too. These are written on the way through the form,
     // and a debug fill does not walk it - so without this a payload taken
     // straight after a fill carries every answer and no page count.
+    if (typeof applyOverflowLinks === 'function') {
+      applyOverflowLinks();
+    }
     if (typeof applyComputedFields === 'function') {
       applyComputedFields();
     }

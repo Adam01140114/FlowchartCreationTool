@@ -27,7 +27,28 @@ const ANSWERS = args.find((a) => !a.startsWith('--') && a.endsWith('.json')) || 
 const OUT = flag('out', 'pipeline-out');
 const SERVER = flag('server', 'http://127.0.0.1:8080');
 const RENDER = args.includes('--render');
-const FORMS = (flag('forms', 'dv100,dv109,dv110')).split(',');
+/**
+ * Which forms to fill: every form the packet has, unless told otherwise.
+ *
+ * This was a written-out list of three, and a list of forms kept beside the
+ * packet rather than in it goes stale the moment a form is added. DV-101 and
+ * DV-105 were both in the packet, both switched on by the run, and neither was
+ * filled or rendered - so the pages that would have shown the overflow landing
+ * on DV-101 were never produced, and nothing said so.
+ */
+function packetForms() {
+  try {
+    const gui = JSON.parse(fs.readFileSync('dv-packet-gui.json', 'utf8'));
+    const names = (gui.projectForms || [])
+      .map((f) => String(f.name || '').toLowerCase().replace(/[^a-z0-9]/g, ''))
+      .filter((n) => n && fs.existsSync(path.join('FormWiz GUI', n + '.pdf')));
+    if (names.length) return names;
+  } catch (err) { /* fall through to the forms on disk */ }
+  return fs.readdirSync('FormWiz GUI')
+    .filter((f) => /^dv\d+\.pdf$/i.test(f))
+    .map((f) => f.replace(/\.pdf$/i, '').toLowerCase());
+}
+const FORMS = (flag('forms', '') || packetForms().join(',')).split(',').filter(Boolean);
 // Big enough to read a filled box against the printed label, small enough
 // that thirteen pages stay a reasonable size on disk.
 const RENDER_SCALE = Number(flag('scale', '1.6')) || 1.6;
