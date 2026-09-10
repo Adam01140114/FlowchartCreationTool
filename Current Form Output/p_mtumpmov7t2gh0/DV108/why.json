@@ -1,0 +1,12 @@
+{
+ "form": "dv108",
+ "counts": {
+  "empty": 0,
+  "closed": 0,
+  "defect": 0,
+  "unmapped": 0,
+  "court": 0,
+  "overflow": 0
+ },
+ "fields": {}
+}

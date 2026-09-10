@@ -210,7 +210,14 @@ async function buttonCaptions(bytes) {
           && Math.min(right, t.right) - Math.max(left, t.left) > 2)
         .map((t) => t.str).join('');
       const bare = (s) => s.replace(/\s+/g, '').toLowerCase();
+      // A caption can be the alt text a screen reader would say, which spells
+      // the punctuation out: DV-108's footer link is captioned "COURTS DOT CA
+      // DOT GOV" over a page that prints "www.courts.ca.gov". Compared
+      // literally that is not the same string, so it was drawn again - across
+      // the title of the form.
+      const spoken = (s) => bare(s.replace(/\bdot\b/gi, '.'));
       if (bare(under).indexOf(bare(caption)) >= 0) return;
+      if (spoken(under).indexOf(spoken(caption)) >= 0) return;
 
       wanted.push({ page: n, caption, left, right, bottom, top, appearance: a.defaultAppearance || '' });
     });
@@ -252,15 +259,47 @@ async function drawCaptions(bytes, captions) {
       : rgb(Number(grayMatch ? grayMatch[1] : 0), Number(grayMatch ? grayMatch[1] : 0),
             Number(grayMatch ? grayMatch[1] : 0));
 
-    // A push button centres its caption in its box, both ways.
+    // What the button said, not what a screen reader would say it as.
+    //
+    // A caption is sometimes alt text with the punctuation spelled out: the
+    // link in DV-108's footer is captioned COURTS DOT CA DOT GOV and printed
+    // courts.ca.gov. Drawn literally it is both wrong on a court form and half
+    // again as wide as the box it belongs in, so it ran across the title.
+    const spelled = /\bdot\b/i.test(c.caption) && c.caption === c.caption.toUpperCase();
+    const text = spelled
+      ? c.caption.replace(/\s*\bdot\b\s*/gi, '.').toLowerCase()
+      : c.caption;
+
+    // A push button centres its caption in its box, both ways - and clips it to
+    // that box, so a caption that does not fit is shrunk rather than spilled
+    // across whatever the form printed next to it.
     let width;
-    try { width = font.widthOfTextAtSize(c.caption, size); }
+    try { width = font.widthOfTextAtSize(text, size); }
     catch (e) { continue; }                                 // a glyph this font has not got
-    const x = Math.max(c.left, c.left + ((c.right - c.left) - width) / 2);
+    const room = c.right - c.left;
+    if (width > room && room > 0) {
+      size = Math.max(4, size * (room / width));
+      width = font.widthOfTextAtSize(text, size);
+    }
+    const x = Math.max(c.left, c.left + (room - width) / 2);
     const y = c.bottom + ((c.top - c.bottom) - size) / 2 + size * 0.22;
-    page.drawText(c.caption, { x, y, size, font, color: colour });
+    page.drawText(text, { x, y, size, font, color: colour });
   }
   return doc.save();
+}
+
+/** The forms the packet declares, as PDF basenames. */
+function packetForms() {
+  try {
+    const spec = JSON.parse(fs.readFileSync('dv-packet.spec.json', 'utf8'));
+    const bases = (spec.forms || [])
+      .map((f) => String(f.pdf || f.name || '').replace(/\.pdf$/i, '').toLowerCase().replace(/[^a-z0-9]/g, ''))
+      .filter((b) => b && fs.existsSync(path.join(CONFIG_DIR, b + '-field-config.json')));
+    if (bases.length) return bases;
+  } catch (err) { /* no spec beside us - fall through */ }
+  return fs.readdirSync(CONFIG_DIR)
+    .filter((f) => /-field-config\.json$/.test(f))
+    .map((f) => f.replace(/-field-config\.json$/, ''));
 }
 
 async function names(bytes) {
@@ -269,7 +308,10 @@ async function names(bytes) {
 }
 
 async function main() {
-  for (const base of (FORMS.length ? FORMS : ['dv100', 'dv109', 'dv110'])) {
+  // With no forms named, rebuild every one the packet declares. The written-out
+  // default rebuilt three of five, so a field-config edit to one of the other
+  // two was silently not live in the PDF being filled.
+  for (const base of (FORMS.length ? FORMS : packetForms())) {
     const source = base + '.pdf';
     const config = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, base + '-field-config.json'), 'utf8'));
     const result = await sanitizePdfFields(decrypt(source), config);

@@ -1,0 +1,334 @@
+{
+  "_comment": "DV-108 is attached to DV-105 and asks two things: why you believe the children are at risk of being taken (item 3), and which orders you want the judge to make about it (items 4-10). Every field on it is the filer's - the form carries no court section, and says so on both pages. The form prints item 3 and items 4-10 as 'check all that apply' lists, so each is one multiSelect group here rather than a run of yes/no questions; the follow-up boxes hang off the option that asks for them.",
+  "groups": [
+    {
+      "nameId": "dv108_abduction_risk",
+      "multiSelect": true,
+      "question": "Why do you believe the person you want protection from might take your children? Check everything that is true.",
+      "members": [
+        "dv108_risk_violated_custody_order",
+        "dv108_risk_no_ties_to_california",
+        "dv108_risk_preparing_to_take_children",
+        "dv108_risk_has_a_history",
+        "dv108_risk_criminal_record",
+        "dv108_risk_strong_ties_elsewhere",
+        "dv108_risk_citizen_of_another_country"
+      ],
+      "labels": [
+        "They have violated or threatened to violate a custody or visitation order",
+        "They do not have strong ties to California",
+        "They have done things recently that would make it easy to take the children",
+        "They have a history of abuse or of keeping the children from me",
+        "They have a criminal record",
+        "They have strong ties somewhere else",
+        "They are a citizen of another country"
+      ]
+    },
+    {
+      "nameId": "dv108_preparation",
+      "multiSelect": true,
+      "question": "What have they done recently that would make it easier to take the children?",
+      "conditional": {
+        "onlyWhen": "dv108_risk_preparing_to_take_children"
+      },
+      "members": [
+        "dv108_preparation_quit_a_job",
+        "dv108_preparation_applied_for_documents",
+        "dv108_preparation_closed_bank_account",
+        "dv108_preparation_hid_or_destroyed_documents",
+        "dv108_preparation_sold_property",
+        "dv108_preparation_sold_home_or_ended_lease",
+        "dv108_preparation_other"
+      ],
+      "labels": [
+        "Quit a job",
+        "Applied for a passport, birth certificate, or school or medical records",
+        "Closed a bank account",
+        "Hidden or destroyed documents",
+        "Sold or gotten rid of property",
+        "Sold a home or ended a lease",
+        "Something else"
+      ]
+    },
+    {
+      "nameId": "dv108_history",
+      "multiSelect": true,
+      "question": "What do they have a history of?",
+      "conditional": {
+        "onlyWhen": "dv108_risk_has_a_history"
+      },
+      "members": [
+        "dv108_history_abusing_me",
+        "dv108_history_taking_or_hiding_children",
+        "dv108_history_child_abuse",
+        "dv108_history_threatening_to_take_children",
+        "dv108_history_abusing_other_partners",
+        "dv108_history_not_cooperating_in_parenting"
+      ],
+      "labels": [
+        "Abusing me",
+        "Taking away or hiding our children from me",
+        "Child abuse",
+        "Threatening to take away or hide our children from me",
+        "Abusing other partners",
+        "Not cooperating with me in parenting"
+      ]
+    },
+    {
+      "nameId": "dv108_ties",
+      "multiSelect": true,
+      "question": "Where do they have strong ties?",
+      "conditional": {
+        "onlyWhen": "dv108_risk_strong_ties_elsewhere"
+      },
+      "members": [
+        "dv108_ties_another_california_county",
+        "dv108_ties_another_state",
+        "dv108_ties_another_country"
+      ],
+      "labels": [
+        "Another county in California",
+        "Another state",
+        "Another country"
+      ]
+    },
+    {
+      "nameId": "dv108_citizenship_strong_ties",
+      "question": "Do they have strong family, cultural, or emotional ties to that country?",
+      "conditional": {
+        "onlyWhen": "dv108_risk_citizen_of_another_country"
+      },
+      "members": [
+        "dv108_citizenship_strong_ties_yes",
+        "dv108_citizenship_strong_ties_no"
+      ],
+      "labels": [
+        "Yes",
+        "No"
+      ]
+    },
+    {
+      "nameId": "dv108_orders_requested",
+      "multiSelect": true,
+      "question": "Which orders do you want the judge to make to prevent an abduction?",
+      "members": [
+        "dv108_order_no_move_without_permission",
+        "dv108_order_turn_in_travel_documents",
+        "dv108_order_provide_travel_plan",
+        "dv108_order_notify_other_state",
+        "dv108_order_notify_foreign_embassy",
+        "dv108_order_foreign_custody_order",
+        "dv108_order_post_a_bond"
+      ],
+      "labels": [
+        "Do not move with the children without my permission or the judge's",
+        "Turn in passports and other travel documents, and do not apply for more",
+        "Give me a travel plan and documents before travelling with the children",
+        "Register this order in another state before the children travel there",
+        "Notify a foreign embassy or consulate of the passport restrictions",
+        "Get a foreign custody and visitation order before the children travel",
+        "Post a bond"
+      ]
+    },
+    {
+      "nameId": "dv108_travel_plan",
+      "multiSelect": true,
+      "question": "If they are allowed to travel with the children, what should they have to give you?",
+      "conditional": {
+        "onlyWhen": "dv108_order_provide_travel_plan"
+      },
+      "members": [
+        "dv108_travel_plan_schedule",
+        "dv108_travel_plan_round_trip_tickets",
+        "dv108_travel_plan_contact_details",
+        "dv108_travel_plan_open_ticket_for_me",
+        "dv108_travel_plan_other"
+      ],
+      "labels": [
+        "The children's travel schedule",
+        "Copies of round-trip airline tickets",
+        "Addresses and telephone numbers where the children can be reached",
+        "An open airline ticket for me, in case the children are not returned",
+        "Something else"
+      ]
+    }
+  ],
+  "questions": {
+    "dv108_preparation_other_explanation": {
+      "text": "What else have they done?",
+      "conditional": {
+        "onlyWhen": "dv108_preparation_other"
+      }
+    },
+    "dv108_ties_california_county_name": {
+      "text": "Which county in California?",
+      "conditional": {
+        "onlyWhen": "dv108_ties_another_california_county"
+      }
+    },
+    "dv108_ties_state_name": {
+      "text": "Which state?",
+      "conditional": {
+        "onlyWhen": "dv108_ties_another_state"
+      }
+    },
+    "dv108_ties_country_name": {
+      "text": "Which country?",
+      "conditional": {
+        "onlyWhen": "dv108_ties_another_country"
+      }
+    },
+    "dv108_citizenship_countries": {
+      "text": "Which country or countries are they a citizen of?",
+      "conditional": {
+        "onlyWhen": "dv108_risk_citizen_of_another_country"
+      }
+    },
+    "dv108_abduction_risk_examples": {
+      "text": "Give examples or reasons for what you checked above. The judge will use this to decide whether to make the orders you ask for.",
+      "type": "bigParagraph"
+    },
+    "dv108_travel_documents_to_turn_in": {
+      "text": "Which documents should they turn in?",
+      "conditional": {
+        "onlyWhen": "dv108_order_turn_in_travel_documents"
+      }
+    },
+    "dv108_travel_documents_due_date": {
+      "text": "By what date must they turn the documents in?",
+      "type": "date",
+      "conditional": {
+        "onlyWhen": "dv108_order_turn_in_travel_documents"
+      }
+    },
+    "dv108_travel_documents_recipient_name": {
+      "text": "Who should they give the documents to?",
+      "conditional": {
+        "onlyWhen": "dv108_order_turn_in_travel_documents"
+      }
+    },
+    "dv108_travel_plan_other_description": {
+      "text": "What else should they have to give you?",
+      "conditional": {
+        "onlyWhen": "dv108_travel_plan_other"
+      }
+    },
+    "dv108_embassy_or_consulate_name": {
+      "text": "Which embassy or consulate should be notified?",
+      "conditional": {
+        "onlyWhen": "dv108_order_notify_foreign_embassy"
+      }
+    },
+    "dv108_embassy_proof_due_date": {
+      "text": "By what date must they file proof of that notice with the court?",
+      "type": "date",
+      "conditional": {
+        "onlyWhen": "dv108_order_notify_foreign_embassy"
+      }
+    },
+    "dv108_foreign_custody_country": {
+      "text": "Which country would the children be travelling to?",
+      "conditional": {
+        "onlyWhen": "dv108_order_foreign_custody_order"
+      }
+    },
+    "dv108_bond_amount": {
+      "text": "How much should the bond be?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "dv108_order_post_a_bond"
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "Risk of Abduction",
+      "fields": [
+        "case_number",
+        "person_asking_protection_name",
+        "person_to_restrain_full_name",
+        "dv108_risk_violated_custody_order",
+        "dv108_risk_no_ties_to_california",
+        "dv108_risk_preparing_to_take_children",
+        "dv108_risk_has_a_history",
+        "dv108_risk_criminal_record",
+        "dv108_risk_strong_ties_elsewhere",
+        "dv108_risk_citizen_of_another_country",
+        "dv108_preparation_quit_a_job",
+        "dv108_preparation_applied_for_documents",
+        "dv108_preparation_closed_bank_account",
+        "dv108_preparation_hid_or_destroyed_documents",
+        "dv108_preparation_sold_property",
+        "dv108_preparation_sold_home_or_ended_lease",
+        "dv108_preparation_other",
+        "dv108_preparation_other_explanation",
+        "dv108_history_abusing_me",
+        "dv108_history_taking_or_hiding_children",
+        "dv108_history_child_abuse",
+        "dv108_history_threatening_to_take_children",
+        "dv108_history_abusing_other_partners",
+        "dv108_history_not_cooperating_in_parenting",
+        "dv108_ties_another_california_county",
+        "dv108_ties_california_county_name",
+        "dv108_ties_another_state",
+        "dv108_ties_state_name",
+        "dv108_ties_another_country",
+        "dv108_ties_country_name",
+        "dv108_citizenship_countries",
+        "dv108_citizenship_strong_ties_yes",
+        "dv108_citizenship_strong_ties_no",
+        "dv108_abduction_risk_examples"
+      ]
+    },
+    {
+      "name": "Orders to Prevent Abduction",
+      "fields": [
+        "dv108_order_no_move_without_permission",
+        "dv108_order_turn_in_travel_documents",
+        "dv108_order_provide_travel_plan",
+        "dv108_order_notify_other_state",
+        "dv108_order_notify_foreign_embassy",
+        "dv108_order_foreign_custody_order",
+        "dv108_order_post_a_bond",
+        "dv108_travel_documents_to_turn_in",
+        "dv108_travel_documents_due_date",
+        "dv108_travel_documents_recipient_name",
+        "dv108_travel_plan_schedule",
+        "dv108_travel_plan_round_trip_tickets",
+        "dv108_travel_plan_contact_details",
+        "dv108_travel_plan_open_ticket_for_me",
+        "dv108_travel_plan_other",
+        "dv108_travel_plan_other_description",
+        "dv108_notify_state_county_and_state",
+        "dv108_embassy_or_consulate_name",
+        "dv108_embassy_proof_due_date",
+        "dv108_foreign_custody_country",
+        "dv108_bond_amount"
+      ]
+    }
+  ],
+  "splits": [
+    {
+      "field": "dv108_notify_state_county_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv108_notify_county",
+          "label": "County",
+          "question": "Which county should this order be registered with?"
+        },
+        {
+          "nameId": "dv108_notify_state",
+          "label": "State",
+          "question": "And which state is that county in?"
+        }
+      ]
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "dv108_abduction_risk_examples",
+      "why": "The last line of item 3 asks for examples or reasons for the answers above - all of them - so it is shown whatever was said about citizenship, which is merely the question printed nearest to it."
+    }
+  ]
+}

@@ -31,7 +31,21 @@
       "name": "DV-105",
       "title": "DV-105 Request for Child Custody and Visitation Orders",
       "flowchart": "dv105-flowchart.json",
-      "pdf": "dv105.pdf"
+      "pdf": "dv105.pdf",
+      "activates": [
+        {
+          "form": "DV-108",
+          "whenQuestion": "dv105_abduction_risk",
+          "isAnswer": "Yes",
+          "_why": "DV-105 item 8 says it in as many words: \"To ask for orders to help prevent abduction, you must complete form DV-108 ... and attach it to this form.\" So the form asks the question and the packet obeys the answer - the same shape as DV-105 itself hanging off the custody box on DV-100."
+        }
+      ]
+    },
+    {
+      "name": "DV-108",
+      "title": "DV-108 Request for Orders to Prevent Child Abduction",
+      "flowchart": "dv108-flowchart.json",
+      "pdf": "dv108.pdf"
     },
     {
       "name": "DV-109",

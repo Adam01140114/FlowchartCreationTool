@@ -27124,10 +27124,2822 @@
     },
     {
       "sectionId": 19,
+      "sectionName": "Risk of Abduction",
+      "questions": [
+        {
+          "questionId": 236,
+          "text": "Why do you believe the person you want protection from might take your children? Check everything that is true.",
+          "type": "checkbox",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "7",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "They have violated or threatened to violate a custody or visitation order"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "They have violated or threatened to violate a custody or visitation order",
+                "type": "checkbox",
+                "nodeId": "dv108_risk_violated_custody_order",
+                "textboxText": ""
+              },
+              {
+                "trigger": "They do not have strong ties to California",
+                "type": "checkbox",
+                "nodeId": "dv108_risk_no_ties_to_california",
+                "textboxText": ""
+              },
+              {
+                "trigger": "They have done things recently that would make it easy to take the children",
+                "type": "checkbox",
+                "nodeId": "dv108_risk_preparing_to_take_children",
+                "textboxText": ""
+              },
+              {
+                "trigger": "They have a history of abuse or of keeping the children from me",
+                "type": "checkbox",
+                "nodeId": "dv108_risk_has_a_history",
+                "textboxText": ""
+              },
+              {
+                "trigger": "They have a criminal record",
+                "type": "checkbox",
+                "nodeId": "dv108_risk_criminal_record",
+                "textboxText": ""
+              },
+              {
+                "trigger": "They have strong ties somewhere else",
+                "type": "checkbox",
+                "nodeId": "dv108_risk_strong_ties_elsewhere",
+                "textboxText": ""
+              },
+              {
+                "trigger": "They are a citizen of another country",
+                "type": "checkbox",
+                "nodeId": "dv108_risk_citizen_of_another_country",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            {
+              "label": "They have violated or threatened to violate a custody or visitation order",
+              "nameId": "dv108_abduction_risk_they_have_violated_or_threatened_to_violate_a_custody_or_visitation_order",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "They do not have strong ties to California",
+              "nameId": "dv108_abduction_risk_they_do_not_have_strong_ties_to_california",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "They have done things recently that would make it easy to take the children",
+              "nameId": "dv108_abduction_risk_they_have_done_things_recently_that_would_make_it_easy_to_take_the_children",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "They have a history of abuse or of keeping the children from me",
+              "nameId": "dv108_abduction_risk_they_have_a_history_of_abuse_or_of_keeping_the_children_from_me",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "They have a criminal record",
+              "nameId": "dv108_abduction_risk_they_have_a_criminal_record",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "They have strong ties somewhere else",
+              "nameId": "dv108_abduction_risk_they_have_strong_ties_somewhere_else",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "They are a citizen of another country",
+              "nameId": "dv108_abduction_risk_they_are_a_citizen_of_another_country",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false,
+          "allAreRequired": false,
+          "nodeId": "dv108_abduction_risk"
+        },
+        {
+          "questionId": 237,
+          "text": "What have they done recently that would make it easier to take the children?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "236",
+                "prevAnswer": "They have done things recently that would make it easy to take the children"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Quit a job"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "Quit a job",
+                "type": "checkbox",
+                "nodeId": "dv108_preparation_quit_a_job",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Applied for a passport, birth certificate, or school or medical records",
+                "type": "checkbox",
+                "nodeId": "dv108_preparation_applied_for_documents",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Closed a bank account",
+                "type": "checkbox",
+                "nodeId": "dv108_preparation_closed_bank_account",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Hidden or destroyed documents",
+                "type": "checkbox",
+                "nodeId": "dv108_preparation_hid_or_destroyed_documents",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Sold or gotten rid of property",
+                "type": "checkbox",
+                "nodeId": "dv108_preparation_sold_property",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Sold a home or ended a lease",
+                "type": "checkbox",
+                "nodeId": "dv108_preparation_sold_home_or_ended_lease",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Something else",
+                "type": "checkbox",
+                "nodeId": "dv108_preparation_other",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            {
+              "label": "Quit a job",
+              "nameId": "dv108_preparation_quit_a_job",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Applied for a passport, birth certificate, or school or medical records",
+              "nameId": "dv108_preparation_applied_for_a_passport_birth_certificate_or_school_or_medical_records",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Closed a bank account",
+              "nameId": "dv108_preparation_closed_a_bank_account",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Hidden or destroyed documents",
+              "nameId": "dv108_preparation_hidden_or_destroyed_documents",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Sold or gotten rid of property",
+              "nameId": "dv108_preparation_sold_or_gotten_rid_of_property",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Sold a home or ended a lease",
+              "nameId": "dv108_preparation_sold_a_home_or_ended_a_lease",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Something else",
+              "nameId": "dv108_preparation_something_else",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false,
+          "allAreRequired": false,
+          "nodeId": "dv108_preparation"
+        },
+        {
+          "questionId": 238,
+          "text": "What do they have a history of?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "236",
+                "prevAnswer": "They have a history of abuse or of keeping the children from me"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Abusing me"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "Abusing me",
+                "type": "checkbox",
+                "nodeId": "dv108_history_abusing_me",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Taking away or hiding our children from me",
+                "type": "checkbox",
+                "nodeId": "dv108_history_taking_or_hiding_children",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Child abuse",
+                "type": "checkbox",
+                "nodeId": "dv108_history_child_abuse",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Threatening to take away or hide our children from me",
+                "type": "checkbox",
+                "nodeId": "dv108_history_threatening_to_take_children",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Abusing other partners",
+                "type": "checkbox",
+                "nodeId": "dv108_history_abusing_other_partners",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Not cooperating with me in parenting",
+                "type": "checkbox",
+                "nodeId": "dv108_history_not_cooperating_in_parenting",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            {
+              "label": "Abusing me",
+              "nameId": "dv108_history_abusing_me",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Taking away or hiding our children from me",
+              "nameId": "dv108_history_taking_away_or_hiding_our_children_from_me",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Child abuse",
+              "nameId": "dv108_history_child_abuse",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Threatening to take away or hide our children from me",
+              "nameId": "dv108_history_threatening_to_take_away_or_hide_our_children_from_me",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Abusing other partners",
+              "nameId": "dv108_history_abusing_other_partners",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Not cooperating with me in parenting",
+              "nameId": "dv108_history_not_cooperating_with_me_in_parenting",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false,
+          "allAreRequired": false,
+          "nodeId": "dv108_history"
+        },
+        {
+          "questionId": 239,
+          "text": "Where do they have strong ties?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "236",
+                "prevAnswer": "They have strong ties somewhere else"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Another county in California"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "Another county in California",
+                "type": "checkbox",
+                "nodeId": "dv108_ties_another_california_county",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Another state",
+                "type": "checkbox",
+                "nodeId": "dv108_ties_another_state",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Another country",
+                "type": "checkbox",
+                "nodeId": "dv108_ties_another_country",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            {
+              "label": "Another county in California",
+              "nameId": "dv108_ties_another_county_in_california",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Another state",
+              "nameId": "dv108_ties_another_state",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Another country",
+              "nameId": "dv108_ties_another_country",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false,
+          "allAreRequired": false,
+          "nodeId": "dv108_ties"
+        },
+        {
+          "questionId": 240,
+          "text": "Which country or countries are they a citizen of?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "236",
+                "prevAnswer": "They are a citizen of another country"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_citizenship_countries",
+          "placeholder": ""
+        },
+        {
+          "questionId": 241,
+          "text": "Do they have strong family, cultural, or emotional ties to that country?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "240",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "Yes",
+                "type": "checkbox",
+                "nodeId": "dv108_citizenship_strong_ties_yes",
+                "textboxText": ""
+              },
+              {
+                "trigger": "No",
+                "type": "checkbox",
+                "nodeId": "dv108_citizenship_strong_ties_no",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "dv108_citizenship_strong_ties",
+          "placeholder": ""
+        },
+        {
+          "questionId": 242,
+          "text": "Which county in California?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "239",
+                "prevAnswer": "Another county in California"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_ties_california_county_name",
+          "placeholder": ""
+        },
+        {
+          "questionId": 243,
+          "text": "Which state?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "239",
+                "prevAnswer": "Another state"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_ties_state_name",
+          "placeholder": ""
+        },
+        {
+          "questionId": 244,
+          "text": "Which country?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "239",
+                "prevAnswer": "Another country"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_ties_country_name",
+          "placeholder": ""
+        },
+        {
+          "questionId": 245,
+          "text": "What else have they done?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "237",
+                "prevAnswer": "Something else"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_preparation_other_explanation",
+          "placeholder": ""
+        },
+        {
+          "questionId": 246,
+          "text": "Give examples or reasons for what you checked above. The judge will use this to decide whether to make the orders you ask for.",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "236",
+                "prevAnswer": "They have violated or threatened to violate a custody or visitation order"
+              },
+              {
+                "prevQuestion": "236",
+                "prevAnswer": "They do not have strong ties to California"
+              },
+              {
+                "prevQuestion": "237",
+                "prevAnswer": "Quit a job"
+              },
+              {
+                "prevQuestion": "237",
+                "prevAnswer": "Applied for a passport, birth certificate, or school or medical records"
+              },
+              {
+                "prevQuestion": "237",
+                "prevAnswer": "Closed a bank account"
+              },
+              {
+                "prevQuestion": "237",
+                "prevAnswer": "Hidden or destroyed documents"
+              },
+              {
+                "prevQuestion": "237",
+                "prevAnswer": "Sold or gotten rid of property"
+              },
+              {
+                "prevQuestion": "237",
+                "prevAnswer": "Sold a home or ended a lease"
+              },
+              {
+                "prevQuestion": "245",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "238",
+                "prevAnswer": "Abusing me"
+              },
+              {
+                "prevQuestion": "238",
+                "prevAnswer": "Taking away or hiding our children from me"
+              },
+              {
+                "prevQuestion": "238",
+                "prevAnswer": "Child abuse"
+              },
+              {
+                "prevQuestion": "238",
+                "prevAnswer": "Threatening to take away or hide our children from me"
+              },
+              {
+                "prevQuestion": "238",
+                "prevAnswer": "Abusing other partners"
+              },
+              {
+                "prevQuestion": "238",
+                "prevAnswer": "Not cooperating with me in parenting"
+              },
+              {
+                "prevQuestion": "236",
+                "prevAnswer": "They have a criminal record"
+              },
+              {
+                "prevQuestion": "242",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "243",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "244",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "241",
+                "prevAnswer": "Yes"
+              },
+              {
+                "prevQuestion": "241",
+                "prevAnswer": "No"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_abduction_risk_examples",
+          "placeholder": ""
+        }
+      ]
+    },
+    {
+      "sectionId": 20,
+      "sectionName": "Orders to Prevent Abduction",
+      "questions": [
+        {
+          "questionId": 247,
+          "text": "Which orders do you want the judge to make to prevent an abduction?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "246",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Do not move with the children without my permission or the judge's"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "Do not move with the children without my permission or the judge's",
+                "type": "checkbox",
+                "nodeId": "dv108_order_no_move_without_permission",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Turn in passports and other travel documents, and do not apply for more",
+                "type": "checkbox",
+                "nodeId": "dv108_order_turn_in_travel_documents",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Give me a travel plan and documents before travelling with the children",
+                "type": "checkbox",
+                "nodeId": "dv108_order_provide_travel_plan",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Register this order in another state before the children travel there",
+                "type": "checkbox",
+                "nodeId": "dv108_order_notify_other_state",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Notify a foreign embassy or consulate of the passport restrictions",
+                "type": "checkbox",
+                "nodeId": "dv108_order_notify_foreign_embassy",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Get a foreign custody and visitation order before the children travel",
+                "type": "checkbox",
+                "nodeId": "dv108_order_foreign_custody_order",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Post a bond",
+                "type": "checkbox",
+                "nodeId": "dv108_order_post_a_bond",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            {
+              "label": "Do not move with the children without my permission or the judge's",
+              "nameId": "dv108_orders_requested_do_not_move_with_the_children_without_my_permission_or_the_judge_s",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Turn in passports and other travel documents, and do not apply for more",
+              "nameId": "dv108_orders_requested_turn_in_passports_and_other_travel_documents_and_do_not_apply_for_more",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Give me a travel plan and documents before travelling with the children",
+              "nameId": "dv108_orders_requested_give_me_a_travel_plan_and_documents_before_travelling_with_the_children",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Register this order in another state before the children travel there",
+              "nameId": "dv108_orders_requested_register_this_order_in_another_state_before_the_children_travel_there",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Notify a foreign embassy or consulate of the passport restrictions",
+              "nameId": "dv108_orders_requested_notify_a_foreign_embassy_or_consulate_of_the_passport_restrictions",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Get a foreign custody and visitation order before the children travel",
+              "nameId": "dv108_orders_requested_get_a_foreign_custody_and_visitation_order_before_the_children_travel",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Post a bond",
+              "nameId": "dv108_orders_requested_post_a_bond",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false,
+          "allAreRequired": false,
+          "nodeId": "dv108_orders_requested"
+        },
+        {
+          "questionId": 248,
+          "text": "Which documents should they turn in?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "247",
+                "prevAnswer": "Turn in passports and other travel documents, and do not apply for more"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_travel_documents_to_turn_in",
+          "placeholder": ""
+        },
+        {
+          "questionId": 249,
+          "text": "If they are allowed to travel with the children, what should they have to give you?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "247",
+                "prevAnswer": "Give me a travel plan and documents before travelling with the children"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "The children's travel schedule"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "The children's travel schedule",
+                "type": "checkbox",
+                "nodeId": "dv108_travel_plan_schedule",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Copies of round-trip airline tickets",
+                "type": "checkbox",
+                "nodeId": "dv108_travel_plan_round_trip_tickets",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Addresses and telephone numbers where the children can be reached",
+                "type": "checkbox",
+                "nodeId": "dv108_travel_plan_contact_details",
+                "textboxText": ""
+              },
+              {
+                "trigger": "An open airline ticket for me, in case the children are not returned",
+                "type": "checkbox",
+                "nodeId": "dv108_travel_plan_open_ticket_for_me",
+                "textboxText": ""
+              },
+              {
+                "trigger": "Something else",
+                "type": "checkbox",
+                "nodeId": "dv108_travel_plan_other",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            {
+              "label": "The children's travel schedule",
+              "nameId": "dv108_travel_plan_the_children_s_travel_schedule",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Copies of round-trip airline tickets",
+              "nameId": "dv108_travel_plan_copies_of_round_trip_airline_tickets",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Addresses and telephone numbers where the children can be reached",
+              "nameId": "dv108_travel_plan_addresses_and_telephone_numbers_where_the_children_can_be_reached",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "An open airline ticket for me, in case the children are not returned",
+              "nameId": "dv108_travel_plan_an_open_airline_ticket_for_me_in_case_the_children_are_not_returned",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Something else",
+              "nameId": "dv108_travel_plan_something_else",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false,
+          "allAreRequired": false,
+          "nodeId": "dv108_travel_plan"
+        },
+        {
+          "questionId": 250,
+          "text": "Which embassy or consulate should be notified?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "247",
+                "prevAnswer": "Notify a foreign embassy or consulate of the passport restrictions"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_embassy_or_consulate_name",
+          "placeholder": ""
+        },
+        {
+          "questionId": 251,
+          "text": "Which country would the children be travelling to?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "247",
+                "prevAnswer": "Get a foreign custody and visitation order before the children travel"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_foreign_custody_country",
+          "placeholder": ""
+        },
+        {
+          "questionId": 252,
+          "text": "How much should the bond be?",
+          "type": "money",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "247",
+                "prevAnswer": "Post a bond"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_bond_amount",
+          "placeholder": ""
+        },
+        {
+          "questionId": 253,
+          "text": "By what date must they turn the documents in?",
+          "type": "date",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "248",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_travel_documents_due_date",
+          "placeholder": ""
+        },
+        {
+          "questionId": 254,
+          "text": "By what date must they file proof of that notice with the court?",
+          "type": "date",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "250",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_embassy_proof_due_date",
+          "placeholder": ""
+        },
+        {
+          "questionId": 255,
+          "text": "What else should they have to give you?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "249",
+                "prevAnswer": "Something else"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_travel_plan_other_description",
+          "placeholder": ""
+        },
+        {
+          "questionId": 256,
+          "text": "Who should they give the documents to?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "253",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_travel_documents_recipient_name",
+          "placeholder": ""
+        },
+        {
+          "questionId": 257,
+          "text": "Which county should this order be registered with?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "247",
+                "prevAnswer": "Do not move with the children without my permission or the judge's"
+              },
+              {
+                "prevQuestion": "256",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "249",
+                "prevAnswer": "The children's travel schedule"
+              },
+              {
+                "prevQuestion": "249",
+                "prevAnswer": "Copies of round-trip airline tickets"
+              },
+              {
+                "prevQuestion": "249",
+                "prevAnswer": "Addresses and telephone numbers where the children can be reached"
+              },
+              {
+                "prevQuestion": "249",
+                "prevAnswer": "An open airline ticket for me, in case the children are not returned"
+              },
+              {
+                "prevQuestion": "255",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "247",
+                "prevAnswer": "Register this order in another state before the children travel there"
+              },
+              {
+                "prevQuestion": "254",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "251",
+                "prevAnswer": "Any Text"
+              },
+              {
+                "prevQuestion": "252",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_notify_county",
+          "placeholder": ""
+        },
+        {
+          "questionId": 258,
+          "text": "And which state is that county in?",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "257",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Any Text",
+                "to": "end"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Any Text"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "dv108_notify_state",
+          "placeholder": ""
+        }
+      ]
+    },
+    {
+      "sectionId": 21,
       "sectionName": "Restrained Person's Description",
       "questions": [
         {
-          "questionId": 246,
+          "questionId": 272,
           "text": "About how tall is the restrained person?",
           "type": "text",
           "logic": {
@@ -27223,14 +30035,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 247,
+          "questionId": 273,
           "text": "About how much does the restrained person weigh?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "246",
+                "prevQuestion": "272",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -27319,14 +30131,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 248,
+          "questionId": 274,
           "text": "What color is the restrained person's hair?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "247",
+                "prevQuestion": "273",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -27415,14 +30227,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 249,
+          "questionId": 275,
           "text": "What color are the restrained person's eyes?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "248",
+                "prevQuestion": "274",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -27432,7 +30244,7 @@
             "conditions": [
               {
                 "option": "Any Text",
-                "to": "20"
+                "to": "22"
               }
             ]
           },
@@ -27516,7 +30328,7 @@
           "placeholder": ""
         },
         {
-          "questionId": 251,
+          "questionId": 277,
           "text": "In a few words, how is the restrained person related to you? For example: spouse, former partner, parent.",
           "type": "text",
           "logic": {
@@ -27612,14 +30424,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 252,
+          "questionId": 278,
           "text": "Do you know where the restrained person lives?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "251",
+                "prevQuestion": "277",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -27715,14 +30527,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 253,
+          "questionId": 279,
           "text": "Where does the restrained person live?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "252",
+                "prevQuestion": "278",
                 "prevAnswer": "Yes"
               }
             ]
@@ -27865,18 +30677,18 @@
           "nodeId": "restrained_person"
         },
         {
-          "questionId": 254,
+          "questionId": 280,
           "text": "What firearms, firearm parts, or ammunition might the restrained person have? Include what you listed on DV-100, item 9.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "252",
+                "prevQuestion": "278",
                 "prevAnswer": "Yes"
               },
               {
-                "prevQuestion": "252",
+                "prevQuestion": "278",
                 "prevAnswer": "No"
               }
             ]
@@ -27967,18 +30779,18 @@
       ]
     },
     {
-      "sectionId": 20,
+      "sectionId": 22,
       "sectionName": "Other People This Order Protects",
       "questions": [
         {
-          "questionId": 255,
+          "questionId": 281,
           "text": "Does this order also protect other people, such as your children or family?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "254",
+                "prevQuestion": "280",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -28115,11 +30927,19 @@
     },
     {
       "groupId": 4,
+      "name": "DV-108",
+      "sections": [
+        "Risk of Abduction",
+        "Orders to Prevent Abduction"
+      ]
+    },
+    {
+      "groupId": 5,
       "name": "DV-109",
       "sections": []
     },
     {
-      "groupId": 5,
+      "groupId": 6,
       "name": "DV-110",
       "sections": [
         "Restrained Person's Description",
@@ -28128,8 +30948,8 @@
     }
   ],
   "hiddenFields": [],
-  "sectionCounter": 21,
-  "questionCounter": 258,
+  "sectionCounter": 23,
+  "questionCounter": 284,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "DV-100",
@@ -28248,6 +31068,15 @@
         "child_together_2_name",
         "child_together_3_name",
         "child_together_4_name"
+      ],
+      "join": ", "
+    },
+    {
+      "id": "linkedField0",
+      "linkedFieldId": "dv108_notify_state_county_and_state",
+      "fields": [
+        "dv108_notify_county",
+        "dv108_notify_state"
       ],
       "join": ", "
     }
@@ -28670,6 +31499,21 @@
     "dv105_unsupervised_visit_sunday_location_pickup": 11,
     "dv105_unsupervised_schedule_other_description": 40,
     "dv105_unsupervised_start_date": 52,
+    "dv108_preparation_other_explanation": 40,
+    "dv108_ties_california_county_name": 40,
+    "dv108_ties_state_name": 63,
+    "dv108_ties_country_name": 59,
+    "dv108_citizenship_countries": 40,
+    "dv108_abduction_risk_examples": 387,
+    "dv108_travel_documents_to_turn_in": 34,
+    "dv108_travel_documents_due_date": 11,
+    "dv108_travel_documents_recipient_name": 29,
+    "dv108_travel_plan_other_description": 71,
+    "dv108_notify_state_county_and_state": 29,
+    "dv108_embassy_or_consulate_name": 11,
+    "dv108_embassy_proof_due_date": 29,
+    "dv108_foreign_custody_country": 40,
+    "dv108_bond_amount": 34,
     "hearing_date": 11,
     "hearing_time": 11,
     "hearing_department": 11,
@@ -28790,6 +31634,7 @@
       "dv105_current_custody_order_terms": 4,
       "dv105_current_custody_order_change_reason": 4,
       "dv105_unsupervised_visit_details": 2,
+      "dv108_abduction_risk_examples": 4,
       "hearing_court_name_and_address": 3,
       "denial_reason_other_explanation": 2,
       "restrained_person_prohibited_items_details": 3,
@@ -28834,8 +31679,19 @@
       "asksNothing": false
     },
     {
-      "name": "DV-109",
+      "name": "DV-108",
       "index": 3,
+      "firstSection": 19,
+      "lastSection": 20,
+      "alwaysIncluded": false,
+      "pdfFile": "dv108.pdf",
+      "pdfName": "DV-108 Request for Orders to Prevent Child Abduction",
+      "pdfPages": 2,
+      "asksNothing": false
+    },
+    {
+      "name": "DV-109",
+      "index": 4,
       "firstSection": 0,
       "lastSection": -1,
       "alwaysIncluded": false,
@@ -28846,9 +31702,9 @@
     },
     {
       "name": "DV-110",
-      "index": 4,
-      "firstSection": 19,
-      "lastSection": 20,
+      "index": 5,
+      "firstSection": 21,
+      "lastSection": 22,
       "alwaysIncluded": false,
       "pdfFile": "dv110.pdf",
       "pdfName": "DV-110 Temporary Restraining Order",
@@ -28902,6 +31758,15 @@
       "fromForm": "DV-100"
     },
     {
+      "targetForm": "DV-108",
+      "unconditional": false,
+      "optionNameId": "dv105_abduction_risk_yes",
+      "optionLabel": "Yes",
+      "fromForm": "DV-105",
+      "questionId": "181",
+      "questionNameId": "dv105_abduction_risk"
+    },
+    {
       "targetForm": "DV-110",
       "unconditional": true,
       "optionNameId": null,
@@ -28916,12 +31781,12 @@
       "questionId": 1,
       "alsoAnswers": [
         {
-          "questionId": 233,
-          "section": 19
+          "questionId": 259,
+          "section": 21
         },
         {
-          "questionId": 238,
-          "section": 20
+          "questionId": 264,
+          "section": 22
         }
       ]
     },
@@ -28931,12 +31796,12 @@
       "questionId": 2,
       "alsoAnswers": [
         {
-          "questionId": 234,
-          "section": 19
+          "questionId": 260,
+          "section": 21
         },
         {
-          "questionId": 239,
-          "section": 20
+          "questionId": 265,
+          "section": 22
         }
       ]
     },
@@ -28954,12 +31819,16 @@
           "section": 13
         },
         {
-          "questionId": 235,
+          "questionId": 233,
           "section": 19
         },
         {
-          "questionId": 240,
-          "section": 20
+          "questionId": 261,
+          "section": 21
+        },
+        {
+          "questionId": 266,
+          "section": 22
         }
       ]
     },
@@ -28977,12 +31846,16 @@
           "section": 13
         },
         {
-          "questionId": 236,
+          "questionId": 234,
           "section": 19
         },
         {
-          "questionId": 241,
-          "section": 20
+          "questionId": 262,
+          "section": 21
+        },
+        {
+          "questionId": 267,
+          "section": 22
         }
       ]
     },
@@ -29000,12 +31873,16 @@
           "section": 13
         },
         {
-          "questionId": 237,
+          "questionId": 235,
           "section": 19
         },
         {
-          "questionId": 242,
-          "section": 20
+          "questionId": 263,
+          "section": 21
+        },
+        {
+          "questionId": 268,
+          "section": 22
         }
       ]
     },
@@ -29015,8 +31892,8 @@
       "questionId": 8,
       "alsoAnswers": [
         {
-          "questionId": 244,
-          "section": 20
+          "questionId": 270,
+          "section": 22
         }
       ]
     },
@@ -29026,8 +31903,8 @@
       "questionId": 9,
       "alsoAnswers": [
         {
-          "questionId": 245,
-          "section": 20
+          "questionId": 271,
+          "section": 22
         }
       ]
     },
@@ -29037,8 +31914,8 @@
       "questionId": 10,
       "alsoAnswers": [
         {
-          "questionId": 243,
-          "section": 20
+          "questionId": 269,
+          "section": 22
         }
       ]
     },
@@ -29048,8 +31925,8 @@
       "questionId": 11,
       "alsoAnswers": [
         {
-          "questionId": 250,
-          "section": 20
+          "questionId": 276,
+          "section": 22
         }
       ]
     },
@@ -29059,8 +31936,8 @@
       "questionId": 65,
       "alsoAnswers": [
         {
-          "questionId": 256,
-          "section": 20
+          "questionId": 282,
+          "section": 22
         }
       ]
     },
@@ -29070,8 +31947,8 @@
       "questionId": 66,
       "alsoAnswers": [
         {
-          "questionId": 257,
-          "section": 20
+          "questionId": 283,
+          "section": 22
         }
       ]
     }

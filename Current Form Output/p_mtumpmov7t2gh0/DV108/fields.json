@@ -1,0 +1,286 @@
+{
+ "1": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "person_asking_protection_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Ro[end]"
+  },
+  {
+   "name": "person_to_restrain_full_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+  },
+  {
+   "name": "dv108_risk_violated_custody_order",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_risk_no_ties_to_california",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_risk_preparing_to_take_children",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_preparation_quit_a_job",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_preparation_applied_for_documents",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_preparation_closed_bank_account",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_preparation_hid_or_destroyed_documents",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_preparation_other_explanation",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodriguez-Va[end]"
+  },
+  {
+   "name": "dv108_preparation_sold_property",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_preparation_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_preparation_sold_home_or_ended_lease",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_risk_has_a_history",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_history_abusing_me",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_history_taking_or_hiding_children",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_history_child_abuse",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_history_threatening_to_take_children",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_history_abusing_other_partners",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_history_not_cooperating_in_parenting",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_risk_criminal_record",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_risk_strong_ties_elsewhere",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_ties_california_county_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+  },
+  {
+   "name": "dv108_ties_another_california_county",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_ties_state_name",
+   "kind": "text",
+   "value": "Test User"
+  },
+  {
+   "name": "dv108_ties_another_state",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_ties_country_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Rodriguez-Vasquez 1847 North Wil[end]"
+  },
+  {
+   "name": "dv108_ties_another_country",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_citizenship_countries",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodriguez-Va[end]"
+  },
+  {
+   "name": "dv108_risk_citizen_of_another_country",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_citizenship_strong_ties_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_citizenship_strong_ties_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv108_abduction_risk_examples",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go.[end]"
+  }
+ ],
+ "2": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "dv108_order_no_move_without_permission",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_order_turn_in_travel_documents",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_travel_documents_to_turn_in",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodrig[end]"
+  },
+  {
+   "name": "dv108_travel_documents_due_date",
+   "kind": "text",
+   "value": "06-15-2024"
+  },
+  {
+   "name": "dv108_travel_documents_recipient_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Ro[end]"
+  },
+  {
+   "name": "dv108_order_provide_travel_plan",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_travel_plan_schedule",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_travel_plan_round_trip_tickets",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_travel_plan_contact_details",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_travel_plan_open_ticket_for_me",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_travel_plan_other_description",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Av[end]"
+  },
+  {
+   "name": "dv108_travel_plan_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_order_notify_other_state",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_notify_state_county_and_state",
+   "kind": "text",
+   "value": "Test Value, Test Value"
+  },
+  {
+   "name": "dv108_order_notify_foreign_embassy",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_embassy_or_consulate_name",
+   "kind": "text",
+   "value": "Test U[end]"
+  },
+  {
+   "name": "dv108_embassy_proof_due_date",
+   "kind": "text",
+   "value": "06-15-2024"
+  },
+  {
+   "name": "dv108_order_foreign_custody_order",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_foreign_custody_country",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodriguez-Va[end]"
+  },
+  {
+   "name": "dv108_order_post_a_bond",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv108_bond_amount",
+   "kind": "text",
+   "value": "100"
+  }
+ ]
+}

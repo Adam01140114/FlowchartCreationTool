@@ -87,6 +87,14 @@
       "page": 6
      },
      {
+      "form": "DV108",
+      "page": 1
+     },
+     {
+      "form": "DV108",
+      "page": 2
+     },
+     {
       "form": "DV109",
       "page": 1
      },
@@ -150,6 +158,10 @@
       "page": 1
      },
      {
+      "form": "DV108",
+      "page": 1
+     },
+     {
       "form": "DV109",
       "page": 1
      },
@@ -173,6 +185,10 @@
       "page": 1
      },
      {
+      "form": "DV108",
+      "page": 1
+     },
+     {
       "form": "DV109",
       "page": 1
      },
@@ -187,6 +203,7 @@
   "forms": [
    "DV100",
    "DV101",
+   "DV108",
    "DV109",
    "DV110"
   ],
@@ -278,6 +295,14 @@
      {
       "form": "DV105",
       "page": 6
+     },
+     {
+      "form": "DV108",
+      "page": 1
+     },
+     {
+      "form": "DV108",
+      "page": 2
      },
      {
       "form": "DV109",
@@ -422,6 +447,14 @@
       "page": 6
      },
      {
+      "form": "DV108",
+      "page": 1
+     },
+     {
+      "form": "DV108",
+      "page": 2
+     },
+     {
       "form": "DV109",
       "page": 1
      },
@@ -474,7 +507,20 @@
   ],
   "substantive": 0,
   "forms": [],
-  "connectors": []
+  "connectors": [
+   {
+    "name": "dv105_abduction_risk_no",
+    "to": "DV-108",
+    "answer": "Yes",
+    "on": false
+   },
+   {
+    "name": "dv105_abduction_risk_yes",
+    "to": "DV-108",
+    "answer": "Yes",
+    "on": true
+   }
+  ]
  },
  "4": {
   "fields": [
@@ -562,6 +608,14 @@
      {
       "form": "DV105",
       "page": 6
+     },
+     {
+      "form": "DV108",
+      "page": 1
+     },
+     {
+      "form": "DV108",
+      "page": 2
      },
      {
       "form": "DV109",
@@ -706,6 +760,14 @@
       "page": 6
      },
      {
+      "form": "DV108",
+      "page": 1
+     },
+     {
+      "form": "DV108",
+      "page": 2
+     },
+     {
       "form": "DV109",
       "page": 1
      },
@@ -846,6 +908,14 @@
      {
       "form": "DV105",
       "page": 5
+     },
+     {
+      "form": "DV108",
+      "page": 1
+     },
+     {
+      "form": "DV108",
+      "page": 2
      },
      {
       "form": "DV109",
