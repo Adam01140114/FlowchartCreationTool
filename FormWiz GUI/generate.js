@@ -14607,7 +14607,33 @@ function applyComputedFields(){
     rules.forEach(function(rule){
         if (!rule || !rule.nameId) return;
         var total = 0;
-        if (rule.pagesOfAttachedForms){
+        if (rule.pagesOfFormsAttachedTo){
+            // The pages attached to this form - and to whatever is attached to
+            // it, because an attachment's attachment is in the same stack.
+            //
+            // Each form says what it is attached to on its own first line, and
+            // that is a different fact from what switches it on. DV-140 is
+            // switched on by DV-100's custody box and printed as attached to
+            // DV-110; counting every conditional form as DV-100's attachment put
+            // its six pages into DV-100 item 32, which a filer signs under
+            // penalty of perjury. DV-108 is attached to DV-105, which is
+            // attached to DV-100, so its two pages rightly count.
+            var target = String(rule.pagesOfFormsAttachedTo);
+            var byName = {};
+            getProjectForms().forEach(function(form){ byName[form.name] = form; });
+            getProjectForms().forEach(function(form){
+                if (!isFormActivated(form)) return;
+                var at = form.attachedTo || '';
+                var hops = 0;
+                while (at && at !== target && byName[at] && hops < 8){
+                    at = byName[at].attachedTo || '';
+                    hops++;
+                }
+                if (at === target) total += Number(form.pdfPages) || 0;
+            });
+        } else if (rule.pagesOfAttachedForms){
+            // The older rule, for a project whose forms do not say what they
+            // are attached to: every form switched on by an answer.
             getProjectForms().forEach(function(form){
                 if (!isAttachmentForm(form) || !isFormActivated(form)) return;
                 total += Number(form.pdfPages) || 0;

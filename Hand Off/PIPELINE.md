@@ -217,6 +217,15 @@ first two or three items and every other field is marked `courtUse`, so no
 question is ever generated for it and `pipeline-explain.js` counts the blank as
 blank by design.
 
+**Say what each attachment is attached to.** `attachedTo` in the spec, copied
+from the form's own first line, is a different fact from what switches it on.
+DV-140 is switched on by DV-100's custody box and printed as attached to DV-110;
+counting it as DV-100's put six pages into DV-100 item 32, which read 18 where
+the stack is 12. The computed rule `pagesOfFormsAttachedTo` follows the chain,
+so DV-108 (attached to DV-105, attached to DV-100) counts and DV-140 does not.
+It travels in `defaultPdfProperties` beside `pdfPages`, and has to be named in
+`project-gui-export.js`, the one place the export lists a form's keys by name.
+
 **Which forms are in the packet is answered in one place.** `packet-forms.js`,
 reading `dv-packet.spec.json`. Four scripts used to keep their own list and
 every one went stale silently - a form joined the packet and was not filled, or

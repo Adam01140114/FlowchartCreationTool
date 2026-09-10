@@ -32,7 +32,8 @@
       "name": "DV-101",
       "title": "DV-101 Description of Abuse",
       "flowchart": "dv101-flowchart.json",
-      "pdf": "dv101.pdf"
+      "pdf": "dv101.pdf",
+      "attachedTo": "DV-100"
     },
     {
       "name": "DV-105",
@@ -46,19 +47,22 @@
           "isAnswer": "Yes",
           "_why": "DV-105 item 8 says it in as many words: \"To ask for orders to help prevent abduction, you must complete form DV-108 ... and attach it to this form.\" So the form asks the question and the packet obeys the answer - the same shape as DV-105 itself hanging off the custody box on DV-100."
         }
-      ]
+      ],
+      "attachedTo": "DV-100"
     },
     {
       "name": "DV-108",
       "title": "DV-108 Request for Orders to Prevent Child Abduction",
       "flowchart": "dv108-flowchart.json",
-      "pdf": "dv108.pdf"
+      "pdf": "dv108.pdf",
+      "attachedTo": "DV-105"
     },
     {
       "name": "DV-140",
       "title": "DV-140 Child Custody and Visitation Order",
       "flowchart": "dv140-flowchart.json",
-      "pdf": "dv140.pdf"
+      "pdf": "dv140.pdf",
+      "attachedTo": "DV-110"
     },
     {
       "name": "CLETS-001",
@@ -81,5 +85,6 @@
       "flowchart": "dv110-flowchart.json",
       "pdf": "dv110.pdf"
     }
-  ]
+  ],
+  "_attachedToNote": "attachedTo is what each form says it is attached to, on its own first line - not what switches it on. DV-140 is switched on by DV-100's custody box and printed as attached to DV-110, and treating the first as the second put its six pages into DV-100 item 32. DV-109, DV-110 and CLETS-001 are filed alongside and attached to nothing."
 }

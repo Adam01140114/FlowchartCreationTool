@@ -240,7 +240,11 @@ async function main() {
       pdfName: entry.title || entry.name,
       pdfFile: entry.pdf,
       pdfPrice: String(entry.price == null ? 0 : entry.price),
-      pdfPages: await pageCount(entry.pdf)
+      pdfPages: await pageCount(entry.pdf),
+      // What this form is attached to, as the form itself prints it. It rides
+      // in defaultPdfProperties because that is the part of a flowchart the
+      // editor keeps whole - pdfPages reaches the runtime the same way.
+      attachedTo: entry.attachedTo || ''
     };
     // Rule 5: exactly one group per form, named after the form, holding the
     // sections that actually carry a question.

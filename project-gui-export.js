@@ -502,7 +502,12 @@ function reportGroupProblems(merged) {
         pdfName: gui.defaultPDFName || entry.name,
         // What this form adds to the pile a filer hands in.
         pdfPages: (entry.flowchart && entry.flowchart.defaultPdfProperties
-          && entry.flowchart.defaultPdfProperties.pdfPages) || 0
+          && entry.flowchart.defaultPdfProperties.pdfPages) || 0,
+        // Which form this one is attached to. This list is the one place the
+        // export names its keys one by one, so anything a form knows about
+        // itself and the runtime needs has to be named here or it stops here.
+        attachedTo: (entry.flowchart && entry.flowchart.defaultPdfProperties
+          && entry.flowchart.defaultPdfProperties.attachedTo) || ''
       });
 
       merged.sections = merged.sections.concat(gui.sections || []);

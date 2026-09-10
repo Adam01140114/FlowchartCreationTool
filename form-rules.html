@@ -252,6 +252,12 @@ const RULES = [
     why: 'DV-140 is 221 fields and 195 of them are the judge’s. Of the 25 that are not, every one - the two names, the two relationships to the children, the children themselves - is a question DV-100 or DV-105 already asks. Given DV-105’s names it asks nothing at all, which is right: a filer should not answer the same question twice because two forms print it.',
     by: 'dv140-field-config.json; the same split DV-110 and DV-109 use' },
 
+  { id: 'attached-to-is-not-switched-on-by', group: 'packet', num: 'Rule',
+    title: 'What a form is attached to is not what switches it on',
+    says: 'Each attachment declares attachedTo in the spec, copied from its own first line - "This form is attached to ...". A count of attached pages follows that chain to the form it is for, so an attachment’s attachment counts and a form attached elsewhere does not.',
+    why: 'DV-100 item 32 counted every form switched on by an answer as attached to DV-100. That held while DV-101 and DV-105 were the only such forms. DV-140 is switched on by DV-100’s custody box and printed as attached to DV-110, so its six pages went into item 32, which read 18 where the stack handed in with DV-100 is 12 - on a line the filer signs under penalty of perjury. DV-108 is attached to DV-105, which is attached to DV-100, so its two pages rightly do count.',
+    by: 'attachedTo in dv-packet.spec.json, carried in defaultPdfProperties like pdfPages; pagesOfFormsAttachedTo in the computed rule; the chain walk in applyComputedFields' },
+
   { id: 'court-use', group: 'packet', num: 'Rule 6',
     title: 'Ask only what the filer completes',
     says: 'Every Judicial Council form prints who completes what. A field marked courtUse never becomes a question and stays blank for the judge or clerk.',

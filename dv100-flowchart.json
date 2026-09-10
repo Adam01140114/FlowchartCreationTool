@@ -19235,7 +19235,8 @@
     {
       "nameId": "additional_pages_count",
       "_why": "DV-100 item 32 asks for the number of extra pages attached. A filer cannot count them and the debug fill answered 100. The packet knows: the pages of every attachment being filed, plus one for each separate sheet already promised.",
-      "pagesOfAttachedForms": true,
+      "_whyAttachedTo": "Counted along what each form says it is attached to, not along what switches it on. DV-108 is attached to DV-105, which is attached to DV-100, so its pages are part of the stack handed in with this form; DV-140 is attached to DV-110, a separate order, so its pages are not - and counting every conditional form as an attachment had put DV-140 in, making this 18 where it is 12.",
+      "pagesOfFormsAttachedTo": "DV-100",
       "onePageEachWhenYes": [
         "other_protected_people_additional_list_attached_yes",
         "dv101_additional_pages_attached",
