@@ -1,0 +1,156 @@
+{
+ "1": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "person_asking_protection_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Ro[end]"
+  },
+  {
+   "name": "person_to_restrain_full_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+  },
+  {
+   "name": "dv101_abuse_1_date",
+   "kind": "text",
+   "value": "06-15-2024"
+  },
+  {
+   "name": "dv101_abuse_1_witnesses",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to[end]"
+  },
+  {
+   "name": "dv101_abuse_1_description",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Av[end]"
+  },
+  {
+   "name": "dv101_abuse_1_weapon_description",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked hi[end]"
+  },
+  {
+   "name": "dv101_abuse_1_injuries",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked hi[end]"
+  },
+  {
+   "name": "dv101_abuse_1_police_came_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv101_abuse_1_police_came_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv101_abuse_1_epo_given_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv101_abuse_1_epo_given_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv101_abuse_1_epo_given_unknown",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv101_abuse_1_epo_protects_you",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv101_abuse_1_epo_protects_restrained_person",
+   "kind": "checkbox",
+   "value": true
+  }
+ ],
+ "2": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "dv101_abuse_2_date",
+   "kind": "text",
+   "value": "06-15-2024"
+  },
+  {
+   "name": "dv101_abuse_2_witnesses",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to[end]"
+  },
+  {
+   "name": "dv101_abuse_2_description",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-202[end]"
+  },
+  {
+   "name": "dv101_abuse_2_weapon_description",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked hi[end]"
+  },
+  {
+   "name": "dv101_abuse_2_injuries",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked hi[end]"
+  },
+  {
+   "name": "dv101_abuse_2_police_came_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv101_abuse_2_police_came_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv101_abuse_2_epo_given_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv101_abuse_2_epo_given_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv101_abuse_2_epo_given_unknown",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv101_abuse_2_epo_protects_you",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv101_abuse_2_epo_protects_restrained_person",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv101_further_abuse_description",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go.[end]"
+  },
+  {
+   "name": "dv101_additional_pages_attached",
+   "kind": "checkbox",
+   "value": true
+  }
+ ]
+}

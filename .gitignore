@@ -80,5 +80,16 @@ FormWiz GUI/*-test.html
 pipeline-answers.json
 pipeline-out/
 
-# Published page images - regenerate with pipeline-current-output.js
-Current Form Output/
+# The published run is committed on purpose.
+#
+# It is what the dashboard reads, and the whole point of a project's dashboard
+# URL is that it can be handed to somebody else. Ignored, the link worked only
+# on the machine that produced it: a fresh clone answered "no manifest" and
+# View PDF 404ed. Each run is about 18MB of PNGs and filled PDFs and replaces
+# the last one wholesale, so the history carries a copy per published run -
+# that is the cost of the link being real, and `git rm -r --cached "Current
+# Form Output"` takes it back.
+#
+# pipeline-out/ above stays ignored: it is scratch, and everything worth
+# keeping out of it is copied into the published run.
+Current Form Output/index.json.tmp

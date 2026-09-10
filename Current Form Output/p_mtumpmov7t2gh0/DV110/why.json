@@ -1,0 +1,226 @@
+{
+ "form": "dv110",
+ "counts": {
+  "empty": 71,
+  "closed": 0,
+  "defect": 0,
+  "unmapped": 0,
+  "court": 71,
+  "overflow": 0
+ },
+ "fields": {
+  "amended_order_number": {
+   "verdict": "court"
+  },
+  "hearing_date": {
+   "verdict": "court"
+  },
+  "hearing_time": {
+   "verdict": "court"
+  },
+  "dv110_firearm_item_1_description": {
+   "verdict": "court"
+  },
+  "dv110_firearm_item_1_location": {
+   "verdict": "court"
+  },
+  "firearm_item_1_proof_of_compliance_date": {
+   "verdict": "court"
+  },
+  "dv110_firearm_item_2_description": {
+   "verdict": "court"
+  },
+  "dv110_firearm_item_2_location": {
+   "verdict": "court"
+  },
+  "firearm_item_2_proof_of_compliance_date": {
+   "verdict": "court"
+  },
+  "dv110_firearm_item_3_description": {
+   "verdict": "court"
+  },
+  "dv110_firearm_item_3_location": {
+   "verdict": "court"
+  },
+  "firearm_item_3_proof_of_compliance_date": {
+   "verdict": "court"
+  },
+  "dv110_firearm_item_4_description": {
+   "verdict": "court"
+  },
+  "dv110_firearm_item_4_location": {
+   "verdict": "court"
+  },
+  "firearm_item_4_proof_of_compliance_date": {
+   "verdict": "court"
+  },
+  "ammunition_item_1_description": {
+   "verdict": "court"
+  },
+  "ammunition_item_1_amount": {
+   "verdict": "court"
+  },
+  "ammunition_item_1_location": {
+   "verdict": "court"
+  },
+  "ammunition_item_1_proof_of_compliance_date": {
+   "verdict": "court"
+  },
+  "ammunition_item_2_description": {
+   "verdict": "court"
+  },
+  "ammunition_item_2_amount": {
+   "verdict": "court"
+  },
+  "ammunition_item_2_location": {
+   "verdict": "court"
+  },
+  "ammunition_item_2_proof_of_compliance_date": {
+   "verdict": "court"
+  },
+  "firearms_review_hearing_date": {
+   "verdict": "court"
+  },
+  "firearms_review_hearing_department": {
+   "verdict": "court"
+  },
+  "firearms_review_hearing_time": {
+   "verdict": "court"
+  },
+  "firearms_review_hearing_room": {
+   "verdict": "court"
+  },
+  "firearms_review_hearing_court_name_and_address": {
+   "verdict": "court"
+  },
+  "no_contact_exception_other_explanation": {
+   "verdict": "court"
+  },
+  "stay_away_distance_yards": {
+   "verdict": "court"
+  },
+  "stay_away_other_location_explanation": {
+   "verdict": "court"
+  },
+  "stay_away_exception_other_explanation_line_1": {
+   "verdict": "court"
+  },
+  "stay_away_exception_other_explanation_line_2": {
+   "verdict": "court"
+  },
+  "move_out_address": {
+   "verdict": "court"
+  },
+  "other_orders_details": {
+   "verdict": "court"
+  },
+  "child_custody_other_form_name": {
+   "verdict": "court"
+  },
+  "protect_animals_stay_away_distance_yards": {
+   "verdict": "court"
+  },
+  "animal_1_name_or_id": {
+   "verdict": "court"
+  },
+  "animal_1_type": {
+   "verdict": "court"
+  },
+  "animal_1_breed": {
+   "verdict": "court"
+  },
+  "animal_1_color": {
+   "verdict": "court"
+  },
+  "animal_2_name_or_id": {
+   "verdict": "court"
+  },
+  "animal_2_type": {
+   "verdict": "court"
+  },
+  "animal_2_breed": {
+   "verdict": "court"
+  },
+  "animal_2_color": {
+   "verdict": "court"
+  },
+  "animal_3_name_or_id": {
+   "verdict": "court"
+  },
+  "animal_3_type": {
+   "verdict": "court"
+  },
+  "animal_3_breed": {
+   "verdict": "court"
+  },
+  "animal_3_color": {
+   "verdict": "court"
+  },
+  "animal_4_name_or_id": {
+   "verdict": "court"
+  },
+  "animal_4_type": {
+   "verdict": "court"
+  },
+  "animal_4_breed": {
+   "verdict": "court"
+  },
+  "animal_4_color": {
+   "verdict": "court"
+  },
+  "controlled_property_description": {
+   "verdict": "court"
+  },
+  "property_debt_payment_1_pay_to": {
+   "verdict": "court"
+  },
+  "property_debt_payment_1_for": {
+   "verdict": "court"
+  },
+  "property_debt_payment_1_amount": {
+   "verdict": "court"
+  },
+  "property_debt_payment_1_due_date": {
+   "verdict": "court"
+  },
+  "property_debt_payment_2_pay_to": {
+   "verdict": "court"
+  },
+  "property_debt_payment_2_for": {
+   "verdict": "court"
+  },
+  "property_debt_payment_2_amount": {
+   "verdict": "court"
+  },
+  "property_debt_payment_2_due_date": {
+   "verdict": "court"
+  },
+  "property_debt_payment_3_pay_to": {
+   "verdict": "court"
+  },
+  "property_debt_payment_3_for": {
+   "verdict": "court"
+  },
+  "property_debt_payment_3_amount": {
+   "verdict": "court"
+  },
+  "property_debt_payment_3_due_date": {
+   "verdict": "court"
+  },
+  "attached_pages_count": {
+   "verdict": "court"
+  },
+  "attachment_other_form_name": {
+   "verdict": "court"
+  },
+  "judge_signature_date": {
+   "verdict": "court"
+  },
+  "clerk_certificate_date": {
+   "verdict": "court"
+  },
+  "clerk_certificate_deputy_name": {
+   "verdict": "court"
+  }
+ }
+}

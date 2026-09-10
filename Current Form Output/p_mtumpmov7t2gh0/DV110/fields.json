@@ -1,0 +1,985 @@
+{
+ "1": [
+  {
+   "name": "amended_order_number",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "order_type_original",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "order_type_amended",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "person_asking_protection_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Ro[end]"
+  },
+  {
+   "name": "person_to_restrain_full_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+  },
+  {
+   "name": "person_to_restrain_race",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "person_to_restrain_gender_male",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "person_to_restrain_gender_female",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "person_to_restrain_gender_nonbinary",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "person_to_restrain_age",
+   "kind": "text",
+   "value": "100"
+  },
+  {
+   "name": "person_to_restrain_date_of_birth",
+   "kind": "text",
+   "value": "06-15-2024"
+  },
+  {
+   "name": "court_name_and_street_address",
+   "kind": "text",
+   "value": "Test User, 123 Test Street"
+  },
+  {
+   "name": "restrained_person_height",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "restrained_person_weight",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "restrained_person_hair_color",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "restrained_person_eye_color",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "restrained_person_relationship_to_protected_person",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "restrained_person_street_address",
+   "kind": "text",
+   "value": "123 Test Street Maria El[end]"
+  },
+  {
+   "name": "restrained_person_city",
+   "kind": "text",
+   "value": "Los An[end]"
+  },
+  {
+   "name": "restrained_person_state",
+   "kind": "text",
+   "value": "WY"
+  },
+  {
+   "name": "restrained_person_zip_code",
+   "kind": "text",
+   "value": "90210"
+  },
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "restrained_person_prohibited_items_details",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has[end]"
+  },
+  {
+   "name": "other_protected_people_yes_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "other_protected_person_1_full_name",
+   "kind": "text",
+   "value": "Test User"
+  },
+  {
+   "name": "other_protected_person_1_relationship",
+   "kind": "text",
+   "value": "Test Value"
+  },
+  {
+   "name": "other_protected_person_1_age",
+   "kind": "text",
+   "value": "100"
+  },
+  {
+   "name": "other_protected_person_2_full_name",
+   "kind": "text",
+   "value": "Test User"
+  },
+  {
+   "name": "other_protected_person_2_relationship",
+   "kind": "text",
+   "value": "Test Value"
+  },
+  {
+   "name": "other_protected_person_2_age",
+   "kind": "text",
+   "value": "100"
+  },
+  {
+   "name": "other_protected_person_3_full_name",
+   "kind": "text",
+   "value": "Test User"
+  },
+  {
+   "name": "other_protected_person_3_relationship",
+   "kind": "text",
+   "value": "Test Value"
+  },
+  {
+   "name": "other_protected_person_3_age",
+   "kind": "text",
+   "value": "100"
+  },
+  {
+   "name": "other_protected_person_4_full_name",
+   "kind": "text",
+   "value": "Test User"
+  },
+  {
+   "name": "other_protected_person_4_relationship",
+   "kind": "text",
+   "value": "Test Value"
+  },
+  {
+   "name": "other_protected_person_4_age",
+   "kind": "text",
+   "value": "100"
+  },
+  {
+   "name": "other_protected_people_additional_list_attached_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "hearing_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "hearing_time",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "hearing_time_am",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "hearing_time_pm",
+   "kind": "checkbox",
+   "value": false
+  }
+ ],
+ "2": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "restrained_person_has_prohibited_items_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "firearm_item_1_proof_of_compliance_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv110_firearm_item_1_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv110_firearm_item_1_location",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "firearm_item_1_proof_of_compliance_received_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv110_firearm_item_2_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv110_firearm_item_2_location",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "firearm_item_2_proof_of_compliance_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "firearm_item_2_proof_of_compliance_received_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv110_firearm_item_3_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv110_firearm_item_3_location",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "firearm_item_3_proof_of_compliance_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "firearm_item_3_proof_of_compliance_received_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv110_firearm_item_4_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv110_firearm_item_4_location",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "firearm_item_4_proof_of_compliance_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "firearm_item_4_proof_of_compliance_received_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "ammunition_item_1_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "ammunition_item_1_amount",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "ammunition_item_1_location",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "ammunition_item_1_proof_of_compliance_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "ammunition_item_1_proof_of_compliance_received_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "ammunition_item_2_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "ammunition_item_2_amount",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "ammunition_item_2_location",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "ammunition_item_2_proof_of_compliance_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "ammunition_item_2_proof_of_compliance_received_yes",
+   "kind": "checkbox",
+   "value": false
+  }
+ ],
+ "3": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "firearms_compliance_review_hearing_required_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "firearms_review_hearing_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "firearms_review_hearing_department",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "firearms_review_hearing_court_name_and_address",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "firearms_review_hearing_time",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "firearms_review_hearing_room",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "cannot_look_order_not_granted_good_cause_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "order_not_abuse_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "order_not_abuse_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "order_not_abuse_granted",
+   "kind": "checkbox",
+   "value": false
+  }
+ ],
+ "4": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "no_contact_order_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "no_contact_order_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "no_contact_order_granted",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "no_contact_protected_person_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "no_contact_other_protected_people_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "no_contact_exception_applies_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "no_contact_exception_child_communication",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "no_contact_exception_children_visits_only",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "no_contact_exception_other_explanation",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "no_contact_exception_other",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_order_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_order_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_order_granted",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_distance_yards",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "stay_away_from_protected_person",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_from_protected_person_school",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_from_protected_person_home",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv110_stay_away_from_other_protected_people",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_from_protected_person_workplace",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_from_childrens_school_or_child_care",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_from_protected_person_vehicle",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_other_location_explanation",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "stay_away_from_other_location",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_exception_applies_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_exception_child_exchange",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_exception_child_visits",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_exception_other_explanation_line_1",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "stay_away_exception_other",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "stay_away_exception_other_explanation_line_2",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "move_out_order_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "move_out_order_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "move_out_order_granted",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "move_out_address",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "other_orders_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "other_orders_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "other_orders_granted",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "other_orders_details",
+   "kind": "text",
+   "value": ""
+  }
+ ],
+ "5": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "child_custody_visitation_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "child_custody_visitation_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "child_custody_visitation_granted",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "child_custody_other_form_name",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "child_custody_other_form_attached_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "protect_animals_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "protect_animals_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "protect_animals_granted",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "protect_animals_stay_away_distance_yards",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "protect_animals_stay_away_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "protect_animals_no_harm_or_transfer_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "protect_animals_protected_person_sole_possession_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "animal_1_breed",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_1_color",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_1_name_or_id",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_1_type",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_2_name_or_id",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_2_type",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_2_breed",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_2_color",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_3_name_or_id",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_3_type",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_3_breed",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_3_color",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_4_name_or_id",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_4_type",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_4_breed",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "animal_4_color",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "control_of_property_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "control_of_property_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "control_of_property_granted",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "controlled_property_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "health_insurance_order_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "health_insurance_order_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "health_insurance_order_granted",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "health_insurance_order_applies_to_protected_person_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "health_insurance_order_applies_to_restrained_person_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "record_communications_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "record_communications_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "record_communications_granted",
+   "kind": "checkbox",
+   "value": false
+  }
+ ],
+ "6": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "property_restraint_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "property_restraint_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "property_restraint_granted",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "property_restraint_applies_to_protected_person_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "property_restraint_applies_to_restrained_person_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "pay_property_debts_not_requested",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "pay_property_debts_denied_until_hearing",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "pay_property_debts_granted",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "property_debt_payment_1_pay_to",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "property_debt_payment_1_for",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "property_debt_payment_1_amount",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "property_debt_payment_1_due_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "property_debt_payment_2_pay_to",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "property_debt_payment_2_for",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "property_debt_payment_2_amount",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "property_debt_payment_2_due_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "property_debt_payment_3_pay_to",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "property_debt_payment_3_for",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "property_debt_payment_3_amount",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "property_debt_payment_3_due_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "has_attached_pages_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "attached_pages_count",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "attachment_other_form_name",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "attachment_form_dv_140",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "attachment_form_dv_145",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "attachment_form_dv_820",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "attachment_form_other",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "judge_signature_date",
+   "kind": "text",
+   "value": ""
+  }
+ ],
+ "7": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  }
+ ],
+ "8": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  }
+ ],
+ "9": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "clerk_certificate_date",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "clerk_certificate_deputy_name",
+   "kind": "text",
+   "value": ""
+  }
+ ]
+}

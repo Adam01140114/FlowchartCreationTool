@@ -1,0 +1,1369 @@
+{
+ "1": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "person_asking_protection_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Ro[end]"
+  },
+  {
+   "name": "dv105_your_relationship_parent",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_your_relationship_legal_guardian",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_your_relationship_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_your_relationship_other_description",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "person_to_restrain_full_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+  },
+  {
+   "name": "dv105_their_relationship_parent",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_their_relationship_legal_guardian",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_their_relationship_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_their_relationship_other_description",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_child_1_date_of_birth",
+   "kind": "text",
+   "value": "06-15-2024"
+  },
+  {
+   "name": "dv105_child_1_name",
+   "kind": "text",
+   "value": "Test User"
+  },
+  {
+   "name": "dv105_child_2_date_of_birth",
+   "kind": "text",
+   "value": "06-15-2024"
+  },
+  {
+   "name": "dv105_child_2_name",
+   "kind": "text",
+   "value": "Test User"
+  },
+  {
+   "name": "dv105_child_3_name",
+   "kind": "text",
+   "value": "Test User"
+  },
+  {
+   "name": "dv105_child_3_date_of_birth",
+   "kind": "text",
+   "value": "06-15-2024"
+  },
+  {
+   "name": "dv105_child_4_date_of_birth",
+   "kind": "text",
+   "value": "06-15-2024"
+  },
+  {
+   "name": "dv105_child_4_name",
+   "kind": "text",
+   "value": "Test User"
+  },
+  {
+   "name": "dv105_children_additional_list_attached",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_children_lived_together_five_years_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_children_lived_together_five_years_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_1_from",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_child_home_1_city_and_state",
+   "kind": "text",
+   "value": "Los Angeles"
+  },
+  {
+   "name": "dv105_child_home_1_lived_with_me",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_1_lived_with_restrained_person",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_1_lived_with_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_1_other_relationship",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_child_home_1_address_private",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_2_from",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_child_home_2_until",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_child_home_2_city_and_state",
+   "kind": "text",
+   "value": "Los Angeles"
+  },
+  {
+   "name": "dv105_child_home_2_lived_with_me",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_2_lived_with_restrained_person",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_2_lived_with_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_2_other_relationship",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_child_home_3_from",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_child_home_3_until",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_child_home_3_city_and_state",
+   "kind": "text",
+   "value": "Los Angeles"
+  },
+  {
+   "name": "dv105_child_home_3_lived_with_me",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_3_lived_with_restrained_person",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_3_lived_with_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_3_other_relationship",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_child_home_4_from",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_child_home_4_until",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_child_home_4_city_and_state",
+   "kind": "text",
+   "value": "Los Angeles"
+  },
+  {
+   "name": "dv105_child_home_4_lived_with_me",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_4_lived_with_restrained_person",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_4_lived_with_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_4_other_relationship",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_child_home_5_from",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_child_home_5_until",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_child_home_5_city_and_state",
+   "kind": "text",
+   "value": "Los Angeles"
+  },
+  {
+   "name": "dv105_child_home_5_lived_with_me",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_5_lived_with_restrained_person",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_5_lived_with_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_5_other_relationship",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_child_home_6_from",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_child_home_6_until",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_child_home_6_city_and_state",
+   "kind": "text",
+   "value": "Los Angeles"
+  },
+  {
+   "name": "dv105_child_home_6_lived_with_me",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_6_lived_with_restrained_person",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_6_lived_with_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_child_home_6_other_relationship",
+   "kind": "text",
+   "value": "Test V[end]"
+  }
+ ],
+ "2": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "dv105_other_case_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_other_case_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_other_case_custody_details",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue L[end]"
+  },
+  {
+   "name": "dv105_other_case_custody",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_other_case_divorce_details",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue L[end]"
+  },
+  {
+   "name": "dv105_other_case_divorce",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_other_case_juvenile_details",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodriguez-Va[end]"
+  },
+  {
+   "name": "dv105_other_case_juvenile",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_other_case_guardianship_details",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Av[end]"
+  },
+  {
+   "name": "dv105_other_case_guardianship",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_other_case_criminal_details",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue L[end]"
+  },
+  {
+   "name": "dv105_other_case_criminal",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_other_case_other_details",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodriguez-Vasquez 1847 N[end]"
+  },
+  {
+   "name": "dv105_other_case_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_current_custody_order_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_current_custody_order_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_current_custody_order_terms",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and wouldx[end]"
+  },
+  {
+   "name": "dv105_current_custody_order_change_reason",
+   "kind": "text",
+   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and wouldx[end]"
+  },
+  {
+   "name": "dv105_other_guardian_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+  },
+  {
+   "name": "dv105_other_guardian_is_parent",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_other_guardian_is_legal_guardian",
+   "kind": "checkbox",
+   "value": true
+  }
+ ],
+ "3": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "dv105_limit_travel_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_limit_travel_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_limit_travel_county",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_limit_travel_county_name",
+   "kind": "text",
+   "value": "Test User Maria Elena Rodriguez-Vasquez 1847 North Willowb[end]"
+  },
+  {
+   "name": "dv105_limit_travel_california",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_limit_travel_other",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_limit_travel_other_places",
+   "kind": "text",
+   "value": "Test Value Maria Elena Rodriguez-Vasquez 1847 North Willow[end]"
+  },
+  {
+   "name": "dv105_records_access_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_records_access_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_records_withheld_all_children",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_records_withheld_named_children",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_records_withheld_children_names",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_records_medical",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_records_school",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_records_extracurricular",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_records_other",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_records_employment",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_records_other_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_abduction_risk_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_abduction_risk_yes",
+   "kind": "checkbox",
+   "value": true
+  }
+ ],
+ "4": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "dv105_custody_orders_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_custody_orders_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_legal_custody_sole_to_me",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_physical_custody_sole_to_me",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_legal_custody_sole_to_them",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_physical_custody_sole_to_them",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_legal_custody_joint",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_physical_custody_joint",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_legal_custody_other",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_physical_custody_other",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_legal_custody_other_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_physical_custody_other_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_visits_none",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_visits_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_visits_virtual_only",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_visits_supervised_yes",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_visits_supervised_no",
+   "kind": "checkbox",
+   "value": false
+  }
+ ],
+ "5": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "dv105_supervisor_professional_name",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_supervisor_professional",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_supervisor_fees_me_percent",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_supervisor_fees_them_percent",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_supervisor_fees_other_who",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_supervisor_fees_other_percent",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_supervisor_nonprofessional",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervisor_nonprofessional_name",
+   "kind": "text",
+   "value": "Test U[end]"
+  },
+  {
+   "name": "dv105_supervisor_nonprofessional_agreed",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_location_in_person",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_location_virtual",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_supervised_location_other",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_supervised_location_other_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_supervised_frequency_once_a_week",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_frequency_once_a_week_hours",
+   "kind": "text",
+   "value": "100"
+  },
+  {
+   "name": "dv105_supervised_frequency_twice_a_week",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_supervised_frequency_twice_a_week_hours",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_supervised_frequency_other",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_supervised_frequency_other_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_supervised_use_schedule_chart",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_visit_monday_start",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_monday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_monday_location_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_monday_virtual_visit",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_visit_monday_end",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_supervised_visit_monday_person_to_bring_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_monday_location_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_tuesday_start",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_tuesday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_tuesday_location_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_tuesday_virtual_visit",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_visit_tuesday_end",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_supervised_visit_tuesday_person_to_bring_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_tuesday_location_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_wednesday_start",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_wednesday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_wednesday_location_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_wednesday_virtual_visit",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_visit_wednesday_end",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_supervised_visit_wednesday_person_to_bring_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_wednesday_location_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_thursday_start",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_thursday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_thursday_location_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_thursday_virtual_visit",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_visit_thursday_end",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_supervised_visit_thursday_person_to_bring_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_thursday_location_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_friday_start",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_friday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_friday_location_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_friday_virtual_visit",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_visit_friday_end",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_supervised_visit_friday_person_to_bring_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_friday_location_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_saturday_start",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_saturday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_saturday_location_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_saturday_virtual_visit",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_visit_saturday_end",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_supervised_visit_saturday_person_to_bring_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_saturday_location_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_sunday_start",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_sunday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_sunday_location_dropoff",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_sunday_virtual_visit",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_visit_sunday_end",
+   "kind": "text",
+   "value": "Test "
+  },
+  {
+   "name": "dv105_supervised_visit_sunday_person_to_bring_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_visit_sunday_location_pickup",
+   "kind": "text",
+   "value": "Test V[end]"
+  },
+  {
+   "name": "dv105_supervised_schedule_other_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_supervised_schedule_every_week",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_supervised_schedule_every_other_week",
+   "kind": "checkbox",
+   "value": true
+  },
+  {
+   "name": "dv105_supervised_schedule_other",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_supervised_start_date",
+   "kind": "text",
+   "value": "06-15-2024"
+  }
+ ],
+ "6": [
+  {
+   "name": "case_number",
+   "kind": "text",
+   "value": "Test Value Maria Elena R[end]"
+  },
+  {
+   "name": "dv105_exchanges_supervised_no",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_exchanges_supervised_yes",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_exchange_supervisor_professional_name",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_exchange_supervisor_professional",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_exchange_fees_me_percent",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_exchange_fees_them_percent",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_exchange_fees_other_who",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_exchange_fees_other_percent",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_exchange_supervisor_nonprofessional",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_exchange_supervisor_nonprofessional_name",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_exchange_supervisor_nonprofessional_agreed",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_location_in_person",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_location_virtual",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_location_other",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_location_other_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_details",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_monday_start",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_monday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_monday_location_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_monday_virtual_visit",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_visit_monday_end",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_monday_person_to_bring_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_monday_location_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_tuesday_start",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_tuesday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_tuesday_location_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_tuesday_virtual_visit",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_visit_tuesday_end",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_tuesday_person_to_bring_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_tuesday_location_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_wednesday_start",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_wednesday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_wednesday_location_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_wednesday_virtual_visit",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_visit_wednesday_end",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_wednesday_person_to_bring_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_wednesday_location_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_thursday_start",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_thursday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_thursday_location_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_thursday_virtual_visit",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_visit_thursday_end",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_thursday_person_to_bring_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_thursday_location_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_friday_start",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_friday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_friday_location_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_friday_virtual_visit",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_visit_friday_end",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_friday_person_to_bring_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_friday_location_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_saturday_start",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_saturday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_saturday_location_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_saturday_virtual_visit",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_visit_saturday_end",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_saturday_person_to_bring_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_saturday_location_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_sunday_start",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_sunday_person_to_bring_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_sunday_location_dropoff",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_sunday_virtual_visit",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_visit_sunday_end",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_sunday_person_to_bring_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_visit_sunday_location_pickup",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_schedule_other_description",
+   "kind": "text",
+   "value": ""
+  },
+  {
+   "name": "dv105_unsupervised_schedule_every_week",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_schedule_every_other_week",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_schedule_other",
+   "kind": "checkbox",
+   "value": false
+  },
+  {
+   "name": "dv105_unsupervised_start_date",
+   "kind": "text",
+   "value": ""
+  }
+ ]
+}

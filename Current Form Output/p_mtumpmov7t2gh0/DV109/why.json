@@ -1,0 +1,46 @@
+{
+ "form": "dv109",
+ "counts": {
+  "empty": 11,
+  "closed": 0,
+  "defect": 0,
+  "unmapped": 0,
+  "court": 11,
+  "overflow": 0
+ },
+ "fields": {
+  "hearing_date": {
+   "verdict": "court"
+  },
+  "hearing_time": {
+   "verdict": "court"
+  },
+  "hearing_department": {
+   "verdict": "court"
+  },
+  "hearing_room": {
+   "verdict": "court"
+  },
+  "hearing_court_name_and_address": {
+   "verdict": "court"
+  },
+  "denial_reason_other_explanation": {
+   "verdict": "court"
+  },
+  "service_deadline_other_days_count": {
+   "verdict": "court"
+  },
+  "serve_other_form_name": {
+   "verdict": "court"
+  },
+  "judicial_officer_signature_date": {
+   "verdict": "court"
+  },
+  "clerk_certificate_date": {
+   "verdict": "court"
+  },
+  "clerk_deputy_name": {
+   "verdict": "court"
+  }
+ }
+}

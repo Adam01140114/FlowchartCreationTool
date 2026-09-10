@@ -1098,8 +1098,11 @@ function setViewerMode(pdf) {
 function loadViewerPdf() {
   const page = viewerPages()[viewerAt];
   if (!page) return;
-  // The filled PDFs sit beside the images the audit published.
-  const url = 'pipeline-out/' + page.dataset.form.toLowerCase() + '-filled.pdf'
+  // Out of the published run, which is self-contained, rather than out of
+  // pipeline-out - that is scratch, the next fill overwrites it, and it is not
+  // in the repository. A run published on one machine and opened on another
+  // showed its pages and 404ed on the document.
+  const url = ROOT + '/' + page.dataset.form + '/filled.pdf'
     + '#page=' + page.dataset.page;
   const frame = document.getElementById('viewerPdf');
   if (frame.getAttribute('src') !== url) frame.setAttribute('src', url);
