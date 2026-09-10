@@ -34,8 +34,9 @@
     background: #fbfcfe;
   }
   .form-panel > :first-child { margin-top: 0; }
-  .form-nav { margin: 0 0 14px; text-align: center; }
+  .form-nav { margin: 10px 0 14px; text-align: center; }
   .form-nav #addFormBtn { width: 100%; margin-bottom: 6px; }
+  .form-nav #viewFullProjectBtn { width: 100%; margin-top: 6px; }
   .form-nav-row { display: flex; gap: 6px; }
   .form-nav-row button { flex: 1; }
   .form-nav-row button[disabled] { opacity: 0.5; cursor: default; }
@@ -44,6 +45,31 @@
     font-size: 0.85rem;
     color: #555;
   }
+
+  /* View Full Project: every form at once, over the whole window. */
+  #fullProjectView {
+    position: fixed; inset: 0; z-index: 10000;
+    background: #e9edf2; display: flex; flex-direction: column;
+  }
+  #fullProjectView .fpv-bar {
+    display: flex; align-items: center; gap: 12px; padding: 8px 14px;
+    background: #1f3a5f; color: #fff; font-size: 14px;
+  }
+  #fullProjectView .fpv-title { font-size: 15px; }
+  #fullProjectView .fpv-hint { flex: 1; opacity: 0.8; font-size: 13px; }
+  #fullProjectView .fpv-bar button {
+    width: auto; margin: 0; padding: 6px 14px; border: 0; border-radius: 4px;
+    background: #fff; color: #1f3a5f; font-weight: 600; cursor: pointer;
+  }
+  #fullProjectView .fpv-canvas {
+    position: relative; flex: 1; overflow: hidden; cursor: grab; background: #e9edf2;
+  }
+  /* Read-only: nothing inside a label can be clicked into. */
+  #fullProjectView .fpv-canvas foreignObject,
+  #fullProjectView .fpv-canvas input,
+  #fullProjectView .fpv-canvas button,
+  #fullProjectView .fpv-canvas select { pointer-events: none; }
+  #fullProjectView .fpv-canvas svg { background: transparent !important; }
 </style>
 </head>
 <body>
@@ -259,6 +285,17 @@
       <label for="projectNameInput" style="font-weight:bold;">Project Name:</label>
       <input type="text" id="projectNameInput" placeholder="Name this project..." />
     </div>
+    <!-- Form navigator: one project, several flowcharts, switched like sheets -->
+    <div class="form-nav">
+      <button type="button" id="addFormBtn" onclick="addProjectForm()">Add Form</button>
+      <div class="form-nav-row">
+        <button type="button" id="prevFormBtn" onclick="prevProjectForm()">Back</button>
+        <button type="button" id="nextFormBtn" onclick="nextProjectForm()">Next</button>
+      </div>
+      <!-- Every form at once, each in its own box - see project-overview.js -->
+      <button type="button" id="viewFullProjectBtn" onclick="viewFullProject()">View Full Project</button>
+      <div id="formNavLabel" class="form-nav-label">Form 1 of 1</div>
+    </div>
   </div>
 
   <!-- Everything from here to the end of the PDF defaults belongs to the form
@@ -358,7 +395,6 @@
          it writes into - see pdf-preview.js. -->
     <div class="pdf-preview-head">
       <label>Preview</label>
-      <button type="button" id="pdfPreviewFullscreen">View Fullscreen</button>
     </div>
     <div id="pdfPreviewNote" class="pdf-preview-note" hidden></div>
     <div id="pdfPreviewFieldLabel" class="pdf-preview-field" hidden></div>
@@ -371,19 +407,12 @@
       <span id="pdfPreviewPage">&nbsp;</span>
       <button type="button" id="pdfPreviewNext">&rarr;</button>
     </div>
+    <div class="pdf-preview-full-row">
+      <button type="button" id="pdfPreviewFullscreen">View Fullscreen</button>
+    </div>
   </div>
 
   </div><!-- /#formPanel -->
-
-  <!-- Form navigator: one project, several flowcharts, switched like sheets -->
-  <div class="form-nav">
-    <button type="button" id="addFormBtn" onclick="addProjectForm()">Add Form</button>
-    <div class="form-nav-row">
-      <button type="button" id="prevFormBtn" onclick="prevProjectForm()">Back</button>
-      <button type="button" id="nextFormBtn" onclick="nextProjectForm()">Next</button>
-    </div>
-    <div id="formNavLabel" class="form-nav-label">Form 1 of 1</div>
-  </div>
 
   <!-- Below the legends -->
   <br>
@@ -781,5 +810,6 @@
 <script src="connector-nodes.js"></script>
 <script src="project-gui-export.js"></script>
 <script src="pdf-preview.js"></script>
+<script src="project-overview.js"></script>
 </body>
 </html>

@@ -156,7 +156,9 @@ The rules page and the page-image dashboard link to each other, top right.
 ## The paper is on screen, and a node points at a box on it
 
 Under **Default PDF Properties** the editor renders the form that panel names,
-page by page, with a **View Fullscreen** button. Select a node and the box it
+page by page, with a **View Fullscreen** button that lays every page out one
+under the next to scroll through, opening on the page that was showing and
+handing the panel back the page the reading reached. Select a node and the box it
 fills lights up: the preview jumps to the page that box is on, outlines it, and
 prints the field name in full above the page. A node whose name matches nothing
 on the PDF says so in red.

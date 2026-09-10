@@ -1293,13 +1293,19 @@ body.ctrl-pressed::after {
   color: #495057;
   font-size: 12px;
 }
+/* Under the page arrows. The global button rule makes every button a
+   full-width block of white text; this one is neither. */
+.pdf-preview-full-row { text-align: center; padding-top: 8px; }
 #pdfPreviewFullscreen {
-  padding: 4px 10px;
+  display: inline-block;
+  width: auto;
+  margin: 0;
+  padding: 4px 12px;
   font-size: 11px;
   border: 1px solid #ced4da;
   border-radius: 3px;
   background: #fff;
-  color: #495057;
+  color: #212529;
   cursor: pointer;
 }
 #pdfPreviewFullscreen:hover { background: #e9ecef; }
@@ -1330,18 +1336,6 @@ body.ctrl-pressed::after {
   max-height: 46vh;
   line-height: 0;
 }
-#pdfPreviewStage.full {
-  max-height: none;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #2b2f36;
-  border: none;
-  border-radius: 0;
-  overflow: hidden;
-}
-#pdfPreviewStage.full #pdfPreviewLayer { top: 50%; left: 50%; transform: translate(-50%, -50%); }
 #pdfPreviewCanvas { display: block; }
 
 /* Over the page, and never in the way of it. */
@@ -1374,13 +1368,79 @@ body.ctrl-pressed::after {
   font-size: 11px;
   color: #495057;
 }
+/* Sized to the arrow, and dark. Without width and color here the global
+   button rule stretched both across the panel in white text on the white
+   background this sets - arrows nobody could see. */
 .pdf-preview-nav button {
-  padding: 2px 10px;
+  display: inline-block;
+  width: auto;
+  min-width: 40px;
+  margin: 0;
+  padding: 2px 12px;
   border: 1px solid #ced4da;
   border-radius: 3px;
   background: #fff;
+  color: #212529;
+  font-size: 15px;
+  line-height: 1.4;
   cursor: pointer;
 }
 .pdf-preview-nav button:hover { background: #e9ecef; }
 
 #pdfPreviewStage { scrollbar-gutter: stable; }
+
+/* Fullscreen: every page, one under the next, to scroll through. */
+#pdfFullView {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  flex-direction: column;
+  background: #2b2f36;
+}
+/* Stated, because an id selector setting display outranks [hidden]. */
+#pdfFullView[hidden] { display: none; }
+.pdf-full-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  background: #1f2328;
+  color: #fff;
+  font-size: 14px;
+}
+.pdf-full-bar .pdf-full-title { flex: 1; }
+.pdf-full-bar .pdf-full-page { opacity: 0.8; font-size: 13px; }
+.pdf-full-bar button {
+  display: inline-block;
+  width: auto;
+  margin: 0;
+  padding: 6px 14px;
+  background: #fff;
+  color: #1f2328;
+  font-weight: 600;
+}
+.pdf-full-bar button:hover { background: #e9ecef; }
+.pdf-full-pages {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 0 40px;
+}
+.pdf-full-caption {
+  flex: none;
+  margin: 14px 0 6px;
+  color: #c9d1d9;
+  font-size: 12px;
+}
+.pdf-full-sheet {
+  position: relative;
+  flex: none;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .45);
+}
+.pdf-full-sheet canvas { display: block; }
+.pdf-full-layer { position: absolute; inset: 0; pointer-events: none; }

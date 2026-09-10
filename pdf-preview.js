@@ -147,22 +147,14 @@
     const page = await doc.getPage(pageNumber);
     if (mine !== generation) return;
     const unscaled = page.getViewport({ scale: 1 });
-    // Fit the width the panel actually has, and the height the screen has when
-    // it is filling the screen.
+    // Fit the width the panel actually has.
     //
     // Measured from the panel around the box, never from the box itself. The
     // canvas is what makes the box tall enough to need a scrollbar, and the
     // scrollbar is what makes the box narrower - so sizing to the box meant
     // every draw changed the width the next draw would use, and the preview
     // redrew itself forever without ever finishing one.
-    const full = document.fullscreenElement === stage;
-    const width = full
-      ? Math.max(160, stage.clientWidth || 260)
-      : Math.max(160, fitWidth());
-    let scale = width / unscaled.width;
-    if (full) {
-      scale = Math.min(scale, (stage.clientHeight - 8) / unscaled.height);
-    }
+    const scale = Math.max(160, fitWidth()) / unscaled.width;
     const ratio = window.devicePixelRatio || 1;
     viewport = page.getViewport({ scale: scale });
 
@@ -306,6 +298,201 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* fullscreen: every page, one under the next                          */
+  /* ------------------------------------------------------------------ */
+
+  // Fullscreen used to enlarge the one page being previewed, which is the
+  // wrong half of the job: the reason to go fullscreen is to read the form,
+  // and a form is read by scrolling through it. So it lays out every page,
+  // each at the width of the window, and opens on the page that was showing -
+  // with any highlighted box marked wherever it is printed.
+
+  let fullView = null;       // the view, made the first time it is opened
+  let fullGeneration = 0;    // which full render is the current one
+  let fullTasks = [];        // its page renders still in flight
+  let fullDeferred = false;  // a full render waiting for the tab to be looked at
+  let fullWidth = 0;         // the page width it was last laid out at
+
+  function isFullOpen() { return !!fullView && !fullView.hidden; }
+
+  /** The page width: from the window, the one size no drawing here changes. */
+  function fullTargetWidth() {
+    return Math.max(320, Math.min(window.innerWidth - 80, 1200));
+  }
+
+  function fullElement() {
+    if (fullView) return fullView;
+    fullView = document.createElement('div');
+    fullView.id = 'pdfFullView';
+    fullView.hidden = true;
+    fullView.innerHTML = '<div class="pdf-full-bar">'
+      + '<strong class="pdf-full-title"></strong>'
+      + '<span class="pdf-full-page"></span>'
+      + '<button type="button" class="pdf-full-exit">Exit Fullscreen</button>'
+      + '</div>'
+      + '<div class="pdf-full-pages"></div>';
+    document.body.appendChild(fullView);
+    fullView.querySelector('.pdf-full-exit').addEventListener('click', closeFull);
+    fullView.querySelector('.pdf-full-pages').addEventListener('scroll', showFullPage, { passive: true });
+    return fullView;
+  }
+
+  function openFull() {
+    if (!doc) return;
+    const el = fullElement();
+    el.hidden = false;
+    el.querySelector('.pdf-full-title').textContent = loadedName;
+    document.addEventListener('keydown', onFullKey);
+    drawFull(true);
+    // The browser's own fullscreen where it is allowed. Where it is not - a
+    // preview pane, an iframe - the view already covers the whole window.
+    if (el.requestFullscreen) {
+      try { el.requestFullscreen().catch(function () { /* stays a window-sized view */ }); }
+      catch (e) { /* the same */ }
+    }
+  }
+
+  function closeFull() {
+    if (!isFullOpen()) return;
+    const reading = currentFullPage();
+    fullGeneration++;                 // any page still rendering stops
+    fullTasks.forEach(function (t) { try { t.cancel(); } catch (e) { /* done */ } });
+    fullTasks = [];
+    fullDeferred = false;
+    fullView.hidden = true;
+    fullView.querySelector('.pdf-full-pages').textContent = '';
+    document.removeEventListener('keydown', onFullKey);
+    if (document.fullscreenElement === fullView && document.exitFullscreen) {
+      document.exitFullscreen().catch(function () { /* already out */ });
+    }
+    // Back in the panel on the page the reading got to.
+    if (doc && reading && reading !== pageNumber) { pageNumber = reading; draw(); }
+  }
+
+  function onFullKey(e) { if (e.key === 'Escape') closeFull(); }
+
+  /** The page under the middle of the view - the one being read. */
+  function currentFullPage() {
+    if (!isFullOpen()) return 0;
+    const holder = fullView.querySelector('.pdf-full-pages');
+    const mid = holder.scrollTop + holder.clientHeight / 2;
+    let best = 0, bestGap = Infinity;
+    holder.querySelectorAll('.pdf-full-sheet').forEach(function (sheet) {
+      const top = sheet.offsetTop, bottom = top + sheet.offsetHeight;
+      const gap = mid < top ? top - mid : (mid > bottom ? mid - bottom : 0);
+      if (gap < bestGap) { bestGap = gap; best = Number(sheet.dataset.page); }
+    });
+    return best;
+  }
+
+  function showFullPage() {
+    if (!isFullOpen() || !doc) return;
+    const n = currentFullPage();
+    fullView.querySelector('.pdf-full-page').textContent = n ? 'Page ' + n + ' of ' + doc.numPages : '';
+  }
+
+  /** Mark the wanted boxes that are printed on page n. */
+  function paintFullHighlights(layer, n, vp) {
+    layer.textContent = '';
+    wanted.forEach(function (name) {
+      (fields[name] || []).forEach(function (hit) {
+        if (hit.page !== n) return;
+        const [x1, y1, x2, y2] = vp.convertToViewportRectangle(hit.rect);
+        const box = document.createElement('div');
+        box.className = 'pdf-preview-hit';
+        box.style.left = Math.min(x1, x2) + 'px';
+        box.style.top = Math.min(y1, y2) + 'px';
+        box.style.width = Math.abs(x2 - x1) + 'px';
+        box.style.height = Math.abs(y2 - y1) + 'px';
+        box.title = name;
+        layer.appendChild(box);
+      });
+    });
+  }
+
+  /** Bring page n into view - its highlighted box if it has one, else its top. */
+  function scrollFullTo(n) {
+    const holder = fullView.querySelector('.pdf-full-pages');
+    const sheet = holder.querySelector('.pdf-full-sheet[data-page="' + n + '"]');
+    if (!sheet) return;
+    const hit = sheet.querySelector('.pdf-preview-hit');
+    holder.scrollTop = hit
+      ? sheet.offsetTop + hit.offsetTop - holder.clientHeight / 2
+      : Math.max(0, sheet.offsetTop - 40);
+  }
+
+  async function drawFull(opening) {
+    if (!doc || !isFullOpen()) return;
+    fullTasks.forEach(function (t) { try { t.cancel(); } catch (e) { /* done */ } });
+    fullTasks = [];
+    const mine = ++fullGeneration;
+    const keep = opening ? pageNumber : (currentFullPage() || pageNumber);
+    const holder = fullView.querySelector('.pdf-full-pages');
+    const width = fullTargetWidth();
+    const ratio = window.devicePixelRatio || 1;
+    fullWidth = width;
+
+    // Every sheet at its full size before any is drawn, so the page being
+    // read can be scrolled to at once and the rest fill in around it.
+    const sheets = [];
+    const frag = document.createDocumentFragment();
+    for (let n = 1; n <= doc.numPages; n++) {
+      const page = await doc.getPage(n);   // eslint-disable-line no-await-in-loop
+      if (mine !== fullGeneration) return;
+      const vp = page.getViewport({ scale: width / page.getViewport({ scale: 1 }).width });
+      const caption = document.createElement('div');
+      caption.className = 'pdf-full-caption';
+      caption.textContent = 'Page ' + n + ' of ' + doc.numPages;
+      const sheet = document.createElement('div');
+      sheet.className = 'pdf-full-sheet';
+      sheet.dataset.page = String(n);
+      sheet.style.width = Math.floor(vp.width) + 'px';
+      sheet.style.height = Math.floor(vp.height) + 'px';
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.floor(vp.width * ratio);
+      canvas.height = Math.floor(vp.height * ratio);
+      canvas.style.width = Math.floor(vp.width) + 'px';
+      canvas.style.height = Math.floor(vp.height) + 'px';
+      const layer = document.createElement('div');
+      layer.className = 'pdf-full-layer';
+      sheet.append(canvas, layer);
+      frag.append(caption, sheet);
+      paintFullHighlights(layer, n, vp);
+      sheets.push({ n: n, page: page, vp: vp, canvas: canvas });
+    }
+    holder.textContent = '';
+    holder.appendChild(frag);
+    scrollFullTo(keep);
+    showFullPage();
+
+    // Not while nobody is looking - the same reason as draw(): a hidden tab
+    // gets no animation frames, and pdf.js renders on them.
+    if (document.hidden) { fullDeferred = true; return; }
+    fullDeferred = false;
+
+    // The page being read first, then outward from it.
+    sheets.sort(function (a, b) { return Math.abs(a.n - keep) - Math.abs(b.n - keep); });
+    for (const s of sheets) {
+      if (mine !== fullGeneration) return;
+      if (document.hidden) { fullDeferred = true; return; }
+      const ctx = s.canvas.getContext('2d');
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, s.vp.width, s.vp.height);
+      const t = s.page.render({ canvasContext: ctx, viewport: s.vp });
+      fullTasks.push(t);
+      try {
+        await t.promise;                    // eslint-disable-line no-await-in-loop
+      } catch (err) {
+        if (err && err.name === 'RenderingCancelledException') return;
+        // One page that will not draw is left blank; the rest still come.
+      } finally {
+        fullTasks = fullTasks.filter(function (x) { return x !== t; });
+      }
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
   /* wiring                                                              */
   /* ------------------------------------------------------------------ */
 
@@ -332,27 +519,19 @@
     if (prev) prev.addEventListener('click', function () { goTo(pageNumber - 1); });
     if (next) next.addEventListener('click', function () { goTo(pageNumber + 1); });
 
+    // Every page, one under the next, to scroll through - see openFull().
     const full = $('pdfPreviewFullscreen');
-    const stage = $('pdfPreviewStage');
-    if (full && stage) {
-      full.addEventListener('click', function () {
-        if (document.fullscreenElement === stage) { document.exitFullscreen(); return; }
-        if (stage.requestFullscreen) stage.requestFullscreen();
-      });
-      document.addEventListener('fullscreenchange', function () {
-        const on = document.fullscreenElement === stage;
-        stage.classList.toggle('full', on);
-        full.textContent = on ? 'Exit Fullscreen' : 'View Fullscreen';
-        // The page is drawn at a fixed pixel size, so it has to be redrawn for
-        // the size it is now being shown at or it is a small sharp page in the
-        // middle of a large black screen.
-        draw();
-      });
-    }
+    if (full) full.addEventListener('click', openFull);
+    document.addEventListener('fullscreenchange', function () {
+      // Esc in the browser's fullscreen leaves it without a keydown ever
+      // reaching the page, so leaving fullscreen is what closes the view.
+      if (isFullOpen() && document.fullscreenElement !== fullView) closeFull();
+    });
 
     // Draw what was deferred while the tab was in the background.
     document.addEventListener('visibilitychange', function () {
       if (!document.hidden && deferred) draw();
+      if (!document.hidden && fullDeferred) drawFull(false);
     });
 
     // Redraw when the window is resized, and only then.
@@ -367,6 +546,8 @@
     window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function () {
+        // Going into the browser's fullscreen is itself a resize.
+        if (isFullOpen() && Math.abs(fullTargetWidth() - fullWidth) >= 8) drawFull(false);
         const w = fitWidth();
         if (Math.abs(w - lastWidth) < 8) return;
         lastWidth = w;
@@ -387,7 +568,9 @@
     return {
       file: loadedName, pages: doc ? doc.numPages : 0, page: pageNumber,
       generation: generation, rendering: !!task, deferred: deferred,
-      indexed: Object.keys(fields).length, highlighting: wanted.slice()
+      indexed: Object.keys(fields).length, highlighting: wanted.slice(),
+      full: isFullOpen() ? { page: currentFullPage(), width: fullWidth,
+        rendering: fullTasks.length, deferred: fullDeferred } : null
     };
   };
   window.pdfPreviewHighlightCell = function (cell) { highlight(namesOf(cell)); };

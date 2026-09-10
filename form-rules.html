@@ -430,7 +430,7 @@ const RULES = [
   /* ---------------- working on it ---------------- */
   { id: 'the-paper-is-on-screen', group: 'process',
     title: 'The paper is on screen beside the flowchart',
-    says: 'The Default PDF Properties panel renders the form it names, page by page, with a View Fullscreen button. Selecting a node lights up the box on the paper that node fills, jumping to the page that box is on and naming the field in full.',
+    says: 'The Default PDF Properties panel renders the form it names, page by page, with a View Fullscreen button that lays every page out one under the next to scroll through, opening on the page that was showing. Selecting a node lights up the box on the paper that node fills, jumping to the page that box is on and naming the field in full.',
     why: 'A question in the editor is a rectangle with a name on it, and the thing that name refers to is a box on a court form the author cannot see. Whether this is the question that prints in item 7, whether the box is a line or a paragraph, whether two questions point at the same box - all of it was knowable only by opening the PDF separately and hunting for the field by eye. A name that matches nothing on the PDF says so in red, which is the cheapest possible check that a node is wired to something real.',
     by: 'pdf-preview.js — rendered to a canvas, not an iframe, because the highlight needs the widget rectangles drawn over the page' },
 
