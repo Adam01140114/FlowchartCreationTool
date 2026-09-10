@@ -124,8 +124,19 @@ function addConnector(flowchart, targetForm, from) {
   const id = nextId(cells);
   const anchor = from || cells.filter((c) => c.vertex)
     .reduce((low, c) => (c.geometry.y > (low ? low.geometry.y : -1) ? c : low), null);
-  const y = anchor ? anchor.geometry.y + (anchor.geometry.height || 60) + 60 : 80;
+  let y = anchor ? anchor.geometry.y + (anchor.geometry.height || 60) + 60 : 80;
   const x = anchor ? anchor.geometry.x : 80;
+  // One answer can bring in more than one form: the custody box on DV-100
+  // brings in DV-105 and DV-140 together, because page 13 asks for both. Each
+  // connector hung off the same option at the same offset, so the second was
+  // laid exactly on top of the first - one node hiding another on the canvas,
+  // which the flowchart audit catches and a reader would not.
+  const GAP = 20;
+  const clashes = (top) => cells.some((c) => c.vertex && c.geometry
+    && Math.min(x + 180, c.geometry.x + (c.geometry.width || 0)) - Math.max(x, c.geometry.x) > -GAP
+    && Math.min(top + 60, c.geometry.y + (c.geometry.height || 0)) - Math.max(top, c.geometry.y) > -GAP);
+  let guard = 0;
+  while (clashes(y) && guard++ < 500) y += 80;
   cells.push({
     id, vertex: true, edge: false,
     value: '<div style="text-align:center;padding:6px;"><strong>&#8618; Connector</strong>'

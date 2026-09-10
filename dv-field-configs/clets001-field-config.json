@@ -1,0 +1,308 @@
+{
+  "formTitle": "CLETS-001 Confidential Information for Law Enforcement",
+  "_comment": "DV-100 page 13 names CLETS-001 as one of the three forms the filer must complete, so it is always filed. It asks about the same two people the packet already knows - and gives them the packet's names, so the answers travel - plus the identifying detail only this form wants: other names used, marks and scars, driver's license, vehicle, employer, and whether either person speaks English. Only 'Date received by court' is the court's; the case number box says the court fills it, but it is the packet's caption everywhere else and is left as one here too. The three push buttons are omitted; the sanitizer strips them.",
+  "fields": [
+    {
+      "id": "CLETS-001[0].Page1[0].RightCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 1)"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].RightCaption[0].DateField1[0]",
+      "newName": "clets_date_received_by_court",
+      "type": "text",
+      "label": "Date received by court",
+      "courtUse": true
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].nametf[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "1. Name of person you want a restraining order against"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].othernametf[0]",
+      "newName": "clets_restrained_person_other_names",
+      "type": "text",
+      "label": "1. Other names used"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].marktf[0]",
+      "newName": "clets_restrained_person_marks_scars_tattoos",
+      "type": "text",
+      "label": "1. Marks, scars, or tattoos"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].drivelicensetf[0]",
+      "newName": "clets_restrained_person_drivers_license",
+      "type": "text",
+      "label": "1. Driver's license (number and state)"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].ssntf[0]",
+      "newName": "clets_restrained_person_ssn",
+      "type": "text",
+      "label": "1. SSN",
+      "_whyText": "Not type ssn. compile-form.js accepts ssn as a known type and the form builder does not render one, so the question reached the GUI JSON and no input was ever put on the page - the field could not be filled by anyone, and only the page audit found it. As plain text it still gets a properly shaped test value and is never padded, because hasValidatedShape() and getSampleFillValue() key off the name containing ssn."
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].cartypetf[0]",
+      "newName": "clets_restrained_person_vehicle_type",
+      "type": "text",
+      "label": "1. Vehicle type"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].modeltf[0]",
+      "newName": "clets_restrained_person_vehicle_model",
+      "type": "text",
+      "label": "1. Vehicle model"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].yeartf[0]",
+      "newName": "clets_restrained_person_vehicle_year",
+      "type": "number",
+      "label": "1. Vehicle year"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].plateno[0]",
+      "newName": "clets_restrained_person_vehicle_plate",
+      "type": "text",
+      "label": "1. Plate number"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].phonetf[0]",
+      "newName": "clets_restrained_person_telephone",
+      "type": "tel",
+      "label": "1. Telephone"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].employertf[0]",
+      "newName": "clets_restrained_person_employer",
+      "type": "text",
+      "label": "1. Name of employer and address"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].item1ME[0]",
+      "newName": "clets_restrained_person_speaks_english_yes",
+      "type": "checkbox",
+      "label": "1. Does the person speak English - Yes"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].item1ME[2]",
+      "newName": "clets_restrained_person_speaks_english_no",
+      "type": "checkbox",
+      "label": "1. Does the person speak English - No"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].item1ME[1]",
+      "newName": "clets_restrained_person_speaks_english_unknown",
+      "type": "checkbox",
+      "label": "1. Does the person speak English - I don't know"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].notf[0]",
+      "newName": "clets_restrained_person_language",
+      "type": "text",
+      "label": "1. If no, list language"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].item1firearmME[2]",
+      "newName": "clets_restrained_person_weapons_yes",
+      "type": "checkbox",
+      "label": "1. Firearms, ammunition or body armor - Yes"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].item1firearmME[0]",
+      "newName": "clets_restrained_person_weapons_no",
+      "type": "checkbox",
+      "label": "1. Firearms, ammunition or body armor - No"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].item1firearmME[1]",
+      "newName": "clets_restrained_person_weapons_unknown",
+      "type": "checkbox",
+      "label": "1. Firearms, ammunition or body armor - I don't know"
+    },
+    {
+      "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].Yestf[0]",
+      "newName": "clets_restrained_person_weapons_details",
+      "type": "text",
+      "label": "1. Type, amount, or location of any items"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 2)"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List2[0].Li1[0].yournametf[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "2. Your name"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].Item3genderME[1]",
+      "newName": "clets_protected_person_gender_male",
+      "type": "checkbox",
+      "label": "3. Your gender - M"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].Item3genderME[2]",
+      "newName": "clets_protected_person_gender_female",
+      "type": "checkbox",
+      "label": "3. Your gender - F"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].Item3genderME[0]",
+      "newName": "clets_protected_person_gender_nonbinary",
+      "type": "checkbox",
+      "label": "3. Your gender - X (nonbinary)"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].racetf[0]",
+      "newName": "clets_protected_person_race",
+      "type": "text",
+      "label": "3. Your race"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List3[0].Li1[0].agetf[0]",
+      "newName": "person_asking_protection_age",
+      "type": "number",
+      "label": "3. Your age"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List3[0].Li1[0].dob[0]",
+      "newName": "clets_protected_person_date_of_birth",
+      "type": "date",
+      "label": "3. Your date of birth"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].item3phonetf[0]",
+      "newName": "clets_protected_person_telephone",
+      "type": "tel",
+      "label": "3. Your telephone"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].item3EnglishME[1]",
+      "newName": "clets_protected_person_speaks_english_yes",
+      "type": "checkbox",
+      "label": "3. Do you speak English - Yes"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].item3EnglishME[0]",
+      "newName": "clets_protected_person_speaks_english_no",
+      "type": "checkbox",
+      "label": "3. Do you speak English - No"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].item3englishtf[0]",
+      "newName": "clets_protected_person_language",
+      "type": "text",
+      "label": "3. If no, list language"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4nametf1[0]",
+      "newName": "other_protected_person_1_full_name",
+      "type": "text",
+      "label": "4. Other protected person 1 - name"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4gendertf1[0]",
+      "newName": "other_protected_person_1_gender",
+      "type": "text",
+      "label": "4. Other protected person 1 - gender"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4racetf1[0]",
+      "newName": "other_protected_person_1_race",
+      "type": "text",
+      "label": "4. Other protected person 1 - race"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4dob1[0]",
+      "newName": "other_protected_person_1_date_of_birth",
+      "type": "date",
+      "label": "4. Other protected person 1 - date of birth"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4nametf2[0]",
+      "newName": "other_protected_person_2_full_name",
+      "type": "text",
+      "label": "4. Other protected person 2 - name"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4gendertf2[0]",
+      "newName": "other_protected_person_2_gender",
+      "type": "text",
+      "label": "4. Other protected person 2 - gender"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4racetf2[0]",
+      "newName": "other_protected_person_2_race",
+      "type": "text",
+      "label": "4. Other protected person 2 - race"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4dob2[0]",
+      "newName": "other_protected_person_2_date_of_birth",
+      "type": "date",
+      "label": "4. Other protected person 2 - date of birth"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4nametf3[0]",
+      "newName": "other_protected_person_3_full_name",
+      "type": "text",
+      "label": "4. Other protected person 3 - name"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4gendertf3[0]",
+      "newName": "other_protected_person_3_gender",
+      "type": "text",
+      "label": "4. Other protected person 3 - gender"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4racetf3[0]",
+      "newName": "other_protected_person_3_race",
+      "type": "text",
+      "label": "4. Other protected person 3 - race"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4dob3[0]",
+      "newName": "other_protected_person_3_date_of_birth",
+      "type": "date",
+      "label": "4. Other protected person 3 - date of birth"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4nametf4[0]",
+      "newName": "other_protected_person_4_full_name",
+      "type": "text",
+      "label": "4. Other protected person 4 - name"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4gendertf4[0]",
+      "newName": "other_protected_person_4_gender",
+      "type": "text",
+      "label": "4. Other protected person 4 - gender"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4racetf4[0]",
+      "newName": "other_protected_person_4_race",
+      "type": "text",
+      "label": "4. Other protected person 4 - race"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4dob4[0]",
+      "newName": "other_protected_person_4_date_of_birth",
+      "type": "date",
+      "label": "4. Other protected person 4 - date of birth"
+    },
+    {
+      "id": "CLETS-001[0].Page2[0].List4[0].Li1[0].item4cb[0]",
+      "newName": "clets_other_protected_people_attached_page",
+      "type": "checkbox",
+      "label": "4. More people listed on a separate page"
+    }
+  ]
+}

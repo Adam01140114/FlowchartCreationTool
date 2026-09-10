@@ -1,0 +1,286 @@
+{
+  "_comment": "CLETS-001 is filed with every request - DV-100 page 13 lists it as one of the three forms the filer must complete - so it is activated unconditionally. Most of what it asks about is already in the packet under the packet's own names, and travels: the two people's names, the filer's age, and the four other protected people. What is left is the identifying detail only a law-enforcement database wants, which is what this interview asks for. The form stars the required fields; everything else it calls helpful, so the optional ones say so rather than pressing for an answer.",
+  "groups": [
+    {
+      "nameId": "clets_restrained_person_speaks_english",
+      "question": "Does the person you want protection from speak English?",
+      "members": [
+        "clets_restrained_person_speaks_english_yes",
+        "clets_restrained_person_speaks_english_no",
+        "clets_restrained_person_speaks_english_unknown"
+      ],
+      "labels": [
+        "Yes",
+        "No",
+        "I don't know"
+      ]
+    },
+    {
+      "nameId": "clets_restrained_person_weapons",
+      "question": "Does that person have any firearms, firearm parts, ammunition, or body armor?",
+      "members": [
+        "clets_restrained_person_weapons_yes",
+        "clets_restrained_person_weapons_no",
+        "clets_restrained_person_weapons_unknown"
+      ],
+      "labels": [
+        "Yes",
+        "No",
+        "I don't know"
+      ]
+    },
+    {
+      "nameId": "clets_protected_person_gender",
+      "question": "What is your gender?",
+      "members": [
+        "clets_protected_person_gender_male",
+        "clets_protected_person_gender_female",
+        "clets_protected_person_gender_nonbinary"
+      ],
+      "labels": [
+        "Male",
+        "Female",
+        "Nonbinary"
+      ]
+    },
+    {
+      "nameId": "clets_protected_person_speaks_english",
+      "question": "Do you speak English?",
+      "members": [
+        "clets_protected_person_speaks_english_yes",
+        "clets_protected_person_speaks_english_no"
+      ],
+      "labels": [
+        "Yes",
+        "No"
+      ]
+    }
+  ],
+  "questions": {
+    "clets_restrained_person_other_names": {
+      "text": "Does that person go by any other names? Enter any you know of.",
+      "optional": true
+    },
+    "clets_restrained_person_marks_scars_tattoos": {
+      "text": "Do they have any marks, scars, or tattoos? Describe any you know of.",
+      "optional": true
+    },
+    "clets_restrained_person_drivers_license": {
+      "text": "What is their driver's license number and the state that issued it, if you know?",
+      "optional": true
+    },
+    "clets_restrained_person_ssn": {
+      "text": "What is their Social Security number, if you know it?",
+      "optional": true
+    },
+    "clets_restrained_person_vehicle_type": {
+      "text": "What kind of vehicle do they drive?",
+      "optional": true
+    },
+    "clets_restrained_person_vehicle_model": {
+      "text": "What model is it?",
+      "optional": true
+    },
+    "clets_restrained_person_vehicle_year": {
+      "text": "What year is it?",
+      "optional": true
+    },
+    "clets_restrained_person_vehicle_plate": {
+      "text": "What is the plate number?",
+      "optional": true
+    },
+    "clets_restrained_person_telephone": {
+      "text": "What is their telephone number, if you know it?",
+      "optional": true,
+      "type": "phone"
+    },
+    "clets_restrained_person_employer": {
+      "text": "Who do they work for, and where? Give the name and address if you know them.",
+      "optional": true
+    },
+    "clets_restrained_person_language": {
+      "text": "Which language do they speak?",
+      "conditional": {
+        "onlyWhen": "clets_restrained_person_speaks_english_no"
+      }
+    },
+    "clets_restrained_person_weapons_details": {
+      "text": "What do you know about them - the type, the amount, or where they are kept?",
+      "conditional": {
+        "onlyWhen": "clets_restrained_person_weapons_yes"
+      },
+      "type": "bigParagraph"
+    },
+    "clets_protected_person_race": {
+      "text": "What is your race?",
+      "optional": true
+    },
+    "clets_protected_person_date_of_birth": {
+      "text": "What is your date of birth? Giving it puts your order in the federal database as well as California's, which makes it easier to enforce outside the state.",
+      "type": "date",
+      "optional": true
+    },
+    "clets_protected_person_telephone": {
+      "text": "What is your telephone number?",
+      "optional": true,
+      "type": "phone"
+    },
+    "clets_protected_person_language": {
+      "text": "Which language do you speak?",
+      "conditional": {
+        "onlyWhen": "clets_protected_person_speaks_english_no"
+      }
+    },
+    "person_to_restrain_full_name": {
+      "text": "Who do you want protection from?"
+    },
+    "person_asking_protection_name": {
+      "text": "Who is asking for protection?"
+    },
+    "person_asking_protection_age": {
+      "text": "How old are you?",
+      "type": "number"
+    },
+    "case_number": {
+      "text": "What is the case number?"
+    },
+    "clets_other_protected_people_attached_page": {
+      "text": "Are there more people to protect than fit on this form?"
+    }
+  },
+  "sections": [
+    {
+      "name": "For Law Enforcement: The Person to Restrain",
+      "fields": [
+        "case_number",
+        "person_to_restrain_full_name",
+        "clets_restrained_person_other_names",
+        "clets_restrained_person_marks_scars_tattoos",
+        "clets_restrained_person_drivers_license",
+        "clets_restrained_person_ssn",
+        "clets_restrained_person_vehicle_type",
+        "clets_restrained_person_vehicle_model",
+        "clets_restrained_person_vehicle_year",
+        "clets_restrained_person_vehicle_plate",
+        "clets_restrained_person_telephone",
+        "clets_restrained_person_employer",
+        "clets_restrained_person_speaks_english_yes",
+        "clets_restrained_person_speaks_english_no",
+        "clets_restrained_person_speaks_english_unknown",
+        "clets_restrained_person_language",
+        "clets_restrained_person_weapons_yes",
+        "clets_restrained_person_weapons_no",
+        "clets_restrained_person_weapons_unknown",
+        "clets_restrained_person_weapons_details"
+      ]
+    },
+    {
+      "name": "For Law Enforcement: You and Yours",
+      "fields": [
+        "person_asking_protection_name",
+        "clets_protected_person_gender_male",
+        "clets_protected_person_gender_female",
+        "clets_protected_person_gender_nonbinary",
+        "clets_protected_person_race",
+        "person_asking_protection_age",
+        "clets_protected_person_date_of_birth",
+        "clets_protected_person_telephone",
+        "clets_protected_person_speaks_english_yes",
+        "clets_protected_person_speaks_english_no",
+        "clets_protected_person_language",
+        "other_protected_person_1_full_name",
+        "other_protected_person_1_gender",
+        "other_protected_person_1_race",
+        "other_protected_person_1_date_of_birth",
+        "other_protected_person_2_full_name",
+        "other_protected_person_2_gender",
+        "other_protected_person_2_race",
+        "other_protected_person_2_date_of_birth",
+        "other_protected_person_3_full_name",
+        "other_protected_person_3_gender",
+        "other_protected_person_3_race",
+        "other_protected_person_3_date_of_birth",
+        "other_protected_person_4_full_name",
+        "other_protected_person_4_gender",
+        "other_protected_person_4_race",
+        "other_protected_person_4_date_of_birth",
+        "clets_other_protected_people_attached_page"
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "For the first other protected person, what does law enforcement need?",
+      "fields": [
+        {
+          "field": "other_protected_person_1_gender",
+          "label": "Gender"
+        },
+        {
+          "field": "other_protected_person_1_race",
+          "label": "Race"
+        },
+        {
+          "field": "other_protected_person_1_date_of_birth",
+          "label": "Date of birth",
+          "type": "date"
+        }
+      ]
+    },
+    {
+      "question": "For the second other protected person, what does law enforcement need?",
+      "fields": [
+        {
+          "field": "other_protected_person_2_gender",
+          "label": "Gender"
+        },
+        {
+          "field": "other_protected_person_2_race",
+          "label": "Race"
+        },
+        {
+          "field": "other_protected_person_2_date_of_birth",
+          "label": "Date of birth",
+          "type": "date"
+        }
+      ]
+    },
+    {
+      "question": "For the third other protected person, what does law enforcement need?",
+      "fields": [
+        {
+          "field": "other_protected_person_3_gender",
+          "label": "Gender"
+        },
+        {
+          "field": "other_protected_person_3_race",
+          "label": "Race"
+        },
+        {
+          "field": "other_protected_person_3_date_of_birth",
+          "label": "Date of birth",
+          "type": "date"
+        }
+      ]
+    },
+    {
+      "question": "For the fourth other protected person, what does law enforcement need?",
+      "fields": [
+        {
+          "field": "other_protected_person_4_gender",
+          "label": "Gender"
+        },
+        {
+          "field": "other_protected_person_4_race",
+          "label": "Race"
+        },
+        {
+          "field": "other_protected_person_4_date_of_birth",
+          "label": "Date of birth",
+          "type": "date"
+        }
+      ]
+    }
+  ],
+  "_combinesNote": "Ungated on purpose. The repeat that asks how many other people there are, and what they are called, belongs to DV-100; the packet merges the two declarations of it and keeps the first, so the three details only CLETS has boxes for were never asked at all. They are collected here instead, one question per person. A gate would have to name an option, and the thing that decides whether a person exists is their name - a text box, which has none."
+}

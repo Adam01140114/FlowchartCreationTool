@@ -1,0 +1,97 @@
+{
+  "_comment": "DV-140 asks nothing, and that is the whole point of it. It is a court order - it says so at the foot of every page - attached to DV-110, and the filer supplies only items 1, 2 and 3. Every one of those is a question the packet has already asked: the two names, the two relationships to the children, and the children themselves. So each of its filer fields carries the name the form that asks it uses, one answer fills both, and DV-140 is filled entirely from what the packet already knows. Like DV-109, it ships with an empty group.",
+  "sections": [
+    {
+      "name": "The Custody Order",
+      "fields": [
+        "case_number",
+        "person_asking_protection_name",
+        "person_to_restrain_full_name",
+        "dv105_your_relationship_parent",
+        "dv105_your_relationship_legal_guardian",
+        "dv105_your_relationship_other",
+        "dv105_your_relationship_other_description",
+        "dv105_their_relationship_parent",
+        "dv105_their_relationship_legal_guardian",
+        "dv105_their_relationship_other",
+        "dv105_their_relationship_other_description",
+        "dv105_child_1_name",
+        "dv105_child_1_date_of_birth",
+        "dv105_child_2_name",
+        "dv105_child_2_date_of_birth",
+        "dv105_child_3_name",
+        "dv105_child_3_date_of_birth",
+        "dv105_child_4_name",
+        "dv105_child_4_date_of_birth",
+        "dv105_children_additional_list_attached"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "nameId": "dv105_your_relationship_to_children",
+      "question": "What is your relationship to the children?",
+      "members": [
+        "dv105_your_relationship_parent",
+        "dv105_your_relationship_legal_guardian",
+        "dv105_your_relationship_other"
+      ],
+      "labels": [
+        "Parent",
+        "Legal guardian",
+        "Other"
+      ]
+    },
+    {
+      "nameId": "dv105_their_relationship_to_children",
+      "question": "What is the other person's relationship to the children?",
+      "members": [
+        "dv105_their_relationship_parent",
+        "dv105_their_relationship_legal_guardian",
+        "dv105_their_relationship_other"
+      ],
+      "labels": [
+        "Parent",
+        "Legal guardian",
+        "Other"
+      ]
+    }
+  ],
+  "repeats": [
+    {
+      "nameId": "dv105_child",
+      "question": "How many children do you have with the person you want protection from?",
+      "entryTitle": "Child",
+      "min": 1,
+      "max": 4,
+      "fields": [
+        {
+          "label": "Child's name",
+          "nameId": "{n}_name"
+        },
+        {
+          "label": "Date of birth",
+          "nameId": "{n}_date_of_birth",
+          "type": "date"
+        }
+      ]
+    }
+  ],
+  "questions": {
+    "dv105_your_relationship_other_description": {
+      "text": "Describe your relationship to the children.",
+      "conditional": {
+        "onlyWhen": "dv105_your_relationship_other"
+      }
+    },
+    "dv105_their_relationship_other_description": {
+      "text": "Describe their relationship to the children.",
+      "conditional": {
+        "onlyWhen": "dv105_their_relationship_other"
+      }
+    },
+    "dv105_children_additional_list_attached": {
+      "text": "Do you have more children to list on a separate page?"
+    }
+  }
+}

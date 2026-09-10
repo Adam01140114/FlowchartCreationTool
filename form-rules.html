@@ -240,6 +240,18 @@ const RULES = [
     why: 'The editor rebuilds a slot from the canvas, and a property set on the cell does not survive that round trip. Set as _activateWhenTicked the DV-101 rule exported as unconditional: true, which reads as "always file DV-101" — the same class of loss already fixed once for flowchart-level keys. Anything that must survive a rebuild has to live somewhere the rebuild reads.',
     by: 'pipeline-build-packet.js writes it; connector-nodes.js reads either' },
 
+  { id: 'which-forms-are-in-the-packet', group: 'packet', num: 'Rule',
+    title: 'One place says which forms are in the packet',
+    says: 'Every script that walks the packet asks packet-forms.js, which reads dv-packet.spec.json. No script keeps its own list.',
+    why: 'Four of them did, and every one went stale silently. pipeline-fill.js had three of five written out, so DV-101 and DV-105 were switched on by a run and never filled or rendered. pipeline-connect.js had five of six and skipped DV-108’s names entirely. pipeline-sanitize.js rebuilt three of six by default, so a field-config edit to either of the others was not live in the PDF being filled. pipeline-capacity.js matched filenames against /^dv\d+\.pdf$/, which is not a list at all until a form is called CLETS-001. In each case the run looked exactly like a clean one with fewer pages.',
+    by: 'packet-forms.js — packetForms(), from the spec' },
+
+  { id: 'an-order-is-the-courts-except-its-identifying-items', group: 'packet', num: 'Rule',
+    title: 'A court order is the court’s, except the items that identify the case',
+    says: 'On a form that says This is a Court Order, the filer completes only the identifying items and every other field is marked courtUse. Those items carry the names of the questions that already ask them, so the form is filled from what the packet knows and asks nothing new.',
+    why: 'DV-140 is 221 fields and 195 of them are the judge’s. Of the 25 that are not, every one - the two names, the two relationships to the children, the children themselves - is a question DV-100 or DV-105 already asks. Given DV-105’s names it asks nothing at all, which is right: a filer should not answer the same question twice because two forms print it.',
+    by: 'dv140-field-config.json; the same split DV-110 and DV-109 use' },
+
   { id: 'court-use', group: 'packet', num: 'Rule 6',
     title: 'Ask only what the filer completes',
     says: 'Every Judicial Council form prints who completes what. A field marked courtUse never becomes a question and stays blank for the judge or clerk.',
@@ -342,6 +354,12 @@ const RULES = [
     says: 'The writing lines of a box are the longest run of rules that fit an even progression from one of them, within a quarter of the pitch. Not the longest run of consecutive gaps that match the median.',
     why: 'A form’s rules are evenly spaced to the eye and not to the point: DV-100 item 17b is ruled at 14.1, 11.4 and 13.5, which is one block of four lines and reads as one. Comparing each gap to the median broke the run at the 11.4 and kept two, so a box that holds about 380 characters was measured at 190 and half of it went unused. Comparing each rule to where the run says it should be lets that jitter accumulate and cancel, which is what jitter does.',
     by: 'ruled-lines.js — evenlySpacedRun(); every start is tried, because the first rule inside a widget is not always one of its writing lines' },
+
+  { id: 'a-shape-is-a-shape-in-both-places', group: 'page', num: 'Rule',
+    title: 'A field with a shape is known to be one in both places',
+    says: 'getSampleFillValue() and hasValidatedShape() agree about which fields have a shape. A field the first gives a shaped value to is a field the second refuses to pad.',
+    why: 'They had drifted: the sampler produced 123-45-6789 for a Social Security number and the shape test had never heard of one, so the first SSN box in the packet - CLETS-001 item 1 - printed 123-45[end]. A padded SSN is not a longer SSN, it is a wrong one, on a form that goes into a police database. The pair exist to ask the same question, so they have to answer it the same way.',
+    by: 'hasValidatedShape() in the generated runtime, which now knows ssn, social and ein' },
 
   { id: 'a-narrow-box-still-gets-a-limit', group: 'page', num: 'Rule',
     title: 'A box too narrow for a word still gets a limit',

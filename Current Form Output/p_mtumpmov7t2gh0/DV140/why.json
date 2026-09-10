@@ -1,0 +1,319 @@
+{
+ "form": "dv140",
+ "counts": {
+  "empty": 102,
+  "closed": 0,
+  "defect": 0,
+  "unmapped": 0,
+  "court": 102,
+  "overflow": 0
+ },
+ "fields": {
+  "dv140_court_page1_list4_textfield2": {
+   "verdict": "court"
+  },
+  "dv140_court_page1_list4_li4_textfield2": {
+   "verdict": "court"
+  },
+  "dv140_court_page1_list4_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page2_list5_li1_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page2_list5_li2_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page2_list7_li1_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page2_list7_li2_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li2_list_li1_datefield1": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li2_list_li1_datefield2": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li2_list_li1_phonetf": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li2_list_li1_addresstf": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li2_list_li1_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li2_list_li1_tf1": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li2_list_li1_phonetf1": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li2_list_li1_addresstf1": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li2_list_li2_addresstf": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li2_list_li3_item9b3": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li2_list_li3_item9b3cont": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li3_decimalfield1": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li3_decimalfield2": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li3_textfield3": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li4_numericfield3": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li4_numericfield31": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li4_textfield2": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li4_numericfield32": {
+   "verdict": "court"
+  },
+  "dv140_court_page3_list9_li5_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list10_li2_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list10_li2_textfield1": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list10_li2_phonetf": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list10_li2_addresstf": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list10_li3_item10c": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list10_li3_item10ccont": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list10_li4_tf1": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list10_li4_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li1_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li1_phonetf": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li1_addresstf": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li1_numericfield3": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li1_numericfield31": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li1_textfield2": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li1_numericfield32": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li1_datefield3": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li1_datefield4": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li2_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li2_textfield_1": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li2_phonetf": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li2_addresstf": {
+   "verdict": "court"
+  },
+  "dv140_court_page4_list11_li2_list_li2_textfield_2": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list12_li2_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list12_li3_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf1": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf2": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf3": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf4": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf5": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf6": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf7": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf8": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf9": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf10": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf11": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf12": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf13": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf14": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf15": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf16": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf17": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf18": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf19": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf20": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf21": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf22": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf23": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf24": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf25": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf26": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf27": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf28": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf29": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf30": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf31": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf32": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf33": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf34": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf35": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf36": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf37": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf38": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf39": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf40": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf41": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_tf42": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page5_list13_li1_datefield5": {
+   "verdict": "court"
+  },
+  "dv140_court_page6_list14_li2_list_li1_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page6_list14_li2_list_li2_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page6_list15_li1_textfield": {
+   "verdict": "court"
+  },
+  "dv140_court_page6_list16_li1_textfield1": {
+   "verdict": "court"
+  },
+  "dv140_court_page6_list16_li1_textfield2": {
+   "verdict": "court"
+  },
+  "dv140_court_page6_list16_li1_textfield3": {
+   "verdict": "court"
+  },
+  "dv140_court_page6_list16_li1_textfield4": {
+   "verdict": "court"
+  },
+  "dv140_court_page6_list17_li1_textfield2": {
+   "verdict": "court"
+  }
+ }
+}

@@ -110,15 +110,7 @@ function separateCourtFieldsFromFilerFields(spec, load, check) {
   return renamed;
 }
 
-// Every form the packet declares, not a list kept here.
-//
-// Written out, this went stale the moment a form was added: DV-108 joined the
-// packet and its field names were simply not reconciled with anyone else's,
-// which is the one thing this script exists to do. The spec is already loaded
-// above and already says what the packet contains.
-const CONFIG_FORMS = (spec.forms || [])
-  .map((f) => String(f.pdf || f.name || '').replace(/\.pdf$/i, '').toLowerCase().replace(/[^a-z0-9]/g, ''))
-  .filter((base) => base && fs.existsSync(path.join('dv-field-configs', base + '-field-config.json')));
+const CONFIG_FORMS = require('./packet-forms').packetForms({ withConfig: true });
 const separated = separateCourtFieldsFromFilerFields(
   Object.assign({ forms: CONFIG_FORMS }, spec), load, CHECK);
 

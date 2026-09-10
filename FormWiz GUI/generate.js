@@ -20645,7 +20645,13 @@ function hasValidatedShape(el) {
     || type === 'tel' || id.indexOf('zip') !== -1 || id.indexOf('phone') !== -1
     || id.indexOf('date') !== -1 || id.indexOf('amount') !== -1
     || id.indexOf('percent') !== -1 || id.indexOf('_state') !== -1
-    || id.indexOf('age') !== -1;
+    || id.indexOf('age') !== -1
+    // A Social Security or employer identification number has a shape too, and
+    // getSampleFillValue has always produced one for both - but this did not
+    // say so, which is the drift the two of them exist to avoid. CLETS-001 is
+    // the first form in the packet with an SSN box, and it printed 123-45[end].
+    || id.indexOf('ssn') !== -1 || id.indexOf('social') !== -1
+    || id.indexOf('ein') !== -1;
 }
 
 function getSampleFillValue(el) {
@@ -20659,7 +20665,10 @@ function getSampleFillValue(el) {
   if (el.type === 'number' || el.inputMode === 'decimal' || id.indexOf('amount') !== -1 || id.indexOf('money') !== -1) return '100';
   if (id.indexOf('zip') !== -1) return '90210';
   if (id.indexOf('ssn') !== -1 || id.indexOf('social') !== -1) return '123-45-6789';
-  if (id.indexOf('ein') !== -1 || id.indexOf('employer') !== -1) return '12-3456789';
+  // 'employer' alone is not an employer identification number. CLETS-001 item 1
+  // asks for the name and address of an employer, and an EIN there is an answer
+  // to a question nobody asked.
+  if (id.indexOf('ein') !== -1 || /employer.*(ein|tin|tax|number)/.test(id)) return '12-3456789';
   if (id.indexOf('state') !== -1 && el.tagName === 'SELECT') return 'California';
   if (id.indexOf('firstname') !== -1 || (id.indexOf('first') !== -1 && id.indexOf('name') !== -1)) return 'Test';
   if (id.indexOf('lastname') !== -1 || (id.indexOf('last') !== -1 && id.indexOf('name') !== -1)) return 'User';

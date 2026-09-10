@@ -1,0 +1,30 @@
+{
+ "form": "clets001",
+ "counts": {
+  "empty": 3,
+  "closed": 2,
+  "defect": 0,
+  "unmapped": 0,
+  "court": 1,
+  "overflow": 0
+ },
+ "fields": {
+  "clets_restrained_person_language": {
+   "verdict": "closed",
+   "question": "Which language do they speak?",
+   "gate": "Does the person you want protection from speak English?",
+   "wanted": "No",
+   "given": "Yes"
+  },
+  "clets_protected_person_language": {
+   "verdict": "closed",
+   "question": "Which language do you speak?",
+   "gate": "Do you speak English?",
+   "wanted": "No",
+   "given": "Yes"
+  },
+  "clets_date_received_by_court": {
+   "verdict": "court"
+  }
+ }
+}

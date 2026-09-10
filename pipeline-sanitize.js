@@ -17,6 +17,7 @@ const os = require('os');
 const { execFileSync } = require('child_process');
 const { PDFDocument, PDFName, PDFNumber, StandardFonts, rgb } = require('pdf-lib');
 const { sanitizePdfFields } = require('./auto-form/pdf-field-sanitizer');
+const { packetForms } = require('./packet-forms');
 
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
@@ -286,20 +287,6 @@ async function drawCaptions(bytes, captions) {
     page.drawText(text, { x, y, size, font, color: colour });
   }
   return doc.save();
-}
-
-/** The forms the packet declares, as PDF basenames. */
-function packetForms() {
-  try {
-    const spec = JSON.parse(fs.readFileSync('dv-packet.spec.json', 'utf8'));
-    const bases = (spec.forms || [])
-      .map((f) => String(f.pdf || f.name || '').replace(/\.pdf$/i, '').toLowerCase().replace(/[^a-z0-9]/g, ''))
-      .filter((b) => b && fs.existsSync(path.join(CONFIG_DIR, b + '-field-config.json')));
-    if (bases.length) return bases;
-  } catch (err) { /* no spec beside us - fall through */ }
-  return fs.readdirSync(CONFIG_DIR)
-    .filter((f) => /-field-config\.json$/.test(f))
-    .map((f) => f.replace(/-field-config\.json$/, ''));
 }
 
 async function names(bytes) {

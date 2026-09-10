@@ -1,0 +1,1531 @@
+{
+  "formTitle": "DV-140 Child Custody and Visitation Order",
+  "_comment": "DV-140 is a court order - it says so at the foot of every page - and it is attached to DV-110. The split is DV-110's: the filer supplies items 1, 2 and 3, which is the identifying part, and every other field is the judge's and is marked courtUse, so no question is ever generated for it. The filer's fields share the packet's names where the packet already has the answer, so the children named on DV-105 are the children printed here. The court's fields are named from their XFA path - meaningless but unique and stable, and nobody has to read them because nothing asks about them.",
+  "fields": [
+    {
+      "id": "DV-140[0].Page1[0].RightCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 1)"
+    },
+    {
+      "id": "DV-140[0].Page1[0].DV140_cb[0]",
+      "newName": "dv140_court_page1_dv140_cb",
+      "type": "checkbox",
+      "label": "DV-140[0].Page1[0].DV140_cb[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].DV140_cb[1]",
+      "newName": "dv140_court_page1_dv140_cb_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page1[0].DV140_cb[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].List1[0].Li1[0].FullName_ft[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "1. Name of protected person"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List1[0].Li1[0].CheckBoxRightCaptionitem1[0]",
+      "newName": "dv105_your_relationship_parent",
+      "type": "checkbox",
+      "label": "1. Relationship to children - Parent"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List1[0].Li1[0].CheckBoxRightCaptionitem1[1]",
+      "newName": "dv105_your_relationship_legal_guardian",
+      "type": "checkbox",
+      "label": "1. Relationship to children - Legal guardian"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List1[0].Li1[0].CheckBoxRightCaptionitem1[2]",
+      "newName": "dv105_your_relationship_other",
+      "type": "checkbox",
+      "label": "1. Relationship to children - Other"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List1[0].Li1[0].TextField[0]",
+      "newName": "dv105_your_relationship_other_description",
+      "type": "text",
+      "label": "1. Relationship to children - Other (describe)"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List2[0].LI1[0].FullName_ft1[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "2. Name of restrained person"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List2[0].LI1[0].CheckBoxRightCaptionitemitem2[0]",
+      "newName": "dv105_their_relationship_parent",
+      "type": "checkbox",
+      "label": "2. Relationship to children - Parent"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List2[0].LI1[0].CheckBoxRightCaptionitem2[0]",
+      "newName": "dv105_their_relationship_legal_guardian",
+      "type": "checkbox",
+      "label": "2. Relationship to children - Legal guardian"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List2[0].LI1[0].CheckBoxRightCaptionitem2[1]",
+      "newName": "dv105_their_relationship_other",
+      "type": "checkbox",
+      "label": "2. Relationship to children - Other"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List2[0].LI1[0].TextField[0]",
+      "newName": "dv105_their_relationship_other_description",
+      "type": "text",
+      "label": "2. Relationship to children - Other (describe)"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List3[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_has_children_under_18",
+      "type": "checkbox",
+      "label": "3. Children under 18 years old",
+      "courtUse": true,
+      "_why": "The box beside the item number on a court order marks the section the judge is granting, not a fact the filer supplies - the children themselves are named below it and those are the filer's."
+    },
+    {
+      "id": "DV-140[0].Page1[0].List3[0].Li1[0].TextField2[0]",
+      "newName": "dv105_child_1_name",
+      "type": "text",
+      "label": "3a. Child name"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List3[0].Li1[0].TextField34[0]",
+      "newName": "dv105_child_1_date_of_birth",
+      "type": "date",
+      "label": "3a. Child date of birth"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List3[0].Li2[0].TextField2[0]",
+      "newName": "dv105_child_2_name",
+      "type": "text",
+      "label": "3b. Child name"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List3[0].Li2[0].TextField35[0]",
+      "newName": "dv105_child_2_date_of_birth",
+      "type": "date",
+      "label": "3b. Child date of birth"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List3[0].Li3[0].TextField2[0]",
+      "newName": "dv105_child_3_name",
+      "type": "text",
+      "label": "3c. Child name"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List3[0].Li3[0].TextField36[0]",
+      "newName": "dv105_child_3_date_of_birth",
+      "type": "date",
+      "label": "3c. Child date of birth"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List3[0].Li4[0].TextField2[0]",
+      "newName": "dv105_child_4_name",
+      "type": "text",
+      "label": "3d. Child name"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List3[0].Li4[0].TextField37[0]",
+      "newName": "dv105_child_4_date_of_birth",
+      "type": "date",
+      "label": "3d. Child date of birth"
+    },
+    {
+      "id": "DV-140[0].Page1[0].List3[0].MultilineCheckBox[0]",
+      "newName": "dv105_children_additional_list_attached",
+      "type": "checkbox",
+      "label": "3. More children listed on a separate page",
+      "_why": "The same box DV-105 prints, asked once there."
+    },
+    {
+      "id": "DV-140[0].Page1[0].List4[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page1_list4_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page1[0].List4[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].List4[0].CheckBoxRightCaption1[0]",
+      "newName": "dv140_court_page1_list4_checkboxrightcaption1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page1[0].List4[0].CheckBoxRightCaption1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].List4[0].CheckBoxRightCaption2[0]",
+      "newName": "dv140_court_page1_list4_checkboxrightcaption2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page1[0].List4[0].CheckBoxRightCaption2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].List4[0].CheckBoxRightCaption3[0]",
+      "newName": "dv140_court_page1_list4_checkboxrightcaption3",
+      "type": "checkbox",
+      "label": "DV-140[0].Page1[0].List4[0].CheckBoxRightCaption3[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].List4[0].TextField2[0]",
+      "newName": "dv140_court_page1_list4_textfield2",
+      "type": "text",
+      "label": "DV-140[0].Page1[0].List4[0].TextField2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].List4[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page1_list4_li1_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page1[0].List4[0].Li1[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].List4[0].Li2[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page1_list4_li2_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page1[0].List4[0].Li2[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].List4[0].Li3[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page1_list4_li3_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page1[0].List4[0].Li3[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].List4[0].Li4[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page1_list4_li4_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page1[0].List4[0].Li4[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].List4[0].Li4[0].TextField2[0]",
+      "newName": "dv140_court_page1_list4_li4_textfield2",
+      "type": "text",
+      "label": "DV-140[0].Page1[0].List4[0].Li4[0].TextField2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].List4[0].TextField[0]",
+      "newName": "dv140_court_page1_list4_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page1[0].List4[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page1[0].DV140_cb[2]",
+      "newName": "dv140_court_page1_dv140_cb_2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page1[0].DV140_cb[2]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].Caption[0].PxCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number"
+    },
+    {
+      "id": "DV-140[0].Page2[0].List5[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page2_list5_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List5[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List5[0].Li1[0].TextField[0]",
+      "newName": "dv140_court_page2_list5_li1_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page2[0].List5[0].Li1[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List5[0].Li1[0].CheckBoxRightCaptionitem5a[0]",
+      "newName": "dv140_court_page2_list5_li1_checkboxrightcaptionitem5a",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List5[0].Li1[0].CheckBoxRightCaptionitem5a[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List5[0].Li1[0].CheckBoxRightCaptionitem5a[1]",
+      "newName": "dv140_court_page2_list5_li1_checkboxrightcaptionitem5a_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List5[0].Li1[0].CheckBoxRightCaptionitem5a[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List5[0].Li2[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page2_list5_li2_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List5[0].Li2[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List5[0].Li2[0].CheckBoxRightCaption1[0]",
+      "newName": "dv140_court_page2_list5_li2_checkboxrightcaption1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List5[0].Li2[0].CheckBoxRightCaption1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List5[0].Li2[0].MultilineCheckBox[0]",
+      "newName": "dv140_court_page2_list5_li2_multilinecheckbox",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List5[0].Li2[0].MultilineCheckBox[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List5[0].Li2[0].MultilineCheckBox[1]",
+      "newName": "dv140_court_page2_list5_li2_multilinecheckbox_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List5[0].Li2[0].MultilineCheckBox[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List5[0].Li2[0].CheckBoxRightCaption4[0]",
+      "newName": "dv140_court_page2_list5_li2_checkboxrightcaption4",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List5[0].Li2[0].CheckBoxRightCaption4[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List5[0].Li2[0].TextField[0]",
+      "newName": "dv140_court_page2_list5_li2_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page2[0].List5[0].Li2[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List6[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page2_list6_li1_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List6[0].Li1[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List7[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page2_list7_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List7[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List7[0].Li1[0].CheckBoxRightCaptionitem7a[0]",
+      "newName": "dv140_court_page2_list7_li1_checkboxrightcaptionitem7a",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List7[0].Li1[0].CheckBoxRightCaptionitem7a[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List7[0].Li1[0].CheckBoxRightCaptionitem7a[1]",
+      "newName": "dv140_court_page2_list7_li1_checkboxrightcaptionitem7a_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List7[0].Li1[0].CheckBoxRightCaptionitem7a[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List7[0].Li1[0].CheckBoxRightCaptionitem7a[2]",
+      "newName": "dv140_court_page2_list7_li1_checkboxrightcaptionitem7a_2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List7[0].Li1[0].CheckBoxRightCaptionitem7a[2]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List7[0].Li1[0].CheckBoxRightCaptionitem7a[3]",
+      "newName": "dv140_court_page2_list7_li1_checkboxrightcaptionitem7a_3",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List7[0].Li1[0].CheckBoxRightCaptionitem7a[3]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List7[0].Li1[0].TextField[0]",
+      "newName": "dv140_court_page2_list7_li1_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page2[0].List7[0].Li1[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List7[0].Li2[0].CheckBoxRightCaptionitem7b[0]",
+      "newName": "dv140_court_page2_list7_li2_checkboxrightcaptionitem7b",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List7[0].Li2[0].CheckBoxRightCaptionitem7b[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List7[0].Li2[0].CheckBoxRightCaptionitem7b[1]",
+      "newName": "dv140_court_page2_list7_li2_checkboxrightcaptionitem7b_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List7[0].Li2[0].CheckBoxRightCaptionitem7b[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List7[0].Li2[0].CheckBoxRightCaptionitem7b[2]",
+      "newName": "dv140_court_page2_list7_li2_checkboxrightcaptionitem7b_2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List7[0].Li2[0].CheckBoxRightCaptionitem7b[2]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List7[0].Li2[0].CheckBoxRightCaptionitem7b[3]",
+      "newName": "dv140_court_page2_list7_li2_checkboxrightcaptionitem7b_3",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List7[0].Li2[0].CheckBoxRightCaptionitem7b[3]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List7[0].Li2[0].TextField[0]",
+      "newName": "dv140_court_page2_list7_li2_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page2[0].List7[0].Li2[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page2[0].List8[0].Li1[0].MultilineCheckBox[0]",
+      "newName": "dv140_court_page2_list8_li1_multilinecheckbox",
+      "type": "checkbox",
+      "label": "DV-140[0].Page2[0].List8[0].Li1[0].MultilineCheckBox[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].Caption[0].PxCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number"
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page3_list9_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li1[0].CheckBoxRightCaption1[0]",
+      "newName": "dv140_court_page3_list9_li1_checkboxrightcaption1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li1[0].CheckBoxRightCaption1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li1[0].CheckBoxRightCaption11[0]",
+      "newName": "dv140_court_page3_list9_li1_checkboxrightcaption11",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li1[0].CheckBoxRightCaption11[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].DateField1[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li1_datefield1",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].DateField1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].DateField2[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li1_datefield2",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].DateField2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].phonetf[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li1_phonetf",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].phonetf[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].addresstf[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li1_addresstf",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].addresstf[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].TextField[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li1_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li1_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].tf1[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li1_tf1",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].tf1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].phonetf1[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li1_phonetf1",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].phonetf1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].addresstf1[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li1_addresstf1",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li1[0].addresstf1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].CheckBoxitem9b2person[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li2_checkboxitem9b2person",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].CheckBoxitem9b2person[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].CheckBoxitem9b2person2[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li2_checkboxitem9b2person2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].CheckBoxitem9b2person2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].item9b2[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li2_item9b2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].item9b2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].item9b2[1]",
+      "newName": "dv140_court_page3_list9_li2_list_li2_item9b2_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].item9b2[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].CheckBoxitem9b2person3[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li2_checkboxitem9b2person3",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].CheckBoxitem9b2person3[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].CheckBoxitem9b2person4[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li2_checkboxitem9b2person4",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].CheckBoxitem9b2person4[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].addresstf[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li2_addresstf",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].addresstf[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li2_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li2[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li3[0].item9b3[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li3_item9b3",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li3[0].item9b3[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li3[0].item9b3cont[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li3_item9b3cont",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li3[0].item9b3cont[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page3_list9_li2_list_li3_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li3[0].CheckBoxitem9c[0]",
+      "newName": "dv140_court_page3_list9_li3_checkboxitem9c",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li3[0].CheckBoxitem9c[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li3[0].DecimalField1[0]",
+      "newName": "dv140_court_page3_list9_li3_decimalfield1",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li3[0].DecimalField1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li3[0].CheckBoxitem9c[1]",
+      "newName": "dv140_court_page3_list9_li3_checkboxitem9c_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li3[0].CheckBoxitem9c[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li3[0].DecimalField2[0]",
+      "newName": "dv140_court_page3_list9_li3_decimalfield2",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li3[0].DecimalField2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li3[0].CheckBoxitem9c[2]",
+      "newName": "dv140_court_page3_list9_li3_checkboxitem9c_2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li3[0].CheckBoxitem9c[2]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li3[0].TextField3[0]",
+      "newName": "dv140_court_page3_list9_li3_textfield3",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li3[0].TextField3[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li4[0].NumericField3[0]",
+      "newName": "dv140_court_page3_list9_li4_numericfield3",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li4[0].NumericField3[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li4[0].NumericField31[0]",
+      "newName": "dv140_court_page3_list9_li4_numericfield31",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li4[0].NumericField31[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li4[0].TextField2[0]",
+      "newName": "dv140_court_page3_list9_li4_textfield2",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li4[0].TextField2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li4[0].NumericField32[0]",
+      "newName": "dv140_court_page3_list9_li4_numericfield32",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li4[0].NumericField32[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li5[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page3_list9_li5_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li5[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li5[0].CheckBoxRightCaption[1]",
+      "newName": "dv140_court_page3_list9_li5_checkboxrightcaption_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li5[0].CheckBoxRightCaption[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li5[0].CheckBoxRightCaption[2]",
+      "newName": "dv140_court_page3_list9_li5_checkboxrightcaption_2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page3[0].List9[0].Li5[0].CheckBoxRightCaption[2]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page3[0].List9[0].Li5[0].TextField[0]",
+      "newName": "dv140_court_page3_list9_li5_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page3[0].List9[0].Li5[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].Caption[0].PxCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number"
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page4_list10_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List10[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li1[0].item10a[0]",
+      "newName": "dv140_court_page4_list10_li1_item10a",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List10[0].Li1[0].item10a[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li1[0].item10a[1]",
+      "newName": "dv140_court_page4_list10_li1_item10a_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List10[0].Li1[0].item10a[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li2[0].TextField[0]",
+      "newName": "dv140_court_page4_list10_li2_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List10[0].Li2[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li2[0].TextField1[0]",
+      "newName": "dv140_court_page4_list10_li2_textfield1",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List10[0].Li2[0].TextField1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li2[0].phonetf[0]",
+      "newName": "dv140_court_page4_list10_li2_phonetf",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List10[0].Li2[0].phonetf[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li2[0].addresstf[0]",
+      "newName": "dv140_court_page4_list10_li2_addresstf",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List10[0].Li2[0].addresstf[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li3[0].CheckBoxitem10c[0]",
+      "newName": "dv140_court_page4_list10_li3_checkboxitem10c",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List10[0].Li3[0].CheckBoxitem10c[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li3[0].CheckBoxitem10c[1]",
+      "newName": "dv140_court_page4_list10_li3_checkboxitem10c_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List10[0].Li3[0].CheckBoxitem10c[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li3[0].item10c[0]",
+      "newName": "dv140_court_page4_list10_li3_item10c",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List10[0].Li3[0].item10c[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li3[0].item10cCont[0]",
+      "newName": "dv140_court_page4_list10_li3_item10ccont",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List10[0].Li3[0].item10cCont[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li4[0].CheckBoxRightCaption1[0]",
+      "newName": "dv140_court_page4_list10_li4_checkboxrightcaption1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List10[0].Li4[0].CheckBoxRightCaption1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li4[0].tf1[0]",
+      "newName": "dv140_court_page4_list10_li4_tf1",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List10[0].Li4[0].tf1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li4[0].CheckBoxRightCaption2[0]",
+      "newName": "dv140_court_page4_list10_li4_checkboxrightcaption2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List10[0].Li4[0].CheckBoxRightCaption2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li4[0].CheckBoxRightCaption3[0]",
+      "newName": "dv140_court_page4_list10_li4_checkboxrightcaption3",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List10[0].Li4[0].CheckBoxRightCaption3[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List10[0].Li4[0].TextField[0]",
+      "newName": "dv140_court_page4_list10_li4_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List10[0].Li4[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page4_list11_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List11[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li1[0].item11a[0]",
+      "newName": "dv140_court_page4_list11_li1_item11a",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List11[0].Li1[0].item11a[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li1[0].item11a[1]",
+      "newName": "dv140_court_page4_list11_li1_item11a_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List11[0].Li1[0].item11a[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].CheckBox31[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li1_checkbox31",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].CheckBox31[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].TextField[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li1_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].phonetf[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li1_phonetf",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].phonetf[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].addresstf[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li1_addresstf",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].addresstf[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].NumericField3[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li1_numericfield3",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].NumericField3[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].NumericField31[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li1_numericfield31",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].NumericField31[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].TextField2[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li1_textfield2",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].TextField2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].NumericField32[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li1_numericfield32",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].NumericField32[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].DateField3[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li1_datefield3",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].DateField3[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].DateField4[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li1_datefield4",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li1[0].DateField4[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].CheckBox3[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li2_checkbox3",
+      "type": "checkbox",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].CheckBox3[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].TextField[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li2_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].TextField[1]",
+      "newName": "dv140_court_page4_list11_li2_list_li2_textfield_1",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].TextField[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].phonetf[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li2_phonetf",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].phonetf[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].addresstf[0]",
+      "newName": "dv140_court_page4_list11_li2_list_li2_addresstf",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].addresstf[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].TextField[2]",
+      "newName": "dv140_court_page4_list11_li2_list_li2_textfield_2",
+      "type": "text",
+      "label": "DV-140[0].Page4[0].List11[0].Li2[0].List[0].Li2[0].TextField[2]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].Caption[0].PxCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number"
+    },
+    {
+      "id": "DV-140[0].Page5[0].List12[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page5_list12_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List12[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List12[0].Li1[0].item12a[0]",
+      "newName": "dv140_court_page5_list12_li1_item12a",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List12[0].Li1[0].item12a[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List12[0].Li1[0].item12a[1]",
+      "newName": "dv140_court_page5_list12_li1_item12a_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List12[0].Li1[0].item12a[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List12[0].Li2[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page5_list12_li2_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List12[0].Li2[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List12[0].Li2[0].CheckBoxRightCaption1[0]",
+      "newName": "dv140_court_page5_list12_li2_checkboxrightcaption1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List12[0].Li2[0].CheckBoxRightCaption1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List12[0].Li2[0].CheckBoxRightCaption2[0]",
+      "newName": "dv140_court_page5_list12_li2_checkboxrightcaption2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List12[0].Li2[0].CheckBoxRightCaption2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List12[0].Li2[0].TextField[0]",
+      "newName": "dv140_court_page5_list12_li2_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List12[0].Li2[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List12[0].Li3[0].TextField[0]",
+      "newName": "dv140_court_page5_list12_li3_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List12[0].Li3[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List12[0].Li3[0].item12c[0]",
+      "newName": "dv140_court_page5_list12_li3_item12c",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List12[0].Li3[0].item12c[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List12[0].Li3[0].item12c[1]",
+      "newName": "dv140_court_page5_list12_li3_item12c_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List12[0].Li3[0].item12c[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page5_list13_li1_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf1[0]",
+      "newName": "dv140_court_page5_list13_li1_tf1",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf2[0]",
+      "newName": "dv140_court_page5_list13_li1_tf2",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf3[0]",
+      "newName": "dv140_court_page5_list13_li1_tf3",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf3[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf4[0]",
+      "newName": "dv140_court_page5_list13_li1_tf4",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf4[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf5[0]",
+      "newName": "dv140_court_page5_list13_li1_tf5",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf5[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf6[0]",
+      "newName": "dv140_court_page5_list13_li1_tf6",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf6[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf7[0]",
+      "newName": "dv140_court_page5_list13_li1_tf7",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf7[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf8[0]",
+      "newName": "dv140_court_page5_list13_li1_tf8",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf8[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf9[0]",
+      "newName": "dv140_court_page5_list13_li1_tf9",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf9[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf10[0]",
+      "newName": "dv140_court_page5_list13_li1_tf10",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf10[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf11[0]",
+      "newName": "dv140_court_page5_list13_li1_tf11",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf11[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf12[0]",
+      "newName": "dv140_court_page5_list13_li1_tf12",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf12[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf13[0]",
+      "newName": "dv140_court_page5_list13_li1_tf13",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf13[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf14[0]",
+      "newName": "dv140_court_page5_list13_li1_tf14",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf14[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf15[0]",
+      "newName": "dv140_court_page5_list13_li1_tf15",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf15[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf16[0]",
+      "newName": "dv140_court_page5_list13_li1_tf16",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf16[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf17[0]",
+      "newName": "dv140_court_page5_list13_li1_tf17",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf17[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf18[0]",
+      "newName": "dv140_court_page5_list13_li1_tf18",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf18[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf19[0]",
+      "newName": "dv140_court_page5_list13_li1_tf19",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf19[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf20[0]",
+      "newName": "dv140_court_page5_list13_li1_tf20",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf20[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf21[0]",
+      "newName": "dv140_court_page5_list13_li1_tf21",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf21[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf22[0]",
+      "newName": "dv140_court_page5_list13_li1_tf22",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf22[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf23[0]",
+      "newName": "dv140_court_page5_list13_li1_tf23",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf23[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf24[0]",
+      "newName": "dv140_court_page5_list13_li1_tf24",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf24[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf25[0]",
+      "newName": "dv140_court_page5_list13_li1_tf25",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf25[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf26[0]",
+      "newName": "dv140_court_page5_list13_li1_tf26",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf26[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf27[0]",
+      "newName": "dv140_court_page5_list13_li1_tf27",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf27[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf28[0]",
+      "newName": "dv140_court_page5_list13_li1_tf28",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf28[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf29[0]",
+      "newName": "dv140_court_page5_list13_li1_tf29",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf29[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf30[0]",
+      "newName": "dv140_court_page5_list13_li1_tf30",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf30[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf31[0]",
+      "newName": "dv140_court_page5_list13_li1_tf31",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf31[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf32[0]",
+      "newName": "dv140_court_page5_list13_li1_tf32",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf32[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf33[0]",
+      "newName": "dv140_court_page5_list13_li1_tf33",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf33[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf34[0]",
+      "newName": "dv140_court_page5_list13_li1_tf34",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf34[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf35[0]",
+      "newName": "dv140_court_page5_list13_li1_tf35",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf35[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf36[0]",
+      "newName": "dv140_court_page5_list13_li1_tf36",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf36[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf37[0]",
+      "newName": "dv140_court_page5_list13_li1_tf37",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf37[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf38[0]",
+      "newName": "dv140_court_page5_list13_li1_tf38",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf38[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf39[0]",
+      "newName": "dv140_court_page5_list13_li1_tf39",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf39[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf40[0]",
+      "newName": "dv140_court_page5_list13_li1_tf40",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf40[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf41[0]",
+      "newName": "dv140_court_page5_list13_li1_tf41",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf41[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].tf42[0]",
+      "newName": "dv140_court_page5_list13_li1_tf42",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].tf42[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaption12b[0]",
+      "newName": "dv140_court_page5_list13_li1_checkboxrightcaption12b",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaption12b[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaption12b[1]",
+      "newName": "dv140_court_page5_list13_li1_checkboxrightcaption12b_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaption12b[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaption12b[2]",
+      "newName": "dv140_court_page5_list13_li1_checkboxrightcaption12b_2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaption12b[2]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].TextField[0]",
+      "newName": "dv140_court_page5_list13_li1_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].DateField5[0]",
+      "newName": "dv140_court_page5_list13_li1_datefield5",
+      "type": "text",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].DateField5[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[0]",
+      "newName": "dv140_court_page5_list13_li1_checkboxrightcaptionitem13",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[1]",
+      "newName": "dv140_court_page5_list13_li1_checkboxrightcaptionitem13_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[2]",
+      "newName": "dv140_court_page5_list13_li1_checkboxrightcaptionitem13_2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[2]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[3]",
+      "newName": "dv140_court_page5_list13_li1_checkboxrightcaptionitem13_3",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[3]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[4]",
+      "newName": "dv140_court_page5_list13_li1_checkboxrightcaptionitem13_4",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[4]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[5]",
+      "newName": "dv140_court_page5_list13_li1_checkboxrightcaptionitem13_5",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[5]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[6]",
+      "newName": "dv140_court_page5_list13_li1_checkboxrightcaptionitem13_6",
+      "type": "checkbox",
+      "label": "DV-140[0].Page5[0].List13[0].Li1[0].CheckBoxRightCaptionitem13[6]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].Caption[0].PxCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number"
+    },
+    {
+      "id": "DV-140[0].Page6[0].List14[0].Li1[0].item14ab[0]",
+      "newName": "dv140_court_page6_list14_li1_item14ab",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List14[0].Li1[0].item14ab[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List14[0].Li2[0].item14ab[0]",
+      "newName": "dv140_court_page6_list14_li2_item14ab",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List14[0].Li2[0].item14ab[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page6_list14_li2_list_li1_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li1[0].TextField[0]",
+      "newName": "dv140_court_page6_list14_li2_list_li1_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li1[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[1]",
+      "newName": "dv140_court_page6_list14_li2_list_li1_checkboxrightcaption_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[2]",
+      "newName": "dv140_court_page6_list14_li2_list_li1_checkboxrightcaption_2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[2]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li2[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page6_list14_li2_list_li2_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li2[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li2[0].CheckBoxRightCaption[1]",
+      "newName": "dv140_court_page6_list14_li2_list_li2_checkboxrightcaption_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li2[0].CheckBoxRightCaption[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li2[0].CheckBoxRightCaption[2]",
+      "newName": "dv140_court_page6_list14_li2_list_li2_checkboxrightcaption_2",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li2[0].CheckBoxRightCaption[2]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li2[0].TextField[0]",
+      "newName": "dv140_court_page6_list14_li2_list_li2_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li2[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li2[0].CheckBoxRightCaption1[0]",
+      "newName": "dv140_court_page6_list14_li2_list_li2_checkboxrightcaption1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List14[0].Li2[0].List[0].Li2[0].CheckBoxRightCaption1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List15[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page6_list15_li1_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List15[0].Li1[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List15[0].Li1[0].TextField[0]",
+      "newName": "dv140_court_page6_list15_li1_textfield",
+      "type": "text",
+      "label": "DV-140[0].Page6[0].List15[0].Li1[0].TextField[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List16[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv140_court_page6_list16_li1_checkboxrightcaption",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List16[0].Li1[0].CheckBoxRightCaption[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List16[0].Li1[0].TextField1[0]",
+      "newName": "dv140_court_page6_list16_li1_textfield1",
+      "type": "text",
+      "label": "DV-140[0].Page6[0].List16[0].Li1[0].TextField1[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List16[0].Li1[0].TextField2[0]",
+      "newName": "dv140_court_page6_list16_li1_textfield2",
+      "type": "text",
+      "label": "DV-140[0].Page6[0].List16[0].Li1[0].TextField2[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List16[0].Li1[0].TextField3[0]",
+      "newName": "dv140_court_page6_list16_li1_textfield3",
+      "type": "text",
+      "label": "DV-140[0].Page6[0].List16[0].Li1[0].TextField3[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List16[0].Li1[0].TextField4[0]",
+      "newName": "dv140_court_page6_list16_li1_textfield4",
+      "type": "text",
+      "label": "DV-140[0].Page6[0].List16[0].Li1[0].TextField4[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List17[0].Li1[0].CheckBoxRightCaption8[0]",
+      "newName": "dv140_court_page6_list17_li1_checkboxrightcaption8",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List17[0].Li1[0].CheckBoxRightCaption8[0]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List17[0].Li1[0].CheckBoxRightCaption8[1]",
+      "newName": "dv140_court_page6_list17_li1_checkboxrightcaption8_1",
+      "type": "checkbox",
+      "label": "DV-140[0].Page6[0].List17[0].Li1[0].CheckBoxRightCaption8[1]",
+      "courtUse": true
+    },
+    {
+      "id": "DV-140[0].Page6[0].List17[0].Li1[0].TextField2[0]",
+      "newName": "dv140_court_page6_list17_li1_textfield2",
+      "type": "text",
+      "label": "DV-140[0].Page6[0].List17[0].Li1[0].TextField2[0]",
+      "courtUse": true
+    }
+  ],
+  "_sharedNote": "Items 1 and 2 ask the two relationships DV-105 already asks, so they carry DV-105 names and one answer fills both forms. Item 3 carries DV-105 child names for the same reason. That leaves DV-140 asking nothing at all - like DV-109, it is a form the packet fills entirely from what it already knows."
+}

@@ -1607,12 +1607,12 @@
   {
    "name": "additional_pages_count",
    "kind": "text",
-   "value": "12"
+   "value": "18"
   },
   {
    "name": "person_asking_protection_signature_date",
    "kind": "text",
-   "value": "09-09-2026"
+   "value": "09-10-2026"
   },
   {
    "name": "person_asking_protection_signature_printed_name",
@@ -1622,7 +1622,7 @@
   {
    "name": "lawyer_signature_date",
    "kind": "text",
-   "value": "09-09-2026"
+   "value": "09-10-2026"
   },
   {
    "name": "lawyer_signature_printed_name",

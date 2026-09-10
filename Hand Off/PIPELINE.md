@@ -186,6 +186,49 @@ Three things about it are worth keeping in mind if it is ever touched:
   annotations five times to end up back where it started is seconds spent on a
   panel nobody is looking at.
 
+## Adding a form to the packet
+
+The packet is eight forms: DV-100, DV-101, DV-105, DV-108, DV-140, CLETS-001,
+DV-109 and DV-110. Adding one is six steps and about half of it is naming.
+
+```bash
+qpdf --decrypt dv108.pdf plain.pdf            # Judicial Council PDFs are encrypted XFA
+node pipeline-field-labels.js plain.pdf       # what each field sits next to on the page
+#  write dv-field-configs/dv108-field-config.json  - every field, named
+node pipeline-sanitize.js dv108               # rebuild with those names into FormWiz GUI/
+#  write dv108-hints.json                     - the interview
+node compile-form.js dv-field-configs/dv108-field-config.json dv108-flowchart.json --hints dv108-hints.json
+#  add it to dv-packet.spec.json, with what activates it
+node pipeline-connect.js && node pipeline-capacity.js && node pipeline-build-packet.js
+```
+
+Then the usual: import the project JSON in the editor, export the GUI JSON,
+audit, generate, fill, render, read the pages.
+
+**Name a field after the answer, not after the form.** A field the packet
+already asks about takes the packet's name and is filled from the answer that
+already exists - that is the whole wiring. DV-140 is the clearest case: 221
+fields, 195 of them the judge's, and every one of the remaining 25 is a
+question DV-100 or DV-105 already asks. It ends up asking nothing at all.
+
+**A form that says "This is a Court Order" is the court's, bar its identifying
+items.** DV-110, DV-109 and DV-140 all take that shape: the filer completes the
+first two or three items and every other field is marked `courtUse`, so no
+question is ever generated for it and `pipeline-explain.js` counts the blank as
+blank by design.
+
+**Which forms are in the packet is answered in one place.** `packet-forms.js`,
+reading `dv-packet.spec.json`. Four scripts used to keep their own list and
+every one went stale silently - a form joined the packet and was not filled, or
+not measured, or not reconciled with the others, and the run looked exactly like
+a clean one with fewer pages.
+
+**Types the compiler accepts are not all types the builder renders.** `ssn` is
+in `compile-form.js`'s KNOWN_TYPES and the builder draws no input for it, so the
+question reached the GUI JSON and no field ever appeared on the page. Nothing
+catches that but the page audit. CLETS-001's SSN is declared `text`, and the
+runtime still shapes it because `hasValidatedShape()` keys off the name.
+
 ## A project knows its own name
 
 Every project JSON carries a `projectId`, minted once and preserved from then

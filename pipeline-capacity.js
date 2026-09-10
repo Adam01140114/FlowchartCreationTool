@@ -29,6 +29,7 @@
 const fs = require('fs');
 const path = require('path');
 const ruledLines = require('./ruled-lines');
+const { packetForms } = require('./packet-forms');
 const { layoutMultilineText, TextAlignment } = require('pdf-lib');
 
 const args = process.argv.slice(2);
@@ -239,8 +240,7 @@ async function main() {
   const { PDFDocument, StandardFonts, layoutMultilineText, TextAlignment } = require('pdf-lib');
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
 
-  const bases = FORMS.length ? FORMS : fs.readdirSync(PDF_DIR)
-    .filter((f) => /^dv\d+\.pdf$/i.test(f)).map((f) => f.replace(/\.pdf$/i, ''));
+  const bases = FORMS.length ? FORMS : packetForms();
 
   const metrics = await PDFDocument.create();
   const helv = await metrics.embedFont(StandardFonts.Helvetica);
