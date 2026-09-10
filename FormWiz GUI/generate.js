@@ -7097,10 +7097,39 @@ if (s > 1){
   // An answer that spilled onto a continuation form posts only what its own box
   // can print. Wrapped here so every payload builder gets it without four
   // separate edits, and so the two can never disagree.
+  /**
+   * The short form of an answer, when the long one will not fit the box.
+   *
+   * Some answers have two written forms and the paper only has room for one.
+   * DV-110's *State box holds four characters at 11pt - it is printed for a
+   * postal code - while the question is a dropdown of full state names,
+   * because picking "California" is easier and less error-prone than typing
+   * two letters. So "Wyoming" was drawn and clipped to "Wyor", on a field the
+   * form stars as required for a police database.
+   *
+   * The dropdown already keeps the code beside the name, in the hidden
+   * <field>_short the state select maintains. This reaches for it only when
+   * the long form does not fit and the short one does, so an answer that fits
+   * is never shortened and a field with no short form is never touched.
+   */
+  function shorterFormThatFits(name, value) {
+    var caps = (typeof fieldCapacity !== "undefined" && fieldCapacity) ? fieldCapacity : null;
+    var cap = caps ? Number(caps[name] || 0) : 0;
+    var text = String(value == null ? "" : value);
+    if (!cap || text.length <= cap) return null;
+    var el = document.getElementById(name + "_short")
+      || document.querySelector('[name="' + name + '_short"]');
+    if (!el) return null;
+    var short = String(el.value || "").trim();
+    if (!short || short.length > cap) return null;
+    return short;
+  }
+
   window.pdfValueForNamedField = function (name, value) {
+    var short = shorterFormThatFits(name, value);
     var trimmed = (typeof overflowPostValue === "function")
-      ? overflowPostValue(name, value) : value;
-    return window.pdfValueForField(trimmed);
+      ? overflowPostValue(name, short === null ? value : short) : value;
+    return window.pdfValueForField(short === null ? trimmed : short);
   };
   window.pdfValueForField = window.pdfValueForField || function (value) {
     var text = (value === null || value === undefined) ? '' : String(value);
@@ -14499,6 +14528,30 @@ function overflowPostValue(name, value){
     return value;
 }
 
+/**
+ * Recompute the boxes a dropdown keeps beside itself.
+ *
+ * A state select maintains two hidden mirrors - the full name and the postal
+ * code - from an inline onchange. A debug fill sets the select without that
+ * handler ever running, so the mirrors stayed empty and DV-110's
+ * four-character State box had no short form to fall back on.
+ *
+ * Found by convention rather than by parsing the handler: the mirrors are
+ * created as the select's own id plus _hidden and _short, so a select that has
+ * both is one of these and a select that has neither is left alone.
+ */
+function refreshStateMirrors(){
+    if (typeof window.updateStateHiddenFields !== "function") return;
+    var selects = document.querySelectorAll("select");
+    Array.prototype.forEach.call(selects, function(sel){
+        if (!sel.id) return;
+        var full = document.getElementById(sel.id + "_hidden");
+        var short = document.getElementById(sel.id + "_short");
+        if (!full || !short) return;
+        window.updateStateHiddenFields(sel, full.id, short.id);
+    });
+}
+
 function applyComputedFields(){
     // Which project produced this run. It has no PDF field and is meant not to
     // - it rides along in the answers so the publish step knows whose output
@@ -14548,6 +14601,7 @@ function nextSectionAcrossForms(currentSection){
 function handleNext(currentSection){
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
+    refreshStateMirrors();
     applyOverflowLinks();
     applyComputedFields();
     /* remember the place we're leaving - push BEFORE evaluating jumps */
@@ -19941,7 +19995,29 @@ function forgetComputedFieldIds() { window.__fwComputedIds = null; }
 function isComputedFillField(el) {
   if (!el) return false;
   if (el.getAttribute && el.getAttribute('data-address-composite') === '1') return true;
+  if (isDerivedMirror(el)) return true;
   return !!(el.id && solverComputedFieldIds().has(el.id));
+}
+
+/**
+ * A box another control writes, which is not a question and must not be filled.
+ *
+ * The state dropdown keeps the postal code beside the name in a hidden
+ * <field>_short, the phone widget splits a number into _code and _no_code, and
+ * the overflow link parks its marker and its continuation the same way. All of
+ * them are text inputs hidden by an inline style rather than by a gate, and the
+ * fill was writing "Test Value" over every one - so DV-110's four-character
+ * State box asked for a shorter form of Wyoming and was handed "Test Value".
+ *
+ * The test is the inline style, not the name. A question hidden because of an
+ * answer is hidden by a class on its container, which the caller already
+ * checks; a box hidden on itself was put there by the form for its own use.
+ */
+function isDerivedMirror(el) {
+  if (!el || !el.style) return false;
+  if (el.style.display !== 'none') return false;
+  const type = (el.type || '').toLowerCase();
+  return type === 'text' || type === 'textarea' || el.tagName === 'TEXTAREA';
 }
 
 function solverFieldEligible(el) {
@@ -21017,7 +21093,7 @@ function pickBestSelectValue(select) {
 }
 function fillVisibleTextFields() {
   document.querySelectorAll('input, textarea').forEach(function(el) {
-    if (!isDebugFillEligible(el)) return;
+    if (!isDebugFillEligible(el) || isDerivedMirror(el)) return;
     const type = (el.type || '').toLowerCase();
     if (type === 'checkbox' || type === 'radio' || type === 'file') return;
     if (!(el.value || '').trim()) {
@@ -21364,6 +21440,9 @@ async function fillMaximumPath(options) {
     // The derived fields too. These are written on the way through the form,
     // and a debug fill does not walk it - so without this a payload taken
     // straight after a fill carries every answer and no page count.
+    if (typeof refreshStateMirrors === 'function') {
+      refreshStateMirrors();
+    }
     if (typeof applyOverflowLinks === 'function') {
       applyOverflowLinks();
     }

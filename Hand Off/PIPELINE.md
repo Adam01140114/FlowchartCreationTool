@@ -413,9 +413,24 @@ so the two copies are kept in step by hand and each names the other.
 **A box too narrow for a whole word still gets a limit.** Fitting whole words
 returned zero for DV-110's `State` box, which was read as "not measured" and
 left uncapped — so "Wyoming" printed as "Wyor" with nothing to say so. A line
-that takes no word now takes as many characters as fit and ends the run. (That
-box holds four characters, which is a fact about the paper: a state chosen from
-a dropdown of full names cannot fit it, and the mapping wants deciding.)
+that takes no word now takes as many characters as fit and ends the run.
+
+**And where the long form will not fit, the short form goes on the paper.** That
+State box holds four characters — it is printed for a postal code — while the
+question is a dropdown of full state names, because picking "California" is
+easier and less error-prone than typing two letters. The dropdown already keeps
+the code beside the name, in the hidden `<field>_short` it maintains, so
+`pdfValueForNamedField` reaches for it when the measured capacity says the long
+form does not fit and the short one does. An answer that fits is never
+shortened: the same run sends `WY` to DV-110's four-character box and `Wyoming`
+to DV-100's eleven-character one.
+
+Two things had to be fixed under that. The debug fill was writing "Test Value"
+over every derived mirror — `_short`, `_hidden`, `_code`, `_no_code` are text
+inputs hidden by an inline style, not questions — so the short form it reached
+for was test text. And a fill sets a `<select>` without its inline `onchange`
+ever running, so the mirrors were empty afterwards; `refreshStateMirrors()` now
+recomputes them where the other derived fields are recomputed.
 
 **Which boxes wrap travels with the measurement**, under a reserved `__wraps`
 key inside `fieldCapacity`, because whether a box wraps is part of measuring it

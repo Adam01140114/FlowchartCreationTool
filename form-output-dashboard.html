@@ -207,12 +207,19 @@
   }
   #jsonText:focus { outline: none; }
   .viewer-nav { display: flex; gap: 8px; align-items: center; }
-  /* The page is the thing being read, so it keeps its full height and the
-     dialog scrolls. Squeezing it to fit the data panels underneath made the
-     one thing you opened the viewer for the smallest thing in it. */
+  /* The page is the thing being read, so it is sized by the screen it is read
+     on: as tall as the screen allows, and as wide as that height makes it.
+     A page is taller than it is wide, so binding the width instead was
+     binding the wrong edge - it left the page overflowing the dialog on any
+     ordinary laptop, which is the scrolling this was meant to avoid. */
   #viewer { display: flex; flex-direction: column; max-height: 96vh; overflow: hidden; }
-  #viewerScroll { overflow-y: auto; }
-  #viewerImg { max-height: none; width: min(900px, 92vw); height: auto; }
+  /* min-height:0, or a flex item will not shrink below its content and the
+     dialog grows past its own max-height instead of the panel scrolling. */
+  #viewerScroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  #viewerImg {
+    display: block; margin: 0 auto;
+    max-height: 88vh; max-width: 92vw; width: auto; height: auto;
+  }
   #viewer .bar { position: sticky; bottom: 0; z-index: 2; background: var(--paper); }
   .viewer-data {
     display: grid; gap: 12px; padding: 12px 14px 16px; overflow-y: auto;
@@ -228,7 +235,14 @@
   }
   dialog button.step:hover:not([disabled]) { background: var(--ink); color: var(--paper); }
   dialog button[disabled] { opacity: .4; cursor: default; }
-  #viewerPdf { display: block; width: min(900px, 92vw); height: 78vh; border: none; background: #fff; }
+  #viewerPdf {
+    display: block; margin: 0 auto;
+    width: min(900px, 92vw); height: 88vh; border: none; background: #fff;
+  }
+  /* An id selector beats the browser's own [hidden] { display: none }, so the
+     rule above kept the frame in the layout however often the attribute was
+     set - a blank 700px slab under every page, and the gap under the image. */
+  #viewerImg[hidden], #viewerPdf[hidden] { display: none; }
   dialog button {
     border: 1px solid var(--line); background: transparent; color: var(--ink);
     border-radius: 6px; padding: 4px 12px; cursor: pointer; font: inherit; font-size: 13px;
@@ -1047,6 +1061,16 @@ function paintViewerData(form, page) {
 }
 
 function open(img) {
+  // Always opens on the picture.
+  //
+  // The mode used to outlive the dialog: read a page as a PDF, close, open any
+  // other page, and the frame came back still holding the PDF of the page
+  // before - a white slab where the image should be, on a viewer that had
+  // apparently ignored Close. Resetting here rather than on the dialog's close
+  // event because this browser does not fire that event for dialog.close(),
+  // and opening is the moment that has to be right anyway. Back and Next do
+  // not reset, so paging through the PDFs stays in the PDFs.
+  setViewerMode(false);
   showAt(viewerPages().indexOf(img));
   viewer.showModal();
 }
@@ -1084,6 +1108,15 @@ function loadViewerPdf() {
 document.getElementById('viewerPdfToggle').addEventListener('click', function () {
   setViewerMode(!showingPdf);
 });
+
+// Closing puts it back to the picture.
+//
+// Without this the mode outlived the dialog: close while reading the PDF, open
+// any other page, and the frame came back still holding the PDF of the page
+// before - a white slab where the image should be, on a viewer that had
+// apparently ignored Close. Nothing on screen said which page it was showing,
+// because it was showing the wrong one.
+viewer.addEventListener('close', function () { setViewerMode(false); });   // where it fires
 
 document.getElementById('viewerCopy').addEventListener('click', async function () {
   const img = viewerPages()[viewerAt];

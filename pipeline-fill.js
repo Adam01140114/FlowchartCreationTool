@@ -149,6 +149,25 @@ async function renderPages(pdfPath, dir) {
   return pages;
 }
 
+/**
+ * The boxes on this form the court ticks, not the filer.
+ *
+ * Three of DV-110's eighty-five checkboxes come back ticked, which reads as a
+ * form that barely filled - and is right: eighty of them are the judge's
+ * decisions, and DV-110 says on its face that the filer completes items 1, 2
+ * and 3 only. A ratio that has to be re-derived by hand every time it is read
+ * is a ratio that will eventually be read as a defect.
+ */
+function courtOwnedBoxes(base) {
+  const file = path.join('dv-field-configs', base.toLowerCase() + '-field-config.json');
+  try {
+    const config = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return new Set((config.fields || [])
+      .filter((f) => f.courtUse && f.type !== 'text')
+      .map((f) => f.newName));
+  } catch (err) { return new Set(); }
+}
+
 async function main() {
   const data = JSON.parse(fs.readFileSync(ANSWERS, 'utf8'));
   fs.mkdirSync(OUT, { recursive: true });
@@ -175,7 +194,23 @@ async function main() {
     console.log('\n' + base + '  ->  ' + file);
     console.log('  text       ' + filledText.length + '/' + text.length + ' filled'
       + '   (' + markers.length + ' carry their own name, ' + others.length + ' carry something else)');
-    console.log('  checkboxes ' + ticked.length + '/' + boxes.length + ' ticked');
+    const court = courtOwnedBoxes(base);
+    const theirs = boxes.filter((f) => court.has(f.name));
+    const unchosen = boxes.filter((f) => !f.value && !court.has(f.name));
+    console.log('  checkboxes ' + ticked.length + '/' + boxes.length + ' ticked'
+      + (theirs.length || unchosen.length
+        ? '   (' + [
+            theirs.length ? theirs.length + ' the court ticks' : '',
+            unchosen.length ? unchosen.length + ' an option not chosen' : ''
+          ].filter(Boolean).join(', ') + ')'
+        : ''));
+    // A ticked box the court owns is the real defect here, and it is the one
+    // thing this count could hide.
+    const wrong = ticked.filter((f) => court.has(f.name));
+    if (wrong.length) {
+      console.log('  DEFECT: ' + wrong.length + ' box(es) the court ticks were filled: '
+        + wrong.map((f) => f.name).join(', '));
+    }
     const emptyText = text.filter((f) => String(f.value).trim() === '');
     if (emptyText.length) {
       console.log('  empty text fields (' + emptyText.length + '):');

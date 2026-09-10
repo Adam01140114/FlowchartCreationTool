@@ -289,6 +289,12 @@ const RULES = [
     why: 'Every other check reads data. A field can hold exactly the right string and still print in the wrong place — the value lives in the field dictionary and the ink comes from the appearance stream. DV-101 printing an answer through the words "Describe any injuries:" passed every data-level check.',
     by: 'pipeline-fill.js --render, then a page-by-page read' },
 
+  { id: 'every-blank-box-is-accounted-for', group: 'page', num: 'Rule',
+    title: 'Every blank checkbox is either the court’s or an option not chosen',
+    says: 'The fill reports each form’s checkbox count broken down: how many the court ticks, and how many are an option the run did not choose. A box the court owns that comes back ticked is reported as a defect.',
+    why: 'DV-110 comes back with three of eighty-five ticked, which reads as a form that barely filled and is in fact correct - eighty are the judge’s decisions and the other two are the gender options not chosen. A ratio that has to be re-derived by hand every time it is read will eventually be read as a defect, or worse, a real one will be read as this.',
+    by: 'pipeline-fill.js — courtOwnedBoxes(), from the courtUse marks in dv-field-configs/' },
+
   { id: 'publish-the-pages', group: 'page', num: 'Rule',
     title: 'Publish the pages you looked at',
     says: 'Every full pass ends by copying the exact images the audit read into Current Form Output/, one folder per form. The folder is replaced, never merged.',
@@ -312,6 +318,18 @@ const RULES = [
     says: 'pipeline-capacity.js and fillToLength() in the generated runtime share one filler text verbatim, and a box that wraps is filled with it from its first word rather than from a per-field sample value.',
     why: 'A capacity is a promise about some particular text, because these are proportional fonts and no count is right for every string. In a box that wraps, the words before the padding decide where every later line breaks — so measuring against one sample and filling with another gives up the only guarantee the number can offer, and even one leading space moves every break after it. Whether a box wraps is what the measurement says, not what the control looks like: dv101_abuse_1_witnesses is a plain input on the page and two ruled lines on the paper.',
     by: 'the shared FILLER text; the __wraps map inside fieldCapacity, which rides along with the measurement rather than being threaded through five files' },
+
+  { id: 'short-form-when-the-long-one-will-not-fit', group: 'page', num: 'Rule',
+    title: 'Where the long form will not fit, the short form goes on the paper',
+    says: 'When a measured box cannot hold the answer and the form already keeps a canonical short form of that same answer, the short form is what the PDF gets. An answer that fits is never shortened.',
+    why: 'DV-110’s State box holds four characters - it is printed for a postal code - while the question is a dropdown of full state names, because picking California is easier and less error-prone than typing two letters. Neither end is wrong; they just disagree, and the disagreement was being resolved by clipping Wyoming to Wyor on a field the form stars as required for a police database.',
+    by: 'shorterFormThatFits() in pdfValueForNamedField, reading the hidden <field>_short the state select already maintains' },
+
+  { id: 'a-derived-mirror-is-not-an-answer', group: 'page', num: 'Rule',
+    title: 'A box another control writes is not a question',
+    says: 'The debug fill skips fields hidden by an inline style on themselves - the _short, _hidden, _code and _no_code mirrors a dropdown or a phone widget maintains - and refreshes them from their owners after the fill instead.',
+    why: 'The fill was writing Test Value over every one of them, so the short form of a state was test text. A question hidden because of an answer is hidden by a class on its container, which the fill already checks; a box hidden on itself was put there by the form for its own use. And a fill sets a select without its inline onchange ever running, so the mirrors need recomputing afterwards the way every other derived field does.',
+    by: 'isDerivedMirror() and refreshStateMirrors() in the generated runtime' },
 
   { id: 'a-narrow-box-still-gets-a-limit', group: 'page', num: 'Rule',
     title: 'A box too narrow for a word still gets a limit',
