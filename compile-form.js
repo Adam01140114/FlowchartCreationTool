@@ -1281,9 +1281,17 @@ function createBuilder() {
     return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
   }
 
-  function translateSince(from, dx) {
+  /**
+   * Move the nodes made between two marks sideways - `to` left off, every node
+   * since `from`. A row of branches is laid out one after another and then
+   * moved into place one at a time, so moving a branch must stop where the
+   * next one starts: without the end, each move carried along every branch to
+   * its right, and the last of DV-100's ten order columns inherited all nine
+   * moves before it - 11,000 to the right of where it was packed.
+   */
+  function translateSince(from, dx, to) {
     if (!dx) return;
-    cells.slice(from).forEach((c) => { if (c.vertex) c.geometry.x = Math.round(c.geometry.x + dx); });
+    cells.slice(from, to).forEach((c) => { if (c.vertex) c.geometry.x = Math.round(c.geometry.x + dx); });
   }
 
   /**
@@ -1491,6 +1499,7 @@ function layoutSequence(b, steps, startY, centerX) {
       }
       const from = b.mark();
       const sub = layoutSequence(b, opt.follow, branchY, 0); // relative column
+      const end = b.mark();
       return {
         optionCell,
         // prepend the option that opened this branch, keeping the whole chain
@@ -1498,6 +1507,7 @@ function layoutSequence(b, steps, startY, centerX) {
         exits: sub.exits.map((e) => ({ cell: e.cell, origins: [opt.nameId].concat(e.origins || []) })),
         entry: sub.entry,
         mark: from,
+        end: end,
         bbox: b.bboxSince(from)
       };
     });
@@ -1509,7 +1519,7 @@ function layoutSequence(b, steps, startY, centerX) {
       ));
       const packed = packRow(prefXs, withFollow.map((x) => x.bbox.width), NODE_GAP);
       withFollow.forEach((x, i) => {
-        b.translateSince(x.mark, packed[i] - x.bbox.x);
+        b.translateSince(x.mark, packed[i] - x.bbox.x, x.end);
         b.addEdge(x.optionCell.id, x.entry.id);
       });
     }
