@@ -202,7 +202,8 @@
     }
   ],
   "overflowTargets": [
-    "dv101_further_abuse_description"
+    "dv101_further_abuse_description",
+    "dv101_additional_pages_attached"
   ],
-  "_overflowNote": "dv101_further_abuse_description is where DV-100 item 7f spills when it outgrows its box, so DV-101 no longer asks about it - see the overflow declaration in dv100-hints.json."
+  "_overflowNote": "Both of these belong to DV-100 item 7f's overflow, declared in dv100-hints.json, and neither is a question here. dv101_further_abuse_description is where that answer spills when it outgrows its box. dv101_additional_pages_attached is DV-101 item 5's own \"check here if you need more space, attach a sheet of paper\" - the same prediction DV-100 item 7 used to ask for, one form further on - and it is ticked when the answer outgrows both printed boxes. A form is compiled against its own hints, so a field driven from another form's declaration has to be named here or it is compiled as a question."
 }

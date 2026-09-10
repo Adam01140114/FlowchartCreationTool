@@ -150,7 +150,7 @@
   {
    "name": "dv101_additional_pages_attached",
    "kind": "checkbox",
-   "value": true
+   "value": false
   }
  ]
 }

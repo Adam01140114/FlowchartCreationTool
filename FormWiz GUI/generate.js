@@ -14422,13 +14422,25 @@ function overflowSourceEl(link){
  * first box ends on a whole word with room visibly to spare - which is what a
  * clean stop looks like, and what tells a reader it was not clipped.
  */
-function overflowSplit(value, cap){
+function overflowSplit(value, cap, tailCap){
     var text = String(value == null ? "" : value);
-    if (!cap || text.length <= cap) return { head: text, tail: "" };
+    if (!cap || text.length <= cap) return { head: text, tail: "", beyond: false };
     var at = cap;
     var space = text.slice(0, cap).lastIndexOf(" ");
     if (space > cap * 0.6) at = space;
-    return { head: text.slice(0, at), tail: text.slice(at).replace(/^ +/, "") };
+    var head = text.slice(0, at);
+    var tail = text.slice(at).replace(/^ +/, "");
+    // Past what the second box holds there is nothing else to print, and the
+    // form should say so rather than quietly keeping it.
+    var beyond = false;
+    if (tailCap && tail.length > tailCap) {
+        var cut = tail.slice(0, tailCap);
+        var brk = cut.lastIndexOf(" ");
+        if (brk > tailCap * 0.6) cut = cut.slice(0, brk);
+        tail = cut;
+        beyond = true;
+    }
+    return { head: head, tail: tail, beyond: beyond };
 }
 
 function applyOverflowLinks(){
@@ -14460,12 +14472,18 @@ function applyOverflowLinks(){
         var room = cap + Number(caps[link.field] || 0);
         el.setAttribute("data-overflow-cap", String(cap));
         el.setAttribute("data-overflow-room", String(room));
-        if (String(el.getAttribute("maxlength") || "") !== String(room)) {
+        // The limit comes off once there is a third place for the words to go.
+        // Stopping someone dead at the end of the second box would be the form
+        // deciding how much of their account is worth having, when the paper
+        // itself offers them a sheet to carry on writing on.
+        if (link.marksBeyond) {
+            if (el.hasAttribute("maxlength")) el.removeAttribute("maxlength");
+        } else if (String(el.getAttribute("maxlength") || "") !== String(room)) {
             el.setAttribute("maxlength", String(room));
         }
 
         var full = String(el.value || "");
-        var split = overflowSplit(full, cap);
+        var split = overflowSplit(full, cap, Number(caps[link.field] || 0));
         var over = !!split.tail;
 
         // The box that says an attachment is coming. No question makes it any
@@ -14504,6 +14522,31 @@ function applyOverflowLinks(){
         if (target && String(target.value || "") !== split.tail){
             target.value = split.tail;
             triggerFieldChange(target);
+        }
+
+        // And the box that says a sheet of their own is coming.
+        //
+        // DV-101 item 5 carries the same escape DV-100 item 7 does - "Check
+        // here if you need more space. Attach a sheet of paper" - and asking it
+        // was the same mistake one form further on. Past what both printed
+        // boxes hold, this is knowable rather than predictable: the filer has
+        // more to say than the packet can print.
+        if (link.marksBeyond){
+            var far = document.getElementById(link.marksBeyond);
+            if (!far){
+                far = document.createElement("input");
+                far.type = "checkbox";
+                far.id = link.marksBeyond;
+                far.name = link.marksBeyond;
+                far.style.display = "none";
+                var host3 = document.getElementById("hidden_pdf_fields")
+                    || document.getElementById("customForm");
+                if (host3) host3.appendChild(far);
+            }
+            if (far && far.checked !== split.beyond){
+                far.checked = split.beyond;
+                triggerFieldChange(far);
+            }
         }
     });
 }
@@ -20703,7 +20746,16 @@ function fillToLength(seed, length, mark) {
  */
 function padToCapacity(el, value, minimum) {
   if (minimum) return value;
-  var cap = Number(el.getAttribute('data-capacity') || 0);
+  // The map as well as the attribute.
+  //
+  // An entry block is built the moment its count is chosen and filled straight
+  // away, while the sweep that tags new inputs with data-capacity runs on a
+  // 60ms debounce behind it. Reading only the attribute made the padding a race
+  // the fill sometimes lost: the same table came out filled to the brim on one
+  // run and holding a bare "Test User" on the next.
+  var caps = (typeof fieldCapacity !== 'undefined' && fieldCapacity) ? fieldCapacity : {};
+  var cap = Number(el.getAttribute('data-capacity') || 0)
+    || Number(caps[el.name] || caps[el.id] || 0);
   var room = Number(el.getAttribute('data-overflow-room') || 0);
   if (!cap || cap < 4) return value;
   // A ZIP padded to eleven characters is not a longer ZIP, it is a wrong one,

@@ -227,6 +227,9 @@ async function main() {
       (gui.overflowLinks || []).forEach((o) => {
         if (o && o.marks) spill.add(o.marks);
         if (o && o.field) spill.add(o.field);
+        // The third box in the chain: DV-101 item 5's own "attach a sheet",
+        // ticked when the answer outgrows both of the printed ones.
+        if (o && o.marksBeyond) spill.add(o.marksBeyond);
       });
     } catch (e) { /* no overflow links declared */ }
     const config = fs.existsSync(configPath) ? readFieldConfig(configPath) : [];

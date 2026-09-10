@@ -222,6 +222,12 @@ const RULES = [
     why: 'DV-100 item 7 ends with "Check this box if you need more space to describe the abuse. You can use form DV-101" — which asks someone to predict, before they have written a word, whether what they are about to say fits in a box whose size they cannot see. Nobody knows that. They need more space exactly when they have used more than the box holds, and the box has been measured.',
     by: 'the overflow block in the hints; compile-form.js drops both ends; applyOverflowLinks and overflowSplit in the generated runtime' },
 
+  { id: 'no-box-asks-whether-it-will-be-needed', group: 'packet', num: 'Rule',
+    title: 'No box on the packet asks whether it will be needed',
+    says: 'Every "check here if you need more space" is driven by the writing, all the way down the chain. Past what the first box prints the continuation form switches on; past what both printed boxes hold, the box that says a sheet of the filer’s own is attached ticks too, and the limit comes off.',
+    why: 'DV-101 item 5 carries the same escape DV-100 item 7 does, and removing one while leaving the other still asked a filer to predict whether what they were about to write would fit - one form further on. Each of the three states is knowable at the moment it happens: it fits, it fits across two boxes, or there is more of it than the packet can print. And the limit has to come off at the third, because stopping someone dead at the end of the second box is the form deciding how much of their account is worth having, when the paper itself offers them a sheet to carry on writing on.',
+    by: 'the overflow declaration’s marksBeyond in dv100-hints.json; overflowSplit() returns head, tail and beyond. A field driven from another form’s declaration must be named in that form’s overflowTargets, or it is compiled as a question' },
+
   { id: 'the-continuation-carries-the-remainder', group: 'packet', num: 'Rule',
     title: 'The continuation carries the remainder, not a copy',
     says: 'The first box keeps what it can print and the continuation takes the rest, so the two read as one passage. The limit the filer meets is the sum of what the two boxes hold.',
@@ -330,6 +336,12 @@ const RULES = [
     says: 'The debug fill skips fields hidden by an inline style on themselves - the _short, _hidden, _code and _no_code mirrors a dropdown or a phone widget maintains - and refreshes them from their owners after the fill instead.',
     why: 'The fill was writing Test Value over every one of them, so the short form of a state was test text. A question hidden because of an answer is hidden by a class on its container, which the fill already checks; a box hidden on itself was put there by the form for its own use. And a fill sets a select without its inline onchange ever running, so the mirrors need recomputing afterwards the way every other derived field does.',
     by: 'isDerivedMirror() and refreshStateMirrors() in the generated runtime' },
+
+  { id: 'a-rule-is-matched-to-the-run-not-the-last-rule', group: 'page', num: 'Rule',
+    title: 'A ruled line is matched to the run, not to the rule above it',
+    says: 'The writing lines of a box are the longest run of rules that fit an even progression from one of them, within a quarter of the pitch. Not the longest run of consecutive gaps that match the median.',
+    why: 'A form’s rules are evenly spaced to the eye and not to the point: DV-100 item 17b is ruled at 14.1, 11.4 and 13.5, which is one block of four lines and reads as one. Comparing each gap to the median broke the run at the 11.4 and kept two, so a box that holds about 380 characters was measured at 190 and half of it went unused. Comparing each rule to where the run says it should be lets that jitter accumulate and cancel, which is what jitter does.',
+    by: 'ruled-lines.js — evenlySpacedRun(); every start is tried, because the first rule inside a widget is not always one of its writing lines' },
 
   { id: 'a-narrow-box-still-gets-a-limit', group: 'page', num: 'Rule',
     title: 'A box too narrow for a word still gets a limit',

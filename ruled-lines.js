@@ -164,16 +164,29 @@ function evenlySpacedRun(ys) {
   const gaps = ys.slice(1).map((y, i) => ys[i] - y);
   const sorted = gaps.slice().sort((a, b) => a - b);
   const pitch = sorted[Math.floor(sorted.length / 2)];
-  const TOLERANCE = 1.5;
+  if (!(pitch > 0)) return ys;
+  // Enough to absorb the jitter of a real form, far too little to swallow a
+  // rule that belongs to something else.
+  const tolerance = Math.max(1.5, pitch * 0.25);
 
+  // Matched against the progression from a starting rule, not against the gap
+  // to the rule before.
+  //
+  // A form's rules are evenly spaced to the eye and not to the point: DV-100
+  // item 17b is ruled at 14.1, 11.4 and 13.5, which is one block of four lines
+  // and reads as one. Comparing each gap to the median broke it at the 11.4 and
+  // kept two, so a box that holds about 380 characters was measured at 190 and
+  // half of it went unused. Comparing each rule to where the run says it should
+  // be lets that jitter accumulate and cancel, which is what it does.
+  //
+  // Every start is tried because the first rule inside a widget is not always
+  // one of its writing lines; the longest run wins, earliest on a tie.
   let best = [0, 1];
-  let start = 0;
-  for (let i = 0; i < gaps.length; i++) {
-    if (Math.abs(gaps[i] - pitch) <= TOLERANCE) {
-      if (i + 2 - start > best[1] - best[0]) best = [start, i + 2];
-    } else {
-      start = i + 1;
-    }
+  for (let start = 0; start < ys.length - 1; start++) {
+    let end = start + 1;
+    while (end < ys.length
+      && Math.abs(ys[start] - (end - start) * pitch - ys[end]) <= tolerance) end++;
+    if (end - start > best[1] - best[0]) best = [start, end];
   }
   return ys.slice(best[0], best[1]);
 }

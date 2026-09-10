@@ -575,6 +575,29 @@ what the first box cannot print is carried onto DV-101 item 5. The limit the
 filer meets is the sum of what the two boxes hold — 1115 + 387 — which is the
 extra space, honestly counted.
 
+**Nothing in the chain is asked about.** DV-101 item 5 carries the same escape
+DV-100 item 7 does - *"Check here if you need more space. Attach a sheet of
+paper"* - and removing one while leaving the other still asked a filer to
+predict, one form further on. There are three states and each is knowable at
+the moment it happens:
+
+| what the filer wrote | what happens |
+| --- | --- |
+| within DV-100 item 7's 1115 | it prints there, nothing else switches on |
+| more than that | DV-101 switches on, `…additional_space_attached_yes` ticks, the rest prints on DV-101 item 5 |
+| more than 1115 + 387 | `dv101_additional_pages_attached` ticks too, and the limit comes off |
+
+That last row is `marksBeyond` on the overflow declaration. The limit has to
+come off there, because stopping someone dead at the end of the second box is
+the form deciding how much of their account is worth having, when the paper
+itself offers them a sheet to carry on writing on.
+
+**A field driven from another form's declaration must be named in its own
+form's `overflowTargets`.** A form is compiled against its own hints, so
+`dv101_additional_pages_attached` stayed a question until DV-101's hints named
+it - and `compile-form.js` has to be re-run per form before
+`pipeline-build-packet.js`, which only assembles flowcharts that already exist.
+
 **The continuation carries the remainder, not a copy.** The intent was to put
 the whole answer on DV-101 so the attachment reads on its own, and the paper
 does not allow it: DV-100 item 7 holds 1115 characters and DV-101 item 5, the

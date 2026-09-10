@@ -213,6 +213,12 @@
      binding the wrong edge - it left the page overflowing the dialog on any
      ordinary laptop, which is the scrolling this was meant to avoid. */
   #viewer { display: flex; flex-direction: column; max-height: 96vh; overflow: hidden; }
+  /* An id selector beats the browser's own dialog:not([open]) { display: none },
+     so the rule above kept the whole viewer laid out on the page after it was
+     closed - the panels, the bar and all. Pressing Close did close the dialog;
+     it just carried on being displayed. Same mistake as #viewerPdf and
+     [hidden] below, and the same fix: say it. */
+  #viewer:not([open]) { display: none; }
   /* min-height:0, or a flex item will not shrink below its content and the
      dialog grows past its own max-height instead of the panel scrolling. */
   #viewerScroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }

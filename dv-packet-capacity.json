@@ -1,5 +1,5 @@
 {
- "measuredAt": "2026-09-10T01:50:58.614Z",
+ "measuredAt": "2026-09-10T03:20:46.749Z",
  "reference": "Helvetica, laid out over a corpus of form answers",
  "fields": {
   "court_name_and_street_address": 153,
@@ -116,7 +116,7 @@
   "animal_sole_possession_other_reason_line_1": 77,
   "animal_sole_possession_other_reason_line_2": 40,
   "control_of_property_description": 190,
-  "control_of_property_reason": 190,
+  "control_of_property_reason": 379,
   "extend_service_deadline_reason": 91,
   "property_debt_1_pay_to": 11,
   "property_debt_1_for": 11,
@@ -364,7 +364,7 @@
   "firearms_review_hearing_department": 11,
   "firearms_review_hearing_time": 11,
   "firearms_review_hearing_room": 11,
-  "firearms_review_hearing_court_name_and_address": 84,
+  "firearms_review_hearing_court_name_and_address": 121,
   "no_contact_exception_other_explanation": 71,
   "stay_away_distance_yards": 5,
   "stay_away_other_location_explanation": 29,
@@ -424,7 +424,7 @@
   "other_orders_description": 9,
   "animal_sole_possession_other_reason_line_1": 2,
   "control_of_property_description": 2,
-  "control_of_property_reason": 2,
+  "control_of_property_reason": 4,
   "property_debts_payment_reason": 4,
   "property_debt_how_made_explanation": 3,
   "dv101_abuse_1_witnesses": 2,
@@ -442,7 +442,7 @@
   "hearing_court_name_and_address": 3,
   "denial_reason_other_explanation": 2,
   "restrained_person_prohibited_items_details": 3,
-  "firearms_review_hearing_court_name_and_address": 2,
+  "firearms_review_hearing_court_name_and_address": 3,
   "other_orders_details": 5,
   "controlled_property_description": 3
  }

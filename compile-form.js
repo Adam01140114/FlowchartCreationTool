@@ -1535,7 +1535,10 @@ function compile(schema, hints = {}) {
   // an attachment is coming is ticked by the writing, and the continuation
   // form's box holds what the writing spilled - asking about either would put
   // a filer's answer in competition with the form's own.
-  overflowLinks.forEach((o) => { if (o.marks) computedNames.add(o.marks); });
+  overflowLinks.forEach((o) => {
+    if (o.marks) computedNames.add(o.marks);
+    if (o.marksBeyond) computedNames.add(o.marksBeyond);
+  });
   (merged.overflowTargets || []).forEach((name) => computedNames.add(name));
   const mirrored = applyMirrors(
     normalizeFields(schema).filter((f) => !computedNames.has(f.nameId)), merged);
