@@ -280,6 +280,23 @@ than on whatever ran last. Arriving without a `?project=` shows the most recent
 and offers a picker; arriving with one always shows that one, because a link
 handed out for a project has to keep pointing at it.
 
+### And a name a person can read, on the project and on every form
+
+The id is for machines. The project also carries a `projectName` - the
+spec's `"project"` when the builder writes it, the **Project Name** box when
+the editor exports it - and import puts it back in that box. It used to be
+dropped on the editor's first export, so one round trip made the file
+anonymous; `pipeline-audit-flowchart.js` now fails a project without one.
+
+Each form's chart opens with its own name: one notes node above everything
+else, reading `DV-105 Form`, bold, font 50, 1580 x 350, text centred both
+ways. Several charts share one editor and look alike zoomed out - DV-140's
+is DV-105's first twenty nodes - and this is what says which one is open.
+`pipeline-build-packet.js` adds it after everything else is placed (so it
+sits above all of it) and replaces any it finds rather than adding a second;
+audit check 9 fails a form without it. Both read the standard from
+`title-note.js`, so changing the size is one edit, not two that can drift.
+
 ## Publish the pages you looked at
 
 The page-image audit is the last and least skippable step, and describing what

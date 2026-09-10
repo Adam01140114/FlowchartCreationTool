@@ -180,6 +180,9 @@
       type: 'flowchart-project',
       version: PROJECT_VERSION,
       projectId: currentProjectId(true),
+      // The name travels with the file. It was dropped here, so one export
+      // made a named project anonymous.
+      projectName: projectNameInput() ? projectNameInput().value.trim() : '',
       fieldCapacity: window.fieldCapacity || {},
       exportedAt: new Date().toISOString(),
       currentFormIndex: window.currentFormIndex,
@@ -253,6 +256,9 @@
     // The file first, then whatever this browser was last working on.
     rememberProjectId(String(data.projectId || '').trim() || currentProjectId(true));
     window.fieldCapacity = data.fieldCapacity || {};
+    // Always set, even to nothing: leaving the box alone kept the last
+    // project's name on the one just opened.
+    if (projectNameInput()) projectNameInput().value = String(data.projectName || '').trim();
     window.projectForms = data.forms.map(function (f, i) {
       const flowchart = f.flowchart || blankFlowchart();
       return { name: f.name || flowchart.formName || ('Form ' + (i + 1)), flowchart: flowchart };

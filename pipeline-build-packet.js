@@ -23,6 +23,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { addTitleNote } = require('./title-note');
 const OUT_DIR = 'FormWiz GUI';
 
 const SPEC = process.argv[2] || 'dv-packet.spec.json';
@@ -286,6 +287,10 @@ async function main() {
     const n = wireDisqualifiers(flowchart, entry.name, declared);
     if (n) alerted[entry.name] = n;
   });
+
+  // Every chart opens with its form's name, above everything the steps
+  // before this placed - which is why it comes last. See title-note.js.
+  forms.forEach(({ entry, flowchart }) => addTitleNote(flowchart, entry.name));
 
   // The project's own name for itself, kept across rebuilds: the published
   // page images live under it, so a new id every build would orphan the link

@@ -14,6 +14,7 @@
  * Usage:  node pipeline-audit-flowchart.js [project.json]
  */
 const fs = require('fs');
+const { isNotesNode, titleNoteProblems } = require('./title-note');
 
 const args = process.argv.slice(2);
 const FILE = args.find((a) => !a.startsWith('--') && a.endsWith('.json')) || 'dv-packet-project.json';
@@ -31,7 +32,17 @@ const project = JSON.parse(fs.readFileSync(FILE, 'utf8'));
 const forms = project.forms || [{ name: project.formName || 'form', flowchart: project }];
 
 let failures = 0;
-const fail = (msg) => { failures++; console.log('  FAILS  ' + msg); };
+let formFailures = 0;
+// Counted per form as well, or a form that failed still printed "passes".
+const fail = (msg) => { failures++; formFailures++; console.log('  FAILS  ' + msg); };
+
+// A project file names itself. The builder always wrote one and the editor
+// dropped it on export, so a single trip through the editor made the file
+// anonymous - and nothing noticed.
+if (project.forms && !String(project.projectName || '').trim()) {
+  console.log('');
+  fail('the project has no projectName');
+}
 
 forms.forEach((entry) => {
   const chart = entry.flowchart || {};
@@ -81,7 +92,9 @@ forms.forEach((entry) => {
     // linkedLogic is a rule about fields, and a connector wired to nothing means
     // "these two forms always travel together" - neither is a missed step.
     const DETACHED_BY_DESIGN = new Set(['linkedLogic', 'connector']);
-    const orphans = vertices.filter((c) => !seen.has(String(c.id)) && !DETACHED_BY_DESIGN.has(nodeType(c)));
+    // A notes node is read, not answered: nothing leads to it by design.
+    const orphans = vertices.filter((c) => !seen.has(String(c.id))
+      && !DETACHED_BY_DESIGN.has(nodeType(c)) && !isNotesNode(c));
     if (orphans.length) {
       fail(orphans.length + ' node(s) cannot be reached from the first question: '
         + orphans.slice(0, 5).map((c) => nodeId(c) || plain(c.value).slice(0, 24) || c.id).join(', ')
@@ -101,6 +114,8 @@ forms.forEach((entry) => {
     // what a correctly wired alert looks like, not a stranded filer.
     const q = attr(c, 'questionType');
     if (q === 'alertNode' || q === 'hardAlertNode') return false;
+    // A note leads nowhere because it is not a step.
+    if (q === 'notesNode') return false;
     return !(outgoing.get(String(c.id)) || []).length;
   });
   if (deadEnds.length) {
@@ -111,7 +126,7 @@ forms.forEach((entry) => {
 
   // 4. An option belongs to a question. One hanging off nothing exports as an
   //    orphan and its answer reaches no PDF field.
-  const strayOptions = vertices.filter((c) => nodeType(c) === 'options'
+  const strayOptions = vertices.filter((c) => nodeType(c) === 'options' && !isNotesNode(c)
     && !(incoming.get(String(c.id)) || []).length);
   if (strayOptions.length) fail(strayOptions.length + ' option node(s) hang off no question');
 
@@ -155,6 +170,11 @@ forms.forEach((entry) => {
     }
   }
   if (overlaps) fail(overlaps + ' pair(s) of nodes overlap');
+
+  // 9. The chart opens with its form's name - one notes node above everything
+  //    else, to the standard in title-note.js. Several charts share one
+  //    editor and, zoomed out, look alike.
+  titleNoteProblems(chart, entry.name).forEach(fail);
 
   if (!formFailures) console.log('  passes');
   console.log('  ' + questions.length + ' question(s), ' + ends.length + ' End node(s), '

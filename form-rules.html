@@ -300,6 +300,18 @@ const RULES = [
     why: 'The first four disqualifier alerts were drawn by hand into the built project. The next rebuild dropped all four and the packet went out with the rules declared and none of them wired — the exact failure the disqualifiers file exists to prevent.',
     by: 'pipeline-build-packet.js wires them from the declaration each time' },
 
+  { id: 'every-form-opens-with-its-name', group: 'packet', num: 'Rule',
+    title: 'Every form’s flowchart opens with its name',
+    says: 'Each form in the project has one notes node above everything else in its chart, reading "<form> Form" - bold, font 50, 1580 × 350, 150 above the first node, text centred both ways. The builder adds it last, and a rebuild replaces it rather than stacking a second.',
+    why: 'A packet is several charts in one editor, each tens of thousands of pixels tall and built from the same shapes. Zoomed out, DV-140’s chart is DV-105’s first twenty nodes in the same order, and nothing on the canvas said which was open. DV-100 was given one by hand; a convention only one form follows is one the next form breaks.',
+    by: 'pipeline-build-packet.js adds it and pipeline-audit-flowchart.js check 9 fails a form without it - both from title-note.js, so they agree on what it is' },
+
+  { id: 'a-project-carries-its-name', group: 'packet', num: 'Rule',
+    title: 'A project file carries its name',
+    says: 'Every project JSON has a projectName. The builder writes the spec’s "project"; the editor exports whatever the Project Name box holds, and fills that box from the file on import - with nothing, if the file has no name.',
+    why: 'The builder always wrote "DV Restraining Order Packet". The editor dropped it on the first export and never read it on import, so one trip through the editor made the file anonymous, and importing another project left the last one’s name in the box.',
+    by: 'pipeline-audit-flowchart.js - fails a project with no name' },
+
   /* ---------------- the printed page ---------------- */
   { id: 'fill-and-read-back', group: 'page', num: 'Rule 4',
     title: 'Fill the packet and read the PDFs back',

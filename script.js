@@ -6414,7 +6414,10 @@ function updateNotesNodeCell(cell) {
   // Inline styles so they win against theme CSS
   const html =
     `<div class="notes-body" style="font-size:${dynamicFontSize}px !important;` +
-    `font-weight:${isBold ? 700 : 400}; line-height:1.35; white-space:pre-wrap; text-align:left;` +
+    `font-weight:${isBold ? 700 : 400}; line-height:1.35; white-space:pre-wrap; text-align:center;` +
+    // Centred both ways: flex puts the text in the middle of the box, and
+    // text-align centres each line when it wraps.
+    `display:flex; align-items:center; justify-content:center;` +
     `cursor: pointer; user-select: text; width: 100%; height: 100%; box-sizing: border-box; padding: 8px;" ondblclick="window.editNotesNodeText('${cell.id}')">` +
     `${text}</div>`;
   graph.getModel().beginUpdate();
@@ -6425,6 +6428,10 @@ function updateNotesNodeCell(cell) {
     let st = cell.style || "";
     st = st.replace(/fontSize=\d+;?/, "");
     st += `fontSize=${dynamicFontSize};`;
+    // The label must fill the cell, or height:100% is only the text's own
+    // height and there is nothing to centre it within. A notes node made from
+    // the toolbar is created without this.
+    if (!/overflow=fill/.test(st)) st += "pointerEvents=1;overflow=fill;";
     graph.getModel().setStyle(cell, st);
   } finally {
     graph.getModel().endUpdate();
