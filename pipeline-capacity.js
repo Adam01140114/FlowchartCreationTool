@@ -162,7 +162,13 @@ async function main() {
       const chain = (chains[box.name] || [])
         .map((n) => (byName[n] || [])[0]).filter(Boolean);
       let chars = holds(box, size, perChar);
-      chain.forEach((c) => { chars += holds(c, size, perChar); });
+      // Every join costs a word. Capacity is counted in characters and spent in
+      // words: a word will not split across a line, so each line but the last
+      // ends early by up to most of a word. Summing the lines exactly is what
+      // pushed the [end] marker off the second ruled line of DV-100 item 16b.
+      const WORD = 9;
+      chain.forEach((c) => { chars += Math.max(0, holds(c, size, perChar) - WORD); });
+      if (chain.length) chars = Math.max(0, chars - WORD);
       if (!chars) continue;
 
       // A field printed more than once must fit in the smallest of its boxes.

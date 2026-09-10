@@ -1,5 +1,5 @@
 {
- "measuredAt": "2026-09-09T23:46:22.198Z",
+ "measuredAt": "2026-09-10T00:09:36.516Z",
  "reference": "Helvetica, average character width over a corpus of form answers",
  "fields": {
   "court_name_and_street_address": 165,
@@ -20,7 +20,7 @@
   "person_to_restrain_age": 4,
   "person_to_restrain_date_of_birth": 14,
   "person_to_restrain_race": 18,
-  "relationship_children_names_line_1": 135,
+  "relationship_children_names_line_1": 117,
   "relationship_children_names_line_2": 93,
   "recent_restraining_order_1_date": 23,
   "recent_restraining_order_1_expiration_date": 22,
@@ -93,7 +93,7 @@
   "move_out_home_address": 81,
   "move_out_years_at_address": 5,
   "move_out_months_at_address": 5,
-  "move_out_right_to_live_other_explanation_line_1": 82,
+  "move_out_right_to_live_other_explanation_line_1": 64,
   "move_out_right_to_live_other_explanation_line_2": 52,
   "other_orders_description": 900,
   "protected_animal_1_name_or_id": 32,
@@ -113,7 +113,7 @@
   "protected_animal_4_breed": 18,
   "protected_animal_4_color": 18,
   "animal_stay_away_distance_other_yards": 6,
-  "animal_sole_possession_other_reason_line_1": 84,
+  "animal_sole_possession_other_reason_line_1": 66,
   "animal_sole_possession_other_reason_line_2": 52,
   "control_of_property_description": 194,
   "control_of_property_reason": 388,

@@ -18,6 +18,10 @@ const {
   popGraphicsState,
   translate,
   layoutMultilineText,
+  drawTextLines,
+  TextAlignment,
+  rgb,
+  degrees,
 } = require('pdf-lib');
 const { preparePayloadHtml, sanitizePayloadFolderName } = require('./payload-html');
 require('dotenv').config();
@@ -303,6 +307,73 @@ function spillOntoContinuationLines(pdfDoc, form, body, font) {
 }
 
 /**
+ * Lay a multi-line answer on the lines the form actually ruled.
+ *
+ * pdf-lib leads at the font's own line height - 12.21pt at 11pt Helvetica -
+ * and the paper is ruled at whatever pitch the form chose. On DV-100 item 17b
+ * the box is 52.4pt and holds four lines, so the form ruled them 13.1pt apart:
+ * a difference of 0.89pt a line, which by the fourth line has moved the text a
+ * full 3.6pt and dragged it onto the rules. Filling every box to capacity is
+ * what made it visible - with one short line in a four-line box there was
+ * nothing to drift.
+ *
+ * The pitch needs no graphics parsing, because a ruled box is ruled evenly: it
+ * is the box height divided by the number of lines the box holds. That is the
+ * same count the form's printer used to decide how many rules to draw, so it
+ * lands on them by construction and keeps working on a form nobody has seen.
+ *
+ * Text sits just above its rule rather than on it, the way handwriting does.
+ */
+function ruledPitchAppearance(field, widget, font, size) {
+  const rectangle = widget.getRectangle();
+  const lineHeight = font.heightAtSize(size) * 1.2;
+  const lines = Math.floor((rectangle.height - 2) / lineHeight);
+  if (lines < 2) return null;
+
+  const pitch = rectangle.height / lines;
+  // Only worth doing when the paper and the font actually disagree; below a
+  // quarter point the correction is noise and the default is fine.
+  if (Math.abs(pitch - lineHeight) < 0.25) return null;
+
+  let text = "";
+  try { text = field.getText() || ""; } catch (e) { return null; }
+  if (!text) return null;
+
+  const inset = 2;
+  const laid = layoutMultilineText(text, {
+    alignment: TextAlignment.Left,
+    fontSize: size,
+    font: font,
+    bounds: { x: inset, y: inset, width: rectangle.width - inset * 2,
+              height: rectangle.height - inset * 2 },
+  });
+  if (!laid.lines.length) return null;
+
+  // The ascender clears the rule; a little more keeps the descenders of one
+  // line off the rule of the next.
+  const ascender = font.heightAtSize(size, { descender: false });
+  const restack = laid.lines.slice(0, lines).map((line, i) => Object.assign({}, line, {
+    y: rectangle.height - (i + 1) * pitch + (pitch - ascender) / 2 + 0.6,
+  }));
+
+  // Two arguments, and the font named the way the appearance stream names it:
+  // drawTextLines(lines, options), with the resource name from font.name. The
+  // first attempt passed one object and a made-up name, so it threw and the
+  // caller quietly fell back to the old layout - which looked exactly like the
+  // fix not working.
+  return [
+    pushGraphicsState(),
+  ].concat(drawTextLines(restack, {
+    color: rgb(0, 0, 0),
+    font: font.name,
+    size: size,
+    rotate: degrees(0),
+    xSkew: degrees(0),
+    ySkew: degrees(0),
+  })).concat([popGraphicsState()]);
+}
+
+/**
  * Put the first line of a multiline field on the rule the form printed.
  *
  * pdf-lib starts a multiline block one full line-height below the box's top
@@ -332,6 +403,13 @@ function ruledLineTextAppearance(field, widget, font) {
   if (!multiline) return appearance;
   const size = declaredFontSize(field);
   if (!size) return appearance;
+
+  // A box the form ruled at its own pitch is laid out on those rules instead.
+  try {
+    const ruled = ruledPitchAppearance(field, widget, font, size);
+    if (ruled) return ruled;
+  } catch (e) { /* fall back to the lift below */ }
+
   const lineHeight = font.heightAtSize(size) * 1.2;
   const ascender = font.heightAtSize(size, { descender: false });
   const wanted = lineHeight - ascender;

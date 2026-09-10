@@ -289,6 +289,12 @@ const RULES = [
     why: 'A ZIP padded to eleven characters is not a longer ZIP, it is a wrong one, and the page would be testing the wrong thing. Both the marker fill and the capacity padding ask the same question, so the test lives once and they cannot drift.',
     by: 'hasValidatedShape() in the generated runtime, used by getSampleFillValue and padToCapacity' },
 
+  { id: 'text-sits-on-the-ruled-lines', group: 'page', num: 'Rule',
+    title: 'Multi-line text is laid on the lines the form ruled',
+    says: 'A multi-line box is laid out at the pitch the form ruled it, not at the font’s line height. The pitch is the box height divided by the number of lines it holds.',
+    why: 'DV-100 item 17b is 52.4pt holding four lines, so the form ruled them 13.1pt apart against pdf-lib’s 12.21pt — 0.89pt a line, and by the fourth line the text sat on the rules. It needs no graphics parsing because a ruled box is ruled evenly, so the count that decides the pitch is the same one the printer used.',
+    by: 'dev-server.js — ruledPitchAppearance; visible only by filling every box to capacity and reading the page' },
+
   { id: 'long-answer-next-line', group: 'page', num: 'Rule',
     title: 'A long answer runs onto the next ruled line',
     says: 'When an answer is wider than its line, the remainder wraps onto the ruled lines beneath it. The continuation is found by geometry, not by field names.',

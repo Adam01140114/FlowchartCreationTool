@@ -20409,17 +20409,26 @@ function padToCapacity(el, value, minimum) {
   // A ZIP padded to eleven characters is not a longer ZIP, it is a wrong one,
   // and the page would be testing the wrong thing.
   if (hasValidatedShape(el)) return value;
+  // The last thing in the box says so.
+  //
+  // A filled box that stops mid-word could be the capacity working or the ink
+  // being clipped, and on a rendered page those look the same. Ending every
+  // capacity fill with a marker settles it at a glance: if [end] is on the
+  // paper the box held everything it was given, and if it is missing or half
+  // drawn the measurement is wrong.
+  var MARK = '[end]';
+  if (cap < MARK.length + 4) return String(value == null ? '' : value).slice(0, cap);
+  var room = cap - MARK.length;
   var text = String(value == null ? '' : value);
-  if (text.length >= cap) return text.slice(0, cap);
   // Words rather than one long run, so the wrap in a multi-line box is real.
   var filler = ' abcdefghij klmnopqrst uvwxyz 0123456789';
   var out = text;
-  while (out.length < cap) out += filler;
-  // End on the exact count, and never on a trailing space, which would hide
-  // whether the last visible character reached the edge.
-  out = out.slice(0, cap);
+  while (out.length < room) out += filler;
+  out = out.slice(0, room);
+  // Never end the body on a space, which would hide where the text really got
+  // to, and keep one before the marker so it reads as its own word.
   if (out.charAt(out.length - 1) === ' ') out = out.slice(0, -1) + 'x';
-  return out;
+  return out + MARK;
 }
 /**
  * Make every section active for the duration of a debug fill.

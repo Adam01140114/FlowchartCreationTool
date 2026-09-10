@@ -200,6 +200,16 @@
   }
   #jsonText:focus { outline: none; }
   .viewer-nav { display: flex; gap: 8px; align-items: center; }
+  #viewer { display: flex; flex-direction: column; max-height: 96vh; }
+  #viewerImg { max-height: 62vh; }
+  .viewer-data {
+    display: grid; gap: 12px; padding: 12px 14px 16px; overflow-y: auto;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    border-top: 1px solid var(--line); background: var(--ground);
+  }
+  .viewer-data .pane { background: var(--paper); }
+  .viewer-data .rows { max-height: 22vh; }
+  .viewer-data .pane.links h3 { color: var(--link); }
   dialog button[disabled] { opacity: .4; cursor: default; }
   dialog button {
     border: 1px solid var(--line); background: transparent; color: var(--ink);
@@ -227,9 +237,11 @@
     <span class="viewer-nav">
       <button id="viewerPrev" title="Previous page (←)">← Back</button>
       <button id="viewerNext" title="Next page (→)">Next →</button>
+      <button id="viewerCopy" title="Copy this page as JSON">Copy data</button>
       <button id="viewerClose">Close</button>
     </span>
   </div>
+  <div id="viewerData" class="viewer-data"></div>
 </dialog>
 
 <dialog id="jsonBox">
@@ -908,9 +920,75 @@ function showAt(index) {
     + '   (' + (index + 1) + ' of ' + pages.length + ')';
   viewerPrev.disabled = index === 0;
   viewerNext.disabled = index === pages.length - 1;
+  paintViewerData(img.dataset.form, Number(img.dataset.page));
   // Keep the thumbnail behind the dialog in view, so closing leaves you where
   // you got to rather than back where you started.
   img.scrollIntoView({ block: 'center' });
+}
+
+/**
+ * Everything the page holds, under the page.
+ *
+ * Enlarging a page is what you do when you want to look closely, and looking
+ * closely is exactly when you want the names and values rather than only the
+ * picture. Three lists rather than one: text boxes, checkboxes, and what this
+ * page shares with the rest of the packet - a shared name being the wiring
+ * here, and the one thing the paper cannot show you at all.
+ */
+function paintViewerData(form, page) {
+  const host = document.getElementById('viewerData');
+  host.textContent = '';
+  host.appendChild(el('p', { class: 'empty' }, [text('Reading field data…')]));
+  Promise.all([fieldsFor(form, currentStamp), whyFor(form, currentStamp),
+               linksFor(form, currentStamp)]).then(function (all) {
+    // A later page may have been opened while this was in flight.
+    const now = viewerPages()[viewerAt];
+    if (!now || now.dataset.form !== form || Number(now.dataset.page) !== page) return;
+
+    const reasons = (all[1] && all[1].fields) || {};
+    const all3 = ((all[0] && all[0][page]) || []).filter(function (f) { return f.kind !== 'button'; });
+    const linkEntry = (all[2] && all[2][page]) || { fields: [] };
+    const sharedBy = {};
+    (linkEntry.fields || []).forEach(function (s) { sharedBy[s.name] = s; });
+
+    const build = function (title, fields, extra) {
+      const rows = el('div', { class: 'rows' });
+      if (!fields.length) {
+        rows.appendChild(el('p', { class: 'empty' }, [text('None on this page.')]));
+      } else {
+        fields.slice().sort(function (a, b) {
+          return (isBlank(b) ? 0 : 1) - (isBlank(a) ? 0 : 1);
+        }).forEach(function (f) { rows.appendChild(fieldRow(f, reasons)); });
+      }
+      return el('div', { class: 'pane' + (extra || '') }, [
+        el('h3', {}, [text(title + ' (' + fields.length + ')')]), rows
+      ]);
+    };
+
+    host.textContent = '';
+    host.appendChild(build('Text fields', all3.filter(function (f) { return f.kind !== 'checkbox'; })));
+    host.appendChild(build('Checkboxes', all3.filter(function (f) { return f.kind === 'checkbox'; })));
+
+    // The connections, with the value that travels along them.
+    const conn = el('div', { class: 'rows' });
+    const shared = (linkEntry.fields || []);
+    if (!shared.length) {
+      conn.appendChild(el('p', { class: 'empty' }, [text('Nothing on this page is shared.')]));
+    } else {
+      shared.forEach(function (s) {
+        const field = all3.find(function (f) { return f.name === s.name; }) || {};
+        const row = fieldRow(field.name ? field : { name: s.name, kind: s.kind, value: '' }, reasons);
+        row.appendChild(el('span', { class: 'shared' + (s.caption ? ' caption' : '') }, [text(
+          s.caption
+            ? 'the caption — printed on every page of the packet'
+            : '↔ ' + s.to.map(function (p) { return p.form + ' p' + p.page; }).join(', '))]));
+        conn.appendChild(row);
+      });
+    }
+    host.appendChild(el('div', { class: 'pane links' }, [
+      el('h3', {}, [text('Form connections (' + shared.length + ')')]), conn
+    ]));
+  });
 }
 
 function open(img) {
@@ -918,6 +996,31 @@ function open(img) {
   viewer.showModal();
 }
 
+document.getElementById('viewerCopy').addEventListener('click', async function () {
+  const img = viewerPages()[viewerAt];
+  if (!img) return;
+  const btn = document.getElementById('viewerCopy');
+  const form = img.dataset.form, n = Number(img.dataset.page);
+  const byPage = await fieldsFor(form, currentStamp);
+  const why = await whyFor(form, currentStamp);
+  const links = await linksFor(form, currentStamp);
+  const data = pageDataFor(form, n, byPage, why);
+  // The wiring travels with it: a page copied out of the viewer should carry
+  // everything the viewer was showing.
+  data.connections = ((links && links[n] && links[n].fields) || []).map(function (s) {
+    return { name: s.name, caption: !!s.caption,
+      to: s.to.map(function (p) { return p.form + ' p' + p.page; }) };
+  });
+  const json = JSON.stringify(data, null, 2);
+  try {
+    await navigator.clipboard.writeText(json);
+    btn.textContent = 'Copied';
+  } catch (e) {
+    showJson(form + ' — page ' + n, json);
+    btn.textContent = 'Press Ctrl+C';
+  }
+  setTimeout(function () { btn.textContent = 'Copy data'; }, 1600);
+});
 viewerPrev.addEventListener('click', () => showAt(viewerAt - 1));
 viewerNext.addEventListener('click', () => showAt(viewerAt + 1));
 viewer.addEventListener('keydown', (e) => {

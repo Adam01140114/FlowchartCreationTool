@@ -397,12 +397,37 @@ geometry: the filler can find them by shape because it also checks the next line
 is empty, and without that check the same rule chained an age box to whatever
 sat under it and awarded it a hundred characters.
 
+Every capacity fill ends with **`[end]`**. A filled box that stops mid-word
+could be the capacity working or the ink being clipped, and on a rendered page
+those look identical; the marker settles it at a glance. It earned its keep
+immediately — the first run printed `uvwxyz[en` on DV-100 item 16b, which is
+how the chain allowance below was found.
+
+A chain of ruled lines loses a word at each join: capacity is counted in
+characters and spent in words, and a word will not split across a line, so
+summing the lines exactly over-counts.
+
 **The maximum path fills every measured box to exactly its capacity**, so the
 rendered page answers the only question that matters — does the text stop
 cleanly at the edge, or is it cut through? "Test Value" in a box that holds
 fifty-seven characters proves nothing about the fifty-eighth. The minimum path
 is left alone, because there the question is what happens when people answer as
 little as they can.
+
+## Lay multi-line text on the lines the form ruled
+
+pdf-lib leads at the font's own line height — 12.21pt at 11pt Helvetica — and
+the paper is ruled at whatever pitch the form chose. DV-100 item 17b is a 52.4pt
+box holding four lines, so the form ruled them 13.1pt apart: 0.89pt a line, and
+by the fourth line the text has moved 3.6pt and sits on the rules.
+
+The pitch needs no graphics parsing, because **a ruled box is ruled evenly**: it
+is the box height divided by the number of lines the box holds — the same count
+the form's printer used to decide how many rules to draw. It lands on them by
+construction and keeps working on a form nobody has seen.
+
+Filling every box to capacity is what made this visible. With one short line in
+a four-line box there was nothing to drift.
 
 ## A long answer runs onto the next ruled line
 
