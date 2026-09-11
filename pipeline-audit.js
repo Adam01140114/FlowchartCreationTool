@@ -67,7 +67,13 @@ function postedNames(gui) {
       // A combined question posts one field per box, by the box's own id -
       // there is one entry, so nothing is numbered.
       if (q.type === 'multipleTextboxes') {
-        (q.allFieldsInOrder || []).forEach((f) => { if (f.nodeId) add(f.nodeId, q); });
+        (q.allFieldsInOrder || []).forEach((f) => {
+          if (f.nodeId) add(f.nodeId, q);
+          // A choice inside a combined question posts the box its answer ticks:
+          // the form names the dropdown for what its options share and mirrors
+          // the answer into <that>_<option> - each option's own nodeId.
+          if (f.type === "dropdown") (f.options || []).forEach((o) => { if (o && o.nodeId) add(o.nodeId, q); });
+        });
       }
       // A numbered block asks for entry 1..max. The field's own id says where
       // the number goes: {n} in the middle for a PDF that names its rows
@@ -371,6 +377,25 @@ async function main() {
       const labels = labelsOf(gate);
       if (labels.length < 2) return;
       const chosen = new Set(answers);
+      // A question about what the gate opens, reached after its No as well as
+      // some other way, is asked whatever the answer. "Why do these people need
+      // protection?" came straight after DV-100's No to protecting anyone else.
+      // It had no condition of its own - it sat where the branch rejoined - so
+      // the checks here, which read the conditions a question has, never saw it.
+      // What gives it away: its field is named for the gate's subject, and the
+      // only thing it needs of that gate is a No.
+      const gateName = String(gate.nameId || gate.nodeId || '');
+      const ownName = String(q.nameId || q.nodeId || '');
+      const onlyNo = chosen.size === 1 && chosen.has('no');
+      if (onlyNo && grouped.size > 1 && gateName && ownName.indexOf(gateName + '_') === 0) {
+        report.afterNo = report.afterNo || [];
+        report.afterNo.push({
+          question: ownName,
+          text: String(q.text || '').slice(0, 46),
+          gate: gateName,
+          gateText: String(gate.text || '').slice(0, 60)
+        });
+      }
       if (!labels.every((l) => chosen.has(l.toLowerCase()))) return;
       // A two-option Yes/No gate covered on BOTH sides is never a rejoin. A
       // gate with two answers exists precisely to branch, so listing both is
@@ -462,30 +487,93 @@ async function main() {
     }
   }));
 
-  // Rule 9: fields that describe one subject are one question. An address asked
-  // as four questions is four screens for one thing a person types in one go,
-  // and the same is true of a lawyer's name, bar number and firm. The signal is
-  // a run of value questions whose field names share a prefix.
+  // Rule 9: questions about one subject are one question. An address asked as
+  // four questions is four screens for one thing a person types in one go, and
+  // so is a person's name, age, date of birth, gender and race. The signal is a
+  // run of back-to-back questions in one section whose field names share a
+  // subject. The run is cut on the longest shared prefix, not on everything but
+  // the last word: that test put person_to_restrain_age and
+  // person_to_restrain_date_of_birth in different families and never saw the
+  // five questions DV-100 asked about one person. A dropdown counts unless it is
+  // a gate - one whose follow-ups wait on some answers and not others cannot be
+  // a box inside a question - and a narrative never counts. Nor do questions
+  // that open on different answers: "Which county?" and "Which other places?"
+  // each follow their own box, and are not one subject asked twice.
   const combined = new Set();
   (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
     if (q.type === 'multipleTextboxes' && q.nodeId) combined.add(q.nodeId);
   }));
-  const families = new Map();
-  (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
-    if (!VALUE_TYPES.has(q.type) || !q.nameId) return;
-    const parts = String(q.nameId).split('_');
-    if (parts.length < 2) return;
-    const prefix = parts.slice(0, -1).join('_');
-    if (!families.has(prefix)) families.set(prefix, []);
-    families.get(prefix).push(q.nameId);
-  }));
+  const allQuestions = (gui.sections || []).flatMap((s) => s.questions || []);
+  const questionById = new Map(allQuestions.map((q) => [String(q.questionId), q]));
+  const CHOICE_TYPES = new Set(['dropdown', 'checkbox', 'radio']);
+  const optionCount = (q) => (q.options || []).length;
+  // What a question waits on beyond "the one before it was answered": each
+  // choice it needs a particular answer of. Every question is chained to the
+  // one before it, so the chain is not a condition of its own.
+  const branchOf = (q) => {
+    const byPrev = new Map();
+    ((q.logic && q.logic.conditions) || []).forEach((c) => {
+      const key = String(c.prevQuestion);
+      if (!byPrev.has(key)) byPrev.set(key, new Set());
+      byPrev.get(key).add(String(c.prevAnswer));
+    });
+    const parts = [];
+    byPrev.forEach((answers, key) => {
+      const prev = questionById.get(key);
+      if (prev && CHOICE_TYPES.has(prev.type) && answers.size < optionCount(prev)) {
+        parts.push(key + ':' + [...answers].sort().join('|'));
+      }
+    });
+    return parts.sort().join(';');
+  };
+  const gates = new Set();
+  allQuestions.forEach((q) => {
+    const conditions = (q.logic && q.logic.conditions) || [];
+    const byPrev = new Map();
+    conditions.forEach((c) => {
+      const key = String(c.prevQuestion);
+      if (!byPrev.has(key)) byPrev.set(key, new Set());
+      byPrev.get(key).add(String(c.prevAnswer));
+    });
+    byPrev.forEach((answers, key) => {
+      const prev = questionById.get(key);
+      if (!prev || !CHOICE_TYPES.has(prev.type)) return;
+      const options = (prev.options || []).map((o) => String(o && o.text !== undefined ? o.text : o));
+      if (options.length && answers.size < options.length) gates.add(key);
+    });
+  });
+  const SUBJECT_TYPES = new Set(['text', 'number', 'date', 'money', 'phone', 'email', 'dropdown']);
+  const sharedPrefix = (a, b) => {
+    const x = String(a || '').split('_'), y = String(b || '').split('_');
+    let i = 0;
+    while (i < x.length && i < y.length && x[i] === y[i]) i++;
+    return x.slice(0, i).join('_');
+  };
+  const tokenCount = (p) => (p ? p.split('_').length : 0);
   const ADDRESS_TAIL = /^(street|street_address|address|city|state|zip|zip_code|postal_code)$/;
   report.rule9 = [];
-  families.forEach((members, prefix) => {
-    if (combined.has(prefix) || members.length < 3) return;
-    const tails = members.map((m) => m.slice(prefix.length + 1));
-    const address = tails.filter((t) => ADDRESS_TAIL.test(t)).length >= 3;
-    report.rule9.push({ prefix, members, address });
+  (gui.sections || []).forEach((section) => {
+    let run = [];
+    const flush = () => {
+      if (run.length >= 2) {
+        const prefix = run.slice(1).reduce((p, q) => sharedPrefix(p, q.nameId), run[0].nameId);
+        if (tokenCount(prefix) >= 2 && !combined.has(prefix)) {
+          const members = run.map((q) => q.nameId);
+          const tails = members.map((m) => m.slice(prefix.length + 1));
+          const address = tails.filter((t) => ADDRESS_TAIL.test(t)).length >= 3;
+          report.rule9.push({ prefix, members, address });
+        }
+      }
+      run = [];
+    };
+    (section.questions || []).forEach((q) => {
+      const eligible = SUBJECT_TYPES.has(q.type) && q.nameId && !gates.has(String(q.questionId));
+      if (!eligible) { flush(); return; }
+      if (run.length && (tokenCount(sharedPrefix(run[0].nameId, q.nameId)) < 2
+        || branchOf(q) !== branchOf(run[0]))) flush();
+      run.push(q);
+    });
+    flush();
   });
 
   // Rule 10: ask for a value in the field type it is. A date typed into a text
@@ -662,6 +750,19 @@ async function main() {
     yesNoGates.forEach((g) => console.log('      - ' + g.question
       + '  <- both answers of "' + g.gateText + '"'));
     console.log("      Fix the gate, or declare it in the hints alwaysShown, with a reason.");
+  }
+  // Not excused by alwaysShown. That declaration says a follow-up is meant to show
+  // on both answers of one question; nothing makes it right to ask about what Yes
+  // opened after a No - and a declaration that said it was "verified hidden" on No
+  // is what hid DV-100 item 8(2) from both checks.
+  const afterNo = report.afterNo || [];
+  if (!afterNo.length) {
+    console.log('  gates: nothing about what a gate opens is asked after its No');
+  } else {
+    console.log('  FAILS  ' + afterNo.length
+      + ' question(s) about what a gate opens are asked after its No as well:');
+    afterNo.forEach((g) => console.log('      - ' + g.question + '  <- "No" to "' + g.gateText + '"'));
+    console.log("      Give each the gate's Yes as its condition, or declare it in alwaysShown, with a reason.");
   }
   const openGates = report.rule2gates || [];
   if (!openGates.length) {

@@ -3,17 +3,17 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "person_asking_protection_name",
    "kind": "text",
-   "value": "Test User Maria Elena Ro[end]"
+   "value": "person_asking_protection[end]"
   },
   {
    "name": "person_to_restrain_full_name",
    "kind": "text",
-   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+   "value": "person_to_restrain_full_name Mariax[end]"
   },
   {
    "name": "dv108_risk_violated_custody_order",
@@ -53,7 +53,7 @@
   {
    "name": "dv108_preparation_other_explanation",
    "kind": "text",
-   "value": "Test Value Maria Elena Rodriguez-Va[end]"
+   "value": "dv108_preparation_other_explanation[end]"
   },
   {
    "name": "dv108_preparation_sold_property",
@@ -118,7 +118,7 @@
   {
    "name": "dv108_ties_california_county_name",
    "kind": "text",
-   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+   "value": "dv108_ties_california_county_name M[end]"
   },
   {
    "name": "dv108_ties_another_california_county",
@@ -138,7 +138,7 @@
   {
    "name": "dv108_ties_country_name",
    "kind": "text",
-   "value": "Test User Maria Elena Rodriguez-Vasquez 1847 North Wil[end]"
+   "value": "dv108_ties_country_name Maria Elena Rodriguez-Vasquezx[end]"
   },
   {
    "name": "dv108_ties_another_country",
@@ -148,7 +148,7 @@
   {
    "name": "dv108_citizenship_countries",
    "kind": "text",
-   "value": "Test Value Maria Elena Rodriguez-Va[end]"
+   "value": "dv108_citizenship_countries Maria E[end]"
   },
   {
    "name": "dv108_risk_citizen_of_another_country",
@@ -175,7 +175,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "dv108_order_no_move_without_permission",
@@ -190,7 +190,7 @@
   {
    "name": "dv108_travel_documents_to_turn_in",
    "kind": "text",
-   "value": "Test Value Maria Elena Rodrig[end]"
+   "value": "dv108_travel_documents_to_tur[end]"
   },
   {
    "name": "dv108_travel_documents_due_date",
@@ -200,7 +200,7 @@
   {
    "name": "dv108_travel_documents_recipient_name",
    "kind": "text",
-   "value": "Test User Maria Elena Ro[end]"
+   "value": "dv108_travel_documents_r[end]"
   },
   {
    "name": "dv108_order_provide_travel_plan",
@@ -230,7 +230,7 @@
   {
    "name": "dv108_travel_plan_other_description",
    "kind": "text",
-   "value": "Test Value Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Av[end]"
+   "value": "dv108_travel_plan_other_description Maria Elena Rodriguez-Vasquezx[end]"
   },
   {
    "name": "dv108_travel_plan_other",
@@ -245,7 +245,7 @@
   {
    "name": "dv108_notify_state_county_and_state",
    "kind": "text",
-   "value": "Test Value, Test Value"
+   "value": "dv108_notify_county, Wyoming"
   },
   {
    "name": "dv108_order_notify_foreign_embassy",
@@ -255,7 +255,7 @@
   {
    "name": "dv108_embassy_or_consulate_name",
    "kind": "text",
-   "value": "Test U[end]"
+   "value": "dv108_[end]"
   },
   {
    "name": "dv108_embassy_proof_due_date",
@@ -270,7 +270,7 @@
   {
    "name": "dv108_foreign_custody_country",
    "kind": "text",
-   "value": "Test Value Maria Elena Rodriguez-Va[end]"
+   "value": "dv108_foreign_custody_country Maria[end]"
   },
   {
    "name": "dv108_order_post_a_bond",

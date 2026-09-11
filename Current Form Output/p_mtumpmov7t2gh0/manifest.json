@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-09-10T15:31:47.099Z",
+  "publishedAt": "2026-09-11T19:12:29.388Z",
   "forms": [
     {
       "name": "CLETS001",
@@ -7,7 +7,7 @@
       "fields": {
         "text": 38,
         "checkbox": 12,
-        "ticked": 5,
+        "ticked": 4,
         "filled": 35
       },
       "pdf": "filled.pdf",
@@ -19,8 +19,8 @@
       "fields": {
         "text": 163,
         "checkbox": 158,
-        "ticked": 99,
-        "filled": 162
+        "ticked": 86,
+        "filled": 163
       },
       "pdf": "filled.pdf",
       "linkedPages": 2

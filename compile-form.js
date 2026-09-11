@@ -384,6 +384,12 @@ function optionLabel(field, groupNameId) {
  *
  * The parts keep their own PDF names, which is why the question's nameId is the
  * family's shared prefix and each box is named by what is left.
+ *
+ * Not only addresses: any questions about one subject are one question. A part
+ * can name a group as well as a field - a family of checkboxes asked as one
+ * choice - and it sits in the question as a dropdown whose options keep the
+ * boxes' names. A person's name, age, date of birth, gender and race is one
+ * question with five parts, not five screens.
  */
 function applyCombines(fields, hints) {
   const specs = hints.combines || [];
@@ -392,30 +398,63 @@ function applyCombines(fields, hints) {
   const combines = [];
   const absorbed = new Set();
   specs.forEach((spec) => {
-    const members = (spec.fields || [])
-      .map((f) => fields.find((x) => x.nameId === (f.field || f) || x.id === (f.field || f)))
-      .filter(Boolean);
-    if (members.length < 2) return;
+    // Each part names a field, or a group: { group: 'person_to_restrain_gender' }.
+    const parts = (spec.fields || []).map((f) => {
+      const entry = typeof f === 'string' ? { field: f } : f;
+      if (entry.group) {
+        const group = (hints.groups || []).find((g) => g.nameId === entry.group);
+        const members = group ? (group.members || [])
+          .map((m) => fields.find((x) => x.id === m || x.nameId === m)).filter(Boolean) : [];
+        return members.length >= 2 ? { entry, group, members } : null;
+      }
+      const member = fields.find((x) => x.nameId === entry.field || x.id === entry.field);
+      return member ? { entry, members: [member] } : null;
+    }).filter(Boolean);
+    if (parts.length < 2) return;
 
-    const prefix = spec.nameId || commonTokenPrefix(members.map((m) => m.nameId));
+    const prefix = spec.nameId
+      || commonTokenPrefix(parts.map((p) => (p.group ? p.group.nameId : p.members[0].nameId)));
     if (!prefix) return;
-    members.forEach((m) => absorbed.add(m.id));
+    // A group's members are absorbed with it, so detectGroups finds too few left
+    // to ask it again on its own.
+    parts.forEach((p) => p.members.forEach((m) => absorbed.add(m.id)));
+    const tailOf = (name) => (name.indexOf(prefix + '_') === 0 ? name.slice(prefix.length + 1) : name);
     combines.push({
       nameId: prefix,
       question: spec.question,
-      anchor: members[0],
+      // The filer may skip the whole question.
+      optional: spec.optional === true,
+      anchor: parts[0].members[0],
       // One question standing for several fields, so no member's conditional
       // can carry its gate - the same reason repeats and groups read theirs
       // from their own nameId.
       conditional: spec.conditional || declaredConditional(hints, prefix),
-      boxes: members.map((m, i) => {
-        const declared = (spec.fields || [])[i];
-        const suffix = m.nameId.indexOf(prefix + '_') === 0
-          ? m.nameId.slice(prefix.length + 1) : m.nameId;
+      boxes: parts.map((p) => {
+        const declared = p.entry;
+        if (p.group) {
+          return {
+            nameId: p.group.nameId,
+            label: declared.label || titleCase(humanize(tailOf(p.group.nameId))),
+            optional: spec.optional === true || declared.optional === true,
+            type: 'dropdown',
+            options: p.members.map((m, i) => ({
+              label: (p.group.labels && p.group.labels[i]) || optionLabel(m, p.group.nameId),
+              nameId: m.nameId
+            }))
+          };
+        }
+        const m = p.members[0];
+        const suffix = tailOf(m.nameId);
         return {
           nameId: suffix,
-          label: (declared && declared.label) || titleCase(humanize(suffix)),
-          type: (declared && declared.type) || 'label'
+          // The PDF field it fills, whatever the question is called: two combined
+          // questions about one person share a prefix, and only one of them can
+          // be named it.
+          fullNameId: m.nameId,
+          label: declared.label || titleCase(humanize(suffix)),
+          type: declared.type || 'label',
+          // A part the filer may not know - an SSN, a licence plate.
+          optional: spec.optional === true || declared.optional === true
         };
       })
     });
@@ -813,23 +852,29 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
 
     const override = (hints.questions || {})[field.id] || (hints.questions || {})[field.nameId];
 
-    // 0. a numbered family stands in for all its fields, at the position the
-    //    first of them held, so the block is asked where the form asks it
-    const combine = combines.find((c) => c.anchor && c.anchor.index > lastIndex
-      && c.anchor.index < field.index);
-    if (combine && !emittedCombines.has(combine)) {
-      emittedCombines.add(combine);
-      const step = makeStep({
-        nameId: combine.nameId,
-        text: combine.question,
-        type: 'multipleTextboxes',
-        options: [],
-        combine: combine,
-        origin: 'combine'
+    // 0. a combined question stands in for all its fields, at the position the
+    //    first of them held, so it is asked where the form asks them. Every one
+    //    due before this field, in the form's order: taking only the first left
+    //    the rest to the catch-up after the loop, and DV-100's name and age came
+    //    out at the end of "About You" instead of at its start.
+    combines
+      .filter((c) => c.anchor && c.anchor.index > lastIndex && c.anchor.index < field.index
+        && !emittedCombines.has(c))
+      .sort((a, b) => a.anchor.index - b.anchor.index)
+      .forEach((combine) => {
+        emittedCombines.add(combine);
+        const step = makeStep({
+          nameId: combine.nameId,
+          text: combine.question,
+          type: 'multipleTextboxes',
+          options: [],
+          combine: combine,
+          origin: 'combine'
+        });
+        step.optional = combine.optional === true;
+        place(step, hostFor(combine.conditional ? { conditional: combine.conditional } : combine.anchor));
+        notes.push(`combine: ${combine.boxes.length} fields -> "${combine.question}"`);
       });
-      place(step, hostFor(combine.conditional ? { conditional: combine.conditional } : combine.anchor));
-      notes.push(`combine: ${combine.boxes.length} fields -> "${combine.question}"`);
-    }
 
     const repeat = repeats.find((r) => r.anchor && r.anchor.index > lastIndex
       && r.anchor.index < field.index);
@@ -944,6 +989,10 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
       type: field.type,
       field
     });
+    // "optional": true in the question hint: the filer may skip it. It was
+    // written into the hints and read by nothing, so every "if you know it"
+    // question was required.
+    if (override && override.optional === true) step.optional = true;
     place(step, host);
   });
 
@@ -958,6 +1007,7 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
       combine: combine,
       origin: 'combine'
     });
+    step.optional = combine.optional === true;
     place(step, hostFor(combine.conditional ? { conditional: combine.conditional } : combine.anchor));
     notes.push(`combine: ${combine.boxes.length} fields -> "${combine.question}"`);
   });
@@ -1041,8 +1091,12 @@ function assignSections(steps, fields, hints, sectionPrefs) {
     const startsSection = (step) => {
       if (startAt.has(step.nameId)) return startAt.get(step.nameId);
       if (step.combine) {
+        // A box by the PDF field it fills; a choice by its own name or by the
+        // boxes its options tick.
         const anchor = step.combine.boxes
-          .map((b) => step.combine.nameId + '_' + b.nameId)
+          .flatMap((b) => (b.options
+            ? [b.nameId].concat(b.options.map((o) => o.nameId))
+            : [b.fullNameId || (step.combine.nameId + '_' + b.nameId)]))
           .find((name) => startAt.has(name));
         if (anchor !== undefined) return startAt.get(anchor);
       }
@@ -1343,15 +1397,47 @@ function createBuilder() {
  * this is one answer with several parts, not a list.
  */
 function attachCombine(cell, combine) {
-  cell._textboxes = combine.boxes.map((b) => ({
-    nameId: b.nameId,
-    label: b.label,
-    placeholder: b.label,
-    isAmountOption: b.type === 'amount',
-    type: b.type === 'amount' ? undefined : b.type,
-    prefill: ''
-  }));
-  cell._itemOrder = combine.boxes.map((_, i) => ({ type: 'textbox', index: i }));
+  // The editor keeps a question's text boxes and its dropdowns in two arrays;
+  // _itemOrder is what puts them back in one order.
+  const textboxes = [];
+  const dropdowns = [];
+  const order = [];
+  combine.boxes.forEach((b) => {
+    if (b.type === 'dropdown') {
+      order.push({ type: 'dropdown', index: dropdowns.length });
+      dropdowns.push({
+        id: 'dropdown_' + b.nameId,
+        name: b.label,
+        // Each option is named for the PDF box it ticks. The exporter keeps that
+        // name rather than making one from the label, and the generated form
+        // names the dropdown for what its options share - so the answer lands
+        // in the same box the separate question ticked.
+        options: b.options.map((o) => ({
+          id: 'option_' + o.nameId,
+          text: o.label,
+          value: o.label,
+          nodeId: o.nameId
+        })),
+        triggerSequences: [],
+        ...(b.optional ? { optional: true } : {})
+      });
+      return;
+    }
+    order.push({ type: 'textbox', index: textboxes.length });
+    textboxes.push({
+      nameId: b.nameId,
+      fullNameId: b.fullNameId,
+      label: b.label,
+      placeholder: b.label,
+      isAmountOption: b.type === 'amount',
+      type: b.type === 'amount' ? undefined : b.type,
+      prefill: '',
+      ...(b.optional ? { optional: true } : {})
+    });
+  });
+  cell._textboxes = textboxes;
+  cell._itemOrder = order;
+  if (dropdowns.length) cell._dropdowns = dropdowns;
 }
 
 /** Roughly what the editor will draw for a question box of this many fields. */
@@ -1475,6 +1561,8 @@ function layoutSequence(b, steps, startY, centerX) {
     step.cell = q;
     if (step.repeat) attachRepeat(q, step.repeat);
     if (step.combine) attachCombine(q, step.combine);
+    // The editor exports it as required: false, and the form lets the filer past it.
+    if (step.optional) q._optional = true;
 
     if (!entry) entry = joinHub || q;
     if (incoming && incoming.length) {

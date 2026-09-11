@@ -5162,6 +5162,9 @@ function autosaveFlowchartToLocalStorage() {
       if (cell.hasOwnProperty('_linkedJoin')) {
         cellData._linkedJoin = cell._linkedJoin;
       }
+      if (cell.hasOwnProperty('_optional')) {
+        cellData._optional = cell._optional;
+      }
       // Linked checkbox node properties - always save these if they exist on the cell
       if (cell.hasOwnProperty('_linkedCheckboxNodeId')) {
         cellData._linkedCheckboxNodeId = cell._linkedCheckboxNodeId;

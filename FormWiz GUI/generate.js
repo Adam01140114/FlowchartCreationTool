@@ -643,6 +643,14 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '        .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }',
     '        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 737px; width: 100%; }',
     '        .question-container .question-text { margin-top: 0; }',
+    // A title that fits on one line is centred; one that wraps reads left-aligned.
+    // The label carries a class rather than being found with :has() - on a page
+    // this size a :has() rule made every style recalculation a whole-page walk,
+    // and Clear All forces hundreds of them.
+    // As an inline-block it shrinks to its one line and sits in the middle of the
+    // centred label, and fills the width, text left, the moment it wraps.
+    '        .question-container label.fw-question-title { display: block; text-align: center; }',
+    '        .question-container .question-text { display: inline-block; max-width: 100%; text-align: left; }',
     '        .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }',
     '        .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 737px; }',
     '        .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }',
@@ -684,6 +692,17 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '        .address-select-trigger { width: 160px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 2px center; background-size: 12px; padding: 0; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }',
     '        .address-field:first-child { margin-top: 2px; }',
     '        .address-field:last-child { margin-bottom: 2px; }',
+    // A date inside a multiple-textbox question is one more box in the stack:
+    // as wide as the text boxes, its name inside it where theirs are.
+    '        .fw-date-field { position: relative; display: block; width: 80%; max-width: 400px; height: 44px; margin: 4px auto; box-sizing: border-box; border: 1px solid #d1d1d6; border-radius: 8px; background-color: #ffffff; cursor: pointer; }',
+    '        .fw-date-field:focus-within { box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }',
+    '        .fw-date-field input[type="date"] { display: block; width: 100%; height: 100%; box-sizing: border-box; border: none; background: transparent; padding: 0 12px 0 40px; font-size: 16px; font-family: inherit; color: #2c3e50; text-align: center; cursor: pointer; }',
+    '        .fw-date-field input[type="date"]:focus { outline: none; }',
+    // Until a date is picked the box reads like its neighbours: its name, centred,
+    // in placeholder grey - the empty mm/dd/yyyy hidden rather than shown beside it.
+    '        .fw-date-caption { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #6c757d; font-size: 16px; pointer-events: none; }',
+    '        .fw-date-field.fw-has-value .fw-date-caption, .fw-date-field:focus-within .fw-date-caption { display: none; }',
+    '        .fw-date-field:not(.fw-has-value):not(:focus-within) input[type="date"] { color: transparent; }',
     '        .hidden { display: none !important; }',
     '        .file-upload-container { margin: 20px 0; }',
     '        .file-upload-dropzone { border: 2px dashed #2f7bff; border-radius: 12px; padding: 40px 20px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease; }',
@@ -1870,6 +1889,24 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
       }
     }
   });
+  // Which group each section number belongs to. The map above is keyed by
+  // section name, and a packet repeats names - DV-100 and DV-105 each have an
+  // "Other Court Cases" - so DV-100's lit up DV-105 on the progress bar and the
+  // next section dropped back to DV-100, as if the filer had gone backwards. A
+  // name listed by several groups goes to them in order: the first section of
+  // that name to the first group that lists it.
+  const sectionNumberToGroupMap = {};
+  {
+    const claims = {};
+    Object.keys(groupToSectionMap).sort((a, b) => parseInt(a) - parseInt(b)).forEach(groupId => {
+      groupToSectionMap[groupId].forEach(name => { (claims[name] = claims[name] || []).push(groupId); });
+    });
+    for (let s = 1; s < sectionCounter; s++) {
+      const nameEl = document.getElementById("sectionBlock" + s)?.querySelector("#sectionName" + s);
+      const name = nameEl ? nameEl.value.trim() : '';
+      if (claims[name] && claims[name].length) sectionNumberToGroupMap[s] = claims[name].shift();
+    }
+  }
   // If no groups are defined, fall back to section-based progress bar
   const hasGroups = Object.keys(groupToSectionMap).length > 0;
   if (hasGroups) {
@@ -1890,6 +1927,7 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     formHTML += `<script>`;
     formHTML += `window.groupToSectionMap = ${JSON.stringify(groupToSectionMap)};`;
     formHTML += `window.sectionToGroupMap = ${JSON.stringify(sectionToGroupMap)};`;
+    formHTML += `window.sectionNumberToGroupMap = ${JSON.stringify(sectionNumberToGroupMap)};`;
     formHTML += `window.groupNames = ${JSON.stringify(groupNames)};`;
     formHTML += `</script>`;
   } else {
@@ -2024,8 +2062,10 @@ questionSlugMap[questionId] = slug;
       // which questions to put back.
       const conditionalAttr = shouldBeHidden ? ' data-conditional="1"' : "";
       const stepHiddenClass = (formQuestionStyle === 'question' && qIdx !== 0) ? " question-step-hidden" : "";
+      // Optional: the filer may skip it, and nothing that checks for an answer waits on it.
+      const optionalAttr = qBlock.querySelector('#questionOptional' + questionId)?.checked ? ' data-optional="1"' : '';
 
-      formHTML += `<div id="question-container-${questionId}" data-question-id="${questionId}" class="question-container question-item${hiddenClass}${stepHiddenClass}" data-section="${s}" data-question-index="${qIdx + 1}"${conditionalAttr}${questionTypeAttr}>`;
+      formHTML += `<div id="question-container-${questionId}" data-question-id="${questionId}" class="question-container question-item${hiddenClass}${stepHiddenClass}" data-section="${s}" data-question-index="${qIdx + 1}"${conditionalAttr}${questionTypeAttr}${optionalAttr}>`;
       // Check if info box is enabled
       const infoBoxEnabled = qBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false;
       let infoBoxText = "";
@@ -2042,7 +2082,7 @@ questionSlugMap[questionId] = slug;
       if (infoBoxEnabled && infoBoxText) {
         formHTML += `
           <div class="question-header">
-            <label><h3 class="question-text">${questionText}</h3></label>
+            <label class="fw-question-title"><h3 class="question-text">${questionText}</h3></label>
             <div class="info-icon" tabindex="0">
               <span>i</span>
               <div class="info-box-text info-tooltip">${infoBoxText}</div>
@@ -2050,7 +2090,7 @@ questionSlugMap[questionId] = slug;
           </div>
         `;
       } else {
-        formHTML += `<label><h3 class="question-text">${questionText}</h3></label>`;
+        formHTML += `<label class="fw-question-title"><h3 class="question-text">${questionText}</h3></label>`;
       }
       // Add subtitle if enabled
       const subtitleEnabled = qBlock.querySelector(`#enableSubtitle${questionId}`)?.checked || false;
@@ -3784,17 +3824,11 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
                 }
               }, 0);
               } else if (field.type === 'dropdown') {
-                // Add line break above dropdown field
-                const brBeforeDropdown = document.createElement('br');
-                entryContainer.appendChild(brBeforeDropdown);
                 // Handle dropdown fields
                 const dropdownFieldDiv = document.createElement('div');
-                dropdownFieldDiv.style.cssText = 'margin: 15px 0; padding: 20px; border: 2px solid #2196F3; border-radius: 12px; background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%); box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);';
-                // Add field name as a label
-                const fieldNameLabel = document.createElement('h4');
-                fieldNameLabel.textContent = field.fieldName;
-                fieldNameLabel.style.cssText = 'margin: 0 0 15px 0; color: #1976D2; font-size: 18px; font-weight: 600; text-align: center;';
-                dropdownFieldDiv.appendChild(fieldNameLabel);
+                // One more box in the stack, not a card of its own: the same width as the
+                // text boxes, its name in the first option where theirs is a placeholder.
+                dropdownFieldDiv.className = 'address-field';
                 // Create dropdown select element
                 const select = document.createElement('select');
                 // Sanitize fieldName: remove question marks, replace spaces and non-word chars with underscores, convert to lowercase
@@ -3803,14 +3837,32 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
                     .replace(/[?]/g, '')
                     .replace(/[^a-z0-9_]+/g, '_')
                     .replace(/^_+|_+$/g, '');
-                // For multipleTextboxes, don't add entry number suffix (j is always 1)
-                select.id = sanitizedFieldName;
+                // For multipleTextboxes, don't add entry number suffix (j is always 1).
+                // The id is what dropdownMirror names the hidden PDF boxes after:
+                // <id>_<option>. An editor-built dropdown names its options
+                // <field name>_<option>, so the field name is still the id. A
+                // compiled one names each option for the PDF box it ticks -
+                // person_to_restrain_gender_male - and then the id is what those
+                // share, or a combined gender would tick boxes nobody printed.
+                const optionIds = (field.options || []).map(o => String(o.nodeId || '')).filter(Boolean);
+                const namedByField = optionIds.every(id => id.indexOf(sanitizedFieldName + '_') === 0);
+                let sharedOptionPrefix = '';
+                if (!namedByField && optionIds.length > 1) {
+                  const split = optionIds.map(id => id.split('_'));
+                  const common = [];
+                  for (let t = 0; t < split[0].length; t++) {
+                    if (split.every(parts => parts[t] === split[0][t] && parts.length > t + 1)) common.push(split[0][t]);
+                    else break;
+                  }
+                  sharedOptionPrefix = common.join('_');
+                }
+                select.id = sharedOptionPrefix || sanitizedFieldName;
                 select.name = select.id;
-                select.style.cssText = 'width: 100%; padding: 12px; border: 1px solid #2196F3; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
+                select.className = 'address-select';
                 // Add placeholder option
                 const placeholderOption = document.createElement('option');
                 placeholderOption.value = '';
-                placeholderOption.textContent = 'Select an option...';
+                placeholderOption.textContent = field.fieldName || 'Select an option...';
                 placeholderOption.disabled = true;
                 placeholderOption.selected = true;
                 select.appendChild(placeholderOption);
@@ -4472,30 +4524,25 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
                 });
                 entryContainer.appendChild(checkboxFieldDiv);
               } else if (field.type === 'date') {
-                // Add line break above date field
-                const brBeforeDate = document.createElement('br');
-                entryContainer.appendChild(brBeforeDate);
-                // Handle date fields
-                // For multipleTextboxes, don't add entry number suffix
+                // A date in a multiple-textbox question is one more box in the stack:
+                // as wide as the others, its name inside it where their placeholders
+                // are. It was a card of its own, a name over a narrower picker, and
+                // read as a separate question.
                 const fieldId = field.nodeId;
                 const dateDiv = document.createElement('div');
-                dateDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #ddd; border-radius: 8px; display: flex; flex-direction: column; align-items: center;';
-                const label = document.createElement('label');
-                label.textContent = field.label + ':';
-                label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; font-size: 15px; text-align: center;';
+                dateDiv.className = 'fw-date-field';
+                // Clicking the box opens the picker. A click is a user gesture;
+                // opening it on focus was not, and threw on every tab into the box.
+                dateDiv.setAttribute('onclick', "try { this.querySelector('input').showPicker(); } catch (e) {}");
+                const caption = document.createElement('span');
+                caption.className = 'fw-date-caption';
+                caption.textContent = field.label || '';
                 const input = document.createElement('input');
                 input.type = 'date';
                 input.id = fieldId;
                 input.name = fieldId;
-                input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease; margin: 0 auto;';
-                // Add click handler to open calendar
-                input.addEventListener('click', function() {
-                    this.showPicker();
-                });
-                input.addEventListener('focus', function() {
-                    this.showPicker();
-                });
-                dateDiv.appendChild(label);
+                input.setAttribute('aria-label', field.label || '');
+                dateDiv.appendChild(caption);
                 dateDiv.appendChild(input);
                 entryContainer.appendChild(dateDiv);
               } else if (field.nodeId) {
@@ -4511,6 +4558,29 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
               }
               lastWasLocation = isLocationField;
               firstField = false;
+            }
+            // Parts the filer may skip carry data-optional and say so where their
+            // name shows - unless the whole question is optional, which its own
+            // text already says. The import kept them on the question block, by
+            // field for a box and by name for a choice.
+            {
+              const partsBlock = (typeof qBlock !== 'undefined' && qBlock) ? qBlock : document.getElementById('questionBlock' + questionId);
+              let optionalParts = [];
+              try { optionalParts = JSON.parse((partsBlock && partsBlock.getAttribute('data-optional-parts')) || '[]'); } catch (e) { optionalParts = []; }
+              const wholeQuestionOptional = !!(partsBlock && partsBlock.querySelector('#questionOptional' + questionId)?.checked);
+              if (optionalParts.length) {
+                entryContainer.querySelectorAll('input, select, textarea').forEach((el) => {
+                  const byField = optionalParts.indexOf(el.id) !== -1;
+                  const byName = el.tagName === 'SELECT' && el.options.length > 0 && optionalParts.indexOf(el.options[0].textContent) !== -1;
+                  if (!byField && !byName) return;
+                  el.setAttribute('data-optional', '1');
+                  if (wholeQuestionOptional) return;
+                  const dateBox = el.closest('.fw-date-field');
+                  if (el.tagName === 'SELECT') el.options[0].textContent += ' (optional)';
+                  else if (dateBox && dateBox.querySelector('.fw-date-caption')) dateBox.querySelector('.fw-date-caption').textContent += ' (optional)';
+                  else if (el.placeholder) el.placeholder += ' (optional)';
+                });
+              }
             }
             // Convert the entry container to HTML string and add to formHTML
             formHTML += entryContainer.outerHTML;
@@ -5818,7 +5888,12 @@ if (s > 1){
           const questionText = questionTextEl ? questionTextEl.textContent.trim() : '';
 
           const elements = Array.from(container.querySelectorAll('select, textarea, input'));
-          const eligibleElements = elements.filter(isElementEligible);
+          // Anything the filer may skip - an optional question, or an optional box
+          // inside one - never holds the Next button.
+          if (container.getAttribute('data-optional') === '1') return true;
+          const eligibleElements = elements.filter(function (el) {
+            return isElementEligible(el) && !el.closest('[data-optional]');
+          });
           const debugElements = eligibleElements.map(el => ({
             id: el.id || null,
             tag: el.tagName,
@@ -6056,7 +6131,17 @@ if (s > 1){
           }
           return visibleIndices.length ? questionItems[visibleIndices[0]] : null;
         }
+        // The button turns into Submit only when this answer's end node is the
+        // real end - nothing later is left to ask (see nextSectionStillToAnswer).
+        // Otherwise it stays Next, and Next takes the filer to what is left.
         function answerTriggersEnd(container) {
+          if (!answerJumpsToEnd(container)) return false;
+          const sectionEl = container.closest('.section');
+          const sectionNo = sectionEl ? Number(String(sectionEl.id || '').slice(7)) : NaN;
+          if (isNaN(sectionNo) || typeof nextSectionStillToAnswer !== 'function') return true;
+          return nextSectionStillToAnswer(sectionNo) === 'end';
+        }
+        function answerJumpsToEnd(container) {
           // Ensure jumpLogics is defined (it might not be initialized yet)
           const jumpLogicsArray = (typeof jumpLogics !== 'undefined' && Array.isArray(jumpLogics)) ? jumpLogics : (window.jumpLogics || []);
           if (!container || !Array.isArray(jumpLogicsArray) || !jumpLogicsArray.length) {
@@ -6643,6 +6728,7 @@ if (s > 1){
               
               // Helper function to check if input is properly filled (with special rules for zip/phone)
               function isInputProperlyFilled(input) {
+                if (input.closest('[data-optional]')) return true;
                 const value = input.value ? input.value.trim() : '';
                 const inputId = (input.id || input.name || '').toLowerCase();
                 
@@ -6827,9 +6913,21 @@ if (s > 1){
             attributeOldValue: true
           });
         });
+        // One refresh per burst. A gate answered No hides every question behind
+        // it, and each one announces it with this event; refreshing for each
+        // re-read the whole section once per hidden question - DV-105's
+        // abduction-risk No took over a second, and Clear All, which answers
+        // every gate No at once, took six minutes. The refresh now runs once,
+        // after the handler that hid them has finished.
+        let navRefreshQueued = false;
         document.addEventListener('questionVisibilityChanged', function(evt) {
           if (!evt || !evt.detail || !evt.detail.sectionId || evt.detail.sectionId === sectionId) {
-            refreshNav();
+            if (navRefreshQueued) return;
+            navRefreshQueued = true;
+            Promise.resolve().then(function () {
+              navRefreshQueued = false;
+              refreshNav();
+            });
           }
         });
         window.questionNavControllers[sectionId] = refreshNav;
@@ -6945,7 +7043,7 @@ if (s > 1){
   // Close the form & add the thank-you message
   formHTML += [
     "</form>",
-    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><span style="font-size: 0.75em; color: #666;">Your paperwork is now ready, please proceed to checkout</span><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><div id="pdfDevTools" style="display: ' + (showPdfDevTools ? 'block' : 'none') + ';"><button id="downloadPdfBtn" onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDFs</button><br><br><button id="previewPdfsBtn" onclick="showPreviewPdfsModal()" style="font-size: 1.2em;">Preview PDFs</button><br><br><button id="downloadPayloadBtn" onclick="downloadTestPayload()" style="font-size: 1.2em;">Download Payload</button><br><br><button id="restartFormBtn" onclick="restartForm()" style="font-size: 1.2em;">Restart Form</button><br><br></div><div id="productionCheckoutTools" style="display: ' + (showProductionCheckout ? 'block' : 'none') + ';"><button onclick="showCartModal()" style="font-size: 1.2em;">Checkout</button><br><br><button onclick="window.location.href=\'/Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div></div>',
+    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><span style="font-size: 0.75em; color: #666;">Your paperwork is now ready, please proceed to checkout</span><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><div id="pdfDevTools" style="display: ' + (showPdfDevTools ? 'block' : 'none') + ';"><button id="downloadPdfBtn" onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDFs</button><br><br><button id="previewPdfsBtn" onclick="showPreviewPdfsModal()" style="font-size: 1.2em;">Preview PDFs</button><br><br><button id="downloadPayloadBtn" onclick="downloadTestPayload()" style="font-size: 1.2em;">Download Payload</button><br><br><button id="restartFormBtn" onclick="restartForm()" style="font-size: 1.2em;">Restart Form</button><br><br><button id="backFromThankYouBtn" onclick="backFromThankYou()" style="font-size: 1.2em;">Back</button><br><br></div><div id="productionCheckoutTools" style="display: ' + (showProductionCheckout ? 'block' : 'none') + ';"><button onclick="showCartModal()" style="font-size: 1.2em;">Checkout</button><br><br><button onclick="window.location.href=\'/Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div></div>',
     "</div>",
     "</section>",
     "</div>",
@@ -11780,6 +11878,11 @@ function getQuestionTypeFromContainer(questionContainer) {
 }
 function validateQuestion(questionContainer, questionType, questionId) {
     let isValid = true;
+    if (questionContainer.getAttribute('data-optional') === '1') {
+        questionContainer.classList.remove('form-field-required');
+        hideValidationError(questionContainer);
+        return true;
+    }
     switch (questionType) {
         case 'checkbox':
             isValid = validateCheckboxQuestion(questionContainer);
@@ -11844,6 +11947,7 @@ function validateTextQuestion(questionContainer) {
         return true;
     }
     for (let input of eligibleInputs) {
+        if (input.closest('[data-optional]')) continue;
         const value = input.value ? input.value.trim() : '';
 
         if (!value) {
@@ -12665,53 +12769,33 @@ function showTextboxLabels(questionId, count){
                 });
                 entryContainer.appendChild(checkboxFieldDiv);
             } else if (field.type === 'date') {
-                // Add line break above date field
-                const brBeforeDate = document.createElement('br');
-                entryContainer.appendChild(brBeforeDate);
-                // Handle date fields
+                // A date in a multiple-textbox question is one more box in the stack:
+                // as wide as the others, its name inside it where their placeholders
+                // are. It was a card of its own, a name over a narrower picker, and
+                // read as a separate question.
                 const fieldId = entryFieldId(field.nodeId, j);
                 const dateDiv = document.createElement('div');
-                dateDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #ddd; border-radius: 8px; display: flex; flex-direction: column; align-items: center;';
-                const label = document.createElement('label');
-                label.textContent = field.label + ":";
-                label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; font-size: 15px; text-align: center;';
+                dateDiv.className = 'fw-date-field';
+                // Clicking the box opens the picker. A click is a user gesture;
+                // opening it on focus was not, and threw on every tab into the box.
+                dateDiv.setAttribute('onclick', "try { this.querySelector('input').showPicker(); } catch (e) {}");
+                const caption = document.createElement('span');
+                caption.className = 'fw-date-caption';
+                caption.textContent = field.label || '';
                 const input = document.createElement('input');
                 input.type = 'date';
                 input.id = fieldId;
                 input.name = fieldId;
-                input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease; margin: 0 auto;';
-                // Add hover effect
-                input.addEventListener('mouseenter', function() {
-                    this.style.borderColor = '#999';
-                    this.style.backgroundColor = '#f9f9f9';
-                });
-                input.addEventListener('mouseleave', function() {
-                    this.style.borderColor = '#ddd';
-                    this.style.backgroundColor = 'white';
-                });
-                // Ensure clicking anywhere on the input opens the calendar
-                input.addEventListener('click', function() {
-                    this.showPicker();
-                });
-                // Also handle focus to ensure calendar opens
-                input.addEventListener('focus', function() {
-                    this.showPicker();
-                });
-                dateDiv.appendChild(label);
+                input.setAttribute('aria-label', field.label || '');
+                dateDiv.appendChild(caption);
                 dateDiv.appendChild(input);
                 entryContainer.appendChild(dateDiv);
             } else if (field.type === 'dropdown') {
-                // Add line break above dropdown field
-                const brBeforeDropdown = document.createElement('br');
-                entryContainer.appendChild(brBeforeDropdown);
                 // Handle dropdown fields
                 const dropdownFieldDiv = document.createElement('div');
-                dropdownFieldDiv.style.cssText = 'margin: 15px 0; padding: 20px; border: 2px solid #2196F3; border-radius: 12px; background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%); box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);';
-                // Add field name as a label
-                const fieldNameLabel = document.createElement('h4');
-                fieldNameLabel.textContent = field.fieldName;
-                fieldNameLabel.style.cssText = 'margin: 0 0 15px 0; color: #1976D2; font-size: 18px; font-weight: 600; text-align: center;';
-                dropdownFieldDiv.appendChild(fieldNameLabel);
+                // One more box in the stack, not a card of its own: the same width as the
+                // text boxes, its name in the first option where theirs is a placeholder.
+                dropdownFieldDiv.className = 'address-field';
                 // Create dropdown select element
                 const select = document.createElement('select');
                 // Sanitize fieldName: remove question marks, replace spaces and non-word chars with underscores, convert to lowercase
@@ -12722,11 +12806,11 @@ function showTextboxLabels(questionId, count){
                     .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
                 select.id = sanitizedFieldName + "_" + j;
                 select.name = select.id;
-                select.style.cssText = 'width: 100%; padding: 12px; border: 1px solid #2196F3; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
+                select.className = 'address-select';
                 // Add placeholder option
                 const placeholderOption = document.createElement('option');
                 placeholderOption.value = '';
-                placeholderOption.textContent = 'Select an option...';
+                placeholderOption.textContent = field.fieldName || 'Select an option...';
                 placeholderOption.disabled = true;
                 placeholderOption.selected = true;
                 select.appendChild(placeholderOption);
@@ -14666,9 +14750,66 @@ function nextSectionAcrossForms(currentSection){
     if (!current || currentSection !== current.lastSection) return null;
 
     for (var i = current.index + 1; i < forms.length; i++){
-        if (isFormActivated(forms[i])) return forms[i].firstSection;
+        // A form that asks nothing has no page to go to. DV-140 is switched on
+        // by the custody order and filled from DV-105's answers, and its first
+        // page is recorded as 0 - so finishing DV-108 went to "page 0", which
+        // is page 1, instead of on to CLETS-001.
+        var form = forms[i];
+        if (form.asksNothing || !(form.firstSection >= 1) || form.lastSection < form.firstSection) continue;
+        if (isFormActivated(form)) return form.firstSection;
     }
     return 'end';
+}
+
+/*------------------------------------------------------------------
+ *  nextSectionStillToAnswer(currentSection)
+ *  - where a jump to "end" really goes.
+ *
+ *    An end node says the path through one form stops there, not that
+ *    the filer is done. DV-100 sends every order the filer can ask for
+ *    to its end node, and the custody order is also what switches on
+ *    DV-105 and DV-140 - so obeying the jump finished the packet on
+ *    DV-100's "Orders You Want" page, before DV-100's own signatures and
+ *    before DV-105, DV-108, CLETS-001 and DV-110 had asked anything.
+ *
+ *    The thank-you screen now waits until nothing is left: this returns
+ *    the first later page, in a form that is switched on, that has a
+ *    question showing - or "end" when there is none. Each page's own
+ *    Next still checks its answers, so reaching the end means every
+ *    question the answers opened has been asked.
+ *-----------------------------------------------------------------*/
+function nextSectionStillToAnswer(currentSection){
+    var from = parseInt(currentSection, 10);
+    if (isNaN(from)) return 'end';
+    var numbers = [];
+    document.querySelectorAll('.section').forEach(function(sec){
+        var id = String(sec.id || '');
+        if (id.indexOf('section') !== 0) return;
+        var n = Number(id.slice(7));
+        if (id.length > 7 && !isNaN(n)) numbers.push(n);
+    });
+    numbers.sort(function(a, b){ return a - b; });
+    for (var i = 0; i < numbers.length; i++){
+        var n = numbers[i];
+        if (n <= from) continue;
+        var form = formOwningSection(n);
+        if (form && !isFormActivated(form)) continue;
+        if (sectionHasQuestionShowing(document.getElementById('section' + n))) return n;
+    }
+    return 'end';
+}
+
+/** A question on this page that its conditions show. */
+function sectionHasQuestionShowing(sec){
+    if (!sec) return false;
+    var questions = sec.querySelectorAll('.question-container');
+    for (var i = 0; i < questions.length; i++){
+        var q = questions[i];
+        if (q.classList.contains('hidden') || q.style.display === 'none') continue;
+        if (q.parentElement && q.parentElement.closest('.hidden')) continue;
+        return true;
+    }
+    return false;
 }
 
 /*------------------------------------------------------------------
@@ -14715,7 +14856,10 @@ function handleNext(currentSection){
         if (acrossForms !== null) nextSection = acrossForms;
     }
 
-    /* ---------- special "end" shortcut ---------- */
+    /* ---------- "end" only when nothing later is left to ask ---------- */
+    if (nextSection === 'end'){
+        nextSection = nextSectionStillToAnswer(currentSection);
+    }
     if (nextSection === 'end'){
         processAllPdfs().then(()=>navigateSection('end'));
         return;
@@ -14910,6 +15054,33 @@ function restartForm(){
     window.__fwKeepAnswersOnNavigate = true;
     try { navigateSection(1); }
     finally { window.__fwKeepAnswersOnNavigate = false; }
+}
+/*------------------------------------------------------------------
+ *  backFromThankYou()
+ *  - from the thank-you screen to the question screen it was reached from.
+ *
+ *    A test-mode button under Restart Form. Finishing with Next leaves
+ *    currentSectionNumber on 'end', with the page it came from on the
+ *    history stack, and Back takes that page off it. Finishing with
+ *    Submit shows the thank-you screen over the page still open, and
+ *    Back shows that page again. Either way it only navigates: every
+ *    answer stays where it was.
+ *-----------------------------------------------------------------*/
+function backFromThankYou(){
+    window.__fwKeepAnswersOnNavigate = true;
+    try {
+        if (currentSectionNumber === 'end') {
+            if (typeof sectionStack !== 'undefined' && sectionStack && sectionStack.length) {
+                goBack();
+            } else {
+                navigateSection(document.querySelectorAll('.section').length, true);
+            }
+        } else {
+            navigateSection(currentSectionNumber, true);
+        }
+    } finally {
+        window.__fwKeepAnswersOnNavigate = false;
+    }
 }
 /*──────────────── helpers ───────────────*/
 function setCurrentDate () {
@@ -16551,7 +16722,10 @@ function updateProgressBar() {
         const sectionTitleEl = currentSectionEl.querySelector('.section-title');
         if (sectionTitleEl) {
           const currentSectionName = sectionTitleEl.textContent.trim();
-          const currentGroupId = window.sectionToGroupMap[currentSectionName];
+          // By number first: section names repeat across a packet's forms.
+          const byNumber = window.sectionNumberToGroupMap
+            ? window.sectionNumberToGroupMap[currentSectionNumber] : undefined;
+          const currentGroupId = byNumber || window.sectionToGroupMap[currentSectionName];
           if (currentGroupId) {
             // Find the step number for this group
             const groupIds = Object.keys(window.groupToSectionMap).sort((a, b) => parseInt(a) - parseInt(b));
@@ -16719,6 +16893,72 @@ if (typeof handleNext === 'function') {
         }
         // Debounce and queue management for saveAnswers
         let saveAnswersTimeout = null;
+        // Set by Clear All. While it is set nothing is saved, so the emptied form
+        // is not written back over the copy Clear All is about to delete; the
+        // next thing the person types or picks in the form clears it.
+        let answersWiped = false;
+        // Set while the restore re-announces the answers it put back. Nothing is
+        // saved then - those answers came from the save - and an edit the person
+        // makes meanwhile is saved once the replay is over.
+        let replayingAnswers = false;
+        let editedDuringReplay = false;
+        // An empty saved value means nobody answered that question. The form
+        // saves every field, answered or not, so a draft is mostly empty values:
+        // the test account's held 643, and 13 of them were answers. Restoring an
+        // empty value could only empty a box or announce an empty one, and the
+        // passes announced every one - input and change on hundreds of unanswered
+        // fields, seconds after the page appeared in which nothing could be typed.
+        // Only answers are restored. A saved false stays: it is how a box that
+        // starts ticked comes back unticked.
+        function dropUnansweredValues(saved) {
+            Object.keys(saved).forEach(function (key) {
+                if (saved[key] === '' || saved[key] === null) delete saved[key];
+            });
+            return saved;
+        }
+        // How long the replay works before giving the page back.
+        const REPLAY_SLICE_MS = 40;
+
+        // The restore re-announces every answer it put back, so the questions
+        // those answers open are opened. Only answers: a checkbox or a radio
+        // always has a value, and the old test - value or checked - announced
+        // every box in the packet, ticked or not. That was over a thousand change
+        // events, each running the form's logic and a save, and eleven seconds
+        // after the page appeared in which nothing could be typed. It also hands
+        // the page back between slices, so a box can be typed in while it runs.
+        async function replayRestoredAnswers(fields) {
+            const answered = fields.filter(function (el) {
+                if (el.type === 'checkbox' || el.type === 'radio') return el.checked;
+                return String(el.value || '') !== '';
+            });
+            replayingAnswers = true;
+            try {
+                let sliceStart = performance.now();
+                for (let i = 0; i < answered.length; i++) {
+                    answered[i].dispatchEvent(new Event('change', { bubbles: true }));
+                    if (performance.now() - sliceStart > REPLAY_SLICE_MS) {
+                        await (typeof fillYield === 'function'
+                            ? fillYield()
+                            : new Promise(function (resolve) { setTimeout(resolve, 0); }));
+                        sliceStart = performance.now();
+                    }
+                }
+            } finally {
+                replayingAnswers = false;
+            }
+            if (typeof fwSyncDateFields === 'function') fwSyncDateFields();
+            if (editedDuringReplay) {
+                editedDuringReplay = false;
+                if (isUserLoggedIn) saveAnswers();
+                else saveAnswersToLocalStorage();
+            }
+        }
+        // What the saved copy holds, as far as this page knows: what was read
+        // when the page loaded, plus every field written since. A save writes
+        // only what differs from it. The DV packet's saved copy is about 930
+        // fields and 60 KB, and every tick or choice wrote all of it again -
+        // three ticks were five of those writes, back to back.
+        let lastSavedAnswers = {};
         let isSaving = false;
         let pendingSave = false;
         let saveRetryCount = 0;
@@ -16727,6 +16967,7 @@ if (typeof handleNext === 'function') {
         
         // Helper: save answers (with debouncing, error handling, and visibility prioritization)
         async function saveAnswers(immediate = false) {
+            if (answersWiped || replayingAnswers) return;
             if (!isUserLoggedIn || !userId) {
 
                 return;
@@ -16766,9 +17007,18 @@ if (typeof handleNext === 'function') {
 
                 const answers = {};
                 const fieldVisibility = {}; // Track which fields are visible
+                // Which field to keep only matters for a name several fields
+                // share, and asking whether a field is visible reads the layout.
+                // A box that starts ticked is the one whose "unticked" is news.
+                const nameCounts = {};
+                const startsTicked = {};
+                fields.forEach(el => {
+                    nameCounts[el.name] = (nameCounts[el.name] || 0) + 1;
+                    if (el.type === 'checkbox' && el.defaultChecked) startsTicked[el.name] = true;
+                });
                 
                 fields.forEach(el => {
-                    const isVisible = isElementActuallyVisible(el);
+                    const isVisible = nameCounts[el.name] > 1 ? isElementActuallyVisible(el) : true;
                     const fieldName = el.name;
                     const fieldId = el.id;
                     const fieldType = el.type || el.tagName;
@@ -16805,8 +17055,23 @@ if (typeof handleNext === 'function') {
                     }
                 });
                 
-                // Write to Firestore with error handling and retry logic
-                await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
+                // Only what changed since the saved copy last heard from this page.
+                // Nothing it never held is written as empty: a missing field and a
+                // blank one come back the same way, and so does an unticked box that
+                // starts unticked. The write merges, so the rest of the saved copy -
+                // and the uploaded files kept in it - stay as they are.
+                const changed = {};
+                Object.keys(answers).forEach(function (name) {
+                    const value = answers[name];
+                    const held = Object.prototype.hasOwnProperty.call(lastSavedAnswers, name);
+                    if (!held && (value === '' || value === null)) return;
+                    if (!held && value === false && !startsTicked[name]) return;
+                    if (!held || lastSavedAnswers[name] !== value) changed[name] = value;
+                });
+                if (Object.keys(changed).length) {
+                    await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(changed, { merge: true });
+                    Object.assign(lastSavedAnswers, changed);
+                }
 
                 saveRetryCount = 0; // Reset retry count on success
             } catch (error) {
@@ -16992,6 +17257,7 @@ if (typeof handleNext === 'function') {
                 let formData = {};
                 if (doc.exists) {
                     formData = doc.data();
+                    lastSavedAnswers = Object.assign({}, formData);
 
                 } else {
 
@@ -17016,7 +17282,7 @@ if (typeof handleNext === 'function') {
                     }
                     return mappedData;
                 }
-                const mappedData = mapFirebaseDataToFormFields(data);
+                const mappedData = dropUnansweredValues(mapFirebaseDataToFormFields(data));
 
                 // 🔧 NEW: Store mappedData globally so showTextboxLabels can access it for immediate autofill
                 window.mappedData = mappedData;
@@ -17078,11 +17344,12 @@ if (typeof handleNext === 'function') {
                             if (el.id === 'current_date' || el.name === 'current_date') {
                                 return;
                             }
-                            // Check if this answer would trigger a jump to the end
-                        if (wouldTriggerJumpToEnd(el, autofillValue)) {
-                                // Don't autofill this answer - keep it as default
-                                return;
-                            }
+                            // An answer whose option leads to an end node is put back like any
+                            // other. It used to be left out, so the end node could not finish the
+                            // form early - but that is now handled where the form moves on, and
+                            // leaving it out meant DV-100's child support, shared workplace and
+                            // debt answers, DV-101's police answers and CLETS-001's more-people
+                            // answer came back blank on every reload.
                             if (el.type === 'checkbox' || el.type === 'radio') {
                             if (el.type === 'radio') {
                                 // For radio buttons, check if it would trigger a hard alert before checking
@@ -17222,14 +17489,9 @@ if (typeof handleNext === 'function') {
 
                     // After autofilling, trigger visibility updates for dependent questions
                     // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         // Trigger change events on all autofilled elements to ensure conditional logic runs
-                        fields.forEach(el => {
-                            if (el.value || el.checked) {
-                                const event = new Event('change', { bubbles: true });
-                                el.dispatchEvent(event);
-                            }
-                        });
+                        await replayRestoredAnswers(fields);
                         // After conditional logic creates trigger fields, scrub hard-alert autofills
                         if (typeof scrubHardAlertAutofillSelects === 'function') {
                             scrubHardAlertAutofillSelects('post-autofill-visibility');
@@ -17909,43 +18171,60 @@ if (typeof handleNext === 'function') {
             } catch (e) {
             }
         }
-        // Helper: check if an answer would trigger a jump to the end
-        function wouldTriggerJumpToEnd(element, answerValue) {
-            // Ensure jumpLogics is defined (it might not be initialized yet)
-            const jumpLogicsForCheck = (typeof jumpLogics !== 'undefined' && Array.isArray(jumpLogics)) ? jumpLogics : (window.jumpLogics || []);
-            if (!jumpLogicsForCheck || jumpLogicsForCheck.length === 0) return false;
-            // Find the question ID for this element
-            let questionId = null;
-            for (const [qId, nameId] of Object.entries(questionNameIds)) {
-                if (element.name === nameId || element.id === nameId) {
-                    questionId = qId;
-                    break;
-                }
-            }
-            if (!questionId) return false;
-            // Check if there's a jump logic for this question that would go to 'end'
-            const relevantJumps = jumpLogicsForCheck.filter(jl => jl.questionId === questionId);
-            for (const jl of relevantJumps) {
-                if (jl.jumpTo.toLowerCase() === 'end') {
-                    // Check if the answer matches the jump condition
-                    if (jl.questionType === 'dropdown' || jl.questionType === 'radio' || jl.questionType === 'numberedDropdown') {
-                        if (answerValue.toString().toLowerCase() === jl.jumpOption.trim().toLowerCase()) {
-                            return true;
-                        }
-                    } else if (jl.questionType === 'checkbox') {
-                        if (answerValue.toString().toLowerCase() === jl.jumpOption.trim().toLowerCase()) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
         // Helper: wipe answers
         function wipeAnswers() {
             if (!isUserLoggedIn || !userId) return;
             db.collection('users').doc(userId).collection('formAnswers').doc(formId).delete();
+            lastSavedAnswers = {};
         }
+        // Clear All empties every field and fires its change handlers, and each
+        // handler saves the form: on the DV packet that was about eleven saves a
+        // field, ten thousand for one clear, and it is most of why the page froze.
+        // So saving stops first, until the person next edits the form themselves.
+        function stopSavingUntilNextEdit() {
+            answersWiped = true;
+            clearTimeout(saveAnswersTimeout);
+            saveAnswersTimeout = null;
+            pendingSave = false;
+        }
+        // Then the saved copies go: the answers, the uploaded files (kept under a
+        // document id of their own), and the copies in this browser.
+        async function deleteSavedAnswers() {
+            stopSavingUntilNextEdit();
+            lastSavedAnswers = {};
+            const uploadFormId = urlParams.get('formId')
+                || (window.pdfOutputFileName ? window.pdfOutputFileName.replace(/.pdf$/i, '') : 'default');
+            const uploadDocId = portfolioId ? (uploadFormId + '__' + portfolioId) : uploadFormId;
+            ['formData_' + formId, 'formwiz_uploadedFiles_' + uploadDocId].forEach(function (key) {
+                try { localStorage.removeItem(key); } catch (e) { /* storage blocked */ }
+            });
+            if (!isUserLoggedIn || !userId) return { signedIn: false, deleted: [] };
+            const answersRef = db.collection('users').doc(userId).collection('formAnswers');
+            const ids = [formId];
+            if (ids.indexOf(uploadDocId) < 0) ids.push(uploadDocId);
+            await Promise.all(ids.map(function (id) { return answersRef.doc(id).delete(); }));
+            return { signedIn: true, deleted: ids };
+        }
+        window.fwStopSavingUntilNextEdit = stopSavingUntilNextEdit;
+        window.fwDeleteSavedAnswers = deleteSavedAnswers;
+        // Clear Section: one save once the page is empty, rather than one per
+        // field it emptied. The saved copy then holds the emptied answers as
+        // blanks, and a blank is never restored.
+        async function saveAnswersNow() {
+            answersWiped = false;
+            if (isUserLoggedIn && userId) await saveAnswers(true);
+            else saveAnswersToLocalStorage();
+        }
+        window.fwSaveAnswersNow = saveAnswersNow;
+        // An edit is the person's when the browser made the event, not a script.
+        ['input', 'change'].forEach(function (type) {
+            document.addEventListener(type, function (ev) {
+                if (ev.isTrusted && ev.target && ev.target.closest && ev.target.closest('#customForm')) {
+                    answersWiped = false;
+                    if (replayingAnswers) editedDuringReplay = true;
+                }
+            }, true);
+        });
         // Attach listeners to all fields
         function attachAutosaveListeners() {
             const fields = getFormFields();
@@ -17995,6 +18274,7 @@ if (typeof handleNext === 'function') {
         // Cart Modal Logic - now handled by global functions outside Firebase IIFE
         // Helper: save answers to localStorage for non-logged-in users
         function saveAnswersToLocalStorage() {
+            if (answersWiped || replayingAnswers) return;
             try {
                 // 🔧 NEW: Prevent blank values from being saved in first 3 seconds
                 if (window.preventBlankSaves) {
@@ -18028,7 +18308,7 @@ if (typeof handleNext === 'function') {
             try {
                 const savedData = localStorage.getItem('formData_' + formId);
                 if (savedData) {
-                    const data = JSON.parse(savedData);
+                    const data = dropUnansweredValues(JSON.parse(savedData));
                     const fields = getFormFields();
                     // A saved draft is not what is on the screen once a debug fill has written
                     // the form. The restore is a round-trip and its later passes are on timers of
@@ -18083,15 +18363,10 @@ if (typeof handleNext === 'function') {
                         }
                     }, 2000);
                     // Trigger visibility updates for dependent questions
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         // Trigger change events on all autofilled elements to ensure conditional logic runs
                         const fields = getFormFields();
-                        fields.forEach(el => {
-                            if (el.value || el.checked) {
-                                const event = new Event('change', { bubbles: true });
-                                el.dispatchEvent(event);
-                            }
-                        });
+                        await replayRestoredAnswers(fields);
                         // Also call the global visibility updates function
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
@@ -18967,6 +19242,9 @@ function createAddressInput(id, label, index, type = 'text', prefill = '', isAmo
         <button id="fillMinimumPathBtn" style="background: linear-gradient(90deg, #7b5cff 0%, #b06ab3 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(123, 92, 255, 0.35);">
           🌱 Fill minimum path
         </button>
+        <button id="clearSectionAnswersBtn" style="background: linear-gradient(90deg, #8a94a6 0%, #b9c1cc 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(138, 148, 166, 0.35);">
+          🧽 Clear Section
+        </button>
         <button id="clearAllAnswersBtn" style="background: linear-gradient(90deg, #6b7785 0%, #99a3ad 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(107, 119, 133, 0.35);">
           🧹 Clear All
         </button>
@@ -19206,6 +19484,200 @@ if (typeof document !== 'undefined' && !window.__NAV_CONTEXT_MENU_BOUND__) {
     if (e.key === 'Escape') closeNavContextMenu();
   });
   window.addEventListener('scroll', closeNavContextMenu, true);
+}
+
+/**
+ * Test mode: double-click a question to answer it the way the minimum path
+ * would, so testing a form does not mean typing every box by hand.
+ *
+ * Only that question - its answer, then the boxes inside it, including the
+ * entries its answer opens - with the values the minimum-path button writes.
+ * Double-clicking inside a box that already holds text still selects a word.
+ */
+function minimumPathAnswerFor(qid) {
+  if (typeof solveFillPath !== 'function') return undefined;
+  const key = String(qid);
+  const plan = solveFillPath({ minimum: true, alsoChoose: key });
+  if (!plan || !plan.model[key]) return undefined;
+  return plan.answers[key] !== undefined ? plan.answers[key] : plan.extra[key];
+}
+
+/** Write one question's answer, as applySolvedPath would, without firing anything. */
+function applyAnswerToQuestion(container, qid, given) {
+  const touched = [];
+  const owned = new Set();
+  // A written answer carries no value of its own; the sweep fills the box.
+  if (given === undefined || given === 'x') return { touched: touched, owned: owned };
+  if (given && given.has) {
+    container.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(function (box) {
+      if (!solverFieldEligible(box)) return;
+      owned.add(box);
+      const wanted = given.has(String(box.value || '').trim().toLowerCase());
+      if (box.checked === wanted) return;
+      box.checked = wanted;
+      touched.push(box);
+    });
+    return { touched: touched, owned: owned };
+  }
+  const model = solverModel();
+  const el = model[qid] ? solverAnswerElement(qid, model) : null;
+  if (el && el.tagName === 'SELECT') {
+    owned.add(el);
+    if (el.value !== String(given)) { el.value = given; touched.push(el); }
+    return { touched: touched, owned: owned };
+  }
+  const wanted = String(given).trim().toLowerCase();
+  const radios = container.querySelectorAll('input[type="radio"]');
+  radios.forEach(function (rb) { owned.add(rb); });
+  for (let i = 0; i < radios.length; i++) {
+    if (String(radios[i].value || '').trim().toLowerCase() !== wanted) continue;
+    if (!radios[i].checked) { radios[i].checked = true; touched.push(radios[i]); }
+    return { touched: touched, owned: owned };
+  }
+  if (el) {
+    owned.add(el);
+    if (String(el.value || '') !== String(given)) { el.value = given; touched.push(el); }
+  }
+  return { touched: touched, owned: owned };
+}
+
+/** fillSolvedRemainder's narrow sweep, kept to one question. */
+function fillQuestionRemainder(container, owned) {
+  const preferred = ['no', "i don't know", "i don’t know", 'none'];
+  container.querySelectorAll('select').forEach(function (sel) {
+    if (!solverFieldEligible(sel) || owned.has(sel)) return;
+    const opts = getSelectOptions(sel).filter(function (o) {
+      return !wouldOptionJumpToEnd(sel, o.value) && !wouldTriggerHardAlertOnSelect(sel, o.value);
+    });
+    if (!opts.length) return;
+    let pick = null;
+    for (let p = 0; p < preferred.length && !pick; p++) {
+      pick = opts.find(function (o) {
+        return (o.textContent || '').trim().toLowerCase().indexOf(preferred[p]) !== -1;
+      }) || null;
+    }
+    if (!pick) pick = opts[0];
+    if (sel.value === pick.value) return;
+    sel.value = pick.value;
+    triggerFieldChange(sel);
+    triggerSelectSideEffects(sel);
+  });
+
+  const groupDone = {};
+  container.querySelectorAll('input[type="radio"]').forEach(function (r) {
+    if (!solverFieldEligible(r) || !r.name || groupDone[r.name] || owned.has(r)) return;
+    if (wouldOptionJumpToEnd(r, r.value)) return;
+    groupDone[r.name] = true;
+    const group = document.getElementsByName(r.name);
+    for (let i = 0; i < group.length; i++) {
+      if (group[i] === r || !group[i].checked) continue;
+      group[i].checked = false;
+      triggerFieldChange(group[i]);
+    }
+    if (r.checked) return;
+    r.checked = true;
+    triggerFieldChange(r);
+  });
+
+  container.querySelectorAll('input, textarea').forEach(function (el) {
+    if (!solverFieldEligible(el) || owned.has(el)) return;
+    const type = (el.type || '').toLowerCase();
+    if (type === 'checkbox' || type === 'radio' || type === 'file') return;
+    const value = padToCapacity(el, getSampleFillValue(el), true);
+    if (String(el.value || '') === String(value)) return;
+    el.value = value;
+    triggerFieldChange(el);
+  });
+}
+
+function flashFilledQuestion(container) {
+  const previous = container.style.boxShadow;
+  container.style.transition = 'box-shadow 0.2s ease';
+  container.style.boxShadow = '0 0 0 3px rgba(56, 211, 159, 0.85)';
+  setTimeout(function () { container.style.boxShadow = previous; }, 700);
+}
+
+async function fillQuestionForTest(container) {
+  const qid = container.getAttribute('data-question-id')
+    || String(container.id || '').replace('question-container-', '');
+  if (!qid) return;
+  const saved = {
+    markers: window.__FILL_MARKER_VALUES__,
+    minimum: window.__FILL_MINIMUM__,
+    autofill: window.isInitialAutofill
+  };
+  // The minimum-path button's settings: field ids as text values, the narrow
+  // choices, and alerts kept quiet the way the fill keeps them quiet.
+  window.__FILL_MARKER_VALUES__ = true;
+  window.__FILL_MINIMUM__ = true;
+  window.isInitialAutofill = true;
+  try {
+    if (typeof forgetComputedFieldIds === 'function') forgetComputedFieldIds();
+    const applied = applyAnswerToQuestion(container, qid, minimumPathAnswerFor(qid));
+    applied.touched.forEach(function (el) {
+      triggerFieldChange(el);
+      if (el.tagName === 'SELECT') triggerSelectSideEffects(el);
+    });
+    // The answer can open entries - a count of children builds a row for each -
+    // and some of what builds them runs a moment later. The second sweep fills
+    // what the first one's answers opened.
+    await fillYield();
+    fillQuestionRemainder(container, applied.owned);
+    await fillYield();
+    fillQuestionRemainder(container, applied.owned);
+    if (typeof fillSolvedPhoneSplits === 'function') fillSolvedPhoneSplits();
+  } finally {
+    window.__FILL_MARKER_VALUES__ = saved.markers;
+    window.__FILL_MINIMUM__ = saved.minimum;
+    window.isInitialAutofill = saved.autofill;
+  }
+  flashFilledQuestion(container);
+}
+
+/**
+ * A date part shows its name until a date is picked, then the date. Whether it
+ * holds one is kept as a class on its box, because CSS cannot see an input's
+ * value - so every way a value arrives says so: the filer's own input, and the
+ * change events the restore, the fills and Clear All all fire.
+ */
+function fwSyncDateField(input) {
+  const box = input && input.closest ? input.closest('.fw-date-field') : null;
+  if (box) box.classList.toggle('fw-has-value', String(input.value || '') !== '');
+}
+function fwSyncDateFields() {
+  document.querySelectorAll('.fw-date-field input').forEach(fwSyncDateField);
+}
+if (typeof document !== 'undefined' && !window.__FW_DATE_FIELDS_BOUND__) {
+  window.__FW_DATE_FIELDS_BOUND__ = true;
+  ['input', 'change'].forEach(function (type) {
+    document.addEventListener(type, function (e) {
+      if (e.target && e.target.closest && e.target.closest('.fw-date-field')) fwSyncDateField(e.target);
+    }, true);
+  });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fwSyncDateFields);
+  else fwSyncDateFields();
+}
+
+if (typeof document !== 'undefined' && !window.__FILL_QUESTION_DBLCLICK_BOUND__) {
+  window.__FILL_QUESTION_DBLCLICK_BOUND__ = true;
+  document.addEventListener('dblclick', function (e) {
+    if (!isTestDeployment()) return;
+    const target = e.target;
+    const container = target && target.closest ? target.closest('.question-container') : null;
+    if (!container || container.closest('#debugMenu')) return;
+    // A box with words in it keeps the browser's own double-click: select a word.
+    const typing = ['text', 'email', 'tel', 'number', 'search', 'url', 'date', 'textarea'];
+    const kind = target.tagName === 'TEXTAREA' ? 'textarea' : String(target.type || '').toLowerCase();
+    if ((target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')
+        && typing.indexOf(kind) !== -1 && String(target.value || '') !== '') return;
+    if (container.__fwFilling) return;
+    container.__fwFilling = true;
+    const selection = window.getSelection ? window.getSelection() : null;
+    if (selection && selection.removeAllRanges) selection.removeAllRanges();
+    fillQuestionForTest(container)
+      .catch(function (err) { console.error('Could not fill the question', err); })
+      .then(function () { container.__fwFilling = false; });
+  });
 }
 
 function createHiddenCheckboxesForAutofilledDropdowns() {
@@ -20016,7 +20488,17 @@ function solveFillPath(options) {
     visible = solverVisibility(model, ids, answers);
     if (!changed) break;
   }
-  return { model: model, ids: ids, answers: answers, visible: visible, rounds: rounds };
+  // A question the path never reaches can still be asked what it would take:
+  // the double-click fill in test mode answers the question under the pointer,
+  // whichever way the filer came to it. choose() leaves its last trial in the
+  // answers, so that is taken back out.
+  const extra = {};
+  const also = options && options.alsoChoose;
+  if (also !== undefined && model[also] && answers[also] === undefined) {
+    extra[also] = choose(also);
+    delete answers[also];
+  }
+  return { model: model, ids: ids, answers: answers, visible: visible, rounds: rounds, extra: extra };
 }
 
 /**
@@ -20941,15 +21423,13 @@ function hideEverythingAFreshPageHides(){
     });
 }
 
-function clearAllAnswers(){
-    var form = document.getElementById("customForm");
-    if (!form) return;
-    var controls = [].slice.call(form.querySelectorAll("input, textarea, select"))
-        .concat([].slice.call(document.querySelectorAll(
-            "input[form='customForm'], textarea[form='customForm'], select[form='customForm']")));
-    var hidden = document.getElementById("hidden_pdf_fields");
-    if (hidden) controls = controls.concat([].slice.call(hidden.querySelectorAll("input, textarea, select")));
+// How long Clear All works before letting the page draw the progress bar.
+var CLEAR_SLICE_MS = 40;
+// How long to wait on Firestore before saying the saved copy could not be reached.
+var CLEAR_DELETE_TIMEOUT_MS = 8000;
 
+/** Empty every answer among these controls. The ones that held something come back. */
+function emptyControls(controls){
     var cleared = [];
     controls.forEach(function(el){
         if (!el || el.disabled) return;
@@ -20963,39 +21443,170 @@ function clearAllAnswers(){
         }
         cleared.push(el);
     });
+    return cleared;
+}
 
-    // Let the handlers that built the revealed questions, the entry rows and
-    // the hidden mirrors run again now that there is nothing to build them from.
-    //
-    cleared.forEach(function(el){
+/**
+ * Let the handlers that built the revealed questions, the entry rows and the
+ * hidden mirrors run again now that there is nothing to build them from. A few
+ * hundred fields after a maximum path is seconds of work, so it runs in slices
+ * and the bar moves between them.
+ */
+async function refireCleared(cleared){
+    var sliceStart = performance.now();
+    for (var i = 0; i < cleared.length; i++) {
+        var el = cleared[i];
         try {
             triggerFieldChange(el);
             if (el.tagName === "SELECT") triggerSelectSideEffects(el);
         } catch (e) { /* one stubborn field should not stop the rest */ }
-    });
+        if (performance.now() - sliceStart > CLEAR_SLICE_MS) {
+            fillProgress({ text: "Clearing answers (" + (i + 1) + " of " + cleared.length + ")",
+                           percent: Math.round((i + 1) / cleared.length * 85) });
+            await fillYield();
+            sliceStart = performance.now();
+        }
+    }
+}
 
-    // Then put the conditional questions back where a freshly loaded page has
-    // them: hidden. Re-firing the triggers reveals what the answers justify but
-    // does not reliably take back what earlier answers revealed - a rule is
-    // wired to its own trigger, so a gate that was already empty never runs,
-    // and firing every control instead is worse still, because an empty value
-    // matches some rules and opens more than it closes. The generator marks a
-    // question that starts hidden, and that mark is the answer: a question with
-    // a rule is hidden until its rule says otherwise, which is exactly the
-    // state this button is trying to get back to.
-    hideEverythingAFreshPageHides();
-    // Again once the page has settled. Firing a control does not finish when
-    // the call returns: some of the handlers debounce, so a question hidden
-    // here is shown again a moment later by work the clear itself started.
-    // Twice more, at the next tick and after the debounces, is enough - and
-    // re-hiding something already hidden costs nothing.
-    setTimeout(hideEverythingAFreshPageHides, 0);
-    setTimeout(hideEverythingAFreshPageHides, 400);
+async function clearAllAnswers(){
+    var form = document.getElementById("customForm");
+    if (!form) return 0;
+    // Before anything is emptied: every field cleared below fires its change
+    // handlers, and each of those used to save the form again.
+    if (typeof fwStopSavingUntilNextEdit === "function") fwStopSavingUntilNextEdit();
+    var controls = [].slice.call(form.querySelectorAll("input, textarea, select"))
+        .concat([].slice.call(document.querySelectorAll(
+            "input[form='customForm'], textarea[form='customForm'], select[form='customForm']")));
+    var hidden = document.getElementById("hidden_pdf_fields");
+    if (hidden) controls = controls.concat([].slice.call(hidden.querySelectorAll("input, textarea, select")));
 
-    if (typeof setCurrentDate === "function") setCurrentDate();
-    if (typeof applyComputedFields === "function") applyComputedFields();
-    if (typeof sectionStack !== "undefined" && sectionStack) sectionStack.length = 0;
-    navigateSection(1);
+    var cleared = emptyControls(controls);
+
+    fillProgress({ title: "Clearing the form",
+                   subtitle: "Emptying every answer and deleting the saved copy.",
+                   text: "Clearing " + cleared.length + " answers", percent: 0 });
+    await fillPaint();
+    try {
+        await refireCleared(cleared);
+
+        // Then put the conditional questions back where a freshly loaded page has
+        // them: hidden. Re-firing the triggers reveals what the answers justify but
+        // does not reliably take back what earlier answers revealed - a rule is
+        // wired to its own trigger, so a gate that was already empty never runs,
+        // and firing every control instead is worse still, because an empty value
+        // matches some rules and opens more than it closes. The generator marks a
+        // question that starts hidden, and that mark is the answer: a question with
+        // a rule is hidden until its rule says otherwise, which is exactly the
+        // state this button is trying to get back to.
+        hideEverythingAFreshPageHides();
+        // Again once the page has settled. Firing a control does not finish when
+        // the call returns: some of the handlers debounce, so a question hidden
+        // here is shown again a moment later by work the clear itself started.
+        // Twice more, at the next tick and after the debounces, is enough - and
+        // re-hiding something already hidden costs nothing.
+        setTimeout(hideEverythingAFreshPageHides, 0);
+        setTimeout(hideEverythingAFreshPageHides, 400);
+
+        if (typeof setCurrentDate === "function") setCurrentDate();
+        if (typeof applyComputedFields === "function") applyComputedFields();
+        if (typeof sectionStack !== "undefined" && sectionStack) sectionStack.length = 0;
+        navigateSection(1);
+
+        // Last, the saved copies. Offline, or with Firestore blocked, the delete
+        // waits for a server that is not coming, so it is given a few seconds.
+        if (typeof fwDeleteSavedAnswers === "function") {
+            fillProgress({ text: "Deleting the saved answers", percent: 92 });
+            await fillYield();
+            var outcome;
+            try {
+                outcome = await Promise.race([
+                    fwDeleteSavedAnswers(),
+                    new Promise(function (resolve) {
+                        setTimeout(function () { resolve({ timedOut: true }); }, CLEAR_DELETE_TIMEOUT_MS);
+                    })
+                ]);
+            } catch (err) {
+                outcome = { failed: true };
+                console.error("Clear All could not delete the saved answers", err);
+            }
+            var saidText = outcome && outcome.timedOut
+                ? "Answers cleared - the saved copy could not be reached"
+                : outcome && outcome.failed
+                    ? "Answers cleared - deleting the saved copy failed"
+                    : "Answers cleared";
+            fillProgress({ text: saidText, percent: 100 });
+        } else {
+            fillProgress({ text: "Answers cleared", percent: 100 });
+        }
+        await new Promise(function (resolve) { setTimeout(resolve, 350); });
+    } finally {
+        fillProgress(null);
+    }
+    return cleared.length;
+}
+
+/**
+ * Clear Section: the answers on the page on screen, and nothing else.
+ *
+ * A test-mode button under Clear All, for walking one page again without
+ * refilling the whole form. Saving stops while it runs, as it does for Clear
+ * All, and the form is saved once at the end: the rest of the answers are
+ * still wanted, and the emptied ones must not come back on the next visit.
+ * Returns the number of answers emptied, or null when no page is open - the
+ * thank-you screen has none.
+ */
+async function clearSectionAnswers(){
+    var sectionNumber = (typeof currentSectionNumber === "number") ? currentSectionNumber : null;
+    var section = sectionNumber ? document.getElementById("section" + sectionNumber) : null;
+    if (!section) return null;
+    if (typeof fwStopSavingUntilNextEdit === "function") fwStopSavingUntilNextEdit();
+    var cleared = emptyControls([].slice.call(section.querySelectorAll("input, textarea, select")));
+
+    fillProgress({ title: "Clearing this section",
+                   subtitle: "Emptying the answers on this page. The rest of the form keeps its answers.",
+                   text: "Clearing " + cleared.length + " answers", percent: 0 });
+    await fillPaint();
+    try {
+        await refireCleared(cleared);
+        // This page's conditional questions back where a fresh page has them:
+        // hidden until what they wait on is answered again. Three times, as
+        // Clear All does, because some of the handlers it fired debounce.
+        var hideFresh = function(){
+            section.querySelectorAll('.question-container[data-conditional="1"]')
+                .forEach(function(el){ el.classList.add("hidden"); });
+            (fwInitialHidden || []).forEach(function(id){
+                var el = document.getElementById(id);
+                if (el && section.contains(el)) el.classList.add("hidden");
+            });
+        };
+        hideFresh();
+        setTimeout(hideFresh, 0);
+        setTimeout(hideFresh, 400);
+        if (typeof setCurrentDate === "function") setCurrentDate();
+        if (typeof applyComputedFields === "function") applyComputedFields();
+        // Back to the top of the same page - one asked a question at a time
+        // starts again at its first question - without resetting anything else.
+        window.__fwKeepAnswersOnNavigate = true;
+        try { navigateSection(sectionNumber, true); }
+        finally { window.__fwKeepAnswersOnNavigate = false; }
+        if (typeof fwSaveAnswersNow === "function") {
+            fillProgress({ text: "Saving the rest of your answers", percent: 94 });
+            await fillYield();
+            try {
+                await Promise.race([
+                    fwSaveAnswersNow(),
+                    new Promise(function (resolve) { setTimeout(resolve, CLEAR_DELETE_TIMEOUT_MS); })
+                ]);
+            } catch (err) {
+                console.error("Clear Section could not save", err);
+            }
+        }
+        fillProgress({ text: "Section cleared", percent: 100 });
+        await new Promise(function (resolve) { setTimeout(resolve, 350); });
+    } finally {
+        fillProgress(null);
+    }
     return cleared.length;
 }
 
@@ -21298,9 +21909,9 @@ function fillProgress(state) {
     panel.innerHTML = '<div style="background:#fff;border-radius:14px;padding:32px 36px;'
       + 'width:min(460px,90vw);box-sizing:border-box;text-align:center;'
       + 'box-shadow:0 18px 50px rgba(8,15,30,0.45);">'
-      + '<div style="font-size:1.25rem;font-weight:700;color:#1f2d3d;margin-bottom:6px;">'
+      + '<div id="fillProgressTitle" style="font-size:1.25rem;font-weight:700;color:#1f2d3d;margin-bottom:6px;">'
       + 'Filling the form</div>'
-      + '<div style="font-size:0.9rem;color:#5a6c7d;margin-bottom:22px;">'
+      + '<div id="fillProgressSub" style="font-size:0.9rem;color:#5a6c7d;margin-bottom:22px;">'
       + 'Answering every question the way that opens the most fields. '
       + 'This takes a moment on a long packet.</div>'
       + '<div style="height:10px;background:#e8edf5;border-radius:5px;overflow:hidden;">'
@@ -21324,6 +21935,9 @@ function fillProgress(state) {
   const text = document.getElementById('fillProgressText');
   const bar = document.getElementById('fillProgressBar');
   const pct = document.getElementById('fillProgressPct');
+  // The panel says "Filling the form" unless whoever opened it says otherwise.
+  if (state.title) document.getElementById('fillProgressTitle').textContent = state.title;
+  if (state.subtitle) document.getElementById('fillProgressSub').textContent = state.subtitle;
   const percent = Math.max(0, Math.min(100, state.percent || 0));
   if (text) text.textContent = state.text;
   if (bar) bar.style.width = percent + '%';
@@ -21733,10 +22347,38 @@ document.getElementById('fillMinimumPathBtn').addEventListener('click', function
 });
 // Back to an empty form without reloading the page, so the next path can be
 // walked from the same generated HTML.
-document.getElementById('clearAllAnswersBtn').addEventListener('click', function() {
-  var n = clearAllAnswers();
-  console.log('[debug] cleared ' + n + ' answer(s)');
+document.getElementById('clearAllAnswersBtn').addEventListener('click', async function() {
+  var btn = this;
+  if (btn.disabled) return;
+  var originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Clearing...';
+  // Closed before the clear, not after: while it is open the menu rebuilds its
+  // list of every field on each change, and the clear makes hundreds.
   hideDebugMenu();
+  try {
+    var n = await clearAllAnswers();
+    console.log('[debug] cleared ' + n + ' answer(s)');
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+});
+// The page on screen only. The menu closes first, for the same reason as Clear All.
+document.getElementById('clearSectionAnswersBtn').addEventListener('click', async function() {
+  var btn = this;
+  if (btn.disabled) return;
+  var originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Clearing...';
+  hideDebugMenu();
+  try {
+    var n = await clearSectionAnswers();
+    console.log(n === null ? '[debug] Clear Section: no page is open' : '[debug] cleared ' + n + ' answer(s) on this page');
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
 });
 // Function to create Form Name input field (to be called from the form editor interface)
 function createFormNameInput() {
@@ -22475,7 +23117,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const db = firebase.firestore();
             const userRef = db.collection('users').doc(user.uid);
-            const docIdsToTry = portfolioId ? [docId] : [docId, formId]; // only fallback to legacy when no portfolioId
+            const docIdsToTry = (portfolioId || docId === formId) ? [docId] : [docId, formId]; // the legacy id only when it names another document
 
             for (const tryDocId of docIdsToTry) {
               const formAnswersRef = userRef.collection('formAnswers').doc(tryDocId);

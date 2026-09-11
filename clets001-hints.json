@@ -280,7 +280,24 @@
           "type": "date"
         }
       ]
-    }
-  ],
+    },
+  { "nameId": "clets_restrained_person_details", "question": "What else do you know about the person you want protection from? (optional)", "optional": true, "fields": [
+      {"field":"clets_restrained_person_other_names","label":"Other names they go by"},
+      {"field":"clets_restrained_person_marks_scars_tattoos","label":"Marks, scars, or tattoos"},
+      {"field":"clets_restrained_person_drivers_license","label":"Driver's license number and state"},
+      {"field":"clets_restrained_person_ssn","label":"Social Security number"},
+      {"field":"clets_restrained_person_telephone","label":"Phone number","type":"phone"},
+      {"field":"clets_restrained_person_employer","label":"Employer (name and address)"} ] },
+  { "question": "What vehicle do they drive? (optional)", "optional": true, "fields": [
+      {"field":"clets_restrained_person_vehicle_type","label":"Type of vehicle"},
+      {"field":"clets_restrained_person_vehicle_model","label":"Model"},
+      {"field":"clets_restrained_person_vehicle_year","label":"Year","type":"number"},
+      {"field":"clets_restrained_person_vehicle_plate","label":"Plate number"} ] },
+  { "question": "What does law enforcement need to know about you? Your date of birth also puts your order in the federal database, which makes it easier to enforce outside California.", "fields": [
+      {"group":"clets_protected_person_gender","label":"Gender"},
+      {"field":"clets_protected_person_race","label":"Race","optional":true},
+      {"field":"clets_protected_person_date_of_birth","label":"Date of birth","type":"date","optional":true},
+      {"field":"clets_protected_person_telephone","label":"Phone number","type":"phone","optional":true} ] }
+],
   "_combinesNote": "Ungated on purpose. The repeat that asks how many other people there are, and what they are called, belongs to DV-100; the packet merges the two declarations of it and keeps the first, so the three details only CLETS has boxes for were never asked at all. They are collected here instead, one question per person. A gate would have to name an option, and the thing that decides whether a person exists is their name - a text box, which has none."
 }

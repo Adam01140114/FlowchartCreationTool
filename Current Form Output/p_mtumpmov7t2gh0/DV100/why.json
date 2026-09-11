@@ -1,17 +1,12 @@
 {
  "form": "dv100",
  "counts": {
-  "empty": 1,
+  "empty": 0,
   "closed": 0,
   "defect": 0,
   "unmapped": 0,
   "court": 0,
-  "overflow": 1
+  "overflow": 0
  },
- "fields": {
-  "relationship_children_names_line_2": {
-   "verdict": "overflow",
-   "question": "the line above it held the whole answer"
-  }
- }
+ "fields": {}
 }

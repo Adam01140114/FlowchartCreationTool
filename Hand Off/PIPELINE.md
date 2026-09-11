@@ -808,6 +808,34 @@ A combine becomes a `multipleTextboxes` question whose boxes keep the PDF's own
 field names; a type becomes a date picker, a phone keypad, an email field or a
 number box. Types work inside combined and repeating questions too.
 
+Not only addresses: whenever several questions are about one subject, they are
+one question. A part can name a group - a family of checkboxes asked as one
+choice - and it sits in the question as a dropdown whose options keep the
+checkboxes' names, so the answer ticks the same box the separate question did:
+
+```json
+{ "question": "Who do you want protection from?",
+  "fields": [
+    { "field": "person_to_restrain_full_name",     "label": "Name" },
+    { "field": "person_to_restrain_age",           "label": "Age", "type": "number" },
+    { "field": "person_to_restrain_date_of_birth", "label": "Date of birth", "type": "date" },
+    { "group": "person_to_restrain_gender",        "label": "Gender" },
+    { "field": "person_to_restrain_race",          "label": "Race" } ] }
+```
+
+Every box carries the PDF field it fills, so the question's own name is free.
+Give a combine a `nameId` when its fields' shared prefix already names another
+combined question - DV-100's name and age share `person_asking_protection` with
+its contact details. A choice that opens other questions cannot be a part: it
+stays a question of its own, and so does anything asked as a narrative.
+
+A question the filer may not know the answer to is optional: `"optional": true`
+on a question hint, on a combine, or on one part of a combine. The form lets the
+filer past it, and the question after it waits on what it waited on rather than
+on its answer. An optional part inside an otherwise required question says
+"(optional)" in its box; a question that is optional as a whole should say so in
+its text.
+
 ## Running it
 
 ```bash

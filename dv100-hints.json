@@ -1025,10 +1025,7 @@
     "other_protected_people_additional_list_attached": {
       "text": "Do you have an additional protected people list attached?"
     },
-    "other_protected_people_reason_for_protection": {
-      "text": "Why do these people need protection?",
-      "type": "bigParagraph"
-    },
+    "other_protected_people_reason_for_protection": {"text":"Why do these people need protection?","type":"bigParagraph","conditional":{"onlyWhen":"other_protected_people_yes_yes"}},
     "person_to_restrain_firearms_unknown": {
       "text": "Do you have an i don’t know?"
     },
@@ -2221,8 +2218,21 @@
       "conditional": {
         "onlyWhen": "other_court_case_other_selected"
       }
-    }
-  ],
+    },
+  { "nameId": "person_asking_protection_identity", "question": "What is your name and age?", "fields": [
+      {"field":"person_asking_protection_name","label":"Name"},
+      {"field":"person_asking_protection_age","label":"Age","type":"number"} ] },
+  { "question": "Who do you want protection from?", "fields": [
+      {"field":"person_to_restrain_full_name","label":"Name"},
+      {"field":"person_to_restrain_age","label":"Age","type":"number"},
+      {"field":"person_to_restrain_date_of_birth","label":"Date of birth","type":"date"},
+      {"group":"person_to_restrain_gender","label":"Gender"},
+      {"field":"person_to_restrain_race","label":"Race"} ] },
+  { "nameId": "move_out_length_of_residence", "question": "How long have you lived at this address?", "fields": [
+      {"field":"move_out_years_at_address","label":"Years","type":"number"},
+      {"field":"move_out_months_at_address","label":"Additional months","type":"number"} ],
+    "conditional": {"onlyWhen":"move_out_right_to_live_length_of_residence"} }
+],
   "continuations": [
     {
       "field": "move_out_right_to_live_other_explanation",
@@ -2296,7 +2306,7 @@
     },
     {
       "question": "other_protected_people_reason_for_protection",
-      "why": "Item 8(2) follows 8(1) inside the protect-others Yes branch; verified hidden when that answer is No."
+      "why": "Item 8(2) follows 8(1) whatever the extra-page answer. It waits on the protect-others Yes: it used to be asked after No as well, which this note once claimed had been verified."
     }
   ],
   "computed": {

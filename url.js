@@ -359,6 +359,8 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._linkedLogicNodeId !== undefined) cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
     if (cell._linkedFields !== undefined) cellData._linkedFields = cell._linkedFields;
     if (cell._linkedJoin !== undefined) cellData._linkedJoin = cell._linkedJoin;
+    // A question the filer may skip.
+    if (cell._optional !== undefined) cellData._optional = cell._optional;
     // Linked checkbox node properties
     if (cell._linkedCheckboxNodeId !== undefined) cellData._linkedCheckboxNodeId = cell._linkedCheckboxNodeId;
     if (cell._linkedCheckboxOptions !== undefined) cellData._linkedCheckboxOptions = cell._linkedCheckboxOptions;

@@ -47,30 +47,30 @@
   "dv105_supervisor_fees_me_percent": {
    "verdict": "closed",
    "question": "Who should pay the professional supervisor's fees?",
-   "gate": "What is the professional's name, if you know it?",
-   "wanted": "Any Text",
-   "given": null
+   "gate": "Who do you want to supervise the visits?",
+   "wanted": "A professional",
+   "given": "Someone trusted, like a relative or friend"
   },
   "dv105_supervisor_fees_them_percent": {
    "verdict": "closed",
    "question": "Who should pay the professional supervisor's fees?",
-   "gate": "What is the professional's name, if you know it?",
-   "wanted": "Any Text",
-   "given": null
+   "gate": "Who do you want to supervise the visits?",
+   "wanted": "A professional",
+   "given": "Someone trusted, like a relative or friend"
   },
   "dv105_supervisor_fees_other_who": {
    "verdict": "closed",
    "question": "Who should pay the professional supervisor's fees?",
-   "gate": "What is the professional's name, if you know it?",
-   "wanted": "Any Text",
-   "given": null
+   "gate": "Who do you want to supervise the visits?",
+   "wanted": "A professional",
+   "given": "Someone trusted, like a relative or friend"
   },
   "dv105_supervisor_fees_other_percent": {
    "verdict": "closed",
    "question": "Who should pay the professional supervisor's fees?",
-   "gate": "What is the professional's name, if you know it?",
-   "wanted": "Any Text",
-   "given": null
+   "gate": "Who do you want to supervise the visits?",
+   "wanted": "A professional",
+   "given": "Someone trusted, like a relative or friend"
   },
   "dv105_supervised_location_other_description": {
    "verdict": "closed",
@@ -110,29 +110,29 @@
   "dv105_exchange_fees_me_percent": {
    "verdict": "closed",
    "question": "Who should pay the professional supervisor's fees for exchanges?",
-   "gate": "What is the professional's name, if you know it?",
-   "wanted": "Any Text",
+   "gate": "Who do you want to supervise the exchanges?",
+   "wanted": "A professional",
    "given": null
   },
   "dv105_exchange_fees_them_percent": {
    "verdict": "closed",
    "question": "Who should pay the professional supervisor's fees for exchanges?",
-   "gate": "What is the professional's name, if you know it?",
-   "wanted": "Any Text",
+   "gate": "Who do you want to supervise the exchanges?",
+   "wanted": "A professional",
    "given": null
   },
   "dv105_exchange_fees_other_who": {
    "verdict": "closed",
    "question": "Who should pay the professional supervisor's fees for exchanges?",
-   "gate": "What is the professional's name, if you know it?",
-   "wanted": "Any Text",
+   "gate": "Who do you want to supervise the exchanges?",
+   "wanted": "A professional",
    "given": null
   },
   "dv105_exchange_fees_other_percent": {
    "verdict": "closed",
    "question": "Who should pay the professional supervisor's fees for exchanges?",
-   "gate": "What is the professional's name, if you know it?",
-   "wanted": "Any Text",
+   "gate": "Who do you want to supervise the exchanges?",
+   "wanted": "A professional",
    "given": null
   },
   "dv105_exchange_supervisor_nonprofessional_name": {

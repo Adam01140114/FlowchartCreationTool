@@ -479,8 +479,13 @@
         "onlyWhen": "knows_restrained_person_address",
         "gateQuestion": "Do you know where the restrained person lives?"
       }
-    }
-  ],
+    },
+  { "nameId": "restrained_person_description", "question": "What does the restrained person look like? (optional)", "optional": true, "fields": [
+      {"field":"restrained_person_height","label":"Height"},
+      {"field":"restrained_person_weight","label":"Weight"},
+      {"field":"restrained_person_hair_color","label":"Hair color"},
+      {"field":"restrained_person_eye_color","label":"Eye color"} ] }
+],
   "repeats": [
     {
       "nameId": "other_protected_person",
@@ -509,6 +514,7 @@
     {
       "question": "restrained_person_prohibited_items_details",
       "why": "Item 2 of DV-110 is filled from DV-100 item 9 and does not depend on knowing an address."
-    }
-  ]
+    },
+  {"question":"other_protected_people_yes_yes","why":"Item 4 follows the address question whatever its answer. The prohibited-items question before it is optional, and an optional question passes its own condition on - both answers of the address gate - so this reads like a gate that gates nothing. It is not a gate; it is the rejoin."}
+]
 }

@@ -330,5 +330,19 @@
       "question": "dv108_abduction_risk_examples",
       "why": "The last line of item 3 asks for examples or reasons for the answers above - all of them - so it is shown whatever was said about citizenship, which is merely the question printed nearest to it."
     }
-  ]
+  ],
+"combines": [
+  { "question": "Which documents should they turn in, by when, and to whom?", "fields": [
+      {"field":"dv108_travel_documents_to_turn_in","label":"Documents to turn in"},
+      {"field":"dv108_travel_documents_due_date","label":"Turn them in by","type":"date"},
+      {"field":"dv108_travel_documents_recipient_name","label":"Give them to"} ],
+    "conditional": {"onlyWhen":"dv108_order_turn_in_travel_documents"} },
+  { "question": "Which embassy or consulate should be notified?", "fields": [
+      {"field":"dv108_embassy_or_consulate_name","label":"Embassy or consulate"},
+      {"field":"dv108_embassy_proof_due_date","label":"File proof of the notice by","type":"date"} ],
+    "conditional": {"onlyWhen":"dv108_order_notify_foreign_embassy"} },
+  { "question": "Where should this order be registered?", "fields": [
+      {"field":"dv108_notify_county","label":"County"},
+      {"field":"dv108_notify_state","label":"State"} ] }
+]
 }

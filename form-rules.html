@@ -180,10 +180,10 @@ const RULES = [
     by: 'pipeline-audit.js — RULE 8; the splits hint' },
 
   { id: 'one-subject-one-question', group: 'interview', num: 'Rule 9',
-    title: 'Fields about one subject are one question',
-    says: 'An address is one question with four boxes, not four questions.',
-    why: 'Split apart, four screens ask for one address and the shape that made it obvious is gone.',
-    by: 'pipeline-audit.js — RULE 9; the combines hint' },
+    title: 'Questions about one subject are one question',
+    says: 'Whenever the form asks several things about one subject, it asks them as one multiple-textbox question. A person\'s name, age, date of birth, gender and race is one question with five parts; an address is one question with four boxes. Dates, numbers, phone numbers and a choice such as gender go inside it too, each drawn the same size as the text boxes. A choice that opens other questions stays a question of its own. A part the filer may not know is optional and says so.',
+    why: 'DV-100 asked "Who do you want protection from?", "About how old are they?", "What is their date of birth?", "What is their gender?" and "What is their race?" — five screens for one person.',
+    by: 'pipeline-audit.js — RULE 9; the combines hint, where a part names a field or a group' },
 
   { id: 'ask-in-the-right-type', group: 'interview', num: 'Rule 10',
     title: 'Ask for a value in the type it is',
@@ -208,6 +208,18 @@ const RULES = [
     says: 'A follow-up shown on Yes and on No must either be fixed or declared always-shown with a written reason.',
     why: 'It reads as a gate and gates nothing, so nobody notices the block it was supposed to control is always on.',
     by: 'pipeline-audit.js — the gates check; the alwaysShown hint carries the reason' },
+
+  { id: 'no-means-no', group: 'interview', num: 'Rule',
+    title: 'A question about what Yes opens is never asked after No',
+    says: 'When a question opens a subject - "Do you want the order to protect other people?" - every question about that subject waits on the Yes. One that is also reached after No is a missing condition, not a shared question.',
+    why: 'DV-100 asked "Why do these people need protection?" of a filer who had just said the order protects nobody else. It sat where the branch rejoined, with no condition at all, and the gates check only read the conditions questions had.',
+    by: 'pipeline-audit.js — the gates check, "asked after its No"' },
+
+  { id: 'optional-is-skippable', group: 'interview', num: 'Rule',
+    title: 'A question marked optional can be skipped',
+    says: '"optional": true on a question hint, on a combine, or on one part of a combine lets the filer past it without an answer, and the question after it waits on what it waited on, not on its answer. An optional part inside a required question says so in its box.',
+    why: 'The hints marked the CLETS-001 details and DV-110\'s description optional and nothing read the flag: "What is their Social Security number, if you know it?" could not be left blank.',
+    by: 'compile-form.js carries it as _optional; the editor exports required: false; the form skips it when it checks for answers' },
 
   { id: 'disqualifiers-are-declared', group: 'interview', num: 'Rule',
     title: 'What disqualifies a filer is declared and wired',

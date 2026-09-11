@@ -793,7 +793,8 @@ function addQuestion(sectionId, questionId = null) {
             <option value="bigParagraph">Big Paragraph</option>
             <option value="location">Location</option>
             <option value="fileUpload">File Upload</option>
-        </select>        <!-- Name/ID and Placeholder for Text, Big Paragraph, Money, etc. -->
+        </select>
+        <label class="fw-question-optional" style="display: block; margin: 8px 0;"><input type="checkbox" id="questionOptional${currentQuestionId}"> Optional &mdash; the filer may skip this question</label>        <!-- Name/ID and Placeholder for Text, Big Paragraph, Money, etc. -->
         <div id="textboxOptions${currentQuestionId}" class="textbox-options fw-nested-block" style="display: none;">
             <label>Name/ID: </label>
             <input type="text" id="textboxName${currentQuestionId}" placeholder="Enter field name">            <label>Placeholder: </label>

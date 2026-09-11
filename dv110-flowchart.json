@@ -301,106 +301,94 @@
     },
     {
       "id": "15",
-      "value": "About how tall is the restrained person?",
+      "value": "What does the restrained person look like? (optional)",
       "geometry": {
         "x": 610,
         "y": 2502,
         "width": 300,
-        "height": 96
+        "height": 640
       },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=restrained_person_height;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=restrained_person_description;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
       "vertex": true,
       "edge": false,
       "source": null,
       "target": null,
-      "_textboxes": null,
-      "_questionText": "About how tall is the restrained person?",
+      "_textboxes": [
+        {
+          "nameId": "restrained_person_height",
+          "fullNameId": "restrained_person_height",
+          "label": "Height",
+          "placeholder": "Height",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": "",
+          "optional": true
+        },
+        {
+          "nameId": "restrained_person_weight",
+          "fullNameId": "restrained_person_weight",
+          "label": "Weight",
+          "placeholder": "Weight",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": "",
+          "optional": true
+        },
+        {
+          "nameId": "restrained_person_hair_color",
+          "fullNameId": "restrained_person_hair_color",
+          "label": "Hair color",
+          "placeholder": "Hair color",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": "",
+          "optional": true
+        },
+        {
+          "nameId": "restrained_person_eye_color",
+          "fullNameId": "restrained_person_eye_color",
+          "label": "Eye color",
+          "placeholder": "Eye color",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": "",
+          "optional": true
+        }
+      ],
+      "_questionText": "What does the restrained person look like? (optional)",
       "_questionId": "9",
-      "_nameId": "restrained_person_height",
+      "_nameId": "restrained_person_description",
       "_placeholder": "",
       "_mirrorTargets": null,
       "_pdfName": "",
       "_pdfFile": "",
-      "_pdfPrice": ""
+      "_pdfPrice": "",
+      "_itemOrder": [
+        {
+          "type": "textbox",
+          "index": 0
+        },
+        {
+          "type": "textbox",
+          "index": 1
+        },
+        {
+          "type": "textbox",
+          "index": 2
+        },
+        {
+          "type": "textbox",
+          "index": 3
+        }
+      ],
+      "_optional": true
     },
     {
       "id": "16",
-      "value": "About how much does the restrained person weigh?",
-      "geometry": {
-        "x": 610,
-        "y": 2768,
-        "width": 300,
-        "height": 96
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=restrained_person_weight;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "About how much does the restrained person weigh?",
-      "_questionId": "10",
-      "_nameId": "restrained_person_weight",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "17",
-      "value": "What color is the restrained person's hair?",
-      "geometry": {
-        "x": 610,
-        "y": 3034,
-        "width": 300,
-        "height": 96
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=restrained_person_hair_color;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "What color is the restrained person's hair?",
-      "_questionId": "11",
-      "_nameId": "restrained_person_hair_color",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "18",
-      "value": "What color are the restrained person's eyes?",
-      "geometry": {
-        "x": 610,
-        "y": 3300,
-        "width": 300,
-        "height": 96
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=restrained_person_eye_color;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "What color are the restrained person's eyes?",
-      "_questionId": "12",
-      "_nameId": "restrained_person_eye_color",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "20",
       "value": "What is their race?",
       "geometry": {
         "x": 610,
-        "y": 3566,
+        "y": 3312,
         "width": 300,
         "height": 96
       },
@@ -411,7 +399,7 @@
       "target": null,
       "_textboxes": null,
       "_questionText": "What is their race?",
-      "_questionId": "13",
+      "_questionId": "10",
       "_nameId": "person_to_restrain_race",
       "_placeholder": "",
       "_mirrorTargets": null,
@@ -420,11 +408,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "21",
+      "id": "17",
       "value": "In a few words, how is the restrained person related to you? For example: spouse, former partner, parent.",
       "geometry": {
         "x": 610,
-        "y": 3832,
+        "y": 3578,
         "width": 300,
         "height": 168
       },
@@ -435,20 +423,21 @@
       "target": null,
       "_textboxes": null,
       "_questionText": "In a few words, how is the restrained person related to you? For example: spouse, former partner, parent.",
-      "_questionId": "14",
+      "_questionId": "11",
       "_nameId": "restrained_person_relationship_to_protected_person",
       "_placeholder": "",
       "_mirrorTargets": null,
       "_pdfName": "",
       "_pdfFile": "",
-      "_pdfPrice": ""
+      "_pdfPrice": "",
+      "_optional": true
     },
     {
-      "id": "22",
+      "id": "18",
       "value": "Do you know where the restrained person lives?",
       "geometry": {
         "x": 610,
-        "y": 4170,
+        "y": 3916,
         "width": 300,
         "height": 96
       },
@@ -459,7 +448,7 @@
       "target": null,
       "_textboxes": null,
       "_questionText": "Do you know where the restrained person lives?",
-      "_questionId": "15",
+      "_questionId": "12",
       "_nameId": "knows_restrained_person_address",
       "_placeholder": "",
       "_mirrorTargets": null,
@@ -468,11 +457,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "23",
+      "id": "20",
       "value": "Yes",
       "geometry": {
         "x": 581,
-        "y": 4346,
+        "y": 4092,
         "width": 168,
         "height": 80
       },
@@ -487,11 +476,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "24",
+      "id": "21",
       "value": "No",
       "geometry": {
         "x": 771,
-        "y": 4346,
+        "y": 4092,
         "width": 168,
         "height": 80
       },
@@ -506,11 +495,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "25",
+      "id": "22",
       "value": "Where does the restrained person live?",
       "geometry": {
         "x": 515,
-        "y": 4546,
+        "y": 4292,
         "width": 300,
         "height": 640
       },
@@ -522,6 +511,7 @@
       "_textboxes": [
         {
           "nameId": "street_address",
+          "fullNameId": "restrained_person_street_address",
           "label": "Street address",
           "placeholder": "Street address",
           "isAmountOption": false,
@@ -530,6 +520,7 @@
         },
         {
           "nameId": "city",
+          "fullNameId": "restrained_person_city",
           "label": "City",
           "placeholder": "City",
           "isAmountOption": false,
@@ -538,6 +529,7 @@
         },
         {
           "nameId": "state",
+          "fullNameId": "restrained_person_state",
           "label": "State",
           "placeholder": "State",
           "isAmountOption": false,
@@ -546,6 +538,7 @@
         },
         {
           "nameId": "zip_code",
+          "fullNameId": "restrained_person_zip_code",
           "label": "ZIP code",
           "placeholder": "ZIP code",
           "isAmountOption": false,
@@ -554,7 +547,7 @@
         }
       ],
       "_questionText": "Where does the restrained person live?",
-      "_questionId": "16",
+      "_questionId": "13",
       "_nameId": "restrained_person",
       "_placeholder": "",
       "_mirrorTargets": null,
@@ -581,11 +574,11 @@
       ]
     },
     {
-      "id": "26",
+      "id": "23",
       "value": "",
       "geometry": {
         "x": 755,
-        "y": 5306,
+        "y": 5052,
         "width": 10,
         "height": 10
       },
@@ -600,11 +593,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "27",
+      "id": "24",
       "value": "What firearms, firearm parts, or ammunition might the restrained person have? Include what you listed on DV-100, item 9.",
       "geometry": {
         "x": 610,
-        "y": 5364,
+        "y": 5110,
         "width": 300,
         "height": 192
       },
@@ -615,20 +608,21 @@
       "target": null,
       "_textboxes": null,
       "_questionText": "What firearms, firearm parts, or ammunition might the restrained person have? Include what you listed on DV-100, item 9.",
-      "_questionId": "17",
+      "_questionId": "14",
       "_nameId": "restrained_person_prohibited_items_details",
       "_placeholder": "",
       "_mirrorTargets": null,
       "_pdfName": "",
       "_pdfFile": "",
-      "_pdfPrice": ""
+      "_pdfPrice": "",
+      "_optional": true
     },
     {
-      "id": "28",
+      "id": "25",
       "value": "Does this order also protect other people, such as your children or family?",
       "geometry": {
         "x": 610,
-        "y": 5726,
+        "y": 5472,
         "width": 300,
         "height": 144
       },
@@ -639,7 +633,7 @@
       "target": null,
       "_textboxes": null,
       "_questionText": "Does this order also protect other people, such as your children or family?",
-      "_questionId": "18",
+      "_questionId": "15",
       "_nameId": "other_protected_people_yes_yes",
       "_placeholder": "",
       "_mirrorTargets": null,
@@ -648,11 +642,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "29",
+      "id": "26",
       "value": "Yes",
       "geometry": {
         "x": 581,
-        "y": 5950,
+        "y": 5696,
         "width": 168,
         "height": 80
       },
@@ -667,11 +661,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "30",
+      "id": "27",
       "value": "No",
       "geometry": {
         "x": 771,
-        "y": 5950,
+        "y": 5696,
         "width": 168,
         "height": 80
       },
@@ -686,11 +680,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "31",
+      "id": "28",
       "value": "",
       "geometry": {
         "x": 755,
-        "y": 6270,
+        "y": 6016,
         "width": 10,
         "height": 10
       },
@@ -705,11 +699,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "32",
+      "id": "29",
       "value": "How many other people do you want the order to protect?",
       "geometry": {
         "x": 610,
-        "y": 6328,
+        "y": 6074,
         "width": 300,
         "height": 680
       },
@@ -746,7 +740,7 @@
         }
       ],
       "_questionText": "How many other people do you want the order to protect?",
-      "_questionId": "19",
+      "_questionId": "16",
       "_nameId": "other_protected_person",
       "_placeholder": "",
       "_mirrorTargets": null,
@@ -777,11 +771,11 @@
       "_dropdowns": []
     },
     {
-      "id": "33",
+      "id": "30",
       "value": "Is there a separate page listing more protected people?",
       "geometry": {
         "x": 610,
-        "y": 7178,
+        "y": 6924,
         "width": 300,
         "height": 120
       },
@@ -792,7 +786,7 @@
       "target": null,
       "_textboxes": null,
       "_questionText": "Is there a separate page listing more protected people?",
-      "_questionId": "20",
+      "_questionId": "17",
       "_nameId": "other_protected_people_additional_list_attached_yes",
       "_placeholder": "",
       "_mirrorTargets": null,
@@ -801,11 +795,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "34",
+      "id": "31",
       "value": "Yes",
       "geometry": {
         "x": 581,
-        "y": 7378,
+        "y": 7124,
         "width": 168,
         "height": 80
       },
@@ -820,11 +814,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "35",
+      "id": "32",
       "value": "No",
       "geometry": {
         "x": 771,
-        "y": 7378,
+        "y": 7124,
         "width": 168,
         "height": 80
       },
@@ -839,11 +833,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "36",
+      "id": "33",
       "value": "",
       "geometry": {
         "x": 755,
-        "y": 7698,
+        "y": 7444,
         "width": 10,
         "height": 10
       },
@@ -858,11 +852,11 @@
       "_pdfPrice": ""
     },
     {
-      "id": "37",
+      "id": "34",
       "value": "End",
       "geometry": {
         "x": 700,
-        "y": 7756,
+        "y": 7502,
         "width": 120,
         "height": 60
       },
@@ -876,7 +870,7 @@
       "_pdfPrice": ""
     },
     {
-      "id": "38",
+      "id": "35",
       "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">court_name_and_street_address</span></div>",
       "geometry": {
         "x": 1460,
@@ -900,7 +894,7 @@
       "_pdfPrice": ""
     },
     {
-      "id": "39",
+      "id": "36",
       "value": "",
       "geometry": {
         "x": 0,
@@ -927,7 +921,7 @@
       }
     },
     {
-      "id": "40",
+      "id": "37",
       "value": "",
       "geometry": {
         "x": 0,
@@ -954,7 +948,7 @@
       }
     },
     {
-      "id": "41",
+      "id": "38",
       "value": "",
       "geometry": {
         "x": 0,
@@ -981,7 +975,7 @@
       }
     },
     {
-      "id": "42",
+      "id": "39",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1008,7 +1002,7 @@
       }
     },
     {
-      "id": "43",
+      "id": "40",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1035,7 +1029,7 @@
       }
     },
     {
-      "id": "44",
+      "id": "41",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1050,7 +1044,7 @@
       "target": "8"
     },
     {
-      "id": "45",
+      "id": "42",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1077,7 +1071,7 @@
       }
     },
     {
-      "id": "46",
+      "id": "43",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1100,7 +1094,7 @@
       }
     },
     {
-      "id": "47",
+      "id": "44",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1127,7 +1121,7 @@
       }
     },
     {
-      "id": "48",
+      "id": "45",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1158,7 +1152,7 @@
       }
     },
     {
-      "id": "49",
+      "id": "46",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1185,7 +1179,7 @@
       }
     },
     {
-      "id": "50",
+      "id": "47",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1216,7 +1210,7 @@
       }
     },
     {
-      "id": "51",
+      "id": "48",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1231,7 +1225,7 @@
       "target": "13"
     },
     {
-      "id": "52",
+      "id": "49",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1258,7 +1252,7 @@
       }
     },
     {
-      "id": "53",
+      "id": "50",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1285,7 +1279,7 @@
       }
     },
     {
-      "id": "54",
+      "id": "51",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1302,17 +1296,17 @@
         "points": [
           {
             "x": 760,
-            "y": 2608
+            "y": 3152
           },
           {
             "x": 760,
-            "y": 2760
+            "y": 3304
           }
         ]
       }
     },
     {
-      "id": "55",
+      "id": "52",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1329,17 +1323,17 @@
         "points": [
           {
             "x": 760,
-            "y": 2872
+            "y": 3416
           },
           {
             "x": 760,
-            "y": 3024
+            "y": 3568
           }
         ]
       }
     },
     {
-      "id": "56",
+      "id": "53",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1356,17 +1350,17 @@
         "points": [
           {
             "x": 760,
-            "y": 3136
+            "y": 3752
           },
           {
             "x": 760,
-            "y": 3296
+            "y": 3912
           }
         ]
       }
     },
     {
-      "id": "57",
+      "id": "54",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1383,11 +1377,96 @@
         "points": [
           {
             "x": 760,
-            "y": 3408
+            "y": 4032
+          },
+          {
+            "x": 665,
+            "y": 4032
+          }
+        ]
+      }
+    },
+    {
+      "id": "55",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "18",
+      "target": "21",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 4032
+          },
+          {
+            "x": 855,
+            "y": 4032
+          }
+        ]
+      }
+    },
+    {
+      "id": "56",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "20",
+      "target": "22",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 665,
+            "y": 4184
+          },
+          {
+            "x": 665,
+            "y": 4288
+          }
+        ]
+      }
+    },
+    {
+      "id": "57",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "22",
+      "target": "23",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 665,
+            "y": 4948
+          },
+          {
+            "x": 665,
+            "y": 5040
           },
           {
             "x": 760,
-            "y": 3560
+            "y": 5040
           }
         ]
       }
@@ -1401,20 +1480,24 @@
         "width": 0,
         "height": 0
       },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
       "vertex": false,
       "edge": true,
-      "source": "20",
-      "target": "21",
+      "source": "21",
+      "target": "23",
       "edgeGeometry": {
         "points": [
           {
-            "x": 760,
-            "y": 3672
+            "x": 855,
+            "y": 4188
+          },
+          {
+            "x": 855,
+            "y": 5040
           },
           {
             "x": 760,
-            "y": 3824
+            "y": 5040
           }
         ]
       }
@@ -1431,20 +1514,8 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
       "vertex": false,
       "edge": true,
-      "source": "21",
-      "target": "22",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 4008
-          },
-          {
-            "x": 760,
-            "y": 4160
-          }
-        ]
-      }
+      "source": "23",
+      "target": "24"
     },
     {
       "id": "60",
@@ -1458,17 +1529,17 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
       "vertex": false,
       "edge": true,
-      "source": "22",
-      "target": "23",
+      "source": "24",
+      "target": "25",
       "edgeGeometry": {
         "points": [
           {
             "x": 760,
-            "y": 4280
+            "y": 5312
           },
           {
-            "x": 665,
-            "y": 4280
+            "x": 760,
+            "y": 5464
           }
         ]
       }
@@ -1485,17 +1556,17 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
       "vertex": false,
       "edge": true,
-      "source": "22",
-      "target": "24",
+      "source": "25",
+      "target": "26",
       "edgeGeometry": {
         "points": [
           {
             "x": 760,
-            "y": 4280
+            "y": 5632
           },
           {
-            "x": 855,
-            "y": 4280
+            "x": 665,
+            "y": 5632
           }
         ]
       }
@@ -1512,17 +1583,17 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
       "vertex": false,
       "edge": true,
-      "source": "23",
-      "target": "25",
+      "source": "25",
+      "target": "27",
       "edgeGeometry": {
         "points": [
           {
-            "x": 665,
-            "y": 4432
+            "x": 760,
+            "y": 5632
           },
           {
-            "x": 665,
-            "y": 4536
+            "x": 855,
+            "y": 5632
           }
         ]
       }
@@ -1539,21 +1610,21 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
       "vertex": false,
       "edge": true,
-      "source": "25",
-      "target": "26",
+      "source": "26",
+      "target": "28",
       "edgeGeometry": {
         "points": [
           {
             "x": 665,
-            "y": 5202
+            "y": 5792
           },
           {
             "x": 665,
-            "y": 5288
+            "y": 6000
           },
           {
             "x": 760,
-            "y": 5288
+            "y": 6000
           }
         ]
       }
@@ -1570,21 +1641,21 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
       "vertex": false,
       "edge": true,
-      "source": "24",
-      "target": "26",
+      "source": "27",
+      "target": "28",
       "edgeGeometry": {
         "points": [
           {
             "x": 855,
-            "y": 4442
+            "y": 5792
           },
           {
             "x": 855,
-            "y": 5288
+            "y": 6000
           },
           {
             "x": 760,
-            "y": 5288
+            "y": 6000
           }
         ]
       }
@@ -1601,8 +1672,8 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
       "vertex": false,
       "edge": true,
-      "source": "26",
-      "target": "27"
+      "source": "28",
+      "target": "29"
     },
     {
       "id": "66",
@@ -1616,17 +1687,17 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
       "vertex": false,
       "edge": true,
-      "source": "27",
-      "target": "28",
+      "source": "29",
+      "target": "30",
       "edgeGeometry": {
         "points": [
           {
             "x": 760,
-            "y": 5568
+            "y": 6760
           },
           {
             "x": 760,
-            "y": 5720
+            "y": 6920
           }
         ]
       }
@@ -1643,17 +1714,17 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
       "vertex": false,
       "edge": true,
-      "source": "28",
-      "target": "29",
+      "source": "30",
+      "target": "31",
       "edgeGeometry": {
         "points": [
           {
             "x": 760,
-            "y": 5888
+            "y": 7064
           },
           {
             "x": 665,
-            "y": 5888
+            "y": 7064
           }
         ]
       }
@@ -1670,17 +1741,17 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
       "vertex": false,
       "edge": true,
-      "source": "28",
-      "target": "30",
+      "source": "30",
+      "target": "32",
       "edgeGeometry": {
         "points": [
           {
             "x": 760,
-            "y": 5888
+            "y": 7064
           },
           {
             "x": 855,
-            "y": 5888
+            "y": 7064
           }
         ]
       }
@@ -1697,21 +1768,21 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
       "vertex": false,
       "edge": true,
-      "source": "29",
-      "target": "31",
+      "source": "31",
+      "target": "33",
       "edgeGeometry": {
         "points": [
           {
             "x": 665,
-            "y": 6046
+            "y": 7220
           },
           {
             "x": 665,
-            "y": 6256
+            "y": 7432
           },
           {
             "x": 760,
-            "y": 6256
+            "y": 7432
           }
         ]
       }
@@ -1728,21 +1799,21 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
       "vertex": false,
       "edge": true,
-      "source": "30",
-      "target": "31",
+      "source": "32",
+      "target": "33",
       "edgeGeometry": {
         "points": [
           {
             "x": 855,
-            "y": 6046
+            "y": 7220
           },
           {
             "x": 855,
-            "y": 6256
+            "y": 7432
           },
           {
             "x": 760,
-            "y": 6256
+            "y": 7432
           }
         ]
       }
@@ -1759,166 +1830,8 @@
       "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
       "vertex": false,
       "edge": true,
-      "source": "31",
-      "target": "32"
-    },
-    {
-      "id": "72",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "32",
-      "target": "33",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 7016
-          },
-          {
-            "x": 760,
-            "y": 7168
-          }
-        ]
-      }
-    },
-    {
-      "id": "73",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
       "source": "33",
-      "target": "34",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 7312
-          },
-          {
-            "x": 665,
-            "y": 7312
-          }
-        ]
-      }
-    },
-    {
-      "id": "74",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "33",
-      "target": "35",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 7312
-          },
-          {
-            "x": 855,
-            "y": 7312
-          }
-        ]
-      }
-    },
-    {
-      "id": "75",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
-      "vertex": false,
-      "edge": true,
-      "source": "34",
-      "target": "36",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 665,
-            "y": 7474
-          },
-          {
-            "x": 665,
-            "y": 7680
-          },
-          {
-            "x": 760,
-            "y": 7680
-          }
-        ]
-      }
-    },
-    {
-      "id": "76",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
-      "vertex": false,
-      "edge": true,
-      "source": "35",
-      "target": "36",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 855,
-            "y": 7474
-          },
-          {
-            "x": 855,
-            "y": 7680
-          },
-          {
-            "x": 760,
-            "y": 7680
-          }
-        ]
-      }
-    },
-    {
-      "id": "77",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "36",
-      "target": "37"
+      "target": "34"
     }
   ],
   "sectionPrefs": {
@@ -1945,6 +1858,10 @@
     {
       "question": "restrained_person_prohibited_items_details",
       "why": "Item 2 of DV-110 is filled from DV-100 item 9 and does not depend on knowing an address."
+    },
+    {
+      "question": "other_protected_people_yes_yes",
+      "why": "Item 4 follows the address question whatever its answer. The prohibited-items question before it is optional, and an optional question passes its own condition on - both answers of the address gate - so this reads like a gate that gates nothing. It is not a gate; it is the rejoin."
     }
   ]
 }

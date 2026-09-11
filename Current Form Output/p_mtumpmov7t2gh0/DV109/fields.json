@@ -3,22 +3,22 @@
   {
    "name": "person_asking_protection_name",
    "kind": "text",
-   "value": "Test User Maria Elena Ro[end]"
+   "value": "person_asking_protection[end]"
   },
   {
    "name": "court_name_and_street_address",
    "kind": "text",
-   "value": "Test User, 123 Test Street"
+   "value": "court_name, court_street_address"
   },
   {
    "name": "person_to_restrain_full_name",
    "kind": "text",
-   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+   "value": "person_to_restrain_full_name Mariax[end]"
   },
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "hearing_court_name_and_address",
@@ -50,7 +50,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "temporary_restraining_orders_all_granted",
@@ -142,7 +142,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "clerk_certificate_date",

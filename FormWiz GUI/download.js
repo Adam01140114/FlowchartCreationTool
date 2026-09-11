@@ -388,6 +388,10 @@ function loadFormData(formData) {
                     questionTypeSelect.value = migratedType;
                     toggleOptions(question.questionId);
                 }
+                // Optional: the filer may skip it. A checkbox question keeps its own
+                // required/optional select, restored with its options below.
+                const optionalBox = questionBlock.querySelector(`#questionOptional${question.questionId}`);
+                if (optionalBox) optionalBox.checked = question.required === false && question.type !== 'checkbox';
                 // -- Restore subtitle if present --
                 if (question.subtitle && question.subtitle.enabled) {
                     const subtitleCheckbox = questionBlock.querySelector(`#enableSubtitle${question.questionId}`);
@@ -865,6 +869,14 @@ function loadFormData(formData) {
                         const unifiedFieldsDiv = questionBlock.querySelector(`#unifiedFields${question.questionId}`);
                         if (unifiedFieldsDiv) {
                             unifiedFieldsDiv.innerHTML = '';
+                            // Parts the filer may skip, kept on the question block by the
+                            // name each is drawn under - its field for a box, its name for a
+                            // choice - for the generator to mark and the export to write back.
+                            // A checkbox part has its own required/optional select.
+                            questionBlock.setAttribute('data-optional-parts', JSON.stringify(question.allFieldsInOrder
+                                .filter(f => f && f.type !== 'checkbox' && (f.required === 'optional' || f.required === false))
+                                .map(f => (f.type === 'dropdown' ? (f.fieldName || '') : (f.nodeId || '')))
+                                .filter(Boolean)));
                             question.allFieldsInOrder.forEach((field, index) => {
                                 if (field.type === 'label') {
                                     // Add a label field
@@ -4990,6 +5002,19 @@ function exportForm(options) {
                 if (paragraphLimit) {
                     questionData.paragraphLimit = parseInt(paragraphLimit);
                 }
+            }
+            // Optional, as the builder shows it - and its optional parts, by the
+            // names the import recorded.
+            const optionalBoxOut = questionBlock.querySelector(`#questionOptional${questionId}`);
+            if (optionalBoxOut && optionalBoxOut.checked) questionData.required = false;
+            let optionalPartsOut = [];
+            try { optionalPartsOut = JSON.parse(questionBlock.getAttribute('data-optional-parts') || '[]'); } catch (e) { optionalPartsOut = []; }
+            if (optionalPartsOut.length && Array.isArray(questionData.allFieldsInOrder)) {
+                questionData.allFieldsInOrder.forEach(f => {
+                    if (!f || f.type === 'checkbox') return;
+                    const name = f.type === 'dropdown' ? f.fieldName : f.nodeId;
+                    if (optionalPartsOut.indexOf(name) !== -1) f.required = 'optional';
+                });
             }
             // -- Push questionData once (after we finish building it!) --
             sectionData.questions.push(questionData);

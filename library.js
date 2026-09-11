@@ -206,6 +206,17 @@ function buildAlertRules(vertices) {
  */
 const FIELD_TYPE_PASSTHROUGH = new Set(['phone', 'currency', 'date', 'email', 'number']);
 
+// A combined question's box can carry its own PDF field name. Otherwise its id is
+// <question nodeId>_<box nameId>, which only works while the question is named
+// for its fields' shared prefix - and two combined questions about one person
+// share that prefix. Ignored once the box is renamed in the editor, so a stale
+// name cannot outlive the edit.
+function ownPdfFieldName(tb) {
+  const own = tb && tb.fullNameId;
+  if (!own || !tb.nameId) return '';
+  return (own === tb.nameId || own.endsWith('_' + tb.nameId)) ? own : '';
+}
+
 // Download utility moved to export.js module
 // Export functions moved to export.js module
 // Import a flowchart JSON file
@@ -347,6 +358,19 @@ function detectSectionJumps(cell, questionCellMap, questionIdMap) {
  * out blank. A packet hid it: with several sections per form the merging path
  * below builds its own array anyway.
  */
+// How much a section asks, for deciding whether it is too small to stand alone.
+// A combined question counts once per part: "Who do you want protection from?"
+// asks five things, and counted as one it folded "The Person to Restrain" into
+// "About You" the moment DV-100 stopped asking them as five questions.
+function sectionWeight(section) {
+  return (section.questions || []).reduce(function(total, q) {
+    if (q && q.type === "multipleTextboxes" && Array.isArray(q.allFieldsInOrder) && q.allFieldsInOrder.length) {
+      return total + q.allFieldsInOrder.length;
+    }
+    return total + 1;
+  }, 0);
+}
+
 function consolidateSectionsMinQuestions(sections, minQuestions = 2) {
   if (!Array.isArray(sections) || sections.length <= 1) {
     return { sections: (sections || []).slice(), sectionIdMap: {} };
@@ -361,7 +385,7 @@ function consolidateSectionsMinQuestions(sections, minQuestions = 2) {
 
   let i = 0;
   while (i < working.length) {
-    if (working[i].questions.length >= minQuestions || working.length === 1) {
+    if (sectionWeight(working[i]) >= minQuestions || working.length === 1) {
       i++;
       continue;
     }
@@ -755,7 +779,7 @@ window.exportGuiJson = function(download = true) {
             // the filer reads above the box.
             const shownLabel = tb.label || labelName;
             // Use the actual nodeId (which may include _dup2) as the base for fieldNodeId
-            const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
+            const fieldNodeId = ownPdfFieldName(tb) || (sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`);
             const fieldType = FIELD_TYPE_PASSTHROUGH.has(tb.type)
               ? tb.type
               : (tb.isAmountOption ? "amount" : "label");
@@ -776,6 +800,7 @@ window.exportGuiJson = function(download = true) {
             if (fieldType !== "amount" && fieldType !== "currency") {
               fieldEntry.prefill = tb.prefill || '';
             }
+            if (typeof tb !== "undefined" && tb && tb.optional) fieldEntry.required = "optional";
             allFieldsInOrder.push(fieldEntry);
           } else if (item.type === 'location') {
             // Create a single location entry instead of expanding into individual fields
@@ -858,7 +883,9 @@ window.exportGuiJson = function(download = true) {
               const sanitizedOptionValue = (option.value || option.text || "").toLowerCase().replace(/[^a-z0-9\s\/]/g, '').replace(/\s+/g, '_');
               return {
                 text: option.text || "",
-                nodeId: `${sanitizedDropdownName}_${sanitizedOptionValue}`
+                // The compiler names an option for the PDF box it ticks; one made in
+                // the editor is still named from its label.
+                nodeId: option.nodeId || `${sanitizedDropdownName}_${sanitizedOptionValue}`
               };
             }) : [];
             // Process trigger sequences
@@ -1518,6 +1545,7 @@ window.exportGuiJson = function(download = true) {
             allFieldsInOrder.push({
               type: "dropdown",
               fieldName: dropdown.name || "",
+              required: dropdown.optional ? "optional" : undefined,
               options: dropdownOptions,
               triggerSequences: triggerSequences,
               order: dropdownOrder
@@ -1557,6 +1585,7 @@ window.exportGuiJson = function(download = true) {
             if (fieldType !== "amount" && fieldType !== "currency") {
               fieldEntry.prefill = tb.prefill || '';
             }
+            if (typeof tb !== "undefined" && tb && tb.optional) fieldEntry.required = "optional";
             allFieldsInOrder.push(fieldEntry);
           });
         }
@@ -1657,7 +1686,8 @@ window.exportGuiJson = function(download = true) {
       // Keep backward compatibility with old format
       question.textboxes = cell._textboxes.map(tb => ({
         label: "", // Empty label field as required
-        nameId: tb.nameId ? `${nodeId}_${sanitizeNameId(tb.nameId)}` : "",
+        // A box that carries its own PDF name keeps it here too.
+        nameId: ownPdfFieldName(tb) || (tb.nameId ? `${nodeId}_${sanitizeNameId(tb.nameId)}` : ""),
         placeholder: tb.nameId || "Name" // Use nameId as placeholder, default to "Name"
       }));
       // Add empty amounts array for multipleTextboxes
@@ -2120,7 +2150,7 @@ window.exportGuiJson = function(download = true) {
                 fieldType 
               });
               // Use the actual nodeId (which may include _dup2) as the base for fieldNodeId
-              const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
+              const fieldNodeId = ownPdfFieldName(tb) || (sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`);
               const fieldEntry = {
                 type: fieldType,
                 label: shownLabel,
@@ -2131,6 +2161,7 @@ window.exportGuiJson = function(download = true) {
               if (fieldType !== "amount" && fieldType !== "currency") {
                 fieldEntry.prefill = tb.prefill || '';
               }
+              if (typeof tb !== "undefined" && tb && tb.optional) fieldEntry.required = "optional";
               allFieldsInOrder.push(fieldEntry);
             } else if (item.type === 'location') {
               // Only include location if it still exists (locationIndex present)
@@ -2215,7 +2246,9 @@ window.exportGuiJson = function(download = true) {
                 const sanitizedOptionValue = (option.value || "").toLowerCase().replace(/[^a-z0-9\s\/]/g, '').replace(/\s+/g, '_');
                 return {
                   text: option.text || "",
-                  nodeId: `${sanitizedDropdownName}_${sanitizedOptionValue}`
+                  // The compiler names an option for the PDF box it ticks; one made in
+                  // the editor is still named from its label.
+                  nodeId: option.nodeId || `${sanitizedDropdownName}_${sanitizedOptionValue}`
                 };
               }) : [];
               // Process trigger sequences
@@ -2685,6 +2718,7 @@ window.exportGuiJson = function(download = true) {
               allFieldsInOrder.push({
                 type: "dropdown",
                 fieldName: dropdown.name || "",
+                required: dropdown.optional ? "optional" : undefined,
                 options: dropdownOptions,
                 triggerSequences: triggerSequences,
                 order: dropdownOrder
@@ -2709,7 +2743,7 @@ window.exportGuiJson = function(download = true) {
               fieldType 
             });
             // Use the actual nodeId (which may include _dup2) as the base for fieldNodeId
-            const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
+            const fieldNodeId = ownPdfFieldName(tb) || (sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`);
             const fieldEntry = {
               type: fieldType,
               label: shownLabel,
@@ -2720,6 +2754,7 @@ window.exportGuiJson = function(download = true) {
             if (fieldType !== "amount" && fieldType !== "currency") {
               fieldEntry.prefill = tb.prefill || '';
             }
+            if (typeof tb !== "undefined" && tb && tb.optional) fieldEntry.required = "optional";
             allFieldsInOrder.push(fieldEntry);
           });
           // Insert location fields at the correct position if locationIndex is set
@@ -2881,7 +2916,7 @@ window.exportGuiJson = function(download = true) {
           if (sourceSection <= currentSection) {
             // Check if the source is a multiple textbox/dropdown question or number question
             const sourceQuestionType = getQuestionType(sourceCell);
-            if (sourceQuestionType === "multipleTextboxes" || sourceQuestionType === "multipleDropdownType" || sourceQuestionType === "number") {
+            if (sourceQuestionType === "multipleTextboxes" || sourceQuestionType === "multipleDropdownType" || sourceQuestionType === "number" || sourceCell._optional === true) {
               // For multiple textbox/dropdown/number questions, we need to find their parent condition
               const sourceParentCondition = findDirectParentCondition(sourceCell);
               if (sourceParentCondition) {
@@ -3415,6 +3450,8 @@ window.exportGuiJson = function(download = true) {
       }
     }
     // --- END Subtitle PATCH ---
+    // Optional: the filer may skip it. The compiler sets _optional from the hints.
+    if (cell._optional === true) question.required = false;
     sectionMap[section].questions.push(question);
   }
   
@@ -4070,6 +4107,9 @@ window.exportBothJson = function() {
       }
       if (cell._linkedJoin !== undefined) {
         cellData._linkedJoin = cell._linkedJoin;
+      }
+      if (cell._optional !== undefined) {
+        cellData._optional = cell._optional;
       } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
       }
       if (cell._linkedCheckboxNodeId !== undefined) {
@@ -5544,6 +5584,9 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         }
         if (item._linkedJoin !== undefined) {
           newCell._linkedJoin = item._linkedJoin;
+        }
+        if (item._optional !== undefined) {
+          newCell._optional = item._optional;
         }
         if (item._linkedCheckboxNodeId !== undefined) {
           newCell._linkedCheckboxNodeId = item._linkedCheckboxNodeId;

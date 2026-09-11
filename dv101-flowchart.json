@@ -123,7 +123,8 @@
       "_mirrorTargets": null,
       "_pdfName": "",
       "_pdfFile": "",
-      "_pdfPrice": ""
+      "_pdfPrice": "",
+      "_optional": true
     },
     {
       "id": "7",
@@ -171,7 +172,8 @@
       "_mirrorTargets": null,
       "_pdfName": "",
       "_pdfFile": "",
-      "_pdfPrice": ""
+      "_pdfPrice": "",
+      "_optional": true
     },
     {
       "id": "9",
@@ -195,7 +197,8 @@
       "_mirrorTargets": null,
       "_pdfName": "",
       "_pdfFile": "",
-      "_pdfPrice": ""
+      "_pdfPrice": "",
+      "_optional": true
     },
     {
       "id": "10",
@@ -486,7 +489,8 @@
       "_mirrorTargets": null,
       "_pdfName": "",
       "_pdfFile": "",
-      "_pdfPrice": ""
+      "_pdfPrice": "",
+      "_optional": true
     },
     {
       "id": "25",
@@ -534,7 +538,8 @@
       "_mirrorTargets": null,
       "_pdfName": "",
       "_pdfFile": "",
-      "_pdfPrice": ""
+      "_pdfPrice": "",
+      "_optional": true
     },
     {
       "id": "27",
@@ -558,7 +563,8 @@
       "_mirrorTargets": null,
       "_pdfName": "",
       "_pdfFile": "",
-      "_pdfPrice": ""
+      "_pdfPrice": "",
+      "_optional": true
     },
     {
       "id": "28",

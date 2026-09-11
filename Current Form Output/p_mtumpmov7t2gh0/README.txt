@@ -2,8 +2,8 @@ These are the page images of the filled PDFs, exactly as the last audit read
 them. One folder per form; page numbers are zero-padded so they sort.
 
 Rendered from : clets001-filled.pdf, dv100-filled.pdf, dv101-filled.pdf, dv105-filled.pdf, dv108-filled.pdf, dv109-filled.pdf, dv110-filled.pdf, dv140-filled.pdf
-Answers dated : 2026-09-10T15:31:16.704Z
-Published     : 2026-09-10T15:31:48.794Z
+Answers dated : 2026-09-11T19:11:14.346Z
+Published     : 2026-09-11T19:12:31.219Z
 
   CLETS0012 page(s)
   DV100   13 page(s)

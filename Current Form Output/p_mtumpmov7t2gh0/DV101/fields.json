@@ -3,17 +3,17 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "person_asking_protection_name",
    "kind": "text",
-   "value": "Test User Maria Elena Ro[end]"
+   "value": "person_asking_protection[end]"
   },
   {
    "name": "person_to_restrain_full_name",
    "kind": "text",
-   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+   "value": "person_to_restrain_full_name Mariax[end]"
   },
   {
    "name": "dv101_abuse_1_date",
@@ -80,7 +80,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "dv101_abuse_2_date",

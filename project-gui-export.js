@@ -139,6 +139,58 @@
   }
 
   /**
+ * The PDF fields a combined question or a repeating block asks, by name.
+ *
+ * A block asks entry n's fields for every n up to its most, so a later question
+ * for one entry's field is a duplicate of the block: CLETS-001 asked the four
+ * other protected people's names again, as "What is your 4. Other protected
+ * person 1 - name?", after DV-100's block had asked them.
+ *
+ * For a combined question: each box's field, and for a
+ * choice the name its options share - the name a separate question for that
+ * choice would have had (person_to_restrain_gender, for ..._male and ..._female).
+ * A location part is one generic entry, not a field of its own, and is left out.
+ */
+function combinedPartNames(q) {
+  if (!q || !Array.isArray(q.allFieldsInOrder)) return [];
+  if (q.type === 'numberedDropdown') {
+    const most = parseInt(q.max, 10) || 0;
+    const templates = [];
+    q.allFieldsInOrder.forEach(function (f) {
+      if (!f) return;
+      if (f.nodeId && String(f.nodeId).indexOf('{n}') !== -1) templates.push(String(f.nodeId));
+      (f.options || []).forEach(function (o) {
+        if (o && o.nodeId && String(o.nodeId).indexOf('{n}') !== -1) templates.push(String(o.nodeId));
+      });
+    });
+    const blockNames = [];
+    for (let n = 1; n <= most; n++) {
+      templates.forEach(function (t) { blockNames.push(t.split('{n}').join(String(n))); });
+    }
+    return blockNames;
+  }
+  if (q.type !== 'multipleTextboxes') return [];
+  const names = [];
+  q.allFieldsInOrder.forEach(function (f) {
+    if (!f || f.type === 'location') return;
+    if (f.type === 'dropdown' || f.type === 'checkbox') {
+      const ids = (f.options || []).map(function (o) { return String((o && o.nodeId) || ''); }).filter(Boolean);
+      if (ids.length < 2) return;
+      const split = ids.map(function (id) { return id.split('_'); });
+      const common = [];
+      for (let t = 0; t < split[0].length; t++) {
+        if (split.every(function (p) { return p[t] === split[0][t] && p.length > t + 1; })) common.push(split[0][t]);
+        else break;
+      }
+      if (common.length) names.push(common.join('_'));
+      return;
+    }
+    if (f.nodeId) names.push(String(f.nodeId));
+  });
+  return names;
+}
+
+/**
  * Ask each shared value once.
  *
  * The packet shares a lot of fields - the case number appears on all three
@@ -173,6 +225,21 @@ function collapseSharedQuestions(merged) {
         firstByName.set(name, { question: q, section: section.sectionId });
         mirrors.push({ nameId: name, askedInSection: section.sectionId,
                        questionId: q.questionId, alsoAnswers: [] });
+        // A combined question asks each of its parts, and a later form asking
+        // one of them on its own asks it again - DV-110 re-asked the restrained
+        // person's age, date of birth, gender and race the moment DV-100 put
+        // them in one question. So its parts are claimed under their own names,
+        // and a later question for one collapses into it like any duplicate.
+        combinedPartNames(q).forEach(function (part) {
+          if (firstByName.has(part)) {
+            console.warn('[project export] ' + part + ' is asked again in "' + q.text
+              + '" - an earlier question already asks it.');
+            return;
+          }
+          firstByName.set(part, { question: q, section: section.sectionId });
+          mirrors.push({ nameId: part, askedInSection: section.sectionId,
+                         questionId: q.questionId, alsoAnswers: [] });
+        });
         keep.push(q);
         return;
       }

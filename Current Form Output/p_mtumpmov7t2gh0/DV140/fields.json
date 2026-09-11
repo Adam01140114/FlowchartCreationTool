@@ -3,7 +3,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "dv140_court_page1_dv140_cb",
@@ -23,7 +23,7 @@
   {
    "name": "person_asking_protection_name",
    "kind": "text",
-   "value": "Test User Maria Elena Ro[end]"
+   "value": "person_asking_protection[end]"
   },
   {
    "name": "dv105_your_relationship_parent",
@@ -43,12 +43,12 @@
   {
    "name": "dv105_your_relationship_other_description",
    "kind": "text",
-   "value": "Test V[end]"
+   "value": "dv105_[end]"
   },
   {
    "name": "person_to_restrain_full_name",
    "kind": "text",
-   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+   "value": "person_to_restrain_full_name Mariax[end]"
   },
   {
    "name": "dv105_their_relationship_parent",
@@ -68,7 +68,7 @@
   {
    "name": "dv105_their_relationship_other_description",
    "kind": "text",
-   "value": "Test V[end]"
+   "value": "dv105_[end]"
   },
   {
    "name": "dv140_has_children_under_18",
@@ -78,7 +78,7 @@
   {
    "name": "dv105_child_1_name",
    "kind": "text",
-   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+   "value": "dv105_child_1_name Maria Elena Rodr[end]"
   },
   {
    "name": "dv105_child_1_date_of_birth",
@@ -93,7 +93,7 @@
   {
    "name": "dv105_child_2_name",
    "kind": "text",
-   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+   "value": "dv105_child_2_name Maria Elena Rodr[end]"
   },
   {
    "name": "dv105_child_3_date_of_birth",
@@ -103,7 +103,7 @@
   {
    "name": "dv105_child_3_name",
    "kind": "text",
-   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+   "value": "dv105_child_3_name Maria Elena Rodr[end]"
   },
   {
    "name": "dv105_child_4_date_of_birth",
@@ -113,7 +113,7 @@
   {
    "name": "dv105_child_4_name",
    "kind": "text",
-   "value": "Test User Maria Elena Rodriguez-Vas[end]"
+   "value": "dv105_child_4_name Maria Elena Rodr[end]"
   },
   {
    "name": "dv105_children_additional_list_attached",
@@ -180,7 +180,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "dv140_court_page2_list5_checkboxrightcaption",
@@ -302,7 +302,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "dv140_court_page3_list9_checkboxrightcaption",
@@ -494,7 +494,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "dv140_court_page4_list10_checkboxrightcaption",
@@ -676,7 +676,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "dv140_court_page5_list12_checkboxrightcaption",
@@ -1008,7 +1008,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "Test Value Maria Elena R[end]"
+   "value": "case_number Maria Elenax[end]"
   },
   {
    "name": "dv140_court_page6_list14_li1_item14ab",
