@@ -6663,19 +6663,27 @@ function resetAllNodeIds() {
     }
   });
   
-  // Third pass: apply the final node IDs
-  cellsToProcess.forEach(({ cell, correctNodeId }) => {
-    const finalNodeId = finalNodeIds.get(cell);
-    if (finalNodeId) {
+  // Third pass: apply the final node IDs, as one change to the model. Set one
+  // at a time, each redrew the chart and asked for an autosave: DV-100's 339
+  // nodes took 1.1 s instead of 0.3, and a project export resets every form.
+  const model = graph.getModel();
+  model.beginUpdate();
+  try {
+    cellsToProcess.forEach(({ cell }) => {
+      const finalNodeId = finalNodeIds.get(cell);
+      if (finalNodeId) {
         // Clear the manually edited flag since we're resetting to automatic generation
         cell._manuallyEditedNodeId = false;
         // Update the cell's Node ID
         if (typeof window.setNodeId === 'function') {
-        window.setNodeId(cell, finalNodeId);
+          window.setNodeId(cell, finalNodeId);
           resetCount++;
+        }
       }
-    }
-  });
+    });
+  } finally {
+    model.endUpdate();
+  }
   
   // Refresh all cells to update the display
   if (typeof window.refreshAllCells === 'function') {

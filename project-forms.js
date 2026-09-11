@@ -138,9 +138,10 @@
     updateFormNavUi();
   }
 
-  function switchToForm(index) {
+  /** `reload` opens the form again even when it is the one already open. */
+  function switchToForm(index, reload) {
     if (index < 0 || index >= window.projectForms.length) return;
-    if (index === window.currentFormIndex) return;
+    if (index === window.currentFormIndex && !reload) return;
     captureCurrentForm();
     loadFormAt(index);
   }

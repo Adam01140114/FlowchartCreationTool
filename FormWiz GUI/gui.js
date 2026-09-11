@@ -283,6 +283,7 @@ function updateAllChecklistLogicDropdowns() {
 }
 // Function to update all conditional logic dropdowns
 function updateAllConditionalLogicDropdowns() {
+    const items = getFormQuestionPickerItems();
     const logicContainers = document.querySelectorAll('[id^="logicConditions"]');
     logicContainers.forEach(container => {
         const questionId = container.id.replace('logicConditions', '');
@@ -293,7 +294,7 @@ function updateAllConditionalLogicDropdowns() {
             const answerEl = document.getElementById(`prevAnswer${questionId}_${conditionIndex}`);
             if (!prevQuestionEl) return;
             const savedAnswer = answerEl ? answerEl.value : '';
-            fillPrevQuestionSelect(prevQuestionEl, questionId);
+            fillPrevQuestionSelect(prevQuestionEl, questionId, items);
             updateLogicAnswersForRow(questionId, conditionIndex);
             const newAnswerEl = document.getElementById(`prevAnswer${questionId}_${conditionIndex}`);
             if (newAnswerEl && savedAnswer !== undefined && savedAnswer !== '') {
@@ -478,28 +479,81 @@ function getFormQuestionPickerItems() {
     return items;
 }
 
-function fillPrevQuestionSelect(selectEl, excludeQuestionId) {
+/**
+ * A "previous question" picker lists every question in the form, and a packet has
+ * hundreds of logic rows: listed out, the DV packet's pickers held 250,000 <option>s
+ * and took 16 of the 40 seconds its import spent. So a picker holds only its chosen
+ * question until someone opens it (pointer, focus or key), and lists them all then.
+ * Pass `items` when filling many at once, so the question list is read once.
+ */
+function fillPrevQuestionSelect(selectEl, excludeQuestionId, items) {
     if (!selectEl) return;
     const selected = selectEl.value;
+    selectEl.dataset.fwPickerExclude = String(excludeQuestionId);
+    selectEl.dataset.fwPickerLazy = '1';
     selectEl.innerHTML = '<option value="">-- Select a question --</option>';
+    if (!selected || selected === String(excludeQuestionId)) return;
+    const item = (items || getFormQuestionPickerItems()).find(it => String(it.id) === selected);
+    if (!item) return;
+    const opt = document.createElement('option');
+    opt.value = selected;
+    opt.textContent = item.label;
+    selectEl.appendChild(opt);
+    selectEl.value = selected;
+}
+
+/** Give a picker its full list of questions, keeping the one chosen. */
+function expandPrevQuestionSelect(selectEl) {
+    if (!selectEl || selectEl.dataset.fwPickerLazy !== '1') return;
+    delete selectEl.dataset.fwPickerLazy;
+    const selected = selectEl.value;
+    const exclude = selectEl.dataset.fwPickerExclude;
+    selectEl.innerHTML = '<option value="">-- Select a question --</option>';
+    const frag = document.createDocumentFragment();
     getFormQuestionPickerItems().forEach(({ id, label }) => {
-        if (String(id) === String(excludeQuestionId)) return;
+        if (String(id) === exclude) return;
         const opt = document.createElement('option');
         opt.value = String(id);
         opt.textContent = label;
-        selectEl.appendChild(opt);
+        frag.appendChild(opt);
     });
+    selectEl.appendChild(frag);
     if (selected && [...selectEl.options].some(o => o.value === selected)) {
         selectEl.value = selected;
     }
 }
 
+/**
+ * Choose a question in a picker that may not list it yet. During an import the
+ * label is a stand-in: the import ends by refreshing every picker's label.
+ */
+function setPrevQuestionSelectValue(selectEl, value) {
+    if (!selectEl) return;
+    const v = value == null ? '' : String(value);
+    if (v && ![...selectEl.options].some(o => o.value === v)) {
+        const item = window.__fwBulkImport ? null : getFormQuestionPickerItems().find(it => String(it.id) === v);
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = item ? item.label : v;
+        selectEl.appendChild(opt);
+    }
+    selectEl.value = v;
+}
+
+['pointerdown', 'mousedown', 'focusin', 'keydown'].forEach((type) => {
+    document.addEventListener(type, (e) => {
+        const t = e.target;
+        if (t && t.tagName === 'SELECT' && t.dataset.fwPickerLazy === '1') expandPrevQuestionSelect(t);
+    }, true);
+});
+
 function refreshAllLogicPrevQuestionSelects() {
+    const items = getFormQuestionPickerItems();
     document.querySelectorAll('.logic-condition-row select[id^="prevQuestion"]').forEach((sel) => {
         const m = sel.id.match(/^prevQuestion(\d+)_(\d+)$/);
         if (!m) return;
         const ownerQuestionId = m[1];
-        fillPrevQuestionSelect(sel, ownerQuestionId);
+        fillPrevQuestionSelect(sel, ownerQuestionId, items);
     });
 }
 
@@ -684,7 +738,7 @@ function updateJumpConditionsForTextbox(questionId) {
 function updateJumpOptions(questionId, conditionId = null) {
     const selectElements = conditionId 
         ? [document.getElementById(`jumpOption${questionId}_${conditionId}`)]
-        : document.querySelectorAll(`[id^="jumpOption${questionId}_"]`);
+        : (document.getElementById(`questionBlock${questionId}`) || document).querySelectorAll(`[id^="jumpOption${questionId}_"]`);
     selectElements.forEach(selectEl => {
         if (!selectEl) return;
         selectEl.innerHTML = '<option value="" disabled selected>Select an option</option>';
@@ -1342,7 +1396,8 @@ function toggleOptions(questionId) {
                 optionsBlock.style.display = 'block';
                 dropdownImageBlock.style.display = 'block';
                 linkingLogicBlock.style.display = 'block';
-                updateLinkingTargets(questionId);
+                // An import fills every linking list once, at the end.
+                if (!window.__fwBulkImport) updateLinkingTargets(questionId);
                 ensureDropdownDefaultYesNo(questionId);
                 const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
                 jumpConditions.forEach(condition => {
@@ -2052,7 +2107,10 @@ function updateHiddenLogicTriggerOptions(questionId) {
     }
     if (!optionLabels.length) return;
 
-    const triggerSelects = document.querySelectorAll(`[id^="hiddenLogicTrigger${questionId}_"]`);
+    // A question's triggers are in its own block; searching the whole page for
+    // them cost 13 ms a question.
+    const triggerScope = document.getElementById(`questionBlock${questionId}`) || document;
+    const triggerSelects = triggerScope.querySelectorAll(`[id^="hiddenLogicTrigger${questionId}_"]`);
     triggerSelects.forEach(triggerSelect => {
         // Rebuilding the list clears the selection, and this runs once more
         // after a bulk import, so put the chosen trigger back afterwards.
@@ -2465,8 +2523,8 @@ function addDropdownOption(questionId, presetText) {
     });
     // Update all existing jump conditions
     updateJumpOptions(questionId);
-    // Update all checklist logic dropdowns
-    updateAllChecklistLogicDropdowns();
+    // Update all checklist logic dropdowns (an import does this once, at the end)
+    if (!window.__fwBulkImport) updateAllChecklistLogicDropdowns();
     // Update hidden logic trigger options
     if (!window.__fwBulkImport) updateHiddenLogicTriggerOptions(questionId);
 }
@@ -2611,8 +2669,8 @@ function addCheckboxOption(questionId) {
     }
     // Update all existing jump conditions
     updateJumpOptionsForCheckbox(questionId);
-    // Update all checklist logic dropdowns
-    updateAllChecklistLogicDropdowns();
+    // Update all checklist logic dropdowns (an import does this once, at the end)
+    if (!window.__fwBulkImport) updateAllChecklistLogicDropdowns();
 }
 function toggleAmountPlaceholder(questionId, optionNumber) {
     const hasAmount = document.getElementById(`checkboxOptionHasAmount${questionId}_${optionNumber}`).checked;
@@ -2804,23 +2862,8 @@ function addTextboxLabel(questionId) {
     `;
     unifiedDiv.appendChild(fieldDiv);
 
-    // Force a reflow and check if the container has any content
-    unifiedDiv.offsetHeight; // Force reflow
-
-    // Try adding a temporary visible element to force dimensions
-    if (unifiedDiv.offsetWidth === 0 && unifiedDiv.offsetHeight === 0) {
-
-        const tempDiv = document.createElement('div');
-        tempDiv.style.width = '100px';
-        tempDiv.style.height = '20px';
-        tempDiv.style.backgroundColor = 'red';
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.top = '0';
-        tempDiv.style.left = '0';
-        tempDiv.textContent = 'TEMP';
-        unifiedDiv.appendChild(tempDiv);
-
-    }
+    // Nothing here reads the layout: measuring the container after each label made
+    // the whole builder lay out again, 64 ms a label and 11 s of a packet import.
     // Force the container to be visible and have dimensions
     unifiedDiv.classList.add('fw-unified-fields-wrap--active');
 

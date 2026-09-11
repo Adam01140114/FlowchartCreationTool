@@ -2574,7 +2574,7 @@ function loadFormData(formData) {
                         addLogicCondition(question.questionId);
                         const rowId = idx + 1;
                         const pq = questionBlock.querySelector(`#prevQuestion${question.questionId}_${rowId}`);
-                        if (pq) pq.value = String(cond.prevQuestion);
+                        if (pq) setPrevQuestionSelectValue(pq, cond.prevQuestion);
                         updateLogicAnswersForRow(question.questionId, rowId);
                         const pa = questionBlock.querySelector(`#prevAnswer${question.questionId}_${rowId}`);
                         if (pa) {

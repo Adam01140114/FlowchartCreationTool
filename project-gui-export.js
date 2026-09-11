@@ -17,10 +17,69 @@
 (function () {
   'use strict';
 
-  const LOAD_SETTLE_MS = 1500;
+  // A form's load leaves work on timers: the section legend at 50-100 ms, PDF
+  // names spread down the chart at 500, node ids corrected at 1000, the name
+  // field at 1200, PDF inheritance and node ids reset at 3000, the load marked
+  // done at 4000. All of it runs before the form is exported.
+  const LOAD_HORIZON_MS = 4000;
+  // Ids for the timers run here, well clear of the browser's own.
+  const VIRTUAL_TIMER_BASE = 2e9;
+  const MAX_LOAD_STEPS = 10000;
 
-  function wait(ms) {
-    return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  /**
+   * Open form `index` and run the work its load leaves on timers straight
+   * away, in the order the timers would have fired, so the form has settled
+   * when this returns.
+   *
+   * The export used to wait a fixed 1.5 s after each switch: 12 s for an
+   * eight-form packet, and longer once the editor tab is behind the Preview
+   * Form tab, where the browser runs timers at most once a second. The wait
+   * also ended before the 3 s reset, so each form's reset ran on the next form.
+   * Timers set for later than the horizon are left to the browser.
+   */
+  function openFormSettled(index) {
+    const realSetTimeout = window.setTimeout;
+    const realClearTimeout = window.clearTimeout;
+    const pending = [];
+    const cancelled = new Set();
+    let now = 0;
+    let seq = 0;
+    window.setTimeout = function (fn, ms) {
+      const delay = Math.max(0, Number(ms) || 0);
+      if (typeof fn !== 'function' || now + delay > LOAD_HORIZON_MS) {
+        return realSetTimeout.apply(window, arguments);
+      }
+      seq++;
+      pending.push({ at: now + delay, seq: seq, fn: fn, args: Array.prototype.slice.call(arguments, 2) });
+      return VIRTUAL_TIMER_BASE + seq;
+    };
+    window.clearTimeout = function (id) {
+      if (typeof id === 'number' && id > VIRTUAL_TIMER_BASE) cancelled.add(id - VIRTUAL_TIMER_BASE);
+      else realClearTimeout.apply(window, arguments);
+    };
+    try {
+      window.switchToProjectForm(index, true);
+      let steps = 0;
+      while (pending.length && steps < MAX_LOAD_STEPS) {
+        pending.sort(function (a, b) { return a.at - b.at || a.seq - b.seq; });
+        const next = pending.shift();
+        if (cancelled.has(next.seq)) continue;
+        now = next.at;
+        steps++;
+        try {
+          next.fn.apply(window, next.args);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      // A step that keeps rescheduling itself goes back to the browser.
+      pending.forEach(function (t) {
+        if (!cancelled.has(t.seq)) realSetTimeout.apply(window, [t.fn, t.at - now].concat(t.args));
+      });
+    } finally {
+      window.setTimeout = realSetTimeout;
+      window.clearTimeout = realClearTimeout;
+    }
   }
 
   /** Highest question id in one form's GUI JSON, so the next form starts past it. */
@@ -421,23 +480,33 @@ function reportGroupProblems(merged) {
     });
     const perForm = [];
 
-    for (let i = 0; i < forms.length; i++) {
-      window.switchToProjectForm(i);
-      await wait(LOAD_SETTLE_MS);
-      perForm.push({
-        name: forms[i].name || ('Form ' + (i + 1)),
-        gui: JSON.parse(window.exportGuiJson(false)),
-        // exportGuiJson describes the questions; the page count and the
-        // computed fields are properties of the form itself, so they are
-        // taken from the flowchart the project is holding.
-        flowchart: forms[i].flowchart || null,
-        computedFields: computedBefore[i],
-        overflowLinks: overflowBefore[i]
-      });
+    // Nobody looks at the forms the walk passes through, and redrawing each
+    // one - after its load, its edge style, its PDF names, every node-id
+    // reset - was most of the export's time. So the canvas draws nothing
+    // until the walk is over and the operator's form is back.
+    const view = window.graph ? window.graph.view : null;
+    const wasRendering = view ? view.rendering : true;
+    if (view) view.rendering = false;
+    try {
+      for (let i = 0; i < forms.length; i++) {
+        openFormSettled(i);
+        perForm.push({
+          name: forms[i].name || ('Form ' + (i + 1)),
+          gui: JSON.parse(window.exportGuiJson(false)),
+          // exportGuiJson describes the questions; the page count and the
+          // computed fields are properties of the form itself, so they are
+          // taken from the flowchart the project is holding.
+          flowchart: forms[i].flowchart || null,
+          computedFields: computedBefore[i],
+          overflowLinks: overflowBefore[i]
+        });
+      }
+    } finally {
+      if (view) view.rendering = wasRendering;
+      // Put the operator back where they were before the export walked the
+      // project. Reload even when the walk ended on that form, so it is drawn.
+      window.switchToProjectForm(startIndex, true);
     }
-
-    // Put the operator back where they were before the export walked the project.
-    window.switchToProjectForm(startIndex);
 
     const merged = JSON.parse(JSON.stringify(perForm[0].gui));
     merged.sections = [];
@@ -613,8 +682,8 @@ function reportGroupProblems(merged) {
   /**
    * The merged packet JSON, offered as text before anything is saved.
    *
-   * The export walks every form with a settle delay between them, so the dialog
-   * takes the promise and fills itself in when it resolves.
+   * The export walks every form, so the dialog takes the promise and fills
+   * itself in when it resolves.
    */
   function showExportProjectGuiJsonDialog() {
     window.showExportDialog({
