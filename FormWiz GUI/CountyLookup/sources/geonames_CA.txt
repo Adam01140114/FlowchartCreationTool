@@ -1,0 +1,2593 @@
+US	94501	Alameda	California	CA	Alameda	001			37.7706	-122.2648	4
+US	94502	Alameda	California	CA	Alameda	001			37.7351	-122.2431	4
+US	94536	Fremont	California	CA	Alameda	001			37.5605	-121.9999	4
+US	94537	Fremont	California	CA	Alameda	001			37.6802	-121.9215	4
+US	94538	Fremont	California	CA	Alameda	001			37.5308	-121.9712	4
+US	94539	Fremont	California	CA	Alameda	001			37.5176	-121.9287	4
+US	94540	Hayward	California	CA	Alameda	001			37.6802	-121.9215	4
+US	94541	Hayward	California	CA	Alameda	001			37.674	-122.0894	4
+US	94542	Hayward	California	CA	Alameda	001			37.6586	-122.0472	4
+US	94543	Hayward	California	CA	Alameda	001			37.6688	-122.0808	4
+US	94544	Hayward	California	CA	Alameda	001			37.6374	-122.067	4
+US	94545	Hayward	California	CA	Alameda	001			37.6332	-122.0971	4
+US	94546	Castro Valley	California	CA	Alameda	001			37.7015	-122.0782	4
+US	94550	Livermore	California	CA	Alameda	001			37.683	-121.763	4
+US	94551	Livermore	California	CA	Alameda	001			37.7526	-121.77	4
+US	94552	Castro Valley	California	CA	Alameda	001			37.7131	-122.0381	4
+US	94555	Fremont	California	CA	Alameda	001			37.5735	-122.0469	4
+US	94557	Hayward	California	CA	Alameda	001			37.6802	-121.9215	4
+US	94560	Newark	California	CA	Alameda	001			37.5368	-122.032	4
+US	94566	Pleasanton	California	CA	Alameda	001			37.6658	-121.8755	4
+US	94568	Dublin	California	CA	Alameda	001			37.7166	-121.9226	4
+US	94577	San Leandro	California	CA	Alameda	001			37.7205	-122.1587	4
+US	94578	San Leandro	California	CA	Alameda	001			37.7024	-122.124	4
+US	94579	San Leandro	California	CA	Alameda	001			37.6892	-122.1507	4
+US	94580	San Lorenzo	California	CA	Alameda	001			37.6787	-122.1295	4
+US	94586	Sunol	California	CA	Alameda	001			37.6094	-121.8986	4
+US	94587	Union City	California	CA	Alameda	001			37.5895	-122.0497	4
+US	94588	Pleasanton	California	CA	Alameda	001			37.6873	-121.8957	4
+US	94601	Oakland	California	CA	Alameda	001			37.7806	-122.2166	4
+US	94602	Oakland	California	CA	Alameda	001			37.8011	-122.2104	4
+US	94603	Oakland	California	CA	Alameda	001			37.7402	-122.171	4
+US	94604	Oakland	California	CA	Alameda	001			37.8044	-122.2708	4
+US	94605	Oakland	California	CA	Alameda	001			37.7641	-122.1633	4
+US	94606	Oakland	California	CA	Alameda	001			37.7957	-122.2429	4
+US	94607	Oakland	California	CA	Alameda	001			37.8071	-122.2851	4
+US	94608	Emeryville	California	CA	Alameda	001			37.8365	-122.2804	4
+US	94609	Oakland	California	CA	Alameda	001			37.8361	-122.2637	4
+US	94610	Oakland	California	CA	Alameda	001			37.8126	-122.2443	4
+US	94611	Oakland	California	CA	Alameda	001			37.8471	-122.2223	4
+US	94612	Oakland	California	CA	Alameda	001			37.8085	-122.2668	4
+US	94613	Oakland	California	CA	Alameda	001			37.7811	-122.1866	4
+US	94614	Oakland	California	CA	Alameda	001			37.7277	-122.2046	4
+US	94615	Oakland	California	CA	Alameda	001			37.8067	-122.3004	4
+US	94617	Oakland	California	CA	Alameda	001			37.8078	-122.2717	4
+US	94618	Oakland	California	CA	Alameda	001			37.8431	-122.2402	4
+US	94619	Oakland	California	CA	Alameda	001			37.7878	-122.1884	4
+US	94620	Piedmont	California	CA	Alameda	001			37.8244	-122.2316	4
+US	94621	Oakland	California	CA	Alameda	001			37.7589	-122.1853	4
+US	94622	Oakland	California	CA	Alameda	001			37.799	-122.2337	4
+US	94623	Oakland	California	CA	Alameda	001			37.8044	-122.2708	4
+US	94624	Oakland	California	CA	Alameda	001			37.8044	-122.2708	4
+US	94649	Oakland	California	CA	Alameda	001			37.8044	-122.2708	4
+US	94659	Oakland	California	CA	Alameda	001			37.8044	-122.2708	4
+US	94660	Oakland	California	CA	Alameda	001			37.8044	-122.2708	4
+US	94661	Oakland	California	CA	Alameda	001			37.8044	-122.2708	4
+US	94662	Emeryville	California	CA	Alameda	001			37.8313	-122.2852	4
+US	94666	Oakland	California	CA	Alameda	001			37.8044	-122.2708	4
+US	94701	Berkeley	California	CA	Alameda	001			37.8606	-122.2967	4
+US	94702	Berkeley	California	CA	Alameda	001			37.8656	-122.2851	4
+US	94703	Berkeley	California	CA	Alameda	001			37.863	-122.2749	4
+US	94704	Berkeley	California	CA	Alameda	001			37.8664	-122.257	4
+US	94705	Berkeley	California	CA	Alameda	001			37.8571	-122.25	4
+US	94706	Albany	California	CA	Alameda	001			37.89	-122.2954	4
+US	94707	Berkeley	California	CA	Alameda	001			37.8927	-122.2761	4
+US	94708	Berkeley	California	CA	Alameda	001			37.8918	-122.2604	4
+US	94709	Berkeley	California	CA	Alameda	001			37.8784	-122.2655	4
+US	94710	Berkeley	California	CA	Alameda	001			37.8696	-122.2959	4
+US	94712	Berkeley	California	CA	Alameda	001			37.8716	-122.2727	4
+US	94720	Berkeley	California	CA	Alameda	001			37.8738	-122.2549	4
+US	95646	Kirkwood	California	CA	Alpine	003			38.6918	-120.0736	4
+US	96120	Markleeville	California	CA	Alpine	003			38.7713	-119.8327	4
+US	95601	Amador City	California	CA	Amador	005			38.4194	-120.823	4
+US	95629	Fiddletown	California	CA	Amador	005			38.5234	-120.6763	4
+US	95640	Ione	California	CA	Amador	005			38.3324	-120.9418	4
+US	95642	Jackson	California	CA	Amador	005			38.3545	-120.7573	4
+US	95644	Kit Carson	California	CA	Amador	005			38.6707	-120.1135	4
+US	95654	Martell	California	CA	Amador	005			38.3515	-120.7752	4
+US	95665	Pine Grove	California	CA	Amador	005			38.4049	-120.6544	4
+US	95666	Pioneer	California	CA	Amador	005			38.4319	-120.5719	4
+US	95669	Plymouth	California	CA	Amador	005			38.4916	-120.8819	4
+US	95675	River Pines	California	CA	Amador	005			38.5463	-120.743	4
+US	95685	Sutter Creek	California	CA	Amador	005			38.4175	-120.7951	4
+US	95689	Volcano	California	CA	Amador	005			38.4765	-120.6017	4
+US	95699	Drytown	California	CA	Amador	005			38.4411	-120.8533	4
+US	95914	Bangor	California	CA	Butte	007			39.3885	-121.4052	4
+US	95916	Berry Creek	California	CA	Butte	007			39.6776	-121.3689	4
+US	95917	Biggs	California	CA	Butte	007			39.4162	-121.7189	4
+US	95926	Chico	California	CA	Butte	007			39.7458	-121.8444	4
+US	95927	Chico	California	CA	Butte	007			39.8117	-121.9398	4
+US	95928	Chico	California	CA	Butte	007			39.7224	-121.8113	4
+US	95929	Chico	California	CA	Butte	007			39.7301	-121.8414	4
+US	95930	Clipper Mills	California	CA	Butte	007			39.5327	-121.1575	4
+US	95938	Durham	California	CA	Butte	007			39.633	-121.7886	4
+US	95940	Feather Falls	California	CA	Butte	007			39.622	-121.2669	4
+US	95941	Forbestown	California	CA	Butte	007			39.521	-121.2423	4
+US	95942	Forest Ranch	California	CA	Butte	007			39.8821	-121.6728	4
+US	95948	Gridley	California	CA	Butte	007			39.3532	-121.7137	4
+US	95954	Magalia	California	CA	Butte	007			39.8912	-121.58	4
+US	95958	Nelson	California	CA	Butte	007			39.5522	-121.7644	4
+US	95965	Oroville	California	CA	Butte	007			39.6054	-121.5751	4
+US	95966	Oroville	California	CA	Butte	007			39.4877	-121.4698	4
+US	95967	Paradise	California	CA	Butte	007			39.7155	-121.6551	4
+US	95968	Palermo	California	CA	Butte	007			39.4361	-121.5454	4
+US	95969	Paradise	California	CA	Butte	007			39.7555	-121.6069	4
+US	95973	Chico	California	CA	Butte	007			39.8032	-121.8673	4
+US	95974	Richvale	California	CA	Butte	007			39.4959	-121.748	4
+US	95976	Chico	California	CA	Butte	007			39.7346	-121.8331	4
+US	95978	Stirling City	California	CA	Butte	007			39.9077	-121.5269	4
+US	95221	Altaville	California	CA	Calaveras	009			38.0838	-120.5608	4
+US	95222	Angels Camp	California	CA	Calaveras	009			38.071	-120.5722	4
+US	95223	Arnold	California	CA	Calaveras	009			38.3086	-120.268	4
+US	95224	Avery	California	CA	Calaveras	009			38.2044	-120.3688	4
+US	95225	Burson	California	CA	Calaveras	009			38.1838	-120.8894	4
+US	95226	Campo Seco	California	CA	Calaveras	009			38.2271	-120.8533	4
+US	95228	Copperopolis	California	CA	Calaveras	009			37.944	-120.6423	4
+US	95229	Douglas Flat	California	CA	Calaveras	009			38.1144	-120.4538	4
+US	95232	Glencoe	California	CA	Calaveras	009			38.3554	-120.5778	4
+US	95233	Hathaway Pines	California	CA	Calaveras	009			38.1919	-120.3644	4
+US	95245	Mokelumne Hill	California	CA	Calaveras	009			38.3152	-120.5591	4
+US	95246	Mountain Ranch	California	CA	Calaveras	009			38.2328	-120.4994	4
+US	95247	Murphys	California	CA	Calaveras	009			38.1345	-120.4516	4
+US	95248	Rail Road Flat	California	CA	Calaveras	009			38.3405	-120.5161	4
+US	95249	San Andreas	California	CA	Calaveras	009			38.1904	-120.6441	4
+US	95251	Vallecito	California	CA	Calaveras	009			38.1013	-120.4676	4
+US	95252	Valley Springs	California	CA	Calaveras	009			38.162	-120.8572	4
+US	95254	Wallace	California	CA	Calaveras	009			38.1983	-120.9793	4
+US	95255	West Point	California	CA	Calaveras	009			38.4197	-120.4759	4
+US	95257	Wilseyville	California	CA	Calaveras	009			38.3793	-120.4627	4
+US	95912	Arbuckle	California	CA	Colusa	011			39.0138	-122.0274	4
+US	95932	Colusa	California	CA	Colusa	011			39.2345	-122.0277	4
+US	95950	Grimes	California	CA	Colusa	011			39.0744	-121.8927	4
+US	95955	Maxwell	California	CA	Colusa	011			39.3163	-122.1849	4
+US	95970	Princeton	California	CA	Colusa	011			39.4168	-122.0519	4
+US	95979	Stonyford	California	CA	Colusa	011			39.3176	-122.5393	4
+US	95987	Williams	California	CA	Colusa	011			39.1337	-122.2162	4
+US	94505	Discovery Bay	California	CA	Contra Costa	013			37.8989	-121.6054	4
+US	94506	Danville	California	CA	Contra Costa	013			37.8321	-121.9167	4
+US	94507	Alamo	California	CA	Contra Costa	013			37.8537	-122.0229	4
+US	94509	Antioch	California	CA	Contra Costa	013			37.9939	-121.8089	4
+US	94511	Bethel Island	California	CA	Contra Costa	013			38.0266	-121.6425	4
+US	94513	Brentwood	California	CA	Contra Costa	013			37.9324	-121.6894	4
+US	94514	Byron	California	CA	Contra Costa	013			37.8254	-121.6236	4
+US	94516	Canyon	California	CA	Contra Costa	013			37.8339	-122.165	4
+US	94517	Clayton	California	CA	Contra Costa	013			37.9154	-121.91	4
+US	94518	Concord	California	CA	Contra Costa	013			37.9504	-122.0263	4
+US	94519	Concord	California	CA	Contra Costa	013			37.9841	-122.0119	4
+US	94520	Concord	California	CA	Contra Costa	013			37.9823	-122.0362	4
+US	94521	Concord	California	CA	Contra Costa	013			37.9575	-121.975	4
+US	94522	Concord	California	CA	Contra Costa	013			37.978	-122.0311	4
+US	94523	Pleasant Hill	California	CA	Contra Costa	013			37.954	-122.0737	4
+US	94524	Concord	California	CA	Contra Costa	013			37.978	-122.0311	4
+US	94525	Crockett	California	CA	Contra Costa	013			38.0519	-122.2177	4
+US	94526	Danville	California	CA	Contra Costa	013			37.814	-121.966	4
+US	94527	Concord	California	CA	Contra Costa	013			37.9535	-121.9578	4
+US	94528	Diablo	California	CA	Contra Costa	013			37.8387	-121.9667	4
+US	94529	Concord	California	CA	Contra Costa	013			37.978	-122.0311	4
+US	94530	El Cerrito	California	CA	Contra Costa	013			37.9156	-122.2985	4
+US	94531	Antioch	California	CA	Contra Costa	013			37.9658	-121.7758	4
+US	94547	Hercules	California	CA	Contra Costa	013			38.0066	-122.2637	4
+US	94548	Knightsen	California	CA	Contra Costa	013			37.9726	-121.6652	4
+US	94549	Lafayette	California	CA	Contra Costa	013			37.8961	-122.1119	4
+US	94553	Martinez	California	CA	Contra Costa	013			37.9864	-122.135	4
+US	94556	Moraga	California	CA	Contra Costa	013			37.8437	-122.1242	4
+US	94561	Oakley	California	CA	Contra Costa	013			37.994	-121.7036	4
+US	94563	Orinda	California	CA	Contra Costa	013			37.8787	-122.1728	4
+US	94564	Pinole	California	CA	Contra Costa	013			37.9969	-122.2875	4
+US	94565	Pittsburg	California	CA	Contra Costa	013			38.0031	-121.9172	4
+US	94569	Port Costa	California	CA	Contra Costa	013			38.046	-122.1866	4
+US	94570	Moraga	California	CA	Contra Costa	013			37.7772	-121.9554	4
+US	94572	Rodeo	California	CA	Contra Costa	013			38.0307	-122.2581	4
+US	94575	Moraga	California	CA	Contra Costa	013			37.7772	-121.9554	4
+US	94582	San Ramon	California	CA	Contra Costa	013			37.7636	-121.9155	4
+US	94583	San Ramon	California	CA	Contra Costa	013			37.7562	-121.9522	4
+US	94595	Walnut Creek	California	CA	Contra Costa	013			37.8753	-122.0703	4
+US	94596	Walnut Creek	California	CA	Contra Costa	013			37.9053	-122.0549	4
+US	94597	Walnut Creek	California	CA	Contra Costa	013			37.9182	-122.0717	4
+US	94598	Walnut Creek	California	CA	Contra Costa	013			37.9194	-122.0259	4
+US	94801	Richmond	California	CA	Contra Costa	013			37.94	-122.362	4
+US	94802	Richmond	California	CA	Contra Costa	013			37.9358	-122.3477	4
+US	94803	El Sobrante	California	CA	Contra Costa	013			37.9693	-122.2901	4
+US	94804	Richmond	California	CA	Contra Costa	013			37.9265	-122.3342	4
+US	94805	Richmond	California	CA	Contra Costa	013			37.9417	-122.3238	4
+US	94806	San Pablo	California	CA	Contra Costa	013			37.9724	-122.3369	4
+US	94807	Richmond	California	CA	Contra Costa	013			37.9358	-122.3477	4
+US	94808	Richmond	California	CA	Contra Costa	013			37.9358	-122.3477	4
+US	94820	El Sobrante	California	CA	Contra Costa	013			37.9771	-122.2952	4
+US	94850	Richmond	California	CA	Contra Costa	013			37.9358	-122.3477	4
+US	95531	Crescent City	California	CA	Del Norte	015			41.7817	-124.1332	4
+US	95532	Crescent City	California	CA	Del Norte	015			41.7561	-124.2005	4
+US	95538	Fort Dick	California	CA	Del Norte	015			41.8679	-124.149	4
+US	95543	Gasquet	California	CA	Del Norte	015			41.9056	-123.831	1
+US	95548	Klamath	California	CA	Del Norte	015			41.5804	-124.0387	4
+US	95567	Smith River	California	CA	Del Norte	015			41.9404	-124.1587	4
+US	95613	Coloma	California	CA	El Dorado	017			38.8	-120.8891	4
+US	95614	Cool	California	CA	El Dorado	017			38.8923	-120.9802	1
+US	95619	Diamond Springs	California	CA	El Dorado	017			38.6865	-120.8145	4
+US	95623	El Dorado	California	CA	El Dorado	017			38.633	-120.8498	4
+US	95633	Garden Valley	California	CA	El Dorado	017			38.8665	-120.8567	4
+US	95634	Georgetown	California	CA	El Dorado	017			38.9185	-120.7599	4
+US	95635	Greenwood	California	CA	El Dorado	017			38.9143	-120.9001	4
+US	95636	Grizzly Flats	California	CA	El Dorado	017			38.6489	-120.5098	1
+US	95651	Lotus	California	CA	El Dorado	017			38.8278	-120.9238	4
+US	95656	Mount Aukum	California	CA	El Dorado	017			38.55	-120.7304	4
+US	95664	Pilot Hill	California	CA	El Dorado	017			38.8135	-121.0308	4
+US	95667	Placerville	California	CA	El Dorado	017			38.7195	-120.8046	4
+US	95672	Rescue	California	CA	El Dorado	017			38.7194	-120.9945	1
+US	95682	Shingle Springs	California	CA	El Dorado	017			38.6465	-120.9641	4
+US	95684	Somerset	California	CA	El Dorado	017			38.5953	-120.5949	4
+US	95709	Camino	California	CA	El Dorado	017			38.747	-120.6743	4
+US	95720	Kyburz	California	CA	El Dorado	017			38.7825	-120.2569	4
+US	95721	Echo Lake	California	CA	El Dorado	017			38.8338	-120.0416	4
+US	95726	Pollock Pines	California	CA	El Dorado	017			38.7708	-120.5427	4
+US	95735	Twin Bridges	California	CA	El Dorado	017			38.8092	-120.1242	4
+US	95762	El Dorado Hills	California	CA	El Dorado	017			38.685	-121.068	4
+US	96142	Tahoma	California	CA	El Dorado	017			39.0644	-120.1357	4
+US	96150	South Lake Tahoe	California	CA	El Dorado	017			38.917	-119.9865	4
+US	96151	South Lake Tahoe	California	CA	El Dorado	017			38.9039	-119.995	4
+US	96152	South Lake Tahoe	California	CA	El Dorado	017			38.9271	-119.999	4
+US	96154	South Lake Tahoe	California	CA	El Dorado	017			38.8753	-120.0188	4
+US	96155	South Lake Tahoe	California	CA	El Dorado	017			38.8449	-120.043	4
+US	96156	South Lake Tahoe	California	CA	El Dorado	017			38.9352	-119.9676	4
+US	96157	South Lake Tahoe	California	CA	El Dorado	017			38.9344	-119.9767	4
+US	96158	South Lake Tahoe	California	CA	El Dorado	017			38.8981	-119.9984	4
+US	93210	Coalinga	California	CA	Fresno	019			36.1624	-120.3489	4
+US	93234	Huron	California	CA	Fresno	019			36.2371	-120.102	4
+US	93242	Laton	California	CA	Fresno	019			36.4378	-119.7156	4
+US	93602	Auberry	California	CA	Fresno	019			37.0726	-119.4572	4
+US	93605	Big Creek	California	CA	Fresno	019			37.2032	-119.2492	4
+US	93606	Biola	California	CA	Fresno	019			36.8032	-120.0185	4
+US	93607	Burrel	California	CA	Fresno	019			36.5898	-119.8994	4
+US	93608	Cantua Creek	California	CA	Fresno	019			36.4921	-120.3353	4
+US	93609	Caruthers	California	CA	Fresno	019			36.5358	-119.8446	4
+US	93611	Clovis	California	CA	Fresno	019			36.8253	-119.6802	4
+US	93612	Clovis	California	CA	Fresno	019			36.8149	-119.7106	4
+US	93613	Clovis	California	CA	Fresno	019			36.8252	-119.7029	4
+US	93616	Del Rey	California	CA	Fresno	019			36.6543	-119.5929	4
+US	93621	Dunlap	California	CA	Fresno	019			36.7446	-119.0899	4
+US	93622	Firebaugh	California	CA	Fresno	019			36.8651	-120.47	4
+US	93624	Five Points	California	CA	Fresno	019			36.3386	-120.1118	4
+US	93625	Fowler	California	CA	Fresno	019			36.6282	-119.671	4
+US	93626	Friant	California	CA	Fresno	019			37.0422	-119.6807	4
+US	93627	Helm	California	CA	Fresno	019			36.5316	-120.0982	4
+US	93628	Hume	California	CA	Fresno	019			36.7515	-118.9575	4
+US	93630	Kerman	California	CA	Fresno	019			36.7306	-120.0724	4
+US	93631	Kingsburg	California	CA	Fresno	019			36.508	-119.5433	4
+US	93634	Lakeshore	California	CA	Fresno	019			37.253	-119.1748	4
+US	93640	Mendota	California	CA	Fresno	019			36.7424	-120.4093	4
+US	93641	Miramonte	California	CA	Fresno	019			36.6894	-119.0477	4
+US	93642	Mono Hot Springs	California	CA	Fresno	019			37.3266	-119.0176	4
+US	93646	Orange Cove	California	CA	Fresno	019			36.6255	-119.3204	4
+US	93648	Parlier	California	CA	Fresno	019			36.6103	-119.5375	4
+US	93649	Piedra	California	CA	Fresno	019			36.8417	-119.3496	4
+US	93650	Fresno	California	CA	Fresno	019			36.8411	-119.801	4
+US	93651	Prather	California	CA	Fresno	019			36.9938	-119.5268	4
+US	93652	Raisin City	California	CA	Fresno	019			36.6024	-119.904	4
+US	93654	Reedley	California	CA	Fresno	019			36.6044	-119.4378	4
+US	93656	Riverdale	California	CA	Fresno	019			36.4295	-119.872	4
+US	93657	Sanger	California	CA	Fresno	019			36.7243	-119.5478	4
+US	93660	San Joaquin	California	CA	Fresno	019			36.6059	-120.1889	4
+US	93662	Selma	California	CA	Fresno	019			36.5695	-119.617	4
+US	93664	Shaver Lake	California	CA	Fresno	019			37.1397	-119.273	4
+US	93667	Tollhouse	California	CA	Fresno	019			36.9943	-119.3914	4
+US	93668	Tranquillity	California	CA	Fresno	019			36.6584	-120.2617	4
+US	93675	Yokuts	California	CA	Fresno	019			36.7071	-119.1814	4
+US	93701	Fresno	California	CA	Fresno	019			36.7487	-119.7867	4
+US	93702	Fresno	California	CA	Fresno	019			36.74	-119.7532	4
+US	93703	Fresno	California	CA	Fresno	019			36.7684	-119.7594	4
+US	93704	Fresno	California	CA	Fresno	019			36.7991	-119.8016	4
+US	93705	Fresno	California	CA	Fresno	019			36.7863	-119.8286	4
+US	93706	Fresno	California	CA	Fresno	019			36.6486	-119.9987	4
+US	93707	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93708	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93709	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93710	Fresno	California	CA	Fresno	019			36.8236	-119.7621	4
+US	93711	Fresno	California	CA	Fresno	019			36.8303	-119.8319	4
+US	93712	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93714	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93715	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93716	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93717	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93718	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93720	Fresno	California	CA	Fresno	019			36.8579	-119.7655	4
+US	93721	Fresno	California	CA	Fresno	019			36.7377	-119.7843	4
+US	93722	Fresno	California	CA	Fresno	019			36.7918	-119.8801	4
+US	93723	Fresno	California	CA	Fresno	019			36.7863	-119.9532	4
+US	93724	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93725	Fresno	California	CA	Fresno	019			36.6207	-119.7308	4
+US	93726	Fresno	California	CA	Fresno	019			36.7949	-119.7604	4
+US	93727	Fresno	California	CA	Fresno	019			36.7528	-119.7061	4
+US	93728	Fresno	California	CA	Fresno	019			36.7581	-119.8113	4
+US	93729	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93730	Fresno	California	CA	Fresno	019			36.8878	-119.7589	4
+US	93737	Fresno	California	CA	Fresno	019			36.7477	-119.7724	4
+US	93740	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93741	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93744	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93745	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93747	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93750	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93755	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93760	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93761	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93764	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93765	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93771	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93772	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93773	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93774	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93775	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93776	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93777	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93778	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93779	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93786	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93790	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93791	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93792	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93793	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93794	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93844	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	93888	Fresno	California	CA	Fresno	019			36.7464	-119.6397	4
+US	95913	Artois	California	CA	Glenn	021			39.6197	-122.1927	4
+US	95920	Butte City	California	CA	Glenn	021			39.4568	-121.9515	4
+US	95939	Elk Creek	California	CA	Glenn	021			39.5306	-122.6124	4
+US	95943	Glenn	California	CA	Glenn	021			39.6069	-122.0384	4
+US	95951	Hamilton City	California	CA	Glenn	021			39.7386	-122.0085	4
+US	95963	Orland	California	CA	Glenn	021			39.7314	-122.2534	4
+US	95988	Willows	California	CA	Glenn	021			39.5353	-122.2597	4
+US	95501	Eureka	California	CA	Humboldt	023			40.7938	-124.1573	4
+US	95502	Eureka	California	CA	Humboldt	023			40.7965	-124.1737	4
+US	95503	Eureka	California	CA	Humboldt	023			40.7592	-124.1593	4
+US	95511	Alderpoint	California	CA	Humboldt	023			40.1676	-123.6192	4
+US	95514	Blocksburg	California	CA	Humboldt	023			40.2987	-123.6576	4
+US	95518	Arcata	California	CA	Humboldt	023			40.8685	-124.0856	4
+US	95519	Mckinleyville	California	CA	Humboldt	023			40.9465	-124.0834	4
+US	95521	Arcata	California	CA	Humboldt	023			40.8742	-124.0765	4
+US	95524	Bayside	California	CA	Humboldt	023			40.8266	-124.0552	4
+US	95525	Blue Lake	California	CA	Humboldt	023			40.9374	-123.8913	4
+US	95526	Bridgeville	California	CA	Humboldt	023			40.4693	-123.7998	4
+US	95528	Carlotta	California	CA	Humboldt	023			40.507	-123.9743	4
+US	95534	Cutten	California	CA	Humboldt	023			40.7965	-124.1737	4
+US	95536	Ferndale	California	CA	Humboldt	023			40.5259	-124.2514	4
+US	95537	Fields Landing	California	CA	Humboldt	023			40.7268	-124.2174	4
+US	95540	Fortuna	California	CA	Humboldt	023			40.5835	-124.1473	4
+US	95542	Garberville	California	CA	Humboldt	023			40.0864	-123.7991	4
+US	95545	Honeydew	California	CA	Humboldt	023			40.2421	-124.0972	4
+US	95546	Hoopa	California	CA	Humboldt	023			41.0504	-123.6742	4
+US	95547	Hydesville	California	CA	Humboldt	023			40.5485	-124.0847	4
+US	95549	Kneeland	California	CA	Humboldt	023			40.6405	-123.8826	4
+US	95550	Korbel	California	CA	Humboldt	023			40.7775	-123.8486	4
+US	95551	Loleta	California	CA	Humboldt	023			40.6589	-124.2251	4
+US	95553	Miranda	California	CA	Humboldt	023			40.2397	-123.8077	4
+US	95554	Myers Flat	California	CA	Humboldt	023			40.2841	-123.7945	4
+US	95555	Orick	California	CA	Humboldt	023			41.3596	-124.0317	4
+US	95556	Orleans	California	CA	Humboldt	023			41.3115	-123.5399	4
+US	95558	Petrolia	California	CA	Humboldt	023			40.2868	-124.2271	4
+US	95559	Phillipsville	California	CA	Humboldt	023			40.2008	-123.7735	4
+US	95560	Redway	California	CA	Humboldt	023			40.1201	-123.8234	4
+US	95562	Rio Dell	California	CA	Humboldt	023			40.4987	-124.1102	4
+US	95564	Samoa	California	CA	Humboldt	023			40.8037	-124.1936	4
+US	95565	Scotia	California	CA	Humboldt	023			40.4583	-124.0517	4
+US	95569	Redcrest	California	CA	Humboldt	023			40.3437	-123.9095	4
+US	95570	Trinidad	California	CA	Humboldt	023			41.0593	-124.1431	4
+US	95571	Weott	California	CA	Humboldt	023			40.3218	-123.9217	4
+US	95573	Willow Creek	California	CA	Humboldt	023			40.9484	-123.6276	4
+US	95589	Whitethorn	California	CA	Humboldt	023			40.0231	-124.0139	4
+US	92222	Bard	California	CA	Imperial	025			32.7822	-114.5619	1
+US	92227	Brawley	California	CA	Imperial	025			32.9792	-115.5296	4
+US	92231	Calexico	California	CA	Imperial	025			32.6832	-115.5028	4
+US	92232	Calexico	California	CA	Imperial	025			32.6789	-115.4989	4
+US	92233	Calipatria	California	CA	Imperial	025			33.167	-115.5114	4
+US	92243	El Centro	California	CA	Imperial	025			32.7893	-115.5665	4
+US	92244	El Centro	California	CA	Imperial	025			32.7948	-115.6927	4
+US	92249	Heber	California	CA	Imperial	025			32.7218	-115.4383	4
+US	92250	Holtville	California	CA	Imperial	025			32.8104	-115.3775	4
+US	92251	Imperial	California	CA	Imperial	025			32.847	-115.573	4
+US	92257	Niland	California	CA	Imperial	025			33.3784	-115.6965	4
+US	92259	Ocotillo	California	CA	Imperial	025			32.7387	-115.9942	4
+US	92266	Palo Verde	California	CA	Imperial	025			33.3696	-114.7355	4
+US	92273	Seeley	California	CA	Imperial	025			32.7941	-115.6948	4
+US	92275	Salton City	California	CA	Imperial	025			33.3092	-115.9578	4
+US	92281	Westmorland	California	CA	Imperial	025			33.038	-115.5914	4
+US	92283	Winterhaven	California	CA	Imperial	025			32.9818	-114.6854	1
+US	92331	Fontana	California	CA	Imperial	025			34.0922	-117.4612	4
+US	92328	Death Valley	California	CA	Inyo	027			36.4672	-116.8937	4
+US	92384	Shoshone	California	CA	Inyo	027			35.973	-116.2711	1
+US	92389	Tecopa	California	CA	Inyo	027			35.9021	-116.1544	1
+US	93513	Big Pine	California	CA	Inyo	027			37.1679	-118.2916	4
+US	93514	Bishop	California	CA	Inyo	027			37.5014	-118.4048	4
+US	93515	Bishop	California	CA	Inyo	027			37.3635	-118.3951	4
+US	93522	Darwin	California	CA	Inyo	027			36.2948	-117.5957	4
+US	93526	Independence	California	CA	Inyo	027			36.8396	-118.2048	4
+US	93530	Keeler	California	CA	Inyo	027			36.4886	-117.8741	4
+US	93542	Little Lake	California	CA	Inyo	027			35.9366	-117.9067	4
+US	93545	Lone Pine	California	CA	Inyo	027			36.5798	-118.0578	4
+US	93549	Olancha	California	CA	Inyo	027			36.23	-117.9552	4
+US	93203	Arvin	California	CA	Kern	029			35.1966	-118.8336	4
+US	93205	Bodfish	California	CA	Kern	029			35.587	-118.4847	4
+US	93206	Buttonwillow	California	CA	Kern	029			35.4033	-119.4659	4
+US	93215	Delano	California	CA	Kern	029			35.7715	-119.2459	4
+US	93216	Delano	California	CA	Kern	029			35.7688	-119.2471	4
+US	93220	Edison	California	CA	Kern	029			35.3475	-118.8718	4
+US	93222	Pine Mountain Club	California	CA	Kern	029			34.8469	-119.1568	4
+US	93224	Fellows	California	CA	Kern	029			35.1786	-119.5412	4
+US	93225	Frazier Park	California	CA	Kern	029			34.8265	-119.0355	4
+US	93226	Glennville	California	CA	Kern	029			35.7377	-118.7169	4
+US	93238	Kernville	California	CA	Kern	029			35.755	-118.4047	4
+US	93240	Lake Isabella	California	CA	Kern	029			35.669	-118.457	4
+US	93241	Lamont	California	CA	Kern	029			35.2571	-118.9124	4
+US	93243	Lebec	California	CA	Kern	029			34.8818	-118.8566	4
+US	93249	Lost Hills	California	CA	Kern	029			35.6163	-119.6943	4
+US	93250	Mc Farland	California	CA	Kern	029			35.6758	-119.2272	1
+US	93251	Mc Kittrick	California	CA	Kern	029			35.3031	-119.6366	1
+US	93252	Maricopa	California	CA	Kern	029			35.0589	-119.401	4
+US	93255	Onyx	California	CA	Kern	029			35.6824	-118.0959	4
+US	93263	Shafter	California	CA	Kern	029			35.497	-119.2801	4
+US	93268	Taft	California	CA	Kern	029			35.1482	-119.4557	4
+US	93276	Tupman	California	CA	Kern	029			35.2992	-119.3584	4
+US	93280	Wasco	California	CA	Kern	029			35.648	-119.4487	4
+US	93283	Weldon	California	CA	Kern	029			35.6391	-118.2859	4
+US	93285	Wofford Heights	California	CA	Kern	029			35.7246	-118.4559	4
+US	93287	Woody	California	CA	Kern	029			35.7068	-118.8439	4
+US	93301	Bakersfield	California	CA	Kern	029			35.3866	-119.0171	4
+US	93302	Bakersfield	California	CA	Kern	029			35.3733	-119.0187	4
+US	93303	Bakersfield	California	CA	Kern	029			35.2944	-118.9052	4
+US	93304	Bakersfield	California	CA	Kern	029			35.3396	-119.0218	4
+US	93305	Bakersfield	California	CA	Kern	029			35.3855	-118.986	4
+US	93306	Bakersfield	California	CA	Kern	029			35.3867	-118.9391	4
+US	93307	Bakersfield	California	CA	Kern	029			35.3275	-118.9839	4
+US	93308	Bakersfield	California	CA	Kern	029			35.4244	-119.0433	4
+US	93309	Bakersfield	California	CA	Kern	029			35.3384	-119.0627	4
+US	93311	Bakersfield	California	CA	Kern	029			35.3039	-119.1056	4
+US	93312	Bakersfield	California	CA	Kern	029			35.3935	-119.1205	4
+US	93313	Bakersfield	California	CA	Kern	029			35.2974	-119.0509	4
+US	93314	Bakersfield	California	CA	Kern	029			35.3863	-119.17	4
+US	93380	Bakersfield	California	CA	Kern	029			35.2944	-118.9052	4
+US	93383	Bakersfield	California	CA	Kern	029			35.2944	-118.9052	4
+US	93384	Bakersfield	California	CA	Kern	029			35.3733	-119.0187	4
+US	93385	Bakersfield	California	CA	Kern	029			35.2944	-118.9052	4
+US	93386	Bakersfield	California	CA	Kern	029			35.2944	-118.9052	4
+US	93387	Bakersfield	California	CA	Kern	029			35.2944	-118.9052	4
+US	93388	Bakersfield	California	CA	Kern	029			35.2944	-118.9052	4
+US	93389	Bakersfield	California	CA	Kern	029			35.2944	-118.9052	4
+US	93390	Bakersfield	California	CA	Kern	029			35.2944	-118.9052	4
+US	93501	Mojave	California	CA	Kern	029			35.0478	-118.1735	4
+US	93502	Mojave	California	CA	Kern	029			35.0525	-118.174	4
+US	93504	California City	California	CA	Kern	029			35.1871	-117.8854	4
+US	93505	California City	California	CA	Kern	029			35.1278	-117.9651	4
+US	93516	Boron	California	CA	Kern	029			35.0037	-117.6629	1
+US	93518	Caliente	California	CA	Kern	029			35.3701	-118.4612	4
+US	93519	Cantil	California	CA	Kern	029			35.3089	-117.9684	4
+US	93523	Edwards	California	CA	Kern	029			34.9261	-117.9351	4
+US	93524	Edwards	California	CA	Kern	029			34.932	-117.9071	4
+US	93527	Inyokern	California	CA	Kern	029			35.6397	-117.857	4
+US	93528	Johannesburg	California	CA	Kern	029			35.3708	-117.6427	4
+US	93531	Keene	California	CA	Kern	029			35.2375	-118.6076	4
+US	93554	Randsburg	California	CA	Kern	029			35.3866	-117.7159	4
+US	93555	Ridgecrest	California	CA	Kern	029			35.6225	-117.6709	4
+US	93556	Ridgecrest	California	CA	Kern	029			35.6225	-117.6709	4
+US	93560	Rosamond	California	CA	Kern	029			34.8664	-118.3409	4
+US	93561	Tehachapi	California	CA	Kern	029			35.1322	-118.449	4
+US	93581	Tehachapi	California	CA	Kern	029			35.1322	-118.449	4
+US	93596	Boron	California	CA	Kern	029			34.9994	-117.6498	4
+US	93202	Armona	California	CA	Kings	031			36.3095	-119.7053	4
+US	93204	Avenal	California	CA	Kings	031			35.9877	-120.1227	4
+US	93212	Corcoran	California	CA	Kings	031			36.0865	-119.5607	4
+US	93230	Hanford	California	CA	Kings	031			36.3314	-119.6491	4
+US	93232	Hanford	California	CA	Kings	031			36.3275	-119.6457	4
+US	93239	Kettleman City	California	CA	Kings	031			36.0083	-119.9618	4
+US	93245	Lemoore	California	CA	Kings	031			36.2682	-119.8173	4
+US	93246	Lemoore	California	CA	Kings	031			36.1389	-119.8947	4
+US	93266	Stratford	California	CA	Kings	031			36.179	-119.8236	4
+US	95422	Clearlake	California	CA	Lake	033			38.9576	-122.636	4
+US	95423	Clearlake Oaks	California	CA	Lake	033			39.0664	-122.6558	4
+US	95424	Clearlake Park	California	CA	Lake	033			38.9666	-122.65	4
+US	95426	Cobb	California	CA	Lake	033			38.8155	-122.7132	4
+US	95435	Finley	California	CA	Lake	033			39.0043	-122.8755	4
+US	95443	Glenhaven	California	CA	Lake	033			39.0263	-122.733	4
+US	95451	Kelseyville	California	CA	Lake	033			38.9421	-122.7777	4
+US	95453	Lakeport	California	CA	Lake	033			39.047	-122.9328	4
+US	95457	Lower Lake	California	CA	Lake	033			38.8915	-122.5914	4
+US	95458	Lucerne	California	CA	Lake	033			39.0783	-122.7846	4
+US	95461	Middletown	California	CA	Lake	033			38.7824	-122.6487	4
+US	95464	Nice	California	CA	Lake	033			39.1194	-122.8315	4
+US	95467	Hidden Valley Lake	California	CA	Lake	033			38.8036	-122.5407	4
+US	95485	Upper Lake	California	CA	Lake	033			39.1804	-122.9144	4
+US	95493	Witter Springs	California	CA	Lake	033			39.1821	-122.9711	4
+US	96009	Bieber	California	CA	Lassen	035			41.1315	-121.1286	4
+US	96068	Nubieber	California	CA	Lassen	035			41.0957	-121.183	4
+US	96109	Doyle	California	CA	Lassen	035			40.0008	-120.1077	4
+US	96113	Herlong	California	CA	Lassen	035			40.1485	-120.1713	4
+US	96114	Janesville	California	CA	Lassen	035			40.2963	-120.5098	4
+US	96117	Litchfield	California	CA	Lassen	035			40.4073	-120.4092	4
+US	96119	Madeline	California	CA	Lassen	035			40.9766	-120.5548	4
+US	96121	Milford	California	CA	Lassen	035			40.1828	-120.3895	4
+US	96123	Ravendale	California	CA	Lassen	035			40.7985	-120.3652	4
+US	96127	Susanville	California	CA	Lassen	035			40.4163	-120.653	4
+US	96128	Standish	California	CA	Lassen	035			40.3509	-120.4068	4
+US	96130	Susanville	California	CA	Lassen	035			40.3983	-120.6464	4
+US	96132	Termo	California	CA	Lassen	035			40.9509	-120.613	4
+US	96136	Wendel	California	CA	Lassen	035			40.3406	-120.2824	4
+US	96137	Westwood	California	CA	Lassen	035			40.3038	-121.0226	4
+US	90001	Los Angeles	California	CA	Los Angeles	037			33.9731	-118.2479	4
+US	90002	Los Angeles	California	CA	Los Angeles	037			33.9497	-118.2462	4
+US	90003	Los Angeles	California	CA	Los Angeles	037			33.9653	-118.2727	4
+US	90004	Los Angeles	California	CA	Los Angeles	037			34.0762	-118.3029	4
+US	90005	Los Angeles	California	CA	Los Angeles	037			34.0585	-118.3012	4
+US	90006	Los Angeles	California	CA	Los Angeles	037			34.0493	-118.2917	4
+US	90007	Los Angeles	California	CA	Los Angeles	037			34.0294	-118.2871	4
+US	90008	Los Angeles	California	CA	Los Angeles	037			34.0116	-118.3411	4
+US	90009	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90010	Los Angeles	California	CA	Los Angeles	037			34.0606	-118.3027	4
+US	90011	Los Angeles	California	CA	Los Angeles	037			34.0079	-118.2582	4
+US	90012	Los Angeles	California	CA	Los Angeles	037			34.0614	-118.2385	4
+US	90013	Los Angeles	California	CA	Los Angeles	037			34.0448	-118.2434	4
+US	90014	Los Angeles	California	CA	Los Angeles	037			34.0443	-118.2509	4
+US	90015	Los Angeles	California	CA	Los Angeles	037			34.0434	-118.2716	4
+US	90016	Los Angeles	California	CA	Los Angeles	037			34.0298	-118.3528	4
+US	90017	Los Angeles	California	CA	Los Angeles	037			34.0559	-118.2666	4
+US	90018	Los Angeles	California	CA	Los Angeles	037			34.029	-118.3152	4
+US	90019	Los Angeles	California	CA	Los Angeles	037			34.0482	-118.3343	4
+US	90020	Los Angeles	California	CA	Los Angeles	037			34.0665	-118.3022	4
+US	90021	Los Angeles	California	CA	Los Angeles	037			34.0333	-118.2447	4
+US	90022	Los Angeles	California	CA	Los Angeles	037			34.0245	-118.1561	4
+US	90023	Los Angeles	California	CA	Los Angeles	037			34.0245	-118.1975	4
+US	90024	Los Angeles	California	CA	Los Angeles	037			34.0637	-118.4408	4
+US	90025	Los Angeles	California	CA	Los Angeles	037			34.0447	-118.4487	4
+US	90026	Los Angeles	California	CA	Los Angeles	037			34.0766	-118.2646	4
+US	90027	Los Angeles	California	CA	Los Angeles	037			34.104	-118.2925	4
+US	90028	Los Angeles	California	CA	Los Angeles	037			34.1005	-118.3254	4
+US	90029	Los Angeles	California	CA	Los Angeles	037			34.09	-118.2944	4
+US	90030	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90031	Los Angeles	California	CA	Los Angeles	037			34.0783	-118.2113	4
+US	90032	Los Angeles	California	CA	Los Angeles	037			34.0818	-118.1753	4
+US	90033	Los Angeles	California	CA	Los Angeles	037			34.0487	-118.2084	4
+US	90034	Los Angeles	California	CA	Los Angeles	037			34.029	-118.4005	4
+US	90035	Los Angeles	California	CA	Los Angeles	037			34.0531	-118.3806	4
+US	90036	Los Angeles	California	CA	Los Angeles	037			34.0699	-118.3492	4
+US	90037	Los Angeles	California	CA	Los Angeles	037			34.003	-118.2863	4
+US	90038	Los Angeles	California	CA	Los Angeles	037			34.0898	-118.3215	4
+US	90039	Los Angeles	California	CA	Los Angeles	037			34.1121	-118.2594	4
+US	90040	Los Angeles	California	CA	Los Angeles	037			33.9909	-118.1532	4
+US	90041	Los Angeles	California	CA	Los Angeles	037			34.1339	-118.2082	4
+US	90042	Los Angeles	California	CA	Los Angeles	037			34.1145	-118.1929	4
+US	90043	Los Angeles	California	CA	Los Angeles	037			33.9871	-118.3321	4
+US	90044	Los Angeles	California	CA	Los Angeles	037			33.9551	-118.2901	4
+US	90045	Los Angeles	California	CA	Los Angeles	037			33.9631	-118.3941	4
+US	90046	Los Angeles	California	CA	Los Angeles	037			34.1074	-118.3652	4
+US	90047	Los Angeles	California	CA	Los Angeles	037			33.9569	-118.3073	4
+US	90048	Los Angeles	California	CA	Los Angeles	037			34.0737	-118.372	4
+US	90049	Los Angeles	California	CA	Los Angeles	037			34.066	-118.474	4
+US	90050	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90051	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90052	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90053	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90054	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90055	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90056	Los Angeles	California	CA	Los Angeles	037			33.9853	-118.3707	4
+US	90057	Los Angeles	California	CA	Los Angeles	037			34.0622	-118.2763	4
+US	90058	Los Angeles	California	CA	Los Angeles	037			33.9994	-118.2133	4
+US	90059	Los Angeles	California	CA	Los Angeles	037			33.9293	-118.2463	4
+US	90060	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90061	Los Angeles	California	CA	Los Angeles	037			33.9245	-118.2716	4
+US	90062	Los Angeles	California	CA	Los Angeles	037			34.0032	-118.3073	4
+US	90063	Los Angeles	California	CA	Los Angeles	037			34.0451	-118.1859	4
+US	90064	Los Angeles	California	CA	Los Angeles	037			34.0353	-118.4259	4
+US	90065	Los Angeles	California	CA	Los Angeles	037			34.1073	-118.2266	4
+US	90066	Los Angeles	California	CA	Los Angeles	037			34.003	-118.4298	4
+US	90067	Los Angeles	California	CA	Los Angeles	037			34.0551	-118.4095	4
+US	90068	Los Angeles	California	CA	Los Angeles	037			34.1156	-118.3305	4
+US	90069	West Hollywood	California	CA	Los Angeles	037			34.0906	-118.3788	4
+US	90070	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90071	Los Angeles	California	CA	Los Angeles	037			34.0529	-118.2549	4
+US	90072	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90073	Los Angeles	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90074	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90075	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90076	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90077	Los Angeles	California	CA	Los Angeles	037			34.1112	-118.4502	4
+US	90078	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90079	Los Angeles	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90080	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90081	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90082	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90083	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90084	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90086	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90087	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90088	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90089	Los Angeles	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90090	Dodgertown	California	CA	Los Angeles	037			34.0725	-118.2418	1
+US	90091	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90093	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90094	Playa Vista	California	CA	Los Angeles	037			33.9728	-118.4276	4
+US	90095	Los Angeles	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90096	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90099	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90134	Los Angeles	California	CA	Los Angeles	037			34.0522	-118.2437	4
+US	90189	Los Angeles	California	CA	Los Angeles	037			34.0515	-118.2559	4
+US	90201	Bell Gardens	California	CA	Los Angeles	037			33.9653	-118.1515	4
+US	90202	Bell	California	CA	Los Angeles	037			33.9775	-118.187	4
+US	90209	Beverly Hills	California	CA	Los Angeles	037			34.0736	-118.4004	4
+US	90210	Beverly Hills	California	CA	Los Angeles	037			34.0901	-118.4065	4
+US	90211	Beverly Hills	California	CA	Los Angeles	037			34.0652	-118.383	4
+US	90212	Beverly Hills	California	CA	Los Angeles	037			34.0619	-118.3995	4
+US	90213	Beverly Hills	California	CA	Los Angeles	037			34.0736	-118.4004	4
+US	90220	Compton	California	CA	Los Angeles	037			33.8748	-118.2402	4
+US	90221	Compton	California	CA	Los Angeles	037			33.8796	-118.2168	4
+US	90222	Compton	California	CA	Los Angeles	037			33.9099	-118.2357	4
+US	90223	Compton	California	CA	Los Angeles	037			33.8958	-118.2201	4
+US	90224	Compton	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90230	Culver City	California	CA	Los Angeles	037			33.9949	-118.3991	4
+US	90231	Culver City	California	CA	Los Angeles	037			34.0211	-118.3965	4
+US	90232	Culver City	California	CA	Los Angeles	037			34.0168	-118.3973	4
+US	90233	Culver City	California	CA	Los Angeles	037			34.0211	-118.3965	4
+US	90239	Downey	California	CA	Los Angeles	037			33.94	-118.1326	4
+US	90240	Downey	California	CA	Los Angeles	037			33.9581	-118.1174	4
+US	90241	Downey	California	CA	Los Angeles	037			33.9416	-118.1306	4
+US	90242	Downey	California	CA	Los Angeles	037			33.9218	-118.1395	4
+US	90245	El Segundo	California	CA	Los Angeles	037			33.9243	-118.4119	4
+US	90247	Gardena	California	CA	Los Angeles	037			33.8925	-118.2961	4
+US	90248	Gardena	California	CA	Los Angeles	037			33.8766	-118.2835	4
+US	90249	Gardena	California	CA	Los Angeles	037			33.8998	-118.3199	4
+US	90250	Hawthorne	California	CA	Los Angeles	037			33.9143	-118.3493	4
+US	90251	Hawthorne	California	CA	Los Angeles	037			33.9164	-118.3526	4
+US	90254	Hermosa Beach	California	CA	Los Angeles	037			33.8643	-118.3955	4
+US	90255	Huntington Park	California	CA	Los Angeles	037			33.9769	-118.2161	4
+US	90260	Lawndale	California	CA	Los Angeles	037			33.8879	-118.351	4
+US	90261	Lawndale	California	CA	Los Angeles	037			33.8872	-118.3526	4
+US	90262	Lynwood	California	CA	Los Angeles	037			33.9241	-118.2013	4
+US	90263	Malibu	California	CA	Los Angeles	037			34.005	-118.8101	4
+US	90264	Malibu	California	CA	Los Angeles	037			34.005	-118.8101	4
+US	90265	Malibu	California	CA	Los Angeles	037			34.0402	-118.7351	4
+US	90266	Manhattan Beach	California	CA	Los Angeles	037			33.8896	-118.3996	4
+US	90267	Manhattan Beach	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90270	Maywood	California	CA	Los Angeles	037			33.989	-118.1877	4
+US	90272	Pacific Palisades	California	CA	Los Angeles	037			34.0481	-118.5265	4
+US	90274	Palos Verdes Peninsula	California	CA	Los Angeles	037			33.7669	-118.3806	4
+US	90275	Rancho Palos Verdes	California	CA	Los Angeles	037			33.7515	-118.367	4
+US	90277	Redondo Beach	California	CA	Los Angeles	037			33.8307	-118.3832	4
+US	90278	Redondo Beach	California	CA	Los Angeles	037			33.8707	-118.3715	4
+US	90280	South Gate	California	CA	Los Angeles	037			33.9462	-118.2013	4
+US	90290	Topanga	California	CA	Los Angeles	037			34.1076	-118.6023	4
+US	90291	Venice	California	CA	Los Angeles	037			33.9938	-118.4635	4
+US	90292	Marina Del Rey	California	CA	Los Angeles	037			33.9779	-118.4525	4
+US	90293	Playa Del Rey	California	CA	Los Angeles	037			33.9577	-118.4373	4
+US	90294	Venice	California	CA	Los Angeles	037			33.9908	-118.4601	4
+US	90295	Marina Del Rey	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90296	Playa Del Rey	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90301	Inglewood	California	CA	Los Angeles	037			33.955	-118.3556	4
+US	90302	Inglewood	California	CA	Los Angeles	037			33.9745	-118.3548	4
+US	90303	Inglewood	California	CA	Los Angeles	037			33.9377	-118.3321	4
+US	90304	Inglewood	California	CA	Los Angeles	037			33.9379	-118.3586	4
+US	90305	Inglewood	California	CA	Los Angeles	037			33.9583	-118.3259	4
+US	90306	Inglewood	California	CA	Los Angeles	037			33.9617	-118.3531	4
+US	90307	Inglewood	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90308	Inglewood	California	CA	Los Angeles	037			33.9617	-118.3531	4
+US	90309	Inglewood	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90310	Inglewood	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90311	Inglewood	California	CA	Los Angeles	037			33.9617	-118.3531	4
+US	90312	Inglewood	California	CA	Los Angeles	037			33.9617	-118.3531	4
+US	90401	Santa Monica	California	CA	Los Angeles	037			34.0176	-118.4907	4
+US	90402	Santa Monica	California	CA	Los Angeles	037			34.0349	-118.503	4
+US	90403	Santa Monica	California	CA	Los Angeles	037			34.0287	-118.4924	4
+US	90404	Santa Monica	California	CA	Los Angeles	037			34.0268	-118.4733	4
+US	90405	Santa Monica	California	CA	Los Angeles	037			34.01	-118.4717	4
+US	90406	Santa Monica	California	CA	Los Angeles	037			34.0195	-118.4912	4
+US	90407	Santa Monica	California	CA	Los Angeles	037			34.0195	-118.4912	4
+US	90408	Santa Monica	California	CA	Los Angeles	037			34.0195	-118.4912	4
+US	90409	Santa Monica	California	CA	Los Angeles	037			34.0195	-118.4912	4
+US	90410	Santa Monica	California	CA	Los Angeles	037			34.0195	-118.4912	4
+US	90411	Santa Monica	California	CA	Los Angeles	037			34.0195	-118.4912	4
+US	90501	Torrance	California	CA	Los Angeles	037			33.8268	-118.3118	4
+US	90502	Torrance	California	CA	Los Angeles	037			33.8286	-118.292	4
+US	90503	Torrance	California	CA	Los Angeles	037			33.8397	-118.3542	4
+US	90504	Torrance	California	CA	Los Angeles	037			33.8708	-118.3295	4
+US	90505	Torrance	California	CA	Los Angeles	037			33.8106	-118.3507	4
+US	90506	Torrance	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90507	Torrance	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90508	Torrance	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90509	Torrance	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90510	Torrance	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90601	Whittier	California	CA	Los Angeles	037			34.0011	-118.0371	4
+US	90602	Whittier	California	CA	Los Angeles	037			33.9693	-118.0337	4
+US	90603	Whittier	California	CA	Los Angeles	037			33.9432	-117.9927	4
+US	90604	Whittier	California	CA	Los Angeles	037			33.9299	-118.0121	4
+US	90605	Whittier	California	CA	Los Angeles	037			33.9413	-118.0356	4
+US	90606	Whittier	California	CA	Los Angeles	037			33.9777	-118.0658	4
+US	90607	Whittier	California	CA	Los Angeles	037			33.9792	-118.0328	4
+US	90608	Whittier	California	CA	Los Angeles	037			33.9792	-118.0328	4
+US	90609	Whittier	California	CA	Los Angeles	037			33.9792	-118.0328	4
+US	90610	Whittier	California	CA	Los Angeles	037			33.9792	-118.0328	4
+US	90637	La Mirada	California	CA	Los Angeles	037			33.9172	-118.012	4
+US	90638	La Mirada	California	CA	Los Angeles	037			33.9067	-118.0101	4
+US	90639	La Mirada	California	CA	Los Angeles	037			33.9058	-118.0182	4
+US	90640	Montebello	California	CA	Los Angeles	037			34.0133	-118.113	4
+US	90650	Norwalk	California	CA	Los Angeles	037			33.9056	-118.0818	4
+US	90651	Norwalk	California	CA	Los Angeles	037			33.9022	-118.0817	4
+US	90652	Norwalk	California	CA	Los Angeles	037			33.9022	-118.0817	4
+US	90660	Pico Rivera	California	CA	Los Angeles	037			33.9886	-118.0883	4
+US	90661	Pico Rivera	California	CA	Los Angeles	037			33.9831	-118.0967	4
+US	90662	Pico Rivera	California	CA	Los Angeles	037			33.9831	-118.0967	4
+US	90670	Santa Fe Springs	California	CA	Los Angeles	037			33.9464	-118.0838	4
+US	90671	Santa Fe Springs	California	CA	Los Angeles	037			33.9472	-118.0853	4
+US	90701	Artesia	California	CA	Los Angeles	037			33.8654	-118.0731	4
+US	90702	Artesia	California	CA	Los Angeles	037			33.8658	-118.0831	4
+US	90703	Cerritos	California	CA	Los Angeles	037			33.8669	-118.0686	4
+US	90704	Avalon	California	CA	Los Angeles	037			33.332	-118.3437	4
+US	90706	Bellflower	California	CA	Los Angeles	037			33.8867	-118.1265	4
+US	90707	Bellflower	California	CA	Los Angeles	037			33.8817	-118.117	4
+US	90710	Harbor City	California	CA	Los Angeles	037			33.797	-118.2991	4
+US	90711	Lakewood	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90712	Lakewood	California	CA	Los Angeles	037			33.8512	-118.1457	4
+US	90713	Lakewood	California	CA	Los Angeles	037			33.8473	-118.1115	4
+US	90714	Lakewood	California	CA	Los Angeles	037			33.8512	-118.1339	4
+US	90715	Lakewood	California	CA	Los Angeles	037			33.8405	-118.0767	4
+US	90716	Hawaiian Gardens	California	CA	Los Angeles	037			33.8296	-118.073	4
+US	90717	Lomita	California	CA	Los Angeles	037			33.7938	-118.3172	4
+US	90723	Paramount	California	CA	Los Angeles	037			33.8969	-118.1632	4
+US	90731	San Pedro	California	CA	Los Angeles	037			33.7339	-118.2914	4
+US	90732	San Pedro	California	CA	Los Angeles	037			33.742	-118.3121	4
+US	90733	San Pedro	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90734	San Pedro	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90744	Wilmington	California	CA	Los Angeles	037			33.7855	-118.2645	4
+US	90745	Carson	California	CA	Los Angeles	037			33.823	-118.2684	4
+US	90746	Carson	California	CA	Los Angeles	037			33.8584	-118.2554	4
+US	90747	Carson	California	CA	Los Angeles	037			33.8671	-118.2538	4
+US	90748	Wilmington	California	CA	Los Angeles	037			33.78	-118.2626	4
+US	90749	Carson	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90755	Signal Hill	California	CA	Los Angeles	037			33.8029	-118.1677	4
+US	90801	Long Beach	California	CA	Los Angeles	037			33.767	-118.1892	4
+US	90802	Long Beach	California	CA	Los Angeles	037			33.7706	-118.182	4
+US	90803	Long Beach	California	CA	Los Angeles	037			33.7619	-118.1341	4
+US	90804	Long Beach	California	CA	Los Angeles	037			33.7857	-118.1357	4
+US	90805	Long Beach	California	CA	Los Angeles	037			33.8635	-118.1801	4
+US	90806	Long Beach	California	CA	Los Angeles	037			33.8045	-118.1876	4
+US	90807	Long Beach	California	CA	Los Angeles	037			33.8315	-118.1811	4
+US	90808	Long Beach	California	CA	Los Angeles	037			33.8241	-118.1103	4
+US	90809	Long Beach	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90810	Long Beach	California	CA	Los Angeles	037			33.8193	-118.2325	4
+US	90813	Long Beach	California	CA	Los Angeles	037			33.782	-118.1835	4
+US	90814	Long Beach	California	CA	Los Angeles	037			33.7716	-118.148	4
+US	90815	Long Beach	California	CA	Los Angeles	037			33.7939	-118.1192	4
+US	90822	Long Beach	California	CA	Los Angeles	037			33.7927	-118.1638	4
+US	90831	Long Beach	California	CA	Los Angeles	037			33.7678	-118.1994	4
+US	90832	Long Beach	California	CA	Los Angeles	037			33.767	-118.1892	4
+US	90833	Long Beach	California	CA	Los Angeles	037			33.7678	-118.1994	4
+US	90834	Long Beach	California	CA	Los Angeles	037			33.7678	-118.1994	4
+US	90835	Long Beach	California	CA	Los Angeles	037			33.7678	-118.1994	4
+US	90840	Long Beach	California	CA	Los Angeles	037			33.7843	-118.1157	4
+US	90842	Long Beach	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90844	Long Beach	California	CA	Los Angeles	037			33.767	-118.1892	4
+US	90846	Long Beach	California	CA	Los Angeles	037			33.8249	-118.1504	4
+US	90847	Long Beach	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90848	Long Beach	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90853	Long Beach	California	CA	Los Angeles	037			33.7866	-118.2987	4
+US	90895	Carson	California	CA	Los Angeles	037			33.8392	-118.2202	4
+US	90899	Long Beach	California	CA	Los Angeles	037			33.767	-118.1892	4
+US	91001	Altadena	California	CA	Los Angeles	037			34.1912	-118.1392	4
+US	91003	Altadena	California	CA	Los Angeles	037			34.1897	-118.1312	4
+US	91006	Arcadia	California	CA	Los Angeles	037			34.1324	-118.0264	4
+US	91007	Arcadia	California	CA	Los Angeles	037			34.1243	-118.0515	4
+US	91008	Duarte	California	CA	Los Angeles	037			34.149	-117.9644	4
+US	91009	Duarte	California	CA	Los Angeles	037			34.1395	-117.9773	4
+US	91010	Duarte	California	CA	Los Angeles	037			34.1407	-117.9567	4
+US	91011	La Canada Flintridge	California	CA	Los Angeles	037			34.2217	-118.2051	4
+US	91012	La Canada Flintridge	California	CA	Los Angeles	037			34.1992	-118.1879	4
+US	91016	Monrovia	California	CA	Los Angeles	037			34.144	-118.0014	4
+US	91017	Monrovia	California	CA	Los Angeles	037			34.1481	-117.999	4
+US	91020	Montrose	California	CA	Los Angeles	037			34.2114	-118.2305	4
+US	91021	Montrose	California	CA	Los Angeles	037			34.2064	-118.2242	4
+US	91023	Mount Wilson	California	CA	Los Angeles	037			34.2264	-118.0662	4
+US	91024	Sierra Madre	California	CA	Los Angeles	037			34.1651	-118.0519	4
+US	91025	Sierra Madre	California	CA	Los Angeles	037			34.1617	-118.0528	4
+US	91030	South Pasadena	California	CA	Los Angeles	037			34.1109	-118.1547	4
+US	91031	South Pasadena	California	CA	Los Angeles	037			34.1161	-118.1503	4
+US	91040	Sunland	California	CA	Los Angeles	037			34.2618	-118.3371	4
+US	91041	Sunland	California	CA	Los Angeles	037			34.2669	-118.3023	4
+US	91042	Tujunga	California	CA	Los Angeles	037			34.2544	-118.2849	4
+US	91043	Tujunga	California	CA	Los Angeles	037			34.2522	-118.2884	4
+US	91046	Verdugo City	California	CA	Los Angeles	037			34.2114	-118.2395	4
+US	91066	Arcadia	California	CA	Los Angeles	037			34.1397	-118.0353	4
+US	91077	Arcadia	California	CA	Los Angeles	037			34.1397	-118.0353	4
+US	91101	Pasadena	California	CA	Los Angeles	037			34.1468	-118.1391	4
+US	91102	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91103	Pasadena	California	CA	Los Angeles	037			34.1669	-118.1551	4
+US	91104	Pasadena	California	CA	Los Angeles	037			34.1678	-118.1261	4
+US	91105	Pasadena	California	CA	Los Angeles	037			34.1355	-118.1636	4
+US	91106	Pasadena	California	CA	Los Angeles	037			34.1435	-118.1266	4
+US	91107	Pasadena	California	CA	Los Angeles	037			34.151	-118.0889	4
+US	91108	San Marino	California	CA	Los Angeles	037			34.1207	-118.1117	4
+US	91109	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91110	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91114	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91115	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91116	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91117	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91118	San Marino	California	CA	Los Angeles	037			34.1214	-118.1065	4
+US	91121	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91123	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91124	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91125	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91126	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91129	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91182	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91184	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91185	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91188	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91189	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1445	4
+US	91199	Pasadena	California	CA	Los Angeles	037			34.1478	-118.1436	4
+US	91201	Glendale	California	CA	Los Angeles	037			34.1716	-118.2899	4
+US	91202	Glendale	California	CA	Los Angeles	037			34.1652	-118.2656	4
+US	91203	Glendale	California	CA	Los Angeles	037			34.1517	-118.2636	4
+US	91204	Glendale	California	CA	Los Angeles	037			34.1379	-118.2599	4
+US	91205	Glendale	California	CA	Los Angeles	037			34.1378	-118.2425	4
+US	91206	Glendale	California	CA	Los Angeles	037			34.1556	-118.2322	4
+US	91207	Glendale	California	CA	Los Angeles	037			34.1649	-118.2451	4
+US	91208	Glendale	California	CA	Los Angeles	037			34.1921	-118.235	4
+US	91209	Glendale	California	CA	Los Angeles	037			34.1425	-118.2551	4
+US	91210	Glendale	California	CA	Los Angeles	037			34.1425	-118.2551	4
+US	91214	La Crescenta	California	CA	Los Angeles	037			34.2316	-118.2457	4
+US	91221	Glendale	California	CA	Los Angeles	037			34.1425	-118.2551	4
+US	91222	Glendale	California	CA	Los Angeles	037			34.1425	-118.2551	4
+US	91224	La Crescenta	California	CA	Los Angeles	037			34.2242	-118.2401	4
+US	91225	Glendale	California	CA	Los Angeles	037			34.1425	-118.2551	4
+US	91226	Glendale	California	CA	Los Angeles	037			34.1425	-118.2551	4
+US	91301	Agoura Hills	California	CA	Los Angeles	037			34.1227	-118.7573	4
+US	91302	Calabasas	California	CA	Los Angeles	037			34.1419	-118.6641	4
+US	91303	Canoga Park	California	CA	Los Angeles	037			34.1993	-118.5983	4
+US	91304	Canoga Park	California	CA	Los Angeles	037			34.2197	-118.6111	4
+US	91305	Canoga Park	California	CA	Los Angeles	037			34.2011	-118.5981	4
+US	91306	Winnetka	California	CA	Los Angeles	037			34.2092	-118.5749	4
+US	91307	West Hills	California	CA	Los Angeles	037			34.1963	-118.6389	4
+US	91308	West Hills	California	CA	Los Angeles	037			34.1973	-118.644	4
+US	91309	Canoga Park	California	CA	Los Angeles	037			34.2011	-118.5981	4
+US	91310	Castaic	California	CA	Los Angeles	037			34.4889	-118.6229	4
+US	91311	Chatsworth	California	CA	Los Angeles	037			34.2583	-118.5914	4
+US	91313	Chatsworth	California	CA	Los Angeles	037			34.2572	-118.6012	4
+US	91316	Encino	California	CA	Los Angeles	037			34.1655	-118.5175	4
+US	91321	Newhall	California	CA	Los Angeles	037			34.3795	-118.523	4
+US	91322	Newhall	California	CA	Los Angeles	037			34.3847	-118.5309	4
+US	91324	Northridge	California	CA	Los Angeles	037			34.2367	-118.5466	4
+US	91325	Northridge	California	CA	Los Angeles	037			34.2353	-118.5188	4
+US	91326	Porter Ranch	California	CA	Los Angeles	037			34.2619	-118.582	1
+US	91327	Northridge	California	CA	Los Angeles	037			34.2283	-118.5368	4
+US	91328	Northridge	California	CA	Los Angeles	037			34.2283	-118.5368	4
+US	91329	Northridge	California	CA	Los Angeles	037			34.2283	-118.5368	4
+US	91330	Northridge	California	CA	Los Angeles	037			34.2283	-118.5368	4
+US	91331	Pacoima	California	CA	Los Angeles	037			34.2556	-118.4208	4
+US	91333	Pacoima	California	CA	Los Angeles	037			34.2625	-118.427	4
+US	91334	Pacoima	California	CA	Los Angeles	037			34.2625	-118.427	4
+US	91335	Reseda	California	CA	Los Angeles	037			34.2007	-118.5391	4
+US	91337	Reseda	California	CA	Los Angeles	037			34.2011	-118.5365	4
+US	91340	San Fernando	California	CA	Los Angeles	037			34.2875	-118.4352	4
+US	91341	San Fernando	California	CA	Los Angeles	037			34.2819	-118.439	4
+US	91342	Sylmar	California	CA	Los Angeles	037			34.3054	-118.4322	4
+US	91343	North Hills	California	CA	Los Angeles	037			34.2366	-118.4758	4
+US	91344	Granada Hills	California	CA	Los Angeles	037			34.2771	-118.4992	4
+US	91345	Mission Hills	California	CA	Los Angeles	037			34.2619	-118.4587	4
+US	91346	Mission Hills	California	CA	Los Angeles	037			34.2572	-118.467	4
+US	91350	Santa Clarita	California	CA	Los Angeles	037			34.4336	-118.5007	4
+US	91351	Canyon Country	California	CA	Los Angeles	037			34.4262	-118.449	4
+US	91352	Sun Valley	California	CA	Los Angeles	037			34.2209	-118.3699	4
+US	91353	Sun Valley	California	CA	Los Angeles	037			34.2175	-118.3704	4
+US	91354	Valencia	California	CA	Los Angeles	037			34.4466	-118.5374	4
+US	91355	Valencia	California	CA	Los Angeles	037			34.3985	-118.5535	4
+US	91356	Tarzana	California	CA	Los Angeles	037			34.1671	-118.5414	4
+US	91357	Tarzana	California	CA	Los Angeles	037			34.1733	-118.554	4
+US	91364	Woodland Hills	California	CA	Los Angeles	037			34.1557	-118.6	4
+US	91365	Woodland Hills	California	CA	Los Angeles	037			34.1683	-118.6059	4
+US	91367	Woodland Hills	California	CA	Los Angeles	037			34.1767	-118.6159	4
+US	91371	Woodland Hills	California	CA	Los Angeles	037			34.1683	-118.6059	4
+US	91372	Calabasas	California	CA	Los Angeles	037			34.1578	-118.6384	4
+US	91376	Agoura Hills	California	CA	Los Angeles	037			34.1364	-118.7745	4
+US	91380	Santa Clarita	California	CA	Los Angeles	037			34.3917	-118.5426	4
+US	91381	Stevenson Ranch	California	CA	Los Angeles	037			34.3775	-118.6131	4
+US	91382	Santa Clarita	California	CA	Los Angeles	037			34.3917	-118.5426	4
+US	91383	Santa Clarita	California	CA	Los Angeles	037			34.3917	-118.5426	4
+US	91384	Castaic	California	CA	Los Angeles	037			34.4827	-118.6254	4
+US	91385	Valencia	California	CA	Los Angeles	037			34.4436	-118.6095	4
+US	91386	Canyon Country	California	CA	Los Angeles	037			34.4233	-118.472	4
+US	91387	Canyon Country	California	CA	Los Angeles	037			34.4132	-118.426	4
+US	91390	Santa Clarita	California	CA	Los Angeles	037			34.4684	-118.5261	4
+US	91392	Sylmar	California	CA	Los Angeles	037			34.3078	-118.4492	4
+US	91393	North Hills	California	CA	Los Angeles	037			34.2364	-118.4847	4
+US	91394	Granada Hills	California	CA	Los Angeles	037			34.2647	-118.5231	4
+US	91395	Mission Hills	California	CA	Los Angeles	037			34.2572	-118.467	4
+US	91396	Winnetka	California	CA	Los Angeles	037			34.2133	-118.572	4
+US	91401	Van Nuys	California	CA	Los Angeles	037			34.1802	-118.4324	4
+US	91402	Panorama City	California	CA	Los Angeles	037			34.2262	-118.447	4
+US	91403	Sherman Oaks	California	CA	Los Angeles	037			34.1514	-118.4603	4
+US	91404	Van Nuys	California	CA	Los Angeles	037			34.1867	-118.449	4
+US	91405	Van Nuys	California	CA	Los Angeles	037			34.2001	-118.4456	4
+US	91406	Van Nuys	California	CA	Los Angeles	037			34.2006	-118.4868	4
+US	91407	Van Nuys	California	CA	Los Angeles	037			34.1867	-118.449	4
+US	91408	Van Nuys	California	CA	Los Angeles	037			34.1867	-118.449	4
+US	91409	Van Nuys	California	CA	Los Angeles	037			34.1867	-118.449	4
+US	91410	Van Nuys	California	CA	Los Angeles	037			34.1867	-118.449	4
+US	91411	Van Nuys	California	CA	Los Angeles	037			34.1781	-118.4574	4
+US	91412	Panorama City	California	CA	Los Angeles	037			34.2247	-118.4498	4
+US	91413	Sherman Oaks	California	CA	Los Angeles	037			34.1511	-118.4492	4
+US	91416	Encino	California	CA	Los Angeles	037			34.1592	-118.5012	4
+US	91423	Sherman Oaks	California	CA	Los Angeles	037			34.1526	-118.4322	4
+US	91426	Encino	California	CA	Los Angeles	037			34.1592	-118.5012	4
+US	91436	Encino	California	CA	Los Angeles	037			34.151	-118.4882	4
+US	91470	Van Nuys	California	CA	Los Angeles	037			34.1867	-118.449	4
+US	91482	Van Nuys	California	CA	Los Angeles	037			34.1867	-118.449	4
+US	91495	Sherman Oaks	California	CA	Los Angeles	037			34.1511	-118.4492	4
+US	91496	Van Nuys	California	CA	Los Angeles	037			34.1867	-118.449	4
+US	91499	Van Nuys	California	CA	Los Angeles	037			34.1867	-118.449	4
+US	91501	Burbank	California	CA	Los Angeles	037			34.1862	-118.3009	4
+US	91502	Burbank	California	CA	Los Angeles	037			34.1745	-118.3059	4
+US	91503	Burbank	California	CA	Los Angeles	037			34.1808	-118.309	4
+US	91504	Burbank	California	CA	Los Angeles	037			34.2001	-118.3264	4
+US	91505	Burbank	California	CA	Los Angeles	037			34.169	-118.3442	4
+US	91506	Burbank	California	CA	Los Angeles	037			34.1717	-118.3231	4
+US	91507	Burbank	California	CA	Los Angeles	037			34.1808	-118.309	4
+US	91508	Burbank	California	CA	Los Angeles	037			34.1808	-118.309	4
+US	91510	Burbank	California	CA	Los Angeles	037			34.1808	-118.309	4
+US	91521	Burbank	California	CA	Los Angeles	037			34.1808	-118.309	4
+US	91522	Burbank	California	CA	Los Angeles	037			34.1808	-118.309	4
+US	91523	Burbank	California	CA	Los Angeles	037			34.1808	-118.309	4
+US	91526	Burbank	California	CA	Los Angeles	037			34.1808	-118.309	4
+US	91601	North Hollywood	California	CA	Los Angeles	037			34.1687	-118.3713	4
+US	91602	North Hollywood	California	CA	Los Angeles	037			34.151	-118.3663	4
+US	91603	North Hollywood	California	CA	Los Angeles	037			34.1722	-118.379	4
+US	91604	Studio City	California	CA	Los Angeles	037			34.143	-118.3913	4
+US	91605	North Hollywood	California	CA	Los Angeles	037			34.2057	-118.4001	4
+US	91606	North Hollywood	California	CA	Los Angeles	037			34.1872	-118.3865	4
+US	91607	Valley Village	California	CA	Los Angeles	037			34.1672	-118.3989	4
+US	91608	Universal City	California	CA	Los Angeles	037			34.1383	-118.3528	4
+US	91609	North Hollywood	California	CA	Los Angeles	037			34.1722	-118.379	4
+US	91610	Toluca Lake	California	CA	Los Angeles	037			33.7866	-118.2987	1
+US	91611	North Hollywood	California	CA	Los Angeles	037			34.1722	-118.379	4
+US	91612	North Hollywood	California	CA	Los Angeles	037			34.1722	-118.379	4
+US	91614	Studio City	California	CA	Los Angeles	037			34.1486	-118.3965	4
+US	91615	North Hollywood	California	CA	Los Angeles	037			34.1722	-118.379	4
+US	91616	North Hollywood	California	CA	Los Angeles	037			34.1722	-118.379	4
+US	91617	Valley Village	California	CA	Los Angeles	037			34.1649	-118.3965	4
+US	91618	North Hollywood	California	CA	Los Angeles	037			34.1722	-118.379	4
+US	91702	Azusa	California	CA	Los Angeles	037			34.1248	-117.9031	4
+US	91706	Baldwin Park	California	CA	Los Angeles	037			34.0964	-117.9682	4
+US	91711	Claremont	California	CA	Los Angeles	037			34.1092	-117.7183	4
+US	91714	City Of Industry	California	CA	Los Angeles	037			34.0197	-117.9587	4
+US	91715	City Of Industry	California	CA	Los Angeles	037			34.0197	-117.9587	4
+US	91716	City Of Industry	California	CA	Los Angeles	037			34.0197	-117.9587	4
+US	91722	Covina	California	CA	Los Angeles	037			34.0972	-117.9065	4
+US	91723	Covina	California	CA	Los Angeles	037			34.086	-117.8843	4
+US	91724	Covina	California	CA	Los Angeles	037			34.0938	-117.856	4
+US	91731	El Monte	California	CA	Los Angeles	037			34.0791	-118.0371	4
+US	91732	El Monte	California	CA	Los Angeles	037			34.0705	-118.0149	4
+US	91733	South El Monte	California	CA	Los Angeles	037			34.0557	-118.0444	4
+US	91734	El Monte	California	CA	Los Angeles	037			34.0686	-118.0276	4
+US	91735	El Monte	California	CA	Los Angeles	037			34.0686	-118.0276	4
+US	91740	Glendora	California	CA	Los Angeles	037			34.1287	-117.8552	4
+US	91741	Glendora	California	CA	Los Angeles	037			34.1537	-117.8437	4
+US	91744	La Puente	California	CA	Los Angeles	037			34.0289	-117.9373	4
+US	91745	Hacienda Heights	California	CA	Los Angeles	037			33.9977	-117.9652	4
+US	91746	La Puente	California	CA	Los Angeles	037			34.0443	-117.9862	4
+US	91747	La Puente	California	CA	Los Angeles	037			34.02	-117.9495	4
+US	91748	Rowland Heights	California	CA	Los Angeles	037			33.9818	-117.8969	4
+US	91749	La Puente	California	CA	Los Angeles	037			34.02	-117.9495	4
+US	91750	La Verne	California	CA	Los Angeles	037			34.1159	-117.7708	4
+US	91754	Monterey Park	California	CA	Los Angeles	037			34.0534	-118.1271	4
+US	91755	Monterey Park	California	CA	Los Angeles	037			34.048	-118.115	4
+US	91756	Monterey Park	California	CA	Los Angeles	037			34.0625	-118.1228	4
+US	91759	Mount Baldy	California	CA	Los Angeles	037			34.2361	-117.6601	1
+US	91765	Diamond Bar	California	CA	Los Angeles	037			34.0066	-117.8098	4
+US	91766	Pomona	California	CA	Los Angeles	037			34.0418	-117.7569	4
+US	91767	Pomona	California	CA	Los Angeles	037			34.0812	-117.7362	4
+US	91768	Pomona	California	CA	Los Angeles	037			34.0662	-117.7763	4
+US	91769	Pomona	California	CA	Los Angeles	037			34.0553	-117.7523	4
+US	91770	Rosemead	California	CA	Los Angeles	037			34.0658	-118.0853	4
+US	91771	Rosemead	California	CA	Los Angeles	037			34.0806	-118.0728	4
+US	91772	Rosemead	California	CA	Los Angeles	037			34.0806	-118.0728	4
+US	91773	San Dimas	California	CA	Los Angeles	037			34.1023	-117.8169	4
+US	91775	San Gabriel	California	CA	Los Angeles	037			34.1155	-118.0857	4
+US	91776	San Gabriel	California	CA	Los Angeles	037			34.089	-118.0955	4
+US	91778	San Gabriel	California	CA	Los Angeles	037			34.0961	-118.1058	4
+US	91780	Temple City	California	CA	Los Angeles	037			34.1016	-118.0537	4
+US	91788	Walnut	California	CA	Los Angeles	037			34.0203	-117.8653	4
+US	91789	Walnut	California	CA	Los Angeles	037			34.0183	-117.8546	4
+US	91790	West Covina	California	CA	Los Angeles	037			34.0673	-117.9366	4
+US	91791	West Covina	California	CA	Los Angeles	037			34.0653	-117.8978	4
+US	91792	West Covina	California	CA	Los Angeles	037			34.0229	-117.8975	4
+US	91793	West Covina	California	CA	Los Angeles	037			34.0686	-117.939	4
+US	91801	Alhambra	California	CA	Los Angeles	037			34.0914	-118.1293	4
+US	91802	Alhambra	California	CA	Los Angeles	037			34.0953	-118.127	4
+US	91803	Alhambra	California	CA	Los Angeles	037			34.0745	-118.1434	4
+US	91804	Alhambra	California	CA	Los Angeles	037			34.0953	-118.127	4
+US	91896	Alhambra	California	CA	Los Angeles	037			34.0953	-118.127	4
+US	91899	Alhambra	California	CA	Los Angeles	037			34.0953	-118.127	4
+US	93510	Acton	California	CA	Los Angeles	037			34.4835	-118.1959	4
+US	93532	Lake Hughes	California	CA	Los Angeles	037			34.6847	-118.5442	4
+US	93534	Lancaster	California	CA	Los Angeles	037			34.6909	-118.1491	4
+US	93535	Lancaster	California	CA	Los Angeles	037			34.7131	-117.8783	4
+US	93536	Lancaster	California	CA	Los Angeles	037			34.7471	-118.3687	4
+US	93539	Lancaster	California	CA	Los Angeles	037			34.698	-118.1367	4
+US	93543	Littlerock	California	CA	Los Angeles	037			34.4891	-117.9708	4
+US	93544	Llano	California	CA	Los Angeles	037			34.493	-117.7543	4
+US	93550	Palmdale	California	CA	Los Angeles	037			34.4133	-118.0917	4
+US	93551	Palmdale	California	CA	Los Angeles	037			34.6017	-118.231	4
+US	93552	Palmdale	California	CA	Los Angeles	037			34.5715	-118.0231	4
+US	93553	Pearblossom	California	CA	Los Angeles	037			34.4225	-117.9055	4
+US	93563	Valyermo	California	CA	Los Angeles	037			34.3966	-117.7604	4
+US	93584	Lancaster	California	CA	Los Angeles	037			34.698	-118.1367	4
+US	93586	Lancaster	California	CA	Los Angeles	037			34.698	-118.1367	4
+US	93590	Palmdale	California	CA	Los Angeles	037			34.5794	-118.1165	4
+US	93591	Palmdale	California	CA	Los Angeles	037			34.6019	-117.8123	4
+US	93599	Palmdale	California	CA	Los Angeles	037			34.5794	-118.1165	4
+US	93601	Ahwahnee	California	CA	Madera	039			37.4076	-119.7233	4
+US	93604	Bass Lake	California	CA	Madera	039			37.3244	-119.5568	4
+US	93610	Chowchilla	California	CA	Madera	039			37.1014	-120.2691	4
+US	93614	Coarsegold	California	CA	Madera	039			37.2214	-119.7455	4
+US	93637	Madera	California	CA	Madera	039			36.9403	-120.082	4
+US	93638	Madera	California	CA	Madera	039			37.0402	-120.0335	4
+US	93639	Madera	California	CA	Madera	039			36.9613	-120.0607	4
+US	93643	North Fork	California	CA	Madera	039			37.2125	-119.5143	4
+US	93644	Oakhurst	California	CA	Madera	039			37.3476	-119.6449	4
+US	93645	O Neals	California	CA	Madera	039			37.1639	-119.6652	4
+US	93653	Raymond	California	CA	Madera	039			37.279	-119.8766	4
+US	93669	Wishon	California	CA	Madera	039			37.281	-119.557	1
+US	94901	San Rafael	California	CA	Marin	041			37.9691	-122.5105	4
+US	94903	San Rafael	California	CA	Marin	041			38.0339	-122.5855	4
+US	94904	Greenbrae	California	CA	Marin	041			37.9479	-122.5363	4
+US	94912	San Rafael	California	CA	Marin	041			37.9735	-122.5311	4
+US	94913	San Rafael	California	CA	Marin	041			37.9735	-122.5311	4
+US	94914	Kentfield	California	CA	Marin	041			37.9521	-122.5572	4
+US	94915	San Rafael	California	CA	Marin	041			38.0739	-122.5594	4
+US	94920	Belvedere Tiburon	California	CA	Marin	041			37.8843	-122.4637	1
+US	94924	Bolinas	California	CA	Marin	041			37.9079	-122.6947	4
+US	94925	Corte Madera	California	CA	Marin	041			37.9223	-122.5132	4
+US	94929	Dillon Beach	California	CA	Marin	041			38.2508	-122.9653	4
+US	94930	Fairfax	California	CA	Marin	041			37.9883	-122.5937	4
+US	94933	Forest Knolls	California	CA	Marin	041			38.0122	-122.6907	4
+US	94937	Inverness	California	CA	Marin	041			38.1126	-122.8877	4
+US	94938	Lagunitas	California	CA	Marin	041			38.0139	-122.7016	4
+US	94939	Larkspur	California	CA	Marin	041			37.9367	-122.5362	4
+US	94940	Marshall	California	CA	Marin	041			38.1762	-122.89	4
+US	94941	Mill Valley	California	CA	Marin	041			37.8958	-122.5339	4
+US	94942	Mill Valley	California	CA	Marin	041			37.906	-122.545	4
+US	94945	Novato	California	CA	Marin	041			38.1163	-122.5714	4
+US	94946	Nicasio	California	CA	Marin	041			38.0546	-122.6964	4
+US	94947	Novato	California	CA	Marin	041			38.0973	-122.5837	4
+US	94948	Novato	California	CA	Marin	041			38.1489	-122.5737	4
+US	94949	Novato	California	CA	Marin	041			38.0618	-122.5404	4
+US	94950	Olema	California	CA	Marin	041			38.0467	-122.7699	4
+US	94956	Point Reyes Station	California	CA	Marin	041			38.0691	-122.8069	4
+US	94957	Ross	California	CA	Marin	041			37.9624	-122.555	4
+US	94960	San Anselmo	California	CA	Marin	041			37.9846	-122.5711	4
+US	94963	San Geronimo	California	CA	Marin	041			38.0133	-122.6639	4
+US	94964	San Quentin	California	CA	Marin	041			37.9416	-122.4844	4
+US	94965	Sausalito	California	CA	Marin	041			37.8601	-122.4946	4
+US	94966	Sausalito	California	CA	Marin	041			37.8591	-122.4853	4
+US	94970	Stinson Beach	California	CA	Marin	041			37.902	-122.6393	4
+US	94971	Tomales	California	CA	Marin	041			38.2427	-122.9145	4
+US	94973	Woodacre	California	CA	Marin	041			38.0069	-122.6382	4
+US	94974	San Quentin	California	CA	Marin	041			37.9413	-122.485	4
+US	94976	Corte Madera	California	CA	Marin	041			37.9255	-122.5275	4
+US	94977	Larkspur	California	CA	Marin	041			37.9341	-122.5353	4
+US	94978	Fairfax	California	CA	Marin	041			37.9871	-122.5889	4
+US	94979	San Anselmo	California	CA	Marin	041			37.9746	-122.5616	4
+US	94998	Novato	California	CA	Marin	041			38.1173	-122.5684	4
+US	93623	Fish Camp	California	CA	Mariposa	043			37.4785	-119.6404	4
+US	95306	Catheys Valley	California	CA	Mariposa	043			37.4404	-120.1438	4
+US	95311	Coulterville	California	CA	Mariposa	043			37.7197	-120.1197	4
+US	95318	El Portal	California	CA	Mariposa	043			37.6747	-119.7841	4
+US	95325	Hornitos	California	CA	Mariposa	043			37.4676	-120.2793	4
+US	95338	Mariposa	California	CA	Mariposa	043			37.4931	-119.9219	4
+US	95345	Midpines	California	CA	Mariposa	043			37.5757	-119.9601	4
+US	95389	Yosemite National Park	California	CA	Mariposa	043			37.7314	-119.6489	1
+US	95410	Albion	California	CA	Mendocino	045			39.2131	-123.72	4
+US	95415	Boonville	California	CA	Mendocino	045			39.0197	-123.3856	4
+US	95417	Branscomb	California	CA	Mendocino	045			39.6949	-123.5527	4
+US	95418	Calpella	California	CA	Mendocino	045			39.2214	-123.2154	4
+US	95420	Caspar	California	CA	Mendocino	045			39.3629	-123.7944	4
+US	95427	Comptche	California	CA	Mendocino	045			39.2767	-123.5873	4
+US	95428	Covelo	California	CA	Mendocino	045			39.82	-123.0585	4
+US	95429	Dos Rios	California	CA	Mendocino	045			39.7168	-123.3533	4
+US	95432	Elk	California	CA	Mendocino	045			39.1593	-123.7219	4
+US	95437	Fort Bragg	California	CA	Mendocino	045			39.4402	-123.7703	4
+US	95445	Gualala	California	CA	Mendocino	045			38.8251	-123.5399	4
+US	95449	Hopland	California	CA	Mendocino	045			38.938	-123.0703	4
+US	95454	Laytonville	California	CA	Mendocino	045			39.6627	-123.4929	4
+US	95456	Little River	California	CA	Mendocino	045			39.2707	-123.7883	4
+US	95459	Manchester	California	CA	Mendocino	045			39.0097	-123.6523	4
+US	95460	Mendocino	California	CA	Mendocino	045			39.3173	-123.7739	4
+US	95463	Navarro	California	CA	Mendocino	045			39.185	-123.5268	4
+US	95466	Philo	California	CA	Mendocino	045			39.0657	-123.445	4
+US	95468	Point Arena	California	CA	Mendocino	045			38.9152	-123.6	4
+US	95469	Potter Valley	California	CA	Mendocino	045			39.3932	-123.0647	4
+US	95470	Redwood Valley	California	CA	Mendocino	045			39.2779	-123.2243	4
+US	95481	Talmage	California	CA	Mendocino	045			39.1269	-123.1658	4
+US	95482	Ukiah	California	CA	Mendocino	045			39.1552	-123.1951	4
+US	95488	Westport	California	CA	Mendocino	045			39.6843	-123.7686	4
+US	95490	Willits	California	CA	Mendocino	045			39.4493	-123.3679	4
+US	95494	Yorkville	California	CA	Mendocino	045			38.9235	-123.2973	4
+US	95585	Leggett	California	CA	Mendocino	045			39.8481	-123.6615	4
+US	95587	Piercy	California	CA	Mendocino	045			39.9465	-123.7552	4
+US	93620	Dos Palos	California	CA	Merced	047			37.0025	-120.6333	4
+US	93635	Los Banos	California	CA	Merced	047			37.0627	-120.8544	4
+US	93636	Madera	California	CA	Merced	047			36.9528	-119.8806	4
+US	93661	Santa Rita Park	California	CA	Merced	047			37.1869	-120.6504	4
+US	93665	South Dos Palos	California	CA	Merced	047			36.9644	-120.6532	4
+US	95301	Atwater	California	CA	Merced	047			37.3489	-120.6028	4
+US	95303	Ballico	California	CA	Merced	047			37.4548	-120.6931	4
+US	95312	Cressey	California	CA	Merced	047			37.4197	-120.6663	4
+US	95315	Delhi	California	CA	Merced	047			37.4273	-120.7752	4
+US	95317	El Nido	California	CA	Merced	047			37.1391	-120.5251	4
+US	95322	Gustine	California	CA	Merced	047			37.2001	-121.0047	4
+US	95324	Hilmar	California	CA	Merced	047			37.4002	-120.8723	4
+US	95333	Le Grand	California	CA	Merced	047			37.2496	-120.2667	4
+US	95334	Livingston	California	CA	Merced	047			37.3763	-120.7252	4
+US	95340	Merced	California	CA	Merced	047			37.2983	-120.4649	4
+US	95341	Merced	California	CA	Merced	047			37.2308	-120.5144	4
+US	95343	Merced	California	CA	Merced	047			37.3082	-120.48	4
+US	95344	Merced	California	CA	Merced	047			37.3082	-120.48	4
+US	95348	Merced	California	CA	Merced	047			37.3302	-120.508	4
+US	95365	Planada	California	CA	Merced	047			37.2908	-120.3185	4
+US	95369	Snelling	California	CA	Merced	047			37.5354	-120.378	4
+US	95374	Stevinson	California	CA	Merced	047			37.3283	-120.8764	4
+US	95388	Winton	California	CA	Merced	047			37.4014	-120.6045	4
+US	96006	Adin	California	CA	Modoc	049			41.2175	-120.9432	4
+US	96015	Canby	California	CA	Modoc	049			41.4664	-120.9218	4
+US	96054	Lookout	California	CA	Modoc	049			41.2347	-121.2156	4
+US	96101	Alturas	California	CA	Modoc	049			41.4767	-120.5456	4
+US	96104	Cedarville	California	CA	Modoc	049			41.4759	-120.1516	4
+US	96108	Davis Creek	California	CA	Modoc	049			41.7336	-120.3741	1
+US	96110	Eagleville	California	CA	Modoc	049			41.3163	-120.1158	4
+US	96112	Fort Bidwell	California	CA	Modoc	049			41.8644	-120.162	1
+US	96115	Lake City	California	CA	Modoc	049			41.6682	-120.1814	4
+US	96116	Likely	California	CA	Modoc	049			41.2329	-120.5079	4
+US	93512	Benton	California	CA	Mono	051			37.8926	-118.5647	4
+US	93517	Bridgeport	California	CA	Mono	051			38.2566	-119.208	1
+US	93529	June Lake	California	CA	Mono	051			37.7773	-119.0825	1
+US	93541	Lee Vining	California	CA	Mono	051			37.989	-119.1234	1
+US	93546	Mammoth Lakes	California	CA	Mono	051			37.6094	-118.8656	4
+US	96107	Coleville	California	CA	Mono	051			38.5029	-119.4828	4
+US	96133	Topaz	California	CA	Mono	051			38.6415	-119.5122	1
+US	93426	Bradley	California	CA	Monterey	053			35.8093	-120.9728	4
+US	93450	San Ardo	California	CA	Monterey	053			35.9857	-120.8612	4
+US	93901	Salinas	California	CA	Monterey	053			36.6677	-121.6596	4
+US	93902	Salinas	California	CA	Monterey	053			36.6777	-121.6555	4
+US	93905	Salinas	California	CA	Monterey	053			36.6811	-121.6176	4
+US	93906	Salinas	California	CA	Monterey	053			36.7103	-121.6438	4
+US	93907	Salinas	California	CA	Monterey	053			36.7563	-121.6703	4
+US	93908	Salinas	California	CA	Monterey	053			36.6011	-121.6729	4
+US	93912	Salinas	California	CA	Monterey	053			36.6777	-121.6555	4
+US	93915	Salinas	California	CA	Monterey	053			36.6777	-121.6555	4
+US	93920	Big Sur	California	CA	Monterey	053			36.2458	-121.7009	4
+US	93921	Carmel By The Sea	California	CA	Monterey	053			36.5552	-121.9233	4
+US	93922	Carmel	California	CA	Monterey	053			36.5433	-121.9263	4
+US	93923	Carmel	California	CA	Monterey	053			36.5457	-121.8949	4
+US	93924	Carmel Valley	California	CA	Monterey	053			36.4787	-121.7244	4
+US	93925	Chualar	California	CA	Monterey	053			36.595	-121.432	4
+US	93926	Gonzales	California	CA	Monterey	053			36.49	-121.4103	4
+US	93927	Greenfield	California	CA	Monterey	053			36.3202	-121.2451	4
+US	93928	Jolon	California	CA	Monterey	053			35.9708	-121.176	4
+US	93930	King City	California	CA	Monterey	053			36.2028	-121.1273	4
+US	93932	Lockwood	California	CA	Monterey	053			35.95	-121.0626	4
+US	93933	Marina	California	CA	Monterey	053			36.6849	-121.7934	4
+US	93940	Monterey	California	CA	Monterey	053			36.5802	-121.8443	4
+US	93942	Monterey	California	CA	Monterey	053			36.6002	-121.8947	4
+US	93943	Monterey	California	CA	Monterey	053			36.597	-121.8741	4
+US	93944	Monterey	California	CA	Monterey	053			36.6062	-121.9089	4
+US	93950	Pacific Grove	California	CA	Monterey	053			36.6167	-121.922	4
+US	93953	Pebble Beach	California	CA	Monterey	053			36.5907	-121.942	4
+US	93954	San Lucas	California	CA	Monterey	053			36.1289	-121.0205	4
+US	93955	Seaside	California	CA	Monterey	053			36.6217	-121.7935	4
+US	93960	Soledad	California	CA	Monterey	053			36.4196	-121.3243	4
+US	93962	Spreckels	California	CA	Monterey	053			36.6261	-121.6555	4
+US	95004	Aromas	California	CA	Monterey	053			36.8769	-121.6324	4
+US	95012	Castroville	California	CA	Monterey	053			36.7658	-121.758	4
+US	95039	Moss Landing	California	CA	Monterey	053			36.8175	-121.7773	4
+US	94503	American Canyon	California	CA	Napa	055			38.1668	-122.2553	4
+US	94508	Angwin	California	CA	Napa	055			38.5769	-122.4477	4
+US	94515	Calistoga	California	CA	Napa	055			38.5823	-122.5814	4
+US	94558	Napa	California	CA	Napa	055			38.4549	-122.2564	4
+US	94559	Napa	California	CA	Napa	055			38.2904	-122.2841	4
+US	94562	Oakville	California	CA	Napa	055			38.4379	-122.3991	4
+US	94567	Pope Valley	California	CA	Napa	055			38.6152	-122.4278	4
+US	94573	Rutherford	California	CA	Napa	055			38.4585	-122.4225	4
+US	94574	Saint Helena	California	CA	Napa	055			38.5138	-122.4619	4
+US	94576	Deer Park	California	CA	Napa	055			38.5494	-122.4764	4
+US	94581	Napa	California	CA	Napa	055			38.2971	-122.2855	4
+US	94599	Yountville	California	CA	Napa	055			38.4016	-122.3608	4
+US	95712	Chicago Park	California	CA	Nevada	057			39.143	-120.9666	1
+US	95724	Norden	California	CA	Nevada	057			39.318	-120.356	4
+US	95728	Soda Springs	California	CA	Nevada	057			39.317	-120.4259	4
+US	95924	Cedar Ridge	California	CA	Nevada	057			39.1988	-121.02	4
+US	95945	Grass Valley	California	CA	Nevada	057			39.2081	-121.0069	4
+US	95946	Penn Valley	California	CA	Nevada	057			39.2019	-121.2026	4
+US	95949	Grass Valley	California	CA	Nevada	057			39.1193	-121.0938	4
+US	95959	Nevada City	California	CA	Nevada	057			39.3017	-120.9717	4
+US	95960	North San Juan	California	CA	Nevada	057			39.3765	-121.0891	4
+US	95975	Rough And Ready	California	CA	Nevada	057			39.2286	-121.1509	4
+US	95977	Smartsville	California	CA	Nevada	057			39.2076	-121.3001	4
+US	95986	Washington	California	CA	Nevada	057			39.3569	-120.8	4
+US	96111	Floriston	California	CA	Nevada	057			39.3928	-120.0212	1
+US	96160	Truckee	California	CA	Nevada	057			39.328	-120.1833	4
+US	96161	Truckee	California	CA	Nevada	057			39.3385	-120.1729	4
+US	96162	Truckee	California	CA	Nevada	057			39.328	-120.1833	4
+US	90620	Buena Park	California	CA	Orange	059			33.8439	-118.008	4
+US	90621	Buena Park	California	CA	Orange	059			33.8772	-117.9893	4
+US	90622	Buena Park	California	CA	Orange	059			33.8462	-118.0031	4
+US	90623	La Palma	California	CA	Orange	059			33.8491	-118.0398	4
+US	90624	Buena Park	California	CA	Orange	059			33.8584	-118.0033	4
+US	90630	Cypress	California	CA	Orange	059			33.8181	-118.0357	4
+US	90631	La Habra	California	CA	Orange	059			33.9331	-117.9493	4
+US	90632	La Habra	California	CA	Orange	059			33.9143	-117.9547	4
+US	90633	La Habra	California	CA	Orange	059			33.9345	-117.9452	4
+US	90680	Stanton	California	CA	Orange	059			33.7991	-117.9956	4
+US	90720	Los Alamitos	California	CA	Orange	059			33.7956	-118.0648	4
+US	90721	Los Alamitos	California	CA	Orange	059			33.8023	-118.069	4
+US	90740	Seal Beach	California	CA	Orange	059			33.7602	-118.0808	4
+US	90742	Sunset Beach	California	CA	Orange	059			33.7164	-118.069	4
+US	90743	Surfside	California	CA	Orange	059			33.7264	-118.0833	4
+US	92602	Irvine	California	CA	Orange	059			33.7419	-117.7467	4
+US	92603	Irvine	California	CA	Orange	059			33.6245	-117.794	4
+US	92604	Irvine	California	CA	Orange	059			33.6899	-117.7868	4
+US	92605	Huntington Beach	California	CA	Orange	059			33.7151	-118.0077	4
+US	92606	Irvine	California	CA	Orange	059			33.6951	-117.8224	4
+US	92607	Laguna Niguel	California	CA	Orange	059			33.5269	-117.7117	4
+US	92609	El Toro	California	CA	Orange	059			33.624	-117.6908	4
+US	92610	Foothill Ranch	California	CA	Orange	059			33.6748	-117.6649	4
+US	92612	Irvine	California	CA	Orange	059			33.6607	-117.8264	4
+US	92614	Irvine	California	CA	Orange	059			33.6829	-117.8298	4
+US	92615	Huntington Beach	California	CA	Orange	059			33.6566	-117.9699	4
+US	92616	Irvine	California	CA	Orange	059			33.6519	-117.8361	4
+US	92617	Irvine	California	CA	Orange	059			33.6425	-117.8417	4
+US	92618	Irvine	California	CA	Orange	059			33.7074	-117.7054	4
+US	92619	Irvine	California	CA	Orange	059			33.6706	-117.7645	4
+US	92620	Irvine	California	CA	Orange	059			33.7009	-117.7564	4
+US	92623	Irvine	California	CA	Orange	059			33.6942	-117.8126	4
+US	92624	Capistrano Beach	California	CA	Orange	059			33.46	-117.6632	4
+US	92625	Corona Del Mar	California	CA	Orange	059			33.6021	-117.8743	4
+US	92626	Costa Mesa	California	CA	Orange	059			33.6801	-117.9085	4
+US	92627	Costa Mesa	California	CA	Orange	059			33.6483	-117.9155	4
+US	92628	Costa Mesa	California	CA	Orange	059			33.6401	-117.9159	4
+US	92629	Dana Point	California	CA	Orange	059			33.4743	-117.6964	4
+US	92630	Lake Forest	California	CA	Orange	059			33.6437	-117.6868	4
+US	92637	Laguna Woods	California	CA	Orange	059			33.6103	-117.7253	4
+US	92646	Huntington Beach	California	CA	Orange	059			33.6654	-117.9686	4
+US	92647	Huntington Beach	California	CA	Orange	059			33.721	-118.0033	4
+US	92648	Huntington Beach	California	CA	Orange	059			33.6773	-118.0051	4
+US	92649	Huntington Beach	California	CA	Orange	059			33.718	-118.0505	4
+US	92650	East Irvine	California	CA	Orange	059			33.6795	-117.7609	4
+US	92651	Laguna Beach	California	CA	Orange	059			33.5429	-117.7813	4
+US	92652	Laguna Beach	California	CA	Orange	059			33.543	-117.7815	4
+US	92653	Laguna Hills	California	CA	Orange	059			33.5916	-117.6985	4
+US	92654	Laguna Hills	California	CA	Orange	059			33.6042	-117.7154	4
+US	92655	Midway City	California	CA	Orange	059			33.7446	-117.984	4
+US	92656	Aliso Viejo	California	CA	Orange	059			33.5701	-117.7086	4
+US	92657	Newport Coast	California	CA	Orange	059			33.5943	-117.8334	4
+US	92658	Newport Beach	California	CA	Orange	059			33.6422	-117.8631	4
+US	92659	Newport Beach	California	CA	Orange	059			33.6222	-117.9235	4
+US	92660	Newport Beach	California	CA	Orange	059			33.6295	-117.8684	4
+US	92661	Newport Beach	California	CA	Orange	059			33.6045	-117.9021	4
+US	92662	Newport Beach	California	CA	Orange	059			33.6062	-117.8931	4
+US	92663	Newport Beach	California	CA	Orange	059			33.621	-117.9321	4
+US	92672	San Clemente	California	CA	Orange	059			33.4361	-117.6231	4
+US	92673	San Clemente	California	CA	Orange	059			33.4615	-117.6375	4
+US	92674	San Clemente	California	CA	Orange	059			33.4409	-117.6211	4
+US	92675	San Juan Capistrano	California	CA	Orange	059			33.5085	-117.6565	4
+US	92676	Silverado	California	CA	Orange	059			33.7451	-117.6153	4
+US	92677	Laguna Niguel	California	CA	Orange	059			33.5145	-117.7084	4
+US	92678	Trabuco Canyon	California	CA	Orange	059			33.6643	-117.5896	4
+US	92679	Trabuco Canyon	California	CA	Orange	059			33.6625	-117.5903	4
+US	92683	Westminster	California	CA	Orange	059			33.7524	-117.9939	4
+US	92684	Westminster	California	CA	Orange	059			33.7627	-118.0072	4
+US	92685	Westminster	California	CA	Orange	059			33.7528	-117.9951	4
+US	92688	Rancho Santa Margarita	California	CA	Orange	059			33.6512	-117.5938	4
+US	92690	Mission Viejo	California	CA	Orange	059			33.6117	-117.643	4
+US	92691	Mission Viejo	California	CA	Orange	059			33.6128	-117.6622	4
+US	92692	Mission Viejo	California	CA	Orange	059			33.6144	-117.6433	4
+US	92693	San Juan Capistrano	California	CA	Orange	059			33.4977	-117.6651	4
+US	92694	Ladera Ranch	California	CA	Orange	059			33.5472	-117.6238	4
+US	92697	Irvine	California	CA	Orange	059			33.6485	-117.8387	4
+US	92698	Aliso Viejo	California	CA	Orange	059			33.6686	-117.8386	4
+US	92701	Santa Ana	California	CA	Orange	059			33.7523	-117.8541	4
+US	92702	Santa Ana	California	CA	Orange	059			33.7365	-117.8714	4
+US	92703	Santa Ana	California	CA	Orange	059			33.7489	-117.9072	4
+US	92704	Santa Ana	California	CA	Orange	059			33.7249	-117.909	4
+US	92705	Santa Ana	California	CA	Orange	059			33.754	-117.7919	4
+US	92706	Santa Ana	California	CA	Orange	059			33.7691	-117.8855	4
+US	92707	Santa Ana	California	CA	Orange	059			33.7086	-117.8701	4
+US	92708	Fountain Valley	California	CA	Orange	059			33.7102	-117.9503	4
+US	92711	Santa Ana	California	CA	Orange	059			33.7669	-117.8043	4
+US	92712	Santa Ana	California	CA	Orange	059			33.7496	-117.875	4
+US	92728	Fountain Valley	California	CA	Orange	059			33.714	-117.9284	4
+US	92735	Santa Ana	California	CA	Orange	059			33.7188	-117.8546	4
+US	92780	Tustin	California	CA	Orange	059			33.7364	-117.8229	4
+US	92781	Tustin	California	CA	Orange	059			33.7369	-117.8181	4
+US	92782	Tustin	California	CA	Orange	059			33.7346	-117.7869	4
+US	92799	Santa Ana	California	CA	Orange	059			33.7205	-117.9098	4
+US	92801	Anaheim	California	CA	Orange	059			33.8428	-117.9546	4
+US	92802	Anaheim	California	CA	Orange	059			33.8085	-117.9228	4
+US	92803	Anaheim	California	CA	Orange	059			33.8397	-117.9388	4
+US	92804	Anaheim	California	CA	Orange	059			33.8186	-117.9729	4
+US	92805	Anaheim	California	CA	Orange	059			33.8359	-117.9086	4
+US	92806	Anaheim	California	CA	Orange	059			33.8356	-117.8681	4
+US	92807	Anaheim	California	CA	Orange	059			33.8544	-117.7858	4
+US	92808	Anaheim	California	CA	Orange	059			33.8579	-117.7513	4
+US	92809	Anaheim	California	CA	Orange	059			33.8426	-117.9388	4
+US	92811	Atwood	California	CA	Orange	059			33.8674	-117.831	4
+US	92812	Anaheim	California	CA	Orange	059			33.817	-117.9286	4
+US	92814	Anaheim	California	CA	Orange	059			33.8173	-117.9607	4
+US	92815	Anaheim	California	CA	Orange	059			33.8319	-117.9121	4
+US	92816	Anaheim	California	CA	Orange	059			33.8401	-117.8867	4
+US	92817	Anaheim	California	CA	Orange	059			33.8512	-117.7915	4
+US	92821	Brea	California	CA	Orange	059			33.9291	-117.8845	4
+US	92822	Brea	California	CA	Orange	059			33.9187	-117.8892	4
+US	92823	Brea	California	CA	Orange	059			33.923	-117.798	4
+US	92825	Anaheim	California	CA	Orange	059			33.8356	-117.9132	4
+US	92831	Fullerton	California	CA	Orange	059			33.8873	-117.8946	4
+US	92832	Fullerton	California	CA	Orange	059			33.868	-117.9265	4
+US	92833	Fullerton	California	CA	Orange	059			33.8766	-117.9551	4
+US	92834	Fullerton	California	CA	Orange	059			33.8768	-117.897	4
+US	92835	Fullerton	California	CA	Orange	059			33.8994	-117.9063	4
+US	92836	Fullerton	California	CA	Orange	059			33.8755	-117.9038	4
+US	92837	Fullerton	California	CA	Orange	059			33.8695	-117.9611	4
+US	92838	Fullerton	California	CA	Orange	059			33.8934	-117.931	4
+US	92840	Garden Grove	California	CA	Orange	059			33.7869	-117.9273	4
+US	92841	Garden Grove	California	CA	Orange	059			33.7817	-117.9766	4
+US	92842	Garden Grove	California	CA	Orange	059			33.7783	-117.9456	4
+US	92843	Garden Grove	California	CA	Orange	059			33.7671	-117.929	4
+US	92844	Garden Grove	California	CA	Orange	059			33.7661	-117.9738	4
+US	92845	Garden Grove	California	CA	Orange	059			33.7787	-118.0267	4
+US	92846	Garden Grove	California	CA	Orange	059			33.788	-118.0325	4
+US	92850	Anaheim	California	CA	Orange	059			33.8442	-117.9555	4
+US	92856	Orange	California	CA	Orange	059			33.7841	-117.8435	4
+US	92857	Orange	California	CA	Orange	059			33.8317	-117.8491	4
+US	92859	Orange	California	CA	Orange	059			33.8027	-117.7867	4
+US	92861	Villa Park	California	CA	Orange	059			33.8205	-117.8104	4
+US	92862	Orange	California	CA	Orange	059			33.7915	-117.714	4
+US	92863	Orange	California	CA	Orange	059			33.8153	-117.8273	4
+US	92864	Orange	California	CA	Orange	059			33.8143	-117.8308	4
+US	92865	Orange	California	CA	Orange	059			33.8263	-117.8511	4
+US	92866	Orange	California	CA	Orange	059			33.7877	-117.8423	4
+US	92867	Orange	California	CA	Orange	059			33.811	-117.8493	4
+US	92868	Orange	California	CA	Orange	059			33.7875	-117.8776	4
+US	92869	Orange	California	CA	Orange	059			33.7868	-117.7934	4
+US	92870	Placentia	California	CA	Orange	059			33.8744	-117.8543	4
+US	92871	Placentia	California	CA	Orange	059			33.8829	-117.8557	4
+US	92885	Yorba Linda	California	CA	Orange	059			33.8911	-117.8222	4
+US	92886	Yorba Linda	California	CA	Orange	059			33.9058	-117.7865	4
+US	92887	Yorba Linda	California	CA	Orange	059			33.8841	-117.7304	4
+US	92899	Anaheim	California	CA	Orange	059			33.8373	-117.8712	4
+US	95602	Auburn	California	CA	Placer	061			38.9829	-121.0944	4
+US	95603	Auburn	California	CA	Placer	061			38.9115	-121.08	4
+US	95604	Auburn	California	CA	Placer	061			38.9029	-121.067	4
+US	95631	Foresthill	California	CA	Placer	061			39.0682	-120.7224	4
+US	95648	Lincoln	California	CA	Placer	061			38.8942	-121.2908	4
+US	95650	Loomis	California	CA	Placer	061			38.8071	-121.1698	4
+US	95658	Newcastle	California	CA	Placer	061			38.8763	-121.143	4
+US	95661	Roseville	California	CA	Placer	061			38.7346	-121.234	4
+US	95663	Penryn	California	CA	Placer	061			38.8567	-121.1791	4
+US	95677	Rocklin	California	CA	Placer	061			38.7877	-121.2366	4
+US	95678	Roseville	California	CA	Placer	061			38.7609	-121.2867	4
+US	95681	Sheridan	California	CA	Placer	061			38.9953	-121.368	4
+US	95701	Alta	California	CA	Placer	061			39.2441	-120.7531	4
+US	95703	Applegate	California	CA	Placer	061			39.0007	-120.9924	4
+US	95713	Colfax	California	CA	Placer	061			39.0783	-120.9549	4
+US	95714	Dutch Flat	California	CA	Placer	061			39.1978	-120.8262	4
+US	95715	Emigrant Gap	California	CA	Placer	061			39.2968	-120.6727	4
+US	95717	Gold Run	California	CA	Placer	061			39.171	-120.8601	4
+US	95722	Meadow Vista	California	CA	Placer	061			39.0031	-121.0292	4
+US	95736	Weimar	California	CA	Placer	061			39.0375	-120.9713	4
+US	95746	Granite Bay	California	CA	Placer	061			38.7435	-121.1897	4
+US	95747	Roseville	California	CA	Placer	061			38.7703	-121.3372	4
+US	95765	Rocklin	California	CA	Placer	061			38.8136	-121.2677	4
+US	96140	Carnelian Bay	California	CA	Placer	061			39.2319	-120.0753	4
+US	96141	Homewood	California	CA	Placer	061			39.0786	-120.1734	4
+US	96143	Kings Beach	California	CA	Placer	061			39.2401	-120.0233	4
+US	96145	Tahoe City	California	CA	Placer	061			39.1806	-120.1445	4
+US	96146	Olympic Valley	California	CA	Placer	061			39.1752	-120.1954	4
+US	96148	Tahoe Vista	California	CA	Placer	061			39.2448	-120.0521	4
+US	95915	Belden	California	CA	Plumas	063			40.006	-121.2491	4
+US	95923	Canyon Dam	California	CA	Plumas	063			39.5645	-121.5751	1
+US	95934	Crescent Mills	California	CA	Plumas	063			40.0673	-120.9248	4
+US	95947	Greenville	California	CA	Plumas	063			40.1699	-120.9014	4
+US	95956	Meadow Valley	California	CA	Plumas	063			39.9296	-121.0608	4
+US	95971	Quincy	California	CA	Plumas	063			39.9284	-120.9698	4
+US	95980	Storrie	California	CA	Plumas	063			39.9175	-121.3222	4
+US	95983	Taylorsville	California	CA	Plumas	063			40.0357	-120.7353	4
+US	95984	Twain	California	CA	Plumas	063			40.0509	-121.1268	4
+US	96020	Chester	California	CA	Plumas	063			40.2975	-121.2273	4
+US	96103	Blairsden Graeagle	California	CA	Plumas	063			40.1919	-120.1746	1
+US	96105	Chilcoot	California	CA	Plumas	063			39.7977	-120.1396	4
+US	96106	Clio	California	CA	Plumas	063			39.7546	-120.5951	4
+US	96122	Portola	California	CA	Plumas	063			39.8105	-120.4691	4
+US	96129	Beckwourth	California	CA	Plumas	063			39.7721	-120.4051	4
+US	96135	Vinton	California	CA	Plumas	063			39.8043	-120.1783	4
+US	91752	Mira Loma	California	CA	Riverside	065			33.9938	-117.5236	4
+US	92201	Indio	California	CA	Riverside	065			33.7207	-116.2168	4
+US	92202	Indio	California	CA	Riverside	065			33.7529	-116.0556	4
+US	92203	Indio	California	CA	Riverside	065			33.7532	-116.2676	4
+US	92210	Indian Wells	California	CA	Riverside	065			33.7163	-116.3381	4
+US	92211	Palm Desert	California	CA	Riverside	065			33.7644	-116.3398	4
+US	92220	Banning	California	CA	Riverside	065			33.9282	-116.8899	4
+US	92223	Beaumont	California	CA	Riverside	065			33.9504	-116.9701	1
+US	92225	Blythe	California	CA	Riverside	065			33.6103	-114.5963	4
+US	92226	Blythe	California	CA	Riverside	065			33.5987	-114.6525	4
+US	92230	Cabazon	California	CA	Riverside	065			33.9086	-116.7739	4
+US	92234	Cathedral City	California	CA	Riverside	065			33.8098	-116.4665	4
+US	92235	Cathedral City	California	CA	Riverside	065			33.7797	-116.4653	4
+US	92236	Coachella	California	CA	Riverside	065			33.675	-116.1772	4
+US	92239	Desert Center	California	CA	Riverside	065			33.809	-115.3666	4
+US	92240	Desert Hot Springs	California	CA	Riverside	065			33.9531	-116.5219	4
+US	92241	Desert Hot Springs	California	CA	Riverside	065			33.8763	-116.354	4
+US	92247	La Quinta	California	CA	Riverside	065			33.6736	-116.2951	4
+US	92253	La Quinta	California	CA	Riverside	065			33.6685	-116.3081	4
+US	92254	Mecca	California	CA	Riverside	065			33.545	-116.0187	4
+US	92255	Palm Desert	California	CA	Riverside	065			33.7225	-116.377	4
+US	92258	North Palm Springs	California	CA	Riverside	065			33.9228	-116.5431	4
+US	92260	Palm Desert	California	CA	Riverside	065			33.7225	-116.377	4
+US	92261	Palm Desert	California	CA	Riverside	065			33.6604	-116.4082	4
+US	92262	Palm Springs	California	CA	Riverside	065			33.8414	-116.5347	4
+US	92263	Palm Springs	California	CA	Riverside	065			33.7611	-116.5359	4
+US	92264	Palm Springs	California	CA	Riverside	065			33.8018	-116.517	4
+US	92270	Rancho Mirage	California	CA	Riverside	065			33.7643	-116.4225	4
+US	92274	Thermal	California	CA	Riverside	065			33.5578	-116.1572	4
+US	92276	Thousand Palms	California	CA	Riverside	065			33.8082	-116.3713	4
+US	92282	Whitewater	California	CA	Riverside	065			33.989	-116.6566	4
+US	92320	Calimesa	California	CA	Riverside	065			33.9946	-117.043	4
+US	92501	Riverside	California	CA	Riverside	065			33.9924	-117.3694	4
+US	92502	Riverside	California	CA	Riverside	065			33.9533	-117.3962	4
+US	92503	Riverside	California	CA	Riverside	065			33.9208	-117.4589	4
+US	92504	Riverside	California	CA	Riverside	065			33.9315	-117.4119	4
+US	92505	Riverside	California	CA	Riverside	065			33.9228	-117.4867	4
+US	92506	Riverside	California	CA	Riverside	065			33.9455	-117.3757	4
+US	92507	Riverside	California	CA	Riverside	065			33.9761	-117.3389	4
+US	92508	Riverside	California	CA	Riverside	065			33.8897	-117.3043	4
+US	92509	Riverside	California	CA	Riverside	065			34.0033	-117.445	4
+US	92513	Riverside	California	CA	Riverside	065			33.9533	-117.3962	4
+US	92514	Riverside	California	CA	Riverside	065			33.9533	-117.3962	4
+US	92515	Riverside	California	CA	Riverside	065			33.9533	-117.3962	4
+US	92516	Riverside	California	CA	Riverside	065			33.9533	-117.3962	4
+US	92517	Riverside	California	CA	Riverside	065			33.9533	-117.3962	4
+US	92518	March Air Reserve Base	California	CA	Riverside	065			33.9533	-117.3962	1
+US	92519	Riverside	California	CA	Riverside	065			33.9533	-117.3962	4
+US	92521	Riverside	California	CA	Riverside	065			33.9533	-117.3962	4
+US	92522	Riverside	California	CA	Riverside	065			33.9533	-117.3962	4
+US	92530	Lake Elsinore	California	CA	Riverside	065			33.6598	-117.3485	4
+US	92531	Lake Elsinore	California	CA	Riverside	065			33.6681	-117.3273	4
+US	92532	Lake Elsinore	California	CA	Riverside	065			33.6927	-117.303	4
+US	92536	Aguanga	California	CA	Riverside	065			33.4473	-116.7997	4
+US	92539	Anza	California	CA	Riverside	065			33.5688	-116.7135	4
+US	92543	Hemet	California	CA	Riverside	065			33.7416	-116.973	4
+US	92544	Hemet	California	CA	Riverside	065			33.739	-116.9243	4
+US	92545	Hemet	California	CA	Riverside	065			33.7399	-117.0151	4
+US	92546	Hemet	California	CA	Riverside	065			33.7476	-116.9731	4
+US	92548	Homeland	California	CA	Riverside	065			33.7453	-117.1118	4
+US	92549	Idyllwild	California	CA	Riverside	065			33.7304	-116.7107	4
+US	92551	Moreno Valley	California	CA	Riverside	065			33.8814	-117.2261	4
+US	92552	Moreno Valley	California	CA	Riverside	065			33.9375	-117.2306	4
+US	92553	Moreno Valley	California	CA	Riverside	065			33.9157	-117.2351	4
+US	92554	Moreno Valley	California	CA	Riverside	065			33.9375	-117.2306	4
+US	92555	Moreno Valley	California	CA	Riverside	065			33.9377	-117.1851	4
+US	92556	Moreno Valley	California	CA	Riverside	065			33.9375	-117.2306	4
+US	92557	Moreno Valley	California	CA	Riverside	065			33.9553	-117.2457	4
+US	92561	Mountain Center	California	CA	Riverside	065			33.7042	-116.7259	4
+US	92562	Murrieta	California	CA	Riverside	065			33.5631	-117.2738	4
+US	92563	Murrieta	California	CA	Riverside	065			33.569	-117.1783	4
+US	92564	Murrieta	California	CA	Riverside	065			33.5539	-117.2139	4
+US	92567	Nuevo	California	CA	Riverside	065			33.8123	-117.1048	4
+US	92570	Perris	California	CA	Riverside	065			33.7852	-117.3166	4
+US	92571	Perris	California	CA	Riverside	065			33.811	-117.218	4
+US	92572	Perris	California	CA	Riverside	065			33.7825	-117.2286	4
+US	92581	San Jacinto	California	CA	Riverside	065			33.7839	-116.9586	4
+US	92582	San Jacinto	California	CA	Riverside	065			33.7883	-116.9819	4
+US	92583	San Jacinto	California	CA	Riverside	065			33.7967	-116.9324	4
+US	92584	Menifee	California	CA	Riverside	065			33.6647	-117.1743	4
+US	92585	Sun City	California	CA	Riverside	065			33.7467	-117.1721	4
+US	92586	Sun City	California	CA	Riverside	065			33.7044	-117.1969	4
+US	92587	Quail Valley	California	CA	Riverside	065			33.707	-117.245	4
+US	92589	Temecula	California	CA	Riverside	065			33.4936	-117.1484	4
+US	92590	Temecula	California	CA	Riverside	065			33.4903	-117.1824	4
+US	92591	Temecula	California	CA	Riverside	065			33.5217	-117.1286	4
+US	92592	Temecula	California	CA	Riverside	065			33.4983	-117.0958	4
+US	92593	Temecula	California	CA	Riverside	065			33.4936	-117.1484	4
+US	92595	Wildomar	California	CA	Riverside	065			33.6021	-117.264	4
+US	92596	Winchester	California	CA	Riverside	065			33.6243	-117.0885	4
+US	92599	Perris	California	CA	Riverside	065			33.7825	-117.2286	4
+US	92860	Norco	California	CA	Riverside	065			33.9247	-117.5517	4
+US	92877	Corona	California	CA	Riverside	065			33.8753	-117.5664	4
+US	92878	Corona	California	CA	Riverside	065			33.8753	-117.5664	4
+US	92879	Corona	California	CA	Riverside	065			33.8797	-117.5354	4
+US	92880	Corona	California	CA	Riverside	065			33.9208	-117.6096	4
+US	92881	Corona	California	CA	Riverside	065			33.8241	-117.5198	4
+US	92882	Corona	California	CA	Riverside	065			33.8419	-117.6043	4
+US	92883	Corona	California	CA	Riverside	065			33.7541	-117.474	4
+US	94203	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94204	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94205	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94206	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94207	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94208	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94209	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94211	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94229	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94230	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94232	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94234	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94235	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94236	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94237	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94239	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94240	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94244	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94245	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94247	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94248	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94249	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94250	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94252	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94254	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94256	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94257	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94258	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94259	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94261	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94262	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94263	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94267	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94268	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94269	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94271	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94273	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94274	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94277	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94278	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94279	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94280	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94282	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94283	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94284	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94285	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94286	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94287	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94288	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94289	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94290	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94291	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94293	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94294	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94295	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94296	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94297	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94298	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	94299	Sacramento	California	CA	Sacramento	067			38.5816	-121.4944	4
+US	95608	Carmichael	California	CA	Sacramento	067			38.6284	-121.3287	4
+US	95609	Carmichael	California	CA	Sacramento	067			38.6257	-121.3272	4
+US	95610	Citrus Heights	California	CA	Sacramento	067			38.6946	-121.2692	4
+US	95611	Citrus Heights	California	CA	Sacramento	067			38.7072	-121.28	4
+US	95615	Courtland	California	CA	Sacramento	067			38.3137	-121.563	4
+US	95621	Citrus Heights	California	CA	Sacramento	067			38.6952	-121.3075	4
+US	95624	Elk Grove	California	CA	Sacramento	067			38.4232	-121.3599	4
+US	95626	Elverta	California	CA	Sacramento	067			38.7233	-121.4497	4
+US	95628	Fair Oaks	California	CA	Sacramento	067			38.6554	-121.2611	4
+US	95630	Folsom	California	CA	Sacramento	067			38.6709	-121.1529	4
+US	95632	Galt	California	CA	Sacramento	067			38.2691	-121.3	4
+US	95638	Herald	California	CA	Sacramento	067			38.3119	-121.1729	4
+US	95639	Hood	California	CA	Sacramento	067			38.3702	-121.5143	4
+US	95641	Isleton	California	CA	Sacramento	067			38.157	-121.6066	4
+US	95652	Mcclellan	California	CA	Sacramento	067			38.6621	-121.3955	4
+US	95655	Mather	California	CA	Sacramento	067			38.5579	-121.291	4
+US	95660	North Highlands	California	CA	Sacramento	067			38.6707	-121.3781	4
+US	95662	Orangevale	California	CA	Sacramento	067			38.6845	-121.2256	4
+US	95670	Rancho Cordova	California	CA	Sacramento	067			38.6072	-121.2761	4
+US	95671	Represa	California	CA	Sacramento	067			38.7065	-121.1694	1
+US	95673	Rio Linda	California	CA	Sacramento	067			38.6895	-121.4479	4
+US	95680	Ryde	California	CA	Sacramento	067			38.2386	-121.5594	4
+US	95683	Sloughhouse	California	CA	Sacramento	067			38.5143	-121.0964	4
+US	95690	Walnut Grove	California	CA	Sacramento	067			38.2396	-121.5443	4
+US	95693	Wilton	California	CA	Sacramento	067			38.3983	-121.2303	4
+US	95741	Rancho Cordova	California	CA	Sacramento	067			38.5891	-121.3016	4
+US	95742	Rancho Cordova	California	CA	Sacramento	067			38.5981	-121.2153	4
+US	95757	Elk Grove	California	CA	Sacramento	067			38.4081	-121.4294	4
+US	95758	Elk Grove	California	CA	Sacramento	067			38.4243	-121.437	4
+US	95759	Elk Grove	California	CA	Sacramento	067			38.407	-121.3752	4
+US	95763	Folsom	California	CA	Sacramento	067			38.678	-121.175	4
+US	95811	Sacramento	California	CA	Sacramento	067			38.5762	-121.488	4
+US	95812	Sacramento	California	CA	Sacramento	067			38.5822	-121.4943	4
+US	95813	Sacramento	California	CA	Sacramento	067			38.6026	-121.4475	4
+US	95814	Sacramento	California	CA	Sacramento	067			38.5804	-121.4922	4
+US	95815	Sacramento	California	CA	Sacramento	067			38.6093	-121.4443	4
+US	95816	Sacramento	California	CA	Sacramento	067			38.5728	-121.4675	4
+US	95817	Sacramento	California	CA	Sacramento	067			38.5498	-121.4583	4
+US	95818	Sacramento	California	CA	Sacramento	067			38.5568	-121.4929	4
+US	95819	Sacramento	California	CA	Sacramento	067			38.5683	-121.4366	4
+US	95820	Sacramento	California	CA	Sacramento	067			38.5347	-121.4451	4
+US	95821	Sacramento	California	CA	Sacramento	067			38.6239	-121.3837	4
+US	95822	Sacramento	California	CA	Sacramento	067			38.5091	-121.4935	4
+US	95823	Sacramento	California	CA	Sacramento	067			38.4797	-121.4438	4
+US	95824	Sacramento	California	CA	Sacramento	067			38.5178	-121.4419	4
+US	95825	Sacramento	California	CA	Sacramento	067			38.5892	-121.4057	4
+US	95826	Sacramento	California	CA	Sacramento	067			38.5539	-121.3693	4
+US	95827	Sacramento	California	CA	Sacramento	067			38.5662	-121.3286	4
+US	95828	Sacramento	California	CA	Sacramento	067			38.4826	-121.4006	4
+US	95829	Sacramento	California	CA	Sacramento	067			38.4689	-121.344	4
+US	95830	Sacramento	California	CA	Sacramento	067			38.4896	-121.2772	4
+US	95831	Sacramento	California	CA	Sacramento	067			38.4962	-121.5297	4
+US	95832	Sacramento	California	CA	Sacramento	067			38.4695	-121.4883	4
+US	95833	Sacramento	California	CA	Sacramento	067			38.6157	-121.5053	4
+US	95834	Sacramento	California	CA	Sacramento	067			38.6383	-121.5072	4
+US	95835	Sacramento	California	CA	Sacramento	067			38.6626	-121.4834	4
+US	95836	Sacramento	California	CA	Sacramento	067			38.7198	-121.5343	4
+US	95837	Sacramento	California	CA	Sacramento	067			38.6817	-121.603	4
+US	95838	Sacramento	California	CA	Sacramento	067			38.6406	-121.444	4
+US	95840	Sacramento	California	CA	Sacramento	067			38.5816	-121.4933	4
+US	95841	Sacramento	California	CA	Sacramento	067			38.6627	-121.3406	4
+US	95842	Sacramento	California	CA	Sacramento	067			38.6865	-121.3494	4
+US	95843	Antelope	California	CA	Sacramento	067			38.7159	-121.3648	4
+US	95851	Sacramento	California	CA	Sacramento	067			38.6026	-121.4475	4
+US	95852	Sacramento	California	CA	Sacramento	067			38.6026	-121.4475	4
+US	95853	Sacramento	California	CA	Sacramento	067			38.6026	-121.4475	4
+US	95860	Sacramento	California	CA	Sacramento	067			38.6105	-121.3799	4
+US	95864	Sacramento	California	CA	Sacramento	067			38.5878	-121.3769	4
+US	95865	Sacramento	California	CA	Sacramento	067			38.596	-121.3978	4
+US	95866	Sacramento	California	CA	Sacramento	067			38.596	-121.3978	4
+US	95867	Sacramento	California	CA	Sacramento	067			38.5816	-121.4933	4
+US	95894	Sacramento	California	CA	Sacramento	067			38.5816	-121.4933	4
+US	95899	Sacramento	California	CA	Sacramento	067			38.5383	-121.5549	4
+US	95023	Hollister	California	CA	San Benito	069			36.8337	-121.3439	4
+US	95024	Hollister	California	CA	San Benito	069			36.8586	-121.3982	4
+US	95043	Paicines	California	CA	San Benito	069			36.4985	-120.9744	4
+US	95045	San Juan Bautista	California	CA	San Benito	069			36.8463	-121.5346	4
+US	95075	Tres Pinos	California	CA	San Benito	069			36.767	-121.3017	4
+US	91701	Rancho Cucamonga	California	CA	San Bernardino	071			34.1376	-117.5999	4
+US	91708	Chino	California	CA	San Bernardino	071			33.954	-117.6404	4
+US	91709	Chino Hills	California	CA	San Bernardino	071			33.9797	-117.7308	4
+US	91710	Chino	California	CA	San Bernardino	071			34.0125	-117.6844	4
+US	91729	Rancho Cucamonga	California	CA	San Bernardino	071			34.1064	-117.5931	4
+US	91730	Rancho Cucamonga	California	CA	San Bernardino	071			34.107	-117.5941	4
+US	91737	Rancho Cucamonga	California	CA	San Bernardino	071			34.1467	-117.5803	4
+US	91739	Rancho Cucamonga	California	CA	San Bernardino	071			34.1705	-117.5182	4
+US	91743	Guasti	California	CA	San Bernardino	071			34.065	-117.5864	4
+US	91758	Ontario	California	CA	San Bernardino	071			34.0633	-117.6509	4
+US	91761	Ontario	California	CA	San Bernardino	071			34.0316	-117.6187	4
+US	91762	Ontario	California	CA	San Bernardino	071			34.0584	-117.6665	4
+US	91763	Montclair	California	CA	San Bernardino	071			34.0733	-117.6987	4
+US	91764	Ontario	California	CA	San Bernardino	071			34.0763	-117.6254	4
+US	91784	Upland	California	CA	San Bernardino	071			34.141	-117.6581	4
+US	91785	Upland	California	CA	San Bernardino	071			34.1144	-117.6583	4
+US	91786	Upland	California	CA	San Bernardino	071			34.1144	-117.6583	4
+US	92242	Earp	California	CA	San Bernardino	071			34.1652	-114.3197	1
+US	92248	La Quinta	California	CA	San Bernardino	071			33.6736	-116.2951	4
+US	92252	Joshua Tree	California	CA	San Bernardino	071			34.1502	-116.3038	4
+US	92256	Morongo Valley	California	CA	San Bernardino	071			34.0606	-116.5656	4
+US	92267	Parker Dam	California	CA	San Bernardino	071			34.2872	-114.143	4
+US	92268	Pioneertown	California	CA	San Bernardino	071			34.1887	-116.5048	4
+US	92277	Twentynine Palms	California	CA	San Bernardino	071			34.1455	-116.0601	4
+US	92278	Twentynine Palms	California	CA	San Bernardino	071			34.238	-116.0604	4
+US	92280	Vidal	California	CA	San Bernardino	071			34.1561	-114.5656	4
+US	92284	Yucca Valley	California	CA	San Bernardino	071			34.1559	-116.4313	4
+US	92285	Landers	California	CA	San Bernardino	071			34.3103	-116.5241	4
+US	92286	Yucca Valley	California	CA	San Bernardino	071			34.1803	-116.35	4
+US	92301	Adelanto	California	CA	San Bernardino	071			34.5841	-117.4242	4
+US	92304	Amboy	California	CA	San Bernardino	071			34.5578	-115.7444	4
+US	92305	Angelus Oaks	California	CA	San Bernardino	071			34.1531	-116.9485	4
+US	92307	Apple Valley	California	CA	San Bernardino	071			34.5291	-117.2132	4
+US	92308	Apple Valley	California	CA	San Bernardino	071			34.4698	-117.1927	4
+US	92309	Baker	California	CA	San Bernardino	071			35.3606	-116.0638	4
+US	92310	Fort Irwin	California	CA	San Bernardino	071			35.2625	-116.6966	4
+US	92311	Barstow	California	CA	San Bernardino	071			34.8914	-117.0387	4
+US	92312	Barstow	California	CA	San Bernardino	071			34.8986	-117.0228	4
+US	92313	Grand Terrace	California	CA	San Bernardino	071			34.031	-117.3129	4
+US	92314	Big Bear City	California	CA	San Bernardino	071			34.261	-116.8131	4
+US	92315	Big Bear Lake	California	CA	San Bernardino	071			34.235	-116.9053	4
+US	92316	Bloomington	California	CA	San Bernardino	071			34.0662	-117.3993	4
+US	92317	Blue Jay	California	CA	San Bernardino	071			34.2112	-117.0796	4
+US	92318	Bryn Mawr	California	CA	San Bernardino	071			34.0483	-117.2309	4
+US	92321	Cedar Glen	California	CA	San Bernardino	071			34.2545	-117.1533	4
+US	92322	Cedarpines Park	California	CA	San Bernardino	071			34.2544	-117.3265	4
+US	92323	Cima	California	CA	San Bernardino	071			35.2378	-115.4992	1
+US	92324	Colton	California	CA	San Bernardino	071			34.0315	-117.2874	4
+US	92325	Crestline	California	CA	San Bernardino	071			34.2433	-117.2811	4
+US	92327	Daggett	California	CA	San Bernardino	071			34.8668	-116.8876	4
+US	92329	Phelan	California	CA	San Bernardino	071			34.4261	-117.5723	4
+US	92332	Essex	California	CA	San Bernardino	071			34.5881	-115.5771	4
+US	92333	Fawnskin	California	CA	San Bernardino	071			34.2583	-116.9515	4
+US	92334	Fontana	California	CA	San Bernardino	071			34.0922	-117.435	4
+US	92335	Fontana	California	CA	San Bernardino	071			34.0794	-117.4551	4
+US	92336	Fontana	California	CA	San Bernardino	071			34.1173	-117.4378	4
+US	92337	Fontana	California	CA	San Bernardino	071			34.0498	-117.4706	4
+US	92338	Ludlow	California	CA	San Bernardino	071			34.7211	-116.16	4
+US	92339	Forest Falls	California	CA	San Bernardino	071			34.0937	-116.9362	4
+US	92340	Hesperia	California	CA	San Bernardino	071			34.4264	-117.3009	4
+US	92341	Green Valley Lake	California	CA	San Bernardino	071			34.2348	-117.066	4
+US	92342	Helendale	California	CA	San Bernardino	071			34.7499	-117.3367	4
+US	92344	Hesperia	California	CA	San Bernardino	071			34.4239	-117.4075	4
+US	92345	Hesperia	California	CA	San Bernardino	071			34.4222	-117.3025	4
+US	92346	Highland	California	CA	San Bernardino	071			34.1283	-117.2087	4
+US	92347	Hinkley	California	CA	San Bernardino	071			34.9279	-117.1809	4
+US	92350	Loma Linda	California	CA	San Bernardino	071			34.0483	-117.2612	4
+US	92352	Lake Arrowhead	California	CA	San Bernardino	071			34.2606	-117.2016	4
+US	92354	Loma Linda	California	CA	San Bernardino	071			34.0528	-117.2513	4
+US	92356	Lucerne Valley	California	CA	San Bernardino	071			34.447	-116.9189	4
+US	92357	Loma Linda	California	CA	San Bernardino	071			34.0483	-117.2612	4
+US	92358	Lytle Creek	California	CA	San Bernardino	071			34.2558	-117.5186	4
+US	92359	Mentone	California	CA	San Bernardino	071			34.0774	-117.1126	4
+US	92363	Needles	California	CA	San Bernardino	071			34.7824	-114.5871	4
+US	92364	Nipton	California	CA	San Bernardino	071			35.4667	-115.2722	4
+US	92365	Newberry Springs	California	CA	San Bernardino	071			34.885	-116.7464	4
+US	92366	Mountain Pass	California	CA	San Bernardino	071			35.4703	-115.545	4
+US	92368	Oro Grande	California	CA	San Bernardino	071			34.6178	-117.3327	4
+US	92369	Patton	California	CA	San Bernardino	071			34.1358	-117.2239	4
+US	92371	Phelan	California	CA	San Bernardino	071			34.4449	-117.5196	4
+US	92372	Pinon Hills	California	CA	San Bernardino	071			34.4429	-117.6403	4
+US	92373	Redlands	California	CA	San Bernardino	071			34.0397	-117.1804	4
+US	92374	Redlands	California	CA	San Bernardino	071			34.065	-117.1672	4
+US	92375	Redlands	California	CA	San Bernardino	071			34.0556	-117.1825	4
+US	92376	Rialto	California	CA	San Bernardino	071			34.1132	-117.3771	4
+US	92377	Rialto	California	CA	San Bernardino	071			34.1561	-117.4042	4
+US	92378	Rimforest	California	CA	San Bernardino	071			34.2297	-117.225	4
+US	92382	Running Springs	California	CA	San Bernardino	071			34.2102	-117.1109	4
+US	92385	Skyforest	California	CA	San Bernardino	071			34.2353	-117.1792	4
+US	92386	Sugarloaf	California	CA	San Bernardino	071			34.2372	-116.8277	4
+US	92391	Twin Peaks	California	CA	San Bernardino	071			34.2379	-117.2348	4
+US	92392	Victorville	California	CA	San Bernardino	071			34.4802	-117.4082	4
+US	92393	Victorville	California	CA	San Bernardino	071			34.5361	-117.2912	4
+US	92394	Victorville	California	CA	San Bernardino	071			34.5563	-117.3528	4
+US	92395	Victorville	California	CA	San Bernardino	071			34.5016	-117.2944	4
+US	92397	Wrightwood	California	CA	San Bernardino	071			34.3628	-117.6249	4
+US	92398	Yermo	California	CA	San Bernardino	071			34.905	-116.8203	4
+US	92399	Yucaipa	California	CA	San Bernardino	071			34.0282	-117.0489	4
+US	92401	San Bernardino	California	CA	San Bernardino	071			34.1105	-117.2898	4
+US	92402	San Bernardino	California	CA	San Bernardino	071			34.1083	-117.2898	4
+US	92403	San Bernardino	California	CA	San Bernardino	071			34.1083	-117.2898	4
+US	92404	San Bernardino	California	CA	San Bernardino	071			34.1426	-117.2606	4
+US	92405	San Bernardino	California	CA	San Bernardino	071			34.1446	-117.3013	4
+US	92406	San Bernardino	California	CA	San Bernardino	071			34.1083	-117.2898	4
+US	92407	San Bernardino	California	CA	San Bernardino	071			34.2166	-117.3908	4
+US	92408	San Bernardino	California	CA	San Bernardino	071			34.0831	-117.2711	4
+US	92410	San Bernardino	California	CA	San Bernardino	071			34.1069	-117.2975	4
+US	92411	San Bernardino	California	CA	San Bernardino	071			34.1214	-117.3172	4
+US	92413	San Bernardino	California	CA	San Bernardino	071			34.1083	-117.2898	4
+US	92415	San Bernardino	California	CA	San Bernardino	071			34.1083	-117.2898	4
+US	92418	San Bernardino	California	CA	San Bernardino	071			34.1083	-117.2898	4
+US	92423	San Bernardino	California	CA	San Bernardino	071			34.1083	-117.2898	4
+US	92427	San Bernardino	California	CA	San Bernardino	071			34.1083	-117.2898	4
+US	93558	Red Mountain	California	CA	San Bernardino	071			35.3479	-117.6214	4
+US	93562	Trona	California	CA	San Bernardino	071			35.7481	-117.3808	4
+US	93592	Trona	California	CA	San Bernardino	071			35.7627	-117.3728	4
+US	91901	Alpine	California	CA	San Diego	073			32.8282	-116.7543	4
+US	91902	Bonita	California	CA	San Diego	073			32.6671	-117.0221	4
+US	91903	Alpine	California	CA	San Diego	073			32.8351	-116.7664	4
+US	91905	Boulevard	California	CA	San Diego	073			32.6719	-116.32	4
+US	91906	Campo	California	CA	San Diego	073			32.6605	-116.4905	4
+US	91908	Bonita	California	CA	San Diego	073			32.6578	-117.03	4
+US	91909	Chula Vista	California	CA	San Diego	073			32.6401	-117.0842	4
+US	91910	Chula Vista	California	CA	San Diego	073			32.6371	-117.0676	4
+US	91911	Chula Vista	California	CA	San Diego	073			32.6084	-117.0565	4
+US	91912	Chula Vista	California	CA	San Diego	073			32.6401	-117.0842	4
+US	91913	Chula Vista	California	CA	San Diego	073			32.6513	-116.9852	4
+US	91914	Chula Vista	California	CA	San Diego	073			32.6587	-116.9652	4
+US	91915	Chula Vista	California	CA	San Diego	073			32.6315	-116.9408	4
+US	91916	Descanso	California	CA	San Diego	073			32.873	-116.6027	4
+US	91917	Dulzura	California	CA	San Diego	073			32.6152	-116.7285	4
+US	91921	Chula Vista	California	CA	San Diego	073			32.6401	-117.0842	4
+US	91931	Guatay	California	CA	San Diego	073			32.8497	-116.5583	4
+US	91932	Imperial Beach	California	CA	San Diego	073			32.5783	-117.1148	4
+US	91933	Imperial Beach	California	CA	San Diego	073			32.5839	-117.1131	4
+US	91934	Jacumba	California	CA	San Diego	073			32.6249	-116.1952	4
+US	91935	Jamul	California	CA	San Diego	073			32.7163	-116.8323	4
+US	91941	La Mesa	California	CA	San Diego	073			32.7604	-117.0115	4
+US	91942	La Mesa	California	CA	San Diego	073			32.7835	-117.0189	4
+US	91943	La Mesa	California	CA	San Diego	073			32.7678	-117.0231	4
+US	91944	La Mesa	California	CA	San Diego	073			32.7678	-117.0231	4
+US	91945	Lemon Grove	California	CA	San Diego	073			32.7332	-117.0326	4
+US	91946	Lemon Grove	California	CA	San Diego	073			32.7426	-117.0314	4
+US	91948	Mount Laguna	California	CA	San Diego	073			32.8676	-116.4206	4
+US	91950	National City	California	CA	San Diego	073			32.6749	-117.0897	4
+US	91951	National City	California	CA	San Diego	073			32.6781	-117.0992	4
+US	91962	Pine Valley	California	CA	San Diego	073			32.835	-116.5127	4
+US	91963	Potrero	California	CA	San Diego	073			32.6205	-116.6037	4
+US	91976	Spring Valley	California	CA	San Diego	073			32.7448	-116.9989	4
+US	91977	Spring Valley	California	CA	San Diego	073			32.724	-116.9976	4
+US	91978	Spring Valley	California	CA	San Diego	073			32.7329	-116.9596	4
+US	91979	Spring Valley	California	CA	San Diego	073			32.7448	-116.9989	4
+US	91980	Tecate	California	CA	San Diego	073			32.5889	-116.6192	4
+US	91987	Tecate	California	CA	San Diego	073			32.5773	-116.6275	4
+US	92003	Bonsall	California	CA	San Diego	073			33.294	-117.1897	4
+US	92004	Borrego Springs	California	CA	San Diego	073			33.2386	-116.3514	4
+US	92007	Cardiff By The Sea	California	CA	San Diego	073			33.023	-117.2745	4
+US	92008	Carlsbad	California	CA	San Diego	073			33.1602	-117.325	4
+US	92009	Carlsbad	California	CA	San Diego	073			33.0954	-117.2619	4
+US	92010	Carlsbad	California	CA	San Diego	073			33.1639	-117.3009	4
+US	92011	Carlsbad	California	CA	San Diego	073			33.1072	-117.2943	4
+US	92013	Carlsbad	California	CA	San Diego	073			33.1581	-117.3506	4
+US	92014	Del Mar	California	CA	San Diego	073			32.9665	-117.249	4
+US	92018	Carlsbad	California	CA	San Diego	073			33.1581	-117.3506	4
+US	92019	El Cajon	California	CA	San Diego	073			32.7777	-116.9191	4
+US	92020	El Cajon	California	CA	San Diego	073			32.7928	-116.9665	4
+US	92021	El Cajon	California	CA	San Diego	073			32.8178	-116.9223	4
+US	92022	El Cajon	California	CA	San Diego	073			32.7948	-116.9625	4
+US	92023	Encinitas	California	CA	San Diego	073			33.036	-117.292	4
+US	92024	Encinitas	California	CA	San Diego	073			33.0535	-117.2689	4
+US	92025	Escondido	California	CA	San Diego	073			33.1101	-117.07	4
+US	92026	Escondido	California	CA	San Diego	073			33.1605	-117.0978	4
+US	92027	Escondido	California	CA	San Diego	073			33.1388	-117.052	4
+US	92028	Fallbrook	California	CA	San Diego	073			33.369	-117.229	4
+US	92029	Escondido	California	CA	San Diego	073			33.0895	-117.1128	4
+US	92030	Escondido	California	CA	San Diego	073			33.1192	-117.0864	4
+US	92033	Escondido	California	CA	San Diego	073			33.1192	-117.0864	4
+US	92036	Julian	California	CA	San Diego	073			33.0534	-116.5658	4
+US	92037	La Jolla	California	CA	San Diego	073			32.8455	-117.2521	4
+US	92038	La Jolla	California	CA	San Diego	073			32.8473	-117.2742	4
+US	92039	La Jolla	California	CA	San Diego	073			32.8473	-117.2742	4
+US	92040	Lakeside	California	CA	San Diego	073			32.8562	-116.9201	4
+US	92046	Escondido	California	CA	San Diego	073			33.1192	-117.0864	4
+US	92049	Oceanside	California	CA	San Diego	073			33.1959	-117.3795	4
+US	92051	Oceanside	California	CA	San Diego	073			33.1959	-117.3795	4
+US	92052	Oceanside	California	CA	San Diego	073			33.1959	-117.3795	4
+US	92054	Oceanside	California	CA	San Diego	073			33.2072	-117.3573	4
+US	92055	Camp Pendleton	California	CA	San Diego	073			33.2433	-117.3768	1
+US	92056	Oceanside	California	CA	San Diego	073			33.1968	-117.2831	4
+US	92057	Oceanside	California	CA	San Diego	073			33.2407	-117.3025	4
+US	92058	Oceanside	California	CA	San Diego	073			33.1959	-117.3795	4
+US	92059	Pala	California	CA	San Diego	073			33.3777	-117.0717	4
+US	92060	Palomar Mountain	California	CA	San Diego	073			33.3228	-116.8786	4
+US	92061	Pauma Valley	California	CA	San Diego	073			33.3063	-116.9596	4
+US	92064	Poway	California	CA	San Diego	073			32.9756	-117.0402	4
+US	92065	Ramona	California	CA	San Diego	073			33.0293	-116.8535	4
+US	92066	Ranchita	California	CA	San Diego	073			33.21	-116.5167	4
+US	92067	Rancho Santa Fe	California	CA	San Diego	073			33.005	-117.2157	4
+US	92068	San Luis Rey	California	CA	San Diego	073			33.232	-117.3236	4
+US	92069	San Marcos	California	CA	San Diego	073			33.1444	-117.1697	4
+US	92070	Santa Ysabel	California	CA	San Diego	073			33.1476	-116.6963	4
+US	92071	Santee	California	CA	San Diego	073			32.8486	-116.9862	4
+US	92072	Santee	California	CA	San Diego	073			32.8384	-116.9739	4
+US	92074	Poway	California	CA	San Diego	073			32.9628	-117.0359	4
+US	92075	Solana Beach	California	CA	San Diego	073			32.9937	-117.2598	4
+US	92078	San Marcos	California	CA	San Diego	073			33.1193	-117.185	4
+US	92079	San Marcos	California	CA	San Diego	073			33.1434	-117.1661	4
+US	92081	Vista	California	CA	San Diego	073			33.1644	-117.2403	4
+US	92082	Valley Center	California	CA	San Diego	073			33.249	-117.0122	4
+US	92083	Vista	California	CA	San Diego	073			33.1978	-117.2482	4
+US	92084	Vista	California	CA	San Diego	073			33.2131	-117.2243	4
+US	92085	Vista	California	CA	San Diego	073			33.2	-117.2425	4
+US	92086	Warner Springs	California	CA	San Diego	073			33.3096	-116.6527	4
+US	92088	Fallbrook	California	CA	San Diego	073			33.3764	-117.2511	4
+US	92091	Rancho Santa Fe	California	CA	San Diego	073			32.9623	-117.0462	4
+US	92092	La Jolla	California	CA	San Diego	073			32.8473	-117.2742	4
+US	92093	La Jolla	California	CA	San Diego	073			32.8473	-117.2742	4
+US	92096	San Marcos	California	CA	San Diego	073			33.1434	-117.1661	4
+US	92101	San Diego	California	CA	San Diego	073			32.7185	-117.1593	4
+US	92102	San Diego	California	CA	San Diego	073			32.7139	-117.1219	4
+US	92103	San Diego	California	CA	San Diego	073			32.7466	-117.1636	4
+US	92104	San Diego	California	CA	San Diego	073			32.7454	-117.1272	4
+US	92105	San Diego	California	CA	San Diego	073			32.7423	-117.0947	4
+US	92106	San Diego	California	CA	San Diego	073			32.7272	-117.2268	4
+US	92107	San Diego	California	CA	San Diego	073			32.7425	-117.2433	4
+US	92108	San Diego	California	CA	San Diego	073			32.7783	-117.1335	4
+US	92109	San Diego	California	CA	San Diego	073			32.7969	-117.2405	4
+US	92110	San Diego	California	CA	San Diego	073			32.7635	-117.2028	4
+US	92111	San Diego	California	CA	San Diego	073			32.7972	-117.1708	4
+US	92112	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92113	San Diego	California	CA	San Diego	073			32.697	-117.1153	4
+US	92114	San Diego	California	CA	San Diego	073			32.7059	-117.0524	4
+US	92115	San Diego	California	CA	San Diego	073			32.7607	-117.0721	4
+US	92116	San Diego	California	CA	San Diego	073			32.7624	-117.1242	4
+US	92117	San Diego	California	CA	San Diego	073			32.8239	-117.1965	4
+US	92118	Coronado	California	CA	San Diego	073			32.6807	-117.1698	4
+US	92119	San Diego	California	CA	San Diego	073			32.8036	-117.0261	4
+US	92120	San Diego	California	CA	San Diego	073			32.7958	-117.0707	4
+US	92121	San Diego	California	CA	San Diego	073			32.8919	-117.2035	4
+US	92122	San Diego	California	CA	San Diego	073			32.8577	-117.2115	4
+US	92123	San Diego	California	CA	San Diego	073			32.7973	-117.1392	4
+US	92124	San Diego	California	CA	San Diego	073			32.8201	-117.0986	4
+US	92126	San Diego	California	CA	San Diego	073			32.9161	-117.1402	4
+US	92127	San Diego	California	CA	San Diego	073			33.0279	-117.0856	4
+US	92128	San Diego	California	CA	San Diego	073			33.0067	-117.069	4
+US	92129	San Diego	California	CA	San Diego	073			32.9652	-117.1213	4
+US	92130	San Diego	California	CA	San Diego	073			32.9555	-117.2252	4
+US	92131	San Diego	California	CA	San Diego	073			32.9123	-117.0898	4
+US	92132	San Diego	California	CA	San Diego	073			32.6437	-117.1384	4
+US	92134	San Diego	California	CA	San Diego	073			32.7242	-117.1466	4
+US	92135	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92136	San Diego	California	CA	San Diego	073			32.6834	-117.1219	4
+US	92137	San Diego	California	CA	San Diego	073			32.8538	-117.1197	4
+US	92138	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92139	San Diego	California	CA	San Diego	073			32.6806	-117.0474	4
+US	92140	San Diego	California	CA	San Diego	073			32.7434	-117.2004	4
+US	92142	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92143	San Ysidro	California	CA	San Diego	073			33.2553	-116.5664	4
+US	92145	San Diego	California	CA	San Diego	073			32.8891	-117.1005	4
+US	92147	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92149	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92150	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92152	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92153	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92154	San Diego	California	CA	San Diego	073			32.5753	-117.0707	4
+US	92155	San Diego	California	CA	San Diego	073			32.6716	-117.1657	4
+US	92158	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92159	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92160	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92161	San Diego	California	CA	San Diego	073			32.8718	-117.2291	4
+US	92163	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92165	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92166	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92167	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92168	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92169	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92170	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92171	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92172	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92173	San Ysidro	California	CA	San Diego	073			32.5626	-117.043	4
+US	92174	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92175	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92176	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92177	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92178	Coronado	California	CA	San Diego	073			32.6859	-117.1831	4
+US	92179	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92182	San Diego	California	CA	San Diego	073			32.7751	-117.0762	4
+US	92186	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92187	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92190	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92191	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92192	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92193	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92195	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92196	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92197	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92198	San Diego	California	CA	San Diego	073			32.7153	-117.1573	4
+US	92199	San Diego	California	CA	San Diego	073			32.7516	-117.1918	4
+US	94102	San Francisco	California	CA	City and County of San Francisco	075			37.7813	-122.4167	4
+US	94103	San Francisco	California	CA	City and County of San Francisco	075			37.7725	-122.4147	4
+US	94104	San Francisco	California	CA	City and County of San Francisco	075			37.7915	-122.4018	4
+US	94105	San Francisco	California	CA	City and County of San Francisco	075			37.7864	-122.3892	4
+US	94107	San Francisco	California	CA	City and County of San Francisco	075			37.7621	-122.3971	4
+US	94108	San Francisco	California	CA	City and County of San Francisco	075			37.7929	-122.4079	4
+US	94109	San Francisco	California	CA	City and County of San Francisco	075			37.7917	-122.4186	4
+US	94110	San Francisco	California	CA	City and County of San Francisco	075			37.7509	-122.4153	4
+US	94111	San Francisco	California	CA	City and County of San Francisco	075			37.7974	-122.4001	4
+US	94112	San Francisco	California	CA	City and County of San Francisco	075			37.7195	-122.4411	4
+US	94114	San Francisco	California	CA	City and County of San Francisco	075			37.7587	-122.433	4
+US	94115	San Francisco	California	CA	City and County of San Francisco	075			37.7856	-122.4358	4
+US	94116	San Francisco	California	CA	City and County of San Francisco	075			37.7441	-122.4863	4
+US	94117	San Francisco	California	CA	City and County of San Francisco	075			37.7712	-122.4413	4
+US	94118	San Francisco	California	CA	City and County of San Francisco	075			37.7812	-122.4614	4
+US	94119	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94120	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94121	San Francisco	California	CA	City and County of San Francisco	075			37.7786	-122.4892	4
+US	94122	San Francisco	California	CA	City and County of San Francisco	075			37.7593	-122.4836	4
+US	94123	San Francisco	California	CA	City and County of San Francisco	075			37.7999	-122.4342	4
+US	94124	San Francisco	California	CA	City and County of San Francisco	075			37.7309	-122.3886	4
+US	94125	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94126	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94127	San Francisco	California	CA	City and County of San Francisco	075			37.7354	-122.4571	4
+US	94129	San Francisco	California	CA	City and County of San Francisco	075			37.8005	-122.465	4
+US	94130	San Francisco	California	CA	City and County of San Francisco	075			37.8231	-122.3693	4
+US	94131	San Francisco	California	CA	City and County of San Francisco	075			37.745	-122.4383	4
+US	94132	San Francisco	California	CA	City and County of San Francisco	075			37.7211	-122.4754	4
+US	94133	San Francisco	California	CA	City and County of San Francisco	075			37.8002	-122.4091	4
+US	94134	San Francisco	California	CA	City and County of San Francisco	075			37.719	-122.4096	4
+US	94137	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94139	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94140	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94141	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94142	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94143	San Francisco	California	CA	City and County of San Francisco	075			37.7631	-122.4586	4
+US	94144	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94145	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94146	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94147	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94151	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94158	San Francisco	California	CA	City and County of San Francisco	075			37.7694	-122.3867	4
+US	94159	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94160	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94161	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94163	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94164	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94172	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94177	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	94188	San Francisco	California	CA	City and County of San Francisco	075			37.7749	-122.4194	4
+US	95201	Stockton	California	CA	San Joaquin	077			37.958	-121.2876	4
+US	95202	Stockton	California	CA	San Joaquin	077			37.9606	-121.2871	4
+US	95203	Stockton	California	CA	San Joaquin	077			37.9532	-121.3116	4
+US	95204	Stockton	California	CA	San Joaquin	077			37.9743	-121.3154	4
+US	95205	Stockton	California	CA	San Joaquin	077			37.9625	-121.2624	4
+US	95206	Stockton	California	CA	San Joaquin	077			37.9177	-121.3123	4
+US	95207	Stockton	California	CA	San Joaquin	077			38.0024	-121.3238	4
+US	95208	Stockton	California	CA	San Joaquin	077			37.9304	-121.436	4
+US	95209	Stockton	California	CA	San Joaquin	077			38.0377	-121.3445	4
+US	95210	Stockton	California	CA	San Joaquin	077			38.025	-121.2972	4
+US	95211	Stockton	California	CA	San Joaquin	077			37.9809	-121.311	4
+US	95212	Stockton	California	CA	San Joaquin	077			38.0315	-121.2589	4
+US	95213	Stockton	California	CA	San Joaquin	077			37.9054	-121.2222	4
+US	95214	Stockton	California	CA	San Joaquin	077			37.9053	-121.2262	
+US	95215	Stockton	California	CA	San Joaquin	077			37.9551	-121.2041	4
+US	95219	Stockton	California	CA	San Joaquin	077			38.01	-121.3698	4
+US	95220	Acampo	California	CA	San Joaquin	077			38.2004	-121.2186	4
+US	95227	Clements	California	CA	San Joaquin	077			38.1929	-121.0811	4
+US	95230	Farmington	California	CA	San Joaquin	077			37.9299	-121.0002	4
+US	95231	French Camp	California	CA	San Joaquin	077			37.878	-121.2827	4
+US	95234	Holt	California	CA	San Joaquin	077			37.9344	-121.4261	4
+US	95236	Linden	California	CA	San Joaquin	077			38.032	-121.0493	4
+US	95237	Lockeford	California	CA	San Joaquin	077			38.1613	-121.1424	4
+US	95240	Lodi	California	CA	San Joaquin	077			38.1222	-121.2555	4
+US	95241	Lodi	California	CA	San Joaquin	077			38.1327	-121.2724	4
+US	95242	Lodi	California	CA	San Joaquin	077			38.1308	-121.3345	4
+US	95253	Victor	California	CA	San Joaquin	077			38.138	-121.205	4
+US	95258	Woodbridge	California	CA	San Joaquin	077			38.1551	-121.3086	4
+US	95267	Stockton	California	CA	San Joaquin	077			38.0003	-121.3174	4
+US	95269	Stockton	California	CA	San Joaquin	077			38.0187	-121.3225	4
+US	95296	Stockton	California	CA	San Joaquin	077			37.9577	-121.2908	4
+US	95297	Stockton	California	CA	San Joaquin	077			38.0025	-121.324	4
+US	95304	Tracy	California	CA	San Joaquin	077			37.7319	-121.4096	4
+US	95320	Escalon	California	CA	San Joaquin	077			37.7983	-121.0006	4
+US	95330	Lathrop	California	CA	San Joaquin	077			37.8209	-121.2827	4
+US	95336	Manteca	California	CA	San Joaquin	077			37.8134	-121.2132	4
+US	95337	Manteca	California	CA	San Joaquin	077			37.7808	-121.2344	4
+US	95366	Ripon	California	CA	San Joaquin	077			37.7491	-121.1284	4
+US	95376	Tracy	California	CA	San Joaquin	077			37.7383	-121.4345	4
+US	95377	Tracy	California	CA	San Joaquin	077			37.6567	-121.4955	4
+US	95378	Tracy	California	CA	San Joaquin	077			37.6761	-121.433	4
+US	95385	Vernalis	California	CA	San Joaquin	077			37.6176	-121.2581	4
+US	95391	Tracy	California	CA	San Joaquin	077			37.7695	-121.5397	4
+US	95686	Thornton	California	CA	San Joaquin	077			38.2261	-121.4236	4
+US	93401	San Luis Obispo	California	CA	San Luis Obispo	079			35.2635	-120.6509	4
+US	93402	Los Osos	California	CA	San Luis Obispo	079			35.3172	-120.8333	4
+US	93403	San Luis Obispo	California	CA	San Luis Obispo	079			35.2828	-120.6596	4
+US	93405	San Luis Obispo	California	CA	San Luis Obispo	079			35.2901	-120.6817	4
+US	93406	San Luis Obispo	California	CA	San Luis Obispo	079			35.2828	-120.6596	4
+US	93407	San Luis Obispo	California	CA	San Luis Obispo	079			35.2828	-120.6596	4
+US	93408	San Luis Obispo	California	CA	San Luis Obispo	079			35.2828	-120.6596	4
+US	93409	San Luis Obispo	California	CA	San Luis Obispo	079			35.2211	-120.6364	4
+US	93410	San Luis Obispo	California	CA	San Luis Obispo	079			35.3471	-120.4553	4
+US	93412	Los Osos	California	CA	San Luis Obispo	079			35.3111	-120.8324	4
+US	93420	Arroyo Grande	California	CA	San Luis Obispo	079			35.1661	-120.4651	4
+US	93421	Arroyo Grande	California	CA	San Luis Obispo	079			35.1186	-120.5907	4
+US	93422	Atascadero	California	CA	San Luis Obispo	079			35.4754	-120.6638	4
+US	93423	Atascadero	California	CA	San Luis Obispo	079			35.4282	-120.7695	4
+US	93424	Avila Beach	California	CA	San Luis Obispo	079			35.18	-120.7318	4
+US	93428	Cambria	California	CA	San Luis Obispo	079			35.5566	-121.084	4
+US	93430	Cayucos	California	CA	San Luis Obispo	079			35.4446	-120.8908	4
+US	93432	Creston	California	CA	San Luis Obispo	079			35.4779	-120.4361	4
+US	93433	Grover Beach	California	CA	San Luis Obispo	079			35.121	-120.6173	4
+US	93435	Harmony	California	CA	San Luis Obispo	079			35.4919	-120.9763	4
+US	93442	Morro Bay	California	CA	San Luis Obispo	079			35.3795	-120.8447	4
+US	93443	Morro Bay	California	CA	San Luis Obispo	079			35.3658	-120.8499	4
+US	93444	Nipomo	California	CA	San Luis Obispo	079			35.0298	-120.4894	4
+US	93445	Oceano	California	CA	San Luis Obispo	079			35.1019	-120.608	4
+US	93446	Paso Robles	California	CA	San Luis Obispo	079			35.6406	-120.7003	4
+US	93447	Paso Robles	California	CA	San Luis Obispo	079			35.7562	-120.6935	4
+US	93448	Pismo Beach	California	CA	San Luis Obispo	079			35.1428	-120.6413	4
+US	93449	Pismo Beach	California	CA	San Luis Obispo	079			35.1578	-120.6522	4
+US	93451	San Miguel	California	CA	San Luis Obispo	079			35.9004	-120.5929	4
+US	93452	San Simeon	California	CA	San Luis Obispo	079			35.6668	-121.144	4
+US	93453	Santa Margarita	California	CA	San Luis Obispo	079			35.3584	-120.2596	4
+US	93461	Shandon	California	CA	San Luis Obispo	079			35.6513	-120.372	4
+US	93465	Templeton	California	CA	San Luis Obispo	079			35.5551	-120.7107	4
+US	93475	Oceano	California	CA	San Luis Obispo	079			35.1004	-120.6111	4
+US	93483	Grover Beach	California	CA	San Luis Obispo	079			35.1216	-120.6213	4
+US	94002	Belmont	California	CA	San Mateo	081			37.5174	-122.2927	4
+US	94005	Brisbane	California	CA	San Mateo	081			37.6811	-122.4001	4
+US	94010	Burlingame	California	CA	San Mateo	081			37.5671	-122.3676	4
+US	94011	Burlingame	California	CA	San Mateo	081			37.5841	-122.3661	4
+US	94014	Daly City	California	CA	San Mateo	081			37.6875	-122.4388	4
+US	94015	Daly City	California	CA	San Mateo	081			37.6787	-122.478	4
+US	94016	Daly City	California	CA	San Mateo	081			37.7058	-122.4619	4
+US	94017	Daly City	California	CA	San Mateo	081			37.7058	-122.4619	4
+US	94018	El Granada	California	CA	San Mateo	081			37.5101	-122.4734	4
+US	94019	Half Moon Bay	California	CA	San Mateo	081			37.4791	-122.4459	4
+US	94020	La Honda	California	CA	San Mateo	081			37.2726	-122.2495	4
+US	94021	Loma Mar	California	CA	San Mateo	081			37.2708	-122.2807	4
+US	94025	Menlo Park	California	CA	San Mateo	081			37.4396	-122.1864	4
+US	94026	Menlo Park	California	CA	San Mateo	081			37.3811	-122.3348	4
+US	94027	Atherton	California	CA	San Mateo	081			37.4563	-122.2002	4
+US	94028	Portola Valley	California	CA	San Mateo	081			37.3702	-122.2182	4
+US	94030	Millbrae	California	CA	San Mateo	081			37.6004	-122.402	4
+US	94037	Montara	California	CA	San Mateo	081			37.5428	-122.5052	4
+US	94038	Moss Beach	California	CA	San Mateo	081			37.531	-122.5068	4
+US	94044	Pacifica	California	CA	San Mateo	081			37.6196	-122.4816	4
+US	94060	Pescadero	California	CA	San Mateo	081			37.2065	-122.3649	4
+US	94061	Redwood City	California	CA	San Mateo	081			37.4647	-122.2304	4
+US	94062	Redwood City	California	CA	San Mateo	081			37.4245	-122.296	4
+US	94063	Redwood City	California	CA	San Mateo	081			37.4815	-122.2091	4
+US	94064	Redwood City	California	CA	San Mateo	081			37.3811	-122.3348	4
+US	94065	Redwood City	California	CA	San Mateo	081			37.5331	-122.2486	4
+US	94066	San Bruno	California	CA	San Mateo	081			37.6247	-122.429	4
+US	94070	San Carlos	California	CA	San Mateo	081			37.4969	-122.2674	4
+US	94074	San Gregorio	California	CA	San Mateo	081			37.3255	-122.3556	4
+US	94080	South San Francisco	California	CA	San Mateo	081			37.6574	-122.4235	4
+US	94083	South San Francisco	California	CA	San Mateo	081			37.6547	-122.4077	4
+US	94128	San Francisco	California	CA	San Mateo	081			37.6216	-122.3929	1
+US	94303	Palo Alto	California	CA	San Mateo	081			37.4673	-122.1388	4
+US	94401	San Mateo	California	CA	San Mateo	081			37.5735	-122.3225	4
+US	94402	San Mateo	California	CA	San Mateo	081			37.5507	-122.3276	4
+US	94403	San Mateo	California	CA	San Mateo	081			37.5395	-122.2998	4
+US	94404	San Mateo	California	CA	San Mateo	081			37.5538	-122.27	4
+US	94497	San Mateo	California	CA	San Mateo	081			37.5347	-122.3259	4
+US	93013	Carpinteria	California	CA	Santa Barbara	083			34.4036	-119.5183	4
+US	93014	Carpinteria	California	CA	Santa Barbara	083			34.3989	-119.5185	4
+US	93067	Summerland	California	CA	Santa Barbara	083			34.4214	-119.5965	4
+US	93101	Santa Barbara	California	CA	Santa Barbara	083			34.4197	-119.7078	4
+US	93102	Santa Barbara	California	CA	Santa Barbara	083			34.4208	-119.6982	4
+US	93103	Santa Barbara	California	CA	Santa Barbara	083			34.4291	-119.6833	4
+US	93105	Santa Barbara	California	CA	Santa Barbara	083			34.4369	-119.7285	4
+US	93106	Santa Barbara	California	CA	Santa Barbara	083			34.4329	-119.8371	4
+US	93107	Santa Barbara	California	CA	Santa Barbara	083			34.4218	-119.8637	4
+US	93108	Santa Barbara	California	CA	Santa Barbara	083			34.4378	-119.6159	4
+US	93109	Santa Barbara	California	CA	Santa Barbara	083			34.4038	-119.7194	4
+US	93110	Santa Barbara	California	CA	Santa Barbara	083			34.4418	-119.7647	4
+US	93111	Santa Barbara	California	CA	Santa Barbara	083			34.4453	-119.8025	4
+US	93116	Goleta	California	CA	Santa Barbara	083			34.4358	-119.8276	4
+US	93117	Goleta	California	CA	Santa Barbara	083			34.4296	-119.8612	4
+US	93118	Goleta	California	CA	Santa Barbara	083			34.4358	-119.8276	4
+US	93120	Santa Barbara	California	CA	Santa Barbara	083			34.4208	-119.6982	4
+US	93121	Santa Barbara	California	CA	Santa Barbara	083			34.4208	-119.6982	4
+US	93130	Santa Barbara	California	CA	Santa Barbara	083			34.4208	-119.6982	4
+US	93140	Santa Barbara	California	CA	Santa Barbara	083			34.4208	-119.6982	4
+US	93150	Santa Barbara	California	CA	Santa Barbara	083			34.4208	-119.6982	4
+US	93160	Santa Barbara	California	CA	Santa Barbara	083			34.4208	-119.6982	4
+US	93190	Santa Barbara	California	CA	Santa Barbara	083			34.4208	-119.6982	4
+US	93199	Goleta	California	CA	Santa Barbara	083			34.2628	-119.8486	4
+US	93254	New Cuyama	California	CA	Santa Barbara	083			34.9967	-119.8238	4
+US	93427	Buellton	California	CA	Santa Barbara	083			34.6209	-120.1922	4
+US	93429	Casmalia	California	CA	Santa Barbara	083			34.8458	-120.535	4
+US	93434	Guadalupe	California	CA	Santa Barbara	083			34.96	-120.5703	4
+US	93436	Lompoc	California	CA	Santa Barbara	083			34.6583	-120.4506	4
+US	93437	Lompoc	California	CA	Santa Barbara	083			34.7532	-120.5171	4
+US	93438	Lompoc	California	CA	Santa Barbara	083			34.6392	-120.4579	4
+US	93440	Los Alamos	California	CA	Santa Barbara	083			34.7457	-120.2049	4
+US	93441	Los Olivos	California	CA	Santa Barbara	083			34.6678	-120.1149	4
+US	93454	Santa Maria	California	CA	Santa Barbara	083			34.9545	-120.4325	4
+US	93455	Santa Maria	California	CA	Santa Barbara	083			34.8286	-120.4268	4
+US	93456	Santa Maria	California	CA	Santa Barbara	083			34.953	-120.4357	4
+US	93457	Santa Maria	California	CA	Santa Barbara	083			34.953	-120.4357	4
+US	93458	Santa Maria	California	CA	Santa Barbara	083			34.9535	-120.4957	4
+US	93460	Santa Ynez	California	CA	Santa Barbara	083			34.624	-120.0713	4
+US	93463	Solvang	California	CA	Santa Barbara	083			34.6488	-120.1701	4
+US	93464	Solvang	California	CA	Santa Barbara	083			34.6744	-120.1115	4
+US	94022	Los Altos	California	CA	Santa Clara	085			37.3814	-122.1258	4
+US	94023	Los Altos	California	CA	Santa Clara	085			37.3852	-122.1141	4
+US	94024	Los Altos	California	CA	Santa Clara	085			37.3547	-122.0862	4
+US	94035	Mountain View	California	CA	Santa Clara	085			37.3861	-122.0839	4
+US	94039	Mountain View	California	CA	Santa Clara	085			37.3861	-122.0839	4
+US	94040	Mountain View	California	CA	Santa Clara	085			37.3855	-122.088	4
+US	94041	Mountain View	California	CA	Santa Clara	085			37.3893	-122.0783	4
+US	94042	Mountain View	California	CA	Santa Clara	085			37.3861	-122.0839	4
+US	94043	Mountain View	California	CA	Santa Clara	085			37.4056	-122.0775	4
+US	94085	Sunnyvale	California	CA	Santa Clara	085			37.3886	-122.0177	4
+US	94086	Sunnyvale	California	CA	Santa Clara	085			37.3764	-122.0238	4
+US	94087	Sunnyvale	California	CA	Santa Clara	085			37.3502	-122.0349	4
+US	94088	Sunnyvale	California	CA	Santa Clara	085			37.3688	-122.0363	4
+US	94089	Sunnyvale	California	CA	Santa Clara	085			37.3983	-122.0006	4
+US	94301	Palo Alto	California	CA	Santa Clara	085			37.4443	-122.1497	4
+US	94302	Palo Alto	California	CA	Santa Clara	085			37.4419	-122.143	4
+US	94304	Palo Alto	California	CA	Santa Clara	085			37.4334	-122.1842	4
+US	94305	Stanford	California	CA	Santa Clara	085			37.4236	-122.1619	4
+US	94306	Palo Alto	California	CA	Santa Clara	085			37.418	-122.1274	4
+US	94309	Palo Alto	California	CA	Santa Clara	085			37.4419	-122.143	4
+US	95002	Alviso	California	CA	Santa Clara	085			37.426	-121.9736	4
+US	95008	Campbell	California	CA	Santa Clara	085			37.2803	-121.9539	4
+US	95009	Campbell	California	CA	Santa Clara	085			37.2872	-121.9488	4
+US	95011	Campbell	California	CA	Santa Clara	085			37.294	-121.9571	4
+US	95013	Coyote	California	CA	Santa Clara	085			37.2123	-121.7416	4
+US	95014	Cupertino	California	CA	Santa Clara	085			37.318	-122.0449	4
+US	95015	Cupertino	California	CA	Santa Clara	085			37.323	-122.0527	4
+US	95020	Gilroy	California	CA	Santa Clara	085			37.0139	-121.5773	4
+US	95021	Gilroy	California	CA	Santa Clara	085			37.0095	-121.5705	4
+US	95025	San Jose	California	CA	Santa Clara	085			37.3394	-121.895	4
+US	95026	Holy City	California	CA	Santa Clara	085			37.1584	-121.986	4
+US	95030	Los Gatos	California	CA	Santa Clara	085			37.2296	-121.9834	4
+US	95031	Los Gatos	California	CA	Santa Clara	085			37.1574	-121.9676	4
+US	95032	Los Gatos	California	CA	Santa Clara	085			37.2417	-121.9554	4
+US	95033	Los Gatos	California	CA	Santa Clara	085			37.1539	-121.9816	4
+US	95035	Milpitas	California	CA	Santa Clara	085			37.4352	-121.895	4
+US	95036	Milpitas	California	CA	Santa Clara	085			37.424	-121.906	4
+US	95037	Morgan Hill	California	CA	Santa Clara	085			37.1353	-121.6501	4
+US	95038	Morgan Hill	California	CA	Santa Clara	085			37.1525	-121.6722	4
+US	95042	New Almaden	California	CA	Santa Clara	085			37.1771	-121.8207	4
+US	95044	Redwood Estates	California	CA	Santa Clara	085			37.1584	-121.986	4
+US	95046	San Martin	California	CA	Santa Clara	085			37.0911	-121.5999	4
+US	95050	Santa Clara	California	CA	Santa Clara	085			37.3492	-121.953	4
+US	95051	Santa Clara	California	CA	Santa Clara	085			37.3483	-121.9844	4
+US	95052	Santa Clara	California	CA	Santa Clara	085			37.3522	-121.9583	4
+US	95053	Santa Clara	California	CA	Santa Clara	085			37.3498	-121.9378	4
+US	95054	Santa Clara	California	CA	Santa Clara	085			37.3924	-121.9623	4
+US	95055	Santa Clara	California	CA	Santa Clara	085			37.3451	-121.9769	4
+US	95056	Santa Clara	California	CA	Santa Clara	085			37.3997	-121.9608	4
+US	95070	Saratoga	California	CA	Santa Clara	085			37.2713	-122.0227	4
+US	95071	Saratoga	California	CA	Santa Clara	085			37.2593	-122.0302	4
+US	95101	San Jose	California	CA	Santa Clara	085			37.3894	-121.8868	4
+US	95103	San Jose	California	CA	Santa Clara	085			37.3378	-121.8908	4
+US	95106	San Jose	California	CA	Santa Clara	085			37.3378	-121.8908	4
+US	95108	San Jose	California	CA	Santa Clara	085			37.3378	-121.8908	4
+US	95109	San Jose	California	CA	Santa Clara	085			37.3378	-121.8908	4
+US	95110	San Jose	California	CA	Santa Clara	085			37.3391	-121.9016	4
+US	95111	San Jose	California	CA	Santa Clara	085			37.2827	-121.8265	4
+US	95112	San Jose	California	CA	Santa Clara	085			37.3476	-121.887	4
+US	95113	San Jose	California	CA	Santa Clara	085			37.3329	-121.8916	4
+US	95115	San Jose	California	CA	Santa Clara	085			37.3378	-121.8908	4
+US	95116	San Jose	California	CA	Santa Clara	085			37.3518	-121.8508	4
+US	95117	San Jose	California	CA	Santa Clara	085			37.3108	-121.9623	4
+US	95118	San Jose	California	CA	Santa Clara	085			37.2568	-121.8896	4
+US	95119	San Jose	California	CA	Santa Clara	085			37.2329	-121.7875	4
+US	95120	San Jose	California	CA	Santa Clara	085			37.2144	-121.8574	4
+US	95121	San Jose	California	CA	Santa Clara	085			37.3042	-121.8099	4
+US	95122	San Jose	California	CA	Santa Clara	085			37.3293	-121.8339	4
+US	95123	San Jose	California	CA	Santa Clara	085			37.2458	-121.8306	4
+US	95124	San Jose	California	CA	Santa Clara	085			37.2563	-121.9229	4
+US	95125	San Jose	California	CA	Santa Clara	085			37.296	-121.8939	4
+US	95126	San Jose	California	CA	Santa Clara	085			37.3249	-121.9153	4
+US	95127	San Jose	California	CA	Santa Clara	085			37.3692	-121.8208	4
+US	95128	San Jose	California	CA	Santa Clara	085			37.3163	-121.9356	4
+US	95129	San Jose	California	CA	Santa Clara	085			37.3066	-122.0002	4
+US	95130	San Jose	California	CA	Santa Clara	085			37.2886	-121.9818	4
+US	95131	San Jose	California	CA	Santa Clara	085			37.3864	-121.88	4
+US	95132	San Jose	California	CA	Santa Clara	085			37.4031	-121.8585	4
+US	95133	San Jose	California	CA	Santa Clara	085			37.3729	-121.856	4
+US	95134	San Jose	California	CA	Santa Clara	085			37.4087	-121.9406	4
+US	95135	San Jose	California	CA	Santa Clara	085			37.2974	-121.7562	4
+US	95136	San Jose	California	CA	Santa Clara	085			37.2685	-121.849	4
+US	95138	San Jose	California	CA	Santa Clara	085			37.2602	-121.7709	4
+US	95139	San Jose	California	CA	Santa Clara	085			37.2252	-121.7687	4
+US	95140	Mount Hamilton	California	CA	Santa Clara	085			37.3511	-121.6384	1
+US	95141	San Jose	California	CA	Santa Clara	085			37.3394	-121.895	4
+US	95148	San Jose	California	CA	Santa Clara	085			37.3304	-121.7913	4
+US	95150	San Jose	California	CA	Santa Clara	085			37.3866	-121.897	4
+US	95151	San Jose	California	CA	Santa Clara	085			37.3198	-121.8262	4
+US	95152	San Jose	California	CA	Santa Clara	085			37.4022	-121.847	4
+US	95153	San Jose	California	CA	Santa Clara	085			37.2488	-121.8459	4
+US	95154	San Jose	California	CA	Santa Clara	085			37.2649	-121.9139	4
+US	95155	San Jose	California	CA	Santa Clara	085			37.31	-121.9011	4
+US	95156	San Jose	California	CA	Santa Clara	085			37.3576	-121.8416	4
+US	95157	San Jose	California	CA	Santa Clara	085			37.3008	-121.9777	4
+US	95158	San Jose	California	CA	Santa Clara	085			37.2625	-121.8779	4
+US	95159	San Jose	California	CA	Santa Clara	085			37.3179	-121.9349	4
+US	95160	San Jose	California	CA	Santa Clara	085			37.2187	-121.8601	4
+US	95161	San Jose	California	CA	Santa Clara	085			37.3894	-121.8868	4
+US	95164	San Jose	California	CA	Santa Clara	085			37.3916	-121.9203	4
+US	95170	San Jose	California	CA	Santa Clara	085			37.3103	-122.0093	4
+US	95172	San Jose	California	CA	Santa Clara	085			37.334	-121.8847	4
+US	95173	San Jose	California	CA	Santa Clara	085			37.3352	-121.8938	4
+US	95190	San Jose	California	CA	Santa Clara	085			37.3894	-121.8868	4
+US	95191	San Jose	California	CA	Santa Clara	085			37.3262	-121.9158	4
+US	95192	San Jose	California	CA	Santa Clara	085			37.3383	-121.8801	4
+US	95193	San Jose	California	CA	Santa Clara	085			37.2441	-121.8287	4
+US	95194	San Jose	California	CA	Santa Clara	085			37.3894	-121.8868	4
+US	95196	San Jose	California	CA	Santa Clara	085			37.3338	-121.8894	4
+US	95001	Aptos	California	CA	Santa Cruz	087			36.979	-121.898	4
+US	95003	Aptos	California	CA	Santa Cruz	087			36.9797	-121.8902	4
+US	95005	Ben Lomond	California	CA	Santa Cruz	087			37.0882	-122.0887	4
+US	95006	Boulder Creek	California	CA	Santa Cruz	087			37.1547	-122.1365	4
+US	95007	Brookdale	California	CA	Santa Cruz	087			37.1063	-122.105	4
+US	95010	Capitola	California	CA	Santa Cruz	087			36.9767	-121.9555	4
+US	95017	Davenport	California	CA	Santa Cruz	087			37.0423	-122.2137	4
+US	95018	Felton	California	CA	Santa Cruz	087			37.0662	-122.0618	4
+US	95019	Freedom	California	CA	Santa Cruz	087			36.9356	-121.7767	4
+US	95041	Mount Hermon	California	CA	Santa Cruz	087			37.0511	-122.0575	4
+US	95060	Santa Cruz	California	CA	Santa Cruz	087			37.0313	-122.1198	4
+US	95061	Santa Cruz	California	CA	Santa Cruz	087			36.9741	-122.0308	4
+US	95062	Santa Cruz	California	CA	Santa Cruz	087			36.9721	-121.9881	4
+US	95063	Santa Cruz	California	CA	Santa Cruz	087			36.9792	-122.0088	4
+US	95064	Santa Cruz	California	CA	Santa Cruz	087			36.9959	-122.0578	4
+US	95065	Santa Cruz	California	CA	Santa Cruz	087			37.0089	-121.9849	4
+US	95066	Scotts Valley	California	CA	Santa Cruz	087			37.0597	-122.0152	4
+US	95067	Scotts Valley	California	CA	Santa Cruz	087			37.0511	-122.0136	4
+US	95073	Soquel	California	CA	Santa Cruz	087			37.0048	-121.9507	4
+US	95076	Watsonville	California	CA	Santa Cruz	087			36.9102	-121.7569	4
+US	95077	Watsonville	California	CA	Santa Cruz	087			36.9116	-121.7575	4
+US	96001	Redding	California	CA	Shasta	089			40.5605	-122.4116	4
+US	96002	Redding	California	CA	Shasta	089			40.5486	-122.3339	4
+US	96003	Redding	California	CA	Shasta	089			40.6278	-122.353	4
+US	96007	Anderson	California	CA	Shasta	089			40.4574	-122.3282	4
+US	96008	Bella Vista	California	CA	Shasta	089			40.7409	-122.0725	4
+US	96011	Big Bend	California	CA	Shasta	089			40.9749	-121.825	4
+US	96013	Burney	California	CA	Shasta	089			40.8949	-121.655	4
+US	96016	Cassel	California	CA	Shasta	089			40.9337	-121.5677	4
+US	96017	Castella	California	CA	Shasta	089			41.1103	-122.3161	4
+US	96019	Shasta Lake	California	CA	Shasta	089			40.6969	-122.3683	4
+US	96022	Cottonwood	California	CA	Shasta	089			40.3691	-122.3375	4
+US	96028	Fall River Mills	California	CA	Shasta	089			41.0393	-121.4606	4
+US	96033	French Gulch	California	CA	Shasta	089			40.7035	-122.6229	4
+US	96040	Hat Creek	California	CA	Shasta	089			40.7677	-121.4637	4
+US	96047	Igo	California	CA	Shasta	089			40.4318	-122.654	4
+US	96049	Redding	California	CA	Shasta	089			40.7098	-122.3116	4
+US	96051	Lakehead	California	CA	Shasta	089			40.9105	-122.4106	4
+US	96056	Mcarthur	California	CA	Shasta	089			41.0502	-121.3991	4
+US	96062	Millville	California	CA	Shasta	089			40.5653	-122.1111	4
+US	96065	Montgomery Creek	California	CA	Shasta	089			40.9124	-121.9233	4
+US	96069	Oak Run	California	CA	Shasta	089			40.6863	-122.0409	4
+US	96070	Obrien	California	CA	Shasta	089			40.7352	-122.1944	4
+US	96071	Old Station	California	CA	Shasta	089			40.6256	-121.4585	4
+US	96073	Palo Cedro	California	CA	Shasta	089			40.5767	-122.2398	4
+US	96076	Platina	California	CA	Shasta	089			40.376	-122.937	4
+US	96079	Shasta Lake	California	CA	Shasta	089			40.6866	-122.3348	4
+US	96084	Round Mountain	California	CA	Shasta	089			40.794	-121.9419	4
+US	96087	Shasta	California	CA	Shasta	089			40.6109	-122.4968	4
+US	96088	Shingletown	California	CA	Shasta	089			40.505	-121.8857	4
+US	96089	Shasta Lake	California	CA	Shasta	089			40.6579	-122.4273	4
+US	96095	Whiskeytown	California	CA	Shasta	089			40.6388	-122.5597	4
+US	96096	Whitmore	California	CA	Shasta	089			40.6525	-121.8771	4
+US	96099	Redding	California	CA	Shasta	089			40.7043	-122.3878	4
+US	95910	Alleghany	California	CA	Sierra	091			39.4826	-120.8483	4
+US	95936	Downieville	California	CA	Sierra	091			39.569	-120.8344	4
+US	95944	Goodyears Bar	California	CA	Sierra	091			39.5399	-120.8844	4
+US	96118	Loyalton	California	CA	Sierra	091			39.663	-120.2297	4
+US	96124	Calpine	California	CA	Sierra	091			39.6139	-120.4046	4
+US	96125	Sierra City	California	CA	Sierra	091			39.5936	-120.6269	4
+US	96126	Sierraville	California	CA	Sierra	091			39.5825	-120.3711	4
+US	95568	Somes Bar	California	CA	Siskiyou	093			41.4533	-123.4634	4
+US	96014	Callahan	California	CA	Siskiyou	093			41.3833	-122.764	4
+US	96023	Dorris	California	CA	Siskiyou	093			41.9194	-121.9739	4
+US	96025	Dunsmuir	California	CA	Siskiyou	093			41.2124	-122.2734	4
+US	96027	Etna	California	CA	Siskiyou	093			41.4463	-123.01	4
+US	96031	Forks Of Salmon	California	CA	Siskiyou	093			41.2191	-123.2363	1
+US	96032	Fort Jones	California	CA	Siskiyou	093			41.617	-122.8832	4
+US	96034	Gazelle	California	CA	Siskiyou	093			41.5105	-122.5371	4
+US	96037	Greenview	California	CA	Siskiyou	093			41.5403	-122.9366	4
+US	96038	Grenada	California	CA	Siskiyou	093			41.6125	-122.5258	4
+US	96039	Happy Camp	California	CA	Siskiyou	093			41.8018	-123.388	4
+US	96044	Hornbrook	California	CA	Siskiyou	093			41.9077	-122.5265	4
+US	96050	Klamath River	California	CA	Siskiyou	093			41.8637	-122.8197	4
+US	96057	Mccloud	California	CA	Siskiyou	093			41.2475	-122.1128	4
+US	96058	Macdoel	California	CA	Siskiyou	093			41.883	-121.9445	4
+US	96064	Montague	California	CA	Siskiyou	093			41.7243	-122.4638	4
+US	96067	Mount Shasta	California	CA	Siskiyou	093			41.3174	-122.324	4
+US	96085	Scott Bar	California	CA	Siskiyou	093			41.7736	-122.9882	4
+US	96086	Seiad Valley	California	CA	Siskiyou	093			41.8866	-123.2438	4
+US	96094	Weed	California	CA	Siskiyou	093			41.4226	-122.3861	4
+US	96097	Yreka	California	CA	Siskiyou	093			41.7206	-122.6376	4
+US	96134	Tulelake	California	CA	Siskiyou	093			41.9316	-121.4347	1
+US	94510	Benicia	California	CA	Solano	095			38.0685	-122.1614	4
+US	94512	Birds Landing	California	CA	Solano	095			38.1504	-121.8443	4
+US	94533	Fairfield	California	CA	Solano	095			38.2671	-122.0357	4
+US	94534	Fairfield	California	CA	Solano	095			38.2423	-122.1314	4
+US	94535	Travis Afb	California	CA	Solano	095			38.2743	-121.9463	1
+US	94571	Rio Vista	California	CA	Solano	095			38.1637	-121.7016	4
+US	94585	Suisun City	California	CA	Solano	095			38.2408	-122.042	1
+US	94589	Vallejo	California	CA	Solano	095			38.1582	-122.2804	4
+US	94590	Vallejo	California	CA	Solano	095			38.1053	-122.2474	4
+US	94591	Vallejo	California	CA	Solano	095			38.0985	-122.2124	4
+US	94592	Vallejo	California	CA	Solano	095			38.0968	-122.2699	4
+US	95620	Dixon	California	CA	Solano	095			38.4403	-121.8088	4
+US	95625	Elmira	California	CA	Solano	095			38.3482	-121.91	4
+US	95687	Vacaville	California	CA	Solano	095			38.3482	-121.9538	4
+US	95688	Vacaville	California	CA	Solano	095			38.3847	-121.9887	4
+US	95696	Vacaville	California	CA	Solano	095			38.43	-122.0168	4
+US	94922	Bodega	California	CA	Sonoma	097			38.3514	-122.9741	4
+US	94923	Bodega Bay	California	CA	Sonoma	097			38.3309	-123.0373	4
+US	94926	Rohnert Park	California	CA	Sonoma	097			38.3396	-122.7011	4
+US	94927	Rohnert Park	California	CA	Sonoma	097			38.3396	-122.7011	4
+US	94928	Rohnert Park	California	CA	Sonoma	097			38.347	-122.6941	4
+US	94931	Cotati	California	CA	Sonoma	097			38.3259	-122.7048	4
+US	94951	Penngrove	California	CA	Sonoma	097			38.3153	-122.6483	4
+US	94952	Petaluma	California	CA	Sonoma	097			38.2403	-122.6777	4
+US	94953	Petaluma	California	CA	Sonoma	097			38.2324	-122.6367	4
+US	94954	Petaluma	California	CA	Sonoma	097			38.2507	-122.6155	4
+US	94955	Petaluma	California	CA	Sonoma	097			38.2324	-122.6367	4
+US	94972	Valley Ford	California	CA	Sonoma	097			38.318	-122.9242	4
+US	94975	Petaluma	California	CA	Sonoma	097			38.2324	-122.6367	4
+US	94999	Petaluma	California	CA	Sonoma	097			38.2675	-122.6581	4
+US	95401	Santa Rosa	California	CA	Sonoma	097			38.4432	-122.7547	4
+US	95402	Santa Rosa	California	CA	Sonoma	097			38.4399	-122.7096	4
+US	95403	Santa Rosa	California	CA	Sonoma	097			38.4822	-122.7473	4
+US	95404	Santa Rosa	California	CA	Sonoma	097			38.4405	-122.7144	4
+US	95405	Santa Rosa	California	CA	Sonoma	097			38.4386	-122.6727	4
+US	95406	Santa Rosa	California	CA	Sonoma	097			38.4399	-122.7096	4
+US	95407	Santa Rosa	California	CA	Sonoma	097			38.4089	-122.7339	4
+US	95409	Santa Rosa	California	CA	Sonoma	097			38.4592	-122.6393	4
+US	95412	Annapolis	California	CA	Sonoma	097			38.7026	-123.3539	4
+US	95416	Boyes Hot Springs	California	CA	Sonoma	097			38.3141	-122.4843	4
+US	95419	Camp Meeker	California	CA	Sonoma	097			38.425	-122.9485	4
+US	95421	Cazadero	California	CA	Sonoma	097			38.5918	-123.1965	4
+US	95425	Cloverdale	California	CA	Sonoma	097			38.7931	-123.0074	4
+US	95430	Duncans Mills	California	CA	Sonoma	097			38.4538	-123.055	4
+US	95431	Eldridge	California	CA	Sonoma	097			38.3488	-122.5108	4
+US	95433	El Verano	California	CA	Sonoma	097			38.2993	-122.4867	4
+US	95436	Forestville	California	CA	Sonoma	097			38.4923	-122.9042	4
+US	95439	Fulton	California	CA	Sonoma	097			38.4947	-122.7761	4
+US	95441	Geyserville	California	CA	Sonoma	097			38.7173	-122.8834	4
+US	95442	Glen Ellen	California	CA	Sonoma	097			38.3662	-122.5196	4
+US	95444	Graton	California	CA	Sonoma	097			38.4335	-122.8676	4
+US	95446	Guerneville	California	CA	Sonoma	097			38.5055	-122.9965	4
+US	95448	Healdsburg	California	CA	Sonoma	097			38.6184	-122.862	4
+US	95450	Jenner	California	CA	Sonoma	097			38.4987	-123.1974	4
+US	95452	Kenwood	California	CA	Sonoma	097			38.4168	-122.5547	4
+US	95462	Monte Rio	California	CA	Sonoma	097			38.4706	-123.0172	4
+US	95465	Occidental	California	CA	Sonoma	097			38.4087	-122.9954	4
+US	95471	Rio Nido	California	CA	Sonoma	097			38.521	-122.9769	4
+US	95472	Sebastopol	California	CA	Sonoma	097			38.3941	-122.8433	4
+US	95473	Sebastopol	California	CA	Sonoma	097			38.4022	-122.8227	4
+US	95476	Sonoma	California	CA	Sonoma	097			38.2849	-122.4696	4
+US	95480	Stewarts Point	California	CA	Sonoma	097			38.7082	-123.3478	4
+US	95486	Villa Grande	California	CA	Sonoma	097			38.4741	-123.0242	4
+US	95487	Vineburg	California	CA	Sonoma	097			38.2725	-122.4375	4
+US	95492	Windsor	California	CA	Sonoma	097			38.5443	-122.8073	4
+US	95497	The Sea Ranch	California	CA	Sonoma	097			38.7256	-123.4675	1
+US	95307	Ceres	California	CA	Stanislaus	099			37.5833	-120.9496	4
+US	95313	Crows Landing	California	CA	Stanislaus	099			37.4218	-121.0411	4
+US	95316	Denair	California	CA	Stanislaus	099			37.539	-120.7758	4
+US	95319	Empire	California	CA	Stanislaus	099			37.6382	-120.9005	4
+US	95323	Hickman	California	CA	Stanislaus	099			37.6156	-120.7011	4
+US	95326	Hughson	California	CA	Stanislaus	099			37.5964	-120.8627	4
+US	95328	Keyes	California	CA	Stanislaus	099			37.5591	-120.9148	4
+US	95329	La Grange	California	CA	Stanislaus	099			37.6899	-120.3851	4
+US	95350	Modesto	California	CA	Stanislaus	099			37.6746	-121.0113	4
+US	95351	Modesto	California	CA	Stanislaus	099			37.6236	-120.9966	4
+US	95352	Modesto	California	CA	Stanislaus	099			37.6566	-121.0191	4
+US	95353	Modesto	California	CA	Stanislaus	099			37.6424	-120.9999	4
+US	95354	Modesto	California	CA	Stanislaus	099			37.6409	-120.9749	4
+US	95355	Modesto	California	CA	Stanislaus	099			37.6717	-120.9482	4
+US	95356	Modesto	California	CA	Stanislaus	099			37.7005	-121.0252	4
+US	95357	Modesto	California	CA	Stanislaus	099			37.6693	-120.8817	4
+US	95358	Modesto	California	CA	Stanislaus	099			37.6237	-121.0438	4
+US	95360	Newman	California	CA	Stanislaus	099			37.3097	-121.0805	4
+US	95361	Oakdale	California	CA	Stanislaus	099			37.7741	-120.8377	4
+US	95363	Patterson	California	CA	Stanislaus	099			37.4826	-121.1648	4
+US	95367	Riverbank	California	CA	Stanislaus	099			37.7298	-120.942	4
+US	95368	Salida	California	CA	Stanislaus	099			37.7083	-121.0864	4
+US	95380	Turlock	California	CA	Stanislaus	099			37.4888	-120.8535	4
+US	95381	Turlock	California	CA	Stanislaus	099			37.4994	-120.8428	4
+US	95382	Turlock	California	CA	Stanislaus	099			37.5239	-120.8517	4
+US	95386	Waterford	California	CA	Stanislaus	099			37.652	-120.7292	4
+US	95387	Westley	California	CA	Stanislaus	099			37.5452	-121.2255	4
+US	95397	Modesto	California	CA	Stanislaus	099			37.6566	-121.0191	4
+US	95659	Nicolaus	California	CA	Sutter	101			38.8657	-121.557	4
+US	95668	Pleasant Grove	California	CA	Sutter	101			38.8115	-121.4982	4
+US	95674	Rio Oso	California	CA	Sutter	101			38.967	-121.4773	4
+US	95676	Robbins	California	CA	Sutter	101			38.8702	-121.7052	4
+US	95953	Live Oak	California	CA	Sutter	101			39.2601	-121.6923	4
+US	95957	Meridian	California	CA	Sutter	101			39.052	-121.8061	4
+US	95982	Sutter	California	CA	Sutter	101			39.1779	-121.7758	4
+US	95991	Yuba City	California	CA	Sutter	101			39.1051	-121.6202	4
+US	95992	Yuba City	California	CA	Sutter	101			39.023	-121.6116	4
+US	95993	Yuba City	California	CA	Sutter	101			39.1237	-121.6611	4
+US	96021	Corning	California	CA	Tehama	103			39.9296	-122.196	4
+US	96029	Flournoy	California	CA	Tehama	103			39.9024	-122.4918	4
+US	96035	Gerber	California	CA	Tehama	103			40.043	-122.1649	4
+US	96055	Los Molinos	California	CA	Tehama	103			40.0497	-122.0992	4
+US	96059	Manton	California	CA	Tehama	103			40.4331	-121.8365	4
+US	96061	Mill Creek	California	CA	Tehama	103			40.3263	-121.5228	4
+US	96063	Mineral	California	CA	Tehama	103			40.3564	-121.571	4
+US	96074	Paskenta	California	CA	Tehama	103			39.8772	-122.5814	4
+US	96075	Paynes Creek	California	CA	Tehama	103			40.3514	-121.765	4
+US	96078	Proberta	California	CA	Tehama	103			40.0815	-122.1705	4
+US	96080	Red Bluff	California	CA	Tehama	103			40.1795	-122.2383	4
+US	96090	Tehama	California	CA	Tehama	103			40.0271	-122.1233	4
+US	96092	Vina	California	CA	Tehama	103			39.9272	-122.025	4
+US	95527	Burnt Ranch	California	CA	Trinity	105			40.7897	-123.4113	4
+US	95552	Mad River	California	CA	Trinity	105			40.3316	-123.3904	4
+US	95563	Salyer	California	CA	Trinity	105			40.8558	-123.573	4
+US	95595	Zenia	California	CA	Trinity	105			40.2147	-123.3911	4
+US	96010	Big Bar	California	CA	Trinity	105			40.748	-123.229	4
+US	96024	Douglas City	California	CA	Trinity	105			40.6342	-122.9239	4
+US	96041	Hayfork	California	CA	Trinity	105			40.5504	-123.1634	4
+US	96046	Hyampom	California	CA	Trinity	105			40.6137	-123.4488	4
+US	96048	Junction City	California	CA	Trinity	105			40.7411	-123.0718	4
+US	96052	Lewiston	California	CA	Trinity	105			40.746	-122.8426	4
+US	96091	Trinity Center	California	CA	Trinity	105			41.0615	-122.7239	4
+US	96093	Weaverville	California	CA	Trinity	105			40.7317	-122.9353	4
+US	93201	Alpaugh	California	CA	Tulare	107			35.8877	-119.4873	4
+US	93207	California Hot Springs	California	CA	Tulare	107			35.8818	-118.6561	4
+US	93208	Camp Nelson	California	CA	Tulare	107			36.1427	-118.6093	4
+US	93218	Ducor	California	CA	Tulare	107			35.8916	-119.0473	4
+US	93219	Earlimart	California	CA	Tulare	107			35.8744	-119.281	4
+US	93221	Exeter	California	CA	Tulare	107			36.3041	-119.1293	4
+US	93223	Farmersville	California	CA	Tulare	107			36.3002	-119.2054	4
+US	93227	Goshen	California	CA	Tulare	107			36.3572	-119.4254	4
+US	93235	Ivanhoe	California	CA	Tulare	107			36.3856	-119.2189	4
+US	93237	Kaweah	California	CA	Tulare	107			36.4727	-118.9029	4
+US	93244	Lemon Cove	California	CA	Tulare	107			36.4969	-118.9941	4
+US	93247	Lindsay	California	CA	Tulare	107			36.2096	-119.0884	4
+US	93256	Pixley	California	CA	Tulare	107			35.9553	-119.2564	4
+US	93257	Porterville	California	CA	Tulare	107			36.0686	-119.0315	4
+US	93258	Porterville	California	CA	Tulare	107			36.0331	-119.0073	4
+US	93260	Posey	California	CA	Tulare	107			35.8135	-118.6643	4
+US	93261	Richgrove	California	CA	Tulare	107			35.805	-119.1315	4
+US	93262	Sequoia National Park	California	CA	Tulare	107			36.6007	-118.711	1
+US	93265	Springville	California	CA	Tulare	107			36.1363	-118.7961	4
+US	93267	Strathmore	California	CA	Tulare	107			36.1472	-119.0792	4
+US	93270	Terra Bella	California	CA	Tulare	107			35.957	-119.0312	4
+US	93271	Three Rivers	California	CA	Tulare	107			36.4377	-118.8875	4
+US	93272	Tipton	California	CA	Tulare	107			36.0546	-119.3078	4
+US	93274	Tulare	California	CA	Tulare	107			36.2022	-119.338	4
+US	93275	Tulare	California	CA	Tulare	107			36.2077	-119.3473	4
+US	93277	Visalia	California	CA	Tulare	107			36.3114	-119.3065	4
+US	93278	Visalia	California	CA	Tulare	107			36.3302	-119.2921	4
+US	93279	Visalia	California	CA	Tulare	107			36.3302	-119.2921	4
+US	93282	Waukena	California	CA	Tulare	107			36.1296	-119.5161	4
+US	93286	Woodlake	California	CA	Tulare	107			36.4313	-119.0918	4
+US	93290	Visalia	California	CA	Tulare	107			36.3291	-119.2925	4
+US	93291	Visalia	California	CA	Tulare	107			36.3551	-119.301	4
+US	93292	Visalia	California	CA	Tulare	107			36.3302	-119.2921	4
+US	93603	Badger	California	CA	Tulare	107			36.6313	-119.0132	4
+US	93615	Cutler	California	CA	Tulare	107			36.5243	-119.287	4
+US	93618	Dinuba	California	CA	Tulare	107			36.5349	-119.3909	4
+US	93619	Clovis	California	CA	Tulare	107			36.8432	-119.6518	4
+US	93633	Kings Canyon National Pk	California	CA	Tulare	107			36.7341	-118.9588	1
+US	93647	Orosi	California	CA	Tulare	107			36.5464	-119.2815	4
+US	93666	Sultana	California	CA	Tulare	107			36.5455	-119.3401	4
+US	93670	Yettem	California	CA	Tulare	107			36.4718	-119.2594	4
+US	93673	Traver	California	CA	Tulare	107			36.4552	-119.4848	4
+US	95305	Big Oak Flat	California	CA	Tuolumne	109			37.8235	-120.2582	4
+US	95309	Chinese Camp	California	CA	Tuolumne	109			37.8594	-120.4069	4
+US	95310	Columbia	California	CA	Tuolumne	109			38.044	-120.3971	4
+US	95321	Groveland	California	CA	Tuolumne	109			37.8298	-120.1037	4
+US	95327	Jamestown	California	CA	Tuolumne	109			37.8906	-120.4717	4
+US	95335	Long Barn	California	CA	Tuolumne	109			38.093	-120.1344	4
+US	95346	Mi Wuk Village	California	CA	Tuolumne	109			38.0675	-120.1794	4
+US	95347	Moccasin	California	CA	Tuolumne	109			37.8108	-120.2988	4
+US	95364	Pinecrest	California	CA	Tuolumne	109			38.1889	-119.9924	4
+US	95370	Sonora	California	CA	Tuolumne	109			37.9957	-120.3368	4
+US	95372	Soulsbyville	California	CA	Tuolumne	109			37.9926	-120.2624	4
+US	95373	Standard	California	CA	Tuolumne	109			37.9666	-120.3108	4
+US	95375	Strawberry	California	CA	Tuolumne	109			38.2042	-120.0101	4
+US	95379	Tuolumne	California	CA	Tuolumne	109			37.9678	-120.2357	4
+US	95383	Twain Harte	California	CA	Tuolumne	109			38.0454	-120.2178	4
+US	91319	Newbury Park	California	CA	Ventura	111			34.1842	-118.9107	4
+US	91320	Newbury Park	California	CA	Ventura	111			34.1774	-118.9358	4
+US	91358	Thousand Oaks	California	CA	Ventura	111			34.1706	-118.8376	4
+US	91359	Westlake Village	California	CA	Ventura	111			34.1458	-118.8056	4
+US	91360	Thousand Oaks	California	CA	Ventura	111			34.2092	-118.8739	4
+US	91361	Westlake Village	California	CA	Ventura	111			34.1472	-118.8383	4
+US	91362	Thousand Oaks	California	CA	Ventura	111			34.1948	-118.8232	4
+US	91377	Oak Park	California	CA	Ventura	111			34.185	-118.7669	4
+US	93001	Ventura	California	CA	Ventura	111			34.3308	-119.3584	4
+US	93002	Ventura	California	CA	Ventura	111			34.2783	-119.2932	4
+US	93003	Ventura	California	CA	Ventura	111			34.2846	-119.2222	4
+US	93004	Ventura	California	CA	Ventura	111			34.2788	-119.1651	4
+US	93005	Ventura	California	CA	Ventura	111			34.2783	-119.2932	4
+US	93006	Ventura	California	CA	Ventura	111			34.2783	-119.2932	4
+US	93007	Ventura	California	CA	Ventura	111			34.2783	-119.2932	4
+US	93009	Ventura	California	CA	Ventura	111			34.3562	-119.1462	4
+US	93010	Camarillo	California	CA	Ventura	111			34.2313	-119.0464	4
+US	93011	Camarillo	California	CA	Ventura	111			34.2164	-119.0376	4
+US	93012	Camarillo	California	CA	Ventura	111			34.2218	-118.9866	4
+US	93015	Fillmore	California	CA	Ventura	111			34.3992	-118.9182	4
+US	93016	Fillmore	California	CA	Ventura	111			34.3992	-118.9182	4
+US	93020	Moorpark	California	CA	Ventura	111			34.2856	-118.882	4
+US	93021	Moorpark	California	CA	Ventura	111			34.2784	-118.8771	4
+US	93022	Oak View	California	CA	Ventura	111			34.402	-119.2982	4
+US	93023	Ojai	California	CA	Ventura	111			34.4451	-119.2565	4
+US	93024	Ojai	California	CA	Ventura	111			34.448	-119.2429	4
+US	93030	Oxnard	California	CA	Ventura	111			34.2141	-119.175	4
+US	93031	Oxnard	California	CA	Ventura	111			34.0324	-119.1343	4
+US	93032	Oxnard	California	CA	Ventura	111			34.1975	-119.1771	4
+US	93033	Oxnard	California	CA	Ventura	111			34.1685	-119.1717	4
+US	93034	Oxnard	California	CA	Ventura	111			34.0324	-119.1343	4
+US	93035	Oxnard	California	CA	Ventura	111			34.1822	-119.216	4
+US	93036	Oxnard	California	CA	Ventura	111			34.2351	-119.182	4
+US	93040	Piru	California	CA	Ventura	111			34.4352	-118.7855	4
+US	93041	Port Hueneme	California	CA	Ventura	111			34.1626	-119.1973	4
+US	93042	Point Mugu Nawc	California	CA	Ventura	111			34.1134	-119.1124	1
+US	93043	Port Hueneme Cbc Base	California	CA	Ventura	111			34.1621	-119.2074	1
+US	93044	Port Hueneme	California	CA	Ventura	111			34.1478	-119.1951	4
+US	93060	Santa Paula	California	CA	Ventura	111			34.3547	-119.0713	4
+US	93061	Santa Paula	California	CA	Ventura	111			34.3542	-119.0593	4
+US	93062	Simi Valley	California	CA	Ventura	111			34.2694	-118.7815	4
+US	93063	Simi Valley	California	CA	Ventura	111			34.3046	-118.6844	4
+US	93064	Brandeis	California	CA	Ventura	111			34.2582	-118.7107	1
+US	93065	Simi Valley	California	CA	Ventura	111			34.2656	-118.7653	4
+US	93066	Somis	California	CA	Ventura	111			34.2798	-119.0115	4
+US	93094	Simi Valley	California	CA	Ventura	111			34.2694	-118.7815	4
+US	93099	Simi Valley	California	CA	Ventura	111			34.2694	-118.7815	4
+US	95605	West Sacramento	California	CA	Yolo	113			38.5927	-121.5325	4
+US	95606	Brooks	California	CA	Yolo	113			38.8065	-122.2039	4
+US	95607	Capay	California	CA	Yolo	113			38.7209	-122.0912	4
+US	95612	Clarksburg	California	CA	Yolo	113			38.3945	-121.5641	4
+US	95616	Davis	California	CA	Yolo	113			38.5538	-121.7418	4
+US	95617	Davis	California	CA	Yolo	113			38.5494	-121.7253	4
+US	95618	Davis	California	CA	Yolo	113			38.5449	-121.7405	4
+US	95627	Esparto	California	CA	Yolo	113			38.7061	-122.0152	4
+US	95637	Guinda	California	CA	Yolo	113			38.8407	-122.2036	4
+US	95645	Knights Landing	California	CA	Yolo	113			38.8517	-121.7334	4
+US	95653	Madison	California	CA	Yolo	113			38.6802	-121.9721	4
+US	95679	Rumsey	California	CA	Yolo	113			38.8953	-122.3079	4
+US	95691	West Sacramento	California	CA	Yolo	113			38.5673	-121.5516	4
+US	95694	Winters	California	CA	Yolo	113			38.5322	-121.9676	4
+US	95695	Woodland	California	CA	Yolo	113			38.6816	-121.8052	4
+US	95697	Yolo	California	CA	Yolo	113			38.7343	-121.8066	4
+US	95698	Zamora	California	CA	Yolo	113			38.8204	-121.9191	4
+US	95776	Woodland	California	CA	Yolo	113			38.6808	-121.7411	4
+US	95798	West Sacramento	California	CA	Yolo	113			38.5805	-121.5291	4
+US	95799	West Sacramento	California	CA	Yolo	113			38.5713	-121.5715	4
+US	95937	Dunnigan	California	CA	Yolo	113			38.887	-121.9992	4
+US	95692	Wheatland	California	CA	Yuba	115			39.0337	-121.4235	4
+US	95901	Marysville	California	CA	Yuba	115			39.1663	-121.5105	4
+US	95903	Beale Afb	California	CA	Yuba	115			39.1115	-121.3604	1
+US	95918	Browns Valley	California	CA	Yuba	115			39.2882	-121.3303	4
+US	95919	Brownsville	California	CA	Yuba	115			39.4525	-121.2612	4
+US	95922	Camptonville	California	CA	Yuba	115			39.4518	-121.0486	4
+US	95925	Challenge	California	CA	Yuba	115			39.4685	-121.1936	4
+US	95935	Dobbins	California	CA	Yuba	115			39.3662	-121.2256	4
+US	95961	Olivehurst	California	CA	Yuba	115			39.0861	-121.5497	4
+US	95962	Oregon House	California	CA	Yuba	115			39.3459	-121.2663	4
+US	95972	Rackerby	California	CA	Yuba	115			39.4256	-121.3252	4
+US	95981	Strawberry Valley	California	CA	Yuba	115			39.687	-121.045	4

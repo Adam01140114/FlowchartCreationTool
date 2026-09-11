@@ -1,93 +1,47 @@
-# California Zip Code Data Sources
+# ZIP code -> county data: sources and method
 
-This document explains how to get accurate, comprehensive zip code to county mappings for California.
-
-## Recommended Solutions (Best to Good)
-
-### Option 1: Census Bureau Data (Best - Official Source) ⭐ RECOMMENDED
-
-The U.S. Census Bureau provides official ZCTA (Zip Code Tabulation Area) to County relationship files.
-
-**Steps:**
-1. Run: `python update_zip_data.py --download-census`
-2. The script will automatically download and process the data
-3. This creates an accurate `zipData.js` file with official mappings
-
-**Pros:**
-- Official, authoritative source
-- Free and publicly available
-- Comprehensive coverage
-- Regularly updated
-
-**Cons:**
-- ZCTAs are approximations of zip codes (but very close)
-
-### Option 2: Row Zero Dataset (Good - Easy to Use)
-
-Row Zero provides a comprehensive spreadsheet with zip codes, places, and counties.
-
-**Steps:**
-1. Visit: https://rowzero.com/datasets/zip-codes-to-places
-2. Download the CSV file
-3. Filter for California entries (state = 'CA')
-4. Save as `ca_zipcodes.csv`
-5. Run: `python update_zip_data.py --process-csv ca_zipcodes.csv`
-
-**Pros:**
-- Easy to download and use
-- Includes other useful data (city, state, metro area)
-- Well-maintained
-
-**Cons:**
-- Requires manual download step
-- May have some inaccuracies
-
-### Option 3: API Fallback (Built-in)
-
-The website already includes API fallback functionality using GeoNames API.
-
-**Current Implementation:**
-- First checks local `zipData.js` file
-- If not found, tries GeoNames API
-- Free but rate-limited
-
-**To Improve:**
-- Get a free API key from SmartyStreets (more reliable)
-- Or use other geocoding services
-
-### Option 4: Manual CSV Processing
-
-If you have a CSV file with zip codes and counties:
-
-1. Format should be: `zip,county` or include columns like `zip`, `county`
-2. Modify `update_zip_data.py` to match your CSV format
-3. Run the processing function
-
-## Quick Start
-
-For the fastest setup with the most accurate data:
+`zipData.js` is generated. Never hand-edit it; run:
 
 ```bash
-python update_zip_data.py --download-census
+node build-zip-data.js                     # rebuild from ./sources
+node build-zip-data.js --refresh-geonames  # re-download USPS ZIP list first
 ```
 
-This will:
-1. Download the latest Census Bureau data
-2. Filter for California zip codes
-3. Generate a complete `zipData.js` file
-4. Ready to use immediately
+## Sources (all free, filtered to California and kept in `./sources`)
 
-## Verifying Your Data
+| File | What it gives us | Origin |
+|---|---|---|
+| `census_zcta_county_2020.txt` | Which counties each ZCTA (Census ZIP area) touches, with land area of each piece | https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_county20_natl.txt |
+| `census_zcta_county_pop2010.txt` | Resident population of each ZCTA/county piece | https://www2.census.gov/geo/docs/maps-data/data/rel/zcta_county_rel_10.txt |
+| `geonames_CA.txt` | Every USPS ZIP in California with its city and county, including PO-box and single-building ZIPs that have no ZCTA | https://download.geonames.org/export/zip/US.zip (CC BY 4.0) |
 
-Test with known zip codes:
-- `90001` → Los Angeles County
-- `93907` → Monterey County
-- `94102` → San Francisco County
-- `92101` → San Diego County
+## Decision rule
 
-## Notes
+1. ZCTA entirely inside one county: that county.
+2. ZCTA split across counties: the county where most of the ZIP's residents live
+   (2010 population share). Land area is a bad proxy in rural California, where a
+   ZIP can be mostly empty land in one county and all its people in another.
+3. ZIP with no ZCTA (PO box, unique ZIP): the USPS county from GeoNames.
+4. ZIPs the USPS places outside California are dropped, even if a sliver of the
+   Census area crosses the state line (89019, 89439, 97635 and three others).
 
-- California has approximately 1,700+ active zip codes
-- Some zip codes may span multiple counties (the data will use the primary county)
-- Data should be updated periodically as new zip codes are added
+Each entry in `zipCodeDetails` keeps every county the ZIP touches with its share,
+so a form can ask the user to confirm when the top county is below 80%
+(`isSplit` on the `getCourtFromZipCode` result). About 30 ZIPs are in that range.
 
+## Why the old table was wrong
+
+The previous generator kept whichever county appeared first in the Census file.
+That mislabelled 83 ZIPs, including Cypress, La Habra and Seal Beach (Orange, not
+Los Angeles), Redlands, Colton and Yucaipa (San Bernardino, not Riverside), Santa
+Maria (Santa Barbara, not San Luis Obispo), Davis (Yolo, not Solano), Folsom
+(Sacramento, not El Dorado) and Lancaster (Los Angeles, not Kern). It also had no
+entry at all for the roughly 790 PO-box and unique ZIPs.
+
+## Known limits
+
+- Population shares are from the 2010 Census; county lines have not moved since,
+  and ZIP boundaries shift slowly, so the majority county is stable.
+- A ZIP-level lookup can never be exact for a split ZIP. Street-level geocoding
+  is the only way to be certain; the `isSplit` flag tells you when it matters.
+- Refresh GeoNames once or twice a year to pick up new ZIPs.

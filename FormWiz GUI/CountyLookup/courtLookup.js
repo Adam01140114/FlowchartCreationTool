@@ -1,59 +1,56 @@
 /**
  * Court Lookup Functions
- * Integrates zip code lookup with court information for small claims automation
+ * ZIP code -> county (zipData.js) -> small claims court (courtData.js).
+ *
+ * Load order: zipData.js, courtData.js, then this file.
  */
 
-// Main function: Get court info from zip code
+// Threshold below which a ZIP is treated as genuinely split between counties.
+// Ask the user which county they live in rather than silently picking one.
+var SPLIT_ZIP_THRESHOLD = 0.8;
+
+function buildCourtResult(county, extra) {
+    const courtInfo = getCourtByCounty(county);
+    const base = Object.assign({ county: county }, extra || {});
+    if (!courtInfo) {
+        return Object.assign(base, { error: 'Court information not found for this county' });
+    }
+    return Object.assign(base, {
+        courtName: courtInfo.name,
+        address: courtInfo.address,
+        city: courtInfo.city,
+        state: courtInfo.state,
+        zip: courtInfo.zip,
+        phone: courtInfo.phone,
+        fullAddress: formatCourtAddress(courtInfo),
+        note: courtInfo.note || null,
+        locations: courtInfo.locations || null,
+        source: courtInfo.source || null
+    });
+}
+
+// Main function: get court info from a ZIP code ('90210' or '90210-1234').
+// Returns null for anything that is not a California ZIP.
+// Result also carries:
+//   counties  - every county the ZIP touches, most residents first [{county, share}]
+//   isSplit   - true when the top county holds < 80% of residents; offer a choice
 function getCourtFromZipCode(zipCode) {
-    // First, get the county from zip code
-    const county = zipCodeToCounty[zipCode];
-    
+    const county = getCountyFromZip(zipCode);
     if (!county) {
         return null;
     }
-    
-    // Then get court info from county
-    const courtInfo = getCourtByCounty(county);
-    
-    if (!courtInfo) {
-        return {
-            county: county,
-            error: 'Court information not found for this county'
-        };
-    }
-    
-    return {
-        county: county,
-        courtName: courtInfo.name,
-        address: courtInfo.address,
-        city: courtInfo.city,
-        state: courtInfo.state,
-        zip: courtInfo.zip,
-        phone: courtInfo.phone,
-        fullAddress: formatCourtAddress(courtInfo),
-        locations: courtInfo.locations || null
-    };
+    const counties = getCountiesForZip(zipCode);
+    const isSplit = counties.length > 1 && counties[0].share < SPLIT_ZIP_THRESHOLD;
+    return buildCourtResult(county, { counties: counties, isSplit: isSplit });
 }
 
-// Function to get court info directly from county name
+// Get court info directly from a county name ('Orange' or 'Orange County').
 function getCourtFromCounty(countyName) {
-    const courtInfo = getCourtByCounty(countyName);
-    
-    if (!courtInfo) {
+    const county = String(countyName || '').replace(/\s+County$/i, '').trim();
+    if (!getCourtByCounty(county)) {
         return null;
     }
-    
-    return {
-        county: countyName,
-        courtName: courtInfo.name,
-        address: courtInfo.address,
-        city: courtInfo.city,
-        state: courtInfo.state,
-        zip: courtInfo.zip,
-        phone: courtInfo.phone,
-        fullAddress: formatCourtAddress(courtInfo),
-        locations: courtInfo.locations || null
-    };
+    return buildCourtResult(county);
 }
 
 // Export for use in other scripts (if using modules)
@@ -62,7 +59,7 @@ if (typeof module !== 'undefined' && module.exports) {
         getCourtFromZipCode,
         getCourtFromCounty,
         getCourtByCounty,
-        formatCourtAddress
+        formatCourtAddress,
+        SPLIT_ZIP_THRESHOLD
     };
 }
-

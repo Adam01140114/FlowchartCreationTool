@@ -18,7 +18,7 @@ zipInput.addEventListener('keypress', (e) => {
 
 // Only allow numbers in input
 zipInput.addEventListener('input', (e) => {
-    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    e.target.value = e.target.value.replace(/[^0-9-]/g, '');
 });
 
 function handleSearch() {
@@ -34,65 +34,23 @@ function handleSearch() {
         return;
     }
     
-    if (zipCode.length !== 5) {
+    if (!normalizeZip(zipCode)) {
         showError('Please enter a valid 5-digit zip code');
         return;
     }
-    
-    // Lookup county (async)
-    searchBtn.disabled = true;
-    searchBtn.textContent = 'Looking up...';
-    
-    lookupCounty(zipCode).then(county => {
-        searchBtn.disabled = false;
-        searchBtn.textContent = 'Lookup';
-        
-        if (county) {
-            showResult(county, zipCode);
-        } else {
-            showError(`County not found for zip code ${zipCode}. Please verify it's a valid California zip code.`);
-        }
-    });
+
+    const county = lookupCounty(zipCode);
+    if (county) {
+        showResult(county, normalizeZip(zipCode));
+    } else {
+        showError(`County not found for zip code ${zipCode}. Please verify it's a valid California zip code.`);
+    }
 }
 
-async function lookupCounty(zipCode) {
-    // First, try local data lookup
-    if (zipCodeToCounty[zipCode]) {
-        return zipCodeToCounty[zipCode];
-    }
-    
-    // If not found locally, try API fallback
-    // Using SmartyStreets free API (requires free account) or GeoNames
-    try {
-        // Option 1: SmartyStreets (requires API key - free tier available)
-        // const response = await fetch(`https://us-zipcode.api.smartystreets.com/lookup?zipcode=${zipCode}&auth-id=YOUR_AUTH_ID&auth-token=YOUR_AUTH_TOKEN`);
-        
-        // Option 2: GeoNames (free, no key needed for basic usage, but rate limited)
-        const response = await fetch(`http://api.geonames.org/postalCodeSearchJSON?postalcode=${zipCode}&country=US&username=demo&maxRows=1`);
-        
-        if (response.ok) {
-            const data = await response.json();
-            if (data.postalCodes && data.postalCodes.length > 0) {
-                const result = data.postalCodes[0];
-                const adminName1 = result.adminName1; // This is usually the state
-                const adminName2 = result.adminName2; // This might be the county in some cases
-                
-                // For California, we need to check if this is a CA zip code
-                if (adminName1 === 'California' || adminName1 === 'CA') {
-                    // Try to extract county from adminName2 or placeName
-                    // Note: GeoNames may not always have county, so this is a fallback
-                    if (adminName2) {
-                        return adminName2.replace(' County', '').trim();
-                    }
-                }
-            }
-        }
-    } catch (error) {
-        // API failed, return null to show error message
-        console.log('API lookup failed:', error);
-    }
-    
-    return null;
+function lookupCounty(zipCode) {
+    // Local data only. zipData.js already covers every USPS ZIP in California,
+    // so a miss means the ZIP is not in California (or is not a ZIP at all).
+    return getCountyFromZip(zipCode);
 }
 
 function showResult(county, zipCode) {
@@ -101,6 +59,10 @@ function showResult(county, zipCode) {
     
     // Get court information
     const courtInfo = getCourtFromZipCode(zipCode);
+    if (courtInfo && courtInfo.isSplit) {
+        const others = courtInfo.counties.slice(1).map(c => `${c.county} County (${Math.round(c.share * 100)}%)`).join(', ');
+        countyDetails.textContent += `. This zip code straddles a county line: about ${Math.round(courtInfo.counties[0].share * 100)}% of its residents are in ${county} County, the rest in ${others}. Confirm which county the address is actually in.`;
+    }
     const courtInfoDiv = document.getElementById('courtInfo');
     
     if (courtInfo && courtInfo.courtName) {

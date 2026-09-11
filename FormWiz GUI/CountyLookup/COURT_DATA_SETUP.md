@@ -11,7 +11,7 @@ This system provides automatic court name and address lookup for California smal
 ## Files
 
 ### Core Data Files
-- `zipData.js` - Maps zip codes to counties (1,808 California zip codes)
+- `zipData.js` - Maps zip codes to counties (every USPS zip code in California, about 2,600)
 - `courtData.js` - Maps counties to small claims court information (all 58 counties)
 - `courtLookup.js` - Helper functions for court lookups
 
@@ -116,7 +116,7 @@ See `integration-example.js` for complete examples including:
 ## Data Coverage
 
 ✅ **All 58 California counties** included
-✅ **1,808 California zip codes** mapped to counties
+✅ **Every USPS zip code in California** (about 2,600) mapped to counties, with split-county detection
 ✅ **Multiple locations** for counties with multiple courthouses
 ✅ **Complete addresses** including street, city, state, zip
 ✅ **Phone numbers** for all courts

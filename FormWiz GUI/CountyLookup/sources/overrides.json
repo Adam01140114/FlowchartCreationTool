@@ -1,0 +1,5 @@
+{
+  "_comment": "Manual corrections applied last by build-zip-data.js. Key = 5-digit ZIP. Use only for confirmed source errors and say why.",
+  "92248": { "county": "Riverside", "city": "La Quinta", "reason": "PO-box ZIP for La Quinta; GeoNames lists San Bernardino, La Quinta is in Riverside County" },
+  "92331": { "county": "San Bernardino", "city": "Fontana", "reason": "PO-box ZIP for Fontana; GeoNames lists Imperial, Fontana is in San Bernardino County" }
+}
