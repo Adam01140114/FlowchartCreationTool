@@ -679,7 +679,7 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '        .address-input { width: 80%; max-width: 400px; padding: 12px 16px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; height: 44px; line-height: 20px; }',
     '        .address-input:focus, .address-select:focus, .address-select-main:focus, .address-select-trigger:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }',
     '        .address-input::placeholder { color: #6c757d; opacity: 1; }',
-    '        .address-select { width: 93%; max-width: 465px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }',
+    '        .address-select { width: 80%; max-width: 400px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }',
     '        .address-select-main { width: 160px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; padding: 12px 24px 12px 8px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }',
     '        .address-select-trigger { width: 160px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 2px center; background-size: 12px; padding: 0; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }',
     '        .address-field:first-child { margin-top: 2px; }',
@@ -3510,6 +3510,11 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
           }
           // Define location field names for visual separation
           const locationFields = ['Street', 'City', 'State', 'Zip'];
+          // A label belongs to the address by its first word: "Street address"
+          // and "ZIP code" did not match, so City looked like the start of the
+          // address and a <br> opened a gap between it and the street.
+          const isLocationLabel = (label) => locationFields.includes(label) ||
+            /^(street|city|state|zip)( |$)/i.test(String(label || '').trim());
           for(let j = 1; j <= count; j++){
             let lastWasLocation = false;
             let firstField = true;
@@ -3520,7 +3525,7 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
             // Process all fields in creation order
             for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
               const field = allFieldsInOrder[fieldIndex];
-              const isLocationField = field.type === 'location' || locationFields.includes(field.label);
+              const isLocationField = field.type === 'location' || isLocationLabel(field.label);
               // Add <br> before first location field in each count
               if (isLocationField && !lastWasLocation && !firstField) {
                 const br = document.createElement('br');
@@ -12063,6 +12068,9 @@ function showTextboxLabels(questionId, count){
     generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder);
     // Define location field names for visual separation
     const locationFields = ['Street', 'City', 'State', 'Zip'];
+    // By first word, so "Street address" and "ZIP code" belong to the address.
+    const isLocationLabel = (label) => locationFields.includes(label) ||
+      /^(street|city|state|zip)( |$)/i.test(String(label || '').trim());
     for(let j = 1; j <= count; j++){
         let lastWasLocation = false;
         let firstField = true;
@@ -12084,7 +12092,7 @@ function showTextboxLabels(questionId, count){
         // Process all fields in creation order
         for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
             const field = allFieldsInOrder[fieldIndex];
-            const isLocationField = locationFields.includes(field.label);
+            const isLocationField = isLocationLabel(field.label);
             // Skip location fields that should be conditional trigger fields
             // Check if this question has a dropdown with trigger sequences that contain location fields
             const hasLocationTriggerFields = allFieldsInOrder.some(f => 
