@@ -480,12 +480,13 @@
         "gateQuestion": "Do you know where the restrained person lives?"
       }
     },
-  { "nameId": "restrained_person_description", "question": "What does the restrained person look like? (optional)", "optional": true, "fields": [
+  { "nameId": "restrained_person_description", "question": "What does the restrained person look like?", "optional": true, "fields": [
       {"field":"restrained_person_height","label":"Height"},
       {"field":"restrained_person_weight","label":"Weight"},
       {"field":"restrained_person_hair_color","label":"Hair color"},
       {"field":"restrained_person_eye_color","label":"Eye color"} ] }
 ],
+  "attachmentTargets": ["other_protected_people_additional_list_attached_yes"],
   "repeats": [
     {
       "nameId": "other_protected_person",

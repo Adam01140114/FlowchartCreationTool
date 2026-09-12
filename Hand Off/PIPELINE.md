@@ -12,6 +12,75 @@ be re-run on its own and the result is reproducible rather than remembered.
                                                     HTML form ──┴──► filled PDFs
 ```
 
+## The cornerstone: a question never carries its condition
+
+Every other interview rule rests on this one. When a question only applies in
+some situations, the situation is asked first, as a Yes/No question of its own,
+and the question is shown only on Yes.
+
+| Never | Always |
+|---|---|
+| "If there is another parent or legal guardian besides you and the other person, what is their name?" | "Is there another parent or legal guardian besides you and the other person?", then on Yes "What is their name?" |
+| "Where is it, if you know?" | "Where it is kept", marked optional |
+| "If someone else, their relationship to the child" - a box everyone sees | "How is the other person they lived with related to the children?", shown only when "Someone else" is ticked |
+| "End, if it applies" | "End", marked optional |
+
+The words of a title, a box label or a choice never hold an "if". A condition an
+earlier choice already answers is that question's `conditional`; one nobody has
+asked yet is a gate the hints create:
+
+```json
+"dv105_other_guardian_name": {
+  "text": "What is their name?",
+  "conditional": {
+    "onlyWhen": "dv105_other_guardian_exists",
+    "gateQuestion": "Is there another parent or legal guardian besides you and the other person?"
+  }
+},
+"dv105_other_guardian_role": { "conditional": { "onlyWhen": "dv105_other_guardian_exists" } }
+```
+
+An `onlyWhen` naming something that does not exist yet creates the Yes/No gate,
+worded by `gateQuestion`, and everything naming the same gate waits on the same
+Yes. Something the filer may simply not know - a serial number, a breed - is
+`"optional": true`, and the Next button lets the filer past it. The title never
+says "(optional)" - see "Optional is coded, never said" below.
+
+This is enforced, not advised. The patterns live in `wording-rules.js`, which
+tests itself (`node wording-rules.js`). `compile-form.js` refuses to write a
+flowchart whose wording carries a condition, and `pipeline-audit.js` fails the
+run (RULE 2, CORNERSTONE). The audit's earlier copy of the pattern held literal
+backspace characters where `\b` belonged: it matched nothing and printed
+"passes", which is how that DV-105 question shipped after the rule was written.
+
+## Every question title is a full sentence
+
+A title stands on its own; the one-question-at-a-time mode shows nothing else.
+It ends in a question mark or a full stop, never leans on the question before it
+("And before that?"), is never a fragment ("Which county?", "Your lawyer's
+information"), never opens with a label and a colon ("Monday: what should the
+visit look like?") and never ends in one. Name what is asked about: "Where did
+the children live before the address you just gave?", "Which county should the
+children not be taken out of?", "What should the visit on Monday look like?".
+The "(check all that apply)" the form adds to a checklist is not part of the
+title. `pipeline-audit.js` RULE 14 fails the run on a title that is not a
+sentence.
+
+## Optional is coded, never said
+
+A question the filer may skip is marked optional in the hints - `"optional":
+true` on the question, the combine or one part - and that is all it takes: the
+editor exports `required: false`, the form tags the question `data-optional`, and
+the Next button lets the filer past it blank. The title never says "(optional)",
+and neither does a box label in the hints. An optional box inside an otherwise
+required question is the one place the form shows it, in the box itself.
+
+"How can the court reach you? (optional)" said it and was required anyway -
+nothing had marked it - so a filer who believed the title was stopped at Next.
+`pipeline-audit.js` RULE 15 fails the run on any title or box label that says
+"optional", and tells you whether the question was really marked;
+`compile-form.js` refuses to write a flowchart whose title says it.
+
 ## What disqualifies a filer
 
 A court form does not only ask questions. It also says when the answers rule
@@ -695,6 +764,123 @@ the feature not working:
   than wherever a word boundary falls — letting it fall put ten characters more
   on DV-101 than DV-101 holds, which is testing the overflow by overflowing.
 
+## No connector is left loose
+
+A connector an answer decides hangs off that answer's option. Every other one -
+a form that always travels with this one (DV-109, CLETS-001), or one that waits
+on a ticked field (DV-101) - is a child of the form's central **End** node,
+chained one below the other in the order the spec's `activates` lists them:
+**most important at the top, least important at the bottom.** DV-100 reads End,
+DV-101, DV-109, CLETS-001; DV-109 reads End, DV-110.
+
+They used to be dropped under the lowest node and wired to nothing, which left
+every chart ending in boxes floating below it. `pipeline-build-packet.js`
+(`endNodeOf`, and the chain in `main`) now wires them. The reader had to change
+with it: `collectProjectConnectors` in `connector-nodes.js` took whatever fed a
+connector as its condition, so End read as an answer labelled "END" and every
+form chained under it would never have switched on. An End or connector feeder
+is now a place in the chain, not a condition.
+
+## More entries than the paper has rows go on a page the form draws
+
+DV-105 item 3 prints four rows for children - a name and a date of birth each -
+and under them: *"Check here if you need more space. Write 'DV-105, Children' at
+the top and attach it to this form."* It was asked as "Do you have more children
+to list on a separate page?", and nothing let a fifth child be entered or produced
+the page, while DV-100 item 32 counted one the moment the filer said yes.
+
+It is the row version of the overflow link above, and it is declared on the
+block, beside the rows it continues:
+
+```json
+"repeats": [{
+  "nameId": "dv105_child", "entryTitle": "Child", "min": 1, "max": 4,
+  "fields": [ ... ],
+  "attachment": {
+    "name": "Additional_Children",
+    "heading": "DV-105, Children",
+    "item": "3",
+    "itemTitle": "Children Under 18 Years Old",
+    "marks": "dv105_children_additional_list_attached",
+    "most": 12
+  }
+}]
+```
+
+- `max` stays the rows the PDF prints; `most` is how many the filer may add.
+- The compiler drops `marks` as a question, as it drops an overflow link's box.
+- The form's "how many" goes up to `most`, and an entry past `max` says it goes
+  on the attached page. Whenever there are more than `max`, `marks` ticks - so
+  DV-100 item 32 counts the page - and the page joins Download PDFs, Preview
+  PDFs and the payload.
+- The page is drawn, not filled. The form posts its extra rows with the request
+  (`__attachment`) and `/edit_pdf` hands them to `FormWiz GUI/attachment-page.js`:
+  the heading the form says to write at the top, the item it continues, the case
+  number, and one lettered row per entry carrying on from the PDF's last letter
+  (the form prints a-d; the page starts at e). A long list runs onto more pages,
+  each headed the same way.
+
+**Setting it up by hand.** On a Multiple Dropdown node open Properties →
+*Extra entries on an attached page*, tick it, and fill in the most entries, the
+page's file name, its heading, the item it continues and the PDF checkbox it
+ticks. "Number Range - To" stays the number of rows the PDF prints. The FormWiz
+builder's numbered dropdown has the same settings under its Entry Title.
+
+**One block, several forms' pages.** DV-100, DV-110 and CLETS-001 each print four
+other protected people and each says to attach a sheet for the rest - under its
+own heading ("DV-100, Other Protected People", "DV-110, Other Protected People",
+"Item 4"), with its own columns, ticking its own box. The people are asked once,
+in DV-100's block, which asks everything any of the three forms prints about each
+person (CLETS-001's gender, race and date of birth included - it used to ask them
+on four screens of their own). The block's attachment says which columns its own
+page prints, and lists the other forms' pages:
+
+```json
+"attachment": {
+  "name": "DV100_Other_Protected_People", "heading": "DV-100, Other Protected People",
+  "item": "8", "itemTitle": "Other Protected People",
+  "marks": "other_protected_people_additional_list_attached_yes", "most": 12,
+  "fields": ["{n}_full_name", "{n}_age", "{n}_relationship", "Lives with you?"],
+  "otherPages": [
+    { "form": "DV-110", "name": "DV110_Other_Protected_People", "heading": "DV-110, Other Protected People",
+      "item": "3", "itemTitle": "Other Protected People",
+      "marks": "other_protected_people_additional_list_attached_yes",
+      "fields": ["{n}_full_name", "{n}_relationship", "{n}_age"] },
+    { "form": "CLETS-001", "name": "CLETS001_Item_4", "heading": "Item 4",
+      "item": "4", "itemTitle": "Other People You Want Protected",
+      "marks": "clets_other_protected_people_attached_page",
+      "fields": ["{n}_full_name", "{n}_gender", "{n}_race", "{n}_date_of_birth"] } ] }
+```
+
+- A `fields` entry is an entry field's key as the hints write it (`{n}_age`) or
+  its label (`Lives with you?`), in the order the page prints them. None: all.
+- A page in `otherPages` exists only while its `form` is in the packet, and a box
+  two pages share by name (DV-100 and DV-110 print the same one) ticks when either
+  page exists.
+- The other forms still declare the block under the same `nameId`, so each
+  compiles on its own; the project export asks it once. Each names the box its
+  page ticks in `attachmentTargets`, or it would ask for it.
+
+**The audit finds the ones still missing.** `pipeline-audit.js` RULE 13 reads
+every PDF's text for a checkbox beside "need more space", "list more people",
+"on a separate piece of paper" and the like, and fails each such box nothing
+ticks - no overflow link, no attachment. Court-use boxes are exempt. A box two
+forms share by name (DV-105 and DV-140 both print the children one) is covered
+by the one declaration - and the other form names it in its hints'
+`attachmentTargets`, the way a continuation field goes in `overflowTargets`, or
+it is compiled as a question there. DV-140 asked "Do you have more children to
+list on a separate page?" the moment DV-105 stopped.
+
+**The pipeline draws it too.** `pipeline-fill.js` reads every block with an
+`attachment` from `dv-packet-gui.json` (`--gui` for another), and every page it
+feeds, `otherPages` included. When the answers' count is past `max`, it ticks
+each page's `marks` in the answers it fills the forms with, posts the same
+`__attachment` the form would, and writes one PDF per page, named for the page -
+`pipeline-out/additional_children-filled.pdf`, `dv110_other_protected_people-filled.pdf`
+- plus its `-pages` folder under `--render`. When the count fits the paper, it says no attachment is needed and
+removes any page an earlier run left there. `--answers <file>` fills from another
+answer set.
+
 ## A long answer runs onto the next ruled line
 
 A court form often prints two ruled lines for one answer and gives each its own
@@ -785,6 +971,26 @@ node carrying the separator; the generated form keeps a hidden field of the
 original name holding the parts joined in order, and that is what fills the PDF.
 Any field, any separator, any form - see rule 8.
 
+Two values in one box are two boxes even when the paper prints one line for
+them, and even inside a combined question. DV-105 item 4's "City and state" is
+split into `_city` and `_state` and joined with ", "; CLETS-001's "Driver's
+license number and state" and "Employer (name and address)" are split the same
+way. Splits run before combines, so a combine names the parts, not the original:
+
+```json
+"splits": [ { "field": "dv105_child_home_1_city_and_state", "join": ", ",
+              "parts": [ { "nameId": "dv105_child_home_1_city",  "label": "City" },
+                         { "nameId": "dv105_child_home_1_state", "label": "State" } ] } ],
+"combines": [ { "question": "Where do the children live now, and since when?",
+                "fields": [ { "field": "dv105_child_home_1_from",  "label": "Living there since", "type": "date" },
+                            { "field": "dv105_child_home_1_city",  "label": "City" },
+                            { "field": "dv105_child_home_1_state", "label": "State" } ] } ]
+```
+
+RULE 8 reads every box inside a question as well as whole questions, by field
+name (`_and_`) and by label ("number and state", "name and address"), and a
+failure fails the audit run.
+
 ## Combining fields into one question, and typing them properly
 
 Fields that describe one subject are one question (rule 9), and a value is asked
@@ -807,6 +1013,14 @@ in the type it is (rule 10):
 A combine becomes a `multipleTextboxes` question whose boxes keep the PDF's own
 field names; a type becomes a date picker, a phone keypad, an email field or a
 number box. Types work inside combined and repeating questions too.
+
+A date is a date by what the box says, not only by what it is called. DV-105
+item 4 named its boxes `_from` and `_until` and printed "(month/year)" beside
+them, and they were asked as text: RULE 10 read field names only. It now reads
+the part's label and the PDF's own caption too (date, since, from, until,
+month/year) and fails the run. A date the box cannot print whole prints in its
+short form - a "(month/year)" box five characters wide gets `03/20`, a wider one
+`03/2020` (`shorterFormThatFits` in the generated form).
 
 Not only addresses: whenever several questions are about one subject, they are
 one question. A part can name a group - a family of checkboxes asked as one
@@ -833,8 +1047,8 @@ A question the filer may not know the answer to is optional: `"optional": true`
 on a question hint, on a combine, or on one part of a combine. The form lets the
 filer past it, and the question after it waits on what it waited on rather than
 on its answer. An optional part inside an otherwise required question says
-"(optional)" in its box; a question that is optional as a whole should say so in
-its text.
+"(optional)" in its box; a question that is optional as a whole never says so in
+its title (RULE 15) - the flag is what makes it skippable.
 
 ## Running it
 
@@ -858,7 +1072,8 @@ node pipeline-build-packet.js   # also wires every declared disqualifier as an a
 
 # 5. audit the static rules - the chart, the disqualifiers, then the interview
 node pipeline-audit-flowchart.js
-node pipeline-audit.js
+node wording-rules.js                     # the wording patterns test themselves
+node pipeline-audit.js                    # exits 1 when a wording rule fails
 node pipeline-disqualifiers.js --check    # every declared one has an alert
 
 # 6. fill the form (debug menu: Ctrl+Shift, then "Fill maximum path"),
@@ -921,7 +1136,12 @@ carries a value.
 
 **Fill minimum path** answers every question the way that opens the fewest:
 "no" before "yes", the smallest count on a numbered block, and no optional
-checkbox ticked at all. It measures the opposite thing - that a gate answered No
+checkbox ticked at all. A **required** checkbox question gets exactly one box -
+the one that opens least - because Next will not take none: "What is your
+relationship to the person you want protection from?" came back blank from every
+minimum run and from the test-mode double-click, which stopped the path at a
+question the filer cannot get past (`solverQuestionRequired` in the solver, the
+same test in the DOM fill). It measures the opposite thing - that a gate answered No
 actually closes the block behind it. A form can pass the widest path and fail
 this one, which is how thirty questions about further abuse stayed on screen for
 a filer who had just said it happened once.

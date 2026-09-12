@@ -85,6 +85,13 @@
     border-radius: 6px; font: inherit; font-size: 11px; padding: 2px 8px; cursor: pointer;
   }
   .copy:hover { color: var(--accent); border-color: var(--accent); }
+  /* The rule every other interview rule rests on: it may not read like one of many. */
+  article.cornerstone { border: 2px solid #c2410c; box-shadow: 0 0 0 4px rgba(194, 65, 12, .12); }
+  article.cornerstone .says { font-weight: 560; }
+  .cornerstone-tag {
+    font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    color: #fff; background: #c2410c; border-radius: 5px; padding: 2px 7px; white-space: nowrap;
+  }
   .says { margin: 10px 0 0; }
   .why, .by { margin: 9px 0 0; font-size: 13.5px; color: var(--muted); }
   .why b, .by b { color: var(--ink); font-weight: 650; }
@@ -137,6 +144,24 @@ const GROUPS = [
 
 const RULES = [
   /* ---------------- the interview ---------------- */
+  { id: 'a-question-never-carries-its-condition', group: 'interview', num: 'Rule 2', cornerstone: true,
+    title: 'A question never carries its condition: the condition is a gate',
+    says: 'Every other interview rule rests on this one. When a question only applies in some situations, the situation is asked first, as a Yes/No question of its own, and the question is shown only on Yes. The words of a title, a box label or a choice never hold the condition: no "If there is…, what is…?", no "…, if you know", no "if any", no "if it applies", no "If someone else, …". "If there is another parent or legal guardian besides you and the other person, what is their name?" is two questions: "Is there another parent or legal guardian besides you and the other person?" and, only on Yes, "What is their name?". A condition an earlier choice already answers is that question’s condition, not part of its words. Something the filer may simply not know is marked optional ("optional": true), and the Next button lets them past it; the title never says so (Rule 15).',
+    why: 'A condition in the wording makes every filer read, work out and dismiss a question that is not about them, and the form asks it anyway. DV-105 asked "If there is another parent or legal guardian besides you and the other person, what is their name?" of everyone after this rule was written, because the check meant to catch it was silently broken: its pattern held literal backspace characters where \\b belonged, matched nothing, and printed "passes". A rule whose checker cannot fail is not enforced, so the patterns now test themselves.',
+    by: 'wording-rules.js (node wording-rules.js runs its self-test), read by compile-form.js, which refuses to write a flowchart whose wording carries a condition, and by pipeline-audit.js RULE 2 (CORNERSTONE), which fails the run. A gate is written as conditional: { onlyWhen, gateQuestion } in the hints' },
+
+  { id: 'every-title-is-a-full-sentence', group: 'interview', num: 'Rule 14',
+    title: 'Every question title is a full sentence',
+    says: 'A question title reads on its own as a complete sentence ending in a question mark or a full stop. It never leans on the question before it ("And before that?", "And somewhere else before that?"), is never a fragment ("Which county?", "Which children?", "Your lawyer’s information"), never opens with a label and a colon ("Monday: what should the visit look like?") and never ends in a colon ("They must have written permission or a court order to take the children outside:"). Name what is asked about: "Where did the children live before the address you just gave?", "Which county should the children not be taken out of?", "What should the visit on Monday look like?". A title never says "(optional)" (Rule 15); the "(check all that apply)" the form adds to a checklist is not part of the title.',
+    why: 'The one-question-at-a-time mode shows a title and nothing else, so "And before that?" means nothing on its screen. Titles lifted from the paper were captions for a box with its heading printed above it; the interview has no heading above it.',
+    by: 'wording-rules.js; pipeline-audit.js RULE 14, which fails the run' },
+
+  { id: 'optional-is-coded-not-said', group: 'interview', num: 'Rule 15',
+    title: 'Optional is coded, never said',
+    says: 'A question the filer may skip is marked optional — "optional": true on the question hint, the combine or the part — and that is the whole of it: the editor exports it as required: false, the form tags it data-optional, and the Next button lets the filer past it blank. Its title never says "(optional)", and neither does a box label in the hints. An optional box inside a required question is the one place the form shows it, in the box itself, because there the question cannot be skipped and the box can.',
+    why: '"How can the court reach you? (optional)" said it and was required all the same: nothing had marked it, so the word was a promise the form did not keep, and a filer who believed it was stopped at Next. A word in a title is not a setting.',
+    by: 'wording-rules.js (saysOptional); pipeline-audit.js RULE 15, which fails the run and says whether the question was really marked; compile-form.js refuses to write a flowchart whose title says it' },
+
   { id: 'every-field-reachable', group: 'interview', num: 'Rule 1',
     title: 'Every PDF field is reachable',
     says: 'Every fillable field on the PDF must be reachable from something the form posts. A field nothing can fill is a blank on a filed document.',
@@ -175,9 +200,9 @@ const RULES = [
 
   { id: 'one-question-one-thing', group: 'interview', num: 'Rule 8',
     title: 'One question asks one thing',
-    says: 'A PDF box holding two answers is asked as two questions and rejoined on the way out.',
-    why: 'A single box wanting a name and a date gets one of them.',
-    by: 'pipeline-audit.js — RULE 8; the splits hint' },
+    says: 'A PDF box holding two answers is asked as two boxes and rejoined on the way out, even when the paper prints one line for both and even inside a question of several boxes. A city and a state are two boxes; a driver’s license number and the state that issued it are two; an employer’s name and address are two. Each box in a multi-part question is one thing.',
+    why: 'A single box wanting a name and a date gets one of them. DV-105 item 4 asked "City and state" in one box six times, inside combined questions this check never looked into: it read whole questions only.',
+    by: 'pipeline-audit.js — RULE 8, which reads every box inside a question by field name and by label, and fails the run; the splits hint, whose parts a combine can name' },
 
   { id: 'one-subject-one-question', group: 'interview', num: 'Rule 9',
     title: 'Questions about one subject are one question',
@@ -187,9 +212,9 @@ const RULES = [
 
   { id: 'ask-in-the-right-type', group: 'interview', num: 'Rule 10',
     title: 'Ask for a value in the type it is',
-    says: 'Dates get a date picker, phones a keypad, money a number box.',
-    why: 'A date typed free-hand arrives in a format the PDF was not expecting.',
-    by: 'pipeline-audit.js — RULE 10; questions[...].type' },
+    says: 'Dates get a date picker, phones a keypad, money a number box. What a box holds is read from what it says as well as from what it is called: a label or a PDF caption saying date, since, from, until or (month/year) is a date. A date the PDF box cannot print whole prints in the short form the box asks for: a "(month/year)" box gets 03/2020, or 03/20 when only five characters fit.',
+    why: 'A date typed free-hand arrives in a format the PDF was not expecting. DV-105 item 4 asked "Living there since (month/year)", "From" and "Until" as plain text: the check only looked for field names ending in _date, and these were named _from and _until.',
+    by: 'pipeline-audit.js — RULE 10, by field name, by label and by the PDF caption, and it fails the run; questions[...].type and a combine part’s type' },
 
   { id: 'say-what-to-enter', group: 'interview', num: 'Rule 11',
     title: 'A question says what to enter',
@@ -217,7 +242,7 @@ const RULES = [
 
   { id: 'optional-is-skippable', group: 'interview', num: 'Rule',
     title: 'A question marked optional can be skipped',
-    says: '"optional": true on a question hint, on a combine, or on one part of a combine lets the filer past it without an answer, and the question after it waits on what it waited on, not on its answer. An optional part inside a required question says so in its box.',
+    says: '"optional": true on a question hint, on a combine, or on one part of a combine lets the filer past it without an answer, and the question after it waits on what it waited on, not on its answer. An optional part inside a required question says so in its box; the title of an optional question never does (Rule 15).',
     why: 'The hints marked the CLETS-001 details and DV-110\'s description optional and nothing read the flag: "What is their Social Security number, if you know it?" could not be left blank.',
     by: 'compile-form.js carries it as _optional; the editor exports required: false; the form skips it when it checks for answers' },
 
@@ -246,11 +271,23 @@ const RULES = [
     why: 'The intent was to put the whole answer on DV-101 so the attachment reads on its own, and the paper does not allow it: DV-100 item 7 holds 1115 characters and DV-101 item 5, the box that continues it, holds 387. Copying the whole answer would print a clipped one, and a court document that is unreadable at the bottom is worse than one that is split. Nothing is lost and nothing is cut.',
     by: 'overflowSplit() — one function for both readers, because a split computed twice drops a word between the two pages or prints it on both' },
 
+  { id: 'more-rows-go-on-an-attached-page', group: 'packet', num: 'Rule',
+    title: 'More entries than the paper has rows go on a page the form draws',
+    says: 'A “check here if you need more space” box under a table of rows is never asked. The block lets the filer keep adding entries past the rows the PDF prints; the extra ones are drawn on an attachment page headed the way the form instructs, and the box ticks itself whenever that page exists. The audit reads every PDF for these boxes and fails any that nothing ticks. One block can feed several pages: when several forms print the same entries, the block is asked once and its extra entries are drawn on each form’s own page — under that form’s heading, with that form’s columns, ticking that form’s box — and each page exists only while its form is in the packet.',
+    why: 'DV-105 item 3 prints four rows for children and asked “Do you have more children to list on a separate page?” — but nothing let a fifth child be entered and no page was ever produced, while DV-100 item 32 counted one the moment the filer said yes. A parent of five had nowhere to name their fifth child, and a packet that claimed an attachment it never attached. Then the same gap on three forms at once: DV-100, DV-110 and CLETS-001 each print four other protected people with a “list more on a separate page” box, and CLETS-001 asked gender, race and date of birth on four screens of their own for people DV-100 had just named.',
+    by: 'repeats[].attachment in the hints (fields: the columns this page prints; otherPages: the same entries on other forms’ pages), or “Extra entries on an attached page” on a Multiple Dropdown node; compile-form.js drops each box as a question, and a form whose box another form’s page ticks names it in attachmentTargets; the generated form ticks them and asks /edit_pdf to draw each page (FormWiz GUI/attachment-page.js); pipeline-fill.js draws them too; pipeline-audit.js RULE 13' },
+
   { id: 'a-condition-lives-in-the-style', group: 'packet', num: 'Rule',
     title: 'A connector’s condition lives in its style',
     says: 'Whatever decides a connector — the option chosen, or the field ticked — is written into the connector cell’s style string, beside connectorTarget.',
     why: 'The editor rebuilds a slot from the canvas, and a property set on the cell does not survive that round trip. Set as _activateWhenTicked the DV-101 rule exported as unconditional: true, which reads as "always file DV-101" — the same class of loss already fixed once for flowchart-level keys. Anything that must survive a rebuild has to live somewhere the rebuild reads.',
     by: 'pipeline-build-packet.js writes it; connector-nodes.js reads either' },
+
+  { id: 'no-connector-is-left-loose', group: 'packet', num: 'Rule',
+    title: 'No connector is left loose: the ones no answer decides hang under End, most important first',
+    says: 'A connector that an answer decides hangs off that answer. Every other connector — one that always switches its form on, or one that waits on a ticked field — is a child of the form’s central End node, chained one below the other: End, then the most important form, then the next, down to the least important at the bottom. The order is the order the form lists them in the spec’s activates. What feeds a connector in that chain is a place, not a condition.',
+    why: 'They were dropped under the lowest node and wired to nothing, so every chart ended in boxes floating below it — a loose end, which the flowchart rules forbid everywhere else, and no way to see at a glance which forms follow this one or in what order. Chaining them under End says what they mean: finish this form and these come next. The reader that turns connectors into activation rules had to learn the same thing, or it read End as an answer labelled "END" that no filer can choose, and DV-109, DV-110 and CLETS-001 would never have been asked.',
+    by: 'pipeline-build-packet.js (endNodeOf, the chain in main); connector-nodes.js collectProjectConnectors treats an End or connector feeder as unconditional' },
 
   { id: 'which-forms-are-in-the-packet', group: 'packet', num: 'Rule',
     title: 'One place says which forms are in the packet',
@@ -520,12 +557,13 @@ function render(filter) {
     rules.forEach((rule) => {
       const link = document.createElement('a');
       link.href = '#' + slug(rule.id);
-      link.textContent = rule.title;
+      link.textContent = (rule.cornerstone ? '★ ' : '') + rule.title;
       toc.appendChild(link);
 
       const art = document.createElement('article');
       art.id = slug(rule.id);
       art.style.setProperty('--tag', group.tag);
+      if (rule.cornerstone) art.classList.add('cornerstone');
 
       const h = document.createElement('div');
       h.className = 'rule-head';
@@ -541,7 +579,13 @@ function render(filter) {
           () => { copy.textContent = url; }
         );
       });
-      h.append(num, title, copy);
+      if (rule.cornerstone) {
+        const tag = document.createElement('span');
+        tag.className = 'cornerstone-tag'; tag.textContent = 'Cornerstone';
+        h.append(num, tag, title, copy);
+      } else {
+        h.append(num, title, copy);
+      }
 
       const says = document.createElement('p'); says.className = 'says'; says.textContent = rule.says;
       const why = document.createElement('p'); why.className = 'why';

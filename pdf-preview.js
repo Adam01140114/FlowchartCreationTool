@@ -522,6 +522,11 @@
     // Every page, one under the next, to scroll through - see openFull().
     const full = $('pdfPreviewFullscreen');
     if (full) full.addEventListener('click', openFull);
+    // Double-clicking the page is the other way in, and the more natural one:
+    // the page is what is being looked at, the button is below it. Nothing
+    // listens for a single click here, so this takes nothing away from one.
+    const stage = $('pdfPreviewStage');
+    if (stage) stage.addEventListener('dblclick', openFull);
     document.addEventListener('fullscreenchange', function () {
       // Esc in the browser's fullscreen leaves it without a keydown ever
       // reaching the page, so leaving fullscreen is what closes the view.

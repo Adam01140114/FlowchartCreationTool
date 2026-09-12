@@ -112,7 +112,7 @@
     },
     {
       "nameId": "dv105_limit_travel_places",
-      "question": "They must have written permission or a court order to take the children outside:",
+      "question": "Which places should the children not be taken out of without your written permission or a court order?",
       "multiSelect": true,
       "members": [
         "dv105_limit_travel_county",
@@ -151,7 +151,7 @@
     },
     {
       "nameId": "dv105_records_kinds",
-      "question": "Which records or information?",
+      "question": "Which of the children's records should they not have access to?",
       "multiSelect": true,
       "members": [
         "dv105_records_medical",
@@ -373,7 +373,7 @@
     },
     {
       "nameId": "dv105_child_home_2_lived_with",
-      "question": "Who did the children live with there?",
+      "question": "Who did the children live with at that address?",
       "multiSelect": true,
       "members": [
         "dv105_child_home_2_lived_with_me",
@@ -388,7 +388,7 @@
     },
     {
       "nameId": "dv105_child_home_3_lived_with",
-      "question": "Who did the children live with there?",
+      "question": "Who did the children live with at that address?",
       "multiSelect": true,
       "members": [
         "dv105_child_home_3_lived_with_me",
@@ -403,7 +403,7 @@
     },
     {
       "nameId": "dv105_child_home_4_lived_with",
-      "question": "Who did the children live with there?",
+      "question": "Who did the children live with at that address?",
       "multiSelect": true,
       "members": [
         "dv105_child_home_4_lived_with_me",
@@ -418,7 +418,7 @@
     },
     {
       "nameId": "dv105_child_home_5_lived_with",
-      "question": "Who did the children live with there?",
+      "question": "Who did the children live with at that address?",
       "multiSelect": true,
       "members": [
         "dv105_child_home_5_lived_with_me",
@@ -433,7 +433,7 @@
     },
     {
       "nameId": "dv105_child_home_6_lived_with",
-      "question": "Who did the children live with there?",
+      "question": "Who did the children live with at that address?",
       "multiSelect": true,
       "members": [
         "dv105_child_home_6_lived_with_me",
@@ -510,7 +510,15 @@
           "nameId": "{n}_date_of_birth",
           "type": "date"
         }
-      ]
+      ],
+      "attachment": {
+        "name": "Additional_Children",
+        "heading": "DV-105, Children",
+        "item": "3",
+        "itemTitle": "Children Under 18 Years Old",
+        "marks": "dv105_children_additional_list_attached",
+        "most": 12
+      }
     }
   ],
   "combines": [
@@ -519,120 +527,131 @@
       "fields": [
         {
           "field": "dv105_child_home_1_from",
-          "label": "Living there since (month/year)"
+          "label": "Living there since",
+          "type": "date"
         },
         {
-          "field": "dv105_child_home_1_city_and_state",
-          "label": "City and state"
+          "field": "dv105_child_home_1_city",
+          "label": "City"
         },
         {
-          "field": "dv105_child_home_1_other_relationship",
-          "label": "If someone else, their relationship to the child"
+          "field": "dv105_child_home_1_state",
+          "label": "State"
         }
       ]
     },
     {
-      "question": "Where did the children live before that?",
+      "question": "Where did the children live before their current address?",
       "fields": [
         {
           "field": "dv105_child_home_2_from",
-          "label": "From (month/year)"
+          "label": "From",
+          "type": "date"
         },
         {
           "field": "dv105_child_home_2_until",
-          "label": "Until (month/year)"
+          "label": "Until",
+          "type": "date"
         },
         {
-          "field": "dv105_child_home_2_city_and_state",
-          "label": "City and state"
+          "field": "dv105_child_home_2_city",
+          "label": "City"
         },
         {
-          "field": "dv105_child_home_2_other_relationship",
-          "label": "If someone else, their relationship to the child"
+          "field": "dv105_child_home_2_state",
+          "label": "State"
         }
       ]
     },
     {
-      "question": "And before that?",
+      "question": "Where did the children live before the address you just gave?",
       "fields": [
         {
           "field": "dv105_child_home_3_from",
-          "label": "From (month/year)"
+          "label": "From",
+          "type": "date"
         },
         {
           "field": "dv105_child_home_3_until",
-          "label": "Until (month/year)"
+          "label": "Until",
+          "type": "date"
         },
         {
-          "field": "dv105_child_home_3_city_and_state",
-          "label": "City and state"
+          "field": "dv105_child_home_3_city",
+          "label": "City"
         },
         {
-          "field": "dv105_child_home_3_other_relationship",
-          "label": "If someone else, their relationship to the child"
+          "field": "dv105_child_home_3_state",
+          "label": "State"
         }
       ]
     },
     {
-      "question": "And before that?",
+      "question": "Where did the children live before the address you just gave?",
       "fields": [
         {
           "field": "dv105_child_home_4_from",
-          "label": "From (month/year)"
+          "label": "From",
+          "type": "date"
         },
         {
           "field": "dv105_child_home_4_until",
-          "label": "Until (month/year)"
+          "label": "Until",
+          "type": "date"
         },
         {
-          "field": "dv105_child_home_4_city_and_state",
-          "label": "City and state"
+          "field": "dv105_child_home_4_city",
+          "label": "City"
         },
         {
-          "field": "dv105_child_home_4_other_relationship",
-          "label": "If someone else, their relationship to the child"
+          "field": "dv105_child_home_4_state",
+          "label": "State"
         }
       ]
     },
     {
-      "question": "And before that?",
+      "question": "Where did the children live before the address you just gave?",
       "fields": [
         {
           "field": "dv105_child_home_5_from",
-          "label": "From (month/year)"
+          "label": "From",
+          "type": "date"
         },
         {
           "field": "dv105_child_home_5_until",
-          "label": "Until (month/year)"
+          "label": "Until",
+          "type": "date"
         },
         {
-          "field": "dv105_child_home_5_city_and_state",
-          "label": "City and state"
+          "field": "dv105_child_home_5_city",
+          "label": "City"
         },
         {
-          "field": "dv105_child_home_5_other_relationship",
-          "label": "If someone else, their relationship to the child"
+          "field": "dv105_child_home_5_state",
+          "label": "State"
         }
       ]
     },
     {
-      "question": "And before that?",
+      "question": "Where did the children live before the address you just gave?",
       "fields": [
         {
           "field": "dv105_child_home_6_from",
-          "label": "From (month/year)"
+          "label": "From",
+          "type": "date"
         },
         {
           "field": "dv105_child_home_6_until",
-          "label": "Until (month/year)"
+          "label": "Until",
+          "type": "date"
         },
         {
-          "field": "dv105_child_home_6_city_and_state",
-          "label": "City and state"
+          "field": "dv105_child_home_6_city",
+          "label": "City"
         },
         {
-          "field": "dv105_child_home_6_other_relationship",
-          "label": "If someone else, their relationship to the child"
+          "field": "dv105_child_home_6_state",
+          "label": "State"
         }
       ]
     },
@@ -679,7 +698,7 @@
       ]
     },
     {
-      "question": "Monday: what should the supervised visit look like?",
+      "question": "What should the supervised visit on Monday look like?",
       "fields": [
         {
           "field": "dv105_supervised_visit_monday_start",
@@ -687,7 +706,8 @@
         },
         {
           "field": "dv105_supervised_visit_monday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_supervised_visit_monday_person_to_bring_dropoff",
@@ -708,7 +728,7 @@
       ]
     },
     {
-      "question": "Tuesday: what should the supervised visit look like?",
+      "question": "What should the supervised visit on Tuesday look like?",
       "fields": [
         {
           "field": "dv105_supervised_visit_tuesday_start",
@@ -716,7 +736,8 @@
         },
         {
           "field": "dv105_supervised_visit_tuesday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_supervised_visit_tuesday_person_to_bring_dropoff",
@@ -737,7 +758,7 @@
       ]
     },
     {
-      "question": "Wednesday: what should the supervised visit look like?",
+      "question": "What should the supervised visit on Wednesday look like?",
       "fields": [
         {
           "field": "dv105_supervised_visit_wednesday_start",
@@ -745,7 +766,8 @@
         },
         {
           "field": "dv105_supervised_visit_wednesday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_supervised_visit_wednesday_person_to_bring_dropoff",
@@ -766,7 +788,7 @@
       ]
     },
     {
-      "question": "Thursday: what should the supervised visit look like?",
+      "question": "What should the supervised visit on Thursday look like?",
       "fields": [
         {
           "field": "dv105_supervised_visit_thursday_start",
@@ -774,7 +796,8 @@
         },
         {
           "field": "dv105_supervised_visit_thursday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_supervised_visit_thursday_person_to_bring_dropoff",
@@ -795,7 +818,7 @@
       ]
     },
     {
-      "question": "Friday: what should the supervised visit look like?",
+      "question": "What should the supervised visit on Friday look like?",
       "fields": [
         {
           "field": "dv105_supervised_visit_friday_start",
@@ -803,7 +826,8 @@
         },
         {
           "field": "dv105_supervised_visit_friday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_supervised_visit_friday_person_to_bring_dropoff",
@@ -824,7 +848,7 @@
       ]
     },
     {
-      "question": "Saturday: what should the supervised visit look like?",
+      "question": "What should the supervised visit on Saturday look like?",
       "fields": [
         {
           "field": "dv105_supervised_visit_saturday_start",
@@ -832,7 +856,8 @@
         },
         {
           "field": "dv105_supervised_visit_saturday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_supervised_visit_saturday_person_to_bring_dropoff",
@@ -853,7 +878,7 @@
       ]
     },
     {
-      "question": "Sunday: what should the supervised visit look like?",
+      "question": "What should the supervised visit on Sunday look like?",
       "fields": [
         {
           "field": "dv105_supervised_visit_sunday_start",
@@ -861,7 +886,8 @@
         },
         {
           "field": "dv105_supervised_visit_sunday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_supervised_visit_sunday_person_to_bring_dropoff",
@@ -882,7 +908,7 @@
       ]
     },
     {
-      "question": "Monday: what should the visit look like?",
+      "question": "What should the visit on Monday look like?",
       "fields": [
         {
           "field": "dv105_unsupervised_visit_monday_start",
@@ -890,7 +916,8 @@
         },
         {
           "field": "dv105_unsupervised_visit_monday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_unsupervised_visit_monday_person_to_bring_dropoff",
@@ -911,7 +938,7 @@
       ]
     },
     {
-      "question": "Tuesday: what should the visit look like?",
+      "question": "What should the visit on Tuesday look like?",
       "fields": [
         {
           "field": "dv105_unsupervised_visit_tuesday_start",
@@ -919,7 +946,8 @@
         },
         {
           "field": "dv105_unsupervised_visit_tuesday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_unsupervised_visit_tuesday_person_to_bring_dropoff",
@@ -940,7 +968,7 @@
       ]
     },
     {
-      "question": "Wednesday: what should the visit look like?",
+      "question": "What should the visit on Wednesday look like?",
       "fields": [
         {
           "field": "dv105_unsupervised_visit_wednesday_start",
@@ -948,7 +976,8 @@
         },
         {
           "field": "dv105_unsupervised_visit_wednesday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_unsupervised_visit_wednesday_person_to_bring_dropoff",
@@ -969,7 +998,7 @@
       ]
     },
     {
-      "question": "Thursday: what should the visit look like?",
+      "question": "What should the visit on Thursday look like?",
       "fields": [
         {
           "field": "dv105_unsupervised_visit_thursday_start",
@@ -977,7 +1006,8 @@
         },
         {
           "field": "dv105_unsupervised_visit_thursday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_unsupervised_visit_thursday_person_to_bring_dropoff",
@@ -998,7 +1028,7 @@
       ]
     },
     {
-      "question": "Friday: what should the visit look like?",
+      "question": "What should the visit on Friday look like?",
       "fields": [
         {
           "field": "dv105_unsupervised_visit_friday_start",
@@ -1006,7 +1036,8 @@
         },
         {
           "field": "dv105_unsupervised_visit_friday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_unsupervised_visit_friday_person_to_bring_dropoff",
@@ -1027,7 +1058,7 @@
       ]
     },
     {
-      "question": "Saturday: what should the visit look like?",
+      "question": "What should the visit on Saturday look like?",
       "fields": [
         {
           "field": "dv105_unsupervised_visit_saturday_start",
@@ -1035,7 +1066,8 @@
         },
         {
           "field": "dv105_unsupervised_visit_saturday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_unsupervised_visit_saturday_person_to_bring_dropoff",
@@ -1056,7 +1088,7 @@
       ]
     },
     {
-      "question": "Sunday: what should the visit look like?",
+      "question": "What should the visit on Sunday look like?",
       "fields": [
         {
           "field": "dv105_unsupervised_visit_sunday_start",
@@ -1064,7 +1096,8 @@
         },
         {
           "field": "dv105_unsupervised_visit_sunday_end",
-          "label": "End, if it applies"
+          "label": "End",
+          "optional": true
         },
         {
           "field": "dv105_unsupervised_visit_sunday_person_to_bring_dropoff",
@@ -1104,9 +1137,6 @@
         "onlyWhen": "dv105_their_relationship_other"
       }
     },
-    "dv105_children_additional_list_attached": {
-      "text": "Do you have more children to list on a separate page?"
-    },
     "dv105_child_home_1_address_private": {
       "text": "Is the current address private (confidential)?",
       "conditional": {
@@ -1114,37 +1144,37 @@
       }
     },
     "dv105_other_case_custody_details": {
-      "text": "The custody case: where was it filed, what year, and what is the case number?",
+      "text": "Where and in what year was the custody case filed, and what is its case number?",
       "conditional": {
         "onlyWhen": "dv105_other_case_custody"
       }
     },
     "dv105_other_case_divorce_details": {
-      "text": "The divorce case: where was it filed, what year, and what is the case number?",
+      "text": "Where and in what year was the divorce case filed, and what is its case number?",
       "conditional": {
         "onlyWhen": "dv105_other_case_divorce"
       }
     },
     "dv105_other_case_juvenile_details": {
-      "text": "The juvenile case: where was it filed, what year, and what is the case number?",
+      "text": "Where and in what year was the juvenile case filed, and what is its case number?",
       "conditional": {
         "onlyWhen": "dv105_other_case_juvenile"
       }
     },
     "dv105_other_case_guardianship_details": {
-      "text": "The guardianship case: where was it filed, what year, and what is the case number?",
+      "text": "Where and in what year was the guardianship case filed, and what is its case number?",
       "conditional": {
         "onlyWhen": "dv105_other_case_guardianship"
       }
     },
     "dv105_other_case_criminal_details": {
-      "text": "The criminal case: where was it filed, what year, and what is the case number?",
+      "text": "Where and in what year was the criminal case filed, and what is its case number?",
       "conditional": {
         "onlyWhen": "dv105_other_case_criminal"
       }
     },
     "dv105_other_case_other_details": {
-      "text": "The other case: where was it filed, what year, and what is the case number?",
+      "text": "Where and in what year was the other case filed, and what is its case number?",
       "conditional": {
         "onlyWhen": "dv105_other_case_other"
       }
@@ -1164,29 +1194,32 @@
       }
     },
     "dv105_other_guardian_name": {
-      "text": "If there is another parent or legal guardian besides you and the other person, what is their name?",
-      "optional": true
+      "text": "What is their name?",
+      "conditional": {
+        "onlyWhen": "dv105_other_guardian_exists",
+        "gateQuestion": "Is there another parent or legal guardian besides you and the other person?"
+      }
     },
     "dv105_limit_travel_county_name": {
-      "text": "Which county?",
+      "text": "Which county should the children not be taken out of?",
       "conditional": {
         "onlyWhen": "dv105_limit_travel_county"
       }
     },
     "dv105_limit_travel_other_places": {
-      "text": "Which other places?",
+      "text": "Which other places should the children not be taken out of?",
       "conditional": {
         "onlyWhen": "dv105_limit_travel_other"
       }
     },
     "dv105_records_withheld_children_names": {
-      "text": "Which children?",
+      "text": "Which children's records should they not have access to?",
       "conditional": {
         "onlyWhen": "dv105_records_withheld_named_children"
       }
     },
     "dv105_records_other_description": {
-      "text": "What other records or information?",
+      "text": "Which other records should they not have access to?",
       "conditional": {
         "onlyWhen": "dv105_records_other"
       }
@@ -1204,7 +1237,7 @@
       }
     },
     "dv105_supervisor_professional_name": {
-      "text": "What is the professional's name, if you know it?",
+      "text": "What is the professional supervisor's name?",
       "optional": true,
       "conditional": {
         "onlyWhen": "dv105_supervisor_professional"
@@ -1229,14 +1262,14 @@
       }
     },
     "dv105_supervised_frequency_once_a_week_hours": {
-      "text": "How many hours?",
+      "text": "How many hours should the weekly visit last?",
       "type": "number",
       "conditional": {
         "onlyWhen": "dv105_supervised_frequency_once_a_week"
       }
     },
     "dv105_supervised_frequency_twice_a_week_hours": {
-      "text": "How many hours each visit?",
+      "text": "How many hours should each of the two weekly visits last?",
       "type": "number",
       "conditional": {
         "onlyWhen": "dv105_supervised_frequency_twice_a_week"
@@ -1268,7 +1301,7 @@
       }
     },
     "dv105_exchange_supervisor_professional_name": {
-      "text": "What is the professional's name, if you know it?",
+      "text": "What is the professional exchange supervisor's name?",
       "optional": true,
       "conditional": {
         "onlyWhen": "dv105_exchange_supervisor_professional"
@@ -1534,6 +1567,47 @@
     },
     "case_number": {
       "text": "What is the case number?"
+    },
+    "dv105_other_guardian_role": {
+      "conditional": {
+        "onlyWhen": "dv105_other_guardian_exists"
+      }
+    },
+    "dv105_child_home_1_other_relationship": {
+      "text": "How is the other person they lived with related to the children?",
+      "conditional": {
+        "onlyWhen": "dv105_child_home_1_lived_with_other"
+      }
+    },
+    "dv105_child_home_2_other_relationship": {
+      "text": "How is the other person they lived with related to the children?",
+      "conditional": {
+        "onlyWhen": "dv105_child_home_2_lived_with_other"
+      }
+    },
+    "dv105_child_home_3_other_relationship": {
+      "text": "How is the other person they lived with related to the children?",
+      "conditional": {
+        "onlyWhen": "dv105_child_home_3_lived_with_other"
+      }
+    },
+    "dv105_child_home_4_other_relationship": {
+      "text": "How is the other person they lived with related to the children?",
+      "conditional": {
+        "onlyWhen": "dv105_child_home_4_lived_with_other"
+      }
+    },
+    "dv105_child_home_5_other_relationship": {
+      "text": "How is the other person they lived with related to the children?",
+      "conditional": {
+        "onlyWhen": "dv105_child_home_5_lived_with_other"
+      }
+    },
+    "dv105_child_home_6_other_relationship": {
+      "text": "How is the other person they lived with related to the children?",
+      "conditional": {
+        "onlyWhen": "dv105_child_home_6_lived_with_other"
+      }
     }
   },
   "sections": [
@@ -1547,8 +1621,7 @@
         "person_to_restrain_full_name",
         "dv105_their_relationship_to_children",
         "dv105_their_relationship_other_description",
-        "dv105_child",
-        "dv105_children_additional_list_attached"
+        "dv105_child"
       ]
     },
     {
@@ -1557,22 +1630,28 @@
         "dv105_children_lived_together_five_years",
         "dv105_child_home_1_from",
         "dv105_child_home_1_lived_with",
+        "dv105_child_home_1_other_relationship",
         "dv105_child_home_1_address_private",
         "dv105_child_home_2_asked",
         "dv105_child_home_2_from",
         "dv105_child_home_2_lived_with",
+        "dv105_child_home_2_other_relationship",
         "dv105_child_home_3_asked",
         "dv105_child_home_3_from",
         "dv105_child_home_3_lived_with",
+        "dv105_child_home_3_other_relationship",
         "dv105_child_home_4_asked",
         "dv105_child_home_4_from",
         "dv105_child_home_4_lived_with",
+        "dv105_child_home_4_other_relationship",
         "dv105_child_home_5_asked",
         "dv105_child_home_5_from",
         "dv105_child_home_5_lived_with",
+        "dv105_child_home_5_other_relationship",
         "dv105_child_home_6_asked",
         "dv105_child_home_6_from",
-        "dv105_child_home_6_lived_with"
+        "dv105_child_home_6_lived_with",
+        "dv105_child_home_6_other_relationship"
       ]
     },
     {
@@ -1685,7 +1764,7 @@
     },
     {
       "question": "dv105_children_lived_together_five_years",
-      "why": "Item 4a opens its own section. It follows the \"more children on a separate page\" box only because that box is the last thing item 3 asks, and it is asked whichever way that one was answered."
+      "why": "Item 4a opens its own section. It follows the children block only because that block is the last thing item 3 asks, and it is asked however many children there are."
     },
     {
       "question": "dv105_child_home_1_lived_with",
@@ -1739,7 +1818,7 @@
     },
     {
       "nameId": "dv105_child_home_3_asked",
-      "question": "And somewhere else before that?",
+      "question": "Did the children live somewhere else before the address you just gave?",
       "before": "dv105_child_home_3_lived_with_me",
       "onlyWhen": "dv105_child_home_2_asked_yes",
       "options": [
@@ -1755,7 +1834,7 @@
     },
     {
       "nameId": "dv105_child_home_4_asked",
-      "question": "And somewhere else before that?",
+      "question": "Did the children live somewhere else before the address you just gave?",
       "before": "dv105_child_home_4_lived_with_me",
       "onlyWhen": "dv105_child_home_3_asked_yes",
       "options": [
@@ -1771,7 +1850,7 @@
     },
     {
       "nameId": "dv105_child_home_5_asked",
-      "question": "And somewhere else before that?",
+      "question": "Did the children live somewhere else before the address you just gave?",
       "before": "dv105_child_home_5_lived_with_me",
       "onlyWhen": "dv105_child_home_4_asked_yes",
       "options": [
@@ -1787,7 +1866,7 @@
     },
     {
       "nameId": "dv105_child_home_6_asked",
-      "question": "And somewhere else before that?",
+      "question": "Did the children live somewhere else before the address you just gave?",
       "before": "dv105_child_home_6_lived_with_me",
       "onlyWhen": "dv105_child_home_5_asked_yes",
       "options": [
@@ -1798,6 +1877,92 @@
         {
           "label": "No",
           "nameId": "dv105_child_home_6_asked_no"
+        }
+      ]
+    }
+  ],
+  "splits": [
+    {
+      "field": "dv105_child_home_1_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_child_home_1_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105_child_home_1_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105_child_home_2_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_child_home_2_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105_child_home_2_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105_child_home_3_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_child_home_3_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105_child_home_3_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105_child_home_4_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_child_home_4_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105_child_home_4_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105_child_home_5_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_child_home_5_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105_child_home_5_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105_child_home_6_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_child_home_6_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105_child_home_6_state",
+          "label": "State"
         }
       ]
     }

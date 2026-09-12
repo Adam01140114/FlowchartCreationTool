@@ -682,7 +682,10 @@ function applyRepeats(fields, hints) {
       // fields the block stood in for.
       joinInto: spec.joinInto || null,
       absorbs: (spec.absorbs || []).slice(),
-      conditional: spec.conditional || declaredConditional(hints, spec.nameId)
+      conditional: spec.conditional || declaredConditional(hints, spec.nameId),
+      // Entries past the rows the PDF prints, drawn on a page of their own -
+      // DV-105 item 3 prints four children and says to attach a sheet for more.
+      attachment: spec.attachment || null
     });
   });
 
@@ -1467,6 +1470,7 @@ function repeatHeight(repeat) {
 function attachRepeat(cell, repeat) {
   cell._twoNumbers = { first: String(repeat.min), second: String(repeat.max) };
   cell._dropdownTitle = repeat.entryTitle || '';
+  if (repeat.attachment) cell._attachment = Object.assign({}, repeat.attachment);
 
   // The editor keeps an entry's plain fields and its choices in two arrays, and
   // _itemOrder is what puts them back in one order. Each entry here indexes the
@@ -1638,6 +1642,21 @@ function compile(schema, hints = {}) {
     if (o.marksBeyond) computedNames.add(o.marksBeyond);
   });
   (merged.overflowTargets || []).forEach((name) => computedNames.add(name));
+  // The same for a box another form's attachment ticks: DV-140 prints DV-105's
+  // "more children" box under the same name, and compiled against its own
+  // hints it would ask for it again once DV-105 stops asking.
+  (merged.attachmentTargets || []).forEach((name) => computedNames.add(name));
+  // A box that says more entries are on an attached page is ticked by the
+  // count the same way: the block lets the filer keep adding entries, and the
+  // page is drawn when there are more than the rows the PDF prints.
+  // A block's page may be drawn again for other forms (otherPages), each
+  // ticking that form's own box.
+  (merged.repeats || []).forEach((r) => {
+    const att = r && r.attachment;
+    if (!att) return;
+    [att].concat(Array.isArray(att.otherPages) ? att.otherPages : [])
+      .forEach((p) => { if (p && p.marks) computedNames.add(p.marks); });
+  });
   const mirrored = applyMirrors(
     normalizeFields(schema).filter((f) => !computedNames.has(f.nameId)), merged);
   const { fields: kept, continuations } = applyContinuations(mirrored, merged);
@@ -1735,6 +1754,14 @@ function compile(schema, hints = {}) {
     computed.forEach((c) => notes.push(
       'computed field ' + c.nameId + ' -> no question; the form works it out'));
   }
+  repeats.forEach((r) => {
+    if (r.attachment && r.attachment.name) notes.push('attachment ' + r.attachment.name
+      + ' -> ' + r.nameId + ' entries past ' + r.max + ' drawn on a page of their own');
+    ((r.attachment && r.attachment.otherPages) || []).forEach((p) => {
+      if (p && p.name) notes.push('attachment ' + p.name + ' -> the same entries on '
+        + (p.form || 'another form') + '\'s page, ticking ' + (p.marks || 'no box'));
+    });
+  });
   // Questions the author has looked at and declared unconditional. The audit
   // fails on a follow-up shown on both Yes and No of its gate; some of those
   // are the compiler rejoining a branch to the spine, where always-show is
@@ -1875,6 +1902,46 @@ if (require.main === module) {
     `${slug(result.flowchart.formName).slice(0, 40) || 'form'}-flowchart.json`
   );
   const issues = audit(result);
+  // The cornerstone: a question never carries its condition. A flowchart whose
+  // wording does - "If there is another parent ..., what is their name?", a box
+  // labelled "Where is it, if you know?" - is not written; the old one stays
+  // and the exit code says why. The patterns are the audit's own
+  // (wording-rules.js), so the two cannot disagree.
+  const { conditionTell, saysOptional } = require('./wording-rules');
+  const carried = [];
+  const read = (where, s) => { const t = conditionTell(s); if (t) carried.push({ where, text: String(s), tell: t }); };
+  (result.flowchart.cells || []).forEach((c) => {
+    if (!c || !c._questionText) return;
+    const who = c._nameId || c._questionText;
+    read(who, c._questionText);
+    (c._textboxes || []).forEach((b) => read(who + ' [box]', b && b.label));
+    (c._checkboxes || []).forEach((b) => read(who + ' [choice]', b && (b.label || b.text)));
+    (c._dropdowns || []).forEach((d) => (d.options || []).forEach((o) => read(who + ' [choice]', o && o.text)));
+  });
+  (result.flowchart.cells || []).forEach((c) => {
+    if (c && !c._questionText && c._nameId && typeof c.value === 'string' && c.edge !== true) read(c._nameId + ' [option]', c.value);
+  });
+  // Nor does a title say "optional": the question is marked optional and the
+  // Next button lets the filer past it. See form-rules.html#rule-optional-is-coded-not-said
+  const saidOptional = (result.flowchart.cells || [])
+    .filter((c) => c && c._questionText && saysOptional(c._questionText));
+  if (saidOptional.length) {
+    console.error('\nA title never says "optional". Not written:');
+    saidOptional.forEach((c) => console.error('  - ' + (c._nameId || '') + ': "' + c._questionText + '"'));
+    console.error('Take the word out and mark the question "optional": true in the hints;'
+      + ' the Next button then lets the filer past it.');
+    process.exitCode = 3;
+    return;
+  }
+  if (carried.length) {
+    console.error('\nCORNERSTONE — a question never carries its condition. Not written:');
+    carried.forEach((c) => console.error('  - ' + c.where + ': "' + c.text + '"   <- "' + c.tell + '"'));
+    console.error('Ask the condition first as a Yes/No gate (conditional: { onlyWhen, gateQuestion })'
+      + ' and show the question only on Yes; a part the filer may not know is "optional": true.'
+      + ' See form-rules.html#rule-a-question-never-carries-its-condition');
+    process.exitCode = 3;
+    return;
+  }
   fs.writeFileSync(outPath, JSON.stringify(result.flowchart, null, 2));
   console.log('\nWrote', outPath);
   process.exitCode = issues.length ? 2 : 0;

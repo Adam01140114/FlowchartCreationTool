@@ -133,7 +133,7 @@
     {
       "nameId": "dv108_travel_plan",
       "multiSelect": true,
-      "question": "If they are allowed to travel with the children, what should they have to give you?",
+      "question": "What should they have to give you before they travel with the children?",
       "conditional": {
         "onlyWhen": "dv108_order_provide_travel_plan"
       },
@@ -161,19 +161,19 @@
       }
     },
     "dv108_ties_california_county_name": {
-      "text": "Which county in California?",
+      "text": "Which county in California do they have strong ties to?",
       "conditional": {
         "onlyWhen": "dv108_ties_another_california_county"
       }
     },
     "dv108_ties_state_name": {
-      "text": "Which state?",
+      "text": "Which state do they have strong ties to?",
       "conditional": {
         "onlyWhen": "dv108_ties_another_state"
       }
     },
     "dv108_ties_country_name": {
-      "text": "Which country?",
+      "text": "Which country do they have strong ties to?",
       "conditional": {
         "onlyWhen": "dv108_ties_another_country"
       }
@@ -320,7 +320,7 @@
         {
           "nameId": "dv108_notify_state",
           "label": "State",
-          "question": "And which state is that county in?"
+          "question": "Which state is that county in?"
         }
       ]
     }

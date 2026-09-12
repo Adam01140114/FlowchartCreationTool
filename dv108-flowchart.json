@@ -712,12 +712,12 @@
     },
     {
       "id": "38",
-      "value": "Which county in California?",
+      "value": "Which county in California do they have strong ties to?",
       "geometry": {
         "x": 1624,
         "y": 1838,
         "width": 300,
-        "height": 96
+        "height": 120
       },
       "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=dv108_ties_california_county_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
       "vertex": true,
@@ -725,7 +725,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "Which county in California?",
+      "_questionText": "Which county in California do they have strong ties to?",
       "_questionId": "9",
       "_nameId": "dv108_ties_california_county_name",
       "_placeholder": "",
@@ -736,7 +736,7 @@
     },
     {
       "id": "39",
-      "value": "Which state?",
+      "value": "Which state do they have strong ties to?",
       "geometry": {
         "x": 1980,
         "y": 1838,
@@ -749,7 +749,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "Which state?",
+      "_questionText": "Which state do they have strong ties to?",
       "_questionId": "10",
       "_nameId": "dv108_ties_state_name",
       "_placeholder": "",
@@ -760,7 +760,7 @@
     },
     {
       "id": "40",
-      "value": "Which country?",
+      "value": "Which country do they have strong ties to?",
       "geometry": {
         "x": 2336,
         "y": 1838,
@@ -773,7 +773,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "Which country?",
+      "_questionText": "Which country do they have strong ties to?",
       "_questionId": "11",
       "_nameId": "dv108_ties_country_name",
       "_placeholder": "",
@@ -1155,12 +1155,12 @@
     },
     {
       "id": "57",
-      "value": "If they are allowed to travel with the children, what should they have to give you?",
+      "value": "What should they have to give you before they travel with the children?",
       "geometry": {
         "x": 272,
         "y": 3084,
         "width": 300,
-        "height": 144
+        "height": 120
       },
       "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=checkbox;nodeId=dv108_travel_plan;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
       "vertex": true,
@@ -1168,7 +1168,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "If they are allowed to travel with the children, what should they have to give you?",
+      "_questionText": "What should they have to give you before they travel with the children?",
       "_questionId": "17",
       "_nameId": "dv108_travel_plan",
       "_placeholder": "",
@@ -1182,7 +1182,7 @@
       "value": "",
       "geometry": {
         "x": 417,
-        "y": 3268,
+        "y": 3244,
         "width": 10,
         "height": 10
       },
@@ -1201,7 +1201,7 @@
       "value": "The children's travel schedule",
       "geometry": {
         "x": -204,
-        "y": 3334,
+        "y": 3310,
         "width": 216,
         "height": 144
       },
@@ -1220,7 +1220,7 @@
       "value": "Copies of round-trip airline tickets",
       "geometry": {
         "x": 34,
-        "y": 3334,
+        "y": 3310,
         "width": 260,
         "height": 144
       },
@@ -1239,7 +1239,7 @@
       "value": "Addresses and telephone numbers where the children can be reached",
       "geometry": {
         "x": 316,
-        "y": 3334,
+        "y": 3310,
         "width": 260,
         "height": 144
       },
@@ -1258,7 +1258,7 @@
       "value": "An open airline ticket for me, in case the children are not returned",
       "geometry": {
         "x": 598,
-        "y": 3334,
+        "y": 3310,
         "width": 260,
         "height": 144
       },
@@ -1277,7 +1277,7 @@
       "value": "Something else",
       "geometry": {
         "x": 880,
-        "y": 3334,
+        "y": 3310,
         "width": 168,
         "height": 144
       },
@@ -1296,7 +1296,7 @@
       "value": "What else should they have to give you?",
       "geometry": {
         "x": 814,
-        "y": 3598,
+        "y": 3574,
         "width": 300,
         "height": 96
       },
@@ -1421,7 +1421,7 @@
       "value": "",
       "geometry": {
         "x": 755,
-        "y": 3814,
+        "y": 3790,
         "width": 10,
         "height": 10
       },
@@ -1440,7 +1440,7 @@
       "value": "Where should this order be registered?",
       "geometry": {
         "x": 610,
-        "y": 3872,
+        "y": 3848,
         "width": 300,
         "height": 420
       },
@@ -1493,7 +1493,7 @@
       "value": "End",
       "geometry": {
         "x": 700,
-        "y": 4462,
+        "y": 4438,
         "width": 120,
         "height": 60
       },
@@ -3131,7 +3131,7 @@
         "points": [
           {
             "x": 1774,
-            "y": 1950
+            "y": 1974
           },
           {
             "x": 1774,
@@ -3547,11 +3547,11 @@
         "points": [
           {
             "x": 422,
-            "y": 3296
+            "y": 3272
           },
           {
             "x": -96,
-            "y": 3296
+            "y": 3272
           }
         ]
       }
@@ -3574,11 +3574,11 @@
         "points": [
           {
             "x": 422,
-            "y": 3296
+            "y": 3272
           },
           {
             "x": 164,
-            "y": 3296
+            "y": 3272
           }
         ]
       }
@@ -3601,11 +3601,11 @@
         "points": [
           {
             "x": 422,
-            "y": 3296
+            "y": 3272
           },
           {
             "x": 446,
-            "y": 3296
+            "y": 3272
           }
         ]
       }
@@ -3628,11 +3628,11 @@
         "points": [
           {
             "x": 422,
-            "y": 3296
+            "y": 3272
           },
           {
             "x": 728,
-            "y": 3296
+            "y": 3272
           }
         ]
       }
@@ -3655,11 +3655,11 @@
         "points": [
           {
             "x": 422,
-            "y": 3296
+            "y": 3272
           },
           {
             "x": 964,
-            "y": 3296
+            "y": 3272
           }
         ]
       }
@@ -3682,11 +3682,11 @@
         "points": [
           {
             "x": 964,
-            "y": 3488
+            "y": 3464
           },
           {
             "x": 964,
-            "y": 3592
+            "y": 3568
           }
         ]
       }
@@ -3868,11 +3868,11 @@
           },
           {
             "x": 24,
-            "y": 3800
+            "y": 3776
           },
           {
             "x": 760,
-            "y": 3800
+            "y": 3776
           }
         ]
       }
@@ -3899,11 +3899,11 @@
           },
           {
             "x": -410,
-            "y": 3800
+            "y": 3776
           },
           {
             "x": 760,
-            "y": 3800
+            "y": 3776
           }
         ]
       }
@@ -3926,15 +3926,15 @@
         "points": [
           {
             "x": -96,
-            "y": 3494
+            "y": 3470
           },
           {
             "x": -96,
-            "y": 3800
+            "y": 3776
           },
           {
             "x": 760,
-            "y": 3800
+            "y": 3776
           }
         ]
       }
@@ -3957,15 +3957,15 @@
         "points": [
           {
             "x": 164,
-            "y": 3494
+            "y": 3470
           },
           {
             "x": 164,
-            "y": 3800
+            "y": 3776
           },
           {
             "x": 760,
-            "y": 3800
+            "y": 3776
           }
         ]
       }
@@ -3988,15 +3988,15 @@
         "points": [
           {
             "x": 446,
-            "y": 3494
+            "y": 3470
           },
           {
             "x": 446,
-            "y": 3800
+            "y": 3776
           },
           {
             "x": 760,
-            "y": 3800
+            "y": 3776
           }
         ]
       }
@@ -4019,15 +4019,15 @@
         "points": [
           {
             "x": 728,
-            "y": 3494
+            "y": 3470
           },
           {
             "x": 728,
-            "y": 3800
+            "y": 3776
           },
           {
             "x": 760,
-            "y": 3800
+            "y": 3776
           }
         ]
       }
@@ -4050,15 +4050,15 @@
         "points": [
           {
             "x": 964,
-            "y": 3710
+            "y": 3686
           },
           {
             "x": 964,
-            "y": 3800
+            "y": 3776
           },
           {
             "x": 760,
-            "y": 3800
+            "y": 3776
           }
         ]
       }
@@ -4085,11 +4085,11 @@
           },
           {
             "x": 590,
-            "y": 3800
+            "y": 3776
           },
           {
             "x": 760,
-            "y": 3800
+            "y": 3776
           }
         ]
       }
@@ -4116,11 +4116,11 @@
           },
           {
             "x": 1320,
-            "y": 3800
+            "y": 3776
           },
           {
             "x": 760,
-            "y": 3800
+            "y": 3776
           }
         ]
       }
@@ -4147,11 +4147,11 @@
           },
           {
             "x": 1676,
-            "y": 3800
+            "y": 3776
           },
           {
             "x": 760,
-            "y": 3800
+            "y": 3776
           }
         ]
       }
@@ -4178,11 +4178,11 @@
           },
           {
             "x": 2032,
-            "y": 3800
+            "y": 3776
           },
           {
             "x": 760,
-            "y": 3800
+            "y": 3776
           }
         ]
       }
@@ -4220,11 +4220,11 @@
         "points": [
           {
             "x": 760,
-            "y": 4304
+            "y": 4280
           },
           {
             "x": 760,
-            "y": 4456
+            "y": 4432
           }
         ]
       }

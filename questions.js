@@ -1450,6 +1450,8 @@ window.showNumberedDropdownProperties = function(cell) {
     })
   ]);
   modalContent.appendChild(questionTitleSection);
+  // Extra entries on an attached page: see createAttachmentSection.
+  modalContent.appendChild(createAttachmentSection(cell));
   // Options Section (now includes location functionality)
   const optionsSection = createFieldSection('Dropdown Options', [
     createOptionsContainer(cell)
@@ -1566,6 +1568,165 @@ window.showNumberedDropdownProperties = function(cell) {
   };
 };
 // Helper function to create field sections
+/**
+ * "Extra entries on an attached page", for a Multiple Dropdown (numbered) node.
+ *
+ * A table on the paper form prints a fixed number of rows - DV-105 item 3 has
+ * four for children - and says to attach a sheet for the rest. With this on,
+ * the "how many" dropdown goes past those rows (Number Range "To" stays the
+ * rows the PDF prints), the extra entries are drawn on a page of their own
+ * headed the way the form asks, and the form's "need more space" box ticks
+ * itself. Saved on the cell as _attachment and exported as question.attachment.
+ */
+function createAttachmentSection(cell) {
+  const save = () => { if (typeof window.requestAutosave === 'function') window.requestAutosave(); };
+  const att = () => cell._attachment || (cell._attachment = {});
+  const rows = () => parseInt(cell._twoNumbers && cell._twoNumbers.second, 10) || 0;
+  const toggleWrap = document.createElement('label');
+  toggleWrap.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:14px;color:#2c3e50;cursor:pointer;font-weight:500;';
+  const toggle = document.createElement('input');
+  toggle.type = 'checkbox';
+  toggle.checked = !!(cell._attachment && cell._attachment.name);
+  toggleWrap.appendChild(toggle);
+  toggleWrap.appendChild(document.createTextNode('Let the filer add more entries than the PDF has rows'));
+  const hint = document.createElement('p');
+  hint.style.cssText = 'margin:0 0 12px 0;font-size:12px;color:#6b7280;line-height:1.4;';
+  hint.textContent = 'For a table the paper prints with a fixed number of rows and a box that says to attach a sheet for the rest. '
+    + '"Number Range - To" stays the rows the PDF prints; entries past them are drawn on the attached page, and the box you name here is ticked whenever that page exists.';
+  const body = document.createElement('div');
+  const build = () => {
+    body.innerHTML = '';
+    body.style.display = toggle.checked ? '' : 'none';
+    if (!toggle.checked) return;
+    const a = att();
+    body.appendChild(createNumberField('Most entries the filer can add', String(a.most != null ? a.most : Math.max(rows() * 3, rows() + 1)), (v) => { att().most = parseInt(v, 10) || 0; save(); }));
+    body.appendChild(createTextField('Attached page file name (e.g. Additional_Children)', a.name || '', (v) => { att().name = String(v).trim().replace(/\.pdf$/i, ''); save(); }));
+    body.appendChild(createTextField('Heading the form says to write at the top (e.g. DV-105, Children)', a.heading || '', (v) => { att().heading = v; save(); }));
+    body.appendChild(createTextField('Item on the form it continues (e.g. 3)', a.item || '', (v) => { att().item = v; save(); }));
+    body.appendChild(createTextField('Item title (e.g. Children Under 18 Years Old)', a.itemTitle || '', (v) => { att().itemTitle = v; save(); }));
+    body.appendChild(createTextField('"Need more space" box it ticks (PDF field name)', a.marks || '', (v) => { att().marks = String(v).trim(); save(); }));
+    body.appendChild(createTextField('Fields on this page, comma-separated - blank prints every field (e.g. {n}_full_name, {n}_age, Lives with you?)', attachmentFieldList(a.fields).join(', '), (v) => {
+      const list = attachmentFieldList(v);
+      if (list.length) att().fields = list; else delete att().fields;
+      save();
+    }));
+    body.appendChild(createAttachmentOtherPagesEditor(att, save));
+  };
+  toggle.addEventListener('change', () => {
+    if (toggle.checked) {
+      const a = att();
+      if (a.most == null) a.most = Math.max(rows() * 3, rows() + 1);
+    } else {
+      delete cell._attachment;
+    }
+    build();
+    save();
+  });
+  build();
+  return createFieldSection('Extra entries on an attached page', [toggleWrap, hint, body]);
+}
+/**
+ * Which entry fields an attached page prints: an array of hint keys
+ * ("{n}_full_name") or labels ("Lives with you?"). Takes the array or the
+ * comma-separated text the inputs show; empty means every field.
+ */
+function attachmentFieldList(value) {
+  const parts = Array.isArray(value) ? value : String(value == null ? '' : value).split(',');
+  return parts.map((s) => String(s == null ? '' : s).trim()).filter(Boolean);
+}
+/**
+ * "Also drawn on another form's page": the same extra entries drawn again on a
+ * page belonging to another form in the packet (e.g. DV-110's own "Other
+ * Protected People" page). Saved as _attachment.otherPages, an array of
+ * { form, name, heading, item, itemTitle, marks, fields }; the key is dropped
+ * when the last row is removed.
+ */
+const ATTACHMENT_OTHER_PAGE_COLUMNS = [
+  { key: 'form', label: 'Form', placeholder: 'e.g. DV-110' },
+  { key: 'name', label: 'Page file name', placeholder: 'e.g. DV110_Other_Protected_People' },
+  { key: 'heading', label: 'Heading', placeholder: 'e.g. DV-110, Other Protected People' },
+  { key: 'item', label: 'Item', placeholder: 'e.g. 3' },
+  { key: 'itemTitle', label: 'Item title', placeholder: 'e.g. Other Protected People' },
+  { key: 'marks', label: 'Box it ticks (PDF field name)', placeholder: 'PDF checkbox name' },
+  { key: 'fields', label: 'Fields, comma-separated - blank prints every field', placeholder: 'e.g. {n}_full_name, {n}_relationship, {n}_age' }
+];
+function createAttachmentOtherPagesEditor(att, save) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'margin-bottom:15px;';
+  const title = document.createElement('div');
+  title.textContent = 'Also drawn on another form\'s page';
+  title.style.cssText = 'font-weight:500;color:#2c3e50;font-size:14px;margin-bottom:4px;';
+  const note = document.createElement('p');
+  note.style.cssText = 'margin:0 0 10px 0;font-size:12px;color:#6b7280;line-height:1.4;';
+  note.textContent = 'The same extra entries drawn again on a page that belongs to another form in the packet, e.g. DV-110\'s own "Other Protected People" page.';
+  const list = document.createElement('div');
+  const addBtn = document.createElement('button');
+  addBtn.type = 'button';
+  addBtn.textContent = 'Add page';
+  addBtn.style.cssText = 'padding:8px 16px;border:none;border-radius:6px;background:#007bff;color:#fff;cursor:pointer;font-size:14px;';
+  const current = () => (Array.isArray(att().otherPages) ? att().otherPages : []);
+  const render = () => {
+    list.innerHTML = '';
+    current().forEach((page, index) => {
+      const row = document.createElement('div');
+      row.className = 'attachment-other-page';
+      row.style.cssText = 'position:relative;border:1px solid #e0e7ef;border-radius:6px;background:#fff;padding:12px 12px 10px;margin-bottom:10px;'
+        + 'display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px 12px;';
+      ATTACHMENT_OTHER_PAGE_COLUMNS.forEach((col) => {
+        const cellWrap = document.createElement('label');
+        cellWrap.style.cssText = 'display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:500;color:#2c3e50;'
+          + (col.key === 'fields' ? 'grid-column:1 / -1;' : '');
+        cellWrap.appendChild(document.createTextNode(col.label));
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = col.placeholder;
+        input.dataset.attachmentKey = col.key;
+        input.value = col.key === 'fields' ? attachmentFieldList(page.fields).join(', ') : (page[col.key] == null ? '' : String(page[col.key]));
+        input.style.cssText = 'padding:7px 9px;border:1px solid #ddd;border-radius:5px;font-size:13px;font-weight:400;width:100%;box-sizing:border-box;';
+        input.addEventListener('change', () => {
+          const v = input.value;
+          if (col.key === 'fields') page.fields = attachmentFieldList(v);
+          else if (col.key === 'name') page.name = String(v).trim().replace(/\.pdf$/i, '');
+          else if (col.key === 'form' || col.key === 'marks') page[col.key] = String(v).trim();
+          else page[col.key] = v;
+          save();
+        });
+        cellWrap.appendChild(input);
+        row.appendChild(cellWrap);
+      });
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.textContent = 'Remove';
+      removeBtn.title = 'Stop drawing the entries on this page';
+      removeBtn.style.cssText = 'grid-column:1 / -1;justify-self:end;padding:5px 12px;border:none;border-radius:5px;background:#dc3545;color:#fff;cursor:pointer;font-size:12px;';
+      removeBtn.addEventListener('click', () => {
+        const pages = current();
+        pages.splice(index, 1);
+        if (!pages.length) delete att().otherPages;
+        render();
+        save();
+      });
+      row.appendChild(removeBtn);
+      list.appendChild(row);
+    });
+  };
+  addBtn.addEventListener('click', () => {
+    const a = att();
+    if (!Array.isArray(a.otherPages)) a.otherPages = [];
+    a.otherPages.push({ form: '', name: '', heading: '', item: '', itemTitle: '', marks: '', fields: [] });
+    render();
+    save();
+    const rowsNow = list.querySelectorAll('.attachment-other-page');
+    const firstInput = rowsNow.length ? rowsNow[rowsNow.length - 1].querySelector('input') : null;
+    if (firstInput) firstInput.focus();
+  });
+  render();
+  wrap.appendChild(title);
+  wrap.appendChild(note);
+  wrap.appendChild(list);
+  wrap.appendChild(addBtn);
+  return wrap;
+}
 function createFieldSection(title, fields) {
   const section = document.createElement('div');
   section.style.cssText = `

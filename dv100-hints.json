@@ -1348,12 +1348,6 @@
     "has_additional_pages": {
       "text": "Did you attach additional paper or forms?"
     },
-    "other_protected_people_additional_list_attached_yes": {
-      "text": "Do you need to list more people on a separate page?",
-      "conditional": {
-        "onlyWhen": "other_protected_people_yes_yes"
-      }
-    },
     "animal_order_stay_away_requested_yes": {
       "text": "Do you want the judge to order the person to stay away from your animals?",
       "conditional": {
@@ -1600,6 +1594,10 @@
         "person_asking_protection_telephone",
         "person_asking_protection_fax",
         "person_asking_protection_email",
+        "has_lawyer",
+        "person_asking_protection_lawyer_name",
+        "person_asking_protection_lawyer_state_bar_number",
+        "person_asking_protection_lawyer_firm_name",
         "court_name_and_street_address",
         "court_name",
         "court_street_address",
@@ -1695,10 +1693,6 @@
     {
       "name": "Signatures",
       "fields": [
-        "has_lawyer",
-        "person_asking_protection_lawyer_name",
-        "person_asking_protection_lawyer_state_bar_number",
-        "person_asking_protection_lawyer_firm_name",
         "person_asking_protection_signature_date",
         "person_asking_protection_signature_printed_name",
         "lawyer_signature_date",
@@ -1715,7 +1709,7 @@
       "max": 6,
       "fields": [
         {
-          "label": "Describe the firearm, firearm part, or ammunition (include the serial number if you know it)",
+          "label": "Describe the firearm, firearm part, or ammunition, including any serial number",
           "nameId": "{n}_description"
         },
         {
@@ -1723,7 +1717,8 @@
           "nameId": "{n}_number_or_amount"
         },
         {
-          "label": "Where is it, if you know?",
+          "label": "Where it is kept",
+          "optional": true,
           "nameId": "{n}_location"
         }
       ]
@@ -1744,7 +1739,8 @@
           "nameId": "{n}_type"
         },
         {
-          "label": "Breed, if known",
+          "label": "Breed",
+          "optional": true,
           "nameId": "{n}_breed"
         },
         {
@@ -1827,6 +1823,35 @@
       "entryTitle": "Protected Person",
       "min": 0,
       "max": 4,
+      "attachment": {
+        "name": "DV100_Other_Protected_People",
+        "heading": "DV-100, Other Protected People",
+        "item": "8",
+        "itemTitle": "Other Protected People",
+        "marks": "other_protected_people_additional_list_attached_yes",
+        "most": 12,
+        "fields": ["{n}_full_name", "{n}_age", "{n}_relationship", "Lives with you?"],
+        "otherPages": [
+          {
+            "form": "DV-110",
+            "name": "DV110_Other_Protected_People",
+            "heading": "DV-110, Other Protected People",
+            "item": "3",
+            "itemTitle": "Other Protected People",
+            "marks": "other_protected_people_additional_list_attached_yes",
+            "fields": ["{n}_full_name", "{n}_relationship", "{n}_age"]
+          },
+          {
+            "form": "CLETS-001",
+            "name": "CLETS001_Item_4",
+            "heading": "Item 4",
+            "item": "4",
+            "itemTitle": "Other People You Want Protected",
+            "marks": "clets_other_protected_people_attached_page",
+            "fields": ["{n}_full_name", "{n}_gender", "{n}_race", "{n}_date_of_birth"]
+          }
+        ]
+      },
       "fields": [
         {
           "label": "Full name",
@@ -1836,6 +1861,21 @@
           "label": "Age",
           "nameId": "{n}_age",
           "type": "number"
+        },
+        {
+          "label": "Date of birth",
+          "nameId": "{n}_date_of_birth",
+          "type": "date",
+          "optional": true
+        },
+        {
+          "label": "Gender",
+          "nameId": "{n}_gender"
+        },
+        {
+          "label": "Race",
+          "nameId": "{n}_race",
+          "optional": true
         },
         {
           "label": "Relationship to you",
@@ -2059,7 +2099,7 @@
       ]
     },
     {
-      "question": "Your lawyer's information",
+      "question": "Who is your lawyer?",
       "fields": [
         {
           "field": "person_asking_protection_lawyer_name",
@@ -2080,7 +2120,8 @@
       }
     },
     {
-      "question": "How can the court reach you? (optional)",
+      "question": "How can the court reach you?",
+      "optional": true,
       "fields": [
         {
           "field": "person_asking_protection_telephone",
@@ -2280,6 +2321,14 @@
     }
   ],
   "alwaysShown": [
+    {
+      "question": "person_to_restrain",
+      "why": "Item 2 follows item 1 whether or not the filer has a lawyer; the lawyer question is the last of item 1."
+    },
+    {
+      "question": "relationship_to_person_to_restrain",
+      "why": "Item 3 follows item 2 whatever the lawyer answer was; 'The Person to Restrain' is one question and rejoins right after it."
+    },
     {
       "question": "recent_restraining_orders",
       "why": "Item 4 follows item 3 whatever the relationship was."

@@ -1,0 +1,24 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "flowchart-dev",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "dev-server.js"
+      ],
+      "port": 8080,
+      "autoPort": true
+    },
+    {
+      "name": "blue-dev",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "-e",
+        "const p=require(\"path\").resolve(\"../Finance Forms/blue\"); process.chdir(p); require(require(\"path\").join(p,\"server.js\"))"
+      ],
+      "port": 3000,
+      "autoPort": true
+    }
+  ]
+}

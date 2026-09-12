@@ -36,7 +36,39 @@
   .form-panel > :first-child { margin-top: 0; }
   .form-nav { margin: 10px 0 14px; text-align: center; }
   .form-nav #addFormBtn { width: 100%; margin-bottom: 6px; }
-  .form-nav #viewFullProjectBtn { width: 100%; margin-top: 6px; }
+  /* View Full Project sits under the project name and search, as wide as they are. */
+  .button-bar #viewFullProjectBtn { width: 100%; margin-top: 6px; }
+
+  /* Project search. The global button rule in style.css makes every button a
+     full-width block: that would stretch the clear button over the whole
+     input, where it takes the clicks meant for the input, and stack Back and
+     Next above and below the count instead of either side of it. */
+  .project-search { margin-top: 6px; }
+  .project-search-box { position: relative; }
+  .project-search-box input {
+    width: 100%;
+    padding: 8px 30px 8px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  #projectSearchClearBtn {
+    position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+    width: auto; margin: 0; padding: 2px 6px; line-height: 1;
+    background: none; color: #999; font-size: 18px; border-radius: 3px;
+    display: none;
+  }
+  #projectSearchClearBtn:hover { background: #f0f0f0; color: #666; }
+  #projectSearchClearBtn.show { display: block; }
+  .project-search-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+  /* display:flex above would otherwise beat the hidden attribute. */
+  .project-search-row[hidden] { display: none; }
+  .project-search-row button { width: auto; margin: 0; flex: 0 0 auto; }
+  .project-search-row button[disabled] { opacity: 0.5; cursor: default; }
+  .project-search-count {
+    flex: 1; min-width: 0; text-align: center; font-size: 0.85rem; color: #555;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
   .form-nav-row { display: flex; gap: 6px; }
   .form-nav-row button { flex: 1; }
   .form-nav-row button[disabled] { opacity: 0.5; cursor: default; }
@@ -70,6 +102,23 @@
   #fullProjectView .fpv-canvas button,
   #fullProjectView .fpv-canvas select { pointer-events: none; }
   #fullProjectView .fpv-canvas svg { background: transparent !important; }
+
+  /* The node palette now follows the PDF preview instead of heading the
+     column, so it needs the same gap above it as the panels it sits among. */
+  .form-panel .custom-ui-elements { margin: 15px 0 0; }
+
+  /* Section Names and Groups fold away like the node palette. A form with a
+     dozen sections otherwise pushes the PDF preview a screen further down. */
+  .sidebar-fold > summary {
+    cursor: pointer;
+    font-weight: bold;
+    list-style: none;
+    user-select: none;
+  }
+  .sidebar-fold > summary::-webkit-details-marker { display: none; }
+  .sidebar-fold > summary::before { content: "▸ "; display: inline-block; width: 1em; }
+  .sidebar-fold[open] > summary::before { content: "▾ "; }
+  .sidebar-fold[open] > summary { margin-bottom: 8px; }
 </style>
 </head>
 <body>
@@ -102,6 +151,201 @@
 </div>
 
 <div class="toolbar">
+  <div class="button-bar">
+    <button onclick="previewForm()">Preview Form</button>
+    <!-- The pages the last full pass produced, and the rules they were read
+         against. Opens in its own tab so the canvas is not lost. -->
+    <button onclick="viewPdfOutput()">View PDF Output</button>
+    <!-- The hub the generated forms are published to, in its own tab for the
+         same reason: the flowchart stays where it was. -->
+    <button onclick="window.open('/Auto-Form-Creator/Demo_form_hub/index.html', '_blank')">Go To FormHub</button>
+    <button onclick="clearProject()">Clear</button><br>
+    <!-- The single-form Import Flowchart / Export Flowchart JSON / Export GUI
+         JSON buttons were removed: they only ever see the form currently on the
+         canvas, so on a project they silently act on one form. The file input
+         stays because exportFlowchartJson() and importFlowchartJson() are still
+         called internally - the project export walks the forms through them. -->
+    <input
+      type="file"
+      id="importFlowchartFile"
+      accept=".json,application/json"
+      onchange="importFlowchartJson(event)"
+      style="display:none;"
+    />
+    <button onclick="showImportProjectJsonDialog()">Import JSON</button>
+    <button onclick="showExportProjectJsonDialog()">Export JSON</button>
+    <button onclick="showExportProjectGuiJsonDialog()">Export GUI JSON</button>
+    <input
+      type="file"
+      id="importProjectFile"
+      accept=".json,application/json"
+      onchange="importProjectJson(event)"
+      style="display:none;"
+    /><br>
+    <!-- Save stores the whole project under the Project Name. Save As was
+         removed: it made a second library entry for the same project, and the
+         two drifted apart. Renaming is done by changing the Project Name. -->
+    <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save</button>
+    <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
+    <button id="settingsBtn" onclick="showSettingsMenu()">Settings</button><br>
+    <div class="project-name-container">
+      <label for="projectNameInput" style="font-weight:bold;">Project Name:</label>
+      <input type="text" id="projectNameInput" placeholder="Name this project..." />
+    </div>
+    <!-- Project search: every node in every form, not just the one on the
+         canvas. It sits with the project name because, like the name, it
+         belongs to the project rather than to the open form. See
+         project-search.js. -->
+    <div class="project-search">
+      <div class="project-search-box">
+        <input type="text" id="projectSearchBox" placeholder="Search all forms..." autocomplete="off" />
+        <button type="button" id="projectSearchClearBtn" title="Clear search">×</button>
+      </div>
+      <div class="project-search-row" id="projectSearchRow" hidden>
+        <button type="button" id="projectSearchPrevBtn" title="Previous match (Shift+Enter)">Back</button>
+        <span id="projectSearchCount" class="project-search-count"></span>
+        <button type="button" id="projectSearchNextBtn" title="Next match (Enter)">Next</button>
+      </div>
+    </div>
+    <!-- Every form at once, each in its own box - see project-overview.js. It
+         shows the project, so it lives here rather than among the controls
+         for the open form. -->
+    <button type="button" id="viewFullProjectBtn" onclick="viewFullProject()">View Full Project</button>
+  </div>
+
+  <!-- Everything from here to the end of the PDF defaults belongs to the form
+       currently open, and is swapped wholesale when switching forms. The two
+       exceptions are the form navigator and the node palette: they belong to
+       the project, and sit in here only because this is where they are used -
+       the navigator beside the name it changes, the palette under the paper. -->
+  <div id="formPanel" class="form-panel">
+
+  <!-- Form Name -->
+  <div class="form-name-container">
+    <label for="formNameInput" style="font-weight: bold; margin-right: 10px;">Form Name:</label>
+    <input type="text" id="formNameInput" placeholder="Enter form name..." style="width: 200px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+  </div>
+
+  <!-- Form navigator: one project, several flowcharts, switched like sheets -->
+  <div class="form-nav">
+    <button type="button" id="addFormBtn" onclick="addProjectForm()">Add Form</button>
+    <div class="form-nav-row">
+      <button type="button" id="prevFormBtn" onclick="prevProjectForm()">Back</button>
+      <button type="button" id="nextFormBtn" onclick="nextProjectForm()">Next</button>
+    </div>
+    <div id="formNavLabel" class="form-nav-label">Form 1 of 1</div>
+  </div>
+
+  <!-- Search Box -->
+  <div class="search-container">
+    <input type="text" id="nodeSearchBox" placeholder="Search nodes..." />
+    <button id="clearSearchBtn" title="Clear search">×</button>
+  </div>
+
+  <div class="legend">
+    <strong>Question Types</strong><br>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorText"></div>
+      <span>Textbox</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorCheckbox"></div>
+      <span>Checkbox</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorDropdown"></div>
+      <span>Dropdown</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorMoney"></div>
+      <span>Number</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorDate"></div>
+      <span>Date</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorDateRange"></div>
+      <span>Date Range</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorEmail"></div>
+      <span>Email</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorPhone"></div>
+      <span>Phone</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorBigParagraph"></div>
+      <span>Big Paragraph</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorTextColor"></div>
+      <span>Text Color</span>
+    </div>
+    <button id="resetBtn">Reset Colors</button>
+  </div>
+
+  <!-- Section Legend. Closed until asked for; legend.js rewrites everything
+       inside it, the <summary> included, so the heading lives there too. -->
+  <details id="sectionLegend" class="sidebar-fold">
+    <summary>Section Names</summary>
+    <!-- Section items will be populated dynamically -->
+  </details>
+
+  <!-- Groups Interface. Add Group is inside the fold, so it is never showing
+       under a closed list it would add to invisibly; groups.js puts each new
+       group above it. -->
+  <details id="groupsContainer" class="sidebar-fold">
+    <summary>Groups</summary>
+    <!-- Groups will be populated dynamically -->
+    <button type="button" class="add-group-btn" onclick="addGroup()">Add Group</button>
+  </details>
+
+  <!-- Default PDF Properties -->
+  <div id="defaultPdfPropertiesContainer">
+    <h4>Default PDF Properties</h4>
+    <div class="form-group">
+      <label for="defaultPdfNameInput">PDF Name:</label>
+      <input type="text" id="defaultPdfNameInput" placeholder="Enter default PDF name" 
+             value="" oninput="updateDefaultPdfProperties()">
+    </div>
+    <div class="form-group">
+      <label for="defaultPdfFileInput">PDF File:</label>
+      <input type="text" id="defaultPdfFileInput" placeholder="Enter default PDF filename" 
+             value="" oninput="updateDefaultPdfProperties()">
+    </div>
+    <div class="form-group">
+      <label for="defaultPdfPriceInput">PDF Price:</label>
+      <input type="text" id="defaultPdfPriceInput" placeholder="Enter default PDF price" 
+             value="" oninput="updateDefaultPdfProperties()">
+    </div>
+
+    <!-- The paper this flowchart fills. Selecting a node lights up the box
+         it writes into - see pdf-preview.js. -->
+    <div class="pdf-preview-head">
+      <label>Preview</label>
+    </div>
+    <div id="pdfPreviewNote" class="pdf-preview-note" hidden></div>
+    <div id="pdfPreviewFieldLabel" class="pdf-preview-field" hidden></div>
+    <div id="pdfPreviewStage" hidden>
+      <canvas id="pdfPreviewCanvas"></canvas>
+      <div id="pdfPreviewLayer"></div>
+    </div>
+    <div class="pdf-preview-nav">
+      <button type="button" id="pdfPreviewPrev">&larr;</button>
+      <span id="pdfPreviewPage">&nbsp;</span>
+      <button type="button" id="pdfPreviewNext">&rarr;</button>
+    </div>
+    <div class="pdf-preview-full-row">
+      <button type="button" id="pdfPreviewFullscreen">View Fullscreen</button>
+    </div>
+  </div>
+
+  <!-- The node palette, under the paper rather than above everything: it is
+       reached for occasionally, and closed it costs one line. The drag handlers
+       find its .shape items by class (events.js), so where it sits is free. -->
   <details class="custom-ui-elements">
     <summary>Select Nodes</summary>
     <p class="custom-ui-elements-hint">Drag and drop elements below</p>
@@ -248,169 +492,6 @@
     Inverse Checkbox
   </div>
   </details>
-
-  <div class="button-bar">
-    <button onclick="previewForm()">Preview Form</button>
-    <!-- The pages the last full pass produced, and the rules they were read
-         against. Opens in its own tab so the canvas is not lost. -->
-    <button onclick="viewPdfOutput()">View PDF Output</button>
-    <button onclick="clearProject()">Clear</button><br>
-    <!-- The single-form Import Flowchart / Export Flowchart JSON / Export GUI
-         JSON buttons were removed: they only ever see the form currently on the
-         canvas, so on a project they silently act on one form. The file input
-         stays because exportFlowchartJson() and importFlowchartJson() are still
-         called internally - the project export walks the forms through them. -->
-    <input
-      type="file"
-      id="importFlowchartFile"
-      accept=".json,application/json"
-      onchange="importFlowchartJson(event)"
-      style="display:none;"
-    />
-    <button onclick="showImportProjectJsonDialog()">Import JSON</button>
-    <button onclick="showExportProjectJsonDialog()">Export JSON</button>
-    <button onclick="showExportProjectGuiJsonDialog()">Export GUI JSON</button>
-    <input
-      type="file"
-      id="importProjectFile"
-      accept=".json,application/json"
-      onchange="importProjectJson(event)"
-      style="display:none;"
-    /><br>
-    <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save</button>
-    <button id="saveAsFlowchartBtn" onclick="saveAsFlowchart()">Save As</button>
-    <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
-    <button id="settingsBtn" onclick="showSettingsMenu()">Settings</button><br>
-    <div class="project-name-container">
-      <label for="projectNameInput" style="font-weight:bold;">Project Name:</label>
-      <input type="text" id="projectNameInput" placeholder="Name this project..." />
-    </div>
-    <!-- Form navigator: one project, several flowcharts, switched like sheets -->
-    <div class="form-nav">
-      <button type="button" id="addFormBtn" onclick="addProjectForm()">Add Form</button>
-      <div class="form-nav-row">
-        <button type="button" id="prevFormBtn" onclick="prevProjectForm()">Back</button>
-        <button type="button" id="nextFormBtn" onclick="nextProjectForm()">Next</button>
-      </div>
-      <!-- Every form at once, each in its own box - see project-overview.js -->
-      <button type="button" id="viewFullProjectBtn" onclick="viewFullProject()">View Full Project</button>
-      <div id="formNavLabel" class="form-nav-label">Form 1 of 1</div>
-    </div>
-  </div>
-
-  <!-- Everything from here to the end of the PDF defaults belongs to the form
-       currently open, and is swapped wholesale when switching forms. -->
-  <div id="formPanel" class="form-panel">
-
-  <!-- Form Name -->
-  <div class="form-name-container">
-    <label for="formNameInput" style="font-weight: bold; margin-right: 10px;">Form Name:</label>
-    <input type="text" id="formNameInput" placeholder="Enter form name..." style="width: 200px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-  </div>
-
-  <!-- Search Box -->
-  <div class="search-container">
-    <input type="text" id="nodeSearchBox" placeholder="Search nodes..." />
-    <button id="clearSearchBtn" title="Clear search">×</button>
-  </div>
-
-  <div class="legend">
-    <strong>Question Types</strong><br>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorText"></div>
-      <span>Textbox</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorCheckbox"></div>
-      <span>Checkbox</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorDropdown"></div>
-      <span>Dropdown</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorMoney"></div>
-      <span>Number</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorDate"></div>
-      <span>Date</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorDateRange"></div>
-      <span>Date Range</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorEmail"></div>
-      <span>Email</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorPhone"></div>
-      <span>Phone</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorBigParagraph"></div>
-      <span>Big Paragraph</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorTextColor"></div>
-      <span>Text Color</span>
-    </div>
-    <button id="resetBtn">Reset Colors</button>
-  </div>
-
-  <!-- Section Legend inserted into the toolbar above the Save Flowchart button -->
-  <div id="sectionLegend">
-    <h4>Section Names</h4>
-    <!-- Section items will be populated dynamically -->
-  </div>
-
-  <!-- Groups Interface -->
-  <div id="groupsContainer">
-    <h4>Groups</h4>
-    <!-- Groups will be populated dynamically -->
-  </div>
-  <button type="button" onclick="addGroup()">Add Group</button>
-
-  <!-- Default PDF Properties -->
-  <div id="defaultPdfPropertiesContainer">
-    <h4>Default PDF Properties</h4>
-    <div class="form-group">
-      <label for="defaultPdfNameInput">PDF Name:</label>
-      <input type="text" id="defaultPdfNameInput" placeholder="Enter default PDF name" 
-             value="" oninput="updateDefaultPdfProperties()">
-    </div>
-    <div class="form-group">
-      <label for="defaultPdfFileInput">PDF File:</label>
-      <input type="text" id="defaultPdfFileInput" placeholder="Enter default PDF filename" 
-             value="" oninput="updateDefaultPdfProperties()">
-    </div>
-    <div class="form-group">
-      <label for="defaultPdfPriceInput">PDF Price:</label>
-      <input type="text" id="defaultPdfPriceInput" placeholder="Enter default PDF price" 
-             value="" oninput="updateDefaultPdfProperties()">
-    </div>
-
-    <!-- The paper this flowchart fills. Selecting a node lights up the box
-         it writes into - see pdf-preview.js. -->
-    <div class="pdf-preview-head">
-      <label>Preview</label>
-    </div>
-    <div id="pdfPreviewNote" class="pdf-preview-note" hidden></div>
-    <div id="pdfPreviewFieldLabel" class="pdf-preview-field" hidden></div>
-    <div id="pdfPreviewStage" hidden>
-      <canvas id="pdfPreviewCanvas"></canvas>
-      <div id="pdfPreviewLayer"></div>
-    </div>
-    <div class="pdf-preview-nav">
-      <button type="button" id="pdfPreviewPrev">&larr;</button>
-      <span id="pdfPreviewPage">&nbsp;</span>
-      <button type="button" id="pdfPreviewNext">&rarr;</button>
-    </div>
-    <div class="pdf-preview-full-row">
-      <button type="button" id="pdfPreviewFullscreen">View Fullscreen</button>
-    </div>
-  </div>
 
   </div><!-- /#formPanel -->
 
@@ -807,9 +888,12 @@
 <!-- Multi-form projects - loaded last so the editor API exists -->
 <script src="io-dialogs.js"></script>
 <script src="project-forms.js"></script>
+<script src="project-search.js"></script>
 <script src="connector-nodes.js"></script>
 <script src="project-gui-export.js"></script>
 <script src="pdf-preview.js"></script>
 <script src="project-overview.js"></script>
+<!-- Save rebuilds the project's live site at the link its id owns. -->
+<script src="live-site-publish.js"></script>
 </body>
 </html>

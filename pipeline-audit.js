@@ -8,6 +8,7 @@
  *   Rule 1  every fillable PDF field is reachable from something the form posts
  *   Rule 3  no repeated <base>_<n>_<field> block left as flat numbered questions
  *   Rule 5  one group per form, named after the form, holding its sections
+ *   Rule 13 every "need more space" box the paper prints is ticked by something
  *
  * Rule 4 is dynamic - it needs the form filled and the PDFs produced - and lives
  * in pipeline-fill.js. Rule 2 is about wording and stays a human read.
@@ -131,6 +132,53 @@ async function pdfFieldNames(file) {
   });
 }
 
+/**
+ * The "need more space" boxes a PDF prints - a checkbox on the same line as
+ * "check here if you need more space", "if you need to list more people", "on a
+ * separate piece of paper" and the like. Read from the page itself: the field
+ * configs label these boxes with their own names, not their words.
+ */
+const MORE_SPACE = /need (more|additional) (space|room)|(list|have) more (children|people|persons)|more (children|people) to list|separate (piece of |sheet of )?(paper|page|sheet)|attach (a|another) (sheet|page)/i;
+let pdfjsForText = null;
+async function moreSpaceBoxes(file) {
+  if (!pdfjsForText) pdfjsForText = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  const doc = await pdfjsForText.getDocument({
+    data: new Uint8Array(fs.readFileSync(file)),
+    isEvalSupported: false,
+    standardFontDataUrl: path.join(__dirname, 'node_modules', 'pdfjs-dist', 'standard_fonts') + path.sep
+  }).promise;
+  const found = [];
+  for (let n = 1; n <= doc.numPages; n++) {
+    const page = await doc.getPage(n);
+    const items = (await page.getTextContent()).items
+      .filter((i) => i.str && i.str.trim())
+      .map((i) => ({ str: i.str, x: i.transform[4], y: i.transform[5], w: i.width || 0 }));
+    // A line is the text whose baselines sit within 3pt of each other.
+    const lines = [];
+    items.sort((a, b) => (b.y - a.y) || (a.x - b.x)).forEach((it) => {
+      const line = lines.find((l) => Math.abs(l.y - it.y) <= 3);
+      if (line) line.items.push(it); else lines.push({ y: it.y, items: [it] });
+    });
+    const boxes = (await page.getAnnotations()).filter((a) => a.subtype === 'Widget' && a.checkBox && a.fieldName);
+    lines.forEach((l) => {
+      l.items.sort((a, b) => a.x - b.x);
+      const text = l.items.map((i) => i.str).join(' ').replace(/\s+/g, ' ').trim();
+      if (!MORE_SPACE.test(text)) return;
+      const left = l.items[0].x;
+      const right = Math.max(...l.items.map((i) => i.x + i.w));
+      boxes.forEach((b) => {
+        const [x1, y1, x2, y2] = b.rect;
+        const middle = (y1 + y2) / 2;
+        if (Math.abs(middle - (l.y + 4)) > 9) return;        // not on this line
+        if (Math.min(x1, x2) > right + 4) return;           // a box past the words belongs to something else
+        if (Math.max(x1, x2) < left - 40) return;           // and so does one well before them
+        if (!found.some((f) => f.name === b.fieldName)) found.push({ name: b.fieldName, page: n, text: text.slice(0, 90) });
+      });
+    });
+  }
+  return found;
+}
+
 /** A field config's own view of a form: id (raw AcroForm path) -> newName. */
 function readFieldConfig(file) {
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -237,9 +285,32 @@ async function main() {
         // ticked when the answer outgrows both of the printed ones.
         if (o && o.marksBeyond) spill.add(o.marksBeyond);
       });
+      // And the box a block ticks when its entries run onto an attached page.
+      (gui.sections || []).forEach((s) => (s.questions || []).forEach((q) => {
+        if (!q || !q.attachment || typeof q.attachment !== 'object') return;
+        // Its own page's box, and the boxes of other forms' pages drawn from it.
+        [q.attachment].concat(Array.isArray(q.attachment.otherPages) ? q.attachment.otherPages : [])
+          .forEach((p) => { if (p && p.marks) spill.add(p.marks); });
+      }));
     } catch (e) { /* no overflow links declared */ }
     const config = fs.existsSync(configPath) ? readFieldConfig(configPath) : [];
     const byName = new Map(config.map((c) => [c.name, c]));
+
+    // RULE 13: every "need more space" box the paper prints is backed by what
+    // ticks it - an overflow link for a text box, an attachment for a table.
+    // Asked as a question instead, it asks the filer to promise a page nothing
+    // produces: DV-105 item 3 did, and no fifth child could be entered.
+    report.rule13 = report.rule13 || [];
+    try {
+      (await moreSpaceBoxes(pdfPath)).forEach((b) => {
+        const cfg = byName.get(b.name);
+        if (cfg && cfg.courtUse) return;
+        if (spill.has(b.name)) return;
+        report.rule13.push({ form: form.name, field: b.name, page: b.page, text: b.text });
+      });
+    } catch (e) {
+      report.rule13.push({ form: form.name, field: '(PDF text unreadable: ' + e.message + ')', page: 0, text: '' });
+    }
 
     // Rule 1 is about what the filer must answer. A field the form itself says
     // the court completes is left blank on purpose, and asking for it would be
@@ -336,32 +407,59 @@ async function main() {
   const labelsOf = (q) => (q && Array.isArray(q.options) && q.options.length)
     ? q.options.map((o) => String((o && typeof o === 'object') ? (o.label || o.text || o.value) : o))
     : [];
-  // Rule 2 (wording): a condition smuggled into the question text. The rule has
-  // listed these tells since it was written; nothing was checking them, and two
-  // slipped through - "Your lawyer's information, if you have one" and "Where
-  // does the restrained person live, if you know?".
-  const CONDITION_TELLS = /(if you have|if any|if known|if applicable|if it|if they|if there|if needed|if so)|,s*if/i;
-  // A continuation line is the one shape allowed to say "if": it is overflow
-  // from a single answer, not a second fact.
-  const CONTINUATION = /continue|did not fit|more space|additional space/i;
+  // Rule 2 (wording) - THE CORNERSTONE: a question never carries its condition.
+  // "If there is another parent or legal guardian besides you and the other
+  // person, what is their name?" is two questions: a Yes/No gate, then the name
+  // on Yes. This check read every question and reported "passes" for as long as
+  // it existed, because its pattern held literal backspace characters where \b
+  // belonged and matched nothing. The patterns now live in wording-rules.js,
+  // which the compiler reads too and which tests itself; and the check reads
+  // every box label and choice, not only titles.
+  const { conditionTell, sentenceProblem, saysOptional, twoThingsInOneBox, asksForDate } = require('./wording-rules');
   report.rule2wording = [];
   // Rule 11: a question that does not say what to enter. "What is your custody
   // case details?" is answerable only by someone holding the paper form, which
   // is the person the interview exists to spare.
-  const VAGUE = /(details|information|info)/i;
+  const VAGUE = /\b(details|information|info)\b/i;
   report.rule11 = [];
+  // Rule 14: every question title is a full sentence. "And before that?" and
+  // "Which county?" mean nothing on a screen of their own, which is exactly how
+  // the one-question-at-a-time mode shows them.
+  report.rule14 = [];
+  // Rule 15: optional is coded, never said. "How can the court reach you?
+  // (optional)" said it and was required all the same: nothing had marked it.
+  report.rule15 = [];
   (gui.sections || []).forEach((sec) => (sec.questions || []).forEach((q) => {
+    const who = q.nameId || q.nodeId || ('q' + q.questionId);
     const text = String(q.text || '');
     if (!text) return;
-    if (CONDITION_TELLS.test(text) && !CONTINUATION.test(text)) {
-      report.rule2wording.push({ question: q.nameId || q.nodeId || ('q' + q.questionId), text: text });
+    const tell = conditionTell(text);
+    if (tell) report.rule2wording.push({ question: who, where: 'question', text: text, tell: tell });
+    (q.allFieldsInOrder || []).forEach((f) => {
+      const t = conditionTell(f && f.label);
+      if (t) report.rule2wording.push({ question: who, where: 'box', text: String(f.label), tell: t });
+    });
+    labelsOf(q).forEach((label) => {
+      const t = conditionTell(label);
+      if (t) report.rule2wording.push({ question: who, where: 'choice', text: label, tell: t });
+    });
+    const problem = sentenceProblem(text);
+    if (problem) report.rule14.push({ question: who, text: text, problem: problem });
+    if (saysOptional(text)) {
+      report.rule15.push({ question: who, where: 'question', text: text, marked: q.required === false });
     }
+    (q.allFieldsInOrder || []).forEach((f) => {
+      if (f && saysOptional(f.label)) {
+        report.rule15.push({ question: who, where: 'box', text: String(f.label), marked: f.optional === true });
+      }
+    });
     // Only a single free-text box: a multipleTextboxes question naming its
     // boxes has already said what it wants.
     if (VAGUE.test(text) && (q.type === 'text' || q.type === 'bigParagraph')) {
-      report.rule11.push({ question: q.nameId || q.nodeId || ('q' + q.questionId), text: text, type: q.type });
+      report.rule11.push({ question: who, text: text, type: q.type });
     }
   }));
+
 
   report.rule2gates = [];
   (gui.sections || []).forEach((sec) => (sec.questions || []).forEach((q) => {
@@ -486,6 +584,19 @@ async function main() {
       report.rule8.review.push({ name, text });
     }
   }));
+  // ... and every box inside a question of several boxes is one thing too. The
+  // check above read whole questions only, so DV-105 asked "City and state" in
+  // one box six times inside its address questions, and CLETS-001 "Driver's
+  // license number and state", and neither was seen.
+  (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
+    (q.allFieldsInOrder || []).forEach((f) => {
+      const node = String((f && f.nodeId) || '');
+      const label = String((f && f.label) || '');
+      if ((/_and_/.test(node) && !joined.has(node)) || twoThingsInOneBox(label)) {
+        report.rule8.compound.push({ name: node || q.nodeId, text: label + '"   (a box inside "' + q.text });
+      }
+    });
+  }));
 
   // Rule 9: questions about one subject are one question. An address asked as
   // four questions is four screens for one thing a person types in one go, and
@@ -607,6 +718,35 @@ async function main() {
       }
     });
   }));
+  // By what the box says, not only by what it is called. DV-105 item 4 named
+  // its dates _from and _until, printed "(month/year)" beside them, and they
+  // were asked as text boxes: the names above were all this rule read.
+  const captionOf = new Map();
+  forms.forEach((form) => {
+    const base = String(form.pdfFile || form.name || '').replace(/\.pdf$/i, '');
+    const configPath = path.join(CONFIG_DIR, base.toLowerCase() + '-field-config.json');
+    if (!fs.existsSync(configPath)) return;
+    readFieldConfig(configPath).forEach((c) => { if (c && c.name) captionOf.set(c.name, c.label || ''); });
+  });
+  const flagged10 = new Set(report.rule10.map((r) => r.name));
+  const flagDate = (name, is, why) => {
+    if (flagged10.has(name)) return;
+    flagged10.add(name);
+    report.rule10.push({ name: name, is: is, should: 'date', text: why });
+  };
+  (gui.sections || []).forEach((section) => (section.questions || []).forEach((q) => {
+    if (q.nameId && q.type === 'text' && (asksForDate(q.text) || asksForDate(captionOf.get(q.nameId)))) {
+      flagDate(q.nameId, q.type, '"' + q.text + '"');
+    }
+    (q.allFieldsInOrder || []).forEach((f) => {
+      if (!f || !f.nodeId) return;
+      const is = f.type === 'label' ? 'text' : f.type;
+      if (is !== 'text') return;
+      if (asksForDate(f.label) || asksForDate(captionOf.get(f.nodeId))) {
+        flagDate(f.nodeId, is, '(box "' + f.label + '" inside "' + q.text + '")');
+      }
+    });
+  }));
 
   // A question gated on one that comes later can never open: the form reveals
   // questions in order, so its trigger is still unanswered when it is passed.
@@ -722,12 +862,16 @@ async function main() {
       + r.shown + '"' + (r.text ? '   in "' + r.text + '"' : '')));
     if (report.rule2.length > 12) console.log('      ... ' + (report.rule2.length - 12) + ' more');
   }
+  console.log('');
+  console.log('RULE 2 (CORNERSTONE) — a question never carries its condition');
   if (!(report.rule2wording || []).length) {
-    console.log('  wording: no question hides a condition in its text');
+    console.log('  passes  (every title, box label and choice read)');
   } else {
-    console.log('  FAILS  ' + report.rule2wording.length
-      + ' question(s) hide a condition in the wording - each should be a gate plus a follow-up:');
-    report.rule2wording.forEach((r) => console.log('      - ' + r.question + ': "' + r.text + '"'));
+    console.log('  FAILS  ' + report.rule2wording.length + ' place(s) carry a condition in their wording.');
+    console.log('      Ask the condition first as a Yes/No gate and show the question only on Yes;');
+    console.log('      a part the filer may not know is optional, never "if you know":');
+    report.rule2wording.forEach((r) => console.log('      - ' + r.question + ' [' + r.where + ']: "'
+      + r.text + '"   <- "' + r.tell + '"'));
   }
   // Anything the author declared always-shown, with its reason, read out of the
   // per-form flowcharts beside the packet.
@@ -838,6 +982,37 @@ async function main() {
   }
 
   console.log('');
+  console.log('RULE 13 — a "need more space" box is backed by what ticks it');
+  if (!(report.rule13 || []).length) {
+    console.log('  passes');
+  } else {
+    console.log('  FAILS  ' + report.rule13.length
+      + ' box(es) the paper prints for more space or more entries, with nothing behind them:');
+    report.rule13.forEach((r) => console.log('      - ' + r.form + ' ' + r.field + ' (page ' + r.page + '): "' + r.text + '"'));
+    console.log('      A table: give its block an attachment (hints repeats[].attachment, or the node\'s');
+    console.log('      "Extra entries on an attached page"). A text box: an overflow link.');
+  }
+  console.log('');
+  console.log('RULE 14 — every question title is a full sentence');
+  if (!(report.rule14 || []).length) {
+    console.log('  passes');
+  } else {
+    console.log('  FAILS  ' + report.rule14.length + ' title(s) are not a sentence that stands on its own:');
+    report.rule14.forEach((r) => console.log('      - ' + r.question + ': "' + r.text + '"   (' + r.problem + ')'));
+  }
+  console.log('');
+  console.log('RULE 15 — optional is coded, never said');
+  const markedOptional = (gui.sections || []).reduce((n, s) =>
+    n + (s.questions || []).filter((q) => q.required === false).length, 0);
+  if (!(report.rule15 || []).length) {
+    console.log('  passes  (' + markedOptional + ' question(s) marked optional, none saying so)');
+  } else {
+    console.log('  FAILS  ' + report.rule15.length + ' title(s) or box(es) say "optional" instead of being marked optional:');
+    report.rule15.forEach((r) => console.log('      - ' + r.question + ' [' + r.where + ']: "' + r.text + '"'
+      + (r.marked ? '' : '   <- and it is NOT marked optional, so the form requires it')));
+    console.log('      Take the word out and set "optional": true in the hints; the Next button then lets the filer past it.');
+  }
+  console.log('');
   console.log('RULE 7 — a form that asks nothing still ships');
   report.rule7.forEach((f) => {
     const how = f.alwaysIncluded ? 'always included'
@@ -862,6 +1037,21 @@ async function main() {
   console.log('  one per form: ' + report.rule5.oneGroupPerForm
     + '   named after forms: ' + report.rule5.namedAfterForms
     + '   all hold sections: ' + report.rule5.everyGroupHoldsSections);
+
+  // The wording rules are not advice. A packet that breaks one does not ship,
+  // and a run that found one says so in its exit code.
+  const blocking = [
+    ['RULE 2 (CORNERSTONE)', (report.rule2wording || []).length],
+    ['RULE 8', report.rule8.compound.length],
+    ['RULE 10', report.rule10.length],
+    ['RULE 14', (report.rule14 || []).length],
+    ['RULE 15', (report.rule15 || []).length]
+  ].filter((b) => b[1]);
+  if (blocking.length) {
+    console.log('');
+    console.log('NOT SHIPPABLE — ' + blocking.map((b) => b[0] + ': ' + b[1]).join(', '));
+    process.exitCode = 1;
+  }
 }
 
 main().catch((err) => { console.error(err); process.exit(1); });

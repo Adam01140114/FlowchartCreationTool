@@ -93,3 +93,7 @@ pipeline-out/
 # pipeline-out/ above stays ignored: it is scratch, and everything worth
 # keeping out of it is copied into the published run.
 Current Form Output/index.json.tmp
+
+# A guest's saved projects (dev-server.js /api/guest-library). Personal
+# work, one machine's library - never committed.
+guest-library/

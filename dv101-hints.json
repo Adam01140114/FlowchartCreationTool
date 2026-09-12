@@ -104,7 +104,7 @@
       "optional": true
     },
     "dv101_abuse_1_injuries": {
-      "text": "Describe any injuries.",
+      "text": "Describe any injuries the person caused you.",
       "type": "bigParagraph",
       "optional": true
     },
@@ -137,7 +137,7 @@
       "optional": true
     },
     "dv101_abuse_2_injuries": {
-      "text": "Describe any injuries.",
+      "text": "Describe any injuries the person caused you.",
       "type": "bigParagraph",
       "optional": true
     },

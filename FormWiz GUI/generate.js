@@ -15,6 +15,8 @@ const alertLogics = [];
 let checklistLogics = [];
 const conditionalAlerts = [];
 const jumpLogics = [];
+// Numbered blocks whose entries past the PDF's rows go on a page the form draws.
+const attachmentPages = [];
 const labelMap = {};
 const amountMap = {}; // used for numberedDropdown with amounts
 const linkedDropdowns = []; // For storing linked dropdown pairs
@@ -149,7 +151,14 @@ function getDiscreteAnswersForQuestion(prevQuestionId) {
         if (rangeStartEl && rangeEndEl) {
             const min = parseInt(rangeStartEl.value, 10) || 1;
             const max = parseInt(rangeEndEl.value, 10) || min;
-            for (let i = min; i <= max; i++) answers.push(String(i));
+            // A block whose extra entries go on an attached page offers counts up
+            // to the most the filer may add, and the fill's model has to know it:
+            // stopping at the PDF's rows never produced the page at all.
+            const attachmentOn = qBlock.querySelector("#attachmentEnabled" + prevQuestionId);
+            const attachmentMostEl = qBlock.querySelector("#attachmentMost" + prevQuestionId);
+            const top = (attachmentOn && attachmentOn.checked && attachmentMostEl)
+              ? Math.max(parseInt(attachmentMostEl.value, 10) || 0, max) : max;
+            for (let i = min; i <= top; i++) answers.push(String(i));
         }
     }
     return answers;
@@ -622,6 +631,7 @@ const formNameEl = document.getElementById('formNameInput');
 const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
 const skipSignInGate = !!(document.getElementById('skipSignInGateCheckbox') && document.getElementById('skipSignInGateCheckbox').checked);
 const formQuestionStyle = getFormQuestionStyle();
+attachmentPages.length = 0;
 const formDeploymentStyle = getFormDeploymentStyle();
 const showPdfDevTools = formDeploymentStyle === 'test';
 const showProductionCheckout = formDeploymentStyle !== 'test';
@@ -663,7 +673,7 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '        .nav-context-menu .nav-context-hint { padding: 2px 12px 7px; color: #64748b; font-size: 11px; letter-spacing: 0.03em; text-transform: uppercase; }',
     '        .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }',
     '        .question-step-hidden { display: none !important; }',
-    '        .section-form-card { background: linear-gradient(180deg, #f7fbff 0%, #eef5ff 100%); border: 1px solid #c5d9f7; border-radius: 24px; padding: 12px 12px 32px; max-width: 800px; margin: 0 auto 36px; box-shadow: 0 12px 32px rgba(30,73,150,0.10); }',
+    '        .section-form-card { background: linear-gradient(180deg, #f7fbff 0%, #eef5ff 100%); border: 1px solid #c5d9f7; border-radius: 24px; padding: 12px 12px 32px; max-width: 960px; margin: 0 auto 36px; box-shadow: 0 12px 32px rgba(30,73,150,0.10); }',
     '        .section-form-card .section-title { margin: 18px 12px 10px; }',
     '        body.form-style-all .section { display: block !important; }',
     '        body.form-style-all .section .question-nav { display: none; }',
@@ -1700,7 +1710,9 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     'if (typeof firebase !== "undefined" && !firebase.apps.length) {',
     '    firebase.initializeApp(firebaseConfig);',
     '}',
-    'const auth = firebase.auth();',
+    '// Guarded like the line above: a test payload or a live site leaves Firebase',
+    '// out, and an unguarded call stopped the rest of this script there.',
+    'const auth = (typeof firebase !== "undefined" && firebase.apps.length) ? firebase.auth() : null;',
     '',
     '// Auth state management',
     'if (typeof firebase !== "undefined" && firebase.apps.length > 0) {',
@@ -3554,7 +3566,7 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
           // and "ZIP code" did not match, so City looked like the start of the
           // address and a <br> opened a gap between it and the street.
           const isLocationLabel = (label) => locationFields.includes(label) ||
-            /^(street|city|state|zip)( |$)/i.test(String(label || '').trim());
+            /^(street( address)?|city|state|zip( code)?)$/i.test(String(label || '').trim());
           for(let j = 1; j <= count; j++){
             let lastWasLocation = false;
             let firstField = true;
@@ -3566,11 +3578,7 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
             for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
               const field = allFieldsInOrder[fieldIndex];
               const isLocationField = field.type === 'location' || isLocationLabel(field.label);
-              // Add <br> before first location field in each count
-              if (isLocationField && !lastWasLocation && !firstField) {
-                const br = document.createElement('br');
-                entryContainer.appendChild(br);
-              }
+              // No <br> before the first address box: every box in a question keeps the same spacing.
               if (field.type === 'location') {
                 // Render main location field block
                 const locationFieldDiv = document.createElement('div');
@@ -4602,6 +4610,17 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
         if (entryTitle) {
           window.entryTitleMap[questionId] = entryTitle;
         }
+        // More entries than the PDF has rows, drawn on an attached page: the
+        // count goes past the rows (ddMax) up to the most the filer may add.
+        const attachmentOnEl = qBlock.querySelector("#attachmentEnabled" + questionId);
+        const attachmentSetting = (key) => {
+          const el = qBlock.querySelector("#" + key + questionId);
+          return el ? String(el.value || "").trim() : "";
+        };
+        const attachmentName = (attachmentOnEl && attachmentOnEl.checked)
+          ? attachmentSetting("attachmentName").replace(/\.pdf$/i, "") : "";
+        const attachmentMost = attachmentName
+          ? Math.max(parseInt(attachmentSetting("attachmentMost"), 10) || 0, ddMax) : ddMax;
         // gather unified field data from the new unified container
         const unifiedFields = qBlock.querySelectorAll("#unifiedFields" + questionId + " .unified-field");
         const labelVals = [];
@@ -5106,10 +5125,72 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
         questionNameIds[questionId] = dropdownId;
         formHTML += `<select id="${dropdownId}" name="${dropdownId}" data-question-id="${questionId}" onchange="showTextboxLabels(${questionId}, this.value); updateHiddenCheckboxes(${questionId}, this.value); updateHiddenLogic('${dropdownId}', this.value)">
                        <option value="" disabled selected>Select an option</option>`;
-        for (let rnum = ddMin; rnum <= ddMax; rnum++) {
+        for (let rnum = ddMin; rnum <= attachmentMost; rnum++) {
           formHTML += `<option value="${rnum}">${rnum}</option>`;
         }
         formHTML += `</select><br><div id="labelContainer${questionId}"></div>`;
+        if (attachmentName) {
+          const allAttachmentFields = (allFieldsInOrder || []).map(function (f) {
+            return {
+              label: f.label || f.fieldName || "",
+              nodeId: f.nodeId || "",
+              type: f.type || "label",
+              options: (f.options || []).map(function (o) {
+                return { text: o.text || o.checkboxText || "", nodeId: o.nodeId || "" };
+              })
+            };
+          });
+          // The columns one page prints, in the order named: a key such as
+          // "{n}_full_name" (the end of the entry field's id) or a label such as
+          // "Lives with you?". Nothing named - or nothing matched - prints all.
+          const fieldsFor = function (keys) {
+            const wanted = (Array.isArray(keys) ? keys : String(keys || "").split(","))
+              .map(function (k) { return String(k || "").trim(); }).filter(Boolean);
+            const picked = [];
+            wanted.forEach(function (k) {
+              const hit = allAttachmentFields.find(function (f) {
+                return (k.indexOf("{n}") !== -1 && f.nodeId.slice(-k.length) === k)
+                  || String(f.label).trim().toLowerCase() === k.toLowerCase();
+              });
+              if (hit && picked.indexOf(hit) === -1) picked.push(hit);
+            });
+            return picked.length ? picked : allAttachmentFields;
+          };
+          const pageFor = function (p) {
+            return {
+              questionId: String(questionId),
+              block: dropdownId,
+              pdfRows: ddMax,
+              most: attachmentMost,
+              name: String(p.name || "").replace(/\.pdf$/i, ""),
+              heading: p.heading || "",
+              item: p.item || "",
+              itemTitle: p.itemTitle || "",
+              marks: p.marks || "",
+              // The form whose page this is, when it is not the block's own: the
+              // page exists only while that form is in the packet.
+              form: p.form || "",
+              fields: fieldsFor(p.fields)
+            };
+          };
+          attachmentPages.push(pageFor({
+            name: attachmentName,
+            heading: attachmentSetting("attachmentHeading"),
+            item: attachmentSetting("attachmentItem"),
+            itemTitle: attachmentSetting("attachmentItemTitle"),
+            marks: attachmentSetting("attachmentMarks"),
+            fields: attachmentSetting("attachmentFields")
+          }));
+          // The same entries again on another form's own page. DV-100 asks for
+          // the other protected people once; DV-110 and CLETS-001 each print four
+          // of them and say to attach a sheet for the rest, under their own
+          // heading, with their own columns, ticking their own box.
+          let otherPages = [];
+          try { otherPages = JSON.parse(attachmentSetting("attachmentOtherPages") || "[]"); } catch (e) { otherPages = []; }
+          (Array.isArray(otherPages) ? otherPages : []).forEach(function (p) {
+            if (p && p.name) attachmentPages.push(pageFor(p));
+          });
+        }
         // Ensure formatCurrencyInput function is available for currency fields
         formHTML += `<script>
           window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
@@ -5230,7 +5311,7 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
             logicScriptBuffer += `      var checkedVals=[];\n`;
             logicScriptBuffer += `      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
             logicScriptBuffer += `      \n`;
-            logicScriptBuffer += `      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }\n`;
+            logicScriptBuffer += `      if(checkedVals.indexOf(cPrevAns)!==-1 && questionContainer && !questionContainer.classList.contains('hidden')){ anyMatch=true; }\n`;
             logicScriptBuffer += `    } else {\n`;
             logicScriptBuffer += `      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
             // Special case for special options that check for presence rather than exact value
@@ -5252,11 +5333,27 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
               } else {
                 logicScriptBuffer += `      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }\n`;
               }
-              logicScriptBuffer += `    } else { }\n`;
+              // A question asked in several boxes has no element of its own: the
+              // name is the question's, and only its parts are on the page. Its
+              // answer is what its boxes hold. Once "Who do you want protection
+              // from?" and "What is your name and age?" were asked in parts, every
+              // form that opens on them stayed shut - DV-101, DV-105, DV-108,
+              // CLETS-001 and DV-110 never showed their first question, and a
+              // question-at-a-time page that showed nothing had its first question
+              // forced on screen instead.
+              const anyAnswerWillDo = paVal === "any text" || paVal === "any amount" || paVal === "any date";
+              logicScriptBuffer += "    } else { var boxQ=document.getElementById('question-container-' + cPrevQNum); if(boxQ && !boxQ.classList.contains('hidden')){ var boxes=boxQ.querySelectorAll('input, select, textarea'); for(var bi=0; bi<boxes.length; bi++){ var bx=boxes[bi]; if(bx.type==='hidden' || bx.disabled) continue; var bv=(bx.type==='checkbox' || bx.type==='radio') ? (bx.checked ? String(bx.value || '') : '') : String(bx.value || '').trim(); if(bv==='' || bv.toLowerCase()==='select an option') continue; "
+                + (anyAnswerWillDo ? "anyMatch=true; break;" : "if(bv.toLowerCase()===cPrevAns){ anyMatch=true; break; }")
+                + " } } }\n";
             }
             logicScriptBuffer += `  })();\n`;
           }
           logicScriptBuffer += ` if(anyMatch){ thisQ.classList.remove("hidden"); } else { \n`;
+          // A settle runs every question's check again, and one already closed has
+          // nothing to reset: resetting it anyway fired its dropdowns' change events
+          // and everything listening to them, 258 times a pass - nine seconds after
+          // a reload in which the page could not be used. Closing still resets.
+          logicScriptBuffer += `   if(!(window.__fwSettling && thisQ.classList.contains('hidden'))){\n`;
           // Check if this is a numbered dropdown question and reset it before hiding
           // Use fallback check since data-question-type might not be reliable
           logicScriptBuffer += `   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');\n`;
@@ -5338,6 +5435,7 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
           // fill spent twelve seconds inside that cascade where it had spent forty
           // milliseconds. It buys nothing, because a dependent reads the trigger
           // value as well as the class, and that value has just been cleared.
+          logicScriptBuffer += `   }\n`;
           logicScriptBuffer += `   thisQ.classList.add("hidden");\n`;
           logicScriptBuffer += ` }\n`;
           logicScriptBuffer += `  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;\n`;
@@ -5397,16 +5495,21 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
               logicScriptBuffer += `   if(el3){ el3.addEventListener("input", function(){ updateVisibility();}); el3.addEventListener("change", function(){ updateVisibility();}); }\n`;
               logicScriptBuffer += ` })();\n`;
             } else {
-              // Use "input" event for text fields
+              // "input" for text fields, and "change" as well: the restore puts a saved
+              // paragraph back without an input event and replays every answer as
+              // "change", so a question waiting on a paragraph never heard it come
+              // back - after a reload DV-100's pages 6 to 9 stayed shut.
               logicScriptBuffer += ` (function(){\n`;
               // Use explicit question ID reference
               logicScriptBuffer += `   var textQuestion = "${pqVal2}";\n`;
               // IMPORTANT: Try questionNameIds first, then fallback to default naming
               logicScriptBuffer += `   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);\n`;
-              logicScriptBuffer += `   if(el3){ el3.addEventListener("input", function(){ updateVisibility();}); }\n`;
+              logicScriptBuffer += `   if(el3){ el3.addEventListener("input", function(){ updateVisibility();}); el3.addEventListener("change", function(){ updateVisibility();}); } else { var boxQ3=document.getElementById('question-container-' + textQuestion); if(boxQ3){ boxQ3.addEventListener('input', function(){ updateVisibility(); }); boxQ3.addEventListener('change', function(){ updateVisibility(); }); } }\n`;
               logicScriptBuffer += ` })();\n`;
             }
           }
+          // On one list, so the restore can run them all again once every answer is back.
+          logicScriptBuffer += ` (window.__fwVisibilityUpdaters = window.__fwVisibilityUpdaters || []).push(updateVisibility);\n`;
           logicScriptBuffer += ` updateVisibility();\n`;
           logicScriptBuffer += `})();\n`;
         }
@@ -6671,9 +6774,12 @@ if (s > 1){
               if (firstQuestion) {
                 const questionId = firstQuestion.getAttribute('data-question-id') || firstQuestion.id || 'unknown';
 
-                // Remove both question-step-hidden AND hidden classes to ensure question is visible
+                // Only the step class. A question its conditions hide stays hidden:
+                // taking "hidden" off here showed DV-100's "How many wireless phone
+                // numbers do you want transferred?" to a filer who had unticked the
+                // phone transfer - page 9 had nothing left to ask, so its first
+                // question was shown anyway, and Next stopped on it.
                 firstQuestion.classList.remove('question-step-hidden');
-                firstQuestion.classList.remove('hidden');
 
               }
             }
@@ -7222,7 +7328,19 @@ if (s > 1){
     if (!cap || text.length <= cap) return null;
     var el = document.getElementById(name + "_short")
       || document.querySelector('[name="' + name + '_short"]');
-    if (!el) return null;
+    if (!el) {
+      // A date the box cannot hold whole keeps its month and year - what a
+      // "(month/year)" box on DV-105 item 4 asks for - as 03/2020 when that
+      // fits and 03/20 when only five characters do.
+      var bits = text.split(text.indexOf("/") !== -1 ? "/" : "-");
+      if (bits.length === 3 && bits[0].length === 2 && bits[2].length === 4) {
+        var monthYear = bits[0] + "/" + bits[2];
+        if (monthYear.length <= cap) return monthYear;
+        var monthShortYear = bits[0] + "/" + bits[2].slice(2);
+        if (monthShortYear.length <= cap) return monthShortYear;
+      }
+      return null;
+    }
     var short = String(el.value || "").trim();
     if (!short || short.length > cap) return null;
     return short;
@@ -9640,6 +9758,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var projectId = ${JSON.stringify(window.projectIdConfig || '')};\n`;
   formHTML += `var fieldCapacity = ${JSON.stringify(window.fieldCapacityConfig || {})};\n`;
   formHTML += `var overflowLinks = ${JSON.stringify(window.overflowLinksConfig || [])};\n`;
+  formHTML += `var attachmentPages = ${JSON.stringify(attachmentPages)};\n`;
   formHTML += `window.__PROJECT_ID__ = projectId;\n`;
   formHTML += `var isHandlingLink = false;\n`;
   // Dynamic conditional logic for business type question to show county question
@@ -12174,7 +12293,7 @@ function showTextboxLabels(questionId, count){
     const locationFields = ['Street', 'City', 'State', 'Zip'];
     // By first word, so "Street address" and "ZIP code" belong to the address.
     const isLocationLabel = (label) => locationFields.includes(label) ||
-      /^(street|city|state|zip)( |$)/i.test(String(label || '').trim());
+      /^(street( address)?|city|state|zip( code)?)$/i.test(String(label || '').trim());
     for(let j = 1; j <= count; j++){
         let lastWasLocation = false;
         let firstField = true;
@@ -12190,6 +12309,10 @@ function showTextboxLabels(questionId, count){
             // person no way to say which one they are filling in, or to match
             // what they typed against the numbered rows on the printed form.
             titleLabel.textContent = entryTitle + ' #' + j;
+            var attachmentHere = attachmentPageList().filter(function(a){ return String(a.questionId) === String(questionId); })[0];
+            if (attachmentHere && j > attachmentHere.pdfRows) {
+                titleLabel.textContent += ' - on the attached page (' + (attachmentHere.heading || attachmentHere.name) + ')';
+            }
             titleLabel.style.cssText = 'margin: 0 0 15px 0; color: #2980b9; font-size: 16px; font-weight: 600; text-align: center; padding-bottom: 10px; border-bottom: 1px solid #e1e5e9;';
             entryContainer.appendChild(titleLabel);
         }
@@ -12211,11 +12334,7 @@ function showTextboxLabels(questionId, count){
                 // Skip this location field as it should be handled by trigger sequences
                 continue;
             }
-            // Add <br> before first location field in each count
-            if (isLocationField && !lastWasLocation && !firstField) {
-                const br = document.createElement('br');
-                entryContainer.appendChild(br);
-            }
+            // No <br> before the first address box: every box in a question keeps the same spacing.
             if (field.type === 'location') {
                 // Render main location field block
                 const locationFieldDiv = document.createElement('div');
@@ -14398,6 +14517,113 @@ function writeComputedField(nameId, value){
     el.value = String(value);
 }
 
+/*------------------------------------------------------------------
+ *  Entries past what the PDF prints, on a page the form draws.
+ *
+ *    A table on the paper prints a fixed number of rows - DV-105 item 3
+ *    has four for children - and says to attach a sheet for the rest. A
+ *    block with an attachment lets the filer keep adding entries; the
+ *    ones past the rows are posted with the request for that page and
+ *    the server draws it (FormWiz GUI/attachment-page.js). The form's
+ *    "need more space" box ticks itself whenever the page exists.
+ *-----------------------------------------------------------------*/
+function attachmentPageList(){
+    return (typeof attachmentPages !== "undefined" && Array.isArray(attachmentPages)) ? attachmentPages : [];
+}
+function attachmentBaseName(pdfName){
+    var base = String(pdfName || "");
+    if (base.toLowerCase().slice(-4) === ".pdf") base = base.slice(0, -4);
+    return base;
+}
+function attachmentCount(att){
+    var sel = document.getElementById(att.block);
+    var n = sel ? parseInt(sel.value, 10) : 0;
+    return isNaN(n) ? 0 : n;
+}
+/**
+ * The page exists when its form is in the packet, its block is on screen, and
+ * the block holds more entries than the PDF prints. Without the first, DV-105's
+ * children page came out for a filer who never asked for custody orders - the
+ * block was answerable, but DV-105 itself was never switched on.
+ */
+function attachmentInUse(att){
+    var sel = document.getElementById(att.block);
+    if (!sel) return false;
+    var q = sel.closest(".question-container");
+    if (q && q.classList.contains("hidden")) return false;
+    var sec = sel.closest(".section");
+    if (sec && typeof formOwningSection === "function" && typeof isFormActivated === "function"){
+        var owner = formOwningSection(Number(String(sec.id || "").slice(7)));
+        if (owner && !isFormActivated(owner)) return false;
+    }
+    if (att.form && typeof getProjectForms === "function" && typeof isFormActivated === "function"){
+        var named = getProjectForms().filter(function(f){ return f && f.name === att.form; })[0];
+        if (named && !isFormActivated(named)) return false;
+    }
+    return attachmentCount(att) > att.pdfRows;
+}
+/** Tick - or clear - the box that says the page is attached. */
+function applyAttachmentMarks(){
+    attachmentPageList().forEach(function(att){
+        if (!att.marks) return;
+        var box = document.getElementById(att.marks);
+        if (!box){
+            box = document.createElement("input");
+            box.type = "checkbox";
+            box.id = att.marks;
+            box.name = att.marks;
+            box.style.display = "none";
+            box.setAttribute("data-computed", "1");
+            var host = document.getElementById("hidden_pdf_fields") || document.getElementById("customForm");
+            if (!host) return;
+            host.appendChild(box);
+        }
+        var on = attachmentPageList().some(function(a){ return a.marks === att.marks && attachmentInUse(a); });
+        if (box.type === "checkbox") box.checked = on;
+        else box.value = on ? "Yes" : "";
+    });
+}
+/** One entry's answer to one field, as the page prints it. */
+function attachmentValue(field, n){
+    if (field.type === "checkbox" && field.options && field.options.length){
+        return field.options.filter(function(o){
+            var box = document.getElementById(entryFieldId(o.nodeId, n));
+            return box && box.checked;
+        }).map(function(o){ return o.text; }).join(", ");
+    }
+    var el = document.getElementById(entryFieldId(field.nodeId, n));
+    if (!el) return "";
+    var v = String(el.value || "").trim();
+    if (el.type === "date" && v && typeof formatDateForServer === "function") v = formatDateForServer(v);
+    return v;
+}
+/** What the server needs to draw the page, or null when this PDF is not one. */
+function attachmentSpecFor(pdfName){
+    var base = attachmentBaseName(pdfName);
+    var att = attachmentPageList().filter(function(a){ return a.name === base; })[0];
+    if (!att) return null;
+    var count = attachmentCount(att);
+    var entries = [];
+    for (var n = att.pdfRows + 1; n <= count; n++){
+        var values = (att.fields || []).map(function(f){ return { label: f.label, value: attachmentValue(f, n) }; });
+        if (values.some(function(v){ return v.value; })) entries.push({ number: n, values: values });
+    }
+    var caseEl = document.getElementById("case_number");
+    return {
+        name: att.name, heading: att.heading, item: att.item, itemTitle: att.itemTitle,
+        caseNumber: caseEl ? String(caseEl.value || "").trim() : "",
+        entries: entries
+    };
+}
+if (typeof document !== "undefined" && !window.__FW_ATTACHMENT_MARKS_BOUND__){
+    window.__FW_ATTACHMENT_MARKS_BOUND__ = true;
+    document.addEventListener("change", function(e){
+        var t = e && e.target;
+        if (!t || t.tagName !== "SELECT") return;
+        if (attachmentPageList().some(function(a){ return a.block === t.id; })) applyAttachmentMarks();
+    }, true);
+}
+
 /**
  * Work out the fields the form asks for that the filer cannot know.
  *
@@ -14821,6 +15047,7 @@ function handleNext(currentSection){
     runAllHiddenTextCalculations();
     refreshStateMirrors();
     applyOverflowLinks();
+    applyAttachmentMarks();
     applyComputedFields();
     /* remember the place we're leaving - push BEFORE evaluating jumps */
     sectionStack.push(currentSection);
@@ -14866,6 +15093,16 @@ function handleNext(currentSection){
     }
     nextSection = parseInt(nextSection,10);
     if (isNaN(nextSection)) nextSection = currentSection + 1;
+    // A page with no question showing is nothing to stop on - the answers so
+    // far have closed everything on it. Go on to the next page that has one.
+    if (!sectionHasQuestionShowing(document.getElementById('section' + nextSection))){
+        var onward = nextSectionStillToAnswer(nextSection);
+        if (onward === 'end'){
+            processAllPdfs().then(()=>navigateSection('end'));
+            return;
+        }
+        nextSection = onward;
+    }
     navigateSection(nextSection);
     /* recalc hidden fields after navigation */
     runAllHiddenCheckboxCalculations();
@@ -15212,6 +15449,13 @@ async function processAllPdfs() {
             emittedForForms = true;
             await editAndDownloadPDF(baseName);
         }
+    }
+    // A page the form draws itself: a block's entries past the rows its PDF prints.
+    applyAttachmentMarks();
+    for (const att of attachmentPageList()) {
+        if (!attachmentInUse(att) || processedPdfs.has(att.name)) continue;
+        processedPdfs.add(att.name);
+        await editAndDownloadPDF(att.name);
     }
     // Process main PDFs - use the actual PDF filename, not the form name
     if (!emittedForForms && pdfOutputFileName) {
@@ -15584,6 +15828,12 @@ async function getAllPdfsList() {
         }
     }
 
+    // A page the form draws itself - listed like a form, previewed through /edit_pdf.
+    for (const att of attachmentPageList()) {
+        if (!attachmentInUse(att) || processedPdfs.has(att.name)) continue;
+        processedPdfs.add(att.name);
+        pdfsList.push({ baseName: att.name, displayName: att.heading || att.name, type: 'form' });
+    }
     // Process main PDF
     if (!listedPacketForms && pdfOutputFileName) {
         const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
@@ -16021,6 +16271,8 @@ async function previewPdf(baseName, isUploaded, isLatex, isPdfPreview, questionI
             }
         });
 
+        var previewAttachmentSpec = attachmentSpecFor(baseName);
+        if (previewAttachmentSpec) fd.append("__attachment", JSON.stringify(previewAttachmentSpec));
         // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
         const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
         const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
@@ -16269,6 +16521,9 @@ async function editAndDownloadPDF (pdfName) {
         for (const [key, val] of fd.entries()) {
 
         }
+        // A page the form draws: send the rows it prints.
+        var attachmentSpec = attachmentSpecFor(pdfName);
+        if (attachmentSpec) fd.append("__attachment", JSON.stringify(attachmentSpec));
         // Use the /edit_pdf endpoint with the PDF name as a query parameter.
         // Keep the extension and include credentials so the backend can find the file and respect the current session.
         const baseName = pdfName.replace(/\.pdf$/i, '');
@@ -16943,6 +17198,8 @@ if (typeof handleNext === 'function') {
                         sliceStart = performance.now();
                     }
                 }
+                // Every answer is back: let each question see the ones it waits on.
+                if (typeof fwSettleVisibility === 'function') fwSettleVisibility();
             } finally {
                 replayingAnswers = false;
             }
@@ -18076,6 +18333,9 @@ if (typeof handleNext === 'function') {
                 if (targetRadioBefore) {
 
                 }
+            // The later passes fill boxes that only exist once their question is
+            // open; settle again with those in.
+            if (typeof fwSettleVisibility === 'function') fwSettleVisibility();
             window.isInitialAutofill = false;
 
                 // Verify target radio button state after clearing flag
@@ -19647,6 +19907,46 @@ function fwSyncDateField(input) {
 function fwSyncDateFields() {
   document.querySelectorAll('.fw-date-field input').forEach(fwSyncDateField);
 }
+
+/**
+ * Check every question's visibility again until nothing changes.
+ *
+ * A question counts its parent's answer only while the parent is showing, and
+ * hears that answer only when it changes. A restore puts every answer back
+ * once, in page order, often while the question holding it is still hidden -
+ * and when that question then appears, nothing tells the ones waiting on it.
+ * After a reload DV-100's pages 6 to 9 and DV-105's pages 13 to 17 stayed shut
+ * with every answer still in them. Returns the number of passes it took.
+ */
+function fwSettleVisibility(maxPasses) {
+  var updaters = window.__fwVisibilityUpdaters || [];
+  if (!updaters.length) return 0;
+  var state = function () {
+    var s = '';
+    document.querySelectorAll('.question-container').forEach(function (q) {
+      s += q.classList.contains('hidden') ? '0' : '1';
+    });
+    return s;
+  };
+  var before = state();
+  var passes = 0;
+  window.__fwSettling = true;
+  try {
+    while (passes < (maxPasses || 8)) {
+      passes++;
+      for (var i = 0; i < updaters.length; i++) {
+        try { updaters[i](); } catch (e) { /* one question's logic should not stop the rest */ }
+      }
+      var after = state();
+      if (after === before) break;
+      before = after;
+    }
+  } finally {
+    window.__fwSettling = false;
+  }
+  document.dispatchEvent(new CustomEvent('questionVisibilityChanged', { detail: { sectionId: null } }));
+  return passes;
+}
 if (typeof document !== 'undefined' && !window.__FW_DATE_FIELDS_BOUND__) {
   window.__FW_DATE_FIELDS_BOUND__ = true;
   ['input', 'change'].forEach(function (type) {
@@ -20238,6 +20538,17 @@ function solverModel() {
 }
 
 /**
+ * Must this question be answered before Next lets the filer on?
+ *
+ * Read off the page the way validateQuestion reads it, so the fill and the
+ * button agree: a question is required unless its container says it is not.
+ */
+function solverQuestionRequired(qid) {
+  const container = document.getElementById('question-container-' + qid);
+  return !!container && container.getAttribute('data-optional') !== '1';
+}
+
+/**
  * What each question is worth if the path reaches it: the fields inside it.
  *
  * Read from the page once, because the scorer has to weigh what the old one
@@ -20424,7 +20735,43 @@ function solveFillPath(options) {
     // PDF field behind each of the others empty. The narrowest marks none.
     if (q.type === 'checkbox') {
       const set = new Set();
-      if (!minimum) opts.forEach(function (v) { set.add(String(v).trim().toLowerCase()); });
+      const norm = function (v) { return String(v).trim().toLowerCase(); };
+      if (!minimum) { opts.forEach(function (v) { set.add(norm(v)); }); return set; }
+      // The narrowest marks none - unless the question is required, where none
+      // is not an answer Next will take. "What is your relationship to the
+      // person you want protection from?" came back blank from every minimum
+      // run, and the double-click fill left it blank too, so the path stopped
+      // at a question the filer cannot get past. A required one gets the single
+      // box that opens least, scored and tie-broken the way a dropdown is.
+      if (!opts.length || !solverQuestionRequired(qid)) return set;
+      // Measured one step ahead, every box opens exactly one question and they
+      // all tie - "We are married" opens the rest of the interview, "We live
+      // together" opens "Did you live together as more than roommates?" - and
+      // the last one won the tie, putting a detour on the narrowest path whose
+      // "No" is the disqualifier. So a question only one box opens is a detour,
+      // and the least path takes the box with the smallest detour: the one that
+      // goes straight on to what most of the boxes lead to.
+      delete answers[qid];
+      const before = solverVisibility(model, ids, answers);
+      const trials = opts.map(function (v) {
+        answers[qid] = new Set([norm(v)]);
+        const vis = solverVisibility(model, ids, answers);
+        return {
+          v: v,
+          s: score(answers),
+          opened: ids.filter(function (i) { return i !== qid && vis[i] && !before[i]; })
+        };
+      });
+      const openedBy = {};
+      trials.forEach(function (t) { t.opened.forEach(function (i) { openedBy[i] = (openedBy[i] || 0) + 1; }); });
+      trials.forEach(function (t) {
+        t.detour = t.opened.reduce(function (n, i) { return n + (openedBy[i] === 1 ? weights[i] : 0); }, 0);
+      });
+      let least = trials[0];
+      trials.forEach(function (t) {
+        if (t.detour < least.detour || (t.detour === least.detour && t.s < least.s)) least = t;
+      });
+      set.add(norm(least.v));
       return set;
     }
     if (!opts.length) return 'x';            // a written answer: present, that is all
@@ -21080,16 +21427,11 @@ function getQuestionIdForFillElement(element) {
   return null;
 }
 function wouldOptionJumpToEnd(element, answerValue) {
-  const jumpLogicsArray = (typeof jumpLogics !== 'undefined' && Array.isArray(jumpLogics)) ? jumpLogics : (window.jumpLogics || []);
-  if (!jumpLogicsArray.length) return false;
-  const questionId = getQuestionIdForFillElement(element);
-  if (!questionId) return false;
-  const valLower = String(answerValue).trim().toLowerCase();
-  return jumpLogicsArray.some(function(jl) {
-    return String(jl.questionId) === String(questionId)
-      && String(jl.jumpTo).toLowerCase() === 'end'
-      && String(jl.jumpOption).trim().toLowerCase() === valLower;
-  });
+  // An end node finishes a form only when nothing later is left to ask
+  // (nextSectionStillToAnswer), so an option that leads to one no longer cuts
+  // the path short. Avoiding them kept the maximum fill off every order DV-100
+  // routes to its end node - custody among them - and DV-105 was never filled.
+  return false;
 }
 function wouldTriggerHardAlertOnSelect(select, value) {
   const trigger = select.getAttribute('data-hard-alert-trigger');
@@ -21842,8 +22184,33 @@ function fillVisibleCheckboxesAndRadios() {
     if (!isDebugFillEligible(cb)) return;
     // A minimum run ticks nothing optional: a checkbox group is "mark all that
     // apply", and the least that can apply is none. Leaving them clear is the
-    // whole point - it is what shows which follow-ups are gated on them.
-    if (window.__FILL_MINIMUM__) return;
+    // whole point - it is what shows which follow-ups are gated on them. A
+    // required group is the exception, because Next will not take none: it
+    // gets the one box that opens least, as the solver picks it.
+    if (window.__FILL_MINIMUM__) {
+      const group = cb.closest('.question-container');
+      if (!group || group.getAttribute('data-optional') === '1') return;
+      if (group.querySelector('input[type="radio"]')) return;
+      const boxes = Array.from(group.querySelectorAll('input[type="checkbox"]')).filter(isDebugFillEligible);
+      if (!boxes.length || boxes.some(function (b) { return b.checked; })) return;
+      const usable = boxes.filter(function (b) { return !wouldTriggerHardAlertOnSelect(b, b.value); });
+      const pool = usable.length ? usable : boxes;
+      const scoreOf = function (b) {
+        b.checked = true; triggerFieldChange(b);
+        const s = countExportableFields();
+        b.checked = false; triggerFieldChange(b);
+        return s;
+      };
+      let least = pool[pool.length - 1];
+      let leastScore = scoreOf(least);
+      pool.forEach(function (b) {
+        const s = scoreOf(b);
+        if (s < leastScore) { leastScore = s; least = b; }
+      });
+      least.checked = true;
+      triggerFieldChange(least);
+      return;
+    }
     const container = cb.closest('.question-container');
     const isMarkOnlyOne = container && container.querySelector('input[type="radio"]');
     if (isMarkOnlyOne) return;

@@ -231,11 +231,18 @@ input[type="file"] {
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
+/* The global button rule above makes every button a full-width block. This
+   one sits over the right end of the search box, so at full width it covered
+   the whole input and a click meant to place the cursor cleared the search
+   instead. Size it to its own glyph so the rest of the input takes clicks. */
 #clearSearchBtn {
   position: absolute;
   right: 5px;
   top: 50%;
   transform: translateY(-50%);
+  width: auto;
+  margin: 0;
+  line-height: 1;
   background: none;
   border: none;
   color: #999;

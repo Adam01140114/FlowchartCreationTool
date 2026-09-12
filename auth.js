@@ -123,7 +123,12 @@ function setGuestFlowchartIndex(index) {
 function flowchartCookieKey(id) {
   return 'fwg_d_' + id;
 }
-const guestStorage = {
+/**
+ * The guest library as it was first built: in this browser's cookies, split
+ * into ~4KB pieces, overflowing into localStorage. It is now only the fallback
+ * for a page not served by the dev server - see guestStorage below.
+ */
+const cookieGuestLibrary = {
   saveFlowchart(name, payload) {
     return new Promise((resolve, reject) => {
       try {
@@ -190,7 +195,7 @@ const guestStorage = {
       if (entry) {
         entry.lastUsed = Date.now();
         setGuestFlowchartIndex(index);
-        guestStorage.getFlowchart(name).then(payload => {
+        cookieGuestLibrary.getFlowchart(name).then(payload => {
           if (payload) {
             payload.lastUsed = entry.lastUsed;
             writeChunkedCookie(flowchartCookieKey(entry.id), JSON.stringify(payload));
@@ -246,6 +251,125 @@ const guestStorage = {
   loadSettings() {
     return Promise.resolve(readGuestJsonCookie(GUEST_SETTINGS_COOKIE, null));
   }
+};
+
+/**
+ * The guest library lives on disk, in guest-library/ beside the dev server.
+ *
+ * In cookies a project was dozens of 4KB pieces, a packet the size of the DV set
+ * overflowed into localStorage, and either way it lived and died with this
+ * browser's site data: clearing it, or opening the editor in another browser,
+ * lost every saved project. On disk it is a file that survives all of that.
+ *
+ * Colours and settings stay in cookies - they are small, and per browser is
+ * right for them. The cookie library stays as the fallback for a page that is
+ * not served by the dev server, where the routes do not exist.
+ */
+const GUEST_DISK_API = '/api/guest-library';
+const GUEST_MIGRATED_COOKIE = 'fwg_disk';
+let guestDiskCheck = null;
+
+function guestDiskCall(method, sub, body) {
+  return fetch(GUEST_DISK_API + sub, {
+    method: method,
+    cache: 'no-store',
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined
+  }).then(res => res.json().catch(() => ({})).then(out => {
+    if (!res.ok) {
+      const err = new Error(out.error || ('HTTP ' + res.status));
+      err.status = res.status;
+      throw err;
+    }
+    return out;
+  }));
+}
+
+/**
+ * Whether the disk library is there, asked once per page. The first time it is,
+ * whatever the cookies hold that the disk does not is copied across, so moving
+ * to disk loses nothing. The cookies are left as they were, and a marker stops a
+ * project deleted from disk being copied back on the next visit.
+ */
+function guestDiskReady() {
+  if (guestDiskCheck) return guestDiskCheck;
+  guestDiskCheck = fetch(GUEST_DISK_API, { cache: 'no-store' })
+    .then(res => res.ok && /json/.test(res.headers.get('content-type') || ''))
+    .catch(() => false)
+    .then(ok => {
+      if (!ok) return false;
+      if (getCookie(GUEST_MIGRATED_COOKIE) === '1') return true;
+      return guestDiskCall('GET', '').then(onDisk => {
+        const have = new Set((onDisk || []).map(e => e.name));
+        const moves = getGuestFlowchartIndex().filter(e => !have.has(e.name)).map(entry => {
+          let payload = null;
+          try { payload = JSON.parse(readChunkedCookie(flowchartCookieKey(entry.id)) || 'null'); } catch (e) { payload = null; }
+          if (!payload) return Promise.resolve();
+          payload.lastUsed = entry.lastUsed || payload.lastUsed || Date.now();
+          return guestDiskCall('POST', '/record', { name: entry.name, payload: payload });
+        });
+        return Promise.all(moves);
+      }).then(() => {
+        setCookie(GUEST_MIGRATED_COOKIE, '1', GUEST_COOKIE_DAYS);
+        return true;
+      }, err => {
+        console.warn('[guest library] Could not copy the cookie library to disk:', err && err.message);
+        return true;
+      });
+    });
+  return guestDiskCheck;
+}
+
+const diskGuestLibrary = {
+  saveFlowchart(name, payload) {
+    return guestDiskCall('POST', '/record', { name: name, payload: payload }).then(() => undefined);
+  },
+  // The index only, not every project: a listing that read each file would
+  // move megabytes to draw a list of names. What the library needs to tell
+  // records apart - the project's id and name - is kept in the index.
+  listFlowcharts() {
+    return guestDiskCall('GET', '').then(list => (list || []).map(entry => ({
+      name: entry.name,
+      lastUsed: entry.lastUsed || 0,
+      projectId: entry.projectId || '',
+      data: {
+        lastUsed: entry.lastUsed || 0,
+        flowchart: { projectId: entry.projectId || '', projectName: entry.projectName || '' }
+      }
+    })));
+  },
+  getFlowchart(name) {
+    return guestDiskCall('GET', '/record?name=' + encodeURIComponent(name))
+      .catch(err => { if (err.status === 404) return null; throw err; });
+  },
+  updateLastUsed(name) {
+    return guestDiskCall('POST', '/touch', { name: name }).then(() => undefined, () => undefined);
+  },
+  renameFlowchart(oldName, newName) {
+    return guestDiskCall('POST', '/rename', { oldName: oldName, newName: newName });
+  },
+  deleteFlowchart(name) {
+    return guestDiskCall('POST', '/delete', { name: name }).then(() => undefined);
+  }
+};
+
+function guestLibraryCall(method, args) {
+  return guestDiskReady().then(onDisk => (onDisk ? diskGuestLibrary : cookieGuestLibrary)[method].apply(null, args));
+}
+
+const guestStorage = {
+  saveFlowchart() { return guestLibraryCall('saveFlowchart', arguments); },
+  listFlowcharts() { return guestLibraryCall('listFlowcharts', arguments); },
+  getFlowchart() { return guestLibraryCall('getFlowchart', arguments); },
+  updateLastUsed() { return guestLibraryCall('updateLastUsed', arguments); },
+  renameFlowchart() { return guestLibraryCall('renameFlowchart', arguments); },
+  deleteFlowchart() { return guestLibraryCall('deleteFlowchart', arguments); },
+  /** Where the library is: 'disk' or 'cookies'. */
+  whereStored() { return guestDiskReady().then(onDisk => (onDisk ? 'disk' : 'cookies')); },
+  saveColors(colors) { return cookieGuestLibrary.saveColors(colors); },
+  loadColors() { return cookieGuestLibrary.loadColors(); },
+  saveSettings(settings) { return cookieGuestLibrary.saveSettings(settings); },
+  loadSettings() { return cookieGuestLibrary.loadSettings(); }
 };
 /**
  * Shows the login overlay.

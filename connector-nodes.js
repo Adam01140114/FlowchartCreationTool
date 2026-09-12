@@ -145,15 +145,25 @@
         const edge = cells.find((e) => e.edge && e.target === cell.id);
         return edge ? byId.get(edge.source) : null;
       };
+      // What feeds a connector is its condition, except when it is the form's
+      // End node or another connector. A connector that nothing decides hangs
+      // under End, one below the other, so the chart shows where the filer goes
+      // once the form is finished - and the one above it in that chain is a
+      // place, not an answer. Read as an answer, End became an option labelled
+      // "END" that no filer can choose, and every form chained under it stayed
+      // switched off.
+      const isChainLink = (cell) => /nodeType=(end|connector)(;|$)/.test((cell && cell.style) || '');
       cells.forEach((c) => {
         if (!/nodeType=connector/.test(c.style || '')) return;
         const target = c._connectorTarget
           || (/connectorTarget=([^;]*)/.exec(c.style || '') || [])[1];
         if (!target) return;
         // A connector fed by an option activates its target only when that
-        // option is chosen. A connector wired to nothing activates its target
-        // unconditionally - the way to say two forms always travel together.
-        const option = sourceOf(c);
+        // option is chosen. A connector wired to nothing - or chained under End -
+        // activates its target unconditionally, the way to say two forms always
+        // travel together.
+        const feeder = sourceOf(c);
+        const option = isChainLink(feeder) ? null : feeder;
         const owner = option ? sourceOf(option) : null;
         // A connector can also wait on a plain field rather than on an option.
         // DV-101 arrives because the description outgrew its box, and the box

@@ -14,8 +14,12 @@
  * The PDFs are also rendered to PNG so the pages can be read against the blank
  * form, which is the only way 4b is finished.
  *
- * Usage:  node pipeline-fill.js [answers.json] [--out dir] [--render] [--scale n]
- *                                 [--server url] [--forms a,b,c]
+ * A block with more entries than the paper has rows (DV-105's children) also
+ * gets the page the form draws for the rest, built from the same answers.
+ *
+ * Usage:  node pipeline-fill.js [answers.json] [--answers file] [--out dir]
+ *                                 [--render] [--scale n] [--server url]
+ *                                 [--forms a,b,c] [--gui file]
  */
 const fs = require('fs');
 const path = require('path');
@@ -23,7 +27,14 @@ const { PDFDocument } = require('pdf-lib');
 
 const args = process.argv.slice(2);
 const flag = (n, d) => { const i = args.indexOf('--' + n); return i >= 0 ? args[i + 1] : d; };
-const ANSWERS = args.find((a) => !a.startsWith('--') && a.endsWith('.json')) || 'pipeline-answers.json';
+// A value that follows one of these is that flag's, not the answers file -
+// "--gui dv-packet-gui.json" would otherwise be filled as the answers.
+const VALUE_FLAGS = ['--answers', '--out', '--server', '--forms', '--scale', '--gui'];
+const positional = args.filter((a, i) => !a.startsWith('--') && !VALUE_FLAGS.includes(args[i - 1]));
+const ANSWERS = flag('answers', '') || positional.find((a) => a.endsWith('.json')) || 'pipeline-answers.json';
+// The interview the answers came from. It is the only place a block says how
+// many rows the paper prints and which page takes the rest.
+const GUI = flag('gui', 'dv-packet-gui.json');
 const OUT = flag('out', 'pipeline-out');
 const SERVER = flag('server', 'http://127.0.0.1:8080');
 const RENDER = args.includes('--render');
@@ -148,10 +159,107 @@ function courtOwnedBoxes(base) {
   } catch (err) { return new Set(); }
 }
 
+/**
+ * The blocks that continue on a page the form draws.
+ *
+ * DV-105 item 3 prints four children and the filer may enter twelve. The fifth
+ * onward never reaches a PDF field - the form posts them to /edit_pdf as an
+ * "__attachment" and the server draws the sheet - so filling the packet's PDFs
+ * alone gives a clean-looking run with those children nowhere in it.
+ */
+function attachmentBlocks() {
+  let gui;
+  try { gui = JSON.parse(fs.readFileSync(GUI, 'utf8')); }
+  catch (err) {
+    console.log('attachment pages: cannot read ' + GUI + ' (' + err.message + '), none drawn');
+    return [];
+  }
+  const pages = [];
+  (gui.sections || []).forEach((s) => (s.questions || []).forEach((q) => {
+    // Other settings are also called "attachment" and hold a string.
+    if (!q || !q.attachment || typeof q.attachment !== 'object' || !q.attachment.name) return;
+    // The block's own page, then the same entries on other forms' pages
+    // (DV-110 and CLETS-001 each print four of DV-100's other protected people).
+    [q.attachment].concat(Array.isArray(q.attachment.otherPages) ? q.attachment.otherPages : [])
+      .forEach((att) => { if (att && att.name) pages.push({ q, att, fields: pageFields(q, att.fields) }); });
+  }));
+  return pages;
+}
+
+/**
+ * The columns one page prints, as generate.js picks them: a key such as
+ * "{n}_full_name" (the end of the entry field's id) or a label, in the order
+ * named. Nothing named, or nothing matched, prints every field.
+ */
+function pageFields(q, keys) {
+  const all = q.allFieldsInOrder || [];
+  const wanted = (Array.isArray(keys) ? keys : String(keys || '').split(','))
+    .map((k) => String(k || '').trim()).filter(Boolean);
+  const picked = [];
+  wanted.forEach((k) => {
+    const hit = all.find((f) => (k.includes('{n}') && String(f.nodeId || '').endsWith(k))
+      // A choice column keeps its name as fieldName ("Lives with you?").
+      || String(f.label || f.fieldName || '').trim().toLowerCase() === k.toLowerCase());
+    if (hit && !picked.includes(hit)) picked.push(hit);
+  });
+  return picked.length ? picked : all;
+}
+
+/** The form's id for one entry's field: "{n}" filled in, or "_n" appended. */
+function entryFieldId(nodeId, n) {
+  const id = String(nodeId == null ? '' : nodeId);
+  return id.includes('{n}') ? id.split('{n}').join(String(n)) : id + '_' + n;
+}
+
+/** A ticked box. The form posts "on"; a captured answer set may say "Yes". */
+function ticked(v) {
+  return !!v && !/^(off|false|no|0)$/i.test(String(v).trim());
+}
+
+/**
+ * The request the form sends for the page, built from the answers instead of
+ * the page's inputs - the same shape as attachmentSpecFor in
+ * FormWiz GUI/generate.js, so the server cannot tell the two apart.
+ */
+function attachmentSpec(page, data, count) {
+  const { q, att } = page;
+  const rows = parseInt(q.max, 10) || 0;
+  const entries = [];
+  for (let n = rows + 1; n <= count; n++) {
+    const values = page.fields.map((f) => {
+      const label = f.label || f.fieldName || '';
+      if (f.type === 'checkbox' && f.options && f.options.length) {
+        const chosen = f.options.filter((o) => ticked(data[entryFieldId(o.nodeId, n)]));
+        return { label, value: chosen.map((o) => o.text || o.checkboxText || '').join(', ') };
+      }
+      const v = data[entryFieldId(f.nodeId, n)];
+      return { label, value: v == null ? '' : String(v).trim() };
+    });
+    // An entry the filer left empty is not a row, as on the form.
+    if (values.some((v) => v.value)) entries.push({ number: n, values });
+  }
+  return {
+    name: att.name, heading: att.heading || '', item: att.item || '', itemTitle: att.itemTitle || '',
+    caseNumber: String(data.case_number || '').trim(),
+    entries
+  };
+}
+
 async function main() {
   const data = JSON.parse(fs.readFileSync(ANSWERS, 'utf8'));
   fs.mkdirSync(OUT, { recursive: true });
   console.log('answers: ' + Object.keys(data).length + ' values from ' + ANSWERS);
+
+  // Decided before any form is filled: the box that says a page is attached
+  // is on the forms, and the form ticks it itself whenever there are more
+  // entries than rows, so a captured answer set need not carry it.
+  const attachments = attachmentBlocks().map((page) => Object.assign(page, {
+    count: parseInt(data[page.q.nodeId], 10) || 0, rows: parseInt(page.q.max, 10) || 0
+  }));
+  attachments.forEach((a) => {
+    const marks = a.att.marks;
+    if (a.count > a.rows && marks && !ticked(data[marks])) data[marks] = 'on';
+  });
 
   for (const base of FORMS) {
     let buffer;
@@ -205,6 +313,39 @@ async function main() {
     if (RENDER) {
       const n = await renderPages(file, path.join(OUT, base + '-pages'));
       console.log('  rendered ' + n + ' page(s) to ' + path.join(OUT, base + '-pages'));
+    }
+  }
+
+  for (const a of attachments) {
+    const att = a.att;
+    const base = String(att.name).toLowerCase();
+    const file = path.join(OUT, base + '-filled.pdf');
+    const pagesDir = path.join(OUT, base + '-pages');
+    if (a.count <= a.rows) {
+      console.log('\n' + att.name + ': no attachment needed (' + a.q.nodeId + ' = ' + a.count
+        + ', the form prints ' + a.rows + ')');
+      // pipeline-current-output.js publishes every -pages folder it finds, so
+      // a sheet from an earlier run with more entries would still be shown as
+      // part of a packet that no longer has it.
+      fs.rmSync(file, { force: true });
+      fs.rmSync(pagesDir, { recursive: true, force: true });
+      continue;
+    }
+    const spec = attachmentSpec(a, data, a.count);
+    let buffer;
+    try { buffer = await fillOne(att.name, { __attachment: JSON.stringify(spec) }); }
+    catch (err) { console.log('\n' + att.name + ': ' + err.message); continue; }
+    fs.writeFileSync(file, buffer);
+    console.log('\n' + att.name + '  ->  ' + file);
+    console.log('  "' + spec.heading + '", item ' + spec.item + ': ' + a.q.nodeId + ' = ' + a.count
+      + ', the form prints ' + a.rows + ', ' + spec.entries.length + ' entr'
+      + (spec.entries.length === 1 ? 'y' : 'ies') + ' drawn'
+      + (att.marks ? '   (' + att.marks + ' ticked)' : ''));
+    if (RENDER) {
+      // A shorter list draws fewer pages; last run's extra PNGs would stay.
+      fs.rmSync(pagesDir, { recursive: true, force: true });
+      const n = await renderPages(file, pagesDir);
+      console.log('  rendered ' + n + ' page(s) to ' + pagesDir);
     }
   }
 }

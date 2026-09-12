@@ -177,7 +177,7 @@
     },
     {
       "id": "9",
-      "value": "Describe any injuries.",
+      "value": "Describe any injuries the person caused you.",
       "geometry": {
         "x": 610,
         "y": 1970,
@@ -190,7 +190,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "Describe any injuries.",
+      "_questionText": "Describe any injuries the person caused you.",
       "_questionId": "8",
       "_nameId": "dv101_abuse_1_injuries",
       "_placeholder": "",
@@ -543,7 +543,7 @@
     },
     {
       "id": "27",
-      "value": "Describe any injuries.",
+      "value": "Describe any injuries the person caused you.",
       "geometry": {
         "x": 610,
         "y": 4600,
@@ -556,7 +556,7 @@
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "Describe any injuries.",
+      "_questionText": "Describe any injuries the person caused you.",
       "_questionId": "16",
       "_nameId": "dv101_abuse_2_injuries",
       "_placeholder": "",

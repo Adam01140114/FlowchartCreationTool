@@ -2827,6 +2827,10 @@ window.exportGuiJson = function(download = true) {
         if (cell._dropdownTitle) {
           question.entryTitle = cell._dropdownTitle;
         }
+        // More entries than the PDF prints, drawn on an attached page.
+        if (cell._attachment && cell._attachment.name) {
+          question.attachment = JSON.parse(JSON.stringify(cell._attachment));
+        }
         // Set the allFieldsInOrder array
         question.allFieldsInOrder = allFieldsInOrder;
       } else {
@@ -2843,6 +2847,10 @@ window.exportGuiJson = function(download = true) {
       // Add entryTitle if _dropdownTitle is set
       if (cell._dropdownTitle) {
         question.entryTitle = cell._dropdownTitle;
+      }
+      // More entries than the PDF prints, drawn on an attached page.
+      if (cell._attachment && cell._attachment.name) {
+        question.attachment = JSON.parse(JSON.stringify(cell._attachment));
       }
         question.allFieldsInOrder = [];
       }
@@ -4031,6 +4039,7 @@ window.exportBothJson = function() {
       if (cell._questionText) cellData._questionText = cell._questionText;
       if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
       if (cell._dropdownTitle) cellData._dropdownTitle = cell._dropdownTitle;
+      if (cell._attachment) cellData._attachment = cell._attachment;
       if (cell._nameId) cellData._nameId = cell._nameId;
       if (cell._placeholder) cellData._placeholder = cell._placeholder;
       if (cell._questionId) cellData._questionId = cell._questionId;
@@ -4202,8 +4211,37 @@ function persistFlowchartRecord(flowchartName, cleanedData) {
   }
   return db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set(payload);
 }
-window.saveFlowchart = function() {
-  if (!window.currentUser) { alert("Please log in to save flowcharts."); return;}  
+/**
+ * Every entry in the library, as {name, lastUsed, data}. The Library list
+ * shows them; Save reads them to find this project's own entry, which is
+ * keyed by name but recognised by the project id inside it.
+ */
+function listLibraryRecords() {
+  if (window.isGuestUser && window.isGuestUser()) {
+    return window.guestStorage.listFlowcharts();
+  }
+  return db.collection("users").doc(window.currentUser.uid).collection("flowcharts").get()
+    .then(snapshot=>{
+      let flowcharts = [];
+      snapshot.forEach(doc=>{
+        const name = doc.id;
+        const data = doc.data();
+        const lastUsed = data.lastUsed || 0;
+        flowcharts.push({
+          name: name,
+          lastUsed: lastUsed,
+          data: data
+        });
+      });
+      return flowcharts;
+    });
+}
+/**
+ * Everything Save writes for the form on the canvas. The project hook on
+ * persistFlowchartRecord (project-forms.js) adds the other forms, so this
+ * only has to describe the open one.
+ */
+function collectFlowchartSaveData() {
   // Automatically reset PDF inheritance and Node IDs before saving
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
   // Check Linked Logic properties BEFORE reset
@@ -4228,21 +4266,6 @@ window.saveFlowchart = function() {
     }
   });
   renumberQuestionIds();
-  let flowchartName = currentFlowchartName;
-  if (!flowchartName) {
-    // Get form name from input field
-    const formNameInput = document.getElementById('formNameInput');
-    const formName = formNameInput ? formNameInput.value.trim() : '';
-    if (formName) {
-      flowchartName = formName;
-    } else {
-    flowchartName = prompt("Enter a name for this flowchart:");
-    if (!flowchartName || !flowchartName.trim()) return;
-    }
-    currentFlowchartName = flowchartName;
-    window.currentFlowchartName = flowchartName;
-    console.log('[SAVE FLOWCHART] Set currentFlowchartName', flowchartName);
-  }
   console.log('[EXPORT SAVEFLOWCHART] ========== SAVE FLOWCHART STARTED ==========');
   // Gather data and save
   const data = { cells: [] };
@@ -4293,7 +4316,7 @@ window.saveFlowchart = function() {
         }))
       } : null,
       _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
-      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _fileName: cell._fileName||null, _nameId: cell._nameId||null, _currencyAlerts: cell._currencyAlerts||null,
+      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _attachment: cell._attachment||null, _fileName: cell._fileName||null, _nameId: cell._nameId||null, _currencyAlerts: cell._currencyAlerts||null,
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
@@ -4356,162 +4379,112 @@ window.saveFlowchart = function() {
   // Get current edge style
   data.edgeStyle = currentEdgeStyle;
   // Remove undefined values before saving to Firebase (Firebase doesn't accept undefined)
-  const cleanedData = removeUndefinedValues(data);
-  persistFlowchartRecord(flowchartName, cleanedData)
-    .then(()=>{
-      alert("Flowchart saved as: " + flowchartName);
-      // Set the library flowchart name for autosave protocol
-      window.currentFlowchartName = flowchartName;
-      console.log('[SAVE FLOWCHART] Updated currentFlowchartName after save', flowchartName);
-      // Trigger autosave to update the library flowchart name
-      if (typeof autosaveFlowchartToLocalStorage === 'function') {
-        autosaveFlowchartToLocalStorage();
-      }
-    })
-    .catch(err=>alert("Error saving: " + err));
-};
-// Save flowchart as a new flowchart (Save As functionality)
-window.saveAsFlowchart = function() {
-  if (!window.currentUser) { 
-    alert("Please log in to save flowcharts."); 
-    return;
-  }  
-  // Automatically reset PDF inheritance and Node IDs before saving
-  // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
-  // Check Linked Logic properties BEFORE reset
-  const graph = window.graph;
-  const parent = graph.getDefaultParent();
-  const allCells = graph.getChildVertices(parent);
-  allCells.forEach(cell => {
-    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
-    }
-  });
-  // Reset PDF inheritance for all nodes FIRST
-  if (typeof window.resetAllPdfInheritance === 'function') {
-    window.resetAllPdfInheritance();
+  return removeUndefinedValues(data);
+}
+/**
+ * The name the project is saved under: the Project Name box. When the box is
+ * empty the operator is asked, and the answer goes into the box, so the next
+ * Save does not ask again and exports and autosave carry the same name.
+ */
+function projectSaveName() {
+  const input = document.getElementById('projectNameInput');
+  const typed = input ? input.value.trim() : '';
+  if (typed) return typed;
+  const answer = prompt("Enter a name for this project:");
+  const name = answer ? answer.trim() : '';
+  if (name && input) input.value = name;
+  return name;
+}
+/** The project id a library entry was saved with, or '' for one saved before ids. */
+function libraryRecordProjectId(record) {
+  const flowchart = record && record.data && record.data.flowchart;
+  return flowchart && flowchart.projectId ? String(flowchart.projectId) : '';
+}
+function deleteLibraryRecord(name) {
+  if (window.isGuestUser && window.isGuestUser()) {
+    return window.guestStorage.deleteFlowchart(name);
   }
-  // Reset all Node IDs SECOND (after PDF inheritance is fixed)
-  if (typeof resetAllNodeIds === 'function') {
-    resetAllNodeIds();
-  }
-  // Check Linked Logic properties AFTER reset
-  allCells.forEach(cell => {
-    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
-    }
-  });
-  renumberQuestionIds();
-  // Always prompt for a new name for "Save As"
-  let flowchartName = prompt("Enter a name for this new flowchart:");
-  if (!flowchartName || !flowchartName.trim()) return;
-  // Update the current flowchart name to the new name
-  currentFlowchartName = flowchartName;
-  window.currentFlowchartName = flowchartName;
-  console.log('[SAVE AS] Set currentFlowchartName', flowchartName);
-  // Gather data and save (same logic as saveFlowchart)
-  const data = { cells: [] };
-  const cells = graph.getModel().cells;
-  for (let id in cells) {
-    if (id === "0" || id === "1") continue;
-    const cell = cells[id];
-    const cellData = {
-      id: cell.id, 
-      value: cell.value || "",
-      geometry: cell.geometry ? { 
-        x: cell.geometry.x, 
-        y: cell.geometry.y, 
-        width: cell.geometry.width, 
-        height: cell.geometry.height 
-      } : null,
-      style: cleanStyle(cell.style || ""),
-      vertex: !!cell.vertex, 
-      edge: !!cell.edge,
-      source: cell.edge ? (cell.source? cell.source.id:null) : null,
-      target: cell.edge ? (cell.target? cell.target.id:null) : null,
-      // Save edge geometry (articulation points) if it exists
-      edgeGeometry: cell.edge && cell.geometry && cell.geometry.points && cell.geometry.points.length > 0 ? {
-        points: cell.geometry.points.map(point => ({
-          x: point.x,
-          y: point.y
-        }))
-      } : null,
-      _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
-      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _fileName: cell._fileName||null, _nameId: cell._nameId||null, _currencyAlerts: cell._currencyAlerts||null,
-      _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
-      _image: cell._image||null,
-      _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
-      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null, _pdfLogicEnabled: cell._pdfLogicEnabled||null, _pdfTriggerLimit: cell._pdfTriggerLimit||null, _bigParagraphPdfName: cell._bigParagraphPdfName||null, _bigParagraphPdfFile: cell._bigParagraphPdfFile||null, _bigParagraphPdfPrice: cell._bigParagraphPdfPrice||null,
-      _pdfPreviewTitle: cell._pdfPreviewTitle !== undefined ? cell._pdfPreviewTitle : null,
-      _pdfPreviewFile: cell._pdfPreviewFile !== undefined ? cell._pdfPreviewFile : null,
-      _pdfPreviewFilename: cell._pdfPreviewFilename !== undefined ? cell._pdfPreviewFilename : null,
-      _pdfPreviewPriceId: cell._pdfPreviewPriceId !== undefined ? cell._pdfPreviewPriceId : null,
-      _pdfPreviewAttachment: cell._pdfPreviewAttachment !== undefined ? cell._pdfPreviewAttachment : null,
-      _checkboxAvailability: cell._checkboxAvailability||null,
-      _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
-      _locationIndex: cell._locationIndex !== undefined ? cell._locationIndex : undefined,
-      _locationTitle: cell._locationTitle !== undefined ? cell._locationTitle : undefined,
-      _checkboxes: cell._checkboxes||null,
-      _itemOrder: cell._itemOrder||null,
-      _times: cell._times||null,
-      _dropdowns: cell._dropdowns||null,
-      _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
-      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null, _linkedJoin: cell._linkedJoin||null,
-      _linkedCheckboxNodeId: cell._linkedCheckboxNodeId||null, _linkedCheckboxOptions: cell._linkedCheckboxOptions||null,
-      _inverseCheckboxNodeId: (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) ? (cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null) : (cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null),
-      _inverseCheckboxOption: (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) ? (cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null) : (cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null)
+  return db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name).delete();
+}
+/**
+ * Work out what saving this project as `name` does to the library.
+ *
+ * The library is keyed by name, but a project is recognised by its id, and
+ * the two come apart when the project is renamed. An entry holding this
+ * project's id under another name is the project's old name: it is removed
+ * once the new one is written, so one project stays one entry rather than
+ * leaving stale copies behind. An entry with this name and a different id is
+ * another project, and overwriting it needs a yes.
+ */
+function planProjectSave(name, projectId) {
+  return listLibraryRecords().then(records => {
+    const existing = records.find(record => record.name === name);
+    const ownerId = existing ? libraryRecordProjectId(existing) : '';
+    // An entry saved before projects carried ids cannot say whose it is. If
+    // it is the entry this project was opened from it is this project;
+    // otherwise it is treated like any other project's entry.
+    const isOurs = !!existing && (ownerId ? ownerId === projectId : name === window.currentFlowchartName);
+    return {
+      clash: !!existing && !isOurs,
+      ownerId: ownerId,
+      // Without an id there is nothing to recognise an old name by, and
+      // matching on the empty id would sweep up every entry saved before ids.
+      renamedFrom: projectId
+        ? records
+            .filter(record => record.name !== name && libraryRecordProjectId(record) === projectId)
+            .map(record => record.name)
+        : []
     };
-    // Log inverse checkbox properties for this cell
-    if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
-      console.log(`[EXPORT] Cell ${cell.id} is inverse checkbox:`, {
-        cellId: cell.id,
-        cellInverseCheckboxNodeId: cell._inverseCheckboxNodeId,
-        cellInverseCheckboxOption: cell._inverseCheckboxOption,
-        exportedInverseCheckboxNodeId: cellData._inverseCheckboxNodeId,
-        exportedInverseCheckboxOption: cellData._inverseCheckboxOption
-      });
-    }
-    // Debug logging for Linked Logic properties
-    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
-    }
-    if (isCalculationNode(cell)) {
-      cellData._calcTitle = cell._calcTitle || null;
-      cellData._calcAmountLabel = cell._calcAmountLabel || null;
-      cellData._calcOperator = cell._calcOperator || null;
-      cellData._calcThreshold = cell._calcThreshold || null;
-      cellData._calcFinalText = cell._calcFinalText || null;
-      cellData._calcTerms = cell._calcTerms || null;
-      cellData._calcFinalOutputType = cell._calcFinalOutputType || null;
-      cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked || null;
-    }
-    data.cells.push(cellData);
-  }
-  // Get current section preferences using the proper function
-  const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {});
-  data.sectionPrefs = currentSectionPrefs;
-  data.groups = getGroupsData();
-  // Get default PDF properties
-  const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
-    window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
-  data.defaultPdfProperties = defaultPdfProps;
-  // Get form name
-  const formName = document.getElementById('formNameInput')?.value || '';
-  data.formName = formName;
-  // Get current edge style
-  data.edgeStyle = currentEdgeStyle;
-  // Remove undefined values before saving to Firebase (Firebase doesn't accept undefined)
-  const cleanedData = removeUndefinedValues(data);
-  persistFlowchartRecord(flowchartName, cleanedData)
-    .then(()=>{
-      alert("Flowchart saved as: " + flowchartName);
-      // Set the library flowchart name for autosave protocol
-      window.currentFlowchartName = flowchartName;
-      console.log('[SAVE AS] Updated currentFlowchartName after save', flowchartName);
-      // Trigger autosave to update the library flowchart name
-      if (typeof autosaveFlowchartToLocalStorage === 'function') {
-        autosaveFlowchartToLocalStorage();
+  });
+}
+window.saveFlowchart = function() {
+  if (!window.currentUser) { alert("Please log in to save flowcharts."); return; }
+  const flowchartName = projectSaveName();
+  if (!flowchartName) return;
+  const projectId = typeof window.currentProjectId === 'function' ? window.currentProjectId(true) : '';
+  planProjectSave(flowchartName, projectId)
+    .then(plan => {
+      if (plan.clash) {
+        const question = plan.ownerId
+          ? 'A different project is already saved as "' + flowchartName + '". Replace it with this one?'
+          : '"' + flowchartName + '" is already in the library, saved before projects had IDs, '
+            + 'so it may be a different project. Replace it with this one?';
+        if (!confirm(question)) return;
       }
+      // Resetting Node IDs rewrites the canvas, so it waits until the save
+      // is certain to go ahead.
+      const cleanedData = collectFlowchartSaveData();
+      return persistFlowchartRecord(flowchartName, cleanedData).then(() => {
+        currentFlowchartName = flowchartName;
+        window.currentFlowchartName = flowchartName;
+        console.log('[SAVE FLOWCHART] Updated currentFlowchartName after save', flowchartName);
+        // The old name is removed only after the new one is written, so a
+        // failed save can never leave the project with no entry at all.
+        const replaced = plan.renamedFrom;
+        return Promise.all(replaced.map(deleteLibraryRecord)).then(
+          () => alert("Project saved as: " + flowchartName
+            + (replaced.length ? ' (replacing "' + replaced.join('", "') + '")' : '')),
+          err => alert("Project saved as: " + flowchartName + ', but the old entry "'
+            + replaced.join('", "') + '" could not be removed: ' + err)
+        );
+      }).then(() => {
+        // Trigger autosave to update the library flowchart name
+        if (typeof autosaveFlowchartToLocalStorage === 'function') {
+          autosaveFlowchartToLocalStorage();
+        }
+        // A save is the newest version, so the project's live site is rebuilt
+        // from it straight away, at the link its project id owns - see
+        // live-site-publish.js. It runs after the save has landed, and a
+        // failure there says so without undoing the save.
+        if (typeof window.publishProjectLiveSite === 'function') {
+          window.publishProjectLiveSite();
+        }
+      });
     })
     .catch(err=>alert("Error saving: " + err));
 };
+// Save As used to live here. It was removed with its button: it made a second
+// library entry for the same project, and Save now names the project instead.
 function loadSavedFlowchartList(flowcharts) {
   flowcharts.sort((a, b) => b.lastUsed - a.lastUsed);
   window.currentFlowcharts = flowcharts;
@@ -4532,24 +4505,7 @@ function loadSavedFlowchartList(flowcharts) {
 // View saved flowcharts
 window.viewSavedFlowcharts = function() {
   if (!window.currentUser) { alert("Please log in to view saved flowcharts."); return; }
-  const listPromise = (window.isGuestUser && window.isGuestUser())
-    ? window.guestStorage.listFlowcharts()
-    : db.collection("users").doc(window.currentUser.uid).collection("flowcharts").get()
-      .then(snapshot=>{
-        let flowcharts = [];
-        snapshot.forEach(doc=>{
-          const name = doc.id;
-          const data = doc.data();
-          const lastUsed = data.lastUsed || 0;
-          flowcharts.push({
-            name: name,
-            lastUsed: lastUsed,
-            data: data
-          });
-        });
-        return flowcharts;
-      });
-  listPromise
+  listLibraryRecords()
     .then(loadSavedFlowchartList)
     .catch(err=>alert("Error fetching: " + err));
 };
@@ -5497,6 +5453,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         }
         if (item._twoNumbers) newCell._twoNumbers = item._twoNumbers;
         if (item._dropdownTitle) newCell._dropdownTitle = item._dropdownTitle;
+        if (item._attachment) newCell._attachment = item._attachment;
         if (item._fileName) newCell._fileName = item._fileName;
         if (item._nameId) newCell._nameId = item._nameId;
         if (item._placeholder) newCell._placeholder = item._placeholder;

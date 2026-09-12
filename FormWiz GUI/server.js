@@ -719,6 +719,18 @@ function mapRadioValue(field, value) {
  * and returns the edited PDF with filled‑in fields.
  */
 app.post('/edit_pdf', async (req, res) => {
+  const { drawAttachmentPage } = require('./attachment-page');
+  // A page the form draws itself: entries past the rows the paper prints.
+  // There is no template to fill - the form sends the rows it wants drawn.
+  if (req.body && req.body.__attachment) {
+    let spec;
+    try { spec = JSON.parse(req.body.__attachment); } catch (e) { return res.status(400).send('Bad attachment spec'); }
+    const attachmentBytes = await drawAttachmentPage(spec);
+    const attachmentBase = path.basename(String(req.query.pdf || spec.name || 'Attachment')).replace(/\.pdf$/i, '');
+    return res
+      .set({ 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="Edited_${attachmentBase}.pdf"` })
+      .send(Buffer.from(attachmentBytes));
+  }
   let pdfBytes;
   let outputName = 'Edited_document.pdf';
 

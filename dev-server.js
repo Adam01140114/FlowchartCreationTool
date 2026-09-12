@@ -25,6 +25,7 @@ const {
 } = require('pdf-lib');
 const { preparePayloadHtml, sanitizePayloadFolderName } = require('./payload-html');
 const ruledLines = require('./ruled-lines');
+const { drawAttachmentPage } = require('./FormWiz GUI/attachment-page');
 
 /**
  * The printed rules of the document being filled, for the length of one fill.
@@ -545,6 +546,17 @@ function ruledLineTextAppearance(field, widget, font) {
 
 app.post('/edit_pdf', async (req, res) => {
   try {
+    // A page the form draws itself: entries past the rows the paper prints.
+    // There is no template to fill - the form sends the rows it wants drawn.
+    if (req.body && req.body.__attachment) {
+      let spec;
+      try { spec = JSON.parse(req.body.__attachment); } catch (e) { return res.status(400).send('Bad attachment spec'); }
+      const attachmentBytes = await drawAttachmentPage(spec);
+      const attachmentBase = path.basename(String(req.query.pdf || spec.name || 'Attachment')).replace(/\.pdf$/i, '');
+      return res
+        .set({ 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="Edited_${attachmentBase}.pdf"` })
+        .send(Buffer.from(attachmentBytes));
+    }
     let pdfBytes;
     let outputName = 'Edited_document.pdf';
 
@@ -719,6 +731,240 @@ app.post('/api/test-payload', express.json({ limit: '50mb' }), async (req, res) 
   }
 });
 
+/**
+ * Publish the thank-you screen's Download Payload as a live folder, not a zip.
+ *
+ * The same page the payload holds - test deployment, no Firebase, Stripe or
+ * cart - written to live-sites/<name>/ and served by this server, so its link
+ * works at once and /edit_pdf fills its PDFs. The payload drops the county
+ * lookup; here it is copied in beside the page instead, so a ZIP code still
+ * finds its county and court. A folder is only ever replaced when it holds the
+ * live-site.json this route writes, so nothing else can be deleted by a rebuild.
+ * The skill that drives it: .claude/skills/publish-live-site/SKILL.md.
+ */
+const LIVE_SITES_DIR = path.join(ROOT, 'live-sites');
+const COUNTY_LOOKUP_FILES = ['zipData.js', 'courtData.js', 'courtLookup.js'];
+
+function liveSiteSlug(name) {
+  return String(name || 'form')
+    .replace(/\.pdf$/i, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'form';
+}
+
+function readLiveSiteManifest(slug) {
+  try { return JSON.parse(fs.readFileSync(path.join(LIVE_SITES_DIR, slug, 'live-site.json'), 'utf8')); }
+  catch (e) { return null; }
+}
+
+/**
+ * Which folder a project publishes to: the one already holding its id.
+ *
+ * A project is its id, not its name. Saving it republishes the same link, so the
+ * page handed out yesterday is the page that updates today - even after the
+ * project is renamed. A project publishing for the first time takes the folder
+ * its name makes, or the next free one if another project already has that
+ * name: two projects called the same thing must not overwrite each other.
+ */
+function resolveLiveSiteSlug(folderName, projectId) {
+  const base = liveSiteSlug(folderName);
+  if (!projectId) return base;
+  if (fs.existsSync(LIVE_SITES_DIR)) {
+    const owned = fs.readdirSync(LIVE_SITES_DIR).find((slug) => {
+      const m = readLiveSiteManifest(slug);
+      return m && m.projectId === projectId;
+    });
+    if (owned) return owned;
+  }
+  for (let n = 1; n < 100; n++) {
+    const slug = n === 1 ? base : base + '-' + n;
+    if (!fs.existsSync(path.join(LIVE_SITES_DIR, slug))) return slug;
+    const m = readLiveSiteManifest(slug);
+    // A folder this route did not make is never taken; one it made for no
+    // project in particular is.
+    if (m && !m.projectId) return slug;
+  }
+  return base + '-' + Date.now().toString(36);
+}
+
+/** The page's tab title, so an open tab says which build it is showing. */
+function withTabTitle(html, tabTitle) {
+  if (!tabTitle) return html;
+  const tag = '<title>' + String(tabTitle).replace(/[&<>"]/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) + '</title>';
+  const titled = /<title>[\s\S]*?<\/title>/i;
+  if (titled.test(html)) return html.replace(titled, () => tag);
+  return html.replace(/<head[^>]*>/i, (m) => m + '\n' + tag);
+}
+
+// The ways a packet can ask its questions, in the order index.html prefers them.
+const LIVE_SITE_MODES = ['question', 'section', 'all'];
+const LIVE_SITE_MODE_LABELS = {
+  question: 'One question at a time',
+  section: 'One section at a time',
+  all: 'Every section on one page'
+};
+
+/** Keep the county lookup - pointed at the folder's own copy - then prepare it as the payload is. */
+function prepareLiveSitePage(html) {
+  let out = String(html || '').replace(/src="\.\.\/\.\.\/CountyLookup\//g, 'src="CountyLookup/');
+  out = preparePayloadHtml(out);
+  if (!/^<!DOCTYPE/i.test(out)) out = '<!DOCTYPE html>\n' + out;
+  return out;
+}
+
+/**
+ * index.html: sends ?mode=question or ?mode=section to that page.
+ *
+ * The style is built into a page when it is generated - which sections start
+ * open, which questions start stepped, which visibility checks a stacked page
+ * leaves out - so one page cannot be switched after the fact. Each mode is its
+ * own page, and the link picks one.
+ */
+function liveSiteRouter(title, modes) {
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const links = modes.map((m) => `<li><a href="${m}.html">${esc(LIVE_SITE_MODE_LABELS[m] || m)}</a></li>`).join('');
+  return [
+    '<!DOCTYPE html>',
+    '<html lang="en"><head><meta charset="utf-8">',
+    `<title>${esc(title)}</title>`,
+    '<script>',
+    '(function () {',
+    `  var pages = ${JSON.stringify(modes)};`,
+    '  var params = new URLSearchParams(location.search);',
+    '  var mode = String(params.get("mode") || "").toLowerCase();',
+    '  if (pages.indexOf(mode) < 0) mode = pages[0];',
+    '  params.delete("mode");',
+    '  var rest = params.toString();',
+    '  location.replace(mode + ".html" + (rest ? "?" + rest : "") + location.hash);',
+    '})();',
+    '</script></head>',
+    `<body><noscript><h1>${esc(title)}</h1><ul>${links}</ul></noscript></body></html>`
+  ].join('\n');
+}
+
+app.post('/api/publish-live-site', (req, res) => {
+  try {
+    const body = req.body || {};
+    const projectId = String(body.projectId || '').trim();
+    const slug = resolveLiveSiteSlug(body.folderName, projectId);
+    const target = path.join(LIVE_SITES_DIR, slug);
+    // "DV Packet 9/11/26 2:00pm": made by the editor in the operator's own
+    // clock, so every tab on the site says which save it came from.
+    const tabTitle = String(body.tabTitle || '').trim();
+    // One page per mode. An older caller that sends a single html gets it as
+    // the mode it names, or as the one-question-at-a-time page.
+    const pages = {};
+    if (body.pages && typeof body.pages === 'object') {
+      LIVE_SITE_MODES.forEach((mode) => {
+        if (String(body.pages[mode] || '').trim()) pages[mode] = body.pages[mode];
+      });
+    } else if (String(body.html || '').trim()) {
+      pages[LIVE_SITE_MODES.includes(body.questionStyle) ? body.questionStyle : 'question'] = body.html;
+    }
+    const modes = LIVE_SITE_MODES.filter((mode) => pages[mode]);
+    if (!modes.length) return res.status(400).json({ error: 'no html' });
+
+    if (fs.existsSync(target)) {
+      if (!fs.existsSync(path.join(target, 'live-site.json'))) {
+        return res.status(409).json({
+          error: `live-sites/${slug} already exists and was not made by this route - left alone`
+        });
+      }
+      fs.rmSync(target, { recursive: true, force: true });
+    }
+    fs.mkdirSync(path.join(target, 'CountyLookup'), { recursive: true });
+    // Claim the folder before writing into it: a build that fails partway
+    // leaves a folder the next one may replace, not one it has to refuse.
+    // The claim carries the project's id, so a second save arriving while this
+    // one builds still finds its own folder rather than starting a new one.
+    fs.writeFileSync(path.join(target, 'live-site.json'), JSON.stringify({ building: true, projectId, startedAt: new Date().toISOString() }));
+
+    const title = String(body.title || slug);
+    const files = [];
+    modes.forEach((mode) => {
+      fs.writeFileSync(path.join(target, mode + '.html'), prepareLiveSitePage(withTabTitle(pages[mode], tabTitle)));
+      files.push(mode + '.html');
+    });
+    fs.writeFileSync(path.join(target, 'index.html'), liveSiteRouter(tabTitle || title, modes));
+    files.push('index.html');
+    // The interview the pages were generated from, kept beside them so a page
+    // can be traced back to the save that made it.
+    if (body.gui && typeof body.gui === 'object') {
+      fs.writeFileSync(path.join(target, 'gui.json'), JSON.stringify(body.gui, null, 2));
+      files.push('gui.json');
+    }
+    ['generate.css', 'generate2.css', 'logo.png'].forEach((asset) => {
+      const src = path.join(FORM_WIZ_DIR, asset);
+      if (!fs.existsSync(src)) return;
+      fs.copyFileSync(src, path.join(target, asset));
+      files.push(asset);
+    });
+    COUNTY_LOOKUP_FILES.forEach((name) => {
+      const src = path.join(FORM_WIZ_DIR, 'CountyLookup', name);
+      if (!fs.existsSync(src)) return;
+      fs.copyFileSync(src, path.join(target, 'CountyLookup', name));
+      files.push('CountyLookup/' + name);
+    });
+
+    const pdfs = [];
+    const missingPdfs = [];
+    (Array.isArray(body.pdfs) ? body.pdfs : []).forEach((name) => {
+      const base = path.basename(String(name || '').trim());
+      if (!base) return;
+      const withExt = /\.pdf$/i.test(base) ? base : base + '.pdf';
+      if (pdfs.includes(withExt) || missingPdfs.includes(withExt)) return;
+      const src = findPdfFile(withExt);
+      if (!src) { missingPdfs.push(withExt); return; }
+      fs.copyFileSync(src, path.join(target, withExt));
+      pdfs.push(withExt);
+      files.push(withExt);
+    });
+
+    const url = `/live-sites/${encodeURIComponent(slug)}/index.html`;
+    const links = {};
+    const pageLinks = {};
+    modes.forEach((mode) => {
+      links[mode] = `${url}?mode=${mode}`;
+      pageLinks[mode] = `/live-sites/${encodeURIComponent(slug)}/${mode}.html`;
+    });
+    const manifest = {
+      title,
+      tabTitle,
+      folder: `live-sites/${slug}`,
+      url,
+      modes,
+      links,
+      pages: pageLinks,
+      builtAt: new Date().toISOString(),
+      source: String(body.source || ''),
+      projectId,
+      pdfs,
+      missingPdfs
+    };
+    fs.writeFileSync(path.join(target, 'live-site.json'), JSON.stringify(manifest, null, 2));
+    fs.writeFileSync(path.join(target, 'README.txt'), [
+      manifest.title,
+      '',
+      'Built by the publish-live-site skill from ' + (manifest.source || 'the project GUI export') + '.',
+      'Open it through the dev server (npm start, or the flowchart-dev launch config):',
+      ...modes.map((mode) => '  ' + (LIVE_SITE_MODE_LABELS[mode] || mode) + ': http://localhost:' + PORT + links[mode]),
+      '',
+      'The PDFs are filled by the dev server\'s POST /edit_pdf, so opening index.html',
+      'as a file shows the form but cannot produce PDFs. This folder keeps its own',
+      'copies of the PDFs and of CountyLookup/ so it is complete on its own.',
+      'Rebuilding replaces this whole folder - do not edit it by hand.'
+    ].join('\n'));
+    files.push('live-site.json', 'README.txt');
+
+    res.json(Object.assign({}, manifest, { files }));
+  } catch (error) {
+    console.error('publish-live-site failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Auto Form Creator (ported from FormWiz) — mounts /Auto-Form-Creator + its API.
 // Registered before the repo-wide static handler so its routes take precedence.
 /**
@@ -760,6 +1006,121 @@ app.post('/api/dev-save-html', (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+/**
+ * The guest library, on disk.
+ *
+ * A guest's saved projects lived in the browser's cookies - dozens of 4KB pieces
+ * per project, overflowing into localStorage - and went with the site data.
+ * Here each is a file under guest-library/records/, named by an id this server
+ * picks, and guest-library/index.json lists them by the name the operator gave
+ * and the project each belongs to. Names never become paths, so no name can
+ * steer a write outside the folder. auth.js falls back to cookies when these
+ * routes are not there.
+ */
+const GUEST_LIBRARY_DIR = path.join(ROOT, 'guest-library');
+const GUEST_LIBRARY_INDEX = path.join(GUEST_LIBRARY_DIR, 'index.json');
+
+function writeFileAtomic(file, text) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  const tmp = file + '.' + process.pid + '.tmp';
+  fs.writeFileSync(tmp, text);
+  fs.renameSync(tmp, file);
+}
+function readGuestIndex() {
+  try {
+    const list = JSON.parse(fs.readFileSync(GUEST_LIBRARY_INDEX, 'utf8'));
+    return Array.isArray(list) ? list : [];
+  } catch (e) {
+    return [];
+  }
+}
+function writeGuestIndex(list) {
+  writeFileAtomic(GUEST_LIBRARY_INDEX, JSON.stringify(list, null, 2));
+}
+function guestRecordFile(id) {
+  return path.join(GUEST_LIBRARY_DIR, 'records', path.basename(String(id)) + '.json');
+}
+function guestNameOf(req, key) {
+  return String((req.body && req.body[key || 'name']) || req.query[key || 'name'] || '').trim();
+}
+
+app.get('/api/guest-library', (_req, res) => {
+  res.json(readGuestIndex().slice().sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0)));
+});
+
+app.get('/api/guest-library/record', (req, res) => {
+  const name = guestNameOf(req);
+  const entry = readGuestIndex().find((e) => e.name === name);
+  if (!entry) return res.status(404).json({ error: 'No flowchart named ' + name });
+  try {
+    res.type('application/json').send(fs.readFileSync(guestRecordFile(entry.id), 'utf8'));
+  } catch (err) {
+    res.status(404).json({ error: 'The file for ' + name + ' is missing' });
+  }
+});
+
+app.post('/api/guest-library/record', (req, res) => {
+  const name = guestNameOf(req);
+  const payload = req.body && req.body.payload;
+  if (!name || !payload || typeof payload !== 'object') {
+    return res.status(400).json({ error: 'name and payload are required' });
+  }
+  try {
+    const list = readGuestIndex();
+    let entry = list.find((e) => e.name === name);
+    if (!entry) {
+      entry = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name };
+      list.push(entry);
+    }
+    const flowchart = payload.flowchart || {};
+    entry.lastUsed = payload.lastUsed || Date.now();
+    entry.projectId = String(flowchart.projectId || '');
+    entry.projectName = String(flowchart.projectName || '');
+    const text = JSON.stringify(payload);
+    writeFileAtomic(guestRecordFile(entry.id), text);
+    writeGuestIndex(list);
+    res.json({ saved: name, id: entry.id, bytes: Buffer.byteLength(text) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/guest-library/touch', (req, res) => {
+  const name = guestNameOf(req);
+  const list = readGuestIndex();
+  const entry = list.find((e) => e.name === name);
+  if (!entry) return res.status(404).json({ error: 'No flowchart named ' + name });
+  entry.lastUsed = Date.now();
+  writeGuestIndex(list);
+  res.json({ touched: name });
+});
+
+app.post('/api/guest-library/rename', (req, res) => {
+  const oldName = guestNameOf(req, 'oldName');
+  const newName = guestNameOf(req, 'newName');
+  const list = readGuestIndex();
+  const entry = list.find((e) => e.name === oldName);
+  if (!entry) return res.status(404).json({ error: 'No flowchart named ' + oldName });
+  if (!newName) return res.status(400).json({ error: 'newName is required' });
+  if (list.some((e) => e.name === newName)) {
+    return res.status(409).json({ error: 'A flowchart named "' + newName + '" already exists.' });
+  }
+  entry.name = newName;
+  writeGuestIndex(list);
+  res.json(entry);
+});
+
+app.post('/api/guest-library/delete', (req, res) => {
+  const name = guestNameOf(req);
+  const list = readGuestIndex();
+  const entry = list.find((e) => e.name === name);
+  if (entry) {
+    try { fs.rmSync(guestRecordFile(entry.id), { force: true }); } catch (e) { /* already gone */ }
+  }
+  writeGuestIndex(list.filter((e) => e.name !== name));
+  res.json({ deleted: name, existed: !!entry });
 });
 
 const autoFormStatus = registerAutoFormRoutes(app);

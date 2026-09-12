@@ -301,7 +301,7 @@
     },
     {
       "id": "15",
-      "value": "What does the restrained person look like? (optional)",
+      "value": "What does the restrained person look like?",
       "geometry": {
         "x": 610,
         "y": 2502,
@@ -355,7 +355,7 @@
           "optional": true
         }
       ],
-      "_questionText": "What does the restrained person look like? (optional)",
+      "_questionText": "What does the restrained person look like?",
       "_questionId": "9",
       "_nameId": "restrained_person_description",
       "_placeholder": "",
@@ -772,91 +772,10 @@
     },
     {
       "id": "30",
-      "value": "Is there a separate page listing more protected people?",
-      "geometry": {
-        "x": 610,
-        "y": 6924,
-        "width": 300,
-        "height": 120
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=other_protected_people_additional_list_attached_yes;section=3;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(120, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "Is there a separate page listing more protected people?",
-      "_questionId": "17",
-      "_nameId": "other_protected_people_additional_list_attached_yes",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "31",
-      "value": "Yes",
-      "geometry": {
-        "x": 581,
-        "y": 7124,
-        "width": 168,
-        "height": 80
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=3;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(120, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_nameId": "yes",
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "32",
-      "value": "No",
-      "geometry": {
-        "x": 771,
-        "y": 7124,
-        "width": 168,
-        "height": 80
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=3;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(120, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_nameId": "no",
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "33",
-      "value": "",
-      "geometry": {
-        "x": 755,
-        "y": 7444,
-        "width": 10,
-        "height": 10
-      },
-      "style": "ellipse;whiteSpace=wrap;html=1;nodeType=mergeHub;fillColor=#4a6fa5;strokeColor=#4a6fa5;",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_nameId": "end_join",
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "34",
       "value": "End",
       "geometry": {
         "x": 700,
-        "y": 7502,
+        "y": 6924,
         "width": 120,
         "height": 60
       },
@@ -870,7 +789,7 @@
       "_pdfPrice": ""
     },
     {
-      "id": "35",
+      "id": "31",
       "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">court_name_and_street_address</span></div>",
       "geometry": {
         "x": 1460,
@@ -894,7 +813,7 @@
       "_pdfPrice": ""
     },
     {
-      "id": "36",
+      "id": "32",
       "value": "",
       "geometry": {
         "x": 0,
@@ -921,7 +840,7 @@
       }
     },
     {
-      "id": "37",
+      "id": "33",
       "value": "",
       "geometry": {
         "x": 0,
@@ -948,7 +867,7 @@
       }
     },
     {
-      "id": "38",
+      "id": "34",
       "value": "",
       "geometry": {
         "x": 0,
@@ -975,7 +894,7 @@
       }
     },
     {
-      "id": "39",
+      "id": "35",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1002,7 +921,7 @@
       }
     },
     {
-      "id": "40",
+      "id": "36",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1029,7 +948,7 @@
       }
     },
     {
-      "id": "41",
+      "id": "37",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1044,7 +963,7 @@
       "target": "8"
     },
     {
-      "id": "42",
+      "id": "38",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1071,7 +990,7 @@
       }
     },
     {
-      "id": "43",
+      "id": "39",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1094,7 +1013,7 @@
       }
     },
     {
-      "id": "44",
+      "id": "40",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1121,7 +1040,7 @@
       }
     },
     {
-      "id": "45",
+      "id": "41",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1152,7 +1071,7 @@
       }
     },
     {
-      "id": "46",
+      "id": "42",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1179,7 +1098,7 @@
       }
     },
     {
-      "id": "47",
+      "id": "43",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1210,7 +1129,7 @@
       }
     },
     {
-      "id": "48",
+      "id": "44",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1225,7 +1144,7 @@
       "target": "13"
     },
     {
-      "id": "49",
+      "id": "45",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1252,7 +1171,7 @@
       }
     },
     {
-      "id": "50",
+      "id": "46",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1279,7 +1198,7 @@
       }
     },
     {
-      "id": "51",
+      "id": "47",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1306,7 +1225,7 @@
       }
     },
     {
-      "id": "52",
+      "id": "48",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1333,7 +1252,7 @@
       }
     },
     {
-      "id": "53",
+      "id": "49",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1360,7 +1279,7 @@
       }
     },
     {
-      "id": "54",
+      "id": "50",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1387,7 +1306,7 @@
       }
     },
     {
-      "id": "55",
+      "id": "51",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1414,7 +1333,7 @@
       }
     },
     {
-      "id": "56",
+      "id": "52",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1441,7 +1360,7 @@
       }
     },
     {
-      "id": "57",
+      "id": "53",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1472,7 +1391,7 @@
       }
     },
     {
-      "id": "58",
+      "id": "54",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1503,7 +1422,7 @@
       }
     },
     {
-      "id": "59",
+      "id": "55",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1518,7 +1437,7 @@
       "target": "24"
     },
     {
-      "id": "60",
+      "id": "56",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1545,7 +1464,7 @@
       }
     },
     {
-      "id": "61",
+      "id": "57",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1572,7 +1491,7 @@
       }
     },
     {
-      "id": "62",
+      "id": "58",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1599,7 +1518,7 @@
       }
     },
     {
-      "id": "63",
+      "id": "59",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1630,7 +1549,7 @@
       }
     },
     {
-      "id": "64",
+      "id": "60",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1661,7 +1580,7 @@
       }
     },
     {
-      "id": "65",
+      "id": "61",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1676,7 +1595,7 @@
       "target": "29"
     },
     {
-      "id": "66",
+      "id": "62",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1701,137 +1620,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "67",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "30",
-      "target": "31",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 7064
-          },
-          {
-            "x": 665,
-            "y": 7064
-          }
-        ]
-      }
-    },
-    {
-      "id": "68",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "30",
-      "target": "32",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 7064
-          },
-          {
-            "x": 855,
-            "y": 7064
-          }
-        ]
-      }
-    },
-    {
-      "id": "69",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
-      "vertex": false,
-      "edge": true,
-      "source": "31",
-      "target": "33",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 665,
-            "y": 7220
-          },
-          {
-            "x": 665,
-            "y": 7432
-          },
-          {
-            "x": 760,
-            "y": 7432
-          }
-        ]
-      }
-    },
-    {
-      "id": "70",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
-      "vertex": false,
-      "edge": true,
-      "source": "32",
-      "target": "33",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 855,
-            "y": 7220
-          },
-          {
-            "x": 855,
-            "y": 7432
-          },
-          {
-            "x": 760,
-            "y": 7432
-          }
-        ]
-      }
-    },
-    {
-      "id": "71",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "33",
-      "target": "34"
     }
   ],
   "sectionPrefs": {

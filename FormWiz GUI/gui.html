@@ -416,6 +416,10 @@
 
             window.addEventListener('DOMContentLoaded', function () {
                 if (window.__isPreviewImport) return;
+                // Opened unseen by the editor's Save to rebuild the live site
+                // (live-site-publish.js): nobody is there to answer the prompt,
+                // and its focus call would pull the cursor out of the editor.
+                if (/[?&]liveSiteBuild=/.test(location.search)) return;
                 var raw = null;
                 try {
                     raw = localStorage.getItem(FW_DRAFT_KEY);

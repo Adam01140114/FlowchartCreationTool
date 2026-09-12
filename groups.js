@@ -29,7 +29,9 @@ function addGroup(groupId = null) {
     <button type="button" onclick="addSectionToGroup(${currentGroupId})">Add Section to Group</button>
     <button type="button" onclick="removeGroup(${currentGroupId})">Remove Group</button>
   `;
-  groupsContainer.appendChild(block);
+  // Above the Add Group button, which lives inside the same fold so that it
+  // closes with the list. With no button this is an append.
+  groupsContainer.insertBefore(block, groupsContainer.querySelector(':scope > .add-group-btn'));
   // Increment groupCounter only if not loading from JSON
   if (!groupId) {
     if (window.flowchartConfig) {

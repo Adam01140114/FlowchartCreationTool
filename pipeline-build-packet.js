@@ -120,13 +120,33 @@ function optionCellFor(flowchart, questionNameId, answer) {
   return null;
 }
 
-function addConnector(flowchart, targetForm, from) {
+/**
+ * The form's End node - the lowest one, if a chart has more than one.
+ *
+ * A connector that no answer decides used to be dropped under the lowest node
+ * and wired to nothing. On the canvas it read as a loose end, which is exactly
+ * what the flowchart rules forbid everywhere else. It belongs after End: the
+ * filer reaches it by finishing the form.
+ */
+function endNodeOf(cells) {
+  return cells.filter((c) => c.vertex && c.geometry && /nodeType=end(;|$)/.test(c.style || ''))
+    .reduce((low, c) => (!low || c.geometry.y > low.geometry.y ? c : low), null);
+}
+
+/**
+ * `from` is what feeds the connector: an option that decides it, or - for one
+ * that nothing decides - the End node or the connector above it in the chain,
+ * which `chained` marks so it is centred under it rather than hung off a side.
+ */
+function addConnector(flowchart, targetForm, from, chained) {
   const cells = flowchart.cells;
   const id = nextId(cells);
   const anchor = from || cells.filter((c) => c.vertex)
     .reduce((low, c) => (c.geometry.y > (low ? low.geometry.y : -1) ? c : low), null);
-  let y = anchor ? anchor.geometry.y + (anchor.geometry.height || 60) + 60 : 80;
-  const x = anchor ? anchor.geometry.x : 80;
+  const below = chained && !/nodeType=end(;|$)/.test(anchor.style || '') ? 30 : (chained ? 50 : 60);
+  let y = anchor ? anchor.geometry.y + (anchor.geometry.height || 60) + below : 80;
+  const x = !anchor ? 80
+    : (chained ? anchor.geometry.x + (anchor.geometry.width || 180) / 2 - 90 : anchor.geometry.x);
   // One answer can bring in more than one form: the custody box on DV-100
   // brings in DV-105 and DV-140 together, because page 13 asks for both. Each
   // connector hung off the same option at the same offset, so the second was
@@ -254,6 +274,10 @@ async function main() {
   }
 
   forms.forEach(({ entry, flowchart }) => {
+    // Connectors that no answer decides chain down from End in the order the
+    // spec lists them: the most important form first, at the top, the least
+    // important last. DV-100's reads End, DV-101, DV-109, CLETS-001.
+    let chainTail = endNodeOf(flowchart.cells);
     (entry.activates || []).forEach((activation) => {
       const target = typeof activation === 'string' ? activation : activation.form;
       const option = (activation && activation.whenQuestion)
@@ -263,7 +287,9 @@ async function main() {
         throw new Error(entry.name + ': no option "' + activation.isAnswer + '" under question "'
           + activation.whenQuestion + '" to hang the ' + target + ' connector on');
       }
-      const id = addConnector(flowchart, target, option);
+      const chained = !option && !!chainTail;
+      const id = addConnector(flowchart, target, option || chainTail, chained);
+      if (chained) chainTail = flowchart.cells.find((c) => c.id === id);
       // A form can also arrive because a field got ticked rather than because a
       // question was answered - which is how an attachment that exists to hold
       // an overflow comes in, since nobody is asked whether they need it.

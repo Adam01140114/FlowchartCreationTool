@@ -55,12 +55,12 @@
     },
     {
       "id": "4",
-      "value": "What else do you know about the person you want protection from? (optional)",
+      "value": "What else do you know about the person you want protection from?",
       "geometry": {
         "x": 610,
         "y": 592,
         "width": 300,
-        "height": 860
+        "height": 1080
       },
       "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=clets_restrained_person_details;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
       "vertex": true,
@@ -89,10 +89,20 @@
           "optional": true
         },
         {
-          "nameId": "clets_restrained_person_drivers_license",
-          "fullNameId": "clets_restrained_person_drivers_license",
-          "label": "Driver's license number and state",
-          "placeholder": "Driver's license number and state",
+          "nameId": "clets_restrained_person_drivers_license_number",
+          "fullNameId": "clets_restrained_person_drivers_license_number",
+          "label": "Driver's license number",
+          "placeholder": "Driver's license number",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": "",
+          "optional": true
+        },
+        {
+          "nameId": "clets_restrained_person_drivers_license_state",
+          "fullNameId": "clets_restrained_person_drivers_license_state",
+          "label": "State that issued the license",
+          "placeholder": "State that issued the license",
           "isAmountOption": false,
           "type": "label",
           "prefill": "",
@@ -119,17 +129,27 @@
           "optional": true
         },
         {
-          "nameId": "clets_restrained_person_employer",
-          "fullNameId": "clets_restrained_person_employer",
-          "label": "Employer (name and address)",
-          "placeholder": "Employer (name and address)",
+          "nameId": "clets_restrained_person_employer_name",
+          "fullNameId": "clets_restrained_person_employer_name",
+          "label": "Employer's name",
+          "placeholder": "Employer's name",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": "",
+          "optional": true
+        },
+        {
+          "nameId": "clets_restrained_person_employer_address",
+          "fullNameId": "clets_restrained_person_employer_address",
+          "label": "Employer's address",
+          "placeholder": "Employer's address",
           "isAmountOption": false,
           "type": "label",
           "prefill": "",
           "optional": true
         }
       ],
-      "_questionText": "What else do you know about the person you want protection from? (optional)",
+      "_questionText": "What else do you know about the person you want protection from?",
       "_questionId": "3",
       "_nameId": "clets_restrained_person_details",
       "_placeholder": "",
@@ -161,16 +181,24 @@
         {
           "type": "textbox",
           "index": 5
+        },
+        {
+          "type": "textbox",
+          "index": 6
+        },
+        {
+          "type": "textbox",
+          "index": 7
         }
       ],
       "_optional": true
     },
     {
       "id": "5",
-      "value": "What vehicle do they drive? (optional)",
+      "value": "What vehicle do they drive?",
       "geometry": {
         "x": 610,
-        "y": 1622,
+        "y": 1842,
         "width": 300,
         "height": 640
       },
@@ -221,7 +249,7 @@
           "optional": true
         }
       ],
-      "_questionText": "What vehicle do they drive? (optional)",
+      "_questionText": "What vehicle do they drive?",
       "_questionId": "4",
       "_nameId": "clets_restrained_person_vehicle",
       "_placeholder": "",
@@ -254,7 +282,7 @@
       "value": "Does the person you want protection from speak English?",
       "geometry": {
         "x": 610,
-        "y": 2432,
+        "y": 2652,
         "width": 300,
         "height": 120
       },
@@ -278,7 +306,7 @@
       "value": "",
       "geometry": {
         "x": 755,
-        "y": 2592,
+        "y": 2812,
         "width": 10,
         "height": 10
       },
@@ -297,7 +325,7 @@
       "value": "Yes",
       "geometry": {
         "x": 486,
-        "y": 2658,
+        "y": 2878,
         "width": 168,
         "height": 80
       },
@@ -316,7 +344,7 @@
       "value": "No",
       "geometry": {
         "x": 676,
-        "y": 2658,
+        "y": 2878,
         "width": 168,
         "height": 80
       },
@@ -335,7 +363,7 @@
       "value": "I don't know",
       "geometry": {
         "x": 866,
-        "y": 2658,
+        "y": 2878,
         "width": 168,
         "height": 80
       },
@@ -354,7 +382,7 @@
       "value": "Which language do they speak?",
       "geometry": {
         "x": 610,
-        "y": 2858,
+        "y": 3078,
         "width": 300,
         "height": 96
       },
@@ -378,7 +406,7 @@
       "value": "",
       "geometry": {
         "x": 755,
-        "y": 3074,
+        "y": 3294,
         "width": 10,
         "height": 10
       },
@@ -397,7 +425,7 @@
       "value": "Does that person have any firearms, firearm parts, ammunition, or body armor?",
       "geometry": {
         "x": 610,
-        "y": 3132,
+        "y": 3352,
         "width": 300,
         "height": 144
       },
@@ -421,7 +449,7 @@
       "value": "",
       "geometry": {
         "x": 755,
-        "y": 3316,
+        "y": 3536,
         "width": 10,
         "height": 10
       },
@@ -440,7 +468,7 @@
       "value": "Yes",
       "geometry": {
         "x": 486,
-        "y": 3382,
+        "y": 3602,
         "width": 168,
         "height": 80
       },
@@ -459,7 +487,7 @@
       "value": "No",
       "geometry": {
         "x": 676,
-        "y": 3382,
+        "y": 3602,
         "width": 168,
         "height": 80
       },
@@ -478,7 +506,7 @@
       "value": "I don't know",
       "geometry": {
         "x": 866,
-        "y": 3382,
+        "y": 3602,
         "width": 168,
         "height": 80
       },
@@ -497,7 +525,7 @@
       "value": "What do you know about them - the type, the amount, or where they are kept?",
       "geometry": {
         "x": 420,
-        "y": 3582,
+        "y": 3802,
         "width": 300,
         "height": 144
       },
@@ -521,7 +549,7 @@
       "value": "",
       "geometry": {
         "x": 755,
-        "y": 3846,
+        "y": 4066,
         "width": 10,
         "height": 10
       },
@@ -540,7 +568,7 @@
       "value": "Who is asking for protection?",
       "geometry": {
         "x": 610,
-        "y": 3904,
+        "y": 4124,
         "width": 300,
         "height": 96
       },
@@ -564,7 +592,7 @@
       "value": "What does law enforcement need to know about you? Your date of birth also puts your order in the federal database, which makes it easier to enforce outside California.",
       "geometry": {
         "x": 610,
-        "y": 4170,
+        "y": 4390,
         "width": 300,
         "height": 640
       },
@@ -664,7 +692,7 @@
       "value": "How old are you?",
       "geometry": {
         "x": 610,
-        "y": 4980,
+        "y": 5200,
         "width": 300,
         "height": 96
       },
@@ -688,7 +716,7 @@
       "value": "Do you speak English?",
       "geometry": {
         "x": 610,
-        "y": 5246,
+        "y": 5466,
         "width": 300,
         "height": 96
       },
@@ -712,7 +740,7 @@
       "value": "Yes",
       "geometry": {
         "x": 581,
-        "y": 5422,
+        "y": 5642,
         "width": 168,
         "height": 80
       },
@@ -731,7 +759,7 @@
       "value": "No",
       "geometry": {
         "x": 771,
-        "y": 5422,
+        "y": 5642,
         "width": 168,
         "height": 80
       },
@@ -750,7 +778,7 @@
       "value": "Which language do you speak?",
       "geometry": {
         "x": 705,
-        "y": 5622,
+        "y": 5842,
         "width": 300,
         "height": 96
       },
@@ -774,7 +802,7 @@
       "value": "",
       "geometry": {
         "x": 755,
-        "y": 5838,
+        "y": 6058,
         "width": 10,
         "height": 10
       },
@@ -783,458 +811,101 @@
       "edge": false,
       "source": null,
       "target": null,
-      "_nameId": "other_protected_person_1_full_name_join",
+      "_nameId": "other_protected_person_join",
       "_pdfName": "",
       "_pdfFile": "",
       "_pdfPrice": ""
     },
     {
       "id": "29",
-      "value": "What is your 4. Other protected person 1 - name?",
+      "value": "How many other people do you want the order to protect?",
       "geometry": {
         "x": 610,
-        "y": 5896,
+        "y": 6116,
         "width": 300,
-        "height": 120
+        "height": 820
       },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=other_protected_person_1_full_name;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleDropdownType;nodeId=other_protected_person;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
       "vertex": true,
       "edge": false,
       "source": null,
       "target": null,
-      "_textboxes": null,
-      "_questionText": "What is your 4. Other protected person 1 - name?",
+      "_textboxes": [
+        {
+          "nameId": "{n}_full_name",
+          "label": "Full name",
+          "placeholder": "Full name",
+          "isAmountOption": false,
+          "prefill": "",
+          "conditionalPrefills": []
+        },
+        {
+          "nameId": "{n}_gender",
+          "label": "Gender",
+          "placeholder": "Gender",
+          "isAmountOption": false,
+          "prefill": "",
+          "conditionalPrefills": []
+        },
+        {
+          "nameId": "{n}_race",
+          "label": "Race",
+          "placeholder": "Race",
+          "isAmountOption": false,
+          "prefill": "",
+          "conditionalPrefills": []
+        },
+        {
+          "nameId": "{n}_date_of_birth",
+          "label": "Date of birth",
+          "placeholder": "Date of birth",
+          "isAmountOption": false,
+          "type": "date",
+          "prefill": "",
+          "conditionalPrefills": []
+        }
+      ],
+      "_questionText": "How many other people do you want the order to protect?",
       "_questionId": "14",
-      "_nameId": "other_protected_person_1_full_name",
+      "_nameId": "other_protected_person",
       "_placeholder": "",
       "_mirrorTargets": null,
       "_pdfName": "",
       "_pdfFile": "",
-      "_pdfPrice": ""
+      "_pdfPrice": "",
+      "_twoNumbers": {
+        "first": "0",
+        "second": "4"
+      },
+      "_dropdownTitle": "Protected Person",
+      "_checkboxes": [],
+      "_itemOrder": [
+        {
+          "type": "option",
+          "index": 0
+        },
+        {
+          "type": "option",
+          "index": 1
+        },
+        {
+          "type": "option",
+          "index": 2
+        },
+        {
+          "type": "option",
+          "index": 3
+        }
+      ],
+      "_locationIndex": null,
+      "_dropdowns": []
     },
     {
       "id": "30",
-      "value": "For the first other protected person, what does law enforcement need?",
-      "geometry": {
-        "x": 610,
-        "y": 6186,
-        "width": 300,
-        "height": 530
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=other_protected_person_1;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": [
-        {
-          "nameId": "gender",
-          "fullNameId": "other_protected_person_1_gender",
-          "label": "Gender",
-          "placeholder": "Gender",
-          "isAmountOption": false,
-          "type": "label",
-          "prefill": ""
-        },
-        {
-          "nameId": "race",
-          "fullNameId": "other_protected_person_1_race",
-          "label": "Race",
-          "placeholder": "Race",
-          "isAmountOption": false,
-          "type": "label",
-          "prefill": ""
-        },
-        {
-          "nameId": "date_of_birth",
-          "fullNameId": "other_protected_person_1_date_of_birth",
-          "label": "Date of birth",
-          "placeholder": "Date of birth",
-          "isAmountOption": false,
-          "type": "date",
-          "prefill": ""
-        }
-      ],
-      "_questionText": "For the first other protected person, what does law enforcement need?",
-      "_questionId": "15",
-      "_nameId": "other_protected_person_1",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": "",
-      "_itemOrder": [
-        {
-          "type": "textbox",
-          "index": 0
-        },
-        {
-          "type": "textbox",
-          "index": 1
-        },
-        {
-          "type": "textbox",
-          "index": 2
-        }
-      ]
-    },
-    {
-      "id": "31",
-      "value": "What is your 4. Other protected person 2 - name?",
-      "geometry": {
-        "x": 610,
-        "y": 6886,
-        "width": 300,
-        "height": 120
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=other_protected_person_2_full_name;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "What is your 4. Other protected person 2 - name?",
-      "_questionId": "16",
-      "_nameId": "other_protected_person_2_full_name",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "32",
-      "value": "For the second other protected person, what does law enforcement need?",
-      "geometry": {
-        "x": 610,
-        "y": 7176,
-        "width": 300,
-        "height": 530
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=other_protected_person_2;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": [
-        {
-          "nameId": "gender",
-          "fullNameId": "other_protected_person_2_gender",
-          "label": "Gender",
-          "placeholder": "Gender",
-          "isAmountOption": false,
-          "type": "label",
-          "prefill": ""
-        },
-        {
-          "nameId": "race",
-          "fullNameId": "other_protected_person_2_race",
-          "label": "Race",
-          "placeholder": "Race",
-          "isAmountOption": false,
-          "type": "label",
-          "prefill": ""
-        },
-        {
-          "nameId": "date_of_birth",
-          "fullNameId": "other_protected_person_2_date_of_birth",
-          "label": "Date of birth",
-          "placeholder": "Date of birth",
-          "isAmountOption": false,
-          "type": "date",
-          "prefill": ""
-        }
-      ],
-      "_questionText": "For the second other protected person, what does law enforcement need?",
-      "_questionId": "17",
-      "_nameId": "other_protected_person_2",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": "",
-      "_itemOrder": [
-        {
-          "type": "textbox",
-          "index": 0
-        },
-        {
-          "type": "textbox",
-          "index": 1
-        },
-        {
-          "type": "textbox",
-          "index": 2
-        }
-      ]
-    },
-    {
-      "id": "33",
-      "value": "What is your 4. Other protected person 3 - name?",
-      "geometry": {
-        "x": 610,
-        "y": 7876,
-        "width": 300,
-        "height": 120
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=other_protected_person_3_full_name;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "What is your 4. Other protected person 3 - name?",
-      "_questionId": "18",
-      "_nameId": "other_protected_person_3_full_name",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "34",
-      "value": "For the third other protected person, what does law enforcement need?",
-      "geometry": {
-        "x": 610,
-        "y": 8166,
-        "width": 300,
-        "height": 530
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=other_protected_person_3;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": [
-        {
-          "nameId": "gender",
-          "fullNameId": "other_protected_person_3_gender",
-          "label": "Gender",
-          "placeholder": "Gender",
-          "isAmountOption": false,
-          "type": "label",
-          "prefill": ""
-        },
-        {
-          "nameId": "race",
-          "fullNameId": "other_protected_person_3_race",
-          "label": "Race",
-          "placeholder": "Race",
-          "isAmountOption": false,
-          "type": "label",
-          "prefill": ""
-        },
-        {
-          "nameId": "date_of_birth",
-          "fullNameId": "other_protected_person_3_date_of_birth",
-          "label": "Date of birth",
-          "placeholder": "Date of birth",
-          "isAmountOption": false,
-          "type": "date",
-          "prefill": ""
-        }
-      ],
-      "_questionText": "For the third other protected person, what does law enforcement need?",
-      "_questionId": "19",
-      "_nameId": "other_protected_person_3",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": "",
-      "_itemOrder": [
-        {
-          "type": "textbox",
-          "index": 0
-        },
-        {
-          "type": "textbox",
-          "index": 1
-        },
-        {
-          "type": "textbox",
-          "index": 2
-        }
-      ]
-    },
-    {
-      "id": "35",
-      "value": "What is your 4. Other protected person 4 - name?",
-      "geometry": {
-        "x": 610,
-        "y": 8866,
-        "width": 300,
-        "height": 120
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=other_protected_person_4_full_name;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "What is your 4. Other protected person 4 - name?",
-      "_questionId": "20",
-      "_nameId": "other_protected_person_4_full_name",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "36",
-      "value": "For the fourth other protected person, what does law enforcement need?",
-      "geometry": {
-        "x": 610,
-        "y": 9156,
-        "width": 300,
-        "height": 530
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=other_protected_person_4;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": [
-        {
-          "nameId": "gender",
-          "fullNameId": "other_protected_person_4_gender",
-          "label": "Gender",
-          "placeholder": "Gender",
-          "isAmountOption": false,
-          "type": "label",
-          "prefill": ""
-        },
-        {
-          "nameId": "race",
-          "fullNameId": "other_protected_person_4_race",
-          "label": "Race",
-          "placeholder": "Race",
-          "isAmountOption": false,
-          "type": "label",
-          "prefill": ""
-        },
-        {
-          "nameId": "date_of_birth",
-          "fullNameId": "other_protected_person_4_date_of_birth",
-          "label": "Date of birth",
-          "placeholder": "Date of birth",
-          "isAmountOption": false,
-          "type": "date",
-          "prefill": ""
-        }
-      ],
-      "_questionText": "For the fourth other protected person, what does law enforcement need?",
-      "_questionId": "21",
-      "_nameId": "other_protected_person_4",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": "",
-      "_itemOrder": [
-        {
-          "type": "textbox",
-          "index": 0
-        },
-        {
-          "type": "textbox",
-          "index": 1
-        },
-        {
-          "type": "textbox",
-          "index": 2
-        }
-      ]
-    },
-    {
-      "id": "37",
-      "value": "Are there more people to protect than fit on this form?",
-      "geometry": {
-        "x": 610,
-        "y": 9856,
-        "width": 300,
-        "height": 120
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=clets_other_protected_people_attached_page;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "Are there more people to protect than fit on this form?",
-      "_questionId": "22",
-      "_nameId": "clets_other_protected_people_attached_page",
-      "_placeholder": "",
-      "_mirrorTargets": null,
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "38",
-      "value": "Yes",
-      "geometry": {
-        "x": 581,
-        "y": 10056,
-        "width": 168,
-        "height": 80
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_nameId": "yes",
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "39",
-      "value": "No",
-      "geometry": {
-        "x": 771,
-        "y": 10056,
-        "width": 168,
-        "height": 80
-      },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_nameId": "no",
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "40",
-      "value": "",
-      "geometry": {
-        "x": 755,
-        "y": 10376,
-        "width": 10,
-        "height": 10
-      },
-      "style": "ellipse;whiteSpace=wrap;html=1;nodeType=mergeHub;fillColor=#4a6fa5;strokeColor=#4a6fa5;",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_nameId": "end_join",
-      "_pdfName": "",
-      "_pdfFile": "",
-      "_pdfPrice": ""
-    },
-    {
-      "id": "41",
       "value": "End",
       "geometry": {
         "x": 700,
-        "y": 10434,
+        "y": 7106,
         "width": 120,
         "height": 60
       },
@@ -1248,7 +919,55 @@
       "_pdfPrice": ""
     },
     {
-      "id": "42",
+      "id": "31",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">clets_restrained_person_drivers_license</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 60,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "clets_restrained_person_drivers_license",
+      "_linkedFields": [
+        "clets_restrained_person_drivers_license_number",
+        "clets_restrained_person_drivers_license_state"
+      ],
+      "_linkedJoin": ", ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "32",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">clets_restrained_person_employer</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 200,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "clets_restrained_person_employer",
+      "_linkedFields": [
+        "clets_restrained_person_employer_name",
+        "clets_restrained_person_employer_address"
+      ],
+      "_linkedJoin": ", ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "33",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1275,7 +994,7 @@
       }
     },
     {
-      "id": "43",
+      "id": "34",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1302,7 +1021,7 @@
       }
     },
     {
-      "id": "44",
+      "id": "35",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1319,17 +1038,17 @@
         "points": [
           {
             "x": 760,
-            "y": 1464
+            "y": 1680
           },
           {
             "x": 760,
-            "y": 1616
+            "y": 1832
           }
         ]
       }
     },
     {
-      "id": "45",
+      "id": "36",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1346,17 +1065,17 @@
         "points": [
           {
             "x": 760,
-            "y": 2272
+            "y": 2488
           },
           {
             "x": 760,
-            "y": 2424
+            "y": 2648
           }
         ]
       }
     },
     {
-      "id": "46",
+      "id": "37",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1371,7 +1090,7 @@
       "target": "7"
     },
     {
-      "id": "47",
+      "id": "38",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1388,17 +1107,17 @@
         "points": [
           {
             "x": 760,
-            "y": 2616
+            "y": 2840
           },
           {
             "x": 570,
-            "y": 2616
+            "y": 2840
           }
         ]
       }
     },
     {
-      "id": "48",
+      "id": "39",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1415,13 +1134,13 @@
         "points": [
           {
             "x": 760,
-            "y": 2616
+            "y": 2840
           }
         ]
       }
     },
     {
-      "id": "49",
+      "id": "40",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1438,17 +1157,17 @@
         "points": [
           {
             "x": 760,
-            "y": 2616
+            "y": 2840
           },
           {
             "x": 950,
-            "y": 2616
+            "y": 2840
           }
         ]
       }
     },
     {
-      "id": "50",
+      "id": "41",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1465,17 +1184,17 @@
         "points": [
           {
             "x": 760,
-            "y": 2744
+            "y": 2968
           },
           {
             "x": 760,
-            "y": 2848
+            "y": 3072
           }
         ]
       }
     },
     {
-      "id": "51",
+      "id": "42",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1492,21 +1211,21 @@
         "points": [
           {
             "x": 570,
-            "y": 2754
+            "y": 2974
           },
           {
             "x": 570,
-            "y": 3056
+            "y": 3280
           },
           {
             "x": 760,
-            "y": 3056
+            "y": 3280
           }
         ]
       }
     },
     {
-      "id": "52",
+      "id": "43",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1523,17 +1242,17 @@
         "points": [
           {
             "x": 760,
-            "y": 2970
+            "y": 3190
           },
           {
             "x": 760,
-            "y": 3056
+            "y": 3280
           }
         ]
       }
     },
     {
-      "id": "53",
+      "id": "44",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1550,21 +1269,21 @@
         "points": [
           {
             "x": 950,
-            "y": 2754
+            "y": 2974
           },
           {
             "x": 950,
-            "y": 3056
+            "y": 3280
           },
           {
             "x": 760,
-            "y": 3056
+            "y": 3280
           }
         ]
       }
     },
     {
-      "id": "54",
+      "id": "45",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1579,7 +1298,7 @@
       "target": "13"
     },
     {
-      "id": "55",
+      "id": "46",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1594,7 +1313,7 @@
       "target": "14"
     },
     {
-      "id": "56",
+      "id": "47",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1611,17 +1330,17 @@
         "points": [
           {
             "x": 760,
-            "y": 3344
+            "y": 3560
           },
           {
             "x": 570,
-            "y": 3344
+            "y": 3560
           }
         ]
       }
     },
     {
-      "id": "57",
+      "id": "48",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1638,13 +1357,13 @@
         "points": [
           {
             "x": 760,
-            "y": 3344
+            "y": 3560
           }
         ]
       }
     },
     {
-      "id": "58",
+      "id": "49",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1661,17 +1380,17 @@
         "points": [
           {
             "x": 760,
-            "y": 3344
+            "y": 3560
           },
           {
             "x": 950,
-            "y": 3344
+            "y": 3560
           }
         ]
       }
     },
     {
-      "id": "59",
+      "id": "50",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1688,17 +1407,17 @@
         "points": [
           {
             "x": 570,
-            "y": 3472
+            "y": 3688
           },
           {
             "x": 570,
-            "y": 3576
+            "y": 3792
           }
         ]
       }
     },
     {
-      "id": "60",
+      "id": "51",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1715,21 +1434,21 @@
         "points": [
           {
             "x": 570,
-            "y": 3742
+            "y": 3962
           },
           {
             "x": 570,
-            "y": 3832
+            "y": 4048
           },
           {
             "x": 760,
-            "y": 3832
+            "y": 4048
           }
         ]
       }
     },
     {
-      "id": "61",
+      "id": "52",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1746,17 +1465,17 @@
         "points": [
           {
             "x": 760,
-            "y": 3478
+            "y": 3698
           },
           {
             "x": 760,
-            "y": 3832
+            "y": 4048
           }
         ]
       }
     },
     {
-      "id": "62",
+      "id": "53",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1773,21 +1492,21 @@
         "points": [
           {
             "x": 950,
-            "y": 3478
+            "y": 3698
           },
           {
             "x": 950,
-            "y": 3832
+            "y": 4048
           },
           {
             "x": 760,
-            "y": 3832
+            "y": 4048
           }
         ]
       }
     },
     {
-      "id": "63",
+      "id": "54",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1802,7 +1521,7 @@
       "target": "21"
     },
     {
-      "id": "64",
+      "id": "55",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1819,17 +1538,17 @@
         "points": [
           {
             "x": 760,
-            "y": 4008
+            "y": 4232
           },
           {
             "x": 760,
-            "y": 4160
+            "y": 4384
           }
         ]
       }
     },
     {
-      "id": "65",
+      "id": "56",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1846,17 +1565,17 @@
         "points": [
           {
             "x": 760,
-            "y": 4816
+            "y": 5040
           },
           {
             "x": 760,
-            "y": 4976
+            "y": 5192
           }
         ]
       }
     },
     {
-      "id": "66",
+      "id": "57",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1873,17 +1592,17 @@
         "points": [
           {
             "x": 760,
-            "y": 5088
+            "y": 5304
           },
           {
             "x": 760,
-            "y": 5240
+            "y": 5456
           }
         ]
       }
     },
     {
-      "id": "67",
+      "id": "58",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1900,17 +1619,17 @@
         "points": [
           {
             "x": 760,
-            "y": 5360
+            "y": 5576
           },
           {
             "x": 665,
-            "y": 5360
+            "y": 5576
           }
         ]
       }
     },
     {
-      "id": "68",
+      "id": "59",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1927,17 +1646,17 @@
         "points": [
           {
             "x": 760,
-            "y": 5360
+            "y": 5576
           },
           {
             "x": 855,
-            "y": 5360
+            "y": 5576
           }
         ]
       }
     },
     {
-      "id": "69",
+      "id": "60",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1954,17 +1673,17 @@
         "points": [
           {
             "x": 855,
-            "y": 5512
+            "y": 5728
           },
           {
             "x": 855,
-            "y": 5616
+            "y": 5832
           }
         ]
       }
     },
     {
-      "id": "70",
+      "id": "61",
       "value": "",
       "geometry": {
         "x": 0,
@@ -1981,21 +1700,21 @@
         "points": [
           {
             "x": 665,
-            "y": 5518
+            "y": 5738
           },
           {
             "x": 665,
-            "y": 5824
+            "y": 6040
           },
           {
             "x": 760,
-            "y": 5824
+            "y": 6040
           }
         ]
       }
     },
     {
-      "id": "71",
+      "id": "62",
       "value": "",
       "geometry": {
         "x": 0,
@@ -2012,21 +1731,21 @@
         "points": [
           {
             "x": 855,
-            "y": 5734
+            "y": 5954
           },
           {
             "x": 855,
-            "y": 5824
+            "y": 6040
           },
           {
             "x": 760,
-            "y": 5824
+            "y": 6040
           }
         ]
       }
     },
     {
-      "id": "72",
+      "id": "63",
       "value": "",
       "geometry": {
         "x": 0,
@@ -2041,7 +1760,7 @@
       "target": "29"
     },
     {
-      "id": "73",
+      "id": "64",
       "value": "",
       "geometry": {
         "x": 0,
@@ -2058,334 +1777,14 @@
         "points": [
           {
             "x": 760,
-            "y": 6024
+            "y": 6944
           },
           {
             "x": 760,
-            "y": 6176
+            "y": 7096
           }
         ]
       }
-    },
-    {
-      "id": "74",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "30",
-      "target": "31",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 6728
-          },
-          {
-            "x": 760,
-            "y": 6880
-          }
-        ]
-      }
-    },
-    {
-      "id": "75",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "31",
-      "target": "32",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 7016
-          },
-          {
-            "x": 760,
-            "y": 7168
-          }
-        ]
-      }
-    },
-    {
-      "id": "76",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "32",
-      "target": "33",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 7712
-          },
-          {
-            "x": 760,
-            "y": 7872
-          }
-        ]
-      }
-    },
-    {
-      "id": "77",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "33",
-      "target": "34",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 8008
-          },
-          {
-            "x": 760,
-            "y": 8160
-          }
-        ]
-      }
-    },
-    {
-      "id": "78",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "34",
-      "target": "35",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 8704
-          },
-          {
-            "x": 760,
-            "y": 8856
-          }
-        ]
-      }
-    },
-    {
-      "id": "79",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "35",
-      "target": "36",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 8992
-          },
-          {
-            "x": 760,
-            "y": 9152
-          }
-        ]
-      }
-    },
-    {
-      "id": "80",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "36",
-      "target": "37",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 9696
-          },
-          {
-            "x": 760,
-            "y": 9848
-          }
-        ]
-      }
-    },
-    {
-      "id": "81",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "37",
-      "target": "38",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 9992
-          },
-          {
-            "x": 665,
-            "y": 9992
-          }
-        ]
-      }
-    },
-    {
-      "id": "82",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "37",
-      "target": "39",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 760,
-            "y": 9992
-          },
-          {
-            "x": 855,
-            "y": 9992
-          }
-        ]
-      }
-    },
-    {
-      "id": "83",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
-      "vertex": false,
-      "edge": true,
-      "source": "38",
-      "target": "40",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 665,
-            "y": 10152
-          },
-          {
-            "x": 665,
-            "y": 10360
-          },
-          {
-            "x": 760,
-            "y": 10360
-          }
-        ]
-      }
-    },
-    {
-      "id": "84",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
-      "vertex": false,
-      "edge": true,
-      "source": "39",
-      "target": "40",
-      "edgeGeometry": {
-        "points": [
-          {
-            "x": 855,
-            "y": 10152
-          },
-          {
-            "x": 855,
-            "y": 10360
-          },
-          {
-            "x": 760,
-            "y": 10360
-          }
-        ]
-      }
-    },
-    {
-      "id": "85",
-      "value": "",
-      "geometry": {
-        "x": 0,
-        "y": 0,
-        "width": 0,
-        "height": 0
-      },
-      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
-      "vertex": false,
-      "edge": true,
-      "source": "40",
-      "target": "41"
     }
   ],
   "sectionPrefs": {
@@ -2403,23 +1802,5 @@
     "pdfName": "CLETS-001 Confidential Information for Law Enforcement",
     "pdfFile": "form.pdf",
     "pdfPrice": "0"
-  },
-  "unreviewedWording": [
-    {
-      "question": "other_protected_person_1_full_name",
-      "text": "What is your 4. Other protected person 1 - name?"
-    },
-    {
-      "question": "other_protected_person_2_full_name",
-      "text": "What is your 4. Other protected person 2 - name?"
-    },
-    {
-      "question": "other_protected_person_3_full_name",
-      "text": "What is your 4. Other protected person 3 - name?"
-    },
-    {
-      "question": "other_protected_person_4_full_name",
-      "text": "What is your 4. Other protected person 4 - name?"
-    }
-  ]
+  }
 }

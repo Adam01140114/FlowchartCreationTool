@@ -1,5 +1,5 @@
 {
-  "_comment": "CLETS-001 is filed with every request - DV-100 page 13 lists it as one of the three forms the filer must complete - so it is activated unconditionally. Most of what it asks about is already in the packet under the packet's own names, and travels: the two people's names, the filer's age, and the four other protected people. What is left is the identifying detail only a law-enforcement database wants, which is what this interview asks for. The form stars the required fields; everything else it calls helpful, so the optional ones say so rather than pressing for an answer.",
+  "_comment": "CLETS-001 is filed with every request - DV-100 page 13 lists it as one of the three forms the filer must complete - so it is activated unconditionally. Most of what it asks about is already in the packet under the packet's own names, and travels: the two people's names, the filer's age, and the four other protected people. What is left is the identifying detail only a law-enforcement database wants, which is what this interview asks for. The form stars the required fields; everything else it calls helpful, so those are marked optional and the Next button lets the filer past them. The other protected people are DV-100's block, which asks the gender, race and date of birth this form prints; past four, their page is drawn from it (DV-100's attachment.otherPages).",
   "groups": [
     {
       "nameId": "clets_restrained_person_speaks_english",
@@ -55,6 +55,14 @@
         "No"
       ]
     }
+  ],
+  "splits": [
+    { "field": "clets_restrained_person_drivers_license", "join": ", ", "parts": [
+        { "nameId": "clets_restrained_person_drivers_license_number", "label": "Driver's license number" },
+        { "nameId": "clets_restrained_person_drivers_license_state", "label": "State that issued the license" } ] },
+    { "field": "clets_restrained_person_employer", "join": ", ", "parts": [
+        { "nameId": "clets_restrained_person_employer_name", "label": "Employer's name" },
+        { "nameId": "clets_restrained_person_employer_address", "label": "Employer's address" } ] }
   ],
   "questions": {
     "clets_restrained_person_other_names": {
@@ -143,9 +151,6 @@
     },
     "case_number": {
       "text": "What is the case number?"
-    },
-    "clets_other_protected_people_attached_page": {
-      "text": "Are there more people to protect than fit on this form?"
     }
   },
   "sections": [
@@ -203,92 +208,37 @@
         "other_protected_person_4_full_name",
         "other_protected_person_4_gender",
         "other_protected_person_4_race",
-        "other_protected_person_4_date_of_birth",
-        "clets_other_protected_people_attached_page"
+        "other_protected_person_4_date_of_birth"
+      ]
+    }
+  ],
+  "attachmentTargets": ["clets_other_protected_people_attached_page"],
+  "repeats": [
+    {
+      "nameId": "other_protected_person",
+      "question": "How many other people do you want the order to protect?",
+      "entryTitle": "Protected Person",
+      "min": 0,
+      "max": 4,
+      "fields": [
+        { "label": "Full name", "nameId": "{n}_full_name" },
+        { "label": "Gender", "nameId": "{n}_gender" },
+        { "label": "Race", "nameId": "{n}_race", "optional": true },
+        { "label": "Date of birth", "nameId": "{n}_date_of_birth", "type": "date", "optional": true }
       ]
     }
   ],
   "combines": [
-    {
-      "question": "For the first other protected person, what does law enforcement need?",
-      "fields": [
-        {
-          "field": "other_protected_person_1_gender",
-          "label": "Gender"
-        },
-        {
-          "field": "other_protected_person_1_race",
-          "label": "Race"
-        },
-        {
-          "field": "other_protected_person_1_date_of_birth",
-          "label": "Date of birth",
-          "type": "date"
-        }
-      ]
-    },
-    {
-      "question": "For the second other protected person, what does law enforcement need?",
-      "fields": [
-        {
-          "field": "other_protected_person_2_gender",
-          "label": "Gender"
-        },
-        {
-          "field": "other_protected_person_2_race",
-          "label": "Race"
-        },
-        {
-          "field": "other_protected_person_2_date_of_birth",
-          "label": "Date of birth",
-          "type": "date"
-        }
-      ]
-    },
-    {
-      "question": "For the third other protected person, what does law enforcement need?",
-      "fields": [
-        {
-          "field": "other_protected_person_3_gender",
-          "label": "Gender"
-        },
-        {
-          "field": "other_protected_person_3_race",
-          "label": "Race"
-        },
-        {
-          "field": "other_protected_person_3_date_of_birth",
-          "label": "Date of birth",
-          "type": "date"
-        }
-      ]
-    },
-    {
-      "question": "For the fourth other protected person, what does law enforcement need?",
-      "fields": [
-        {
-          "field": "other_protected_person_4_gender",
-          "label": "Gender"
-        },
-        {
-          "field": "other_protected_person_4_race",
-          "label": "Race"
-        },
-        {
-          "field": "other_protected_person_4_date_of_birth",
-          "label": "Date of birth",
-          "type": "date"
-        }
-      ]
-    },
-  { "nameId": "clets_restrained_person_details", "question": "What else do you know about the person you want protection from? (optional)", "optional": true, "fields": [
+  { "nameId": "clets_restrained_person_details", "question": "What else do you know about the person you want protection from?", "optional": true, "fields": [
       {"field":"clets_restrained_person_other_names","label":"Other names they go by"},
       {"field":"clets_restrained_person_marks_scars_tattoos","label":"Marks, scars, or tattoos"},
-      {"field":"clets_restrained_person_drivers_license","label":"Driver's license number and state"},
+      {"field":"clets_restrained_person_drivers_license_number","label":"Driver's license number"},
+      {"field":"clets_restrained_person_drivers_license_state","label":"State that issued the license"},
       {"field":"clets_restrained_person_ssn","label":"Social Security number"},
       {"field":"clets_restrained_person_telephone","label":"Phone number","type":"phone"},
-      {"field":"clets_restrained_person_employer","label":"Employer (name and address)"} ] },
-  { "question": "What vehicle do they drive? (optional)", "optional": true, "fields": [
+      {"field":"clets_restrained_person_employer_name","label":"Employer's name"},
+      {"field":"clets_restrained_person_employer_address","label":"Employer's address"} ] },
+  { "question": "What vehicle do they drive?", "optional": true, "fields": [
       {"field":"clets_restrained_person_vehicle_type","label":"Type of vehicle"},
       {"field":"clets_restrained_person_vehicle_model","label":"Model"},
       {"field":"clets_restrained_person_vehicle_year","label":"Year","type":"number"},

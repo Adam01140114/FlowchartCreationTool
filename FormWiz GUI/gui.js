@@ -757,6 +757,118 @@ function updateJumpOptions(questionId, conditionId = null) {
     });
 }
 // ============================================
+// ===  ATTACHED PAGE: OTHER FORMS' PAGES  ====
+// ============================================
+// A numbered dropdown's extra entries can also be drawn again on a page that
+// belongs to another form in the packet (e.g. DV-110's own "Other Protected
+// People" page). The hidden #attachmentOtherPages{qid} is the source of truth:
+// generate.js reads it with JSON.parse, so it always holds a JSON array ("[]"
+// when empty). The visible rows are drawn from it and every edit writes it back.
+const ATTACHMENT_OTHER_PAGE_COLUMNS = [
+    { key: 'form', label: 'Form', placeholder: 'e.g., DV-110', width: '80px' },
+    { key: 'name', label: 'Page file name', placeholder: 'e.g., DV110_Other_Protected_People', width: '220px' },
+    { key: 'heading', label: 'Heading', placeholder: 'e.g., DV-110, Other Protected People', width: '220px' },
+    { key: 'item', label: 'Item', placeholder: '3', width: '40px' },
+    { key: 'itemTitle', label: 'Item title', placeholder: 'e.g., Other Protected People', width: '200px' },
+    { key: 'marks', label: 'Box it ticks', placeholder: 'PDF checkbox name', width: '220px' },
+    { key: 'fields', label: 'Fields', placeholder: 'all fields, or e.g. {n}_full_name, {n}_age', width: '300px' }
+];
+// Which entry fields a page prints: hint keys ("{n}_full_name") or labels.
+// Takes an array or comma-separated text; empty means every field.
+function parseAttachmentFieldList(value) {
+    const parts = Array.isArray(value) ? value : String(value == null ? '' : value).split(',');
+    return parts.map(s => String(s == null ? '' : s).trim()).filter(Boolean);
+}
+function normalizeAttachmentOtherPage(page) {
+    const p = (page && typeof page === 'object') ? page : {};
+    const str = (v) => (v == null ? '' : String(v)).trim();
+    return {
+        form: str(p.form),
+        name: str(p.name).replace(/\.pdf$/i, ''),
+        heading: str(p.heading),
+        item: str(p.item),
+        itemTitle: str(p.itemTitle),
+        marks: str(p.marks),
+        fields: parseAttachmentFieldList(p.fields)
+    };
+}
+function readAttachmentOtherPages(questionId) {
+    const hidden = document.getElementById(`attachmentOtherPages${questionId}`);
+    if (!hidden) return [];
+    try {
+        const parsed = JSON.parse(hidden.value || '[]');
+        return Array.isArray(parsed) ? parsed.map(normalizeAttachmentOtherPage) : [];
+    } catch (e) {
+        return [];
+    }
+}
+function writeAttachmentOtherPages(questionId, pages) {
+    const hidden = document.getElementById(`attachmentOtherPages${questionId}`);
+    if (!hidden) return;
+    hidden.value = JSON.stringify((Array.isArray(pages) ? pages : []).map(normalizeAttachmentOtherPage));
+}
+// Visible rows -> hidden JSON, on every keystroke.
+function syncAttachmentOtherPages(questionId) {
+    const container = document.getElementById(`attachmentOtherPagesRows${questionId}`);
+    if (!container) return;
+    const pages = Array.from(container.querySelectorAll('.fw-attachment-other-page')).map(row => {
+        const page = {};
+        row.querySelectorAll('input[data-attachment-key]').forEach(input => {
+            page[input.dataset.attachmentKey] = input.value;
+        });
+        return page;
+    });
+    writeAttachmentOtherPages(questionId, pages);
+}
+// Hidden JSON -> visible rows.
+function renderAttachmentOtherPages(questionId) {
+    const container = document.getElementById(`attachmentOtherPagesRows${questionId}`);
+    if (!container) return;
+    container.innerHTML = '';
+    readAttachmentOtherPages(questionId).forEach((page, index) => {
+        const row = document.createElement('div');
+        row.className = 'fw-attachment-other-page';
+        row.style.cssText = 'display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; padding: 8px 0; border-top: 1px dashed rgba(203, 213, 225, 0.9);';
+        ATTACHMENT_OTHER_PAGE_COLUMNS.forEach(col => {
+            const label = document.createElement('label');
+            label.textContent = col.label + ': ';
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.dataset.attachmentKey = col.key;
+            input.placeholder = col.placeholder;
+            input.style.width = col.width;
+            input.setAttribute('aria-label', col.label);
+            input.value = col.key === 'fields' ? page.fields.join(', ') : page[col.key];
+            input.addEventListener('input', () => syncAttachmentOtherPages(questionId));
+            row.appendChild(label);
+            row.appendChild(input);
+        });
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.textContent = 'Remove';
+        removeBtn.title = 'Stop drawing the entries on this page';
+        removeBtn.style.cssText = 'margin: 0 0 0 auto; padding: 5px 12px; border: none; border-radius: 8px; background-color: #dc3545; color: white; cursor: pointer; font-size: 12px;';
+        removeBtn.addEventListener('click', () => removeAttachmentOtherPage(questionId, index));
+        row.appendChild(removeBtn);
+        container.appendChild(row);
+    });
+}
+function addAttachmentOtherPage(questionId) {
+    const pages = readAttachmentOtherPages(questionId);
+    pages.push({});
+    writeAttachmentOtherPages(questionId, pages);
+    renderAttachmentOtherPages(questionId);
+    const rows = document.querySelectorAll(`#attachmentOtherPagesRows${questionId} .fw-attachment-other-page`);
+    const firstInput = rows.length ? rows[rows.length - 1].querySelector('input') : null;
+    if (firstInput) firstInput.focus();
+}
+function removeAttachmentOtherPage(questionId, index) {
+    const pages = readAttachmentOtherPages(questionId);
+    pages.splice(index, 1);
+    writeAttachmentOtherPages(questionId, pages);
+    renderAttachmentOtherPages(questionId);
+}
+// ============================================
 // ===========  QUESTION FUNCTIONS  ===========
 // ============================================
 function addQuestion(sectionId, questionId = null) {
@@ -815,6 +927,23 @@ function addQuestion(sectionId, questionId = null) {
             <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">
             <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">            <label>Entry Title: </label>
             <input type="text" id="entryTitle${currentQuestionId}" placeholder="e.g., Please enter car info" style="width: 250px;">
+            </div>
+            <div class="fw-nested-block fw-attachment-options" style="margin-top: 8px;">
+            <label title="A table on the paper form prints a fixed number of rows and says to attach a sheet for the rest. With this on, the count goes past the PDF rows (the End number) and the extra entries are drawn on a page of their own."><input type="checkbox" id="attachmentEnabled${currentQuestionId}"> More entries than the PDF has rows go on an attached page</label>
+            <label>Most entries: </label>
+            <input type="number" id="attachmentMost${currentQuestionId}" placeholder="e.g., 12" min="1" style="width: 60px;">            <label>Page file name: </label>
+            <input type="text" id="attachmentName${currentQuestionId}" placeholder="e.g., Additional_Children" style="width: 170px;">            <label>Heading: </label>
+            <input type="text" id="attachmentHeading${currentQuestionId}" placeholder="e.g., DV-105, Children" style="width: 160px;">            <label>Item: </label>
+            <input type="text" id="attachmentItem${currentQuestionId}" placeholder="3" style="width: 40px;">            <label>Item title: </label>
+            <input type="text" id="attachmentItemTitle${currentQuestionId}" placeholder="e.g., Children Under 18 Years Old" style="width: 220px;">            <label>Box it ticks: </label>
+            <input type="text" id="attachmentMarks${currentQuestionId}" placeholder="PDF checkbox name" style="width: 220px;">            <label title="Which of the entry fields this page prints: each is the field's key as written in the hints (e.g. {n}_full_name) or its label (e.g. Lives with you?). Leave blank to print every field.">Fields on this page: </label>
+            <input type="text" id="attachmentFields${currentQuestionId}" placeholder="all fields, or e.g. {n}_full_name, {n}_age" style="width: 300px;">
+            <div class="fw-attachment-other-pages" style="margin-top: 10px;">
+                <label title="The same extra entries drawn again on a page that belongs to another form in the packet, e.g. DV-110's own Other Protected People page.">Also drawn on another form's page:</label>
+                <input type="hidden" id="attachmentOtherPages${currentQuestionId}" value="[]">
+                <div id="attachmentOtherPagesRows${currentQuestionId}" class="fw-attachment-other-pages-rows"></div>
+                <button type="button" onclick="addAttachmentOtherPage(${currentQuestionId})" style="margin: 5px 0; padding: 6px 14px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 13px; display: inline-block;">Add page</button>
+            </div>
             </div>
             <div class="fw-field-toolbar">
                 <button type="button" onclick="addTextboxAmount(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Amount</button>

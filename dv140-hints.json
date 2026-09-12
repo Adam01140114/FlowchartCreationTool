@@ -89,9 +89,9 @@
       "conditional": {
         "onlyWhen": "dv105_their_relationship_other"
       }
-    },
-    "dv105_children_additional_list_attached": {
-      "text": "Do you have more children to list on a separate page?"
     }
-  }
+  },
+  "attachmentTargets": [
+    "dv105_children_additional_list_attached"
+  ]
 }

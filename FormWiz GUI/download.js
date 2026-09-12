@@ -1685,6 +1685,34 @@ function loadFormData(formData) {
                     if (entryTitleEl && question.entryTitle) {
                         entryTitleEl.value = question.entryTitle;
                     }
+                    // More entries than the PDF has rows, drawn on an attached page
+                    const attachment = question.attachment || null;
+                    const setAttachment = (key, value) => {
+                        const el = questionBlock.querySelector(`#${key}${question.questionId}`);
+                        if (!el) return;
+                        if (el.type === 'checkbox') el.checked = !!value;
+                        else el.value = value == null ? '' : value;
+                    };
+                    setAttachment('attachmentEnabled', !!(attachment && attachment.name));
+                    if (attachment) {
+                        setAttachment('attachmentMost', attachment.most);
+                        setAttachment('attachmentName', attachment.name);
+                        setAttachment('attachmentHeading', attachment.heading);
+                        setAttachment('attachmentItem', attachment.item);
+                        setAttachment('attachmentItemTitle', attachment.itemTitle);
+                        setAttachment('attachmentMarks', attachment.marks);
+                        setAttachment('attachmentFields', Array.isArray(attachment.fields) ? attachment.fields.join(', ') : attachment.fields);
+                    }
+                    // The same extra entries drawn again on other forms' pages. The
+                    // hidden input is what generate.js reads (JSON.parse), so it is
+                    // always a JSON array, "[]" when there are none.
+                    const otherPagesEl = questionBlock.querySelector(`#attachmentOtherPages${question.questionId}`);
+                    if (otherPagesEl) {
+                        const otherPages = (attachment && Array.isArray(attachment.otherPages)) ? attachment.otherPages : [];
+                        otherPagesEl.value = JSON.stringify(typeof normalizeAttachmentOtherPage === 'function'
+                            ? otherPages.map(normalizeAttachmentOtherPage) : otherPages);
+                        if (typeof renderAttachmentOtherPages === 'function') renderAttachmentOtherPages(question.questionId);
+                    }
                     // Rebuild unified fields from exported data
                     const unifiedFieldsDiv = questionBlock.querySelector(`#unifiedFields${question.questionId}`);
                     if (unifiedFieldsDiv) {
@@ -3792,6 +3820,46 @@ function exportForm(options) {
                 const entryTitleInput = questionBlock.querySelector(`#entryTitle${questionId}`);
                 if (entryTitleInput && entryTitleInput.value.trim()) {
                     questionData.entryTitle = entryTitleInput.value.trim();
+                }
+                // More entries than the PDF has rows, drawn on an attached page
+                const attachmentOn = questionBlock.querySelector(`#attachmentEnabled${questionId}`);
+                if (attachmentOn && attachmentOn.checked) {
+                    const attachmentValue = (key) => (questionBlock.querySelector(`#${key}${questionId}`)?.value || '').trim();
+                    const attachment = {
+                        name: attachmentValue('attachmentName').replace(/\.pdf$/i, ''),
+                        heading: attachmentValue('attachmentHeading'),
+                        item: attachmentValue('attachmentItem'),
+                        itemTitle: attachmentValue('attachmentItemTitle'),
+                        marks: attachmentValue('attachmentMarks'),
+                        most: parseInt(attachmentValue('attachmentMost'), 10) || 0
+                    };
+                    // Which entry fields this page prints (hint keys or labels);
+                    // absent means every field.
+                    const attachmentList = (v) => (Array.isArray(v) ? v : String(v == null ? '' : v).split(','))
+                        .map(s => String(s == null ? '' : s).trim()).filter(Boolean);
+                    const attachmentFields = attachmentList(attachmentValue('attachmentFields'));
+                    if (attachmentFields.length) attachment.fields = attachmentFields;
+                    // The same entries drawn again on other forms' pages (hidden JSON).
+                    let otherPages = [];
+                    try {
+                        const parsed = JSON.parse(questionBlock.querySelector(`#attachmentOtherPages${questionId}`)?.value || '[]');
+                        if (Array.isArray(parsed)) otherPages = parsed;
+                    } catch (e) { otherPages = []; }
+                    const attachmentText = (v) => (v == null ? '' : String(v)).trim();
+                    otherPages = otherPages
+                        .filter(p => p && typeof p === 'object')
+                        .map(p => ({
+                            form: attachmentText(p.form),
+                            name: attachmentText(p.name).replace(/\.pdf$/i, ''),
+                            heading: attachmentText(p.heading),
+                            item: attachmentText(p.item),
+                            itemTitle: attachmentText(p.itemTitle),
+                            marks: attachmentText(p.marks),
+                            fields: attachmentList(p.fields)
+                        }))
+                        .filter(p => p.name);
+                    if (otherPages.length) attachment.otherPages = otherPages;
+                    if (attachment.name) questionData.attachment = attachment;
                 }
                 // Collect unified field data in true creation order
                 const unifiedContainer = questionBlock.querySelector(`#unifiedFields${questionId}`);

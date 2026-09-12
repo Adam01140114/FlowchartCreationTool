@@ -303,7 +303,10 @@ function updateSectionLegend() {
   if (!legend) {
     return;
   }
-  let innerHTML = "<h4>Section Names</h4>";
+  // The panel is a <details>, and this rewrites all of it - so the <summary>
+  // that folds it has to be rewritten too. Its open state is an attribute on
+  // the panel itself, which innerHTML leaves alone.
+  let innerHTML = "<summary>Section Names</summary>";
   const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
   sections.forEach(sec => {
     innerHTML += `
