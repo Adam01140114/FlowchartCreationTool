@@ -2958,6 +2958,31 @@ window.exportGuiJson = function(download = true) {
           }
         }
       }
+      // Conditions the wiring cannot carry. A question hangs off one branch; one
+      // asked on either of two questions' answers - DV-100's children, after
+      // "We have a child or children together" OR "Child custody and
+      // visitation" - carries the other in its style as alsoWhen (the option's
+      // nameId), and the condition is added here beside the wired one.
+      const alsoRaw = (/(?:^|;)alsoWhen=([^;]*)/.exec(cell.style || '') || [])[1];
+      if (alsoRaw) {
+        let alsoIds = [];
+        try { alsoIds = decodeURIComponent(alsoRaw).split(',').map((s) => s.trim()).filter(Boolean); }
+        catch (e) { alsoIds = []; }
+        const model = window.graph && window.graph.getModel();
+        const allCells = model ? Object.values(model.cells || {}) : [];
+        alsoIds.forEach((nameId) => {
+          const opt = allCells.find((c) => c && isOptions(c) && (c._nameId === nameId
+            || (/(?:^|;)nodeId=([^;]*)/.exec(c.style || '') || [])[1] === nameId));
+          if (!opt) return;
+          const parentEdge = (getLogicalIncomingEdges(opt) || []).find((e) => e.source && isQuestion(e.source));
+          const parentQ = parentEdge && parentEdge.source;
+          if (!parentQ || parseInt(getSection(parentQ) || '1', 10) > currentSection) return;
+          const tmp = document.createElement('div');
+          tmp.innerHTML = opt.value || '';
+          const label = (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
+          if (label) conditions.push({ prevQuestion: String(parentQ._questionId || ''), prevAnswer: label });
+        });
+      }
       // An optional checkbox question passes its own condition on, the way an
       // optional text question does above. "Which of those days should be
       // virtual visits?" is answered by ticking none when every visit is in

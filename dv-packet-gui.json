@@ -1231,130 +1231,6 @@
         },
         {
           "questionId": 10,
-          "text": "How many children do you have together?",
-          "type": "numberedDropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "9",
-                "prevAnswer": "We have a child or children together"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "min": "1",
-          "max": "4",
-          "nodeId": "dv105_child",
-          "entryTitle": "Child",
-          "attachment": {
-            "name": "Additional_Children",
-            "form": "DV-105",
-            "heading": "DV-105, Children",
-            "item": "3",
-            "itemTitle": "Children Under 18 Years Old",
-            "marks": "dv105_children_additional_list_attached",
-            "most": 12,
-            "otherPages": [
-              {
-                "form": "DV-140",
-                "name": "DV140_Children",
-                "heading": "DV-140, Children",
-                "item": "3",
-                "itemTitle": "Children Under 18 Years Old",
-                "marks": "dv105_children_additional_list_attached"
-              }
-            ]
-          },
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Child's name",
-              "nodeId": "dv105_child_{n}_name",
-              "order": 1,
-              "prefill": ""
-            },
-            {
-              "type": "date",
-              "label": "Date of birth",
-              "nodeId": "dv105_child_{n}_date_of_birth",
-              "order": 2,
-              "prefill": ""
-            }
-          ]
-        },
-        {
-          "questionId": 11,
           "text": "How are you related?",
           "type": "dropdown",
           "logic": {
@@ -1485,7 +1361,7 @@
           "placeholder": ""
         },
         {
-          "questionId": 12,
+          "questionId": 11,
           "text": "Did you live together as more than roommates?",
           "type": "dropdown",
           "logic": {
@@ -1594,7 +1470,7 @@
       "sectionName": "Other Court Cases",
       "questions": [
         {
-          "questionId": 13,
+          "questionId": 12,
           "text": "Are there restraining orders in place now, or that expired in the last six months?",
           "type": "dropdown",
           "logic": {
@@ -1621,35 +1497,35 @@
                 "prevAnswer": "We are or used to be engaged to be married"
               },
               {
-                "prevQuestion": "11",
+                "prevQuestion": "10",
                 "prevAnswer": "Parent, stepparent, or parent-in-law"
               },
               {
-                "prevQuestion": "11",
+                "prevQuestion": "10",
                 "prevAnswer": "Brother, sister, sibling, stepsibling, or sibling in-law"
               },
               {
-                "prevQuestion": "11",
+                "prevQuestion": "10",
                 "prevAnswer": "Child, stepchild, or legally adopted child"
               },
               {
-                "prevQuestion": "11",
+                "prevQuestion": "10",
                 "prevAnswer": "Grandparent, step-grandparent, or grandparent-in-law"
               },
               {
-                "prevQuestion": "11",
+                "prevQuestion": "10",
                 "prevAnswer": "Child’s spouse"
               },
               {
-                "prevQuestion": "11",
+                "prevQuestion": "10",
                 "prevAnswer": "Grandchild, step-grandchild, or grandchild-in-law"
               },
               {
-                "prevQuestion": "12",
+                "prevQuestion": "11",
                 "prevAnswer": "Yes"
               },
               {
-                "prevQuestion": "12",
+                "prevQuestion": "11",
                 "prevAnswer": "No"
               }
             ]
@@ -1745,14 +1621,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 14,
+          "questionId": 13,
           "text": "How many restraining orders are in place now, or expired in the last six months?",
           "type": "numberedDropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "13",
+                "prevQuestion": "12",
                 "prevAnswer": "Yes"
               }
             ]
@@ -1850,18 +1726,18 @@
           ]
         },
         {
-          "questionId": 15,
+          "questionId": 14,
           "text": "Are you involved in any other court case with this person?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "13",
+                "prevQuestion": "12",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "13",
+                "prevQuestion": "12",
                 "prevAnswer": "Yes"
               }
             ]
@@ -1957,14 +1833,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 16,
+          "questionId": 15,
           "text": "What kind of court case is it?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "15",
+                "prevQuestion": "14",
                 "prevAnswer": "Yes"
               }
             ]
@@ -2132,14 +2008,14 @@
           "nodeId": "other_court_case_kinds"
         },
         {
-          "questionId": 17,
+          "questionId": 16,
           "text": "What do you know about the custody case?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Custody"
               }
             ]
@@ -2270,14 +2146,14 @@
           "nodeId": "other_court_case_custody_details"
         },
         {
-          "questionId": 18,
+          "questionId": 17,
           "text": "What do you know about the divorce case?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Divorce"
               }
             ]
@@ -2408,14 +2284,14 @@
           "nodeId": "other_court_case_divorce_details"
         },
         {
-          "questionId": 19,
+          "questionId": 18,
           "text": "What do you know about the juvenile case?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Juvenile (child welfare or juvenile justice)"
               }
             ]
@@ -2546,14 +2422,14 @@
           "nodeId": "other_court_case_juvenile_details"
         },
         {
-          "questionId": 20,
+          "questionId": 19,
           "text": "What do you know about the guardianship case?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Guardianship"
               }
             ]
@@ -2684,14 +2560,14 @@
           "nodeId": "other_court_case_guardianship_details"
         },
         {
-          "questionId": 21,
+          "questionId": 20,
           "text": "What do you know about the criminal case?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Criminal"
               }
             ]
@@ -2822,14 +2698,14 @@
           "nodeId": "other_court_case_criminal_details"
         },
         {
-          "questionId": 22,
+          "questionId": 21,
           "text": "What do you know about the other court case?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Another kind of case"
               }
             ]
@@ -2966,38 +2842,38 @@
       "sectionName": "The Abuse",
       "questions": [
         {
-          "questionId": 23,
+          "questionId": 22,
           "text": "When did the most recent abuse happen?",
           "type": "date",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "15",
+                "prevQuestion": "14",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Custody"
               },
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Divorce"
               },
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Juvenile (child welfare or juvenile justice)"
               },
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Guardianship"
               },
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Criminal"
               },
               {
-                "prevQuestion": "16",
+                "prevQuestion": "15",
                 "prevAnswer": "Another kind of case"
               }
             ]
@@ -3086,14 +2962,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 24,
+          "questionId": 23,
           "text": "Did anyone else see or hear the most recent abuse?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "23",
+                "prevQuestion": "22",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -3196,14 +3072,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 25,
+          "questionId": 24,
           "text": "Who else heard or saw what happened?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "24",
+                "prevQuestion": "23",
                 "prevAnswer": "Yes"
               }
             ]
@@ -3292,22 +3168,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 26,
+          "questionId": 25,
           "text": "Did the person use or threaten to use a weapon?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "24",
+                "prevQuestion": "23",
                 "prevAnswer": "I don’t know"
               },
               {
-                "prevQuestion": "24",
+                "prevQuestion": "23",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "25",
+                "prevQuestion": "24",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -3403,14 +3279,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 27,
+          "questionId": 26,
           "text": "What gun or weapon did they use or threaten to use?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "26",
+                "prevQuestion": "25",
                 "prevAnswer": "Yes"
               }
             ]
@@ -3499,18 +3375,18 @@
           "placeholder": ""
         },
         {
-          "questionId": 28,
+          "questionId": 27,
           "text": "Did the person cause you emotional or physical harm?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "26",
+                "prevQuestion": "25",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "27",
+                "prevQuestion": "26",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -3606,14 +3482,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 29,
+          "questionId": 28,
           "text": "What emotional or physical harm did they cause?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "28",
+                "prevQuestion": "27",
                 "prevAnswer": "Yes"
               }
             ]
@@ -3702,18 +3578,18 @@
           "placeholder": ""
         },
         {
-          "questionId": 30,
+          "questionId": 29,
           "text": "Did the police come?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "28",
+                "prevQuestion": "27",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "29",
+                "prevQuestion": "28",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -3816,22 +3692,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 31,
+          "questionId": 30,
           "text": "Describe how the person was abusive that day, including what they said, did, or sent to you, and how often it happened.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "30",
+                "prevQuestion": "29",
                 "prevAnswer": "I don’t know"
               },
               {
-                "prevQuestion": "30",
+                "prevQuestion": "29",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "30",
+                "prevQuestion": "29",
                 "prevAnswer": "Yes"
               }
             ]
@@ -3920,14 +3796,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 32,
+          "questionId": 31,
           "text": "How often has this abuse happened?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "31",
+                "prevQuestion": "30",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -4037,14 +3913,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 33,
+          "questionId": 32,
           "text": "How often did it happen?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "32",
+                "prevQuestion": "31",
                 "prevAnswer": "Other"
               }
             ]
@@ -4133,22 +4009,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 34,
+          "questionId": 33,
           "text": "On what other dates did it happen?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "32",
+                "prevQuestion": "31",
                 "prevAnswer": "2–5 times"
               },
               {
-                "prevQuestion": "32",
+                "prevQuestion": "31",
                 "prevAnswer": "Weekly"
               },
               {
-                "prevQuestion": "33",
+                "prevQuestion": "32",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -4237,18 +4113,18 @@
           "placeholder": ""
         },
         {
-          "questionId": 35,
+          "questionId": 34,
           "text": "Has the person abused you in a different way from the abuse you just described?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "34",
+                "prevQuestion": "33",
                 "prevAnswer": "Any Text"
               },
               {
-                "prevQuestion": "32",
+                "prevQuestion": "31",
                 "prevAnswer": "Just this once"
               }
             ]
@@ -4344,14 +4220,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 36,
+          "questionId": 35,
           "text": "When did that earlier abuse happen?",
           "type": "date",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "35",
+                "prevQuestion": "34",
                 "prevAnswer": "Yes"
               }
             ]
@@ -4440,14 +4316,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 37,
+          "questionId": 36,
           "text": "Did anyone else see or hear this earlier abuse?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "36",
+                "prevQuestion": "35",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -4550,14 +4426,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 38,
+          "questionId": 37,
           "text": "Who else heard or saw what happened?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "37",
+                "prevQuestion": "36",
                 "prevAnswer": "Yes"
               }
             ]
@@ -4646,22 +4522,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 39,
+          "questionId": 38,
           "text": "Did the person use or threaten to use a weapon that time?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "37",
+                "prevQuestion": "36",
                 "prevAnswer": "I don’t know"
               },
               {
-                "prevQuestion": "37",
+                "prevQuestion": "36",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "38",
+                "prevQuestion": "37",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -4757,14 +4633,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 40,
+          "questionId": 39,
           "text": "What gun or weapon did they use or threaten to use?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "39",
+                "prevQuestion": "38",
                 "prevAnswer": "Yes"
               }
             ]
@@ -4853,18 +4729,18 @@
           "placeholder": ""
         },
         {
-          "questionId": 41,
+          "questionId": 40,
           "text": "Did the person cause you emotional or physical harm that time?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "39",
+                "prevQuestion": "38",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "40",
+                "prevQuestion": "39",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -4960,14 +4836,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 42,
+          "questionId": 41,
           "text": "What emotional or physical harm did they cause?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "41",
+                "prevQuestion": "40",
                 "prevAnswer": "Yes"
               }
             ]
@@ -5056,18 +4932,18 @@
           "placeholder": ""
         },
         {
-          "questionId": 43,
+          "questionId": 42,
           "text": "Did the police come that time?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "41",
+                "prevQuestion": "40",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "42",
+                "prevQuestion": "41",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -5170,22 +5046,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 44,
+          "questionId": 43,
           "text": "Describe how the person was abusive that time, including what they said, did, or sent to you, and how often it happened.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "43",
+                "prevQuestion": "42",
                 "prevAnswer": "I don’t know"
               },
               {
-                "prevQuestion": "43",
+                "prevQuestion": "42",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "43",
+                "prevQuestion": "42",
                 "prevAnswer": "Yes"
               }
             ]
@@ -5274,14 +5150,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 45,
+          "questionId": 44,
           "text": "How often has the person you want protection from abused you like this?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "44",
+                "prevQuestion": "43",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -5391,14 +5267,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 46,
+          "questionId": 45,
           "text": "How often did it happen?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "45",
+                "prevQuestion": "44",
                 "prevAnswer": "Other"
               }
             ]
@@ -5487,22 +5363,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 47,
+          "questionId": 46,
           "text": "On what other dates did it happen?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "45",
+                "prevQuestion": "44",
                 "prevAnswer": "2–5 times"
               },
               {
-                "prevQuestion": "45",
+                "prevQuestion": "44",
                 "prevAnswer": "Weekly"
               },
               {
-                "prevQuestion": "46",
+                "prevQuestion": "45",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -5591,22 +5467,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 48,
+          "questionId": 47,
           "text": "Is there other abuse you want the judge to know about?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "47",
+                "prevQuestion": "46",
                 "prevAnswer": "Any Text"
               },
               {
-                "prevQuestion": "45",
+                "prevQuestion": "44",
                 "prevAnswer": "Just this once"
               },
               {
-                "prevQuestion": "35",
+                "prevQuestion": "34",
                 "prevAnswer": "No"
               }
             ]
@@ -5702,14 +5578,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 49,
+          "questionId": 48,
           "text": "When did the other abuse happen?",
           "type": "date",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "48",
+                "prevQuestion": "47",
                 "prevAnswer": "Yes"
               }
             ]
@@ -5798,14 +5674,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 50,
+          "questionId": 49,
           "text": "Did anyone else see or hear this other abuse?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "49",
+                "prevQuestion": "48",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -5908,14 +5784,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 51,
+          "questionId": 50,
           "text": "Who else heard or saw what happened?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "50",
+                "prevQuestion": "49",
                 "prevAnswer": "Yes"
               }
             ]
@@ -6004,22 +5880,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 52,
+          "questionId": 51,
           "text": "Did the person use or threaten to use a weapon then?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "50",
+                "prevQuestion": "49",
                 "prevAnswer": "I don’t know"
               },
               {
-                "prevQuestion": "50",
+                "prevQuestion": "49",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "51",
+                "prevQuestion": "50",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -6115,14 +5991,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 53,
+          "questionId": 52,
           "text": "What gun or weapon did they use or threaten to use?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "52",
+                "prevQuestion": "51",
                 "prevAnswer": "Yes"
               }
             ]
@@ -6211,18 +6087,18 @@
           "placeholder": ""
         },
         {
-          "questionId": 54,
+          "questionId": 53,
           "text": "Did the person cause you emotional or physical harm then?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "52",
+                "prevQuestion": "51",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "53",
+                "prevQuestion": "52",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -6318,14 +6194,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 55,
+          "questionId": 54,
           "text": "What emotional or physical harm did they cause?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "54",
+                "prevQuestion": "53",
                 "prevAnswer": "Yes"
               }
             ]
@@ -6414,18 +6290,18 @@
           "placeholder": ""
         },
         {
-          "questionId": 56,
+          "questionId": 55,
           "text": "Did the police come then?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "54",
+                "prevQuestion": "53",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "55",
+                "prevQuestion": "54",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -6528,22 +6404,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 57,
+          "questionId": 56,
           "text": "Describe how the person was abusive then, including what they said, did, or sent to you, and how often it happened.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "56",
+                "prevQuestion": "55",
                 "prevAnswer": "I don’t know"
               },
               {
-                "prevQuestion": "56",
+                "prevQuestion": "55",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "56",
+                "prevQuestion": "55",
                 "prevAnswer": "Yes"
               }
             ]
@@ -6632,14 +6508,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 58,
+          "questionId": 57,
           "text": "How often has this other abuse happened?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "57",
+                "prevQuestion": "56",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -6749,14 +6625,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 59,
+          "questionId": 58,
           "text": "How often did it happen?",
           "type": "text",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "58",
+                "prevQuestion": "57",
                 "prevAnswer": "Other"
               }
             ]
@@ -6845,22 +6721,22 @@
           "placeholder": ""
         },
         {
-          "questionId": 60,
+          "questionId": 59,
           "text": "On what other dates did it happen?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "58",
+                "prevQuestion": "57",
                 "prevAnswer": "2–5 times"
               },
               {
-                "prevQuestion": "58",
+                "prevQuestion": "57",
                 "prevAnswer": "Weekly"
               },
               {
-                "prevQuestion": "59",
+                "prevQuestion": "58",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -6955,22 +6831,22 @@
       "sectionName": "Other Protected People",
       "questions": [
         {
-          "questionId": 61,
+          "questionId": 60,
           "text": "Do you want the restraining order to protect your children, family, or someone you live with?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "60",
+                "prevQuestion": "59",
                 "prevAnswer": "Any Text"
               },
               {
-                "prevQuestion": "58",
+                "prevQuestion": "57",
                 "prevAnswer": "Just this once"
               },
               {
-                "prevQuestion": "48",
+                "prevQuestion": "47",
                 "prevAnswer": "No"
               }
             ]
@@ -7066,14 +6942,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 62,
+          "questionId": 61,
           "text": "How many other people do you want the order to protect?",
           "type": "numberedDropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "61",
+                "prevQuestion": "60",
                 "prevAnswer": "Yes"
               }
             ]
@@ -7259,14 +7135,14 @@
           ]
         },
         {
-          "questionId": 63,
+          "questionId": 62,
           "text": "Why do these people need protection?",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "61",
+                "prevQuestion": "60",
                 "prevAnswer": "Yes"
               }
             ]
@@ -7361,18 +7237,18 @@
       "sectionName": "Firearms",
       "questions": [
         {
-          "questionId": 64,
+          "questionId": 63,
           "text": "Does the person you want protection from have firearms (guns), firearm parts, or ammunition?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "61",
+                "prevQuestion": "60",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "63",
+                "prevQuestion": "62",
                 "prevAnswer": "Any Text"
               }
             ]
@@ -7475,14 +7351,14 @@
           "placeholder": ""
         },
         {
-          "questionId": 65,
+          "questionId": 64,
           "text": "How many firearms, firearm parts, or ammunition items do you know about?",
           "type": "numberedDropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "64",
+                "prevQuestion": "63",
                 "prevAnswer": "Yes"
               }
             ]
@@ -7593,22 +7469,22 @@
       "sectionName": "Orders You Want",
       "questions": [
         {
-          "questionId": 66,
+          "questionId": 65,
           "text": "Which orders are you asking for?",
           "type": "checkbox",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "64",
+                "prevQuestion": "63",
                 "prevAnswer": "I don't know"
               },
               {
-                "prevQuestion": "64",
+                "prevQuestion": "63",
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "64",
+                "prevQuestion": "63",
                 "prevAnswer": "Yes"
               }
             ]
@@ -7622,10 +7498,6 @@
               },
               {
                 "option": "No-contact order",
-                "to": "end"
-              },
-              {
-                "option": "Child custody and visitation",
                 "to": "end"
               },
               {
@@ -7995,6 +7867,151 @@
           "nodeId": "orders_requested"
         },
         {
+          "questionId": 67,
+          "text": "How many children do you have with the person you want protection from?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "65",
+                "prevAnswer": "Child custody and visitation"
+              },
+              {
+                "prevQuestion": "9",
+                "prevAnswer": "We have a child or children together"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "1",
+                "to": "end"
+              },
+              {
+                "option": "2",
+                "to": "end"
+              },
+              {
+                "option": "3",
+                "to": "end"
+              },
+              {
+                "option": "4",
+                "to": "end"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "min": "1",
+          "max": "4",
+          "nodeId": "dv105_child",
+          "entryTitle": "Child",
+          "attachment": {
+            "name": "Additional_Children",
+            "form": "DV-105",
+            "heading": "DV-105, Children",
+            "item": "3",
+            "itemTitle": "Children Under 18 Years Old",
+            "marks": "dv105_children_additional_list_attached",
+            "most": 12,
+            "otherPages": [
+              {
+                "form": "DV-140",
+                "name": "DV140_Children",
+                "heading": "DV-140, Children",
+                "item": "3",
+                "itemTitle": "Children Under 18 Years Old",
+                "marks": "dv105_children_additional_list_attached"
+              }
+            ]
+          },
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Child's name",
+              "nodeId": "dv105_child_{n}_name",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "date",
+              "label": "Date of birth",
+              "nodeId": "dv105_child_{n}_date_of_birth",
+              "order": 2,
+              "prefill": ""
+            }
+          ]
+        },
+        {
           "questionId": 68,
           "text": "What must the person stay away from?",
           "type": "checkbox",
@@ -8002,7 +8019,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "Stay-away order"
               }
             ]
@@ -8205,7 +8222,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "Order to move out"
               }
             ]
@@ -8301,7 +8318,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "Other orders"
               }
             ]
@@ -10023,14 +10040,14 @@
       "sectionName": "Animals, Property and Support",
       "questions": [
         {
-          "questionId": 67,
+          "questionId": 66,
           "text": "How many wireless phone numbers do you want transferred to you?",
           "type": "numberedDropdown",
           "logic": {
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "Transfer of wireless phone account"
               }
             ]
@@ -10162,7 +10179,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "Control of property"
               }
             ]
@@ -10258,7 +10275,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "Pay expenses caused by the abuse"
               }
             ]
@@ -10386,7 +10403,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "Child support"
               }
             ]
@@ -10509,7 +10526,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "More time to give notice to the person"
               }
             ]
@@ -10610,7 +10627,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "Protect animals"
               }
             ]
@@ -10729,7 +10746,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "Pay debts (bills) owed for property"
               }
             ]
@@ -10948,7 +10965,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "Protect animals"
               }
             ]
@@ -11051,7 +11068,7 @@
             "enabled": true,
             "conditions": [
               {
-                "prevQuestion": "66",
+                "prevQuestion": "65",
                 "prevAnswer": "Pay debts (bills) owed for property"
               }
             ]
@@ -31187,17 +31204,6 @@
       "join": " "
     },
     {
-      "id": "linkedField11",
-      "linkedFieldId": "relationship_children_names_line_1",
-      "fields": [
-        "dv105_child_1_name",
-        "dv105_child_2_name",
-        "dv105_child_3_name",
-        "dv105_child_4_name"
-      ],
-      "join": ", "
-    },
-    {
       "id": "linkedField0",
       "linkedFieldId": "dv105_child_home_1_city_and_state",
       "fields": [
@@ -31332,12 +31338,12 @@
   "alertRules": [
     {
       "id": "alertRule0",
-      "alertNodeId": "733",
+      "alertNodeId": "732",
       "mode": "all",
       "message": "You do not qualify for this kind of restraining order unless you checked one of the other relationships listed above.",
       "conditions": [
         {
-          "questionId": "12",
+          "questionId": "11",
           "op": "is",
           "value": "No"
         },
@@ -31375,12 +31381,12 @@
     },
     {
       "id": "alertRule1",
-      "alertNodeId": "741",
+      "alertNodeId": "740",
       "mode": "all",
       "message": "A property restraint order is only available if you are married to or a registered domestic partner of the person you want protection from.",
       "conditions": [
         {
-          "questionId": "66",
+          "questionId": "65",
           "op": "is",
           "value": "Property restraint"
         },
@@ -31393,12 +31399,12 @@
     },
     {
       "id": "alertRule2",
-      "alertNodeId": "744",
+      "alertNodeId": "743",
       "mode": "all",
       "message": "Spousal support is only available if you are married to or a registered domestic partner of the person you want protection from.",
       "conditions": [
         {
-          "questionId": "66",
+          "questionId": "65",
           "op": "is",
           "value": "Spousal support"
         },
@@ -31411,12 +31417,12 @@
     },
     {
       "id": "alertRule3",
-      "alertNodeId": "747",
+      "alertNodeId": "746",
       "mode": "all",
       "message": "Child support is only available if you have a minor child with the person you want protection from.",
       "conditions": [
         {
-          "questionId": "66",
+          "questionId": "65",
           "op": "is",
           "value": "Child support"
         },
@@ -32136,6 +32142,20 @@
   ],
   "computedFields": [
     {
+      "nameId": "relationship_children_names_line_1",
+      "_why": "DV-100 item 3a prints \"We have a child or children together; names:\" after its box. The same children are now also asked for a custody request made without that box, and their names must not print beside an empty box - so the line is filled from the children block only while the box is ticked.",
+      "joinWhenTicked": {
+        "when": "relationship_have_children_together",
+        "separator": ", ",
+        "fields": [
+          "dv105_child_1_name",
+          "dv105_child_2_name",
+          "dv105_child_3_name",
+          "dv105_child_4_name"
+        ]
+      }
+    },
+    {
       "nameId": "additional_pages_count",
       "_why": "DV-100 item 32 asks for the number of extra pages attached. A filer cannot count them and the debug fill answered 100. The packet knows: the pages of every attachment being filed, plus one for each separate sheet already promised.",
       "_whyAttachedTo": "Counted along what each form says it is attached to, not along what switches it on. DV-108 is attached to DV-105, which is attached to DV-100, so its pages are part of the stack handed in with this form; DV-140 is attached to DV-110, a separate order, so its pages are not - and counting every conditional form as an attachment had put DV-140 in, making this 18 where it is 12.",
@@ -32423,24 +32443,9 @@
       ]
     },
     {
-      "nameId": "dv105_child",
-      "askedInSection": 3,
-      "questionId": 10,
-      "alsoAnswers": [
-        {
-          "questionId": 128,
-          "section": 12
-        },
-        {
-          "questionId": 257,
-          "section": 20
-        }
-      ]
-    },
-    {
       "nameId": "other_protected_person",
       "askedInSection": 6,
-      "questionId": 62,
+      "questionId": 61,
       "alsoAnswers": [
         {
           "questionId": 270,
@@ -32455,10 +32460,25 @@
     {
       "nameId": "person_to_restrain_firearms",
       "askedInSection": 7,
-      "questionId": 64,
+      "questionId": 63,
       "alsoAnswers": [
         {
           "questionId": 263,
+          "section": 20
+        }
+      ]
+    },
+    {
+      "nameId": "dv105_child",
+      "askedInSection": 8,
+      "questionId": 67,
+      "alsoAnswers": [
+        {
+          "questionId": 128,
+          "section": 12
+        },
+        {
+          "questionId": 257,
           "section": 20
         }
       ]
@@ -32510,7 +32530,7 @@
     {
       "nameId": "child_custody_and_visitation_order_requested",
       "askedInSection": 8,
-      "questionId": 66,
+      "questionId": 65,
       "viaAnswer": true,
       "alsoAnswers": [
         {
@@ -32522,7 +32542,7 @@
     {
       "nameId": "other_protected_people_yes_yes",
       "askedInSection": 6,
-      "questionId": 61,
+      "questionId": 60,
       "viaAnswer": true,
       "alsoAnswers": [
         {
@@ -32531,5 +32551,1347 @@
         }
       ]
     }
-  ]
+  ],
+  "fillPaths": {
+    "maximum": {
+      "values": {
+        "court_name": "court_name",
+        "court_street_address": "court_street_address",
+        "person_asking_protection_name": "person_asking_protection[end]",
+        "person_asking_protection_age": "100",
+        "person_asking_protection_mailing_address": "person_asking_protection_mailing_ad[end]",
+        "person_asking_protection_mailing_city": "person[end]",
+        "person_asking_protection_mailing_state": "Wyoming",
+        "person_asking_protection_mailing_state_wyoming": true,
+        "person_asking_protection_mailing_state_hidden": "Wyoming",
+        "person_asking_protection_mailing_state_short": "WY",
+        "person_asking_protection_mailing_zip_code": "90210",
+        "person_asking_protection_telephone": "(555)-555-5555",
+        "person_asking_protection_fax": "(555)-555-5555",
+        "person_asking_protection_email": "test@example.com",
+        "has_lawyer": "Yes",
+        "has_lawyer_dropdown": "Yes",
+        "person_asking_protection_lawyer_name": "person_asking_protection_lawy[end]",
+        "person_asking_protection_lawyer_state_bar_number": "Test Value",
+        "person_asking_protection_lawyer_firm_name": "person_asking_protection_lawyer_firm_name Maria Elena Rodr[end]",
+        "person_to_restrain_full_name": "person_to_restrain_full_name Mariax[end]",
+        "person_to_restrain_age": "100",
+        "person_to_restrain_date_of_birth": "2024-06-15",
+        "person_to_restrain_gender": "Nonbinary",
+        "person_to_restrain_gender_nonbinary": true,
+        "person_to_restrain_race": "person[end]",
+        "relationship_to_person_to_restrain_we_have_a_child_or_children_together": true,
+        "relationship_to_person_to_restrain_we_are_married_or_registered_domestic_partners": true,
+        "relationship_to_person_to_restrain_we_used_to_be_married_or_registered_domestic_partners": true,
+        "relationship_to_person_to_restrain_we_are_dating_or_used_to_date": true,
+        "relationship_to_person_to_restrain_we_are_or_used_to_be_engaged_to_be_married": true,
+        "relationship_to_person_to_restrain_we_are_related": true,
+        "relationship_to_person_to_restrain_we_live_together_or_used_to_live_together": true,
+        "relationship_relative_kind": "Brother, sister, sibling, stepsibling, or sibling in-law",
+        "relationship_relative_kind_dropdown": "Brother, sister, sibling, stepsibling, or sibling in-law",
+        "relationship_lived_together_as_family": "Yes",
+        "relationship_lived_together_as_family_dropdown": "Yes",
+        "recent_restraining_orders": "Yes",
+        "recent_restraining_orders_dropdown": "Yes",
+        "recent_restraining_order": "2",
+        "recent_restraining_order_2": true,
+        "recent_restraining_order_1_date": "2024-06-15",
+        "recent_restraining_order_1_expiration_date": "2024-06-15",
+        "recent_restraining_order_2_date": "2024-06-15",
+        "recent_restraining_order_2_expiration_date": "2024-06-15",
+        "other_court_case_involvement": "Yes",
+        "other_court_case_involvement_dropdown": "Yes",
+        "other_court_case_kinds_custody": true,
+        "other_court_case_kinds_divorce": true,
+        "other_court_case_kinds_juvenile_child_welfare_or_juvenile_justice": true,
+        "other_court_case_kinds_guardianship": true,
+        "other_court_case_kinds_criminal": true,
+        "other_court_case_kinds_another_kind_of_case": true,
+        "other_court_case_custody_details_location": "other_court_case_custody_details_location",
+        "other_court_case_custody_details_year": "other_court_case_custody_details_year",
+        "other_court_case_custody_details_number": "other_court_case_custody_details_number",
+        "other_court_case_divorce_details_location": "other_court_case_divorce_details_location",
+        "other_court_case_divorce_details_year": "other_court_case_divorce_details_year",
+        "other_court_case_divorce_details_number": "other_court_case_divorce_details_number",
+        "other_court_case_juvenile_details_location": "other_court_case_juvenile_details_location",
+        "other_court_case_juvenile_details_year": "other_court_case_juvenile_details_year",
+        "other_court_case_juvenile_details_number": "other_court_case_juvenile_details_number",
+        "other_court_case_guardianship_details_location": "other_court_case_guardianship_details_location",
+        "other_court_case_guardianship_details_year": "other_court_case_guardianship_details_year",
+        "other_court_case_guardianship_details_number": "other_court_case_guardianship_details_number",
+        "other_court_case_criminal_details_location": "other_court_case_criminal_details_location",
+        "other_court_case_criminal_details_year": "other_court_case_criminal_details_year",
+        "other_court_case_criminal_details_number": "other_court_case_criminal_details_number",
+        "other_court_case_other_details_location": "other_court_case_other_details_location",
+        "other_court_case_other_details_year": "other_court_case_other_details_year",
+        "other_court_case_other_details_number": "other_court_case_other_details_number",
+        "most_recent_abuse_date": "2024-06-15",
+        "most_recent_abuse_witnesses": "Yes",
+        "most_recent_abuse_witnesses_dropdown": "Yes",
+        "most_recent_abuse_witness_names": "most_recent_abuse_witness_names Mar[end]",
+        "most_recent_abuse_weapon": "Yes",
+        "most_recent_abuse_weapon_dropdown": "Yes",
+        "most_recent_abuse_weapon_description": "most_recent_abuse_weapon_descriptio[end]",
+        "most_recent_abuse_harm": "Yes",
+        "most_recent_abuse_harm_dropdown": "Yes",
+        "most_recent_abuse_harm_description": "most_recent_abuse_harm_description Maria Elena Rodriguez-Vasquez 1847 North Willowbroo[end]",
+        "most_recent_abuse_police": "Yes",
+        "most_recent_abuse_police_dropdown": "Yes",
+        "most_recent_abuse_details": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-202[end]",
+        "most_recent_abuse_frequency": "Other",
+        "most_recent_abuse_frequency_dropdown": "Other",
+        "most_recent_abuse_frequency_other_description": "most_recent_abuse_frequency_o[end]",
+        "most_recent_abuse_other_dates": "2024-06-15",
+        "has_different_abuse": "Yes",
+        "has_different_abuse_dropdown": "Yes",
+        "different_abuse_incident_date": "2024-06-15",
+        "different_abuse_incident_witnesses": "Yes",
+        "different_abuse_incident_witnesses_dropdown": "Yes",
+        "different_abuse_incident_witness_names": "different_abuse_incident_witness_na[end]",
+        "different_abuse_incident_weapon": "Yes",
+        "different_abuse_incident_weapon_dropdown": "Yes",
+        "different_abuse_incident_weapon_description": "different_abuse_incident_weapon_des[end]",
+        "different_abuse_incident_harm": "Yes",
+        "different_abuse_incident_harm_dropdown": "Yes",
+        "different_abuse_incident_harm_description": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one[end]",
+        "different_abuse_incident_police": "Yes",
+        "different_abuse_incident_police_dropdown": "Yes",
+        "different_abuse_incident_details": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 0[end]",
+        "different_abuse_incident_frequency": "Other",
+        "different_abuse_incident_frequency_dropdown": "Other",
+        "different_abuse_incident_frequency_other_description": "different_abuse_incident_freq[end]",
+        "different_abuse_incident_other_dates": "2024-06-15",
+        "has_other_abuse": "Yes",
+        "has_other_abuse_dropdown": "Yes",
+        "other_abuse_incident_date": "2024-06-15",
+        "other_abuse_incident_witnesses": "Yes",
+        "other_abuse_incident_witnesses_dropdown": "Yes",
+        "other_abuse_incident_witness_names": "other_abuse_incident_witness_namesx[end]",
+        "other_abuse_incident_weapon": "Yes",
+        "other_abuse_incident_weapon_dropdown": "Yes",
+        "other_abuse_incident_weapon_description": "other_abuse_incident_weapon_descrip[end]",
+        "other_abuse_incident_harm": "Yes",
+        "other_abuse_incident_harm_dropdown": "Yes",
+        "other_abuse_incident_harm_description": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only[end]",
+        "other_abuse_incident_police": "Yes",
+        "other_abuse_incident_police_dropdown": "Yes",
+        "other_abuse_incident_details": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children sincex[cont] Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go.[end]",
+        "other_abuse_incident_frequency": "Other",
+        "other_abuse_incident_frequency_dropdown": "Other",
+        "other_abuse_incident_frequency_other_description": "other_abuse_incident_frequenc[end]",
+        "other_abuse_incident_other_dates": "2024-06-15",
+        "other_protected_people": "Yes",
+        "other_protected_people_dropdown": "Yes",
+        "other_protected_person": "12",
+        "other_protected_person_12": true,
+        "other_protected_person_1_full_name": "other_protected_person_1[end]",
+        "other_protected_person_1_age": "100",
+        "other_protected_person_1_date_of_birth": "2024-06-15",
+        "other_protected_person_1_gender": "othe",
+        "other_protected_person_1_race": "other_[end]",
+        "other_protected_person_1_relationship": "other_[end]",
+        "other_protected_person_1_lives_with_you_yes_radio": true,
+        "other_protected_person_2_full_name": "other_protected_person_2[end]",
+        "other_protected_person_2_age": "100",
+        "other_protected_person_2_date_of_birth": "2024-06-15",
+        "other_protected_person_2_gender": "othe",
+        "other_protected_person_2_race": "other_[end]",
+        "other_protected_person_2_relationship": "other_[end]",
+        "other_protected_person_2_lives_with_you_yes_radio": true,
+        "other_protected_person_3_full_name": "other_protected_person_3[end]",
+        "other_protected_person_3_age": "100",
+        "other_protected_person_3_date_of_birth": "2024-06-15",
+        "other_protected_person_3_gender": "othe",
+        "other_protected_person_3_race": "other_[end]",
+        "other_protected_person_3_relationship": "other_[end]",
+        "other_protected_person_3_lives_with_you_yes_radio": true,
+        "other_protected_person_4_full_name": "other_protected_person_4[end]",
+        "other_protected_person_4_age": "100",
+        "other_protected_person_4_date_of_birth": "2024-06-15",
+        "other_protected_person_4_gender": "othe",
+        "other_protected_person_4_race": "other_[end]",
+        "other_protected_person_4_relationship": "other_[end]",
+        "other_protected_person_4_lives_with_you_yes_radio": true,
+        "other_protected_person_5_full_name": "other_protected_person_5_full_name",
+        "other_protected_person_5_age": "100",
+        "other_protected_person_5_date_of_birth": "2024-06-15",
+        "other_protected_person_5_gender": "other_protected_person_5_gender",
+        "other_protected_person_5_race": "other_protected_person_5_race",
+        "other_protected_person_5_relationship": "other_protected_person_5_relationship",
+        "other_protected_person_5_lives_with_you_yes_radio": true,
+        "other_protected_person_6_full_name": "other_protected_person_6_full_name",
+        "other_protected_person_6_age": "100",
+        "other_protected_person_6_date_of_birth": "2024-06-15",
+        "other_protected_person_6_gender": "other_protected_person_6_gender",
+        "other_protected_person_6_race": "other_protected_person_6_race",
+        "other_protected_person_6_relationship": "other_protected_person_6_relationship",
+        "other_protected_person_6_lives_with_you_yes_radio": true,
+        "other_protected_person_7_full_name": "other_protected_person_7_full_name",
+        "other_protected_person_7_age": "100",
+        "other_protected_person_7_date_of_birth": "2024-06-15",
+        "other_protected_person_7_gender": "other_protected_person_7_gender",
+        "other_protected_person_7_race": "other_protected_person_7_race",
+        "other_protected_person_7_relationship": "other_protected_person_7_relationship",
+        "other_protected_person_7_lives_with_you_yes_radio": true,
+        "other_protected_person_8_full_name": "other_protected_person_8_full_name",
+        "other_protected_person_8_age": "100",
+        "other_protected_person_8_date_of_birth": "2024-06-15",
+        "other_protected_person_8_gender": "other_protected_person_8_gender",
+        "other_protected_person_8_race": "other_protected_person_8_race",
+        "other_protected_person_8_relationship": "other_protected_person_8_relationship",
+        "other_protected_person_8_lives_with_you_yes_radio": true,
+        "other_protected_person_9_full_name": "other_protected_person_9_full_name",
+        "other_protected_person_9_age": "100",
+        "other_protected_person_9_date_of_birth": "2024-06-15",
+        "other_protected_person_9_gender": "other_protected_person_9_gender",
+        "other_protected_person_9_race": "other_protected_person_9_race",
+        "other_protected_person_9_relationship": "other_protected_person_9_relationship",
+        "other_protected_person_9_lives_with_you_yes_radio": true,
+        "other_protected_person_10_full_name": "other_protected_person_10_full_name",
+        "other_protected_person_10_age": "100",
+        "other_protected_person_10_date_of_birth": "2024-06-15",
+        "other_protected_person_10_gender": "other_protected_person_10_gender",
+        "other_protected_person_10_race": "other_protected_person_10_race",
+        "other_protected_person_10_relationship": "other_protected_person_10_relationship",
+        "other_protected_person_10_lives_with_you_yes_radio": true,
+        "other_protected_person_11_full_name": "other_protected_person_11_full_name",
+        "other_protected_person_11_age": "100",
+        "other_protected_person_11_date_of_birth": "2024-06-15",
+        "other_protected_person_11_gender": "other_protected_person_11_gender",
+        "other_protected_person_11_race": "other_protected_person_11_race",
+        "other_protected_person_11_relationship": "other_protected_person_11_relationship",
+        "other_protected_person_11_lives_with_you_yes_radio": true,
+        "other_protected_person_12_full_name": "other_protected_person_12_full_name",
+        "other_protected_person_12_age": "100",
+        "other_protected_person_12_date_of_birth": "2024-06-15",
+        "other_protected_person_12_gender": "other_protected_person_12_gender",
+        "other_protected_person_12_race": "other_protected_person_12_race",
+        "other_protected_person_12_relationship": "other_protected_person_12_relationship",
+        "other_protected_person_12_lives_with_you_yes_radio": true,
+        "other_protected_people_reason_for_protection": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since[end]",
+        "person_to_restrain_firearms": "Yes",
+        "person_to_restrain_firearms_dropdown": "Yes",
+        "firearm_item": "6",
+        "firearm_item_6": true,
+        "firearm_item_1_description": "firearm_item_1_description Maria El[end]",
+        "firearm_item_1_number_or_amount": "100",
+        "firearm_item_1_location": "firear[end]",
+        "firearm_item_2_description": "firearm_item_2_description Maria El[end]",
+        "firearm_item_2_number_or_amount": "100",
+        "firearm_item_2_location": "firear[end]",
+        "firearm_item_3_description": "firearm_item_3_description Maria El[end]",
+        "firearm_item_3_number_or_amount": "100",
+        "firearm_item_3_location": "firear[end]",
+        "firearm_item_4_description": "firearm_item_4_description Maria El[end]",
+        "firearm_item_4_number_or_amount": "100",
+        "firearm_item_4_location": "firear[end]",
+        "firearm_item_5_description": "firearm_item_5_description Maria El[end]",
+        "firearm_item_5_number_or_amount": "100",
+        "firearm_item_5_location": "firear[end]",
+        "firearm_item_6_description": "firearm_item_6_description Maria El[end]",
+        "firearm_item_6_number_or_amount": "100",
+        "firearm_item_6_location": "firear[end]",
+        "orders_requested_order_to_not_abuse_me": true,
+        "orders_requested_no_contact_order": true,
+        "orders_requested_stay_away_order": true,
+        "orders_requested_order_to_move_out": true,
+        "orders_requested_other_orders": true,
+        "orders_requested_child_custody_and_visitation": true,
+        "orders_requested_protect_animals": true,
+        "orders_requested_control_of_property": true,
+        "orders_requested_health_and_other_insurance": true,
+        "orders_requested_record_communications": true,
+        "orders_requested_property_restraint": true,
+        "orders_requested_pay_debts_bills_owed_for_property": true,
+        "orders_requested_pay_expenses_caused_by_the_abuse": true,
+        "orders_requested_child_support": true,
+        "orders_requested_spousal_support": true,
+        "orders_requested_lawyer_s_fees_and_costs": true,
+        "orders_requested_batterer_intervention_program": true,
+        "orders_requested_transfer_of_wireless_phone_account": true,
+        "orders_requested_more_time_to_give_notice_to_the_person": true,
+        "dv105_child": "12",
+        "dv105_child_12": true,
+        "dv105_child_1_name": "dv105_child_1_name Maria Elena Rodr[end]",
+        "dv105_child_1_date_of_birth": "2024-06-15",
+        "dv105_child_2_name": "dv105_child_2_name Maria Elena Rodr[end]",
+        "dv105_child_2_date_of_birth": "2024-06-15",
+        "dv105_child_3_name": "dv105_child_3_name Maria Elena Rodr[end]",
+        "dv105_child_3_date_of_birth": "2024-06-15",
+        "dv105_child_4_name": "dv105_child_4_name Maria Elena Rodr[end]",
+        "dv105_child_4_date_of_birth": "2024-06-15",
+        "dv105_child_5_name": "dv105_child_5_name",
+        "dv105_child_5_date_of_birth": "2024-06-15",
+        "dv105_child_6_name": "dv105_child_6_name",
+        "dv105_child_6_date_of_birth": "2024-06-15",
+        "dv105_child_7_name": "dv105_child_7_name",
+        "dv105_child_7_date_of_birth": "2024-06-15",
+        "dv105_child_8_name": "dv105_child_8_name",
+        "dv105_child_8_date_of_birth": "2024-06-15",
+        "dv105_child_9_name": "dv105_child_9_name",
+        "dv105_child_9_date_of_birth": "2024-06-15",
+        "dv105_child_10_name": "dv105_child_10_name",
+        "dv105_child_10_date_of_birth": "2024-06-15",
+        "dv105_child_11_name": "dv105_child_11_name",
+        "dv105_child_11_date_of_birth": "2024-06-15",
+        "dv105_child_12_name": "dv105_child_12_name",
+        "dv105_child_12_date_of_birth": "2024-06-15",
+        "stay_away_targets_me": true,
+        "stay_away_targets_my_home": true,
+        "stay_away_targets_my_school": true,
+        "stay_away_targets_my_job_or_workplace": true,
+        "stay_away_targets_my_vehicle": true,
+        "stay_away_targets_each_person_i_listed_as_protected": true,
+        "stay_away_targets_my_children_s_school_or_childcare": true,
+        "stay_away_targets_somewhere_else": true,
+        "move_out_home_address": "move_out_home_address Maria Elena Rodriguez-Vasquez 1847 North Wil[end]",
+        "other_orders_description": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the c[end]",
+        "move_out_right_to_live_i_own_the_home": true,
+        "move_out_right_to_live_i_have_lived_at_this_address_for_a_while": true,
+        "move_out_right_to_live_my_name_is_on_the_lease": true,
+        "move_out_right_to_live_i_pay_for_some_or_all_of_the_rent_or_mortgage": true,
+        "move_out_right_to_live_i_live_at_this_address_with_my_children": true,
+        "move_out_right_to_live_another_reason": true,
+        "stay_away_other_place_description": "stay_away_other_place_description M[end]",
+        "move_out_years_at_address": "100",
+        "move_out_months_at_address": "100",
+        "stay_away_distance": "Other distance",
+        "stay_away_distance_dropdown": "Other distance",
+        "move_out_right_to_live_other_explanation_line_1": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook A[end]",
+        "stay_away_distance_other_yards": "100",
+        "live_together_or_close": "Yes",
+        "live_together_or_close_dropdown": "Yes",
+        "living_arrangement": "Other",
+        "living_arrangement_dropdown": "Other",
+        "living_arrangement_other_description": "living_arrangement_other_description Maria Elen[end]",
+        "same_workplace_or_school": "Yes",
+        "same_workplace_or_school_dropdown": "Yes",
+        "same_workplace_or_school_kind_we_work_together": true,
+        "same_workplace_or_school_kind_we_go_to_the_same_school": true,
+        "same_workplace_or_school_kind_something_else": true,
+        "same_workplace_company_name": "same_workplace_company_name Maria E[end]",
+        "same_school_name": "same_school_name Maria Elena Rodrig[end]",
+        "same_workplace_or_school_other_description": "same_workplace_or_school_other_description Mari[end]",
+        "wireless_transfer_phone": "4",
+        "wireless_transfer_phone_4": true,
+        "wireless_transfer_phone_1_is_my_number_radio": true,
+        "wireless_transfer_phone_1_number": "(555)-555-5555",
+        "wireless_transfer_phone_2_is_my_number_radio": true,
+        "wireless_transfer_phone_2_number": "(555)-555-5555",
+        "wireless_transfer_phone_3_is_my_number_radio": true,
+        "wireless_transfer_phone_3_number": "(555)-555-5555",
+        "wireless_transfer_phone_4_is_my_number_radio": true,
+        "wireless_transfer_phone_4_number": "(555)-555-5555",
+        "control_of_property_description": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one[end]",
+        "abuse_expense": "4",
+        "abuse_expense_4": true,
+        "abuse_expense_1_pay_to": "abuse_expense_1_pay_to Mariax[end]",
+        "abuse_expense_1_for": "abuse_[end]",
+        "abuse_expense_1_amount": "$100",
+        "abuse_expense_2_pay_to": "abuse_expense_2_pay_to Mariax[end]",
+        "abuse_expense_2_for": "abuse_[end]",
+        "abuse_expense_2_amount": "$100",
+        "abuse_expense_3_pay_to": "abuse_expense_3_pay_to Mariax[end]",
+        "abuse_expense_3_for": "abuse_[end]",
+        "abuse_expense_3_amount": "$100",
+        "abuse_expense_4_pay_to": "abuse_expense_4_pay_to Mariax[end]",
+        "abuse_expense_4_for": "abuse_[end]",
+        "abuse_expense_4_amount": "$100",
+        "child_support_situation": "I now receive or have applied for TANF, Welfare, or CalWORKS",
+        "child_support_situation_dropdown": "I now receive or have applied for TANF, Welfare, or CalWORKS",
+        "extend_service_deadline_reason": "extend_service_deadline_reason Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Av[end]",
+        "protected_animal": "4",
+        "protected_animal_4": true,
+        "protected_animal_1_name_or_id": "protected_animal_1_name_[end]",
+        "protected_animal_1_type": "protec[end]",
+        "protected_animal_1_breed": "protec[end]",
+        "protected_animal_1_color": "protec[end]",
+        "protected_animal_2_name_or_id": "protected_animal_2_name_[end]",
+        "protected_animal_2_type": "protec[end]",
+        "protected_animal_2_breed": "protec[end]",
+        "protected_animal_2_color": "protec[end]",
+        "protected_animal_3_name_or_id": "protected_animal_3_name_[end]",
+        "protected_animal_3_type": "protec[end]",
+        "protected_animal_3_breed": "protec[end]",
+        "protected_animal_3_color": "protec[end]",
+        "protected_animal_4_name_or_id": "protected_animal_4_name_[end]",
+        "protected_animal_4_type": "protec[end]",
+        "protected_animal_4_breed": "protec[end]",
+        "protected_animal_4_color": "protec[end]",
+        "property_debt": "3",
+        "property_debt_3": true,
+        "property_debt_1_pay_to": "proper[end]",
+        "property_debt_1_for": "proper[end]",
+        "property_debt_1_amount": "$100",
+        "property_debt_1_due_date": "2024-06-15",
+        "property_debt_2_pay_to": "proper[end]",
+        "property_debt_2_for": "proper[end]",
+        "property_debt_2_amount": "$100",
+        "property_debt_2_due_date": "2024-06-15",
+        "property_debt_3_pay_to": "proper[end]",
+        "property_debt_3_for": "proper[end]",
+        "property_debt_3_amount": "$100",
+        "property_debt_3_due_date": "2024-06-15",
+        "control_of_property_reason": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked hi[end]",
+        "animal_order_stay_away_requested_yes": "Yes",
+        "animal_order_stay_away_requested_yes_dropdown": "Yes",
+        "property_debts_payment_reason": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked hi[end]",
+        "property_debt_special_finding": "Yes",
+        "property_debt_special_finding_dropdown": "Yes",
+        "animal_stay_away_distance": "Other distance",
+        "animal_stay_away_distance_dropdown": "Other distance",
+        "property_debt_special_finding_debts_the_first_debt_listed_above": true,
+        "property_debt_special_finding_debts_the_second_debt_listed_above": true,
+        "property_debt_special_finding_debts_the_third_debt_listed_above": true,
+        "animal_stay_away_distance_other_yards": "100",
+        "animal_order_no_harm_or_transfer_yes": "Yes",
+        "animal_order_no_harm_or_transfer_yes_dropdown": "Yes",
+        "property_debt_how_made_known": "Yes",
+        "property_debt_how_made_known_dropdown": "Yes",
+        "property_debt_how_made_explanation": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 184[end]",
+        "animal_order_sole_possession_requested_yes": "Yes",
+        "animal_order_sole_possession_requested_yes_dropdown": "Yes",
+        "animal_sole_possession_reasons_the_person_abuses_the_animals": true,
+        "animal_sole_possession_reasons_i_take_care_of_these_animals": true,
+        "animal_sole_possession_reasons_i_purchased_these_animals": true,
+        "animal_sole_possession_reasons_another_reason": true,
+        "animal_sole_possession_other_reason_line_1": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angelesx[end]",
+        "dv101_abuse_1_date": "2024-06-15",
+        "dv101_abuse_1_witnesses": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to[end]",
+        "dv101_abuse_1_description": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Av[end]",
+        "dv101_abuse_1_weapon_description": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked hi[end]",
+        "dv101_abuse_1_injuries": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked hi[end]",
+        "dv101_abuse_1_police_came": "Yes",
+        "dv101_abuse_1_police_came_dropdown": "Yes",
+        "dv101_abuse_1_epo_given": "Yes",
+        "dv101_abuse_1_epo_given_dropdown": "Yes",
+        "dv101_abuse_1_epo_protects": "The person you want protection from",
+        "dv101_abuse_1_epo_protects_dropdown": "The person you want protection from",
+        "dv101_abuse_2_date": "2024-06-15",
+        "dv101_abuse_2_witnesses": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to[end]",
+        "dv101_abuse_2_description": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-202[end]",
+        "dv101_abuse_2_weapon_description": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked hi[end]",
+        "dv101_abuse_2_injuries": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked hi[end]",
+        "dv101_abuse_2_police_came": "Yes",
+        "dv101_abuse_2_police_came_dropdown": "Yes",
+        "dv101_abuse_2_epo_given": "Yes",
+        "dv101_abuse_2_epo_given_dropdown": "Yes",
+        "dv101_abuse_2_epo_protects": "The person you want protection from",
+        "dv101_abuse_2_epo_protects_dropdown": "The person you want protection from",
+        "dv105_your_relationship_to_children": "Other",
+        "dv105_your_relationship_to_children_dropdown": "Other",
+        "dv105_your_relationship_other_description": "dv105_[end]",
+        "dv105_their_relationship_to_children": "Other",
+        "dv105_their_relationship_to_children_dropdown": "Other",
+        "dv105_their_relationship_other_description": "dv105_[end]",
+        "dv105_children_lived_together_five_years": "Yes",
+        "dv105_children_lived_together_five_years_dropdown": "Yes",
+        "dv105_child_home_1_address": "dv105_child_home_1_city, WY",
+        "dv105_child_home_1_from": "2024-06-15",
+        "dv105_child_home_1_city": "dv105_child_home_1_city",
+        "dv105_child_home_1_state": "Wyoming",
+        "dv105_child_home_1_state_wyoming": true,
+        "dv105_child_home_1_state_hidden": "Wyoming",
+        "dv105_child_home_1_state_short": "WY",
+        "dv105_child_home_1_lived_with_me": true,
+        "dv105_child_home_1_lived_with_the_other_person": true,
+        "dv105_child_home_1_lived_with_someone_else": true,
+        "dv105_child_home_1_other_relationship": "dv105_[end]",
+        "dv105_child_home_1_address_private": "Yes",
+        "dv105_child_home_1_address_private_dropdown": "Yes",
+        "dv105_child_home_2_asked": "Yes",
+        "dv105_child_home_2_asked_dropdown": "Yes",
+        "dv105_child_home_2_address": "dv105_child_home_2_city, WY",
+        "dv105_child_home_2_from": "2024-06-15",
+        "dv105_child_home_2_until": "2024-06-15",
+        "dv105_child_home_2_city": "dv105_child_home_2_city",
+        "dv105_child_home_2_state": "Wyoming",
+        "dv105_child_home_2_state_wyoming": true,
+        "dv105_child_home_2_state_hidden": "Wyoming",
+        "dv105_child_home_2_state_short": "WY",
+        "dv105_child_home_2_lived_with_me": true,
+        "dv105_child_home_2_lived_with_the_other_person": true,
+        "dv105_child_home_2_lived_with_someone_else": true,
+        "dv105_child_home_2_other_relationship": "dv105_[end]",
+        "dv105_child_home_3_asked": "Yes",
+        "dv105_child_home_3_asked_dropdown": "Yes",
+        "dv105_child_home_3_address": "dv105_child_home_3_city, WY",
+        "dv105_child_home_3_from": "2024-06-15",
+        "dv105_child_home_3_until": "2024-06-15",
+        "dv105_child_home_3_city": "dv105_child_home_3_city",
+        "dv105_child_home_3_state": "Wyoming",
+        "dv105_child_home_3_state_wyoming": true,
+        "dv105_child_home_3_state_hidden": "Wyoming",
+        "dv105_child_home_3_state_short": "WY",
+        "dv105_child_home_3_lived_with_me": true,
+        "dv105_child_home_3_lived_with_the_other_person": true,
+        "dv105_child_home_3_lived_with_someone_else": true,
+        "dv105_child_home_3_other_relationship": "dv105_[end]",
+        "dv105_child_home_4_asked": "Yes",
+        "dv105_child_home_4_asked_dropdown": "Yes",
+        "dv105_child_home_4_address": "dv105_child_home_4_city, WY",
+        "dv105_child_home_4_from": "2024-06-15",
+        "dv105_child_home_4_until": "2024-06-15",
+        "dv105_child_home_4_city": "dv105_child_home_4_city",
+        "dv105_child_home_4_state": "Wyoming",
+        "dv105_child_home_4_state_wyoming": true,
+        "dv105_child_home_4_state_hidden": "Wyoming",
+        "dv105_child_home_4_state_short": "WY",
+        "dv105_child_home_4_lived_with_me": true,
+        "dv105_child_home_4_lived_with_the_other_person": true,
+        "dv105_child_home_4_lived_with_someone_else": true,
+        "dv105_child_home_4_other_relationship": "dv105_[end]",
+        "dv105_child_home_5_asked": "Yes",
+        "dv105_child_home_5_asked_dropdown": "Yes",
+        "dv105_child_home_5_address": "dv105_child_home_5_city, WY",
+        "dv105_child_home_5_from": "2024-06-15",
+        "dv105_child_home_5_until": "2024-06-15",
+        "dv105_child_home_5_city": "dv105_child_home_5_city",
+        "dv105_child_home_5_state": "Wyoming",
+        "dv105_child_home_5_state_wyoming": true,
+        "dv105_child_home_5_state_hidden": "Wyoming",
+        "dv105_child_home_5_state_short": "WY",
+        "dv105_child_home_5_lived_with_me": true,
+        "dv105_child_home_5_lived_with_the_other_person": true,
+        "dv105_child_home_5_lived_with_someone_else": true,
+        "dv105_child_home_5_other_relationship": "dv105_[end]",
+        "dv105_child_home_6_asked": "Yes",
+        "dv105_child_home_6_asked_dropdown": "Yes",
+        "dv105_child_home_6_address": "dv105_child_home_6_city, WY",
+        "dv105_child_home_6_from": "2024-06-15",
+        "dv105_child_home_6_until": "2024-06-15",
+        "dv105_child_home_6_city": "dv105_child_home_6_city",
+        "dv105_child_home_6_state": "Wyoming",
+        "dv105_child_home_6_state_wyoming": true,
+        "dv105_child_home_6_state_hidden": "Wyoming",
+        "dv105_child_home_6_state_short": "WY",
+        "dv105_child_home_6_lived_with_me": true,
+        "dv105_child_home_6_lived_with_the_other_person": true,
+        "dv105_child_home_6_lived_with_someone_else": true,
+        "dv105_child_home_6_other_relationship": "dv105_[end]",
+        "dv105_other_case": "Yes",
+        "dv105_other_case_dropdown": "Yes",
+        "dv105_other_case_kinds_custody": true,
+        "dv105_other_case_kinds_divorce": true,
+        "dv105_other_case_kinds_juvenile_court_child_welfare_juvenile_justice": true,
+        "dv105_other_case_kinds_guardianship": true,
+        "dv105_other_case_kinds_criminal": true,
+        "dv105_other_case_kinds_another_kind_of_case": true,
+        "dv105_other_case_custody_details": "dv105_other_case_custody_details Maria Elena Rodriguez-Vasquez 1847 Nort[end]",
+        "dv105_other_case_divorce_details": "dv105_other_case_divorce_details Maria Elena Rodriguez-Vasquez 1847 Nort[end]",
+        "dv105_other_case_juvenile_details": "dv105_other_case_juvenile_details M[end]",
+        "dv105_other_case_guardianship_details": "dv105_other_case_guardianship_details Maria Elena Rodriguez-Vasque[end]",
+        "dv105_other_case_criminal_details": "dv105_other_case_criminal_details Maria Elena Rodriguez-Vasquez 1847 Nor[end]",
+        "dv105_other_case_other_details": "dv105_other_case_other_details Maria Elena Rodr[end]",
+        "dv105_current_custody_order": "Yes",
+        "dv105_current_custody_order_dropdown": "Yes",
+        "dv105_current_custody_order_terms": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and wouldx[end]",
+        "dv105_current_custody_order_change_reason": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and wouldx[end]",
+        "dv105_other_guardian_exists": "Yes",
+        "dv105_other_guardian_exists_dropdown": "Yes",
+        "dv105_other_guardian_name": "dv105_other_guardian_name Maria Ele[end]",
+        "dv105_other_guardian_role": "Legal guardian",
+        "dv105_other_guardian_role_dropdown": "Legal guardian",
+        "dv105_limit_travel": "Yes",
+        "dv105_limit_travel_dropdown": "Yes",
+        "dv105_limit_travel_places_a_county": true,
+        "dv105_limit_travel_places_california": true,
+        "dv105_limit_travel_places_other_places": true,
+        "dv105_limit_travel_county_name": "dv105_limit_travel_county_name Maria Elena Rodriguez-Vasqu[end]",
+        "dv105_limit_travel_other_places": "dv105_limit_travel_other_places Maria Elena Rodriguez-Vasq[end]",
+        "dv105_records_access": "Yes",
+        "dv105_records_access_dropdown": "Yes",
+        "dv105_abduction_risk": "Yes",
+        "dv105_abduction_risk_dropdown": "Yes",
+        "dv105_custody_orders": "Yes",
+        "dv105_custody_orders_dropdown": "Yes",
+        "dv105_legal_custody": "The other person alone",
+        "dv105_legal_custody_dropdown": "The other person alone",
+        "dv105_physical_custody": "The other person alone",
+        "dv105_physical_custody_dropdown": "The other person alone",
+        "dv105_visits": "Yes",
+        "dv105_visits_dropdown": "Yes",
+        "dv105_visits_supervised": "Yes",
+        "dv105_visits_supervised_dropdown": "Yes",
+        "dv105_supervisor": "Someone trusted, like a relative or friend",
+        "dv105_supervisor_dropdown": "Someone trusted, like a relative or friend",
+        "dv105_supervisor_nonprofessional_name": "dv105_[end]",
+        "dv105_supervisor_nonprofessional_agreed": "Yes",
+        "dv105_supervisor_nonprofessional_agreed_dropdown": "Yes",
+        "dv105_supervised_location": "In person at a safe location",
+        "dv105_supervised_location_dropdown": "In person at a safe location",
+        "dv105_supervised_frequency": "Once a week",
+        "dv105_supervised_frequency_dropdown": "Once a week",
+        "dv105_supervised_frequency_once_a_week_hours": "100",
+        "dv105_supervised_use_schedule_chart": "Yes",
+        "dv105_supervised_use_schedule_chart_dropdown": "Yes",
+        "dv105_supervised_visit_monday_start": "dv105_[end]",
+        "dv105_supervised_visit_monday_end": "dv105",
+        "dv105_supervised_visit_monday_person_to_bring_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_monday_location_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_monday_person_to_bring_pickup": "dv105_[end]",
+        "dv105_supervised_visit_monday_location_pickup": "dv105_[end]",
+        "dv105_supervised_virtual_visit_days_monday": true,
+        "dv105_supervised_virtual_visit_days_tuesday": true,
+        "dv105_supervised_virtual_visit_days_wednesday": true,
+        "dv105_supervised_virtual_visit_days_thursday": true,
+        "dv105_supervised_virtual_visit_days_friday": true,
+        "dv105_supervised_virtual_visit_days_saturday": true,
+        "dv105_supervised_virtual_visit_days_sunday": true,
+        "dv105_supervised_visit_tuesday_start": "dv105_[end]",
+        "dv105_supervised_visit_tuesday_end": "dv105",
+        "dv105_supervised_visit_tuesday_person_to_bring_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_tuesday_location_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_tuesday_person_to_bring_pickup": "dv105_[end]",
+        "dv105_supervised_visit_tuesday_location_pickup": "dv105_[end]",
+        "dv105_supervised_visit_wednesday_start": "dv105_[end]",
+        "dv105_supervised_visit_wednesday_end": "dv105",
+        "dv105_supervised_visit_wednesday_person_to_bring_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_wednesday_location_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_wednesday_person_to_bring_pickup": "dv105_[end]",
+        "dv105_supervised_visit_wednesday_location_pickup": "dv105_[end]",
+        "dv105_supervised_visit_thursday_start": "dv105_[end]",
+        "dv105_supervised_visit_thursday_end": "dv105",
+        "dv105_supervised_visit_thursday_person_to_bring_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_thursday_location_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_thursday_person_to_bring_pickup": "dv105_[end]",
+        "dv105_supervised_visit_thursday_location_pickup": "dv105_[end]",
+        "dv105_supervised_visit_friday_start": "dv105_[end]",
+        "dv105_supervised_visit_friday_end": "dv105",
+        "dv105_supervised_visit_friday_person_to_bring_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_friday_location_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_friday_person_to_bring_pickup": "dv105_[end]",
+        "dv105_supervised_visit_friday_location_pickup": "dv105_[end]",
+        "dv105_supervised_visit_saturday_start": "dv105_[end]",
+        "dv105_supervised_visit_saturday_end": "dv105",
+        "dv105_supervised_visit_saturday_person_to_bring_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_saturday_location_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_saturday_person_to_bring_pickup": "dv105_[end]",
+        "dv105_supervised_visit_saturday_location_pickup": "dv105_[end]",
+        "dv105_supervised_visit_sunday_start": "dv105_[end]",
+        "dv105_supervised_visit_sunday_end": "dv105",
+        "dv105_supervised_visit_sunday_person_to_bring_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_sunday_location_dropoff": "dv105_[end]",
+        "dv105_supervised_visit_sunday_person_to_bring_pickup": "dv105_[end]",
+        "dv105_supervised_visit_sunday_location_pickup": "dv105_[end]",
+        "dv105_supervised_schedule": "Every other week",
+        "dv105_supervised_schedule_dropdown": "Every other week",
+        "dv105_supervised_start_date": "2024-06-15",
+        "dv108_abduction_risk_they_have_violated_or_threatened_to_violate_a_custody_or_visitation_order": true,
+        "dv108_abduction_risk_they_do_not_have_strong_ties_to_california": true,
+        "dv108_abduction_risk_they_have_done_things_recently_that_would_make_it_easy_to_take_the_children": true,
+        "dv108_abduction_risk_they_have_a_history_of_abuse_or_of_keeping_the_children_from_me": true,
+        "dv108_abduction_risk_they_have_a_criminal_record": true,
+        "dv108_abduction_risk_they_have_strong_ties_somewhere_else": true,
+        "dv108_abduction_risk_they_are_a_citizen_of_another_country": true,
+        "dv108_preparation_quit_a_job": true,
+        "dv108_preparation_applied_for_a_passport_birth_certificate_or_school_or_medical_records": true,
+        "dv108_preparation_closed_a_bank_account": true,
+        "dv108_preparation_hidden_or_destroyed_documents": true,
+        "dv108_preparation_sold_or_gotten_rid_of_property": true,
+        "dv108_preparation_sold_a_home_or_ended_a_lease": true,
+        "dv108_preparation_something_else": true,
+        "dv108_history_abusing_me": true,
+        "dv108_history_taking_away_or_hiding_our_children_from_me": true,
+        "dv108_history_child_abuse": true,
+        "dv108_history_threatening_to_take_away_or_hide_our_children_from_me": true,
+        "dv108_history_abusing_other_partners": true,
+        "dv108_history_not_cooperating_with_me_in_parenting": true,
+        "dv108_ties_another_county_in_california": true,
+        "dv108_ties_another_state": true,
+        "dv108_ties_another_country": true,
+        "dv108_citizenship_countries": "dv108_citizenship_countries Maria E[end]",
+        "dv108_citizenship_strong_ties": "Yes",
+        "dv108_citizenship_strong_ties_dropdown": "Yes",
+        "dv108_ties_california_county_name": "dv108_ties_california_county_name M[end]",
+        "dv108_ties_state_name": "Test User",
+        "dv108_ties_country_name": "dv108_ties_country_name Maria Elena Rodriguez-Vasquezx[end]",
+        "dv108_preparation_other_explanation": "dv108_preparation_other_explanation[end]",
+        "dv108_abduction_risk_examples": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go.[end]",
+        "dv108_orders_requested_do_not_move_with_the_children_without_my_permission_or_the_judge_s": true,
+        "dv108_orders_requested_turn_in_passports_and_other_travel_documents_and_do_not_apply_for_more": true,
+        "dv108_orders_requested_give_me_a_travel_plan_and_documents_before_travelling_with_the_children": true,
+        "dv108_orders_requested_register_this_order_in_another_state_before_the_children_travel_there": true,
+        "dv108_orders_requested_notify_a_foreign_embassy_or_consulate_of_the_passport_restrictions": true,
+        "dv108_orders_requested_get_a_foreign_custody_and_visitation_order_before_the_children_travel": true,
+        "dv108_orders_requested_post_a_bond": true,
+        "dv108_notify_address": "WY",
+        "dv108_notify_county": "dv108_notify_county",
+        "dv108_notify_state": "Wyoming",
+        "dv108_notify_state_wyoming": true,
+        "dv108_notify_state_hidden": "Wyoming",
+        "dv108_notify_state_short": "WY",
+        "dv108_embassy_or_consulate_name": "dv108_[end]",
+        "dv108_embassy_proof_due_date": "2024-06-15",
+        "dv108_travel_documents_to_turn_in": "dv108_travel_documents_to_tur[end]",
+        "dv108_travel_documents_due_date": "2024-06-15",
+        "dv108_travel_documents_recipient_name": "dv108_travel_documents_r[end]",
+        "dv108_travel_plan_the_children_s_travel_schedule": true,
+        "dv108_travel_plan_copies_of_round_trip_airline_tickets": true,
+        "dv108_travel_plan_addresses_and_telephone_numbers_where_the_children_can_be_reached": true,
+        "dv108_travel_plan_an_open_airline_ticket_for_me_in_case_the_children_are_not_returned": true,
+        "dv108_travel_plan_something_else": true,
+        "dv108_foreign_custody_country": "dv108_foreign_custody_country Maria[end]",
+        "dv108_bond_amount": "100",
+        "dv108_travel_plan_other_description": "dv108_travel_plan_other_description Maria Elena Rodriguez-Vasquezx[end]",
+        "clets_restrained_person_other_names": "clets_restrained_person_other_names Maria Elena Rodriguez-Vasquez 1847 N[end]",
+        "clets_restrained_person_marks_scars_tattoos": "clets_restrained_person_marks_scars_tattoos Maria Elena Rodriguez-[end]",
+        "clets_restrained_person_drivers_license_number": "clets_restrained_person_drivers_license_number",
+        "clets_restrained_person_drivers_license_state": "Test Value",
+        "clets_restrained_person_ssn": "123-45-6789",
+        "clets_restrained_person_telephone": "(555)-555-5555",
+        "clets_restrained_person_employer_name": "clets_restrained_person_employer_name",
+        "clets_restrained_person_employer_address": "clets_restrained_person_employer_address",
+        "clets_restrained_person_vehicle_type": "clets_[end]",
+        "clets_restrained_person_vehicle_model": "clets_[end]",
+        "clets_restrained_person_vehicle_year": "100",
+        "clets_restrained_person_vehicle_plate": "clets_[end]",
+        "clets_restrained_person_speaks_english": "Yes",
+        "clets_restrained_person_speaks_english_dropdown": "Yes",
+        "clets_protected_person_gender": "Nonbinary",
+        "clets_protected_person_gender_nonbinary": true,
+        "clets_protected_person_race": "clets_protected_person_race Maria E[end]",
+        "clets_protected_person_date_of_birth": "2024-06-15",
+        "clets_protected_person_speaks_english": "Yes",
+        "clets_protected_person_speaks_english_dropdown": "Yes",
+        "restrained_person_height": "restra[end]",
+        "restrained_person_weight": "restr",
+        "restrained_person_hair_color": "restra[end]",
+        "restrained_person_eye_color": "restr",
+        "knows_restrained_person_address": "Yes",
+        "knows_restrained_person_address_dropdown": "Yes",
+        "restrained_person_address": "restra[end], WY",
+        "restrained_person_street_address": "restrained_person_street[end]",
+        "restrained_person_city": "restra[end]",
+        "restrained_person_state": "Wyoming",
+        "restrained_person_state_wyoming": true,
+        "restrained_person_state_hidden": "Wyoming",
+        "restrained_person_state_short": "WY",
+        "restrained_person_zip_code": "90210",
+        "dv_restraining_order_packet_default_checkbox": true,
+        "other_abuse_incident_additional_space_attached_yes": true,
+        "dv101_further_abuse_description": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go.[end]",
+        "other_protected_people_additional_list_attached_yes": true,
+        "clets_other_protected_people_attached_page": true,
+        "dv105_children_additional_list_attached": true,
+        "other_protected_person_1_lives_with_you_yes": true,
+        "other_protected_person_2_lives_with_you_yes": true,
+        "other_protected_person_3_lives_with_you_yes": true,
+        "other_protected_person_4_lives_with_you_yes": true,
+        "other_protected_person_5_lives_with_you_yes": true,
+        "other_protected_person_6_lives_with_you_yes": true,
+        "other_protected_person_7_lives_with_you_yes": true,
+        "other_protected_person_8_lives_with_you_yes": true,
+        "other_protected_person_9_lives_with_you_yes": true,
+        "other_protected_person_10_lives_with_you_yes": true,
+        "other_protected_person_11_lives_with_you_yes": true,
+        "other_protected_person_12_lives_with_you_yes": true,
+        "wireless_transfer_phone_1_is_my_number": true,
+        "wireless_transfer_phone_2_is_my_number": true,
+        "wireless_transfer_phone_3_is_my_number": true,
+        "wireless_transfer_phone_4_is_my_number": true,
+        "__projectId": "p_mtumpmov7t2gh0",
+        "relationship_children_names_line_1": "dv105_child_1_name Maria Elena Rodr[end], dv105_child_2_name Maria Elena Rodr[end], dv105_child_3_name Maria Elena Rodr[end], dv105_child_4_name Maria Elena Rodr[end]",
+        "additional_pages_count": "12",
+        "restrained_person_relationship_to_protected_person": "spouse/partner, ex-spouse/partner, (ex-)fiancé(e), (ex-)dating partner, co-parent, sibling (step/in-law), (ex-)household member",
+        "court_name_and_street_address": "court_name, court_street_address",
+        "other_court_case_custody_details": "other_court_case_custody_details_location, other_court_case_custody_details_year, other_court_case_custody_details_number",
+        "other_court_case_divorce_details": "other_court_case_divorce_details_location, other_court_case_divorce_details_year, other_court_case_divorce_details_number",
+        "other_court_case_juvenile_details": "other_court_case_juvenile_details_location, other_court_case_juvenile_details_year, other_court_case_juvenile_details_number",
+        "other_court_case_guardianship_details": "other_court_case_guardianship_details_location, other_court_case_guardianship_details_year, other_court_case_guardianship_details_number",
+        "other_court_case_criminal_details": "other_court_case_criminal_details_location, other_court_case_criminal_details_year, other_court_case_criminal_details_number",
+        "other_court_case_other_details": "other_court_case_other_details_location, other_court_case_other_details_year, other_court_case_other_details_number",
+        "person_asking_protection_signature_date": "09-12-2026",
+        "lawyer_signature_date": "09-12-2026",
+        "person_asking_protection_signature_printed_name": "person_asking_protection[end]",
+        "lawyer_signature_printed_name": "person_asking_protection_lawy[end]",
+        "dv105_child_home_1_city_and_state": "dv105_child_home_1_city, Wyoming",
+        "dv105_child_home_2_city_and_state": "dv105_child_home_2_city, Wyoming",
+        "dv105_child_home_3_city_and_state": "dv105_child_home_3_city, Wyoming",
+        "dv105_child_home_4_city_and_state": "dv105_child_home_4_city, Wyoming",
+        "dv105_child_home_5_city_and_state": "dv105_child_home_5_city, Wyoming",
+        "dv105_child_home_6_city_and_state": "dv105_child_home_6_city, Wyoming",
+        "dv108_notify_state_county_and_state": "dv108_notify_county, Wyoming",
+        "clets_restrained_person_drivers_license": "clets_restrained_person_drivers_license_number, Test Value",
+        "clets_restrained_person_employer": "clets_restrained_person_employer_name, clets_restrained_person_employer_address",
+        "clets_restrained_person_weapons_details": "firearm_item_1_description Maria El[end]; 100; firear[end]; firearm_item_2_description Maria El[end]; 100; firear[end]; firearm_item_3_description Maria El[end]; 100; firear[end]; firearm_item_4_description Maria El[end]; 100; firear[end]; firearm_item_5_description Maria El[end]; 100; firear[end]; firearm_item_6_description Maria El[end]; 100; firear[end]",
+        "restrained_person_prohibited_items_details": "firearm_item_1_description Maria El[end]; 100; firear[end]; firearm_item_2_description Maria El[end]; 100; firear[end]; firearm_item_3_description Maria El[end]; 100; firear[end]; firearm_item_4_description Maria El[end]; 100; firear[end]; firearm_item_5_description Maria El[end]; 100; firear[end]; firearm_item_6_description Maria El[end]; 100; firear[end]",
+        "user_county": "Los Angeles County",
+        "has_lawyer_yes": true,
+        "relationship_have_children_together": true,
+        "relationship_current_spouses_or_domestic_partners": true,
+        "relationship_former_spouses_or_domestic_partners": true,
+        "relationship_dating_or_formerly_dated": true,
+        "relationship_engaged_or_formerly_engaged": true,
+        "relationship_related": true,
+        "relationship_live_or_lived_together": true,
+        "other_court_case_custody_selected": true,
+        "other_court_case_divorce_selected": true,
+        "other_court_case_juvenile_selected": true,
+        "other_court_case_guardianship_selected": true,
+        "other_court_case_criminal_selected": true,
+        "other_court_case_other_selected": true,
+        "order_not_to_abuse_requested": true,
+        "no_contact_order_requested": true,
+        "stay_away_order_requested": true,
+        "move_out_order_requested": true,
+        "other_orders_requested": true,
+        "child_custody_and_visitation_order_requested": true,
+        "protect_animals_order_requested": true,
+        "control_of_property_order_requested": true,
+        "health_and_other_insurance_order_requested": true,
+        "record_communications_order_requested": true,
+        "property_restraint_order_requested": true,
+        "pay_property_debts_order_requested": true,
+        "pay_expenses_caused_by_abuse_order_requested": true,
+        "child_support_order_requested": true,
+        "spousal_support_order_requested": true,
+        "lawyers_fees_and_costs_order_requested": true,
+        "batterer_intervention_program_order_requested": true,
+        "wireless_phone_account_transfer_order_requested": true,
+        "extend_service_deadline_requested": true,
+        "stay_away_from_me": true,
+        "stay_away_from_my_home": true,
+        "stay_away_from_my_school": true,
+        "stay_away_from_my_workplace": true,
+        "stay_away_from_my_vehicle": true,
+        "stay_away_from_other_protected_people": true,
+        "stay_away_from_childrens_school_or_childcare": true,
+        "stay_away_from_other_place": true,
+        "move_out_right_to_live_owner": true,
+        "move_out_right_to_live_length_of_residence": true,
+        "move_out_right_to_live_on_lease": true,
+        "move_out_right_to_live_pay_rent_or_mortgage": true,
+        "move_out_right_to_live_with_children": true,
+        "move_out_right_to_live_other": true,
+        "property_debt_special_finding_debt_1": true,
+        "property_debt_special_finding_debt_2": true,
+        "property_debt_special_finding_debt_3": true,
+        "same_workplace_selected": true,
+        "same_school_selected": true,
+        "same_workplace_or_school_other": true,
+        "animal_sole_possession_reason_person_abuses_animals": true,
+        "animal_sole_possession_reason_i_care_for_animals": true,
+        "animal_sole_possession_reason_i_purchased_animals": true,
+        "animal_sole_possession_reason_other": true,
+        "dv105_child_home_1_lived_with_restrained_person": true,
+        "dv105_child_home_1_lived_with_other": true,
+        "dv105_child_home_2_lived_with_restrained_person": true,
+        "dv105_child_home_2_lived_with_other": true,
+        "dv105_child_home_3_lived_with_restrained_person": true,
+        "dv105_child_home_3_lived_with_other": true,
+        "dv105_child_home_4_lived_with_restrained_person": true,
+        "dv105_child_home_4_lived_with_other": true,
+        "dv105_child_home_5_lived_with_restrained_person": true,
+        "dv105_child_home_5_lived_with_other": true,
+        "dv105_child_home_6_lived_with_restrained_person": true,
+        "dv105_child_home_6_lived_with_other": true,
+        "dv105_other_case_custody": true,
+        "dv105_other_case_divorce": true,
+        "dv105_other_case_juvenile": true,
+        "dv105_other_case_guardianship": true,
+        "dv105_other_case_criminal": true,
+        "dv105_other_case_other": true,
+        "dv105_limit_travel_county": true,
+        "dv105_limit_travel_california": true,
+        "dv105_limit_travel_other": true,
+        "dv105_supervised_visit_monday_virtual_visit": true,
+        "dv105_supervised_visit_tuesday_virtual_visit": true,
+        "dv105_supervised_visit_wednesday_virtual_visit": true,
+        "dv105_supervised_visit_thursday_virtual_visit": true,
+        "dv105_supervised_visit_friday_virtual_visit": true,
+        "dv105_supervised_visit_saturday_virtual_visit": true,
+        "dv105_supervised_visit_sunday_virtual_visit": true,
+        "dv108_risk_violated_custody_order": true,
+        "dv108_risk_no_ties_to_california": true,
+        "dv108_risk_preparing_to_take_children": true,
+        "dv108_risk_has_a_history": true,
+        "dv108_risk_criminal_record": true,
+        "dv108_risk_strong_ties_elsewhere": true,
+        "dv108_risk_citizen_of_another_country": true,
+        "dv108_preparation_applied_for_documents": true,
+        "dv108_preparation_closed_bank_account": true,
+        "dv108_preparation_hid_or_destroyed_documents": true,
+        "dv108_preparation_sold_property": true,
+        "dv108_preparation_sold_home_or_ended_lease": true,
+        "dv108_preparation_other": true,
+        "dv108_history_taking_or_hiding_children": true,
+        "dv108_history_threatening_to_take_children": true,
+        "dv108_history_not_cooperating_in_parenting": true,
+        "dv108_ties_another_california_county": true,
+        "dv108_order_no_move_without_permission": true,
+        "dv108_order_turn_in_travel_documents": true,
+        "dv108_order_provide_travel_plan": true,
+        "dv108_order_notify_other_state": true,
+        "dv108_order_notify_foreign_embassy": true,
+        "dv108_order_foreign_custody_order": true,
+        "dv108_order_post_a_bond": true,
+        "dv108_travel_plan_schedule": true,
+        "dv108_travel_plan_round_trip_tickets": true,
+        "dv108_travel_plan_contact_details": true,
+        "dv108_travel_plan_open_ticket_for_me": true,
+        "dv108_travel_plan_other": true,
+        "relationship_relative_sibling_stepsibling_sibling_in_law": true,
+        "relationship_lived_together_as_family_yes": true,
+        "recent_restraining_orders_yes": true,
+        "other_court_case_involvement_yes": true,
+        "most_recent_abuse_witnesses_yes": true,
+        "most_recent_abuse_frequency_other": true,
+        "different_abuse_incident_witnesses_yes": true,
+        "different_abuse_incident_frequency_other_yes": true,
+        "other_abuse_incident_witnesses_yes": true,
+        "other_abuse_incident_frequency_other": true,
+        "property_debt_special_finding_yes": true,
+        "property_debt_how_made_known_yes": true,
+        "dv101_abuse_1_police_came_yes": true,
+        "dv101_abuse_1_epo_given_yes": true,
+        "dv101_abuse_1_epo_protects_restrained_person": true,
+        "dv101_abuse_2_police_came_yes": true,
+        "dv101_abuse_2_epo_given_yes": true,
+        "dv101_abuse_2_epo_protects_restrained_person": true,
+        "dv105_your_relationship_other": true,
+        "dv105_their_relationship_other": true,
+        "dv105_other_guardian_is_legal_guardian": true,
+        "dv105_limit_travel_yes": true,
+        "dv105_records_access_yes": true,
+        "dv105_abduction_risk_yes": true,
+        "dv105_custody_orders_yes": true,
+        "dv105_legal_custody_sole_to_them": true,
+        "dv105_physical_custody_sole_to_them": true,
+        "dv105_visits_yes": true,
+        "dv105_visits_supervised_yes": true,
+        "dv105_supervisor_nonprofessional": true,
+        "dv105_supervisor_nonprofessional_agreed_yes": true,
+        "dv105_supervised_location_in_person": true,
+        "dv105_supervised_frequency_once_a_week": true,
+        "dv105_supervised_use_schedule_chart_yes": true,
+        "dv105_supervised_schedule_every_other_week": true,
+        "dv108_citizenship_strong_ties_yes": true,
+        "clets_restrained_person_speaks_english_yes": true,
+        "clets_protected_person_speaks_english_yes": true,
+        "knows_restrained_person_address_yes": true,
+        "most_recent_abuse_weapon_yes": true,
+        "most_recent_abuse_harm_yes": true,
+        "most_recent_abuse_police_yes": true,
+        "has_different_abuse_yes": true,
+        "different_abuse_incident_weapon_yes": true,
+        "different_abuse_incident_harm_yes": true,
+        "different_abuse_incident_police_yes": true,
+        "has_other_abuse_yes": true,
+        "other_abuse_incident_weapon_yes": true,
+        "other_abuse_incident_harm_yes": true,
+        "other_abuse_incident_police_yes": true,
+        "other_protected_people_yes_yes": true,
+        "person_to_restrain_firearms_yes_yes": true,
+        "child_support_receive_or_applied_tanf_welfare_calworks": true,
+        "stay_away_distance_other": true,
+        "animal_order_stay_away_requested_yes_yes": true,
+        "live_together_or_close_yes_yes": true,
+        "animal_stay_away_distance_other": true,
+        "living_arrangement_other": true,
+        "animal_order_no_harm_or_transfer_yes_yes": true,
+        "same_workplace_or_school_yes": true,
+        "animal_order_sole_possession_requested_yes_yes": true,
+        "dv105_children_lived_together_five_years_yes": true,
+        "dv105_child_home_1_address_private_yes": true,
+        "dv105_child_home_2_asked_yes": true,
+        "dv105_child_home_3_asked_yes": true,
+        "dv105_child_home_4_asked_yes": true,
+        "dv105_child_home_5_asked_yes": true,
+        "dv105_child_home_6_asked_yes": true,
+        "dv105_other_case_yes": true,
+        "dv105_current_custody_order_yes": true,
+        "dv105_other_guardian_exists_yes": true,
+        "user_firstname": "user_firstname",
+        "user_lastname": "user_lastname",
+        "user_email": "test@example.com",
+        "user_phone": "(555) 555-5555",
+        "user_street": "user_street",
+        "user_city": "user_city",
+        "user_state": "Test Value",
+        "user_zip": "90210"
+      },
+      "shown": [
+        "question-container-1",
+        "question-container-2",
+        "question-container-3",
+        "question-container-4",
+        "question-container-5",
+        "question-container-6",
+        "question-container-7",
+        "question-container-8",
+        "question-container-9",
+        "question-container-10",
+        "question-container-11",
+        "question-container-12",
+        "question-container-13",
+        "question-container-14",
+        "question-container-15",
+        "question-container-16",
+        "question-container-17",
+        "question-container-18",
+        "question-container-19",
+        "question-container-20",
+        "question-container-21",
+        "question-container-22",
+        "question-container-23",
+        "question-container-24",
+        "question-container-25",
+        "question-container-26",
+        "question-container-27",
+        "question-container-28",
+        "question-container-29",
+        "question-container-30",
+        "question-container-31",
+        "question-container-32",
+        "question-container-33",
+        "question-container-34",
+        "question-container-35",
+        "question-container-36",
+        "question-container-37",
+        "question-container-38",
+        "question-container-39",
+        "question-container-40",
+        "question-container-41",
+        "question-container-42",
+        "question-container-43",
+        "question-container-44",
+        "question-container-45",
+        "question-container-46",
+        "question-container-47",
+        "question-container-48",
+        "question-container-49",
+        "question-container-50",
+        "question-container-51",
+        "question-container-52",
+        "question-container-53",
+        "question-container-54",
+        "question-container-55",
+        "question-container-56",
+        "question-container-57",
+        "question-container-58",
+        "question-container-59",
+        "question-container-60",
+        "question-container-61",
+        "question-container-62",
+        "question-container-63",
+        "question-container-64",
+        "question-container-65",
+        "question-container-67",
+        "question-container-68",
+        "question-container-69",
+        "question-container-70",
+        "question-container-77",
+        "question-container-79",
+        "question-container-80",
+        "question-container-81",
+        "question-container-82",
+        "question-container-85",
+        "question-container-87",
+        "question-container-90",
+        "question-container-93",
+        "question-container-95",
+        "question-container-98",
+        "question-container-100",
+        "question-container-101",
+        "question-container-102",
+        "question-container-66",
+        "question-container-71",
+        "question-container-72",
+        "question-container-73",
+        "question-container-74",
+        "question-container-75",
+        "question-container-76",
+        "question-container-78",
+        "question-container-83",
+        "question-container-84",
+        "question-container-86",
+        "question-container-88",
+        "question-container-89",
+        "question-container-91",
+        "question-container-92",
+        "question-container-94",
+        "question-container-96",
+        "question-container-97",
+        "question-container-99",
+        "question-container-103",
+        "question-container-106",
+        "question-container-107",
+        "question-container-108",
+        "question-container-109",
+        "question-container-110",
+        "question-container-111",
+        "question-container-112",
+        "question-container-113",
+        "question-container-114",
+        "question-container-115",
+        "question-container-116",
+        "question-container-117",
+        "question-container-118",
+        "question-container-119",
+        "question-container-120",
+        "question-container-121",
+        "question-container-123",
+        "question-container-124",
+        "question-container-126",
+        "question-container-127",
+        "question-container-129",
+        "question-container-130",
+        "question-container-131",
+        "question-container-132",
+        "question-container-133",
+        "question-container-134",
+        "question-container-135",
+        "question-container-136",
+        "question-container-137",
+        "question-container-138",
+        "question-container-139",
+        "question-container-140",
+        "question-container-141",
+        "question-container-142",
+        "question-container-143",
+        "question-container-144",
+        "question-container-145",
+        "question-container-146",
+        "question-container-147",
+        "question-container-148",
+        "question-container-149",
+        "question-container-150",
+        "question-container-151",
+        "question-container-152",
+        "question-container-153",
+        "question-container-154",
+        "question-container-155",
+        "question-container-156",
+        "question-container-157",
+        "question-container-158",
+        "question-container-159",
+        "question-container-160",
+        "question-container-161",
+        "question-container-162",
+        "question-container-163",
+        "question-container-164",
+        "question-container-165",
+        "question-container-166",
+        "question-container-167",
+        "question-container-168",
+        "question-container-169",
+        "question-container-170",
+        "question-container-171",
+        "question-container-172",
+        "question-container-177",
+        "question-container-178",
+        "question-container-179",
+        "question-container-181",
+        "question-container-183",
+        "question-container-184",
+        "question-container-185",
+        "question-container-188",
+        "question-container-191",
+        "question-container-196",
+        "question-container-199",
+        "question-container-201",
+        "question-container-205",
+        "question-container-208",
+        "question-container-210",
+        "question-container-212",
+        "question-container-214",
+        "question-container-216",
+        "question-container-218",
+        "question-container-220",
+        "question-container-222",
+        "question-container-224",
+        "question-container-228",
+        "question-container-231",
+        "question-container-232",
+        "question-container-233",
+        "question-container-234",
+        "question-container-235",
+        "question-container-236",
+        "question-container-237",
+        "question-container-238",
+        "question-container-239",
+        "question-container-240",
+        "question-container-241",
+        "question-container-242",
+        "question-container-243",
+        "question-container-244",
+        "question-container-245",
+        "question-container-246",
+        "question-container-247",
+        "question-container-248",
+        "question-container-249",
+        "question-container-259",
+        "question-container-260",
+        "question-container-261",
+        "question-container-265",
+        "question-container-268",
+        "question-container-282",
+        "question-container-284",
+        "question-container-285"
+      ],
+      "markers": true,
+      "logic": "60317:16v1a8c"
+    },
+    "minimum": {
+      "values": {
+        "court_name": "court_name",
+        "court_street_address": "court_street_address",
+        "person_asking_protection_name": "person_asking_protection_name",
+        "person_asking_protection_age": "100",
+        "person_asking_protection_mailing_address": "person_asking_protection_mailing_address",
+        "person_asking_protection_mailing_city": "person_asking_protection_mailing_city",
+        "person_asking_protection_mailing_state": "Illinois",
+        "person_asking_protection_mailing_state_illinois": true,
+        "person_asking_protection_mailing_state_hidden": "Illinois",
+        "person_asking_protection_mailing_state_short": "IL",
+        "person_asking_protection_mailing_zip_code": "90210",
+        "person_asking_protection_telephone": "(555)-555-5555",
+        "person_asking_protection_fax": "(555)-555-5555",
+        "person_asking_protection_email": "test@example.com",
+        "has_lawyer": "No",
+        "has_lawyer_dropdown": "No",
+        "person_to_restrain_full_name": "person_to_restrain_full_name",
+        "person_to_restrain_age": "100",
+        "person_to_restrain_date_of_birth": "2024-06-15",
+        "person_to_restrain_gender": "Nonbinary",
+        "person_to_restrain_gender_nonbinary": true,
+        "person_to_restrain_race": "person_to_restrain_race",
+        "relationship_to_person_to_restrain_we_are_married_or_registered_domestic_partners": true,
+        "recent_restraining_orders": "No",
+        "recent_restraining_orders_dropdown": "No",
+        "other_court_case_involvement": "No",
+        "other_court_case_involvement_dropdown": "No",
+        "most_recent_abuse_date": "2024-06-15",
+        "most_recent_abuse_witnesses": "I don’t know",
+        "most_recent_abuse_witnesses_dropdown": "I don’t know",
+        "most_recent_abuse_weapon": "No",
+        "most_recent_abuse_weapon_dropdown": "No",
+        "most_recent_abuse_harm": "No",
+        "most_recent_abuse_harm_dropdown": "No",
+        "most_recent_abuse_police": "I don’t know",
+        "most_recent_abuse_police_dropdown": "I don’t know",
+        "most_recent_abuse_details": "most_recent_abuse_details",
+        "most_recent_abuse_frequency": "Just this once",
+        "most_recent_abuse_frequency_dropdown": "Just this once",
+        "has_different_abuse": "No",
+        "has_different_abuse_dropdown": "No",
+        "has_other_abuse": "No",
+        "has_other_abuse_dropdown": "No",
+        "other_protected_people": "No",
+        "other_protected_people_dropdown": "No",
+        "person_to_restrain_firearms": "I don't know",
+        "person_to_restrain_firearms_dropdown": "I don't know",
+        "orders_requested_order_to_not_abuse_me": true,
+        "clets_restrained_person_other_names": "clets_restrained_person_other_names",
+        "clets_restrained_person_marks_scars_tattoos": "clets_restrained_person_marks_scars_tattoos",
+        "clets_restrained_person_drivers_license_number": "clets_restrained_person_drivers_license_number",
+        "clets_restrained_person_drivers_license_state": "Test Value",
+        "clets_restrained_person_ssn": "123-45-6789",
+        "clets_restrained_person_telephone": "(555)-555-5555",
+        "clets_restrained_person_employer_name": "clets_restrained_person_employer_name",
+        "clets_restrained_person_employer_address": "clets_restrained_person_employer_address",
+        "clets_restrained_person_vehicle_type": "clets_restrained_person_vehicle_type",
+        "clets_restrained_person_vehicle_model": "clets_restrained_person_vehicle_model",
+        "clets_restrained_person_vehicle_year": "100",
+        "clets_restrained_person_vehicle_plate": "clets_restrained_person_vehicle_plate",
+        "clets_restrained_person_speaks_english": "No",
+        "clets_restrained_person_speaks_english_dropdown": "No",
+        "clets_restrained_person_language": "Test Value",
+        "clets_protected_person_gender": "Nonbinary",
+        "clets_protected_person_gender_nonbinary": true,
+        "clets_protected_person_race": "clets_protected_person_race",
+        "clets_protected_person_date_of_birth": "2024-06-15",
+        "clets_protected_person_speaks_english": "No",
+        "clets_protected_person_speaks_english_dropdown": "No",
+        "clets_protected_person_language": "Test Value",
+        "restrained_person_height": "restrained_person_height",
+        "restrained_person_weight": "restrained_person_weight",
+        "restrained_person_hair_color": "restrained_person_hair_color",
+        "restrained_person_eye_color": "restrained_person_eye_color",
+        "knows_restrained_person_address": "No",
+        "knows_restrained_person_address_dropdown": "No",
+        "__projectId": "p_mtumpmov7t2gh0",
+        "additional_pages_count": "0",
+        "restrained_person_relationship_to_protected_person": "spouse/partner",
+        "court_name_and_street_address": "court_name, court_street_address",
+        "person_asking_protection_signature_date": "09-12-2026",
+        "lawyer_signature_date": "09-12-2026",
+        "person_asking_protection_signature_printed_name": "person_asking_protection_name",
+        "clets_restrained_person_drivers_license": "clets_restrained_person_drivers_license_number, Test Value",
+        "clets_restrained_person_employer": "clets_restrained_person_employer_name, clets_restrained_person_employer_address",
+        "user_county": "Los Angeles County",
+        "has_lawyer_no": true,
+        "relationship_current_spouses_or_domestic_partners": true,
+        "order_not_to_abuse_requested": true,
+        "recent_restraining_orders_no": true,
+        "other_court_case_involvement_no": true,
+        "most_recent_abuse_witnesses_unknown": true,
+        "most_recent_abuse_weapon_no": true,
+        "most_recent_abuse_harm_no": true,
+        "most_recent_abuse_police_unknown": true,
+        "most_recent_abuse_frequency_once": true,
+        "has_different_abuse_no": true,
+        "has_other_abuse_no": true,
+        "other_protected_people_no_yes": true,
+        "person_to_restrain_firearms_unknown_yes": true,
+        "clets_restrained_person_speaks_english_no": true,
+        "clets_protected_person_speaks_english_no": true,
+        "knows_restrained_person_address_no": true,
+        "user_firstname": "user_firstname",
+        "user_lastname": "user_lastname",
+        "user_email": "test@example.com",
+        "user_phone": "(555) 555-5555",
+        "user_street": "user_street",
+        "user_city": "user_city",
+        "user_state": "Test Value",
+        "user_zip": "90210"
+      },
+      "shown": [
+        "question-container-1",
+        "question-container-2",
+        "question-container-3",
+        "question-container-4",
+        "question-container-5",
+        "question-container-6",
+        "question-container-8",
+        "question-container-9",
+        "question-container-12",
+        "question-container-14",
+        "question-container-22",
+        "question-container-23",
+        "question-container-25",
+        "question-container-27",
+        "question-container-29",
+        "question-container-30",
+        "question-container-31",
+        "question-container-34",
+        "question-container-47",
+        "question-container-60",
+        "question-container-63",
+        "question-container-65",
+        "question-container-106",
+        "question-container-107",
+        "question-container-108",
+        "question-container-109",
+        "question-container-110",
+        "question-container-111",
+        "question-container-123",
+        "question-container-126",
+        "question-container-231",
+        "question-container-259",
+        "question-container-260",
+        "question-container-261",
+        "question-container-262",
+        "question-container-265",
+        "question-container-268",
+        "question-container-269",
+        "question-container-282",
+        "question-container-284"
+      ],
+      "markers": true,
+      "logic": "60317:16v1a8c"
+    },
+    "bakedAt": "2026-09-12T19:34:08.437Z"
+  }
 }

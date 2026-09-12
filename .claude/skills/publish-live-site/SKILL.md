@@ -48,7 +48,17 @@ section at a time). `index.html` is a router - `index.html?mode=question` and
 
    `modes` defaults to `['question', 'section']`; `'all'` (every section on one
    page) can be added if asked for. The result lists the folder, its files, the
-   PDFs copied, any `missingPdfs`, and `links` - one per mode.
+   PDFs copied, any `missingPdfs`, `links` - one per mode - and `fillPaths`, how
+   many answers the minimum and maximum paths recorded.
+
+   The build also records the debug menu's **Fill minimum path** and **Fill
+   maximum path**. It runs each fill in a hidden frame, twice, with Firebase
+   taken out and throwaway storage. It then writes where they end up into
+   `dv-packet-gui.json` (as `fillPaths`), into the site's `gui.json`, and into
+   both pages (as `window.__BAKED_FILLS__`). The buttons put that back in one
+   sweep, in under a second rather than 3-9. A page whose questions changed since
+   the recording works the path out as before. This adds about half a minute to
+   a build.
 
 4. **Check it.** Open each link in the Browser pane and confirm it lands on its
    page (`question.html` / `section.html`), the first question shows, and
@@ -57,11 +67,15 @@ section at a time). `index.html` is a router - `index.html?mode=question` and
    site. Confirm the PDFs fill:
    `(await fetch('/edit_pdf?pdf=dv100.pdf', { method: 'POST', body: new FormData() })).headers.get('content-type')`
    is `application/pdf`. Report any missing PDF by name - never claim a check you
-   did not run.
+   did not run. Then run `node pipeline-nav-audit.js` (it drives the published
+   site in headless Chrome: presses both fill buttons with the debug menu open,
+   checks what is drawn, and walks Next and Back). See `Hand Off/AUDIT.md` §3.
 
 5. **Hand back** the links by project id first -
    `http://localhost:8080/form/<projectId>/section.html` and `.../question.html`
-   (`formLinks` in the result; they follow the project through renames) - then
+   (`formLinks` in the result; they follow the project through renames, and carry
+   the save's moment, `?saved=9-12-26_3-06pm`; a link with no stamp or an old one
+   redirects to the newest) - then
    the folder links `http://localhost:8080/live-sites/<name>/index.html?mode=question`
    and `...?mode=section`, the folder path, what is in it, and the limits below. If the
    Demo Form Hub lists this packet (`auto-form/public/Auto-Form-Creator/Demo_form_hub/`),

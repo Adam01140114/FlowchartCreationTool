@@ -1619,8 +1619,6 @@
       "fields": [
         "relationship_to_person_to_restrain",
         "relationship_relative_kind",
-        "relationship_children_names_line_1",
-        "relationship_children_names_line_2",
         "relationship_lived_together_as_family"
       ]
     },
@@ -1674,7 +1672,9 @@
         "same_workplace_or_school",
         "move_out_home_address",
         "move_out_right_to_live",
-        "other_orders_description"
+        "other_orders_description",
+        "relationship_children_names_line_1",
+        "relationship_children_names_line_2"
       ]
     },
     {
@@ -1928,7 +1928,7 @@
     {
       "nameId": "dv105_child",
       "_why": "The children are asked once, here, under DV-105's name. DV-105 item 3 and DV-140 item 3 list the same children, and the packet asked for them again on DV-105 with a date of birth; one block that asks both fills DV-100's names line, DV-105's table and DV-140's table, and DV-105's own declaration of the block collapses into this one. The pages for children five to twelve belong to DV-105 and DV-140, so they exist only while those forms are in the packet.",
-      "question": "How many children do you have together?",
+      "question": "How many children do you have with the person you want protection from?",
       "entryTitle": "Child",
       "min": 1,
       "max": 4,
@@ -1936,13 +1936,9 @@
         "relationship_children_names_line_1",
         "relationship_children_names_line_2"
       ],
-      "joinInto": {
-        "field": "relationship_children_names_line_1",
-        "separator": ", ",
-        "fields": ["{n}_name"]
-      },
       "conditional": {
-        "onlyWhen": "relationship_have_children_together"
+        "onlyWhen": "relationship_have_children_together,child_custody_and_visitation_order_requested",
+        "_why": "Asked when the filer has children with the person, and whenever they ask for custody orders: DV-105 and DV-140 list the children, and a custody request without the relationship box ticked used to reach them with no child named. It is asked after the orders question so both answers are known when it is reached."
       },
       "fields": [
         {
@@ -2302,6 +2298,12 @@
 ],
   "continuations": [
     {
+      "field": "relationship_children_names",
+      "_why": "Item 3a prints the names on two ruled lines. The first is filled from the children block (computed, and only while the box is ticked); the second is where the filler runs a long list on to, not a question.",
+      "keep": "relationship_children_names_line_1",
+      "drop": ["relationship_children_names_line_2"]
+    },
+    {
       "field": "move_out_right_to_live_other_explanation",
       "keep": "move_out_right_to_live_other_explanation_line_1",
       "drop": [
@@ -2385,6 +2387,14 @@
     }
   ],
   "computed": {
+    "relationship_children_names_line_1": {
+      "_why": "DV-100 item 3a prints \"We have a child or children together; names:\" after its box. The same children are now also asked for a custody request made without that box, and their names must not print beside an empty box - so the line is filled from the children block only while the box is ticked.",
+      "joinWhenTicked": {
+        "when": "relationship_have_children_together",
+        "separator": ", ",
+        "fields": ["dv105_child_1_name", "dv105_child_2_name", "dv105_child_3_name", "dv105_child_4_name"]
+      }
+    },
     "additional_pages_count": {
       "_why": "DV-100 item 32 asks for the number of extra pages attached. A filer cannot count them and the debug fill answered 100. The packet knows: the pages of every attachment being filed, plus one for each separate sheet already promised.",
       "_whyAttachedTo": "Counted along what each form says it is attached to, not along what switches it on. DV-108 is attached to DV-105, which is attached to DV-100, so its pages are part of the stack handed in with this form; DV-140 is attached to DV-110, a separate order, so its pages are not - and counting every conditional form as an attachment had put DV-140 in, making this 18 where it is 12.",

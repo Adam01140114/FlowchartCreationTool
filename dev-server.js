@@ -862,11 +862,30 @@ function liveSiteOfProject(projectId) {
   }) || null;
 }
 
-/** The links that carry the project id, one per way of asking. */
-function formLinksFor(projectId, modes) {
+/**
+ * The moment a site was saved, as it goes in a link: "9-12-26_3-06pm".
+ *
+ * The same moment the tab title shows ("DV Packet 9/12/26 3:06pm"), so a link
+ * and its tab can be matched at a glance. A site built without one (the skill)
+ * takes the moment it was written, in this computer's clock.
+ */
+function liveSiteStamp(manifest) {
+  const m = manifest || {};
+  const t = /(\d{1,2})\/(\d{1,2})\/(\d{2}) (\d{1,2}):(\d{2})\s*(am|pm)\s*$/i.exec(String(m.tabTitle || ''));
+  if (t) return t[1] + '-' + t[2] + '-' + t[3] + '_' + t[4] + '-' + t[5] + t[6].toLowerCase();
+  const d = new Date(m.builtAt || '');
+  if (isNaN(d.getTime())) return '';
+  const h = d.getHours();
+  return (d.getMonth() + 1) + '-' + d.getDate() + '-' + String(d.getFullYear()).slice(-2)
+    + '_' + ((h % 12) || 12) + '-' + String(d.getMinutes()).padStart(2, '0') + (h < 12 ? 'am' : 'pm');
+}
+
+/** The links that carry the project id, one per way of asking, stamped with the save. */
+function formLinksFor(projectId, modes, stamp) {
   const links = {};
   (modes || LIVE_SITE_MODES).forEach((mode) => {
-    links[mode] = '/form/' + encodeURIComponent(projectId) + '/' + mode + '.html';
+    links[mode] = '/form/' + encodeURIComponent(projectId) + '/' + mode + '.html'
+      + (stamp ? '?saved=' + encodeURIComponent(stamp) : '');
   });
   return links;
 }
@@ -881,8 +900,9 @@ app.get('/api/live-site', (req, res) => {
   LIVE_SITE_MODES.forEach((mode) => {
     if (fs.existsSync(path.join(LIVE_SITES_DIR, slug, mode + '.html'))) pages[mode] = '/live-sites/' + slug + '/' + mode + '.html';
   });
-  res.json({ folder: 'live-sites/' + slug, slug, pages, formLinks: formLinksFor(projectId, Object.keys(pages)),
-    tabTitle: m.tabTitle || '', builtAt: m.builtAt || '' });
+  const stamp = liveSiteStamp(m);
+  res.json({ folder: 'live-sites/' + slug, slug, pages, formLinks: formLinksFor(projectId, Object.keys(pages), stamp),
+    tabTitle: m.tabTitle || '', builtAt: m.builtAt || '', stamp });
 });
 
 /**
@@ -909,6 +929,20 @@ app.use('/form/:projectId', (req, res, next) => {
       + '<h1 style="font-size:1.3rem">No form is published for this project yet</h1>'
       + '<p>Project <code>' + safe + '</code> has no live site. Open the project in the editor and press Save, or Open Form Link, and this link will work.</p>'
       + '</body></html>');
+  }
+  // A page's link carries the moment the site was saved: ?saved=9-12-26_3-06pm.
+  // A link with no stamp or an older one - a bookmark, a tab reloaded after a
+  // save - is sent on to the newest, so the address bar always names the build
+  // on screen. Only the newest build is kept, so an old stamp never shows an
+  // old page. The CSS, county lookup and PDFs beside the page are not stamped.
+  if (/^\/[\w-]+\.html$/i.test(req.path)) {
+    const stamp = liveSiteStamp(readLiveSiteManifest(slug));
+    if (stamp && req.query.saved !== stamp) {
+      const params = new URLSearchParams(String(req.originalUrl.split('?')[1] || ''));
+      params.delete('saved');
+      const rest = params.toString();
+      return res.redirect(302, req.baseUrl + req.path + '?saved=' + encodeURIComponent(stamp) + (rest ? '&' + rest : ''));
+    }
   }
   express.static(path.join(LIVE_SITES_DIR, slug))(req, res, next);
 });
@@ -998,6 +1032,7 @@ app.post('/api/publish-live-site', (req, res) => {
       links[mode] = `${url}?mode=${mode}`;
       pageLinks[mode] = `/live-sites/${encodeURIComponent(slug)}/${mode}.html`;
     });
+    const builtAt = new Date().toISOString();
     const manifest = {
       title,
       tabTitle,
@@ -1007,8 +1042,8 @@ app.post('/api/publish-live-site', (req, res) => {
       links,
       pages: pageLinks,
       // The links to hand out: they name the project, not the folder.
-      formLinks: projectId ? formLinksFor(projectId, modes) : {},
-      builtAt: new Date().toISOString(),
+      formLinks: projectId ? formLinksFor(projectId, modes, liveSiteStamp({ tabTitle, builtAt })) : {},
+      builtAt,
       source: String(body.source || ''),
       projectId,
       pdfs,

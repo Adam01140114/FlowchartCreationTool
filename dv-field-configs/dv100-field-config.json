@@ -142,18 +142,6 @@
       "label": "relationship_have_children_together"
     },
     {
-      "id": "DV-100[0].Page2[0].List3[0].Li1[0].TextField[0]",
-      "newName": "relationship_children_names_line_1",
-      "type": "text",
-      "label": "relationship_children_names_line_1"
-    },
-    {
-      "id": "DV-100[0].Page2[0].List3[0].Li1[0].TextField1[0]",
-      "newName": "relationship_children_names_line_2",
-      "type": "text",
-      "label": "relationship_children_names_line_2"
-    },
-    {
       "id": "DV-100[0].Page2[0].List3[0].Li2[0].CheckBox2[0]",
       "newName": "relationship_current_spouses_or_domestic_partners",
       "type": "checkbox",
@@ -1830,6 +1818,18 @@
       "newName": "wireless_phone_account_transfer_order_requested",
       "type": "checkbox",
       "label": "wireless_phone_account_transfer_order_requested"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li1[0].TextField[0]",
+      "newName": "relationship_children_names_line_1",
+      "type": "text",
+      "label": "relationship_children_names_line_1"
+    },
+    {
+      "id": "DV-100[0].Page2[0].List3[0].Li1[0].TextField1[0]",
+      "newName": "relationship_children_names_line_2",
+      "type": "text",
+      "label": "relationship_children_names_line_2"
     },
     {
       "id": "DV-100[0].Page12[0].List28[0].Li1[0].item28aMyNoa_cb[0]",

@@ -798,6 +798,96 @@ async function main() {
     });
   });
 
+  // Rule 18: a form an answer switches on gets its data whenever that answer is
+  // given. DV-105 and DV-140 come in when the filer asks for custody orders,
+  // and both list the children - but the children were asked only after "We
+  // have a child or children together", so a custody request without that box
+  // produced DV-140 item 3 ticked with no child named. For every form brought in
+  // by an answer, each question on another form that fills its boxes has to be
+  // reachable from that answer - and from the answers that bring in the form
+  // the answer is asked on - without depending on some other choice.
+  const qById = new Map();
+  (gui.sections || []).forEach((s) => (s.questions || []).forEach((q) => qById.set(String(q.questionId), q)));
+  const optionLabels = (q) => (q.options || [])
+    .map((o) => (o && typeof o === 'object') ? String(o.label || o.text || '') : String(o)).filter(Boolean);
+  const activations = gui.formActivations || [];
+  const answersBringingIn = (formName, seen) => {
+    seen = seen || new Set();
+    if (seen.has(formName)) return [];
+    seen.add(formName);
+    const out = [];
+    activations.filter((r) => r.targetForm === formName && !r.unconditional && r.optionLabel).forEach((r) => {
+      const q = owner.get(r.optionNameId) || (r.questionId ? qById.get(String(r.questionId)) : null);
+      if (!q) return;
+      out.push({ q: String(q.questionId), a: String(r.optionLabel) });
+      const home = forms.find((f) => ownedByForm(q, f));
+      if (home) answersBringingIn(home.name, seen).forEach((x) => out.push(x));
+    });
+    return out;
+  };
+  // The forms these answers bring in. A choice asked inside one of them is the
+  // filer's own answer within the interview the answer opened - "Describe
+  // their relationship to the children" after "Other" belongs to DV-105 - so a
+  // box it fills is blank exactly when it should be.
+  const opened = (given) => new Set(forms.filter((f) => answersBringingIn(f.name)
+    .some((a) => given.some((g) => g.q === a.q && g.a === a.a))).map((f) => f.name));
+  // Shown given these answers: a condition met by one of them, one on a
+  // question inside a form they open, or one on a question that is itself
+  // shown and passes on whatever it is answered.
+  const shownGiven = (q, given, memo, stack, inside) => {
+    const id = String(q.questionId);
+    if (memo.has(id)) return memo.get(id);
+    // The question whose answer brings the form in has been answered.
+    if (given.some((g) => g.q === id)) { memo.set(id, true); return true; }
+    if (stack.has(id)) return false;
+    stack.add(id);
+    const conds = ((q.logic || {}).conditions) || [];
+    let ok = !conds.length;
+    if (!ok) {
+      const byPrev = new Map();
+      conds.forEach((c) => {
+        const k = String(c.prevQuestion);
+        if (!byPrev.has(k)) byPrev.set(k, []);
+        byPrev.get(k).push(String(c.prevAnswer));
+      });
+      for (const [pid, answers] of byPrev) {
+        const prev = qById.get(pid);
+        if (!prev) continue;
+        if (given.some((g) => g.q === pid && answers.includes(g.a))) { ok = true; break; }
+        const labels = optionLabels(prev);
+        const anyAnswer = answers.includes('Any Text') || (labels.length > 0 && labels.every((l) => answers.includes(l)))
+          || (inside && forms.some((f) => inside.has(f.name) && ownedByForm(prev, f)));
+        if (anyAnswer && shownGiven(prev, given, memo, stack, inside)) { ok = true; break; }
+      }
+    }
+    stack.delete(id);
+    memo.set(id, ok);
+    return ok;
+  };
+  report.rule18 = [];
+  forms.forEach((form) => {
+    if (form.alwaysIncluded) return;
+    const given = answersBringingIn(form.name);
+    if (!given.length) return;   // always on, or brought in by a box the writing ticks
+    const base = String(form.pdfFile || form.name || '').replace(/\.pdf$/i, '');
+    const cfgPath = path.join(CONFIG_DIR, base.toLowerCase() + '-field-config.json');
+    if (!fs.existsSync(cfgPath)) return;
+    const seenQ = new Set();
+    const inside = opened(given);
+    readFieldConfig(cfgPath).filter((c) => !c.courtUse).forEach((c) => {
+      const q = owner.get(c.name);
+      if (!q || ownedByForm(q, form) || seenQ.has(String(q.questionId))) return;
+      if (shownGiven(q, given, new Map(), new Set(), inside)) return;
+      seenQ.add(String(q.questionId));
+      const needs = (((q.logic || {}).conditions) || []).map((x) => 'q' + x.prevQuestion + ' = "' + x.prevAnswer + '"');
+      report.rule18.push({
+        form: form.name, field: c.name, question: q.questionId, text: q.text,
+        needs: needs.slice(0, 3).join(' or ') + (needs.length > 3 ? ' ...' : ''),
+        broughtInBy: given.map((g) => 'q' + g.q + ' = "' + g.a + '"').join(', ')
+      });
+    });
+  });
+
   const sectionIds = new Set((gui.sections || []).map((s) => String(s.sectionId)));
   report.deadJumps = [];
   (gui.sections || []).forEach((s) => (s.questions || []).forEach((q) => {
@@ -1106,6 +1196,12 @@ async function main() {
   if (!report.rule17.length) console.log('  passes');
   report.rule17.forEach((r) => console.log('  FAILS  ' + r.where + ' "' + String(r.text).slice(0, 80) + '" - ' + r.why));
   console.log('');
+  console.log('RULE 18 — a form an answer brings in gets its data whenever that answer is given');
+  if (!report.rule18.length) console.log('  passes');
+  report.rule18.forEach((r) => console.log('  FAILS  ' + r.form + ' prints ' + r.field + ', asked by q' + r.question
+    + ' "' + String(r.text).slice(0, 60) + '" only when ' + r.needs + ' - but ' + r.form + ' comes in on '
+    + r.broughtInBy + ' without that, and prints it blank'));
+  console.log('');
   console.log('RULE 5 — one group per form, named after the form');
   console.log('  groups: ' + (report.rule5.groups.length
     ? report.rule5.groups.map((g) => g.name + '(' + g.sections
@@ -1121,6 +1217,7 @@ async function main() {
     ['RULE 2 (CORNERSTONE)', (report.rule2wording || []).length],
     ['JUMPS', (report.deadJumps || []).length],
     ['RULE 17', (report.rule17 || []).length],
+    ['RULE 18', (report.rule18 || []).length],
     ['RULE 7', report.rule7.filter((f) => !f.pdfFile || (!f.alwaysIncluded && !f.activatedBy.length) || f.dead.length).length],
     ['RULE 8', report.rule8.compound.length],
     ['RULE 10', report.rule10.length],

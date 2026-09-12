@@ -1,6 +1,6 @@
 Form Quality Check
 ==================
-Last updated: September 8, 2026
+Last updated: September 8, 2026 - the full, current rule list is now form-rules.html (repo root) and the audit procedure is Hand Off/AUDIT.md; this file keeps the original ten and why they exist.
 
 Ten rules a generated form must satisfy before it ships. A form can pass the
 compiler's `auditForm()` — clean geometry, no unreachable nodes, no overlaps —

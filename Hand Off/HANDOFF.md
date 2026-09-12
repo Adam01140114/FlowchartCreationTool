@@ -1,10 +1,10 @@
 # Flowchart Creation Tool — Agent Handoff
 
-**Date:** September 8, 2026  
+**Date:** September 8, 2026 · last updated September 12, 2026  
 **Repository:** https://github.com/Adam01140114/FlowchartCreationTool  
 **Branch:** `main`
 
-This document is for the next AI agent (Claude or otherwise) taking over development. Read this first, then read the trainer spec bundled in this folder.
+This document is for the next AI agent (Claude or otherwise) taking over development. Read this first, then read the trainer spec bundled in this folder. The rules every agent follows are in [`AGENTS.md`](../AGENTS.md) at the repo root, and **before calling any change done, follow [`AUDIT.md`](./AUDIT.md)** - the complete audit procedure, the safety rules for testing with the user's data, and the incident log of every defect that got past the checks.
 
 ---
 
@@ -540,7 +540,7 @@ finish rule 3, and add DV-140, which DV-100 page 13 lists as required.
 
 ### Export / audit checklist
 
-Before calling a form done:
+Before calling a form done (this is the short form - the complete, current procedure is [`AUDIT.md`](./AUDIT.md), which adds the published-site audit, `pipeline-nav-audit.js`, and how to test a feature by hand):
 
 1. Import flowchart JSON in editor — edges clean, no overlap.
 2. **Preview Form** — every dropdown shows flowchart options (not Yes/No unless the question is Yes/No).
@@ -691,7 +691,10 @@ On the DV packet only one connection had an actual triggering field
     paths look like XFA but pdf-lib reports 0 fields because of encryption. Decrypt
     with qpdf (`/api/unlock-pdf` does this) before reading fields.
 20. **`Fill maximum path` is a coverage tool, not a correctness test.** It proves
-    fields *can* be filled with "Test Value", not that values land in the right boxes.
+    fields *can* be filled (each with its own name as a marker), not that values land
+    in the right boxes - read the pages for that. Its sibling, Fill minimum path, proves
+    gates close. Both are recorded when the site is published; how the buttons
+    themselves are tested is in [`AUDIT.md`](./AUDIT.md) §3.
 
 ---
 
@@ -754,7 +757,10 @@ Ordered by what actually blocks shipping the DV packet.
 
 | File | Description |
 |------|-------------|
+| `../AGENTS.md` | *(repo root)* The rules every agent follows — read before anything else |
 | `HANDOFF.md` | This document — start here |
+| `AUDIT.md` | **The audit playbook** — what to run, in order, how to test by hand, the incident log |
+| `../form-rules.html` | *(repo root)* Every rule: what it requires, why it exists, what enforces it |
 | `flowchart_ai_trainer_doc.txt` | Full AI trainer spec — **read before editing flowcharts** |
 | `PIPELINE.md` | The packet pipeline: artifacts, commands, the two fill modes |
 | `PDF-PAGE-AUDIT.md` | **The last check before shipping** — render the filled PDF and read it |

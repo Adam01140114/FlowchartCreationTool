@@ -19,6 +19,26 @@
  *   - every section visited belongs to a form that is in the packet;
  *   - Next is never stuck on a section a completed fill left answered.
  *
+ * The fill itself is the debug menu's own button, pressed with the menu open,
+ * the way a person does it - and it is held to what a person sees:
+ *
+ *   - the button finishes within the budget (--fill-budget, 3000 ms);
+ *   - nothing it wrote is gone three seconds later;
+ *   - no section the walk passes has an empty field on a question it shows -
+ *     empty as drawn, not as stored: a value painted transparent is empty;
+ *   - the page after the button is the page after the worked-out fill (run in
+ *     a tab of its own): every answer, and every element drawn the same way.
+ *
+ * Drawn, because the next defect after the slow button was on the screen and
+ * nowhere else. The recorded fill wrote every date, and 46 date boxes still
+ * showed their captions - a date box is marked as holding a date only by an
+ * event, and the button writes without them. Every check read the values.
+ *
+ * Those came later, the day a fill that took a second when called from a
+ * script took 45 with the menu open and left a restraining order's dates
+ * empty. This audit had called fillMaximumPath from a script with the menu
+ * shut, and only asked whether Next worked - so it passed.
+ *
  * It drives the Chrome already on the machine through the DevTools protocol,
  * headless and with a throwaway profile, so nothing needs installing and the
  * answers a person has saved in their own browser are never touched. The dev
@@ -45,6 +65,7 @@ const SERVER = flag('server', 'http://localhost:8080').replace(/\/+$/, '');
 // per path; the section pages share the same Back code, so they are the default.
 const MODES = flag('modes', 'section').split(',').map((s) => s.trim()).filter(Boolean);
 const PATHS = flag('paths', 'minimum,maximum').split(',').map((s) => s.trim()).filter(Boolean);
+const FILL_BUDGET_MS = Number(flag('fill-budget', '3000'));
 
 function findChrome() {
   const candidates = [
@@ -140,13 +161,68 @@ function walkInPage(fillPath) {
     const sec = document.querySelector('.section.active');
     return sec && sec.querySelector(dir > 0 ? '.question-next' : '.question-prev');
   };
+  // The page's own test for a field Next waits on (isElementEligible in the
+  // section nav): enabled, not hidden, laid out.
+  const eligible = (el) => {
+    if (!el || el.disabled || el.type === 'hidden' || el.closest('.hidden')) return false;
+    for (let c = el; c && c !== document.body; c = c.parentElement) {
+      if (getComputedStyle(c).display === 'none') return false;
+    }
+    return !(el.offsetParent === null && el.type !== 'radio' && el.type !== 'checkbox');
+  };
+  // Fields on screen that hold nothing: typed boxes, dropdowns, radio groups.
+  // Ticking boxes is optional; a question marked optional is too.
+  const emptyOnScreen = (n) => {
+    const sec = document.getElementById('section' + n);
+    const out = [];
+    if (!sec) return out;
+    sec.querySelectorAll('.question-container').forEach((q) => {
+      if (q.classList.contains('hidden') || q.getAttribute('data-optional') === '1') return;
+      const radios = {};
+      q.querySelectorAll('select, textarea, input').forEach((el) => {
+        if (!eligible(el) || el.readOnly || el.closest('[data-optional]')) return;
+        if (typeof isComputedFillField === 'function' && isComputedFillField(el)) return;
+        const t = (el.type || '').toLowerCase();
+        if (t === 'checkbox' || t === 'file' || t === 'button' || t === 'submit') return;
+        if (t === 'radio') { (radios[el.name || el.id] = radios[el.name || el.id] || []).push(el.checked); return; }
+        // Empty as drawn, not as stored. A date box paints its date transparent
+        // and its caption over it until the page marks it filled: the value was
+        // there, and the filer saw "Date of the order".
+        const style = getComputedStyle(el);
+        const painted = !/^(transparent|rgba\(\s*0,\s*0,\s*0,\s*0\s*\))$/.test(style.color) && style.opacity !== '0';
+        if (!String(el.value || '').trim() || !painted) out.push(el.id || el.name);
+      });
+      Object.keys(radios).forEach((g) => { if (!radios[g].some(Boolean)) out.push(g); });
+    });
+    return out;
+  };
   return (async () => {
-    window.__navFill = null;
-    fillMaximumPath(fillPath === 'minimum' ? { markers: true, minimum: true } : {})
-      .then(() => { window.__navFill = 'ok'; }, (e) => { window.__navFill = 'failed: ' + e; });
-    for (let i = 0; i < 360 && !window.__navFill; i++) await wait(500);
-    if (window.__navFill !== 'ok') return { error: 'the ' + fillPath + ' fill ' + (window.__navFill || 'never finished') };
-    await wait(2500);
+    // Press the button the way a person does: the debug menu open - it is
+    // where the buttons are - and the clock running.
+    const btnId = fillPath === 'minimum' ? 'fillMinimumPathBtn' : 'fillMaximumPathBtn';
+    if (typeof showDebugMenu === 'function') showDebugMenu();
+    await wait(500);
+    const fillBtn = document.getElementById(btnId);
+    if (!fillBtn) return { error: 'the page has no ' + btnId + ' button' };
+    const t0 = performance.now();
+    fillBtn.click();
+    let fillMs = null;
+    for (let i = 0; i < 1800; i++) {
+      await wait(100);
+      const text = fillBtn.textContent || '';
+      if (/❌/.test(text)) return { error: 'the ' + fillPath + ' fill failed: ' + text.trim() };
+      if (!window.__MAX_FILL_IN_PROGRESS__ && /✅/.test(text)) { fillMs = Math.round(performance.now() - t0); break; }
+    }
+    if (fillMs === null) return { error: 'the ' + fillPath + ' fill never finished' };
+    if (typeof hideDebugMenu === 'function') hideDebugMenu();
+    // The page answers a fill with deferred work of its own, which has emptied
+    // repeating blocks before. What the fill recorded must still be there.
+    await wait(3000);
+    const recorded = window.__BAKED_FILLS__ && window.__BAKED_FILLS__[fillPath];
+    const drift = (recorded && typeof bakedFillDifferences === 'function') ? bakedFillDifferences(recorded) : null;
+    // How the page looks now, before the walk moves anything, to hold against
+    // the worked-out fill: what is drawn, not only what is stored.
+    const appearance = window.__fwAppearance ? window.__fwAppearance() : null;
 
     if (typeof sectionStack !== 'undefined' && Array.isArray(sectionStack)) sectionStack.length = 0;
     navigateSection(1);
@@ -163,9 +239,15 @@ function walkInPage(fillPath) {
     });
     const forward = [activeSection()];
     let stuck = null;
+    const empty = {};
     for (let press = 0; press < 3000; press++) {
       const btn = arrow(1);
       const here = activeSection();
+      // What is on screen now - in question mode, one question per press.
+      emptyOnScreen(here).forEach((id) => {
+        empty[here] = empty[here] || [];
+        if (!empty[here].includes(id)) empty[here].push(id);
+      });
       // Leaving the last open section finishes the form and builds the PDFs.
       // The walk ends on that section instead: it is where Back starts from.
       const leavesSection = !btn || btn.dataset.advanceMode !== 'question';
@@ -215,6 +297,10 @@ function walkInPage(fillPath) {
     const on = (typeof getProjectForms === 'function')
       ? getProjectForms().filter((f) => isFormActivated(f)).map((f) => f.name) : [];
     return {
+      fillMs,
+      appearance,
+      drift: drift && { differences: drift.differences, differ: drift.differ },
+      empty: Object.keys(empty).map((n) => Object.assign(describe(Number(n)), { fields: empty[n] })),
       formsOn: on,
       thankYouBack: thankYouBack && { expected: describe(thankYouBack.expected), went: describe(thankYouBack.went) },
       stuck: stuck === null ? null : describe(stuck),
@@ -224,11 +310,171 @@ function walkInPage(fillPath) {
   })();
 }
 
-function check(result) {
+/**
+ * Runs inside the page: every answer, and how every element in the form is
+ * drawn - its classes, and whether it is switched off by style or hidden.
+ * Elements without an id are named by the nearest one that has one. Which
+ * sections the filer can reach is kept too; what lies in a section they cannot
+ * reach - a form the answers left off - is marked, because nobody sees it and
+ * no PDF is made from it.
+ */
+function appearanceInPage() {
+  const values = {};
+  const classes = {};
+  const off = {};
+  const plumbing = {};
+  const reach = {};
+  const counters = {};
+  const sectionOpen = (sec) => {
+    if (!(sec.id in reach)) {
+      const n = Number(String(sec.id).replace(/^section/, ''));
+      reach[sec.id] = !n || typeof sectionReachable !== 'function' || !!sectionReachable(n);
+    }
+    return reach[sec.id];
+  };
+  document.querySelectorAll('#customForm *').forEach((el) => {
+    let key;
+    if (el.id) key = '#' + el.id;
+    else {
+      const a = el.parentElement && el.parentElement.closest('[id]');
+      const base = (a ? '#' + a.id : '') + '>' + el.tagName;
+      counters[base] = (counters[base] || 0) + 1;
+      key = base + counters[base];
+    }
+    classes[key] = ((typeof el.className === 'string' ? el.className : '')
+      + (el.style && el.style.display === 'none' ? ' [display:none]' : '')
+      + (el.hidden ? ' [hidden]' : '')).trim();
+    const sec = el.closest('.section');
+    if (sec && !sectionOpen(sec)) off[key] = true;
+    // Plumbing: an element outside every section that the page never draws -
+    // the hidden boxes a fill adds to carry an answer to the PDF. Its value is
+    // still compared; whether it exists is not, since an unticked box and no
+    // box print the same and nobody sees either.
+    if (!sec && getComputedStyle(el).display === 'none') plumbing[key] = true;
+    if (/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName) && el.id && el.type !== 'hidden' && el.type !== 'file') {
+      values[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : String(el.value || '');
+    }
+  });
+  return { values, classes, off, plumbing, reach };
+}
+
+/** Runs inside the page: the worked-out fill, then how the page looks after it. */
+function workedOutInPage(fillPath) {
+  return (async () => {
+    await fillMaximumPath(fillPath === 'minimum'
+      ? { markers: true, minimum: true, solve: true } : { markers: true, solve: true });
+    await new Promise((r) => setTimeout(r, 3000));
+    return window.__fwAppearance();
+  })();
+}
+
+/**
+ * Where two pages differ: "value <id>: ..." and "drawn <element>: ...".
+ *
+ * A box left unticked, an empty box and a box that is not there say the same
+ * thing, to the filer and to the PDF. So do two pages that differ only inside
+ * a form neither of them switched on. Which forms are on is compared on its
+ * own: a section open after one fill and shut after the other is reported.
+ */
+function appearanceDifferences(a, b) {
+  const out = [];
+  const norm = (v) => (v === false || v === undefined || v === null) ? '' : String(v);
+  const off = (k) => !!((a.off && a.off[k]) || (b.off && b.off[k]));
+  new Set([...Object.keys(a.reach || {}), ...Object.keys(b.reach || {})]).forEach((id) => {
+    const x = !!(a.reach && a.reach[id]);
+    const y = !!(b.reach && b.reach[id]);
+    if (x !== y) out.push('drawn #' + id + ': reachable only after the ' + (x ? 'worked-out fill' : 'button'));
+  });
+  new Set([...Object.keys(a.values), ...Object.keys(b.values)]).forEach((id) => {
+    if (off('#' + id)) return;
+    const x = norm(a.values[id]);
+    const y = norm(b.values[id]);
+    if (x !== y) out.push('value ' + id + ': worked out ' + JSON.stringify(x) + ', button ' + JSON.stringify(y));
+  });
+  new Set([...Object.keys(a.classes), ...Object.keys(b.classes)]).forEach((k) => {
+    if (off(k)) return;
+    // On one page only, and plumbing there: its value was compared above.
+    if (!(k in a.classes) && b.plumbing && b.plumbing[k]) return;
+    if (!(k in b.classes) && a.plumbing && a.plumbing[k]) return;
+    if (!(k in a.classes)) { out.push('drawn ' + k + ': only after the button'); return; }
+    if (!(k in b.classes)) { out.push('drawn ' + k + ': only after the worked-out fill'); return; }
+    if (a.classes[k] === b.classes[k]) return;
+    const ta = new Set(a.classes[k].split(/\s+/).filter(Boolean));
+    const tb = new Set(b.classes[k].split(/\s+/).filter(Boolean));
+    const lost = [...ta].filter((t) => !tb.has(t));
+    const gained = [...tb].filter((t) => !ta.has(t));
+    out.push('drawn ' + k + ':' + (lost.length ? ' missing ' + lost.join(' ') : '') + (gained.length ? ' extra ' + gained.join(' ') : ''));
+  });
+  return out;
+}
+
+/**
+ * Open the page in a fresh tab with empty storage - the page saves its answers
+ * as it fills, and one tab's must not come back in the next - run one
+ * expression in it, and close it. Null when the page never loads.
+ */
+async function inPage(send, url, expression) {
+  const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
+  try {
+    const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
+    await send('Runtime.enable', {}, sessionId);
+    await send('Page.enable', {}, sessionId);
+    await send('Storage.clearDataForOrigin', { origin: new URL(url).origin, storageTypes: 'all' }, sessionId);
+    await send('Page.navigate', { url }, sessionId);
+    let ready = false;
+    for (let i = 0; i < 120 && !ready; i++) {
+      await new Promise((r) => setTimeout(r, 500));
+      try {
+        ready = await evaluate(send, sessionId,
+          "document.readyState === 'complete' && typeof fillMaximumPath === 'function' && !!document.querySelector('.section.active')", 5000);
+      } catch (e) { ready = false; }
+    }
+    if (!ready) return null;
+    await new Promise((r) => setTimeout(r, 2000));
+    await evaluate(send, sessionId, 'window.__fwAppearance = ' + appearanceInPage.toString());
+    return await evaluate(send, sessionId, expression);
+  } finally {
+    await send('Target.closeTarget', { targetId });
+  }
+}
+
+function check(result, fillPath) {
   const problems = [];
   if (result.error) return [result.error];
   const fwd = result.forward.map((s) => s.section);
   const bwd = result.back.map((s) => s.section);
+  if (result.fillMs > FILL_BUDGET_MS) {
+    problems.push('Pressing Fill ' + fillPath + ' path took ' + (result.fillMs / 1000).toFixed(1)
+      + ' s - the budget is ' + (FILL_BUDGET_MS / 1000).toFixed(1) + ' s');
+  }
+  if (result.drift && result.drift.differences) {
+    problems.push(result.drift.differences + ' answers the fill wrote were gone 3 s later (e.g. '
+      + result.drift.differ.slice(0, 5).join(', ') + ')');
+  }
+  (result.empty || []).forEach((s) => {
+    problems.push('section ' + s.section + ' (' + s.form + ' "' + s.title + '") shows ' + s.fields.length
+      + ' empty field' + (s.fields.length === 1 ? '' : 's') + ' after the fill: '
+      + s.fields.slice(0, 6).join(', ') + (s.fields.length > 6 ? ', ...' : ''));
+  });
+  const diffs = result.appearanceDifferences || [];
+  const answers = diffs.filter((d) => d.indexOf('value ') === 0);
+  if (answers.length) {
+    problems.push(answers.length + ' answer' + (answers.length === 1 ? '' : 's')
+      + ' after pressing the button differ from the worked-out fill: '
+      + answers.slice(0, 4).join('; ') + (answers.length > 4 ? '; ...' : ''));
+  }
+  const kinds = {};
+  diffs.filter((d) => d.indexOf('drawn ') === 0).forEach((d) => {
+    const colon = d.indexOf(':');
+    const kind = d.slice(colon + 1).trim();
+    (kinds[kind] = kinds[kind] || []).push(d.slice(6, colon));
+  });
+  Object.keys(kinds).forEach((kind) => {
+    const els = kinds[kind];
+    problems.push(els.length + ' element' + (els.length === 1 ? '' : 's')
+      + ' drawn differently after pressing the button than after the worked-out fill (' + kind + '), e.g. '
+      + els.slice(0, 3).join(', '));
+  });
   if (result.stuck) {
     problems.push('Next is disabled on section ' + result.stuck.section + ' (' + result.stuck.form
       + ' "' + result.stuck.title + '") although the fill answered it and later sections are open');
@@ -283,37 +529,41 @@ function check(result) {
     for (const mode of MODES) {
       for (const fillPath of PATHS) {
         const url = SERVER + '/live-sites/' + SITE + '/' + mode + '.html';
-        const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
-        const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
-        await send('Runtime.enable', {}, sessionId);
-        await send('Page.enable', {}, sessionId);
-        await send('Page.navigate', { url }, sessionId);
-        let ready = false;
-        for (let i = 0; i < 120 && !ready; i++) {
-          await new Promise((r) => setTimeout(r, 500));
-          try {
-            ready = await evaluate(send, sessionId,
-              "document.readyState === 'complete' && typeof fillMaximumPath === 'function' && !!document.querySelector('.section.active')", 5000);
-          } catch (e) { ready = false; }
-        }
         const label = mode + ' page, ' + fillPath + ' path';
-        if (!ready) {
+        // What the button has to leave on the page: the worked-out fill, in a
+        // tab of its own.
+        const workedOut = () => inPage(send, url, '(' + workedOutInPage.toString() + ')(' + JSON.stringify(fillPath) + ')');
+        const reference = await workedOut();
+        const result = await inPage(send, url, '(' + walkInPage.toString() + ')(' + JSON.stringify(fillPath) + ')');
+        if (!result) {
           console.log('FAILS  ' + label + ': the page never finished loading');
           failed++;
-        } else {
-          await new Promise((r) => setTimeout(r, 2000));
-          const result = await evaluate(send, sessionId, '(' + walkInPage.toString() + ')(' + JSON.stringify(fillPath) + ')');
-          const problems = check(result);
-          console.log((problems.length ? 'FAILS  ' : 'passes ') + label
-            + (result.forward ? '   ' + result.forward.length + ' sections forward, ' + result.back.length + ' back' : ''));
-          if (result.forward) {
-            console.log('   Next: ' + result.forward.map((s) => s.section + ' ' + s.form).join(' > '));
-            console.log('   Back: ' + result.back.map((s) => s.section + ' ' + s.form).join(' > '));
-          }
-          problems.forEach((p) => console.log('   - ' + p));
-          if (problems.length) failed++;
+          continue;
         }
-        await send('Target.closeTarget', { targetId });
+        if (reference && result.appearance) {
+          let differences = appearanceDifferences(reference, result.appearance);
+          // The worked-out fill races the page now and then - it once left the
+          // animals' entries empty - so a difference counts only when a second
+          // worked-out run shows it too.
+          if (differences.length) {
+            const again = await workedOut();
+            if (again) {
+              const second = new Set(appearanceDifferences(again, result.appearance));
+              differences = differences.filter((d) => second.has(d));
+            }
+          }
+          result.appearanceDifferences = differences;
+        }
+        const problems = check(result, fillPath);
+        console.log((problems.length ? 'FAILS  ' : 'passes ') + label
+          + (result.fillMs ? '   fill ' + (result.fillMs / 1000).toFixed(1) + ' s,' : '')
+          + (result.forward ? '   ' + result.forward.length + ' sections forward, ' + result.back.length + ' back' : ''));
+        if (result.forward) {
+          console.log('   Next: ' + result.forward.map((s) => s.section + ' ' + s.form).join(' > '));
+          console.log('   Back: ' + result.back.map((s) => s.section + ' ' + s.form).join(' > '));
+        }
+        problems.forEach((p) => console.log('   - ' + p));
+        if (problems.length) failed++;
       }
     }
   } finally {
@@ -321,6 +571,8 @@ function check(result) {
     browser.proc.kill();
     setTimeout(() => { try { fs.rmSync(browser.profile, { recursive: true, force: true }); } catch (e) { /* locked by Chrome for a moment */ } }, 1500);
   }
-  console.log(failed ? '\nNOT SHIPPABLE - Back does not retrace Next' : '\nBack retraces Next on every path walked');
+  console.log(failed
+    ? '\nNOT SHIPPABLE - ' + failed + ' path' + (failed === 1 ? '' : 's') + ' failed (above)'
+    : '\nThe fill buttons are quick and complete, and Back retraces Next on every path walked');
   process.exitCode = failed ? 1 : 0;
 })().catch((err) => { console.error(err); process.exit(1); });

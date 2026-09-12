@@ -268,6 +268,9 @@ function loadFormData(formData) {
     window.__BUILDER_PROJECT_FORMS__ = Array.isArray(formData.projectForms) ? formData.projectForms : [];
     window.__BUILDER_FORM_ACTIVATIONS__ = Array.isArray(formData.formActivations) ? formData.formActivations : [];
     window.__BUILDER_PACKET_MIRRORS__ = Array.isArray(formData.packetMirrors) ? formData.packetMirrors : [];
+    // The minimum and maximum debug fills recorded when the site was last built
+    // (live-site-builder.js). generate.js bakes them into the page.
+    window.__BUILDER_FILL_PATHS__ = formData.fillPaths && typeof formData.fillPaths === 'object' ? formData.fillPaths : null;
     if (typeof showFormBuilderImportLoading === 'function') {
         try {
             showFormBuilderImportLoading();

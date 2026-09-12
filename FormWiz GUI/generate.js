@@ -7330,6 +7330,9 @@ if (s > 1){
   formHTML += `var questionSlugMap = ${JSON.stringify(questionSlugMap || {})};\n`;
   formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
   formHTML += `window.__FORM_LOGIC__ = ${JSON.stringify(formLogicModel || {})};\n`;
+  // The finished minimum and maximum paths, recorded when the site was built
+  // (live-site-builder.js, kept in the GUI JSON as fillPaths). See bakedFillFor.
+  formHTML += `window.__BAKED_FILLS__ = ${JSON.stringify(window.__BUILDER_FILL_PATHS__ || null).replace(/</g, '\\u003c')};\n`;
   formHTML += `var linkedCheckboxes = ${JSON.stringify(linkedCheckboxes || [])};\n`;
   formHTML += `var inverseCheckboxes = ${JSON.stringify(inverseCheckboxes || [])};\n`;
   formHTML += `var checkboxRequiredMap = ${JSON.stringify(checkboxRequiredMap || {})};\n`;
@@ -14974,6 +14977,25 @@ function applyComputedFields(){
         // spouse", "grandparent". Asking it again in the filer's own words was
         // the same question twice. A dropdown's choice ticks a hidden box of
         // its own, so a relative's kind reads the same way.
+        // Answers joined into one box, but only while a box is ticked. DV-100
+        // item 3a prints the children's names after "We have a child or
+        // children together"; the children are also asked for a custody
+        // request made without that box, and their names must not print
+        // beside an empty one.
+        if (rule.joinWhenTicked && Array.isArray(rule.joinWhenTicked.fields)){
+            var jw = rule.joinWhenTicked;
+            var gateBox = document.getElementById(jw.when);
+            var gateOn = !!gateBox && ((gateBox.type === "checkbox" || gateBox.type === "radio")
+                ? gateBox.checked : String(gateBox.value || "").trim() !== "");
+            var joined = [];
+            jw.fields.forEach(function(id){
+                var el = document.getElementById(id);
+                var v = el ? String(el.value || "").trim() : "";
+                if (v) joined.push(v);
+            });
+            writeComputedField(rule.nameId, gateOn ? joined.join(jw.separator == null ? ", " : jw.separator) : "");
+            return;
+        }
         if (Array.isArray(rule.wordsWhenTicked)){
             var words = [];
             rule.wordsWhenTicked.forEach(function(w){
@@ -22727,6 +22749,156 @@ async function fillMaximumPathPass(pass) {
  * the second, which is how thirty questions about further abuse stayed on
  * screen for a filer who had said it happened once.
  */
+/**
+ * The finished answers of a debug fill, recorded when the page was built.
+ *
+ * Working the path out takes about twenty milliseconds; what made the buttons
+ * lag was writing a thousand fields one at a time, each change re-running the
+ * page's logic - 5,000 events for the maximum path, 25,000 for the minimum -
+ * and then waiting for the page to go quiet. The site builder runs both fills
+ * once, records every field's final value and which questions end up shown,
+ * and bakes that into the page (window.__BAKED_FILLS__) and the site's GUI
+ * JSON (fillPaths). A button then puts the recorded state back in one sweep.
+ * Only the variant that was recorded - markers or not - is used, and only on
+ * the form logic it was recorded from; anything else is still worked out on
+ * the spot.
+ */
+function fwLogicSignature() {
+  var s = JSON.stringify(window.__FORM_LOGIC__ || {});
+  var h = 5381;
+  for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+  return s.length + ':' + (h >>> 0).toString(36);
+}
+
+function bakedFillFor(minimum, markers) {
+  var baked = window.__BAKED_FILLS__;
+  var snap = baked && baked[minimum ? 'minimum' : 'maximum'];
+  if (!snap || !snap.values || !!snap.markers !== !!markers) return null;
+  if (snap.logic && snap.logic !== fwLogicSignature()) {
+    console.warn('The recorded ' + (minimum ? 'minimum' : 'maximum') + ' path is from other questions; working it out instead.');
+    return null;
+  }
+  return snap;
+}
+
+function bakedControls() {
+  var form = document.getElementById('customForm');
+  if (!form) return [];
+  return Array.prototype.slice.call(form.querySelectorAll('input, select, textarea'))
+    .concat(Array.prototype.slice.call(document.querySelectorAll('[form="customForm"]')));
+}
+
+// Not part of a recording: controls with no id, and hidden fields - the page
+// computes those (today's date among them), and the calculations that close
+// every fill write them.
+function bakedSkip(el) {
+  return !el.id || el.type === 'file' || el.type === 'button' || el.type === 'submit' || el.type === 'hidden';
+}
+
+/** The fields that do not hold what was recorded, once a fill is finished. */
+function bakedFillDifferences(snap) {
+  var values = snap.values;
+  var has = function (id) { return Object.prototype.hasOwnProperty.call(values, id); };
+  var differ = [];
+  bakedControls().forEach(function (el) {
+    if (bakedSkip(el)) return;
+    var box = el.type === 'checkbox' || el.type === 'radio';
+    var now = box ? el.checked : String(el.value || '');
+    var want = box ? (has(el.id) && values[el.id] === true) : (has(el.id) ? String(values[el.id]) : '');
+    if (now !== want && !(el.tagName === 'SELECT' && !want && el.selectedIndex === 0)) differ.push(el.id);
+  });
+  var missing = Object.keys(values).filter(function (id) { return !document.getElementById(id); });
+  return { answers: Object.keys(values).length, differences: differ.length, differ: differ.slice(0, 20),
+           missing: missing.length, missingIds: missing.slice(0, 20) };
+}
+
+async function applyBakedFill(snap) {
+  var values = snap.values;
+  var shown = new Set(snap.shown || []);
+  var controls = bakedControls;
+  var isChoice = function (el) {
+    return el.tagName === 'SELECT' || el.type === 'checkbox' || el.type === 'radio';
+  };
+  var skip = bakedSkip;
+  // Put one control in its recorded state, without firing anything. Returns
+  // whether it moved.
+  var write = function (el) {
+    if (skip(el)) return false;
+    var has = Object.prototype.hasOwnProperty.call(values, el.id);
+    if (el.type === 'checkbox' || el.type === 'radio') {
+      var want = has && values[el.id] === true;
+      if (el.checked === want) return false;
+      el.checked = want;
+      return true;
+    }
+    var v = has ? String(values[el.id]) : '';
+    if (el.tagName === 'SELECT') {
+      if (el.value === v) return false;
+      el.value = v;
+      if (el.value !== v) el.selectedIndex = 0;
+      return true;
+    }
+    if (String(el.value || '') === v) return false;
+    el.value = v;
+    return true;
+  };
+  var setShown = function () {
+    document.querySelectorAll('.question-container').forEach(function (c) {
+      if (!c.id) return;
+      if (shown.has(c.id)) c.classList.remove('hidden');
+      else if (!c.classList.contains('hidden')) c.classList.add('hidden');
+    });
+  };
+
+  var sweep = function () {
+    // 1. Every choice, silently, and the questions they show; then one change
+    //    per choice that moved, to build what it implies - the entries of a
+    //    repeating block, the box a dropdown answer mirrors. The entries just
+    //    built have choices of their own (a child's "lives with you"), so round
+    //    again until a round moves nothing.
+    for (var round = 0; round < 6; round++) {
+      var moved = [];
+      controls().forEach(function (el) { if (isChoice(el) && write(el)) moved.push(el); });
+      if (!moved.length) break;
+      setShown();
+      moved.forEach(function (el) {
+        if (typeof triggerFieldChange === 'function') triggerFieldChange(el);
+        if (el.tagName === 'SELECT' && typeof triggerSelectSideEffects === 'function') triggerSelectSideEffects(el);
+      });
+    }
+    // 2. Everything else - the written answers, in the entries too - silently;
+    //    and the choices once more, since the logic just re-ran.
+    controls().forEach(write);
+    setShown();
+    fillSolvedPhoneSplits();
+    // 3. What the page draws from a value, not the value. A date box paints its
+    //    date transparent and its caption over it until it is marked as holding
+    //    one, and only an event marks it: written silently, 46 dates held their
+    //    values behind "Date of the order".
+    if (typeof fwSyncDateFields === 'function') fwSyncDateFields();
+  };
+  sweep();
+  // 3. Hold it there. The page answers those changes with work of its own a
+  //    moment later: 250ms after the fill it rebuilt four repeating blocks'
+  //    entries empty - 176 fields - and Next stayed locked on the section that
+  //    held them. So wait for the page to go quiet, putting back whatever
+  //    moved, as the worked-out fill's settle does. A repair that only writes
+  //    typed answers fires nothing, so it does not set the page off again.
+  //    Counted in looks, not by the clock: a busy page ate a five-second
+  //    deadline before the first look, and the entries it had emptied - the
+  //    restraining orders' dates among them - stayed empty.
+  var clean = 0, repairs = 0;
+  for (var look = 0; look < 12 && clean < 2; look++) {
+    await new Promise(function (resolve) { setTimeout(resolve, 300); });
+    if (!bakedFillDifferences(snap).differences) { clean++; continue; }
+    clean = 0;
+    if (repairs >= 6) break;
+    repairs++;
+    sweep();
+  }
+  return repairs;
+}
+
 async function fillMaximumPath(options) {
   // A field created since the last sweep has no cap yet, and the fill is about
   // to ask every box how much it holds.
@@ -22756,7 +22928,14 @@ async function fillMaximumPath(options) {
     // generate.js emitted a logic model: such a page has the conditions only
     // in its closures, so there is nothing to solve from.
     const solvable = !!(window.__FORM_LOGIC__ && Object.keys(window.__FORM_LOGIC__).length);
-    if (solvable) {
+    // The path recorded when the page was built, when there is one for this
+    // variant: put back in one sweep rather than worked out and typed in.
+    const baked = (options && options.solve) ? null : bakedFillFor(minimum, markers);
+    if (baked) {
+      fillProgress({ text: 'Filling from the recorded path', percent: 50 });
+      await fillPaint();
+      await applyBakedFill(baked);
+    } else if (solvable) {
       fillProgress({ text: 'Working out the path', percent: 4 });
       await fillPaint();
       await fillSolvedPath({ minimum: minimum });
@@ -22801,9 +22980,11 @@ async function fillMaximumPath(options) {
     if (typeof applyComputedFields === 'function') {
       applyComputedFields();
     }
-    const filledCount = solvable ? countSolvedFields() : countExportableFields();
+    // What did not land where it was recorded, for anyone checking.
+    if (baked) window.__lastBakedFill = bakedFillDifferences(baked);
+    const filledCount = (baked || solvable) ? countSolvedFields() : countExportableFields();
     fillProgress({ text: filledCount + ' fields filled', percent: 100 });
-    await new Promise(function (resolve) { setTimeout(resolve, 450); });
+    await new Promise(function (resolve) { setTimeout(resolve, baked ? 120 : 450); });
     if (btn) {
       btn.textContent = '✅ ' + filledCount + ' fields filled';
       setTimeout(function() {
@@ -23066,9 +23247,12 @@ function insertFormNameInput() {
     container.insertBefore(formNameInput, container.firstChild);
   }
 }
-// Update content when form values change
+// Update content when form values change - not during a debug fill, for the
+// reason the change listener below gives. This one had no such guard, and with
+// the menu open (it is how a fill is started) every event the fill fired
+// rebuilt the whole list: pressing Fill maximum path took 45 seconds, not one.
 document.addEventListener('input', function() {
-  if (debugMenuVisible) {
+  if (debugMenuVisible && !window.__MAX_FILL_IN_PROGRESS__) {
     populateDebugContent();
   }
 });

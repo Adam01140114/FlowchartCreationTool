@@ -1097,6 +1097,10 @@ its title (RULE 15) - the flag is what makes it skippable.
 
 ## Running it
 
+This is the command sequence. The full audit procedure - what each check proves
+and cannot see, how to test a feature by hand, and the safety rules for the
+user's data - is [`AUDIT.md`](./AUDIT.md); follow it before calling anything done.
+
 ```bash
 # 1. cross-form identity, then rebuild the PDFs whose field names changed
 node pipeline-connect.js
@@ -1124,7 +1128,9 @@ node pipeline-disqualifiers.js --check    # every declared one has an alert
 # 6. fill the form (debug menu: Ctrl+Shift, then "Fill maximum path"),
 #    save the answers, and produce the PDFs
 node pipeline-fill.js --render   # every form in the packet, not a list kept here
-node pipeline-nav-audit.js       # publish first: Next to the end, Back to the start, same sections
+#    publish first (the publish-live-site skill) - it also records the fill paths
+node pipeline-nav-audit.js       # presses each fill button (menu open, 3 s budget,
+                                 # no empty field shown), then Next to the end and Back to the start
 node pipeline-explain.js dv110
 
 # 7. read the interview yourself. This step is not optional and no packet
@@ -1169,6 +1175,26 @@ field-by-field value check both reported nothing wrong.
 Full procedure, and what a legitimate blank looks like on a Judicial Council
 form: [`PDF-PAGE-AUDIT.md`](./PDF-PAGE-AUDIT.md).
 
+## A form an answer brings in gets its data whenever that answer is given
+
+When an answer switches a form on, every question on another form that fills
+that form's boxes must be asked whenever that answer is given - not only after
+some other choice the filer may not make.
+
+DV-105 and DV-140 come in on "Child custody and visitation", and both list the
+children. The children were asked only after "We have a child or children
+together", so a custody request without that box (a guardian, say) reached
+DV-140 item 3 ticked with no child named. The block is now asked after
+"children together" OR "Child custody and visitation", placed after the orders
+question so both answers are known when it is reached. DV-100 item 3a prints
+the names beside its "children together" box, so that line is a computed field
+(`joinWhenTicked`) filled only while the box is ticked.
+
+`pipeline-audit.js` RULE 18 checks it: for each form brought in by an answer, it
+walks every feeding question's conditions from that answer - and from the
+answers that bring in the form the answer is asked on (DV-108 through DV-105 to
+DV-100) - and fails any question that also needs some other, unrelated choice.
+
 ## Section names are short, and every title speaks to the filer
 
 A section name names what the section is about in a few words: at most 32
@@ -1210,6 +1236,30 @@ restrained person look like?" was never asked. `dropEmptySections` now sends a
 jump into a dropped section to the next section still there (or the end), and
 `pipeline-audit.js` fails any jump whose section does not exist (JUMPS).
 
+The fill buttons are pressed too. The recorded fill (the minimum and maximum
+paths baked into the page at build time) passed every check when called from a
+script with the debug menu shut: about a second, every answer the same as the
+worked-out fill. Pressed for real, with the menu open, it took 45 seconds. The
+menu rebuilt its list of every field on each `input` event (the `change`
+listener already skipped a fill; this one did not). Meanwhile the page emptied
+the restraining orders' dates, and the fill's settle ran out of time before it
+could put them back. So the audit opens the menu and clicks the button. It fails
+a fill over `--fill-budget` (3000 ms), fails when answers the fill wrote are gone
+three seconds later, and fails when any section the walk passes shows an empty
+field on a question it shows.
+
+With that fixed, the restraining orders' dates were still blank on screen. Every
+date held its value; 46 date boxes drew their caption ("Date of the order") over
+it. The CSS paints a date transparent until its box has `fw-has-value`, and only
+an event sets that class, which the recorded fill does not fire. Every check had
+asked what a field holds; the filer sees what it draws. So the audit now judges
+by what is drawn. A value painted transparent or hidden counts as empty. It also
+holds the page after the button against the page after the worked-out fill, run
+in a tab of its own with empty storage: every answer, and every element's
+classes. That comparison is what found the 46, the only difference across 4,414
+elements. A difference counts only when a second worked-out run shows it too,
+because the worked-out fill occasionally races the page.
+
 ## The two fill modes
 
 Both live in the preview's debug menu (Ctrl+Shift), and both write each field's
@@ -1234,6 +1284,26 @@ this one, which is how thirty questions about further abuse stayed on screen for
 a filer who had just said it happened once.
 
 Run both. Neither is sufficient alone, and each takes a few seconds.
+
+### Recorded paths
+
+Working a path out takes about twenty milliseconds; writing a thousand answers
+one change event at a time took 3 s for the maximum path and 9 s for the
+minimum. So publishing records both. `live-site-builder.js` runs each fill in a
+hidden frame, twice, with Firebase stripped and an in-memory `localStorage`, and
+keeps a recording only when both runs agree. The recording is every field's
+final value and which questions are shown, stored as `fillPaths` in the GUI JSON
+and as `window.__BAKED_FILLS__` in the pages. The buttons then put it back
+(`applyBakedFill`): choices first, with one change event each where the page
+has to build something (a block's entries, a mirrored box); then the typed
+answers, silently; then what the page draws from values (`fwSyncDateFields`).
+Then it waits for the page to go quiet and puts back whatever the page's own
+deferred work moved.
+
+A recording names the form logic it came from (`fwLogicSignature`). A page
+whose questions have changed since ignores it and works the path out, so
+publish again after changing the interview. `pipeline-nav-audit.js` checks
+that the button leaves the page exactly as the worked-out fill does.
 
 Either can be run on a page the other has already filled. A fill clears the
 questions its path does not reach, the way the generated logic clears a question

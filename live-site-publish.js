@@ -169,9 +169,11 @@
     try {
       const projectId = typeof window.currentProjectId === 'function' ? window.currentProjectId(true) : '';
       let published = false;
+      let served = null;
       if (projectId) {
         const res = await fetch('/api/live-site?projectId=' + encodeURIComponent(projectId));
         published = res.ok;
+        if (res.ok) served = await res.json();
       }
       let out = null;
       if (!published) {
@@ -179,13 +181,16 @@
         out = await window.publishProjectLiveSite();
         if (!out) throw new Error('The live site could not be built');
       }
-      // The link carries the project id: /form/<id>/section.html. The server
-      // finds whichever folder holds that project's site, so the same link works
-      // for any flowchart with an id, before and after a rename.
+      // The link carries the project id and the moment it was saved:
+      // /form/<id>/section.html?saved=9-12-26_3-06pm. The server finds whichever
+      // folder holds that project's site, so the same link works for any
+      // flowchart with an id, before and after a rename, and sends a stale stamp
+      // on to the newest.
       const id = projectId || (out && out.projectId) || '';
-      const link = id
-        ? '/form/' + encodeURIComponent(id) + '/section.html'
-        : (out && out.pages && (out.pages.section || out.pages.question));
+      const link = (served && served.formLinks && served.formLinks.section)
+        || (out && out.formLinks && out.formLinks.section)
+        || (id ? '/form/' + encodeURIComponent(id) + '/section.html'
+          : (out && out.pages && (out.pages.section || out.pages.question)));
       if (!link) throw new Error('The live site could not be built');
       const url = new URL(link, location.origin).href;
       if (tab && !tab.closed) tab.location.href = url;

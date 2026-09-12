@@ -623,11 +623,17 @@ function repeatTemplateNames(spec) {
  * you?" - and its two PDF checkboxes belong to the entry as much as the name
  * and age beside them, even though neither is numbered the way the others are.
  */
-function applyRepeats(fields, hints) {
+function applyRepeats(fields, hints, allFields) {
   const specs = hints.repeats || [];
   if (!specs.length) return { fields, repeats: [] };
 
   const byName = new Map(fields.map((f) => [f.nameId, f]));
+  // Every field the form has, before anything claimed some of them. A block
+  // with no fields of its own is anchored by what it absorbs, and those can be
+  // spoken for already - DV-100's names lines are a computed field and its
+  // continuation - which left the children block with no anchor, and it was
+  // silently dropped. The anchor is only a position in the form's order.
+  const anyByName = new Map((allFields || fields).map((f) => [f.nameId, f]));
   const absorbed = new Set();
   const repeats = [];
 
@@ -662,7 +668,7 @@ function applyRepeats(fields, hints) {
     // there are. "How many children do you have together?" then a name each is
     // the same information, so the block absorbs both lines and its entries are
     // joined into the first.
-    const absorbs = (spec.absorbs || []).map((n) => byName.get(n)).filter(Boolean);
+    const absorbs = (spec.absorbs || []).map((n) => byName.get(n) || anyByName.get(n)).filter(Boolean);
     absorbs.forEach((f) => absorbed.add(f.id));
 
     if (!members.length && !absorbs.length) return;
@@ -734,8 +740,16 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
     return step;
   }
 
+  // Set by hostFor for the step about to be placed: options of earlier
+  // questions this step also waits on (see hostFor).
+  let pendingAlsoWhen = null;
+
   /** Where does this step attach? Root spine, or under an option. */
   function place(step, host) {
+    if (pendingAlsoWhen) {
+      step.alsoWhen = pendingAlsoWhen;
+      pendingAlsoWhen = null;
+    }
     if (host && host.fromOptions) {
       // Gated on several options: it sits on the spine fed only by those
       // branches, with the others skipping around it. It must land directly
@@ -787,10 +801,21 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
     const hits = targets.map((t) => optionIndex.get(t) || optionIndex.get(slug(t))).filter(Boolean);
     if (hits.length && hits.length === targets.length) {
       // (a) all names are existing options
-      if (hits.length === 1) return hits[0].option;
+      // Options of different questions: a step can hang off only the branch
+      // it follows, the last of them. The earlier ones are kept as "also
+      // when" conditions, which the export adds beside the one its wiring
+      // gives. DV-100's children are asked after "We have a child or children
+      // together" OR "Child custody and visitation" - two questions apart -
+      // and hung under both, the first silently lost its wire.
+      const rootIndex = (h) => steps.indexOf(rootOf(h.option._owner));
+      const lastRoot = Math.max(...hits.map(rootIndex));
+      const near = hits.filter((h) => rootIndex(h) === lastRoot);
+      const far = hits.filter((h) => rootIndex(h) !== lastRoot);
+      pendingAlsoWhen = far.length ? far.map((h) => h.option.nameId) : null;
+      if (near.length === 1) return near[0].option;
       return {
-        fromOptions: hits.map((h) => h.option.nameId),
-        owners: hits.map((h) => h.option)
+        fromOptions: near.map((h) => h.option.nameId),
+        owners: near.map((h) => h.option)
       };
     }
 
@@ -1573,6 +1598,11 @@ function layoutSequence(b, steps, startY, centerX) {
     if (step.combine) attachCombine(q, step.combine);
     // The editor exports it as required: false, and the form lets the filer past it.
     if (step.optional) q._optional = true;
+    // Conditions the wiring cannot carry, in the style so they survive the
+    // editor; the export adds one per option named (library.js).
+    if (step.alsoWhen && step.alsoWhen.length) {
+      q.style += ';alsoWhen=' + encodeURIComponent(step.alsoWhen.join(','));
+    }
 
     if (!entry) entry = joinHub || q;
     if (incoming && incoming.length) {
@@ -1672,7 +1702,7 @@ function compile(schema, hints = {}) {
   // they need no machinery of their own.
   autofills.forEach((a) => joins.push(a));
   const { fields: combined, combines } = applyCombines(split, merged);
-  const { fields, repeats } = applyRepeats(combined, merged);
+  const { fields, repeats } = applyRepeats(combined, merged, normalizeFields(schema));
 
   // A block whose entries share one PDF box joins them the way a split does -
   // same linked-logic node, and the runtime already drops the empty ones, so
