@@ -824,8 +824,8 @@
                     <div class="panel-label">
                       <h3>Generated HTML form</h3>
                       <div class="view-toggle" role="group" aria-label="Form view">
-                        ${htmlUrl ? `<a class="toggle-btn${!oneUrl || defaultHtml === htmlUrl ? ' active' : ''}" href="${htmlUrl}" data-view-src="${htmlUrl}" rel="noopener">All-at-once</a>` : ''}
-                        ${oneUrl ? `<a class="toggle-btn${!htmlUrl || defaultHtml === oneUrl ? ' active' : ''}" href="${oneUrl}" data-view-src="${oneUrl}" rel="noopener">One-at-a-time</a>` : ''}
+                        ${htmlUrl ? `<a class="toggle-btn${!oneUrl || defaultHtml === htmlUrl ? ' active' : ''}" href="${htmlUrl}" data-view-src="${htmlUrl}" rel="noopener">${escapeHtml(form.formHtmlLabel || 'All-at-once')}</a>` : ''}
+                        ${oneUrl ? `<a class="toggle-btn${!htmlUrl || defaultHtml === oneUrl ? ' active' : ''}" href="${oneUrl}" data-view-src="${oneUrl}" rel="noopener">${escapeHtml(form.formHtmlOneAtATimeLabel || 'One-at-a-time')}</a>` : ''}
                       </div>
                     </div>
                     <div class="frame-wrap html">
@@ -880,12 +880,15 @@
         } catch (_) { /* highlight optional */ }
       }
 
+      // The view toggle first: its buttons are links, and until they are wired a
+      // click opens the form in the whole tab. Loading a long PDF used to hold
+      // that off for seconds.
+      if (iframe) wireViewToggle(card, iframe);
       const controller = createPdfViewer(viewerEl, fieldMap);
       if (pdfUrl) await controller.load(pdfUrl);
       if (iframe) {
         wireFormFocus(iframe, controller);
         if (pdfUrl) wireLiveFill(iframe, controller, formSlug, statusEl);
-        wireViewToggle(card, iframe);
       }
     }
 

@@ -29,6 +29,12 @@ function registerAutoFormRoutes(app, options = {}) {
   // demo.html uses absolute /Auto-Form-Creator/... URLs, so mount there.
   app.use('/Auto-Form-Creator', express.static(FRONTEND_DIR));
   app.use('/Forms', express.static(path.join(PUBLIC_DIR, 'Forms')));
+  // The Demo Form Hub's page is one module that starts by importing PDF.js
+  // from /vendor/pdfjs. Nothing served that path, so the import failed and the
+  // hub drew no form at all. Serve the build the project already installs.
+  app.use('/vendor/pdfjs', express.static(
+    path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'build')
+  ));
 
   // --- large bodies for the generation + publish endpoints --------------
   ['/api/auto-form', '/api/demo-hub', '/api/generate-field-config',

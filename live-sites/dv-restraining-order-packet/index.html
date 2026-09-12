@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>DV Packet 9/11/26 8:53pm</title>
+<script>
+(function () {
+  var pages = ["question","section"];
+  var params = new URLSearchParams(location.search);
+  var mode = String(params.get("mode") || "").toLowerCase();
+  if (pages.indexOf(mode) < 0) mode = pages[0];
+  params.delete("mode");
+  var rest = params.toString();
+  location.replace(mode + ".html" + (rest ? "?" + rest : "") + location.hash);
+})();
+</script></head>
+<body><noscript><h1>DV Packet 9/11/26 8:53pm</h1><ul><li><a href="question.html">One question at a time</a></li><li><a href="section.html">One section at a time</a></li></ul></noscript></body></html>
