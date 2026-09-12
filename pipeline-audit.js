@@ -772,6 +772,32 @@ async function main() {
   // sends the filer to the end: DV-110's "Do you know where the restrained
   // person lives?" answered No jumped to section 26 of a 23-section packet and
   // finished the form, skipping "What does the restrained person look like?".
+  // Rule 17: a section name is a short label, and every title speaks to the
+  // filer. CLETS-001's sections were "For Law Enforcement: The Person to
+  // Restrain" and "For Law Enforcement: You and Yours", and one question began
+  // "What does law enforcement need to know about you?" - long, and worded as
+  // though the page belonged to someone else, when the filer is the one who
+  // fills it in. The form printing a line for its eventual reader does not make
+  // that line a heading for the person answering.
+  const SECTION_MAX_CHARS = 32;
+  const SECTION_MAX_WORDS = 5;
+  const OTHER_READER = /\bfor\s+(the\s+)?(law enforcement|police|court|judge|clerk|office|official)s?\b|\b(law enforcement|the police|the court|the judge|the clerk)\s+(needs?|wants?|requires?|must have)\b|\bneeds? to know about you\b|\b(court|office|official)\s+use(\s+only)?\b/i;
+  report.rule17 = [];
+  (gui.sections || []).forEach((s) => {
+    const name = String(s.sectionName || '').trim();
+    const words = name ? name.split(/\s+/).length : 0;
+    if (name.length > SECTION_MAX_CHARS || words > SECTION_MAX_WORDS) {
+      report.rule17.push({ where: 'section ' + s.sectionId, text: name, why: name.length + ' characters, ' + words + ' words - keep it to ' + SECTION_MAX_CHARS + ' and ' + SECTION_MAX_WORDS });
+    }
+    if (/:/.test(name)) report.rule17.push({ where: 'section ' + s.sectionId, text: name, why: 'a colon means a prefix or a qualifier - name the section, nothing more' });
+    if (OTHER_READER.test(name)) report.rule17.push({ where: 'section ' + s.sectionId, text: name, why: 'names someone other than the filer as who it is for' });
+    (s.questions || []).forEach((q) => {
+      if (OTHER_READER.test(String(q.text || ''))) {
+        report.rule17.push({ where: 'q' + q.questionId, text: q.text, why: 'asks on behalf of someone else - ask the filer directly' });
+      }
+    });
+  });
+
   const sectionIds = new Set((gui.sections || []).map((s) => String(s.sectionId)));
   report.deadJumps = [];
   (gui.sections || []).forEach((s) => (s.questions || []).forEach((q) => {
@@ -1076,6 +1102,10 @@ async function main() {
   report.deadJumps.forEach((j) => console.log('  FAILS  q' + j.question + ' "' + String(j.text).slice(0, 60)
     + '" answered "' + j.option + '" jumps to section ' + j.to + ', which does not exist - the form would finish there'));
   console.log('');
+  console.log('RULE 17 — section names are short labels, and every title speaks to the filer');
+  if (!report.rule17.length) console.log('  passes');
+  report.rule17.forEach((r) => console.log('  FAILS  ' + r.where + ' "' + String(r.text).slice(0, 80) + '" - ' + r.why));
+  console.log('');
   console.log('RULE 5 — one group per form, named after the form');
   console.log('  groups: ' + (report.rule5.groups.length
     ? report.rule5.groups.map((g) => g.name + '(' + g.sections
@@ -1090,6 +1120,7 @@ async function main() {
   const blocking = [
     ['RULE 2 (CORNERSTONE)', (report.rule2wording || []).length],
     ['JUMPS', (report.deadJumps || []).length],
+    ['RULE 17', (report.rule17 || []).length],
     ['RULE 7', report.rule7.filter((f) => !f.pdfFile || (!f.alwaysIncluded && !f.activatedBy.length) || f.dead.length).length],
     ['RULE 8', report.rule8.compound.length],
     ['RULE 10', report.rule10.length],

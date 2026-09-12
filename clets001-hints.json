@@ -149,7 +149,7 @@
   },
   "sections": [
     {
-      "name": "For Law Enforcement: The Person to Restrain",
+      "name": "The Person to Restrain",
       "fields": [
         "case_number",
         "person_to_restrain_full_name",
@@ -174,7 +174,7 @@
       ]
     },
     {
-      "name": "For Law Enforcement: You and Yours",
+      "name": "Your Information",
       "fields": [
         "person_asking_protection_name",
         "clets_protected_person_gender_male",
@@ -237,7 +237,7 @@
       {"field":"clets_restrained_person_vehicle_model","label":"Model"},
       {"field":"clets_restrained_person_vehicle_year","label":"Year","type":"number"},
       {"field":"clets_restrained_person_vehicle_plate","label":"Plate number"} ] },
-  { "question": "What does law enforcement need to know about you? Your date of birth also puts your order in the federal database, which makes it easier to enforce outside California.", "fields": [
+  { "question": "What are your identification details?", "fields": [
       {"group":"clets_protected_person_gender","label":"Gender"},
       {"field":"clets_protected_person_race","label":"Race","optional":true},
       {"field":"clets_protected_person_date_of_birth","label":"Date of birth","type":"date","optional":true} ] }

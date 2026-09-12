@@ -596,7 +596,7 @@
       "controlled_property_description": 3
     }
   },
-  "exportedAt": "2026-09-12T17:04:29.849Z",
+  "exportedAt": "2026-09-12T17:43:52.576Z",
   "projectName": "DV Restraining Order Packet",
   "currentFormIndex": 0,
   "forms": [
@@ -45459,7 +45459,7 @@
           },
           {
             "id": "20",
-            "value": "What does law enforcement need to know about you? Your date of birth also puts your order in the federal database, which makes it easier to enforce outside California.",
+            "value": "What are your identification details?",
             "geometry": {
               "x": 610,
               "y": 3980,
@@ -45493,7 +45493,7 @@
                 "optional": true
               }
             ],
-            "_questionText": "What does law enforcement need to know about you? Your date of birth also puts your order in the federal database, which makes it easier to enforce outside California.",
+            "_questionText": "What are your identification details?",
             "_questionId": "8",
             "_nameId": "clets_protected_person",
             "_placeholder": "",
@@ -46704,11 +46704,11 @@
         "sectionPrefs": {
           "1": {
             "borderColor": "hsl(0, 100%, 80%)",
-            "name": "For Law Enforcement: The Person to Restrain"
+            "name": "The Person to Restrain"
           },
           "2": {
             "borderColor": "hsl(30, 100%, 80%)",
-            "name": "For Law Enforcement: You and Yours"
+            "name": "Your Information"
           }
         },
         "groups": [
@@ -46716,8 +46716,8 @@
             "groupId": 1,
             "name": "CLETS-001",
             "sections": [
-              "For Law Enforcement: The Person to Restrain",
-              "For Law Enforcement: You and Yours"
+              "The Person to Restrain",
+              "Your Information"
             ]
           }
         ],

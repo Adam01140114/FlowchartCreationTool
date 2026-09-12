@@ -252,6 +252,12 @@ const RULES = [
     why: 'Back took the nearest earlier section with a question on it. A filer who asked only for an order not to abuse them went from "Orders You Want" to CLETS-001, pressed Back, and landed in DV-108 "Risk of Abduction" - a form that was not in their packet, holding a required question. Every audit read data and none pressed a button, so nothing caught it.',
     by: 'pipeline-nav-audit.js (headless Chrome fills the published site on the minimum and maximum paths, walks Next then Back, exits 1 when they differ); pipeline-audit.js JUMPS (a jump to a section that does not exist finishes the form early); generate.js - sectionReachable, findPrevSectionWithVisibleQuestions, goBack' },
 
+  { id: 'section-names-speak-to-the-filer', group: 'interview', num: 'Rule 17',
+    title: 'A section name is a short label, and every title speaks to the filer',
+    says: 'A section name names what the section is about in a few words - at most 32 characters and 5 words, with no colon and no prefix. No section name or question title says who else will read the answers ("For Law Enforcement", "for the court", "court use only", "what law enforcement needs to know about you"): every page the filer is shown is theirs to fill in, so it is headed and asked in their terms - "The Person to Restrain", "Your Information", "What are your identification details?".',
+    why: 'CLETS-001 opened with "For Law Enforcement: The Person to Restrain" and "For Law Enforcement: You and Yours", and asked "What does law enforcement need to know about you?". The headings were long, and they read as though the page belonged to someone else - a filer could fairly think it was not theirs to answer. The form prints a line for its eventual reader; that line is not a heading for the person filling it in.',
+    by: 'pipeline-audit.js RULE 17 (blocking); the section names live in each form’s hints, so a rename there survives a rebuild' },
+
   { id: 'disqualifiers-are-declared', group: 'interview', num: 'Rule',
     title: 'What disqualifies a filer is declared and wired',
     says: 'Every "you do not qualify unless" sentence on the paper form is written down in the disqualifiers file, and every declared one has an alert node behind it.',

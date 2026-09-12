@@ -29663,7 +29663,7 @@
     },
     {
       "sectionId": 20,
-      "sectionName": "For Law Enforcement: The Person to Restrain",
+      "sectionName": "The Person to Restrain",
       "questions": [
         {
           "questionId": 259,
@@ -30237,11 +30237,11 @@
     },
     {
       "sectionId": 21,
-      "sectionName": "For Law Enforcement: You and Yours",
+      "sectionName": "Your Information",
       "questions": [
         {
           "questionId": 265,
-          "text": "What does law enforcement need to know about you? Your date of birth also puts your order in the federal database, which makes it easier to enforce outside California.",
+          "text": "What are your identification details?",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
@@ -31056,8 +31056,8 @@
       "groupId": 6,
       "name": "CLETS-001",
       "sections": [
-        "For Law Enforcement: The Person to Restrain",
-        "For Law Enforcement: You and Yours"
+        "The Person to Restrain",
+        "Your Information"
       ]
     },
     {

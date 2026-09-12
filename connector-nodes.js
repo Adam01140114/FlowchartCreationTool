@@ -323,6 +323,11 @@
       + '<select id="cpTarget" style="' + field + '">'
       + forms.map((n) => '<option' + (n === target ? ' selected' : '') + '>' + escapeHtml(n) + '</option>').join('')
       + '</select>'
+      // The form it brings in, to look at before deciding: its flowchart in the
+      // editor, or its paper over everything - both for whichever form is
+      // picked above, saved or not.
+      + '<button type="button" data-cp="view-flowchart" style="display:block;width:100%;margin:8px 0 0;padding:8px 12px;border:1px solid #1976d2;border-radius:6px;background:#fff;color:#1976d2;font-weight:600;cursor:pointer;">View Form Flowchart</button>'
+      + '<button type="button" data-cp="view-pdf" style="display:block;width:100%;margin:6px 0 0;padding:8px 12px;border:1px solid #1976d2;border-radius:6px;background:#fff;color:#1976d2;font-weight:600;cursor:pointer;">View Form PDF</button>'
       + '<span style="' + label + '">Hangs from</span>'
       + '<div style="padding:8px 10px;background:#f1f5f9;border-radius:6px;font-size:14px;">' + escapeHtml(feeder.text) + '</div>'
       + '<div style="font-size:12px;color:#64748b;margin-top:4px;">Move the arrow into this connector on the canvas to change it.</div>'
@@ -355,6 +360,26 @@
     overlay.addEventListener('mousedown', (event) => { if (event.target === overlay) close(); });
     box.querySelector('[data-cp="close"]').addEventListener('click', close);
     box.querySelector('[data-cp="cancel"]').addEventListener('click', close);
+    const pickedForm = () => box.querySelector('#cpTarget').value;
+    box.querySelector('[data-cp="view-flowchart"]').addEventListener('click', () => {
+      const name = pickedForm();
+      const index = (window.projectForms || []).findIndex((f) => f && f.name === name);
+      if (index === -1 || typeof window.switchToProjectForm !== 'function') {
+        window.alert('There is no form called "' + name + '" in this project.');
+        return;
+      }
+      // Leaving this form: the menu belongs to a connector on it.
+      close();
+      window.switchToProjectForm(index);
+    });
+    box.querySelector('[data-cp="view-pdf"]').addEventListener('click', () => {
+      if (typeof window.showFormPdf !== 'function') {
+        window.alert('The PDF viewer is not loaded.');
+        return;
+      }
+      // Over the menu, which is still here when the PDF is closed.
+      window.showFormPdf(pickedForm());
+    });
     box.querySelector('[data-cp="save"]').addEventListener('click', () => {
       const newTarget = box.querySelector('#cpTarget').value;
       const useTicked = box.querySelector('input[name="cpWhen"][value="ticked"]').checked;

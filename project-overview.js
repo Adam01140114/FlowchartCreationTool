@@ -918,6 +918,38 @@
   }
 
   window.viewFullProject = function () { overlay ? close() : open(); };
+
+  /**
+   * One form's PDF over whatever is on screen, without the full-project view -
+   * the connector menu's "View Form PDF". The same viewer, and Escape takes
+   * away only the paper: it is caught on the window before the menu under it
+   * hears the key, so the menu is still there when the PDF goes.
+   */
+  window.showFormPdf = function (formName) {
+    if (typeof window.captureCurrentProjectForm === 'function') window.captureCurrentProjectForm();
+    const slot = (window.projectForms || []).find(function (f) { return f && f.name === formName; });
+    if (!slot) {
+      window.alert('There is no form called "' + formName + '" in this project.');
+      return;
+    }
+    const chart = slot.flowchart || {};
+    const file = pdfFileOf(chart);
+    if (!file) {
+      window.alert(formName + ' has no PDF set in its Default PDF Properties.');
+      return;
+    }
+    injectStyle();
+    openPaper({ title: (chart.defaultPdfProperties || {}).pdfName || formName, file: file });
+    if (overlay) return;   // the full-project view already hands Escape to the paper
+    const onEsc = function (e) {
+      if (e.key !== 'Escape') return;
+      window.removeEventListener('keydown', onEsc, true);
+      if (!paper) return;
+      e.stopPropagation();
+      closePaper();
+    };
+    window.addEventListener('keydown', onEsc, true);
+  };
   window.closeFullProjectView = close;
   window.fullProjectViewDebug = function () {
     if (!view) return { open: false };

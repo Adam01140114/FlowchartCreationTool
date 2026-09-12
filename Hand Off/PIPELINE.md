@@ -1169,6 +1169,22 @@ field-by-field value check both reported nothing wrong.
 Full procedure, and what a legitimate blank looks like on a Judicial Council
 form: [`PDF-PAGE-AUDIT.md`](./PDF-PAGE-AUDIT.md).
 
+## Section names are short, and every title speaks to the filer
+
+A section name names what the section is about in a few words: at most 32
+characters and 5 words, no colon, no prefix. No section name or question title
+says who else will read the answers - "For Law Enforcement", "for the court",
+"court use only", "what law enforcement needs to know about you". Every page the
+filer sees is theirs to fill in.
+
+CLETS-001's sections were "For Law Enforcement: The Person to Restrain" and "For
+Law Enforcement: You and Yours", and it asked "What does law enforcement need to
+know about you?". They are now "The Person to Restrain", "Your Information" and
+"What are your identification details?" - in `clets001-hints.json`, because an
+edit made only in the editor is lost at the next rebuild. `pipeline-audit.js`
+RULE 17 fails a long or prefixed section name and any title that names another
+reader.
+
 ## Back retraces Next
 
 Every check above reads data; none presses a button. A filer who asked only for

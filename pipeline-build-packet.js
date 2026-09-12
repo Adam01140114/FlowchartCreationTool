@@ -358,12 +358,20 @@ async function main() {
   // The project's own name for itself, kept across rebuilds: the published
   // page images live under it, so a new id every build would orphan the link
   // that was handed out for the last one.
-  let projectId = '';
-  try {
-    projectId = String(JSON.parse(fs.readFileSync(OUT, 'utf8')).projectId || '');
-  } catch (e) { /* first build, or an older file without one */ }
+  // The spec first: it is a source, and the last build's output is not. When
+  // dv-packet-project.json was overwritten by an unrelated export, reading the
+  // id only from there minted a new one, and the live site went to a second
+  // folder with a second set of /form/<id> links.
+  let projectId = String(spec.projectId || '');
+  if (!projectId) {
+    try {
+      projectId = String(JSON.parse(fs.readFileSync(OUT, 'utf8')).projectId || '');
+    } catch (e) { /* first build, or an older file without one */ }
+  }
   if (!projectId) {
     projectId = 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    console.warn('No projectId in ' + SPEC + ' or ' + OUT + ' - minted ' + projectId
+      + '. Put it in the spec so the next build keeps it.');
   }
 
   // What each PDF box can hold, measured by pipeline-capacity.js. The
