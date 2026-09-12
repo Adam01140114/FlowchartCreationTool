@@ -801,12 +801,22 @@ none, and the days after it open on the chart choice as well as on its boxes
 
 ## No connector is left loose
 
-A connector an answer decides hangs off that answer's option. Every other one -
-a form that always travels with this one (DV-109, CLETS-001), or one that waits
-on a ticked field (DV-101) - is a child of the form's central **End** node,
-chained one below the other in the order the spec's `activates` lists them:
-**most important at the top, least important at the bottom.** DV-100 reads End,
-DV-101, DV-109, CLETS-001; DV-109 reads End, DV-110.
+A connector an answer decides hangs off that answer's option. One that waits on
+a box the writing ticks hangs beside the question whose answer ticks it, with
+its condition written under it: DV-101 hangs off item 7f's "Describe how the
+person was abusive then" (`overflowQuestionFor` finds it from the overflow link),
+labelled "only if item 7f needs more space". Every connector nothing decides - a
+form that always travels with this one (DV-109, CLETS-001) - is a child of the
+form's central **End** node, chained one below the other in the order the spec's
+`activates` lists them: **most important at the top, least important at the
+bottom.** DV-100 reads End, DV-109, CLETS-001; DV-109 reads End, DV-110.
+
+DV-101 used to sit first under End, where it read as "always, next": a filer
+whose 7f fitted went from DV-100 straight to CLETS-001 and saw the chain as
+broken. (DV-109 comes before CLETS-001 but asks nothing - its filer items are
+DV-100's answers - so it has no page to show.) Double-clicking a connector opens
+its properties: the form it brings in, what it hangs from, what switches it on
+and the note under it.
 
 They used to be dropped under the lowest node and wired to nothing, which left
 every chart ending in boxes floating below it. `pipeline-build-packet.js`

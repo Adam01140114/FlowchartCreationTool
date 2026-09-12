@@ -290,10 +290,10 @@ const RULES = [
     by: 'pipeline-build-packet.js writes it; connector-nodes.js reads either' },
 
   { id: 'no-connector-is-left-loose', group: 'packet', num: 'Rule',
-    title: 'No connector is left loose: the ones no answer decides hang under End, most important first',
-    says: 'A connector that an answer decides hangs off that answer. Every other connector — one that always switches its form on, or one that waits on a ticked field — is a child of the form’s central End node, chained one below the other: End, then the most important form, then the next, down to the least important at the bottom. The order is the order the form lists them in the spec’s activates. What feeds a connector in that chain is a place, not a condition.',
+    title: 'No connector is left loose: each hangs off what decides it, and the always-on ones hang under End, most important first',
+    says: 'A connector that an answer decides hangs off that answer. One that waits on a box the writing ticks — DV-101, when item 7f outgrows its space — hangs beside the question whose answer ticks it, with its condition written under it. Every connector that nothing decides is a child of the form’s central End node, chained one below the other: End, then the most important form, then the next, down to the least important at the bottom, in the order of the spec’s activates. Only an answer is a condition: End, a connector above in the chain, or a question a connector hangs beside are places. Double-clicking a connector shows all of this and lets it be edited.',
     why: 'They were dropped under the lowest node and wired to nothing, so every chart ended in boxes floating below it — a loose end, which the flowchart rules forbid everywhere else, and no way to see at a glance which forms follow this one or in what order. Chaining them under End says what they mean: finish this form and these come next. The reader that turns connectors into activation rules had to learn the same thing, or it read End as an answer labelled "END" that no filer can choose, and DV-109, DV-110 and CLETS-001 would never have been asked.',
-    by: 'pipeline-build-packet.js (endNodeOf, the chain in main); connector-nodes.js collectProjectConnectors treats an End or connector feeder as unconditional' },
+    by: 'pipeline-build-packet.js (endNodeOf, overflowQuestionFor, the chain in main); connector-nodes.js collectProjectConnectors takes only an option as a condition, and showConnectorProperties is the double-click menu' },
 
   { id: 'which-forms-are-in-the-packet', group: 'packet', num: 'Rule',
     title: 'One place says which forms are in the packet',

@@ -687,6 +687,10 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '        .stepper-line { flex: 1 1 16px; min-width: 12px; max-width: 40px; height: 4px; margin: 14px 0 0; }',
     '        @media (max-width: 640px) { .stepper-label { white-space: normal; max-width: 160px; } }',
     '        #box { padding-top: 100px; margin: 50px; }',
+    // Half the gap above a step bar: 100px of padding plus the bar's own 12px
+    // margin left 116px of empty card above the form's steps. A card with no
+    // step bar keeps its spacing.
+    '        #box:has(.stepper-progress-bar) { padding-top: 46px; }',
     '        @media (max-width: 600px) {',
     '            body { padding: 0 !important; }',
     '            #box { margin: 12px !important; max-width: none !important; }',

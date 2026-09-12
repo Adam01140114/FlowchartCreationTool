@@ -421,10 +421,12 @@ function setupCustomClickHandlers(graph) {
   // Proper double-click handler that handles all cases
   const baseDblClick = graph.dblClick.bind(graph);
   graph.dblClick = function(evt, cell) {
-    // A connector carries one setting - which form it activates - so editing
-    // it is just picking that form rather than editing a label.
+    // A connector opens its own properties: the form it brings in, what it
+    // hangs from, what switches it on and the note under it - not a label edit.
     if (cell && typeof window.isConnectorNode === 'function' && window.isConnectorNode(cell)) {
-      if (typeof window.chooseConnectorTarget === 'function') {
+      if (typeof window.showConnectorProperties === 'function') {
+        window.showConnectorProperties(cell);
+      } else if (typeof window.chooseConnectorTarget === 'function') {
         window.chooseConnectorTarget(cell);
       }
       mxEvent.consume(evt);

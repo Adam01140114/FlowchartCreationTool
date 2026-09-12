@@ -138,15 +138,35 @@ function endNodeOf(cells) {
  * that nothing decides - the End node or the connector above it in the chain,
  * which `chained` marks so it is centred under it rather than hung off a side.
  */
-function addConnector(flowchart, targetForm, from, chained) {
+/**
+ * The question whose writing ticks this box. A form that comes in because a
+ * description outgrew its space - DV-101 after DV-100 item 7f - hangs off the
+ * question that holds the description: that is what decides it, so that is
+ * where the canvas should say so.
+ */
+function overflowQuestionFor(flowchart, marks) {
+  const link = (flowchart.overflowLinks || [])
+    .find((l) => l && (l.marks === marks || l.marksBeyond === marks));
+  if (!link) return null;
+  return flowchart.cells.find((c) => c.vertex && c._nameId === link.nameId
+    && /nodeType=question/.test(c.style || '')) || null;
+}
+
+function addConnector(flowchart, targetForm, from, chained, beside) {
   const cells = flowchart.cells;
   const id = nextId(cells);
   const anchor = from || cells.filter((c) => c.vertex)
     .reduce((low, c) => (c.geometry.y > (low ? low.geometry.y : -1) ? c : low), null);
   const below = chained && !/nodeType=end(;|$)/.test(anchor.style || '') ? 30 : (chained ? 50 : 60);
   let y = anchor ? anchor.geometry.y + (anchor.geometry.height || 60) + below : 80;
-  const x = !anchor ? 80
+  let x = !anchor ? 80
     : (chained ? anchor.geometry.x + (anchor.geometry.width || 180) / 2 - 90 : anchor.geometry.x);
+  // Hung off a question rather than an answer: beside it, to the right, so the
+  // spine below the question is left to the questions that follow.
+  if (beside && anchor) {
+    x = anchor.geometry.x + (anchor.geometry.width || 300) + 80;
+    y = anchor.geometry.y + Math.max(0, ((anchor.geometry.height || 80) - 80) / 2);
+  }
   // One answer can bring in more than one form: the custody box on DV-100
   // brings in DV-105 and DV-140 together, because page 13 asks for both. Each
   // connector hung off the same option at the same offset, so the second was
@@ -287,8 +307,14 @@ async function main() {
         throw new Error(entry.name + ': no option "' + activation.isAnswer + '" under question "'
           + activation.whenQuestion + '" to hang the ' + target + ' connector on');
       }
-      const chained = !option && !!chainTail;
-      const id = addConnector(flowchart, target, option || chainTail, chained);
+      // A connector that waits on a box the writing ticks hangs off the question
+      // whose answer ticks it. Chained under End it read as "always, next": a
+      // filer whose 7f fitted went past DV-101 and could not see why, because
+      // nothing on the canvas tied DV-101 to item 7f.
+      const overflowSource = (activation && activation.whenFieldTicked && !option)
+        ? overflowQuestionFor(flowchart, activation.whenFieldTicked) : null;
+      const chained = !option && !overflowSource && !!chainTail;
+      const id = addConnector(flowchart, target, option || overflowSource || chainTail, chained, !!overflowSource);
       if (chained) chainTail = flowchart.cells.find((c) => c.id === id);
       // A form can also arrive because a field got ticked rather than because a
       // question was answered - which is how an attachment that exists to hold

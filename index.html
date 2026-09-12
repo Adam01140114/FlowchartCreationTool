@@ -34,6 +34,20 @@
     background: #fbfcfe;
   }
   .form-panel > :first-child { margin-top: 0; }
+  .project-panel {
+    border: 1px solid #c9d3df;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0 6px;
+    background: #fff;
+  }
+  .project-panel > :first-child { margin-top: 0; }
+  /* The question-type colours live in Settings now: a block of their own there,
+     not a label-and-control row, and a menu that scrolls once it outgrows the
+     window. */
+  .settings-menu .settings-container { max-height: 90vh; overflow-y: auto; }
+  .settings-menu .setting-question-types { display: block; }
+  .settings-menu .setting-question-types .legend { margin-top: 0; }
   .form-nav { margin: 10px 0 14px; text-align: center; }
   .form-nav #addFormBtn { width: 100%; margin-bottom: 6px; }
   /* View Full Project sits under the project name and search, as wide as they are. */
@@ -191,29 +205,34 @@
     <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save</button>
     <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
     <button id="settingsBtn" onclick="showSettingsMenu()">Settings</button><br>
-    <div class="project-name-container">
-      <label for="projectNameInput" style="font-weight:bold;">Project Name:</label>
-      <input type="text" id="projectNameInput" placeholder="Name this project..." />
-    </div>
-    <!-- Project search: every node in every form, not just the one on the
-         canvas. It sits with the project name because, like the name, it
-         belongs to the project rather than to the open form. See
-         project-search.js. -->
-    <div class="project-search">
-      <div class="project-search-box">
-        <input type="text" id="projectSearchBox" placeholder="Search all forms..." autocomplete="off" />
-        <button type="button" id="projectSearchClearBtn" title="Clear search">×</button>
+    <!-- The project, in a box of its own: its name, the search across every
+         form, and the view of all of them - apart from the controls above
+         and from the open form below. -->
+    <div class="project-panel">
+      <div class="project-name-container">
+        <label for="projectNameInput" style="font-weight:bold;">Project Name:</label>
+        <input type="text" id="projectNameInput" placeholder="Name this project..." />
       </div>
-      <div class="project-search-row" id="projectSearchRow" hidden>
-        <button type="button" id="projectSearchPrevBtn" title="Previous match (Shift+Enter)">Back</button>
-        <span id="projectSearchCount" class="project-search-count"></span>
-        <button type="button" id="projectSearchNextBtn" title="Next match (Enter)">Next</button>
+      <!-- Project search: every node in every form, not just the one on the
+           canvas. It sits with the project name because, like the name, it
+           belongs to the project rather than to the open form. See
+           project-search.js. -->
+      <div class="project-search">
+        <div class="project-search-box">
+          <input type="text" id="projectSearchBox" placeholder="Search all forms..." autocomplete="off" />
+          <button type="button" id="projectSearchClearBtn" title="Clear search">×</button>
+        </div>
+        <div class="project-search-row" id="projectSearchRow" hidden>
+          <button type="button" id="projectSearchPrevBtn" title="Previous match (Shift+Enter)">Back</button>
+          <span id="projectSearchCount" class="project-search-count"></span>
+          <button type="button" id="projectSearchNextBtn" title="Next match (Enter)">Next</button>
+        </div>
       </div>
+      <!-- Every form at once, each in its own box - see project-overview.js. It
+           shows the project, so it lives here rather than among the controls
+           for the open form. -->
+      <button type="button" id="viewFullProjectBtn" onclick="viewFullProject()">View Full Project</button>
     </div>
-    <!-- Every form at once, each in its own box - see project-overview.js. It
-         shows the project, so it lives here rather than among the controls
-         for the open form. -->
-    <button type="button" id="viewFullProjectBtn" onclick="viewFullProject()">View Full Project</button>
   </div>
 
   <!-- Everything from here to the end of the PDF defaults belongs to the form
@@ -244,67 +263,6 @@
     <input type="text" id="nodeSearchBox" placeholder="Search nodes..." />
     <button id="clearSearchBtn" title="Clear search">×</button>
   </div>
-
-  <div class="legend">
-    <strong>Question Types</strong><br>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorText"></div>
-      <span>Textbox</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorCheckbox"></div>
-      <span>Checkbox</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorDropdown"></div>
-      <span>Dropdown</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorMoney"></div>
-      <span>Number</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorDate"></div>
-      <span>Date</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorDateRange"></div>
-      <span>Date Range</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorEmail"></div>
-      <span>Email</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorPhone"></div>
-      <span>Phone</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorBigParagraph"></div>
-      <span>Big Paragraph</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color-box" id="colorTextColor"></div>
-      <span>Text Color</span>
-    </div>
-    <button id="resetBtn">Reset Colors</button>
-  </div>
-
-  <!-- Section Legend. Closed until asked for; legend.js rewrites everything
-       inside it, the <summary> included, so the heading lives there too. -->
-  <details id="sectionLegend" class="sidebar-fold">
-    <summary>Section Names</summary>
-    <!-- Section items will be populated dynamically -->
-  </details>
-
-  <!-- Groups Interface. Add Group is inside the fold, so it is never showing
-       under a closed list it would add to invisibly; groups.js puts each new
-       group above it. -->
-  <details id="groupsContainer" class="sidebar-fold">
-    <summary>Groups</summary>
-    <!-- Groups will be populated dynamically -->
-    <button type="button" class="add-group-btn" onclick="addGroup()">Add Group</button>
-  </details>
 
   <!-- Default PDF Properties -->
   <div id="defaultPdfPropertiesContainer">
@@ -345,8 +303,23 @@
       <button type="button" id="pdfPreviewFullscreen">View Fullscreen</button>
     </div>
   </div>
+  <!-- Section Legend. Closed until asked for; legend.js rewrites everything
+       inside it, the <summary> included, so the heading lives there too. -->
+  <details id="sectionLegend" class="sidebar-fold">
+    <summary>Section Names</summary>
+    <!-- Section items will be populated dynamically -->
+  </details>
 
-  <!-- The node palette, under the paper rather than above everything: it is
+  <!-- Groups Interface. Add Group is inside the fold, so it is never showing
+       under a closed list it would add to invisibly; groups.js puts each new
+       group above it. -->
+  <details id="groupsContainer" class="sidebar-fold">
+    <summary>Groups</summary>
+    <!-- Groups will be populated dynamically -->
+    <button type="button" class="add-group-btn" onclick="addGroup()">Add Group</button>
+  </details>
+
+  <!-- The node palette, at the foot of the form panel rather than above everything: it is
        reached for occasionally, and closed it costs one line. The drag handlers
        find its .shape items by class (events.js), so where it sits is free. -->
   <details class="custom-ui-elements">
@@ -679,6 +652,54 @@
       <div class="setting-item">
         <label for="addPdfNameToNodeIdToggle">Add PDF name to node ID:</label>
         <input type="checkbox" id="addPdfNameToNodeIdToggle" onchange="updateAddPdfNameToNodeId(this.checked)">
+      </div>
+      <!-- The question-type colours: how each kind of question is drawn on the
+           canvas. A setting, not something used while editing a form. -->
+      <div class="setting-item setting-question-types">
+      <div class="legend">
+        <strong>Question Types</strong><br>
+        <div class="legend-item">
+          <div class="legend-color-box" id="colorText"></div>
+          <span>Textbox</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box" id="colorCheckbox"></div>
+          <span>Checkbox</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box" id="colorDropdown"></div>
+          <span>Dropdown</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box" id="colorMoney"></div>
+          <span>Number</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box" id="colorDate"></div>
+          <span>Date</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box" id="colorDateRange"></div>
+          <span>Date Range</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box" id="colorEmail"></div>
+          <span>Email</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box" id="colorPhone"></div>
+          <span>Phone</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box" id="colorBigParagraph"></div>
+          <span>Big Paragraph</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box" id="colorTextColor"></div>
+          <span>Text Color</span>
+        </div>
+        <button id="resetBtn">Reset Colors</button>
+      </div>
       </div>
       <div class="settings-actions">
         <button id="saveSettingsBtn">Save Settings</button>
