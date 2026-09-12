@@ -1,5 +1,5 @@
 {
- "measuredAt": "2026-09-10T15:18:11.287Z",
+ "measuredAt": "2026-09-12T02:45:53.355Z",
  "reference": "Helvetica, laid out over a corpus of form answers",
  "fields": {
   "court_name_and_street_address": 153,
@@ -461,7 +461,6 @@
   "other_protected_person_4_gender": 4,
   "other_protected_person_4_race": 11,
   "other_protected_person_4_date_of_birth": 11,
-  "clets_protected_person_telephone": 29,
   "clets_protected_person_language": 71,
   "clets_protected_person_race": 40,
   "hearing_date": 11,

@@ -6,7 +6,8 @@
       "id": "DV-101[0].Page1[0].P1Caption[0].Stamp_court_case[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number (page 1)"
+      "label": "Case number (page 1)",
+      "courtUse": true
     },
     {
       "id": "DV-101[0].Page1[0].Item1[0].ProtectedFullName_ft[0]",
@@ -96,7 +97,8 @@
       "id": "DV-101[0].Page2[0].PXCaption[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number (page 2)"
+      "label": "Case number (page 2)",
+      "courtUse": true
     },
     {
       "id": "DV-101[0].Page2[0].List4[0].Lia[0].RestrainedCity_ft[0]",

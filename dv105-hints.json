@@ -248,7 +248,10 @@
       "labels": [
         "Yes",
         "No"
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_visits_yes,dv105_visits_virtual_only"
+      }
     },
     {
       "nameId": "dv105_supervisor",
@@ -302,7 +305,10 @@
         "Every week",
         "Every other week",
         "Something else"
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      }
     },
     {
       "nameId": "dv105_exchanges_supervised",
@@ -354,7 +360,10 @@
         "Every week",
         "Every other week",
         "Something else"
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      }
     },
     {
       "nameId": "dv105_child_home_1_lived_with",
@@ -467,7 +476,8 @@
         "Friday",
         "Saturday",
         "Sunday"
-      ]
+      ],
+      "optional": true
     },
     {
       "nameId": "dv105_unsupervised_virtual_visit_days",
@@ -490,7 +500,8 @@
         "Friday",
         "Saturday",
         "Sunday"
-      ]
+      ],
+      "optional": true
     }
   ],
   "repeats": [
@@ -672,7 +683,7 @@
         },
         {
           "field": "dv105_supervisor_fees_other_percent",
-          "label": "Their share (%)"
+          "label": "Someone else's share (%)"
         }
       ]
     },
@@ -693,7 +704,7 @@
         },
         {
           "field": "dv105_exchange_fees_other_percent",
-          "label": "Their share (%)"
+          "label": "Someone else's share (%)"
         }
       ]
     },
@@ -725,7 +736,11 @@
           "field": "dv105_supervised_visit_monday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the supervised visit on Tuesday look like?",
@@ -755,7 +770,11 @@
           "field": "dv105_supervised_visit_tuesday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the supervised visit on Wednesday look like?",
@@ -785,7 +804,11 @@
           "field": "dv105_supervised_visit_wednesday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the supervised visit on Thursday look like?",
@@ -815,7 +838,11 @@
           "field": "dv105_supervised_visit_thursday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the supervised visit on Friday look like?",
@@ -845,7 +872,11 @@
           "field": "dv105_supervised_visit_friday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the supervised visit on Saturday look like?",
@@ -875,7 +906,11 @@
           "field": "dv105_supervised_visit_saturday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the supervised visit on Sunday look like?",
@@ -905,7 +940,11 @@
           "field": "dv105_supervised_visit_sunday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_supervised_use_schedule_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the visit on Monday look like?",
@@ -935,7 +974,11 @@
           "field": "dv105_unsupervised_visit_monday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the visit on Tuesday look like?",
@@ -965,7 +1008,11 @@
           "field": "dv105_unsupervised_visit_tuesday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the visit on Wednesday look like?",
@@ -995,7 +1042,11 @@
           "field": "dv105_unsupervised_visit_wednesday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the visit on Thursday look like?",
@@ -1025,7 +1076,11 @@
           "field": "dv105_unsupervised_visit_thursday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the visit on Friday look like?",
@@ -1055,7 +1110,11 @@
           "field": "dv105_unsupervised_visit_friday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the visit on Saturday look like?",
@@ -1085,7 +1144,11 @@
           "field": "dv105_unsupervised_visit_saturday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      },
+      "optional": true
     },
     {
       "question": "What should the visit on Sunday look like?",
@@ -1115,7 +1178,11 @@
           "field": "dv105_unsupervised_visit_sunday_location_pickup",
           "label": "Pick-up location"
         }
-      ]
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_unsupervised_plan_format_chart"
+      },
+      "optional": true
     }
   ],
   "questions": {
@@ -1750,10 +1817,6 @@
     }
   ],
   "alwaysShown": [
-    {
-      "question": "dv105_visits_supervised",
-      "why": "Item 11 follows item 10 for both 'Yes' and 'Yes, but only virtual visits'. A gate names one option, so gating on 'Yes' alone would never ask a filer who chose virtual-only whether the visits should be supervised, and items 12 and 13 would both be skipped. Over-asking after 'No visits' is the safer error - the form itself tells that filer to stop."
-    },
     {
       "question": "dv105_abduction_risk",
       "why": "Item 8 is asked whatever was answered about travel or records."

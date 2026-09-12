@@ -6,7 +6,8 @@
       "id": "CLETS-001[0].Page1[0].RightCaption[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number (page 1)"
+      "label": "Case number (page 1)",
+      "courtUse": true
     },
     {
       "id": "CLETS-001[0].Page1[0].RightCaption[0].DateField1[0]",
@@ -108,21 +109,24 @@
     },
     {
       "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].item1firearmME[2]",
-      "newName": "clets_restrained_person_weapons_yes",
+      "newName": "person_to_restrain_firearms_yes_yes",
       "type": "checkbox",
-      "label": "1. Firearms, ammunition or body armor - Yes"
+      "label": "1. Firearms, ammunition or body armor - Yes",
+      "connectedFrom": "clets_restrained_person_weapons_yes"
     },
     {
       "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].item1firearmME[0]",
-      "newName": "clets_restrained_person_weapons_no",
+      "newName": "person_to_restrain_firearms_no_yes",
       "type": "checkbox",
-      "label": "1. Firearms, ammunition or body armor - No"
+      "label": "1. Firearms, ammunition or body armor - No",
+      "connectedFrom": "clets_restrained_person_weapons_no"
     },
     {
       "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].item1firearmME[1]",
-      "newName": "clets_restrained_person_weapons_unknown",
+      "newName": "person_to_restrain_firearms_unknown_yes",
       "type": "checkbox",
-      "label": "1. Firearms, ammunition or body armor - I don't know"
+      "label": "1. Firearms, ammunition or body armor - I don't know",
+      "connectedFrom": "clets_restrained_person_weapons_unknown"
     },
     {
       "id": "CLETS-001[0].Page1[0].List1[0].Li1[0].Yestf[0]",
@@ -134,7 +138,8 @@
       "id": "CLETS-001[0].Page2[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number (page 2)"
+      "label": "Case number (page 2)",
+      "courtUse": true
     },
     {
       "id": "CLETS-001[0].Page2[0].List2[0].Li1[0].yournametf[0]",
@@ -180,9 +185,10 @@
     },
     {
       "id": "CLETS-001[0].Page2[0].item3phonetf[0]",
-      "newName": "clets_protected_person_telephone",
+      "newName": "person_asking_protection_telephone",
       "type": "tel",
-      "label": "3. Your telephone"
+      "label": "3. Your telephone",
+      "connectedFrom": "clets_protected_person_telephone"
     },
     {
       "id": "CLETS-001[0].Page2[0].item3EnglishME[1]",

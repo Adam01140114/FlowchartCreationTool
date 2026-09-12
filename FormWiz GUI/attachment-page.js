@@ -87,16 +87,26 @@ async function drawAttachmentPage(spec) {
     pages.push(page);
     y = PAGE_H - MARGIN;
     // The heading the form tells the filer to write at the top, on every sheet.
-    page.drawText(heading + (pages.length > 1 ? ' (continued)' : ''),
-      { x: MARGIN, y: y - 16, size: 16, font: bold, color: INK });
-    if (caseNumber) {
-      const label = 'Case Number: ' + caseNumber;
+    // It shares the row with the case number, so it is sized to the room the
+    // case number leaves: "DV-110, Other Protected People (continued)" at 16pt
+    // printed its last word over "Case Number:". Below 10pt it would stop being
+    // a heading, so a title that still does not fit puts the case number on a
+    // line of its own instead.
+    const title = heading + (pages.length > 1 ? ' (continued)' : '');
+    const label = caseNumber ? 'Case Number: ' + caseNumber : '';
+    const labelW = label ? regular.widthOfTextAtSize(label, 10) : 0;
+    const room = PAGE_W - MARGIN * 2 - (label ? labelW + 14 : 0);
+    let titleSize = 16;
+    while (titleSize > 10 && bold.widthOfTextAtSize(title, titleSize) > room) titleSize -= 0.5;
+    const ownLine = !!label && bold.widthOfTextAtSize(title, titleSize) > room;
+    page.drawText(title, { x: MARGIN, y: y - 16, size: titleSize, font: bold, color: INK });
+    if (label) {
       page.drawText(label, {
-        x: PAGE_W - MARGIN - regular.widthOfTextAtSize(label, 10),
-        y: y - 14, size: 10, font: regular, color: INK
+        x: PAGE_W - MARGIN - labelW,
+        y: ownLine ? y - 30 : y - 14, size: 10, font: regular, color: INK
       });
     }
-    y -= 34;
+    y -= ownLine ? 46 : 34;
     page.drawText(subtitle, { x: MARGIN, y, size: 10, font: regular, color: GREY });
     y -= 12;
     page.drawLine({ start: { x: MARGIN, y }, end: { x: PAGE_W - MARGIN, y }, thickness: 0.8, color: LINE });

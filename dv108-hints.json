@@ -343,6 +343,7 @@
     "conditional": {"onlyWhen":"dv108_order_notify_foreign_embassy"} },
   { "question": "Where should this order be registered?", "fields": [
       {"field":"dv108_notify_county","label":"County"},
-      {"field":"dv108_notify_state","label":"State"} ] }
+      {"field":"dv108_notify_state","label":"State"} ],
+    "conditional": {"onlyWhen":"dv108_order_notify_other_state"} }
 ]
 }

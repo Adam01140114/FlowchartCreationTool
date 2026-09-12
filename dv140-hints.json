@@ -15,6 +15,7 @@
         "dv105_their_relationship_legal_guardian",
         "dv105_their_relationship_other",
         "dv105_their_relationship_other_description",
+        "child_custody_and_visitation_order_requested",
         "dv105_child_1_name",
         "dv105_child_1_date_of_birth",
         "dv105_child_2_name",
@@ -89,6 +90,10 @@
       "conditional": {
         "onlyWhen": "dv105_their_relationship_other"
       }
+    },
+    "child_custody_and_visitation_order_requested": {
+      "text": "Are you asking for child custody and visitation orders?",
+      "_why": "Item 3 is ticked exactly when the filer asks for custody orders on DV-100 - the box carries DV-100 choice's name, so the packet never asks this; the wording is for the form compiled on its own."
     }
   },
   "attachmentTargets": [

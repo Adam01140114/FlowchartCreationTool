@@ -6,7 +6,8 @@
       "id": "DV-108[0].Page1[0].RightCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number (page 1)"
+      "label": "Case number (page 1)",
+      "courtUse": true
     },
     {
       "id": "DV-108[0].Page1[0].List1[0].LI1[0].Yourname[0]",
@@ -210,7 +211,8 @@
       "id": "DV-108[0].Page2[0].CaptionSub[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number (page 2)"
+      "label": "Case number (page 2)",
+      "courtUse": true
     },
     {
       "id": "DV-108[0].Page2[0].List4[0].Li1[0].CheckBoxRightCaption[0]",

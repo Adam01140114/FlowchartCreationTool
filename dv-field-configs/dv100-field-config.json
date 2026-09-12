@@ -11,7 +11,8 @@
       "id": "DV-100[0].Page1[0].rightCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page1[0].List1[0].Li1[0].YourName_tf[0]",
@@ -131,7 +132,8 @@
       "id": "DV-100[0].Page2[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page2[0].List3[0].Li1[0].CheckBox2[0]",
@@ -359,7 +361,8 @@
       "id": "DV-100[0].Page3[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page3[0].List5[0].Li1[0].dtAbs[0]",
@@ -491,7 +494,8 @@
       "id": "DV-100[0].Page4[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page4[0].List6[0].Li1[0].dtabs[0]",
@@ -584,12 +588,6 @@
       "label": "different_abuse_incident_details"
     },
     {
-      "id": "DV-100[0].Page4[0].List6[0].Li7[0].item26d_tf[0]",
-      "newName": "different_abuse_incident_other_dates",
-      "type": "text",
-      "label": "different_abuse_incident_other_dates"
-    },
-    {
       "id": "DV-100[0].Page4[0].List6[0].Li7[0].abuseFreq[0]",
       "newName": "different_abuse_incident_frequency_once_yes",
       "type": "checkbox",
@@ -618,6 +616,12 @@
       "newName": "different_abuse_incident_frequency_other_description",
       "type": "text",
       "label": "different_abuse_incident_frequency_other_description"
+    },
+    {
+      "id": "DV-100[0].Page4[0].List6[0].Li7[0].item26d_tf[0]",
+      "newName": "different_abuse_incident_other_dates",
+      "type": "text",
+      "label": "different_abuse_incident_other_dates"
     },
     {
       "id": "DV-100[0].Page5[0].List7[0].Li1[0].dtabs[0]",
@@ -755,13 +759,15 @@
       "id": "DV-100[0].Page5[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page6[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page6[0].List8[0].Li1[0].YesNo8a1_cb[0]",
@@ -1037,7 +1043,8 @@
       "id": "DV-100[0].Page7[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page7[0].List10[0].Li1[0].CheckBoxRightCaption[0]",
@@ -1223,7 +1230,8 @@
       "id": "DV-100[0].Page8[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page8[0].List13[0].CheckBoxRightCaption[0]",
@@ -1319,7 +1327,8 @@
       "id": "DV-100[0].Page9[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page9[0].List16[0].Li1[0].List[0].Li1[0].TextField1[0]",
@@ -1529,7 +1538,8 @@
       "id": "DV-100[0].Page10[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page10[0].List21[0].Li1[0].CtyChildFreed_cb[0]",
@@ -1685,7 +1695,8 @@
       "id": "DV-100[0].Page11[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page11[0].List23[0].Li1[0].CtyChildFreed_cb[0]",
@@ -1805,7 +1816,8 @@
       "id": "DV-100[0].Page12[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page12[0].List27[0].Li1[0].CtyChildFreed_cb[0]",
@@ -1895,7 +1907,8 @@
       "id": "DV-100[0].Page13[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-100[0].Page13[0].List32[0].Li1[0].T97[0]",

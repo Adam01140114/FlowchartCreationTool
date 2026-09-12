@@ -6,7 +6,8 @@
       "id": "DV-140[0].Page1[0].RightCaption[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number (page 1)"
+      "label": "Case number (page 1)",
+      "courtUse": true
     },
     {
       "id": "DV-140[0].Page1[0].DV140_cb[0]",
@@ -84,11 +85,11 @@
     },
     {
       "id": "DV-140[0].Page1[0].List3[0].CheckBoxRightCaption[0]",
-      "newName": "dv140_has_children_under_18",
+      "newName": "child_custody_and_visitation_order_requested",
       "type": "checkbox",
       "label": "3. Children under 18 years old",
-      "courtUse": true,
-      "_why": "The box beside the item number on a court order marks the section the judge is granting, not a fact the filer supplies - the children themselves are named below it and those are the filer's."
+      "_why": "The box beside the item number on a court order marks the section the judge is granting, not a fact the filer supplies - the children themselves are named below it and those are the filer's.",
+      "connectedFrom": "dv140_has_children_under_18"
     },
     {
       "id": "DV-140[0].Page1[0].List3[0].Li1[0].TextField2[0]",
@@ -233,7 +234,8 @@
       "id": "DV-140[0].Page2[0].Caption[0].PxCaption[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number",
+      "courtUse": true
     },
     {
       "id": "DV-140[0].Page2[0].List5[0].CheckBoxRightCaption[0]",
@@ -400,7 +402,8 @@
       "id": "DV-140[0].Page3[0].Caption[0].PxCaption[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number",
+      "courtUse": true
     },
     {
       "id": "DV-140[0].Page3[0].List9[0].CheckBoxRightCaption[0]",
@@ -665,7 +668,8 @@
       "id": "DV-140[0].Page4[0].Caption[0].PxCaption[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number",
+      "courtUse": true
     },
     {
       "id": "DV-140[0].Page4[0].List10[0].CheckBoxRightCaption[0]",
@@ -916,7 +920,8 @@
       "id": "DV-140[0].Page5[0].Caption[0].PxCaption[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number",
+      "courtUse": true
     },
     {
       "id": "DV-140[0].Page5[0].List12[0].CheckBoxRightCaption[0]",
@@ -1377,7 +1382,8 @@
       "id": "DV-140[0].Page6[0].Caption[0].PxCaption[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number",
+      "courtUse": true
     },
     {
       "id": "DV-140[0].Page6[0].List14[0].Li1[0].item14ab[0]",

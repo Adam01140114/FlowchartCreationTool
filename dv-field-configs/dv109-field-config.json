@@ -11,7 +11,8 @@
       "id": "DV-109[0].Page1[0].P1RightCaption[0].CaseNo[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number"
+      "label": "Case number",
+      "courtUse": true
     },
     {
       "id": "DV-109[0].Page1[0].List1[0].Li1[0].YourName_tf[0]",
@@ -66,7 +67,8 @@
       "id": "DV-109[0].Page2[0].P2Header[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number (page 2)"
+      "label": "Case number (page 2)",
+      "courtUse": true
     },
     {
       "id": "DV-109[0].Page2[0].List4[0].Li1[0].List[0].Li1[0].TRO_cb[0]",
@@ -191,7 +193,8 @@
       "id": "DV-109[0].Page3[0].P3Header[0].CaseNumber_ft[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "Case number (page 3)"
+      "label": "Case number (page 3)",
+      "courtUse": true
     },
     {
       "id": "DV-109[0].Page3[0].ClerkSub[0].ClerkSignature_da[0]",

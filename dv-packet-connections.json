@@ -18,7 +18,12 @@
     "other_protected_people_yes_yes":    { "dv110": ["has_other_protected_people_yes"] },
     "other_protected_people_additional_list_attached_yes": {
       "dv110": ["other_protected_people_attached_page_yes"]
-    }
+    },
+    "person_asking_protection_telephone": { "clets001": ["clets_protected_person_telephone"] },
+    "person_to_restrain_firearms_yes_yes":     { "clets001": ["clets_restrained_person_weapons_yes"] },
+    "person_to_restrain_firearms_no_yes":      { "clets001": ["clets_restrained_person_weapons_no"] },
+    "person_to_restrain_firearms_unknown_yes": { "clets001": ["clets_restrained_person_weapons_unknown"] },
+    "child_custody_and_visitation_order_requested": { "dv140": ["dv140_has_children_under_18"] }
   },
   "_alreadyShared": [
     "court_name_and_street_address", "case_number",

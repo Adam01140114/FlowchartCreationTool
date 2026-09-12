@@ -2958,6 +2958,33 @@ window.exportGuiJson = function(download = true) {
           }
         }
       }
+      // An optional checkbox question passes its own condition on, the way an
+      // optional text question does above. "Which of those days should be
+      // virtual visits?" is answered by ticking none when every visit is in
+      // person, and the next day's question was reached only through its boxes -
+      // so Tuesday to Sunday and "How often should that plan repeat?" never
+      // appeared for a filer who wanted every visit in person. Only where every
+      // box leads here: a follow-up of one box ("Other" -> describe) stays shut
+      // until that box is ticked.
+      const fedBy = new Map();
+      for (const edge of incomingEdges) {
+        const opt = edge.source;
+        if (!opt || !isOptions(opt)) continue;
+        for (const optEdge of (getLogicalIncomingEdges(opt) || [])) {
+          const parentQ = optEdge.source;
+          if (!parentQ || !isQuestion(parentQ) || parentQ._optional !== true) continue;
+          if (!/checkbox/i.test(String(getQuestionType(parentQ) || ''))) continue;
+          if (!fedBy.has(parentQ)) fedBy.set(parentQ, new Set());
+          fedBy.get(parentQ).add(opt);
+        }
+      }
+      fedBy.forEach((fed, parentQ) => {
+        const all = (getLogicalOutgoingEdges(parentQ) || []).map((e) => e.target).filter((t) => t && isOptions(t));
+        if (all.length < 2 || !all.every((o) => fed.has(o))) return;
+        const inherited = findDirectParentCondition(parentQ);
+        if (Array.isArray(inherited)) conditions.push(...inherited);
+        else if (inherited) conditions.push(inherited);
+      });
       // Remove duplicates based on prevQuestion and prevAnswer combination
       const uniqueConditions = [];
       const seen = new Set();

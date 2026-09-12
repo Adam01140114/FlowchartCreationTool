@@ -771,7 +771,29 @@ async function main() {
   // from an earlier form - but it must still be produced. What makes that go
   // wrong is silent: the form vanishes from the interview and nobody notices it
   // also vanished from the output.
+  //
+  // A connector hung under End, or under another connector, is always on. An
+  // editor still running the old connector code exported it as waiting on an
+  // option named "END" or "↪ ConnectorDV-101" - node ids no answer can choose -
+  // so DV-109, CLETS-001 and DV-110 never switched on, and this rule printed
+  // them as "activated" and passed. An activation must wait on something the
+  // page actually posts.
+  const known = new Set(posted);
+  const collectNames = (v) => {
+    if (typeof v === 'string') known.add(v);
+    else if (Array.isArray(v)) v.forEach(collectNames);
+    else if (v && typeof v === 'object') Object.values(v).forEach(collectNames);
+  };
+  ['hiddenFields', 'computedFields', 'overflowLinks', 'linkedCheckboxes', 'inverseCheckboxes', 'packetMirrors']
+    .forEach((k) => collectNames(gui[k]));
+  const deadActivation = (r) => !r.unconditional && (
+    /^\d+$/.test(String(r.optionNameId || ''))
+    || /^(END$|↪)/.test(String(r.optionLabel || '').trim())
+    || !known.has(r.optionNameId));
   report.rule7 = forms.map((form) => ({
+    dead: (gui.formActivations || [])
+      .filter((r) => r.targetForm === form.name && deadActivation(r))
+      .map((r) => (r.optionLabel ? '"' + r.optionLabel + '" ' : '') + '(' + (r.optionNameId || 'no name') + ')'),
     form: form.name,
     asksNothing: form.asksNothing === true || form.lastSection < form.firstSection,
     pdfFile: form.pdfFile || '',
@@ -1017,10 +1039,14 @@ async function main() {
   report.rule7.forEach((f) => {
     const how = f.alwaysIncluded ? 'always included'
       : (f.activatedBy.length ? 'activated ' + f.activatedBy.join(', ') : 'NOTHING ACTIVATES IT');
-    const verdict = (!f.pdfFile || (!f.alwaysIncluded && !f.activatedBy.length)) ? 'FAILS ' : '';
+    const verdict = (!f.pdfFile || (!f.alwaysIncluded && !f.activatedBy.length) || f.dead.length) ? 'FAILS ' : '';
     console.log('  ' + verdict + f.form.padEnd(8)
       + (f.asksNothing ? 'asks nothing, ' : '')
       + (f.pdfFile ? 'produces ' + f.pdfFile : 'HAS NO PDF') + ', ' + how);
+    if (f.dead.length) {
+      console.log('      waits on ' + f.dead.join(', ') + ', which no answer can choose -'
+        + ' a connector under End or another connector is always on. Export again from a freshly loaded editor.');
+    }
   });
 
   console.log('');
@@ -1042,6 +1068,7 @@ async function main() {
   // and a run that found one says so in its exit code.
   const blocking = [
     ['RULE 2 (CORNERSTONE)', (report.rule2wording || []).length],
+    ['RULE 7', report.rule7.filter((f) => !f.pdfFile || (!f.alwaysIncluded && !f.activatedBy.length) || f.dead.length).length],
     ['RULE 8', report.rule8.compound.length],
     ['RULE 10', report.rule10.length],
     ['RULE 14', (report.rule14 || []).length],

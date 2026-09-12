@@ -1702,6 +1702,7 @@ function loadFormData(formData) {
                         setAttachment('attachmentItemTitle', attachment.itemTitle);
                         setAttachment('attachmentMarks', attachment.marks);
                         setAttachment('attachmentFields', Array.isArray(attachment.fields) ? attachment.fields.join(', ') : attachment.fields);
+                        setAttachment('attachmentForm', attachment.form);
                     }
                     // The same extra entries drawn again on other forms' pages. The
                     // hidden input is what generate.js reads (JSON.parse), so it is
@@ -3839,6 +3840,9 @@ function exportForm(options) {
                         .map(s => String(s == null ? '' : s).trim()).filter(Boolean);
                     const attachmentFields = attachmentList(attachmentValue('attachmentFields'));
                     if (attachmentFields.length) attachment.fields = attachmentFields;
+                    // The form the page is attached to, when it is not this one.
+                    const attachmentForm = attachmentValue('attachmentForm');
+                    if (attachmentForm) attachment.form = attachmentForm;
                     // The same entries drawn again on other forms' pages (hidden JSON).
                     let otherPages = [];
                     try {

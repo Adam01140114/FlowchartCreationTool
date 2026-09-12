@@ -945,7 +945,7 @@
       "text": "On what other dates did it happen?",
       "type": "bigParagraph",
       "conditional": {
-        "onlyWhen": "has_different_abuse"
+        "onlyWhen": "different_abuse_incident_frequency_two_to_five_yes,different_abuse_incident_frequency_weekly_yes,different_abuse_incident_frequency_other_yes"
       }
     },
     "other_abuse_to_describe": {
@@ -1010,7 +1010,7 @@
       "text": "On what other dates did it happen?",
       "type": "bigParagraph",
       "conditional": {
-        "onlyWhen": "has_other_abuse"
+        "onlyWhen": "other_abuse_incident_frequency_two_to_five,other_abuse_incident_frequency_weekly,other_abuse_incident_frequency_other"
       }
     },
     "other_abuse_incident_additional_space_attached": {
@@ -1926,7 +1926,8 @@
       ]
     },
     {
-      "nameId": "child_together",
+      "nameId": "dv105_child",
+      "_why": "The children are asked once, here, under DV-105's name. DV-105 item 3 and DV-140 item 3 list the same children, and the packet asked for them again on DV-105 with a date of birth; one block that asks both fills DV-100's names line, DV-105's table and DV-140's table, and DV-105's own declaration of the block collapses into this one. The pages for children five to twelve belong to DV-105 and DV-140, so they exist only while those forms are in the packet.",
       "question": "How many children do you have together?",
       "entryTitle": "Child",
       "min": 1,
@@ -1937,7 +1938,8 @@
       ],
       "joinInto": {
         "field": "relationship_children_names_line_1",
-        "separator": ", "
+        "separator": ", ",
+        "fields": ["{n}_name"]
       },
       "conditional": {
         "onlyWhen": "relationship_have_children_together"
@@ -1946,8 +1948,32 @@
         {
           "label": "Child's name",
           "nameId": "{n}_name"
+        },
+        {
+          "label": "Date of birth",
+          "nameId": "{n}_date_of_birth",
+          "type": "date"
         }
-      ]
+      ],
+      "attachment": {
+        "name": "Additional_Children",
+        "form": "DV-105",
+        "heading": "DV-105, Children",
+        "item": "3",
+        "itemTitle": "Children Under 18 Years Old",
+        "marks": "dv105_children_additional_list_attached",
+        "most": 12,
+        "otherPages": [
+          {
+            "form": "DV-140",
+            "name": "DV140_Children",
+            "heading": "DV-140, Children",
+            "item": "3",
+            "itemTitle": "Children Under 18 Years Old",
+            "marks": "dv105_children_additional_list_attached"
+          }
+        ]
+      }
     }
   ],
   "splits": [

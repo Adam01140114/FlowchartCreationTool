@@ -938,6 +938,8 @@ function addQuestion(sectionId, questionId = null) {
             <input type="text" id="attachmentItemTitle${currentQuestionId}" placeholder="e.g., Children Under 18 Years Old" style="width: 220px;">            <label>Box it ticks: </label>
             <input type="text" id="attachmentMarks${currentQuestionId}" placeholder="PDF checkbox name" style="width: 220px;">            <label title="Which of the entry fields this page prints: each is the field's key as written in the hints (e.g. {n}_full_name) or its label (e.g. Lives with you?). Leave blank to print every field.">Fields on this page: </label>
             <input type="text" id="attachmentFields${currentQuestionId}" placeholder="all fields, or e.g. {n}_full_name, {n}_age" style="width: 300px;">
+            <label title="The form this page is attached to, when it is not the form that asks the block. DV-100 asks for the children once, but their extra page is DV-105's and exists only while DV-105 is in the packet.">Page belongs to form: </label>
+            <input type="text" id="attachmentForm${currentQuestionId}" placeholder="this form, or e.g. DV-105" style="width: 140px;">
             <div class="fw-attachment-other-pages" style="margin-top: 10px;">
                 <label title="The same extra entries drawn again on a page that belongs to another form in the packet, e.g. DV-110's own Other Protected People page.">Also drawn on another form's page:</label>
                 <input type="hidden" id="attachmentOtherPages${currentQuestionId}" value="[]">

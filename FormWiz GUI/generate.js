@@ -5179,7 +5179,10 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
             item: attachmentSetting("attachmentItem"),
             itemTitle: attachmentSetting("attachmentItemTitle"),
             marks: attachmentSetting("attachmentMarks"),
-            fields: attachmentSetting("attachmentFields")
+            fields: attachmentSetting("attachmentFields"),
+            // A block asked on one form can own a page that belongs to another:
+            // DV-100 asks for the children, and their extra page is DV-105's.
+            form: attachmentSetting("attachmentForm")
           }));
           // The same entries again on another form's own page. DV-100 asks for
           // the other protected people once; DV-110 and CLETS-001 each print four
@@ -14924,6 +14927,24 @@ function applyComputedFields(){
     if (!rules.length) return;
     rules.forEach(function(rule){
         if (!rule || !rule.nameId) return;
+        // Words for whichever boxes are ticked. DV-110 item 2 wants the
+        // restrained person's relationship to the filer in a few words, and
+        // DV-100 item 3 has already asked it as boxes - "spouse", "former
+        // spouse", "grandparent". Asking it again in the filer's own words was
+        // the same question twice. A dropdown's choice ticks a hidden box of
+        // its own, so a relative's kind reads the same way.
+        if (Array.isArray(rule.wordsWhenTicked)){
+            var words = [];
+            rule.wordsWhenTicked.forEach(function(w){
+                if (!w || !w.when || !w.words) return;
+                var box = document.getElementById(w.when);
+                var on = !!box && ((box.type === "checkbox" || box.type === "radio")
+                    ? box.checked : String(box.value || "").trim() !== "");
+                if (on && words.indexOf(w.words) === -1) words.push(w.words);
+            });
+            writeComputedField(rule.nameId, words.join(rule.separator == null ? "; " : rule.separator));
+            return;
+        }
         var total = 0;
         if (rule.pagesOfFormsAttachedTo){
             // The pages attached to this form - and to whatever is attached to
@@ -20618,9 +20639,18 @@ function solverVisible(qid, model, answers, cache, stack) {
   return match;
 }
 
-/** Every question's visibility under one set of answers. */
-function solverVisibility(model, ids, answers) {
+/**
+ * Every question's visibility under one set of answers.
+ *
+ * Off lists the questions in forms the answers leave switched off. The page
+ * never asks them - it skips the form's sections rather than hiding the
+ * question - so they cannot come out of their own conditions, which a question
+ * with none at all always passes. Settling them here also closes whatever hangs
+ * off them, the way emptying them on the page does.
+ */
+function solverVisibility(model, ids, answers, off) {
   const cache = {}, stack = {}, out = {};
+  if (off) Object.keys(off).forEach(function (qid) { cache[qid] = false; });
   for (let i = 0; i < ids.length; i++) {
     out[ids[i]] = solverVisible(ids[i], model, answers, cache, stack);
   }
@@ -20639,6 +20669,60 @@ function solverFormWorth() {
     worth[f.name] = total;
   });
   return worth;
+}
+
+/**
+ * The sections of every form the page has switched off, read off the page.
+ *
+ * Read after the path is written rather than worked out from the model,
+ * because not every activation is an answer the model holds: DV-101 waits on a
+ * box the overflow link ticks when DV-100 item 7 runs past its edge, and DV-108
+ * on an answer inside DV-105, which is emptied once DV-105 turns out to be off.
+ * isFormActivated already settles all of that for the navigation, and the fill
+ * has to agree with the navigation about which forms the filer will see.
+ */
+function solverSwitchedOffSections() {
+  const off = {};
+  if (typeof getProjectForms !== 'function' || typeof isFormActivated !== 'function') return off;
+  getProjectForms().forEach(function (f) {
+    if (isFormActivated(f)) return;
+    for (let n = f.firstSection; n <= f.lastSection; n++) off['section' + n] = true;
+  });
+  return off;
+}
+
+/** The questions that live in those sections. */
+function solverQuestionsIn(ids, sections) {
+  const out = {};
+  ids.forEach(function (qid) {
+    const container = document.getElementById('question-container-' + qid);
+    const section = container && container.closest('.section');
+    if (section && sections[section.id]) out[qid] = true;
+  });
+  return out;
+}
+
+/** Do two sets of section ids name the same sections? */
+function solverSameSections(a, b) {
+  const ka = Object.keys(a);
+  if (ka.length !== Object.keys(b).length) return false;
+  for (let i = 0; i < ka.length; i++) if (!b[ka[i]]) return false;
+  return true;
+}
+
+/** Is this field inside a form the plan leaves switched off? */
+function solverInOffForm(el, plan) {
+  if (!plan || !plan.offSections) return false;
+  const section = el.closest('.section');
+  return !!(section && plan.offSections[section.id]);
+}
+
+/** Does this control hold an answer the filer could have given? */
+function solverHoldsAnswer(el) {
+  if (el.disabled || el.type === 'hidden' || isComputedFillField(el)) return false;
+  if (el.type === 'checkbox' || el.type === 'radio') return !!el.checked;
+  if (el.tagName === 'SELECT') return el.selectedIndex > 0;
+  return String(el.value || '') !== '';
 }
 
 /**
@@ -20705,6 +20789,8 @@ function solverOptionsFor(qid, model) {
  */
 function solveFillPath(options) {
   const minimum = !!(options && options.minimum);
+  // Questions in forms the page has already been seen to leave switched off.
+  const off = (options && options.off) || null;
   const model = solverModel();
   const ids = Object.keys(model);
   if (!ids.length) return null;
@@ -20713,7 +20799,7 @@ function solveFillPath(options) {
   const answers = {};
 
   const score = function (ans) {
-    const vis = solverVisibility(model, ids, ans);
+    const vis = solverVisibility(model, ids, ans, off);
     let total = 0;
     for (let i = 0; i < ids.length; i++) if (vis[ids[i]]) total += weights[ids[i]];
     return total + solverActivationBonus(ans, vis, formWorth);
@@ -20752,10 +20838,10 @@ function solveFillPath(options) {
       // and the least path takes the box with the smallest detour: the one that
       // goes straight on to what most of the boxes lead to.
       delete answers[qid];
-      const before = solverVisibility(model, ids, answers);
+      const before = solverVisibility(model, ids, answers, off);
       const trials = opts.map(function (v) {
         answers[qid] = new Set([norm(v)]);
-        const vis = solverVisibility(model, ids, answers);
+        const vis = solverVisibility(model, ids, answers, off);
         return {
           v: v,
           s: score(answers),
@@ -20805,7 +20891,7 @@ function solveFillPath(options) {
     return best;
   };
 
-  let visible = solverVisibility(model, ids, answers);
+  let visible = solverVisibility(model, ids, answers, off);
   let rounds = 0;
   // The cap is the length of the longest chain the interview could be, because
   // that is what a chain here looks like: item 6 of DV-100 is thirteen questions
@@ -20819,20 +20905,20 @@ function solveFillPath(options) {
       const qid = ids[i];
       if (!visible[qid] || answers[qid] !== undefined) continue;
       answers[qid] = choose(qid);
-      visible = solverVisibility(model, ids, answers);
+      visible = solverVisibility(model, ids, answers, off);
       changed = true;
     }
     // A question the path has since closed keeps no answer: the form clears a
     // hidden question's dropdown, and an answer left behind in the model would
     // hold open a gate the filer never actually opened.
-    const after = solverVisibility(model, ids, answers);
+    const after = solverVisibility(model, ids, answers, off);
     for (let i = 0; i < ids.length; i++) {
       if (!after[ids[i]] && answers[ids[i]] !== undefined) {
         delete answers[ids[i]];
         changed = true;
       }
     }
-    visible = solverVisibility(model, ids, answers);
+    visible = solverVisibility(model, ids, answers, off);
     if (!changed) break;
   }
   // A question the path never reaches can still be asked what it would take:
@@ -20845,7 +20931,8 @@ function solveFillPath(options) {
     extra[also] = choose(also);
     delete answers[also];
   }
-  return { model: model, ids: ids, answers: answers, visible: visible, rounds: rounds, extra: extra };
+  return { model: model, ids: ids, answers: answers, visible: visible, rounds: rounds, extra: extra,
+    off: off || {} };
 }
 
 /**
@@ -20986,6 +21073,11 @@ function applySolvedPath(plan) {
     plan.ids.forEach(function (qid) {
       const container = document.getElementById('question-container-' + qid);
       if (!container) return;
+      // A question in a switched-off form is emptied but keeps its class.
+      // Nothing about its own conditions shut it, and one with no conditions
+      // has nothing that would ever show it again - hiding it here would leave
+      // it hidden for good if the filer then switched the form on.
+      if (plan.off && plan.off[qid]) { clearQuestion(container); return; }
       if (plan.visible[qid]) { container.classList.remove('hidden'); return; }
       if (!container.classList.contains('hidden')) container.classList.add('hidden');
       clearQuestion(container);
@@ -21098,6 +21190,9 @@ function fillSolvedRemainder(plan) {
   // something, which on a signed-in page is whatever the saved draft held. A
   // fill is the answer set, not a set of suggestions laid over yesterday's.
   const owned = (plan && plan.owned) || new Set();
+  // A switched-off form is not on screen for the filer, whatever its classes
+  // say, so nothing in it is this sweep's to answer.
+  const eligible = function (el) { return solverFieldEligible(el) && !solverInOffForm(el, plan); };
   // Entry-level dropdowns, e.g. one child's relationship to the filer. The DOM
   // fill scored these against the whole form like any other question, which
   // cost more than everything else put together and decided nothing: an option
@@ -21105,7 +21200,7 @@ function fillSolvedRemainder(plan) {
   const minimum = !!window.__FILL_MINIMUM__;
   const preferred = minimum ? ['no', "i don't know", "i don’t know", 'none'] : ['yes', 'other'];
   document.querySelectorAll('select').forEach(function (sel) {
-    if (!solverFieldEligible(sel) || owned.has(sel)) return;
+    if (!eligible(sel) || owned.has(sel)) return;
     const opts = getSelectOptions(sel).filter(function (o) {
       return !wouldOptionJumpToEnd(sel, o.value) && !wouldTriggerHardAlertOnSelect(sel, o.value);
     });
@@ -21127,7 +21222,7 @@ function fillSolvedRemainder(plan) {
   // answer already there when the next radio in the same group comes round.
   const radioGroupDone = {};
   document.querySelectorAll('input[type="radio"]').forEach(function (r) {
-    if (!solverFieldEligible(r) || !r.name || radioGroupDone[r.name]) return;
+    if (!eligible(r) || !r.name || radioGroupDone[r.name]) return;
     const group = document.getElementsByName(r.name);
     for (let i = 0; i < group.length; i++) {
       if (owned.has(group[i])) { radioGroupDone[r.name] = true; return; }
@@ -21148,7 +21243,7 @@ function fillSolvedRemainder(plan) {
 
   if (!minimum) {
     document.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
-      if (!solverFieldEligible(cb) || cb.checked) return;
+      if (!eligible(cb) || cb.checked) return;
       const container = cb.closest('.question-container');
       if (container && container.querySelector('input[type="radio"]')) return;  // mark only one
       if (wouldOptionJumpToEnd(cb, cb.value) || wouldTriggerHardAlertOnSelect(cb, cb.value)) return;
@@ -21166,14 +21261,14 @@ function fillSolvedRemainder(plan) {
     // puts back after that is drift, and drift is what the repair is for.
     plan.draftBoxesCleared = true;
     document.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
-      if (!solverFieldEligible(cb) || !cb.checked || owned.has(cb)) return;
+      if (!eligible(cb) || !cb.checked || owned.has(cb)) return;
       cb.checked = false;
       triggerFieldChange(cb);
     });
   }
 
   document.querySelectorAll('input, textarea').forEach(function (el) {
-    if (!solverFieldEligible(el) || owned.has(el)) return;
+    if (!eligible(el) || owned.has(el)) return;
     const type = (el.type || '').toLowerCase();
     if (type === 'checkbox' || type === 'radio' || type === 'file') return;
     const value = padToCapacity(el, getSampleFillValue(el), !!window.__FILL_MINIMUM__);
@@ -21232,6 +21327,14 @@ function solvedPathDrift(plan) {
   plan.ids.forEach(function (qid) {
     const container = document.getElementById('question-container-' + qid);
     if (!container) return;
+    // A question in a switched-off form has drifted only if something has put
+    // an answer back into it - a saved draft landing late, most likely.
+    if (plan.off && plan.off[qid]) {
+      container.querySelectorAll('input, select, textarea').forEach(function (el) {
+        if (solverHoldsAnswer(el)) drifted++;
+      });
+      return;
+    }
     if (plan.visible[qid] === container.classList.contains('hidden')) {
       const section = container.closest('[id^="section"]');
       if (!plan.visible[qid] && section && closedSections[section.id]) return;
@@ -21307,12 +21410,49 @@ async function settleSolvedPath(plan) {
  * touched once per answer instead of once per option per pass.
  */
 async function fillSolvedPath(options) {
-  const plan = solveFillPath({ minimum: !!(options && options.minimum) });
+  const minimum = !!(options && options.minimum);
+  let plan = solveFillPath({ minimum: minimum });
   if (!plan) return null;
+  await writeSolvedPath(plan);
+
+  // Then which forms the answers switched on. The page skips a form that is
+  // off - its sections are never shown and its PDF is never made - but the
+  // model knows nothing of forms, so a question in one with no conditions of
+  // its own counted as asked. A minimum run on the DV packet left DV-101,
+  // DV-105 and DV-108 switched off and put sixty-four answers inside them. So
+  // the path is solved again with those questions shut, which empties them the
+  // way closing a gate does and takes back whatever they were holding open.
+  //
+  // Again rather than once: emptying DV-105 takes back its answer on abduction
+  // risk, and that answer is what switches DV-108 on. It stops when the forms
+  // the page leaves off are the ones the path was solved around. The cap is
+  // for a page that keeps changing its mind.
+  for (let round = 0; round < 3; round++) {
+    // The overflow link ticks the box DV-101 waits on, on its own schedule, so
+    // it is brought up to date before the forms are read.
+    if (typeof applyOverflowLinks === 'function') { try { applyOverflowLinks(); } catch (e) { /* ignore */ } }
+    const offSections = solverSwitchedOffSections();
+    if (solverSameSections(offSections, plan.offSections || {})) break;
+    const next = solveFillPath({ minimum: minimum, off: solverQuestionsIn(plan.ids, offSections) });
+    if (!next) break;
+    next.offSections = offSections;
+    // The saved draft's boxes came off on the way in. What is ticked now, the
+    // fill or the page ticked.
+    next.draftBoxesCleared = plan.draftBoxesCleared;
+    plan = next;
+    await writeSolvedPath(plan, 'Leaving out the forms left switched off');
+  }
+  return plan;
+}
+
+/**
+ * Write one solved path to the page and hold it there until the page is quiet.
+ */
+async function writeSolvedPath(plan, label) {
   // The long one. Writing the answers takes most of the run, so the bar has
   // to be told that before the main thread is taken rather than after - and
   // it has to be drawn before, too.
-  fillProgress({ text: 'Writing ' + Object.keys(plan.answers).length + ' answers', percent: 12 });
+  fillProgress({ text: label || ('Writing ' + Object.keys(plan.answers).length + ' answers'), percent: 12 });
   await fillPaint();
   applySolvedPath(plan);
 

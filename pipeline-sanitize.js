@@ -15,7 +15,10 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { execFileSync } = require('child_process');
-const { PDFDocument, PDFName, PDFNumber, StandardFonts, rgb } = require('pdf-lib');
+const {
+  PDFDocument, PDFName, PDFNumber, PDFRef, PDFStream, PDFObjectCopier, StandardFonts, rgb,
+  decodePDFRawStream, pushGraphicsState, popGraphicsState, concatTransformationMatrix, drawObject,
+} = require('pdf-lib');
 const { sanitizePdfFields } = require('./auto-form/pdf-field-sanitizer');
 const { packetForms } = require('./packet-forms');
 
@@ -153,9 +156,9 @@ async function applyRects(bytes, moved) {
  * Temporary Restraining Order" - six numbers missing from the list of forms
  * they are being told to file.
  *
- * The text is not in the appearance stream, which draws nothing; it is the
- * button's /MK /CA caption, which a viewer paints. So it has to be drawn onto
- * the page as real ink before the widget goes.
+ * The text is the button's /MK /CA caption, drawn by its appearance stream in
+ * the button's own font, size and colour. The widget goes, so that drawing has
+ * to be put onto the page as real ink first.
  *
  * Which buttons are words and which are controls is not a guess. A control
  * carries /MK /BG, a background colour - that is what makes it look like a
@@ -175,6 +178,20 @@ async function buttonCaptions(bytes) {
     standardFontDataUrl: path.join(__dirname, 'node_modules', 'pdfjs-dist', 'standard_fonts') + path.sep,
   }).promise;
 
+  // pdfjs does not hand over a push button's /MK /CA caption or its /DA - both
+  // come back missing - so they are read off the widget itself. Without them
+  // DV-140's footer link fell back to its alt text at a guessed 7.7pt in black,
+  // against 6pt blue in the button, and landed on "Mandatory Form" below it.
+  const raw = await PDFDocument.load(bytes, { ignoreEncryption: true });
+  const text = (v) => (v && typeof v.decodeText === 'function' ? v.decodeText() : '');
+  const inherited = (dict, key) => {
+    for (let d = dict; d; d = d.lookup(PDFName.of('Parent'))) {
+      const v = d.lookup(PDFName.of(key));
+      if (v) return v;
+    }
+    return null;
+  };
+
   const wanted = [];
   for (let n = 1; n <= doc.numPages; n++) {
     const page = await doc.getPage(n);
@@ -188,7 +205,10 @@ async function buttonCaptions(bytes) {
 
     buttons.forEach((a) => {
       if (a.backgroundColor) return;                       // a control, not words
-      const caption = String(a.buttonValue || a.alternativeText || '').trim();
+      const widget = widgetDict(raw, a.id);
+      const mk = widget && widget.lookup(PDFName.of('MK'));
+      const ca = mk && typeof mk.lookup === 'function' ? text(mk.lookup(PDFName.of('CA'))) : '';
+      const caption = String(ca || a.buttonValue || a.alternativeText || '').trim();
       if (!caption) return;
       const [x1, y1, x2, y2] = a.rect;
       const left = Math.min(x1, x2), right = Math.max(x1, x2);
@@ -220,16 +240,63 @@ async function buttonCaptions(bytes) {
       if (bare(under).indexOf(bare(caption)) >= 0) return;
       if (spoken(under).indexOf(spoken(caption)) >= 0) return;
 
-      wanted.push({ page: n, caption, left, right, bottom, top, appearance: a.defaultAppearance || '' });
+      const appearance = text(widget && inherited(widget, 'DA')) || a.defaultAppearance || '';
+      wanted.push({ page: n, id: a.id, caption, left, right, bottom, top, appearance });
     });
   }
   return wanted;
 }
 
-/** Draw those captions onto the rebuilt document as ordinary text. */
-async function drawCaptions(bytes, captions) {
+/** The widget pdfjs calls "791R" (or "791R2" for generation 2), from pdf-lib's side. */
+function widgetDict(doc, id) {
+  const m = /^(\d+)R(\d*)$/.exec(id || '');
+  if (!m) return null;
+  const dict = doc.context.lookup(PDFRef.of(Number(m[1]), Number(m[2] || 0)));
+  return dict && typeof dict.lookup === 'function' ? dict : null;
+}
+
+/**
+ * The button's normal appearance stream, if it draws any text.
+ *
+ * That stream is the caption exactly as a viewer showed it: its font, its size,
+ * its colour, the underline that marks it as a link, and its baseline inside the
+ * box. Drawing the words over again from the box alone has to guess every one of
+ * those, and a wrong guess in a six-point footer lands on the line below.
+ */
+function captionAppearance(source, id) {
+  const widget = widgetDict(source, id);
+  const ap = widget && widget.lookup(PDFName.of('AP'));
+  const ref = ap && typeof ap.get === 'function' ? ap.get(PDFName.of('N')) : null;
+  if (!(ref instanceof PDFRef)) return null;
+  const form = source.context.lookup(ref);
+  if (!(form instanceof PDFStream)) return null;
+  let ops = '';
+  try { ops = Buffer.from(decodePDFRawStream(form).decode()).toString('latin1'); }
+  catch (e) { return null; }
+  if (!/T[jJ]/.test(ops)) return null;                      // draws no words
+  const box = form.dict.lookup(PDFName.of('BBox'));
+  if (!box || typeof box.asArray !== 'function') return null;
+  const matrix = form.dict.lookup(PDFName.of('Matrix'));
+  return {
+    ref,
+    bbox: box.asArray().map((v) => v.asNumber()),
+    matrix: matrix && typeof matrix.asArray === 'function' ? matrix.asArray().map((v) => v.asNumber()) : [1, 0, 0, 1, 0, 0],
+  };
+}
+
+/**
+ * Put those captions onto the rebuilt document as ordinary page content.
+ *
+ * Where the button has an appearance stream, that stream is copied in and
+ * placed over the button's rectangle the way a viewer places it (PDF 32000
+ * 12.5.5: the bounding box, carried through the form's matrix, is fitted to
+ * the rectangle). Only a button without one gets its caption typeset afresh.
+ */
+async function drawCaptions(bytes, captions, source) {
   if (!captions.length) return bytes;
   const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+  const src = await PDFDocument.load(source, { ignoreEncryption: true });
+  const copier = PDFObjectCopier.for(src.context, doc.context);
   const pages = doc.getPages();
   const fonts = new Map();
   const fontFor = async (appearance) => {
@@ -247,6 +314,30 @@ async function drawCaptions(bytes, captions) {
   for (const c of captions) {
     const page = pages[c.page - 1];
     if (!page) continue;
+
+    const look = captionAppearance(src, c.id);
+    if (look) {
+      const [b0, b1, b2, b3] = look.bbox;
+      const [ma, mb, mc, md, me, mf] = look.matrix;
+      const xs = [], ys = [];
+      [[b0, b1], [b2, b1], [b0, b3], [b2, b3]].forEach(([x, y]) => {
+        xs.push(ma * x + mc * y + me);
+        ys.push(mb * x + md * y + mf);
+      });
+      const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+      if (w > 0 && h > 0) {
+        const sx = (c.right - c.left) / w, sy = (c.top - c.bottom) / h;
+        const name = page.node.newXObject('Caption', copier.copy(look.ref));
+        page.pushOperators(
+          pushGraphicsState(),
+          concatTransformationMatrix(sx, 0, 0, sy, c.left - Math.min(...xs) * sx, c.bottom - Math.min(...ys) * sy),
+          drawObject(name),
+          popGraphicsState(),
+        );
+        continue;
+      }
+    }
+
     const font = await fontFor(c.appearance);
 
     // The size and colour the button was going to be painted in.
@@ -303,8 +394,9 @@ async function main() {
     const config = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, base + '-field-config.json'), 'utf8'));
     const result = await sanitizePdfFields(decrypt(source), config);
     const moved = await unoverlapLabels(result.bytes);
-    const captions = await buttonCaptions(decrypt(source));
-    const rebuilt = await drawCaptions(await applyRects(result.bytes, moved), captions);
+    const plain = decrypt(source);
+    const captions = await buttonCaptions(plain);
+    const rebuilt = await drawCaptions(await applyRects(result.bytes, moved), captions, plain);
     const after = result.fieldNames;
     const target = path.join(OUT_DIR, base + '.pdf');
     const before = fs.existsSync(target) ? await names(fs.readFileSync(target)) : [];

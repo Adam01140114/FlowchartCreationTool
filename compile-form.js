@@ -915,6 +915,12 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
         field: null,
         origin: 'group'
       });
+      // A family the filer may leave empty: "Which of those days should be
+      // virtual visits?" is answered by ticking none when every visit is in
+      // person. Required, it held shut every day of the chart after it.
+      const groupSpec = (hints.groups || []).find((g) => g.nameId === group.nameId) || {};
+      const groupHint = (hints.questions || {})[group.nameId] || {};
+      if (groupSpec.optional === true || groupHint.optional === true) step.optional = true;
       place(step, hostFor(group.conditional ? { conditional: group.conditional } : field));
       notes.push(`${group.source}: ${group.members.length} ${group.multiSelect ? 'checkbox' : 'exclusive'} fields -> "${group.question}"`);
       return;
@@ -1674,9 +1680,13 @@ function compile(schema, hints = {}) {
   // separators.
   repeats.forEach((r) => {
     if (!r.joinInto || !r.joinInto.field) return;
+    // The box may print only some of the columns: DV-100's names line takes
+    // each child's name, not the date of birth the same block asks for DV-105.
+    const only = Array.isArray(r.joinInto.fields) ? r.joinInto.fields : null;
+    const templates = repeatTemplateNames(r).filter((t) => !only || only.includes(t));
     const parts = [];
     for (let n = 1; n <= r.max; n++) {
-      repeatTemplateNames(r).forEach((t) => parts.push(repeatFieldName(r.nameId, t, n)));
+      templates.forEach((t) => parts.push(repeatFieldName(r.nameId, t, n)));
     }
     joins.push({
       target: r.joinInto.field,

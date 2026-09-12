@@ -208,6 +208,24 @@ function collapseSharedQuestions(merged) {
   const firstByName = new Map();
   const replacement = new Map();
   const mirrors = [];
+  // The boxes an earlier question ticks through its answers. DV-100's "Do you
+  // want the order to protect other people?" ticks other_protected_people_yes_yes
+  // when it is answered Yes, and DV-110 prints a box of exactly that name - so
+  // DV-110 compiled it into a question of its own and asked it again. The same
+  // for DV-140's "children under 18" box, which is DV-100's custody choice, and
+  // CLETS-001's firearms Yes/No/Don't know, which is DV-100's. A name matching
+  // only a question's own name let all three through.
+  const postedBy = new Map();
+  const optionNamesOf = function (q) {
+    const names = [];
+    (((q.hiddenLogic || {}).configs) || []).forEach(function (h) {
+      if (h && h.nodeId) names.push(String(h.nodeId));
+    });
+    (q.options || []).forEach(function (o) {
+      if (o && typeof o === 'object' && o.nameId) names.push(String(o.nameId));
+    });
+    return names;
+  };
 
   merged.sections.forEach(function (section) {
     const keep = [];
@@ -221,7 +239,21 @@ function collapseSharedQuestions(merged) {
       if (!name) { keep.push(q); return; }
 
       const first = firstByName.get(name);
+      // Asked already, as the answer to an earlier question: either this
+      // question's own box, or every box its answers would tick.
+      const own = first ? [] : optionNamesOf(q);
+      const poster = first ? null : (postedBy.get(name)
+        || (own.length && own.every(function (n) { return postedBy.has(n); }) ? postedBy.get(own[0]) : null));
+      if (poster && q.type !== 'numberedDropdown') {
+        replacement.set(String(q.questionId), String(poster.question.questionId));
+        mirrors.push({ nameId: name, askedInSection: poster.section, questionId: poster.question.questionId,
+                       viaAnswer: true, alsoAnswers: [{ questionId: q.questionId, section: section.sectionId }] });
+        return;
+      }
       if (!first) {
+        optionNamesOf(q).forEach(function (n) {
+          if (!postedBy.has(n)) postedBy.set(n, { question: q, section: section.sectionId });
+        });
         firstByName.set(name, { question: q, section: section.sectionId });
         mirrors.push({ nameId: name, askedInSection: section.sectionId,
                        questionId: q.questionId, alsoAnswers: [] });

@@ -73,7 +73,9 @@ let shown = 0;
         (f.options || []).forEach((o) => console.log('           o  ' + (o.text || o.nodeId)));
         return;
       }
-      console.log('        _  ' + (f.label || f.nodeId || '') + '   (' + f.type + ')');
+      // A dropdown box keeps its caption in fieldName - the page shows it as the
+      // first option - so a box with no label is not a blank one.
+      console.log('        _  ' + (f.label || f.fieldName || f.nodeId || '') + '   (' + f.type + ')');
     });
     if (q.type === 'numberedDropdown') {
       console.log('        repeats ' + q.min + '-' + q.max + ' times, each headed "'

@@ -16,17 +16,18 @@
       ]
     },
     {
-      "nameId": "clets_restrained_person_weapons",
-      "question": "Does that person have any firearms, firearm parts, ammunition, or body armor?",
+      "nameId": "person_to_restrain_firearms",
+      "_why": "DV-100 item 9 asks this, and CLETS-001's three boxes carry DV-100's names (dv-packet-connections.json), so the packet asks it once and this declaration collapses into DV-100's.",
+      "question": "Does the person you want protection from have firearms (guns), firearm parts, or ammunition?",
       "members": [
-        "clets_restrained_person_weapons_yes",
-        "clets_restrained_person_weapons_no",
-        "clets_restrained_person_weapons_unknown"
+        "person_to_restrain_firearms_unknown_yes",
+        "person_to_restrain_firearms_no_yes",
+        "person_to_restrain_firearms_yes_yes"
       ],
       "labels": [
-        "Yes",
+        "I don't know",
         "No",
-        "I don't know"
+        "Yes"
       ]
     },
     {
@@ -112,26 +113,19 @@
         "onlyWhen": "clets_restrained_person_speaks_english_no"
       }
     },
-    "clets_restrained_person_weapons_details": {
-      "text": "What do you know about them - the type, the amount, or where they are kept?",
-      "conditional": {
-        "onlyWhen": "clets_restrained_person_weapons_yes"
-      },
-      "type": "bigParagraph"
-    },
     "clets_protected_person_race": {
       "text": "What is your race?",
       "optional": true
+    },
+    "person_asking_protection_telephone": {
+      "text": "What is your telephone number?",
+      "optional": true,
+      "type": "phone"
     },
     "clets_protected_person_date_of_birth": {
       "text": "What is your date of birth? Giving it puts your order in the federal database as well as California's, which makes it easier to enforce outside the state.",
       "type": "date",
       "optional": true
-    },
-    "clets_protected_person_telephone": {
-      "text": "What is your telephone number?",
-      "optional": true,
-      "type": "phone"
     },
     "clets_protected_person_language": {
       "text": "Which language do you speak?",
@@ -173,9 +167,9 @@
         "clets_restrained_person_speaks_english_no",
         "clets_restrained_person_speaks_english_unknown",
         "clets_restrained_person_language",
-        "clets_restrained_person_weapons_yes",
-        "clets_restrained_person_weapons_no",
-        "clets_restrained_person_weapons_unknown",
+        "person_to_restrain_firearms_yes_yes",
+        "person_to_restrain_firearms_no_yes",
+        "person_to_restrain_firearms_unknown_yes",
         "clets_restrained_person_weapons_details"
       ]
     },
@@ -189,7 +183,7 @@
         "clets_protected_person_race",
         "person_asking_protection_age",
         "clets_protected_person_date_of_birth",
-        "clets_protected_person_telephone",
+        "person_asking_protection_telephone",
         "clets_protected_person_speaks_english_yes",
         "clets_protected_person_speaks_english_no",
         "clets_protected_person_language",
@@ -246,8 +240,12 @@
   { "question": "What does law enforcement need to know about you? Your date of birth also puts your order in the federal database, which makes it easier to enforce outside California.", "fields": [
       {"group":"clets_protected_person_gender","label":"Gender"},
       {"field":"clets_protected_person_race","label":"Race","optional":true},
-      {"field":"clets_protected_person_date_of_birth","label":"Date of birth","type":"date","optional":true},
-      {"field":"clets_protected_person_telephone","label":"Phone number","type":"phone","optional":true} ] }
+      {"field":"clets_protected_person_date_of_birth","label":"Date of birth","type":"date","optional":true} ] }
 ],
+  "autofill": [
+    { "field": "clets_restrained_person_weapons_details", "separator": "; ",
+      "from": ["firearm_item_1_description","firearm_item_1_number_or_amount","firearm_item_1_location","firearm_item_2_description","firearm_item_2_number_or_amount","firearm_item_2_location","firearm_item_3_description","firearm_item_3_number_or_amount","firearm_item_3_location","firearm_item_4_description","firearm_item_4_number_or_amount","firearm_item_4_location","firearm_item_5_description","firearm_item_5_number_or_amount","firearm_item_5_location","firearm_item_6_description","firearm_item_6_number_or_amount","firearm_item_6_location"],
+      "why": "The firearms, parts and ammunition the filer listed on DV-100 item 9 - what each is, how many, and where it is kept - are what this box asks for. Asking again made the filer write the same list twice." }
+  ],
   "_combinesNote": "Ungated on purpose. The repeat that asks how many other people there are, and what they are called, belongs to DV-100; the packet merges the two declarations of it and keeps the first, so the three details only CLETS has boxes for were never asked at all. They are collected here instead, one question per person. A gate would have to name an option, and the thing that decides whether a person exists is their name - a text box, which has none."
 }

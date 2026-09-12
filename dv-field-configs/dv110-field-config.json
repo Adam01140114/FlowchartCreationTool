@@ -11,7 +11,8 @@
       "id": "DV-110[0].Page1[0].StampbxSub[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-110[0].Page1[0].OrigAmen_cb[0]",
@@ -268,7 +269,8 @@
       "id": "DV-110[0].Page2[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-110[0].Page2[0].List6[0].CheckBoxRightCaption[0]",
@@ -541,7 +543,8 @@
       "id": "DV-110[0].Page3[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-110[0].Page4[0].List11[0].item8_cb[0]",
@@ -807,13 +810,15 @@
       "id": "DV-110[0].Page4[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-110[0].Page5[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-110[0].Page5[0].List15[0].Li1[0].item12_cb[0]",
@@ -1099,7 +1104,8 @@
       "id": "DV-110[0].Page6[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-110[0].Page6[0].List20[0].Li1[0].item17_cb[0]",
@@ -1301,13 +1307,15 @@
       "id": "DV-110[0].Page7[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-110[0].Page8[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     },
     {
       "id": "DV-110[0].Page9[0].ClertSub[0].T57[0]",
@@ -1327,7 +1335,8 @@
       "id": "DV-110[0].Page9[0].PxCaption[0].CaseNumber[0]",
       "newName": "case_number",
       "type": "text",
-      "label": "case_number"
+      "label": "case_number",
+      "courtUse": true
     }
   ]
 }

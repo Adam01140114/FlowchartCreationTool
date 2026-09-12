@@ -40,6 +40,11 @@ Object.entries(spec.canonical || {}).forEach(([canonical, byForm]) => {
     const entry = load(form);
     aliases.forEach((alias) => {
       const hits = entry.data.fields.filter((f) => f.newName === alias);
+      // A second run finds the alias already renamed. That is the connection
+      // made, not a field gone missing - it used to exit 1 on every re-run.
+      if (!hits.length && entry.data.fields.some((f) => f.connectedFrom === alias && f.newName === canonical)) {
+        return;
+      }
       if (!hits.length) {
         console.log('  ! ' + form + ': no field named ' + alias);
         missing += 1;

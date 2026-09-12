@@ -764,6 +764,41 @@ the feature not working:
   than wherever a word boundary falls — letting it fall put ten characters more
   on DV-101 than DV-101 holds, which is testing the overflow by overflowing.
 
+## Asked once across the packet
+
+A form later in the packet that prints what an earlier form already asked
+must not ask it again. Matching question names was not enough; five shapes of
+the same answer got through, and each now has its own mechanism.
+
+- **The court's box.** DV-100 prints "Court fills in case number when form is
+  filed." `case_number` is `courtUse` on every form, so no form asks it and the
+  attachment pages leave it off.
+- **A box an earlier answer ticks.** DV-110's "protect other people" box and
+  DV-140's item 3 box carry the names DV-100's answers already tick
+  (`other_protected_people_yes_yes`, `child_custody_and_visitation_order_requested`).
+  `collapseSharedQuestions` in `project-gui-export.js` drops a later question
+  whose own name, or every one of whose options, an earlier question posts
+  through its answers (recorded in `packetMirrors` with `viaAnswer: true`).
+  CLETS-001's firearms Yes/No/Don't know are renamed to DV-100's in
+  `dv-packet-connections.json` and collapse the same way.
+- **A list carried over.** DV-110 item 2 and CLETS-001 ask for the firearms DV-100
+  item 9 lists. Both boxes are `autofill` from DV-100's entries, joined with "; ".
+  The CLETS phone is DV-100's phone by name.
+- **The same answer in other words.** DV-110's "relationship to person in 1" is a
+  `computed` field with `wordsWhenTicked`: a word or two for each DV-100
+  relationship box that is ticked. The box holds 29 characters, so the words are
+  short.
+- **The same block.** DV-100 asks for the children with a date of birth under
+  DV-105's block name, so DV-105's declaration collapses into it. Its `joinInto`
+  takes only `{n}_name` for DV-100's names line. The page for children five to
+  twelve belongs to DV-105 (`attachment.form`) and is drawn again as "DV-140,
+  Children" (`otherPages`), each only while its form is in the packet.
+
+An optional checkbox question passes its own condition on, like an optional text
+question: "Which of those days should be virtual visits?" is answered by ticking
+none, and the days after it open on the chart choice as well as on its boxes
+(`library.js`, only where every box leads on). Groups take `"optional": true`.
+
 ## No connector is left loose
 
 A connector an answer decides hangs off that answer's option. Every other one -
@@ -1153,6 +1188,13 @@ questions its path does not reach, the way the generated logic clears a question
 it closes, so a minimum run does not inherit a maximum run's answers - it used
 to, and reported nineteen ticked boxes on the run whose whole job is to show
 that unticked gates close their blocks.
+
+Both obey the forms the answers switch on. The page skips a switched-off form's
+sections, so once the path is written the fill reads `isFormActivated` for every
+form and, if any are off, solves again with their questions shut - emptied, and
+nothing they held open left open. A minimum run on the DV packet leaves DV-101,
+DV-105 and DV-108 off with nothing in them; it used to post sixty-odd answers
+there that no filer could ever see.
 
 In question-at-a-time mode a minimum path leaves a handful of questions on
 screen that it says are not asked. The step navigator will not show an empty
