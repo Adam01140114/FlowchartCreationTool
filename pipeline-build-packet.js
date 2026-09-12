@@ -302,6 +302,17 @@ async function main() {
           cell._activateWhenTicked = activation.whenFieldTicked;
           cell.style += 'activateWhenTicked='
             + encodeURIComponent(activation.whenFieldTicked) + ';';
+          // And on the canvas. Hung under End, a connector reads as "always,
+          // in this order"; this one comes in only when its field is ticked,
+          // and nothing said so - so a filer's DV-101 not appearing after
+          // DV-100 looked like the chain being skipped. The words also go in
+          // the style, so the editor can draw them again after a retarget.
+          const when = activation.whenLabel || ('only when ' + activation.whenFieldTicked + ' is ticked');
+          cell.style += 'activateWhenLabel=' + encodeURIComponent(when) + ';';
+          cell.value = '<div style="text-align:center;padding:6px;"><strong>&#8618; Connector</strong>'
+            + '<br><span style="font-size:12px;">' + target + '</span>'
+            + '<br><span style="font-size:11px;font-style:italic;">' + when + '</span></div>';
+          cell.geometry.height = 80;
         }
       }
     });

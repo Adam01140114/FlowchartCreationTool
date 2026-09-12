@@ -844,6 +844,75 @@ function liveSiteRouter(title, modes) {
   ].join('\n');
 }
 
+/**
+ * Where a project's live site already is, by its id - "Open Form Link" in the
+ * editor. Only a folder that says it belongs to the project counts, the same
+ * test publishing uses, and nothing is created: a project never published gets
+ * a 404 and the editor publishes it first.
+ */
+/** A project id as it may appear in a link: the editor's own shape, nothing that walks a path. */
+const PROJECT_ID_RE = /^[A-Za-z0-9_-]{1,80}$/;
+
+/** The live-site folder that says it belongs to this project, or null. */
+function liveSiteOfProject(projectId) {
+  if (!projectId || !PROJECT_ID_RE.test(projectId) || !fs.existsSync(LIVE_SITES_DIR)) return null;
+  return fs.readdirSync(LIVE_SITES_DIR).find((s) => {
+    const m = readLiveSiteManifest(s);
+    return m && m.projectId === projectId;
+  }) || null;
+}
+
+/** The links that carry the project id, one per way of asking. */
+function formLinksFor(projectId, modes) {
+  const links = {};
+  (modes || LIVE_SITE_MODES).forEach((mode) => {
+    links[mode] = '/form/' + encodeURIComponent(projectId) + '/' + mode + '.html';
+  });
+  return links;
+}
+
+app.get('/api/live-site', (req, res) => {
+  const projectId = String(req.query.projectId || '').trim();
+  if (!projectId) return res.status(400).json({ error: 'projectId is required' });
+  const slug = liveSiteOfProject(projectId);
+  if (!slug) return res.status(404).json({ error: 'This project has no live site yet' });
+  const m = readLiveSiteManifest(slug) || {};
+  const pages = {};
+  LIVE_SITE_MODES.forEach((mode) => {
+    if (fs.existsSync(path.join(LIVE_SITES_DIR, slug, mode + '.html'))) pages[mode] = '/live-sites/' + slug + '/' + mode + '.html';
+  });
+  res.json({ folder: 'live-sites/' + slug, slug, pages, formLinks: formLinksFor(projectId, Object.keys(pages)),
+    tabTitle: m.tabTitle || '', builtAt: m.builtAt || '' });
+});
+
+/**
+ * The form by its project id: /form/<projectId>/section.html.
+ *
+ * The folder a site lives in comes from the project's name, which can change
+ * and can clash; the id is the project. So the link that is handed out names
+ * the id, and the server looks up whichever folder holds that project's site -
+ * any flowchart with a project id has one, however it is named. The page is
+ * served from under the id, not redirected to the folder, so the link in the
+ * address bar stays the one handed out, and the page's own CSS, county lookup
+ * and PDFs resolve beside it exactly as they do in the folder.
+ */
+app.get('/form/:projectId', (req, res) => {
+  res.redirect(302, '/form/' + encodeURIComponent(req.params.projectId) + '/section.html');
+});
+app.use('/form/:projectId', (req, res, next) => {
+  const projectId = String(req.params.projectId || '');
+  const slug = liveSiteOfProject(projectId);
+  if (!slug) {
+    const safe = projectId.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    return res.status(404).type('html').send('<!DOCTYPE html><html><head><meta charset="utf-8"><title>No form published</title></head>'
+      + '<body style="font-family:system-ui,sans-serif;max-width:640px;margin:48px auto;padding:0 16px;color:#1f2a37">'
+      + '<h1 style="font-size:1.3rem">No form is published for this project yet</h1>'
+      + '<p>Project <code>' + safe + '</code> has no live site. Open the project in the editor and press Save, or Open Form Link, and this link will work.</p>'
+      + '</body></html>');
+  }
+  express.static(path.join(LIVE_SITES_DIR, slug))(req, res, next);
+});
+
 app.post('/api/publish-live-site', (req, res) => {
   try {
     const body = req.body || {};
@@ -937,6 +1006,8 @@ app.post('/api/publish-live-site', (req, res) => {
       modes,
       links,
       pages: pageLinks,
+      // The links to hand out: they name the project, not the folder.
+      formLinks: projectId ? formLinksFor(projectId, modes) : {},
       builtAt: new Date().toISOString(),
       source: String(body.source || ''),
       projectId,
@@ -950,6 +1021,8 @@ app.post('/api/publish-live-site', (req, res) => {
       'Built by the publish-live-site skill from ' + (manifest.source || 'the project GUI export') + '.',
       'Open it through the dev server (npm start, or the flowchart-dev launch config):',
       ...modes.map((mode) => '  ' + (LIVE_SITE_MODE_LABELS[mode] || mode) + ': http://localhost:' + PORT + links[mode]),
+      ...(projectId ? ['', 'By project id (the links to hand out - they follow the project, not this folder):',
+        ...modes.map((mode) => '  ' + (LIVE_SITE_MODE_LABELS[mode] || mode) + ': http://localhost:' + PORT + manifest.formLinks[mode])] : []),
       '',
       'The PDFs are filled by the dev server\'s POST /edit_pdf, so opening index.html',
       'as a file shows the form but cannot produce PDFs. This folder keeps its own',

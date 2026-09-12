@@ -91,6 +91,10 @@
     Object.keys(out.pages || {}).forEach(function (mode) {
       out.pages[mode] = location.origin + out.pages[mode];
     });
+    // The same pages by project id - the links that follow the project.
+    Object.keys(out.formLinks || {}).forEach(function (mode) {
+      out.formLinks[mode] = location.origin + out.formLinks[mode];
+    });
     out.questions = (json.sections || []).reduce(function (n, s) { return n + (s.questions || []).length; }, 0);
     out.sections = (json.sections || []).length;
     return out;

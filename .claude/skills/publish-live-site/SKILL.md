@@ -59,9 +59,11 @@ section at a time). `index.html` is a router - `index.html?mode=question` and
    is `application/pdf`. Report any missing PDF by name - never claim a check you
    did not run.
 
-5. **Hand back** both links -
-   `http://localhost:8080/live-sites/<name>/index.html?mode=question` and
-   `...?mode=section` - the folder path, what is in it, and the limits below. If the
+5. **Hand back** the links by project id first -
+   `http://localhost:8080/form/<projectId>/section.html` and `.../question.html`
+   (`formLinks` in the result; they follow the project through renames) - then
+   the folder links `http://localhost:8080/live-sites/<name>/index.html?mode=question`
+   and `...?mode=section`, the folder path, what is in it, and the limits below. If the
    Demo Form Hub lists this packet (`auto-form/public/Auto-Form-Creator/Demo_form_hub/`),
    its entry points at these same links, so it needs no change.
 

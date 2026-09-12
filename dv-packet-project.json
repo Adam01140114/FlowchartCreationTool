@@ -596,7 +596,7 @@
       "controlled_property_description": 3
     }
   },
-  "exportedAt": "2026-09-12T03:53:05.987Z",
+  "exportedAt": "2026-09-12T16:44:57.485Z",
   "projectName": "DV Restraining Order Packet",
   "currentFormIndex": 0,
   "forms": [
@@ -19148,13 +19148,13 @@
             "id": "723",
             "vertex": true,
             "edge": false,
-            "value": "<div style=\"text-align:center;padding:6px;\"><strong>&#8618; Connector</strong><br><span style=\"font-size:12px;\">DV-101</span></div>",
-            "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=connector;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#fff3cd;fontColor=#7a5c00;strokeColor=#e0a800;strokeWidth=3;connectorTarget=DV-101;activateWhenTicked=other_abuse_incident_additional_space_attached_yes;",
+            "value": "<div style=\"text-align:center;padding:6px;\"><strong>&#8618; Connector</strong><br><span style=\"font-size:12px;\">DV-101</span><br><span style=\"font-size:11px;font-style:italic;\">only if item 7f needs more space</span></div>",
+            "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=connector;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#fff3cd;fontColor=#7a5c00;strokeColor=#e0a800;strokeWidth=3;connectorTarget=DV-101;activateWhenTicked=other_abuse_incident_additional_space_attached_yes;activateWhenLabel=only%20if%20item%207f%20needs%20more%20space;",
             "geometry": {
               "x": 670,
               "y": 30154,
               "width": 180,
-              "height": 60
+              "height": 80
             },
             "_connectorTarget": "DV-101",
             "_activateWhenTicked": "other_abuse_incident_additional_space_attached_yes"
@@ -19240,7 +19240,7 @@
             "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=connector;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#fff3cd;fontColor=#7a5c00;strokeColor=#e0a800;strokeWidth=3;connectorTarget=DV-109;",
             "geometry": {
               "x": 670,
-              "y": 30244,
+              "y": 30264,
               "width": 180,
               "height": 60
             },
@@ -19269,7 +19269,7 @@
             "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=connector;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#fff3cd;fontColor=#7a5c00;strokeColor=#e0a800;strokeWidth=3;connectorTarget=CLETS-001;",
             "geometry": {
               "x": 670,
-              "y": 30334,
+              "y": 30354,
               "width": 180,
               "height": 60
             },

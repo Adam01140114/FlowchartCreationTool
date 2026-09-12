@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DV Packet 9/11/26 8:53pm</title>
+    <title>DV Packet 9/12/26 9:45am</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="generate.css">
     <link rel="stylesheet" href="generate2.css">
@@ -38819,7 +38819,45 @@ function navigateSection(sectionNumber, isBackNavigation = false){
     resetHiddenQuestionsToDefaults(sectionNumber);
     }
     updateProgressBar();
-    scrollFormToTop();
+    if (previousSectionNumber !== sectionNumber && target) {
+        // Moving between sections lands on the question, not the page top:
+        // scrolling to the very top put the logo and the steps on screen and
+        // the filer had to scroll back down to the thing they came to answer.
+        // Again a moment later, because the question-at-a-time controller
+        // shows its question a tick after the section appears.
+        scrollToFirstQuestion(target);
+        setTimeout(function () { scrollToFirstQuestion(target); }, 60);
+    } else {
+        scrollFormToTop();
+    }
+}
+
+/*------------------------------------------------------------------
+ *  scrollToFirstQuestion(section)
+ *  - puts the first question the filer can see in the middle of the
+ *    screen, so after Next (or Back) they are looking at it and ready
+ *    to answer. A question taller than most of the screen is lined up
+ *    at its top instead: centring it would cut off its own first line.
+ *    With no question showing, the page top as before. Instant, for the
+ *    same reasons scrollFormToTop gives.
+ *-----------------------------------------------------------------*/
+function scrollToFirstQuestion(section){
+    var questions = section ? section.querySelectorAll(".question-container") : [];
+    var first = null;
+    for (var i = 0; i < questions.length; i++){
+        var q = questions[i];
+        if (q.classList.contains("hidden") || q.classList.contains("question-step-hidden")) continue;
+        if (!q.offsetParent && getComputedStyle(q).position !== "fixed") continue;
+        first = q;
+        break;
+    }
+    if (!first || typeof first.scrollIntoView !== "function"){
+        scrollFormToTop();
+        return;
+    }
+    var tall = first.getBoundingClientRect().height > (window.innerHeight || 0) * 0.8;
+    try { first.scrollIntoView({ block: tall ? "start" : "center", inline: "nearest", behavior: "auto" }); }
+    catch (e) { first.scrollIntoView(true); }
 }
 /*------------------------------------------------------------------
  *  goBack()
@@ -40543,6 +40581,36 @@ function updateProgressBar() {
   const stepper = document.getElementById('stepperProgressBar');
   if (!stepper) return;
   const steps = stepper.querySelectorAll('.stepper-step');
+  // A form the answers have switched off is not a step. The bar listed every
+  // form in the packet, so a filer who asked for no custody orders still saw
+  // DV-105 and DV-108 ahead of them - and DV-101 as "next" - while Next went
+  // straight past all three. Steps are named after their forms (one group per
+  // form), so each is looked up by name; the ones still in are numbered 1, 2,
+  // 3 again, and a line is drawn only between two steps that are both shown.
+  if (typeof getProjectForms === 'function' && typeof isFormActivated === 'function') {
+    const forms = getProjectForms();
+    let shownCount = 0;
+    steps.forEach(function (step) {
+      const labelEl = step.querySelector('.stepper-label');
+      const name = labelEl ? labelEl.textContent.trim() : '';
+      const form = forms.find(function (f) { return f && f.name === name; });
+      const off = !!form && !form.alwaysIncluded && !isFormActivated(form);
+      step.style.display = off ? 'none' : '';
+      if (!off) {
+        shownCount++;
+        const circle = step.querySelector('.stepper-circle');
+        if (circle) circle.textContent = String(shownCount);
+      }
+    });
+    const all = Array.prototype.slice.call(steps);
+    stepper.querySelectorAll('.stepper-line').forEach(function (line) {
+      const before = line.previousElementSibling;
+      const at = all.indexOf(before);
+      const beforeShown = !!before && before.style.display !== 'none';
+      const laterShown = all.slice(at + 1).some(function (s) { return s.style.display !== 'none'; });
+      line.style.display = (beforeShown && laterShown) ? '' : 'none';
+    });
+  }
   // Check if we're using group-based progress
   if (window.groupToSectionMap && window.sectionToGroupMap) {
     // Group-based progress bar

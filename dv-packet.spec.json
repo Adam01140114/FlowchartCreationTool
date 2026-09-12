@@ -11,7 +11,8 @@
         {
           "form": "DV-101",
           "whenFieldTicked": "other_abuse_incident_additional_space_attached_yes",
-          "_why": "DV-101 continues item 7f. Nobody is asked whether they need it: the box is ticked when the description outgrows its own, so the connector waits on the field rather than on an answer."
+          "whenLabel": "only if item 7f needs more space",
+          "_why": "DV-101 continues item 7f. Nobody is asked whether they need it: the box is ticked when the description outgrows its own, so the connector waits on the field rather than on an answer. whenLabel is what the canvas prints under the connector, because the condition lives in its style and a chain under End otherwise reads as 'always, in this order'."
         },
         {
           "form": "DV-105",

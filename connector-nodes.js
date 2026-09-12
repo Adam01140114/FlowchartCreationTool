@@ -44,18 +44,58 @@
     graph.getModel().beginUpdate();
     try {
       graph.getModel().setStyle(cell, style);
-      graph.getModel().setValue(cell, renderLabel(name));
+      graph.getModel().setValue(cell, renderLabel(name, { style: style }));
     } finally {
       graph.getModel().endUpdate();
     }
   }
 
-  function renderLabel(name) {
+  /**
+   * The condition a connector waits on, in words, or ''. Hung under End, a
+   * connector reads as "always, in this order", and one that waits on a ticked
+   * field looked exactly like the others: DV-101 sat first in DV-100's chain,
+   * and a filer whose description fitted on DV-100 went straight to CLETS-001
+   * wondering why the chain was skipped.
+   */
+  function conditionOf(cell) {
+    const style = (cell && cell.style) || '';
+    const words = /activateWhenLabel=([^;]*)/.exec(style);
+    if (words && words[1]) return decodeURIComponent(words[1]);
+    const ticked = /activateWhenTicked=([^;]*)/.exec(style);
+    return ticked && ticked[1] ? 'only when ' + decodeURIComponent(ticked[1]) + ' is ticked' : '';
+  }
+
+  function renderLabel(name, cell) {
     const shown = name || '(no target form)';
+    const when = conditionOf(cell);
     return '<div style="text-align:center;padding:6px;">'
       + '<strong>&#8618; Connector</strong><br><span style="font-size:12px;">'
-      + escapeHtml(shown) + '</span></div>';
+      + escapeHtml(shown) + '</span>'
+      + (when ? '<br><span style="font-size:11px;font-style:italic;">' + escapeHtml(when) + '</span>' : '')
+      + '</div>';
   }
+
+  // Draw every connector from its style, not from the label saved with it, so
+  // a project saved before connectors said their condition shows it too. Once,
+  // when the editor's graph exists.
+  (function drawConnectorLabelsFromStyle() {
+    let tries = 0;
+    const timer = setInterval(() => {
+      const g = window.graph;
+      if (!g || typeof g.getLabel !== 'function') {
+        if (++tries > 120) clearInterval(timer);
+        return;
+      }
+      clearInterval(timer);
+      if (g.__connectorLabelsFromStyle) return;
+      g.__connectorLabelsFromStyle = true;
+      const base = g.getLabel.bind(g);
+      g.getLabel = function (cell) {
+        return isConnectorNode(cell) ? renderLabel(getConnectorTarget(cell), cell) : base(cell);
+      };
+      if (typeof g.refresh === 'function') g.refresh();
+    }, 250);
+  })();
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, (c) => (

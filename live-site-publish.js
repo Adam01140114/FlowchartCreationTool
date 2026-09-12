@@ -113,7 +113,10 @@
         projectId: gui.projectId || (window.currentProjectId ? window.currentProjectId(true) : ''),
         tabTitle: tabTitle
       });
-      const link = (out.pages && (out.pages.section || out.pages.question))
+      // The link to hand out names the project id, so it keeps working after a
+      // rename and does not depend on which folder the site landed in.
+      const link = (out.formLinks && (out.formLinks.section || out.formLinks.question))
+        || (out.pages && (out.pages.section || out.pages.question))
         || (location.origin + '/' + out.folder + '/section.html');
       status('Live site updated: ' + tabTitle + '. Reload its tab to see it.', link, 'done');
       console.log('[live site] ' + tabTitle + ' -> ' + link, out);
@@ -147,5 +150,50 @@
   };
   window.liveSiteTabTitleFor = function (projectName, when) {
     return tabNameOf(projectName) + ' ' + stampOf(when || new Date());
+  };
+
+  /**
+   * "Open Form Link": this project's live site, one section at a time.
+   *
+   * The tab is opened at the click, before anything is looked up - a tab opened
+   * after an await is a popup, and browsers block it. It is pointed at the
+   * project's section page once the server says where that is; a project that
+   * has never been published is published first, the way Save would.
+   */
+  window.openFormLink = async function () {
+    const tab = window.open('', '_blank');
+    const say = (text) => {
+      try { if (tab && tab.document) tab.document.body.textContent = text; } catch (e) { /* cross-origin once it loads */ }
+    };
+    say('Opening the form…');
+    try {
+      const projectId = typeof window.currentProjectId === 'function' ? window.currentProjectId(true) : '';
+      let published = false;
+      if (projectId) {
+        const res = await fetch('/api/live-site?projectId=' + encodeURIComponent(projectId));
+        published = res.ok;
+      }
+      let out = null;
+      if (!published) {
+        say('This project has no live site yet - building it…');
+        out = await window.publishProjectLiveSite();
+        if (!out) throw new Error('The live site could not be built');
+      }
+      // The link carries the project id: /form/<id>/section.html. The server
+      // finds whichever folder holds that project's site, so the same link works
+      // for any flowchart with an id, before and after a rename.
+      const id = projectId || (out && out.projectId) || '';
+      const link = id
+        ? '/form/' + encodeURIComponent(id) + '/section.html'
+        : (out && out.pages && (out.pages.section || out.pages.question));
+      if (!link) throw new Error('The live site could not be built');
+      const url = new URL(link, location.origin).href;
+      if (tab && !tab.closed) tab.location.href = url;
+      else window.open(url, '_blank');
+    } catch (err) {
+      console.error('[live site] Open Form Link failed:', err);
+      say('The form link could not be opened: ' + (err && err.message ? err.message : err));
+      status('The form link could not be opened: ' + (err && err.message ? err.message : err), null, 'error');
+    }
   };
 })();

@@ -292,6 +292,77 @@
       background: #fff;
     }
 
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .fullscreen-btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #eef2f7;
+      color: var(--ink-soft);
+      cursor: pointer;
+      padding: 5px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: background 120ms ease, color 120ms ease;
+    }
+
+    .fullscreen-btn:hover {
+      background: var(--card);
+      color: var(--accent);
+    }
+
+    /* The form alone, the size of the screen; Esc brings the side-by-side back. */
+    .frame-wrap.html:fullscreen {
+      border: 0;
+      border-radius: 0;
+      height: 100%;
+      min-height: 100%;
+    }
+
+    .frame-wrap.html:fullscreen .form-iframe {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Where the browser will not go full screen - an embedded viewer, a page in
+       a frame - the form fills the window instead. */
+    .frame-wrap.html.is-maximized {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      border: 0;
+      border-radius: 0;
+      height: 100%;
+      min-height: 100%;
+    }
+
+    .frame-wrap.html.is-maximized .form-iframe {
+      width: 100%;
+      height: 100%;
+    }
+
+    .frame-wrap .exit-fullscreen-btn {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      z-index: 1;
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--ink);
+      cursor: pointer;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(20, 32, 51, 0.18);
+    }
+
     .pdf-pages {
       display: flex;
       flex-direction: column;
@@ -822,7 +893,10 @@
                   </div>
                   <div class="preview-pane">
                     <div class="panel-label">
-                      <h3>Generated HTML form</h3>
+                      <div class="panel-title">
+                        <h3>Generated HTML form</h3>
+                        ${defaultHtml ? '<button type="button" class="fullscreen-btn" data-fullscreen>View Full Screen</button>' : ''}
+                      </div>
                       <div class="view-toggle" role="group" aria-label="Form view">
                         ${htmlUrl ? `<a class="toggle-btn${!oneUrl || defaultHtml === htmlUrl ? ' active' : ''}" href="${htmlUrl}" data-view-src="${htmlUrl}" rel="noopener">${escapeHtml(form.formHtmlLabel || 'All-at-once')}</a>` : ''}
                         ${oneUrl ? `<a class="toggle-btn${!htmlUrl || defaultHtml === oneUrl ? ' active' : ''}" href="${oneUrl}" data-view-src="${oneUrl}" rel="noopener">${escapeHtml(form.formHtmlOneAtATimeLabel || 'One-at-a-time')}</a>` : ''}
@@ -884,6 +958,7 @@
       // click opens the form in the whole tab. Loading a long PDF used to hold
       // that off for seconds.
       if (iframe) wireViewToggle(card, iframe);
+      if (iframe) wireFullScreen(card, iframe);
       const controller = createPdfViewer(viewerEl, fieldMap);
       if (pdfUrl) await controller.load(pdfUrl);
       if (iframe) {
@@ -907,6 +982,62 @@
           if (iframe.getAttribute('src') !== src) iframe.setAttribute('src', src);
           buttons.forEach((b) => b.classList.toggle('active', b === btn));
         });
+      });
+    }
+
+    // "View Full Screen": the generated form alone, the size of the screen, in
+    // whichever view the toggle has on - the live fill keeps working, since it is
+    // the same frame. Esc, or the button again, returns to the side-by-side.
+    //
+    // A browser that refuses full screen - an embedded viewer, a page shown in a
+    // frame - gets the form filling the window instead. Not a new tab: by the
+    // time the refusal arrives the click is spent, and a tab opened then is a
+    // popup the browser blocks, so the button would do nothing at all.
+    function wireFullScreen(card, iframe) {
+      const btn = card.querySelector('[data-fullscreen]');
+      const wrap = iframe.closest('.frame-wrap');
+      if (!btn || !wrap) return;
+      let exitBtn = null;
+      const isOn = () => document.fullscreenElement === wrap || wrap.classList.contains('is-maximized');
+      const label = () => { btn.textContent = isOn() ? 'Exit Full Screen' : 'View Full Screen'; };
+      const onKey = (event) => { if (event.key === 'Escape') unmaximize(); };
+      const maximize = () => {
+        wrap.classList.add('is-maximized');
+        if (!exitBtn) {
+          exitBtn = document.createElement('button');
+          exitBtn.type = 'button';
+          exitBtn.className = 'exit-fullscreen-btn';
+          exitBtn.textContent = 'Exit Full Screen';
+          exitBtn.addEventListener('click', () => unmaximize());
+        }
+        wrap.appendChild(exitBtn);
+        document.addEventListener('keydown', onKey);
+        label();
+      };
+      const unmaximize = () => {
+        wrap.classList.remove('is-maximized');
+        if (exitBtn) exitBtn.remove();
+        document.removeEventListener('keydown', onKey);
+        label();
+      };
+      // Real full screen, arriving late, takes over from the window-sized view.
+      document.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement === wrap && wrap.classList.contains('is-maximized')) unmaximize();
+        label();
+      });
+      btn.addEventListener('click', () => {
+        if (document.fullscreenElement === wrap) { document.exitFullscreen(); return; }
+        if (wrap.classList.contains('is-maximized')) { unmaximize(); return; }
+        if (typeof wrap.requestFullscreen === 'function' && document.fullscreenEnabled) {
+          // A refusal is not always prompt: an embedded browser can leave the
+          // request waiting on a permission it never asks for. Past a moment
+          // with no full screen, the form fills the window instead.
+          let settled = false;
+          wrap.requestFullscreen().then(() => { settled = true; label(); }, () => { settled = true; maximize(); });
+          setTimeout(() => { if (!settled && document.fullscreenElement !== wrap) maximize(); }, 700);
+        } else {
+          maximize();
+        }
       });
     }
 
