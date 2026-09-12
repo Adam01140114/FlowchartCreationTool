@@ -246,6 +246,12 @@ const RULES = [
     why: 'The hints marked the CLETS-001 details and DV-110\'s description optional and nothing read the flag: "What is their Social Security number, if you know it?" could not be left blank.',
     by: 'compile-form.js carries it as _optional; the editor exports required: false; the form skips it when it checks for answers' },
 
+  { id: 'back-retraces-next', group: 'interview', num: 'Rule',
+    title: 'Back goes back the way the filer came',
+    says: 'Back returns to the section the filer just left, never to a section of a form their answers have switched off or a section whose questions have all closed. Pressing Next to the last section and Back to the first visits the same sections in reverse.',
+    why: 'Back took the nearest earlier section with a question on it. A filer who asked only for an order not to abuse them went from "Orders You Want" to CLETS-001, pressed Back, and landed in DV-108 "Risk of Abduction" - a form that was not in their packet, holding a required question. Every audit read data and none pressed a button, so nothing caught it.',
+    by: 'pipeline-nav-audit.js (headless Chrome fills the published site on the minimum and maximum paths, walks Next then Back, exits 1 when they differ); pipeline-audit.js JUMPS (a jump to a section that does not exist finishes the form early); generate.js - sectionReachable, findPrevSectionWithVisibleQuestions, goBack' },
+
   { id: 'disqualifiers-are-declared', group: 'interview', num: 'Rule',
     title: 'What disqualifies a filer is declared and wired',
     says: 'Every "you do not qualify unless" sentence on the paper form is written down in the disqualifiers file, and every declared one has an alert node behind it.',

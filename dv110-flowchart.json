@@ -358,7 +358,7 @@
         "width": 300,
         "height": 96
       },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=person_to_restrain_race;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=person_to_restrain_race;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
       "vertex": true,
       "edge": false,
       "source": null,
@@ -382,7 +382,7 @@
         "width": 300,
         "height": 96
       },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=knows_restrained_person_address;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=knows_restrained_person_address;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
       "vertex": true,
       "edge": false,
       "source": null,
@@ -406,7 +406,7 @@
         "width": 168,
         "height": 80
       },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=1;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
       "vertex": true,
       "edge": false,
       "source": null,
@@ -425,7 +425,7 @@
         "width": 168,
         "height": 80
       },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=1;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
       "vertex": true,
       "edge": false,
       "source": null,

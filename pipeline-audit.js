@@ -767,6 +767,22 @@ async function main() {
     });
   });
 
+  // A jump names a section by number. One whose section is gone - dropped for
+  // being empty after the packet asked its only question on another form -
+  // sends the filer to the end: DV-110's "Do you know where the restrained
+  // person lives?" answered No jumped to section 26 of a 23-section packet and
+  // finished the form, skipping "What does the restrained person look like?".
+  const sectionIds = new Set((gui.sections || []).map((s) => String(s.sectionId)));
+  report.deadJumps = [];
+  (gui.sections || []).forEach((s) => (s.questions || []).forEach((q) => {
+    if (!q.jump || !q.jump.enabled) return;
+    (q.jump.conditions || []).forEach((c) => {
+      const to = String(c.to == null ? '' : c.to).trim();
+      if (!to || to.toLowerCase() === 'end' || sectionIds.has(to)) return;
+      report.deadJumps.push({ question: q.questionId, text: q.text, option: c.option, to });
+    });
+  }));
+
   // Rule 7: a form can legitimately ask nothing - every value it prints came
   // from an earlier form - but it must still be produced. What makes that go
   // wrong is silent: the form vanishes from the interview and nobody notices it
@@ -1055,6 +1071,11 @@ async function main() {
   report.forwardRefs.forEach((f) => console.log('  FAILS  q' + f.question + ' (' + f.name
     + ') waits on q' + f.dependsOn + ' (' + f.dependsOnName + '), which is shown later'));
   console.log('');
+  console.log('JUMPS — every jump lands on a section that exists');
+  if (!report.deadJumps.length) console.log('  passes');
+  report.deadJumps.forEach((j) => console.log('  FAILS  q' + j.question + ' "' + String(j.text).slice(0, 60)
+    + '" answered "' + j.option + '" jumps to section ' + j.to + ', which does not exist - the form would finish there'));
+  console.log('');
   console.log('RULE 5 — one group per form, named after the form');
   console.log('  groups: ' + (report.rule5.groups.length
     ? report.rule5.groups.map((g) => g.name + '(' + g.sections
@@ -1068,6 +1089,7 @@ async function main() {
   // and a run that found one says so in its exit code.
   const blocking = [
     ['RULE 2 (CORNERSTONE)', (report.rule2wording || []).length],
+    ['JUMPS', (report.deadJumps || []).length],
     ['RULE 7', report.rule7.filter((f) => !f.pdfFile || (!f.alwaysIncluded && !f.activatedBy.length) || f.dead.length).length],
     ['RULE 8', report.rule8.compound.length],
     ['RULE 10', report.rule10.length],

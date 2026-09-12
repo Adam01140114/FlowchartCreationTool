@@ -388,13 +388,13 @@
         "person_to_restrain_full_name",
         "person_to_restrain_gender",
         "person_to_restrain_age",
-        "person_to_restrain_date_of_birth",
-        "person_to_restrain_race"
+        "person_to_restrain_date_of_birth"
       ]
     },
     {
       "name": "Restrained Person's Description",
       "fields": [
+        "person_to_restrain_race",
         "restrained_person_height",
         "restrained_person_weight",
         "restrained_person_hair_color",

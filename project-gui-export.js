@@ -442,6 +442,7 @@ function dropEmptySections(merged) {
   if (kept.length === merged.sections.length) return [];
 
   const removed = merged.sections.filter(function (s) { return !(s.questions || []).length; });
+  const order = merged.sections.map(function (s) { return String(s.sectionId); });
   const renumber = new Map();
   kept.forEach(function (section, i) {
     renumber.set(String(section.sectionId), i + 1);
@@ -451,13 +452,26 @@ function dropEmptySections(merged) {
   merged.sectionCounter = kept.length + 1;
 
   // "Jump to section N" has to follow the renumbering; "end" is a keyword.
+  // A jump into a section that was dropped goes where that section would have
+  // led: the next one still here, or the end. Left alone it kept its old
+  // number - DV-110's "Do you know where the restrained person lives?" jumped to
+  // section 26 of a 23-section packet, and Next finished the form.
+  const survivorFrom = function (id) {
+    const at = order.indexOf(String(id));
+    if (at === -1) return null;
+    for (let i = at; i < order.length; i++) {
+      const to = renumber.get(order[i]);
+      if (to) return String(to);
+    }
+    return 'end';
+  };
   kept.forEach(function (section) {
     section.questions.forEach(function (q) {
       if (!q.jump || !Array.isArray(q.jump.conditions)) return;
       q.jump.conditions.forEach(function (c) {
         if (String(c.to).toLowerCase() === 'end') return;
-        const to = renumber.get(String(c.to));
-        if (to) c.to = String(to);
+        const to = survivorFrom(c.to);
+        if (to) c.to = to;
       });
     });
   });

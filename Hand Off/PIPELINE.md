@@ -1114,6 +1114,7 @@ node pipeline-disqualifiers.js --check    # every declared one has an alert
 # 6. fill the form (debug menu: Ctrl+Shift, then "Fill maximum path"),
 #    save the answers, and produce the PDFs
 node pipeline-fill.js --render   # every form in the packet, not a list kept here
+node pipeline-nav-audit.js       # publish first: Next to the end, Back to the start, same sections
 node pipeline-explain.js dv110
 
 # 7. read the interview yourself. This step is not optional and no packet
@@ -1157,6 +1158,31 @@ field-by-field value check both reported nothing wrong.
 
 Full procedure, and what a legitimate blank looks like on a Judicial Council
 form: [`PDF-PAGE-AUDIT.md`](./PDF-PAGE-AUDIT.md).
+
+## Back retraces Next
+
+Every check above reads data; none presses a button. A filer who asked only for
+an order not to abuse them went from DV-100 "Orders You Want" to CLETS-001,
+pressed Back, and landed in DV-108 "Risk of Abduction" - switched off by their
+own answers, with a required question on it. Back took the nearest earlier
+section with a question showing, not the section the filer had left.
+
+Back now reads the history of sections left (`sectionStack`) and passes over any
+section `sectionReachable` rejects: a form not in the packet, or a section whose
+questions have all closed. `node pipeline-nav-audit.js` proves it on the
+published site in headless Chrome, with a throwaway profile so no saved answers
+are touched: for the minimum and the maximum fill it presses Next to the last
+section and Back to the first, and fails unless Back visits the same sections in
+reverse, none twice, all in forms that are in the packet. `--modes
+section,question` walks the question-at-a-time page too (a few minutes a path).
+
+The first run found a second defect the same way. DV-110's "Do you know where
+the restrained person lives?" answered No jumped to section 26 of a 23-section
+packet - the section it pointed at had been dropped for being empty once its
+only question was asked on DV-100 - so Next finished the form and "What does the
+restrained person look like?" was never asked. `dropEmptySections` now sends a
+jump into a dropped section to the next section still there (or the end), and
+`pipeline-audit.js` fails any jump whose section does not exist (JUMPS).
 
 ## The two fill modes
 

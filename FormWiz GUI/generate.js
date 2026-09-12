@@ -5948,18 +5948,47 @@ if (s > 1){
 
           return null;
         }
+        // Back goes back the way the filer came. It used to take the nearest
+        // earlier section with a question on it, which is not the same thing:
+        // a filer who asked only for an order not to abuse them went from
+        // "Orders You Want" to CLETS-001, pressed Back, and landed in DV-108
+        // "Risk of Abduction" - a form their answers had switched off, holding
+        // a required question they had no reason to answer. So the history of
+        // sections actually left comes first, and anything the filer can no
+        // longer be on - a form switched off since, a section whose questions
+        // all closed - is passed over, the way Next passes over it.
         function findPrevSectionWithVisibleQuestions() {
-          for (let prevIdx = sectionIdx - 1; prevIdx >= 0; prevIdx--) {
-            const candidateSection = sectionElements[prevIdx];
-            const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
-            if (visibleInfo.indices.length) {
-              return {
-                sectionEl: candidateSection,
-                sectionId: candidateSection.id,
-                sectionNumber: sectionNumbers[prevIdx] || (prevIdx + 1),
-                lastVisibleIndex: visibleInfo.indices[visibleInfo.indices.length - 1]
-              };
+          const reachable = function (idx) {
+            const num = sectionNumbers[idx] || (idx + 1);
+            if (typeof sectionReachable === 'function' && !sectionReachable(num)) return false;
+            return getVisibleIndicesForSectionElement(sectionElements[idx]).indices.length > 0;
+          };
+          const infoAt = function (idx) {
+            const visibleInfo = getVisibleIndicesForSectionElement(sectionElements[idx]);
+            return {
+              sectionEl: sectionElements[idx],
+              sectionId: sectionElements[idx].id,
+              sectionNumber: sectionNumbers[idx] || (idx + 1),
+              lastVisibleIndex: visibleInfo.indices[visibleInfo.indices.length - 1]
+            };
+          };
+          const indexOfSection = function (num) {
+            for (let i = 0; i < sectionElements.length; i++) {
+              if (Number(sectionNumbers[i] || (i + 1)) === num) return i;
             }
+            return -1;
+          };
+          const here = Number(sectionNumbers[sectionIdx] || (sectionIdx + 1));
+          if (typeof sectionStack !== 'undefined' && Array.isArray(sectionStack)) {
+            for (let s = sectionStack.length - 1; s >= 0; s--) {
+              const num = Number(sectionStack[s]);
+              if (!(num >= 1) || num === here) continue;
+              const idx = indexOfSection(num);
+              if (idx !== -1 && reachable(idx)) return infoAt(idx);
+            }
+          }
+          for (let prevIdx = sectionIdx - 1; prevIdx >= 0; prevIdx--) {
+            if (reachable(prevIdx)) return infoAt(prevIdx);
           }
           return null;
         }
@@ -6643,6 +6672,14 @@ if (s > 1){
           const targetSectionId = cachedPrevSectionInfo.sectionId;
           const targetSectionNumber = cachedPrevSectionInfo.sectionNumber;
           const targetQuestionIndex = cachedPrevSectionInfo.lastVisibleIndex;
+          // Going back through the history takes the steps off it, so the next
+          // Back goes one further - not round again to where this one started.
+          if (typeof sectionStack !== 'undefined' && Array.isArray(sectionStack)) {
+            const target = Number(targetSectionNumber);
+            for (let s = sectionStack.length - 1; s >= 0; s--) {
+              if (Number(sectionStack[s]) === target) { sectionStack.length = s; break; }
+            }
+          }
           if (typeof navigateSection === 'function') {
             navigateSection(targetSectionNumber, true);
           }
@@ -14986,6 +15023,27 @@ function applyComputedFields(){
 }
 
 /**
+ * Can the filer be on this section now? Its form is in the packet and at least
+ * one of its questions is open. Next decides the same thing forwards; Back
+ * asks this so it never lands on a form the answers have switched off.
+ */
+function sectionReachable(sectionNumber){
+    var n = Number(sectionNumber);
+    if (!(n >= 1)) return false;
+    var sec = document.getElementById("section" + n);
+    if (!sec) return false;
+    if (typeof formOwningSection === "function" && typeof isFormActivated === "function"){
+        var owner = formOwningSection(n);
+        if (owner && !isFormActivated(owner)) return false;
+    }
+    var questions = sec.querySelectorAll(".question-container");
+    for (var i = 0; i < questions.length; i++){
+        if (!questions[i].classList.contains("hidden")) return true;
+    }
+    return false;
+}
+
+/**
  * Where to go after the last section of a form: the first section of the next
  * activated form, or "end". Returns null when this is not a form boundary, so
  * ordinary section-to-section navigation is untouched.
@@ -15071,7 +15129,11 @@ function handleNext(currentSection){
     applyAttachmentMarks();
     applyComputedFields();
     /* remember the place we're leaving - push BEFORE evaluating jumps */
-    sectionStack.push(currentSection);
+    // Once: the section arrow has usually recorded it already, and a section
+    // on the history twice took two presses of Back to leave.
+    if (Number(sectionStack[sectionStack.length - 1]) !== Number(currentSection)) {
+        sectionStack.push(currentSection);
+    }
     let nextSection = currentSection + 1;
     /* ---------- evaluate jump rules ---------- */
     // Ensure jumpLogics is defined (it might not be initialized yet)
@@ -15272,22 +15334,24 @@ function navigateSection(sectionNumber, isBackNavigation = false){
  *  – pops the history stack; falls back to numeric −1 if empty
  *-----------------------------------------------------------------*/
 function goBack(){
-    if (sectionStack.length > 0){
+    // The way the filer came, passing over anything they can no longer be on:
+    // a form their answers have switched off since, or a section whose
+    // questions have all closed. Next passes over both; Back must too.
+    while (sectionStack.length > 0){
         const prev = sectionStack.pop();
-        // Ensure prev is a number, not a string
         const prevSection = typeof prev === 'string' ? parseInt(prev, 10) : prev;
-        if (!isNaN(prevSection) && prevSection >= 1) {
-            navigateSection(prevSection, true);
-        } else {
-            if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
-                // Fallback only if stack value is invalid
-                navigateSection(currentSectionNumber - 1, true);
+        if (isNaN(prevSection) || prevSection < 1 || prevSection === currentSectionNumber) continue;
+        if (typeof sectionReachable === 'function' && !sectionReachable(prevSection)) continue;
+        navigateSection(prevSection, true);
+        updateProgressBar();
+        return;
+    }
+    if (typeof currentSectionNumber === 'number'){
+        for (let n = currentSectionNumber - 1; n >= 1; n--){
+            if (typeof sectionReachable !== 'function' || sectionReachable(n)){
+                navigateSection(n, true);
+                break;
             }
-        }
-    }else {
-        if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
-            navigateSection(currentSectionNumber - 1, true);
-        } else {
         }
     }
     updateProgressBar();

@@ -30590,120 +30590,6 @@
     },
     {
       "sectionId": 22,
-      "sectionName": "Who the Order Protects",
-      "questions": [
-        {
-          "questionId": 284,
-          "text": "Do you know where the restrained person lives?",
-          "type": "dropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "8",
-                "prevAnswer": "Any Text"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": true,
-            "conditions": [
-              {
-                "option": "No",
-                "to": "26"
-              }
-            ]
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "Yes",
-                "type": "checkbox",
-                "nodeId": "knows_restrained_person_address_yes",
-                "textboxText": ""
-              },
-              {
-                "trigger": "No",
-                "type": "checkbox",
-                "nodeId": "knows_restrained_person_address_no",
-                "textboxText": ""
-              }
-            ]
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [
-            "Yes",
-            "No"
-          ],
-          "labels": [],
-          "nameId": "knows_restrained_person_address",
-          "placeholder": ""
-        }
-      ]
-    },
-    {
-      "sectionId": 23,
       "sectionName": "Restrained Person's Description",
       "questions": [
         {
@@ -30860,6 +30746,109 @@
           "amounts": [],
           "nodeId": "restrained_person_description",
           "required": false
+        },
+        {
+          "questionId": 284,
+          "text": "Do you know where the restrained person lives?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "8",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "Yes",
+                "type": "checkbox",
+                "nodeId": "knows_restrained_person_address_yes",
+                "textboxText": ""
+              },
+              {
+                "trigger": "No",
+                "type": "checkbox",
+                "nodeId": "knows_restrained_person_address_no",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "knows_restrained_person_address",
+          "placeholder": ""
         },
         {
           "questionId": 285,
@@ -31080,13 +31069,12 @@
       "groupId": 8,
       "name": "DV-110",
       "sections": [
-        "Who the Order Protects",
         "Restrained Person's Description"
       ]
     }
   ],
   "hiddenFields": [],
-  "sectionCounter": 24,
+  "sectionCounter": 23,
   "questionCounter": 288,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
@@ -32126,7 +32114,7 @@
       "name": "DV-110",
       "index": 7,
       "firstSection": 22,
-      "lastSection": 23,
+      "lastSection": 22,
       "alwaysIncluded": false,
       "pdfFile": "dv110.pdf",
       "pdfName": "DV-110 Temporary Restraining Order",
@@ -32279,7 +32267,7 @@
         },
         {
           "questionId": 275,
-          "section": 22
+          "section": 24
         }
       ]
     },
@@ -32294,7 +32282,7 @@
         },
         {
           "questionId": 276,
-          "section": 22
+          "section": 24
         }
       ]
     },
@@ -32329,7 +32317,7 @@
         },
         {
           "questionId": 277,
-          "section": 22
+          "section": 24
         }
       ]
     },
@@ -32386,7 +32374,7 @@
         },
         {
           "questionId": 278,
-          "section": 22
+          "section": 24
         }
       ]
     },
@@ -32397,7 +32385,7 @@
       "alsoAnswers": [
         {
           "questionId": 280,
-          "section": 22
+          "section": 24
         }
       ]
     },
@@ -32408,7 +32396,7 @@
       "alsoAnswers": [
         {
           "questionId": 281,
-          "section": 22
+          "section": 24
         }
       ]
     },
@@ -32419,7 +32407,7 @@
       "alsoAnswers": [
         {
           "questionId": 279,
-          "section": 22
+          "section": 24
         }
       ]
     },
