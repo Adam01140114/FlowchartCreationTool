@@ -392,7 +392,7 @@
       ]
     },
     {
-      "name": "Restrained Person's Description",
+      "name": "Describing the Person",
       "fields": [
         "person_to_restrain_race",
         "restrained_person_height",
@@ -447,7 +447,7 @@
   ],
   "combines": [
     {
-      "question": "Where does the restrained person live?",
+      "question": "Where does the person you want protection from live?",
       "fields": [
         {
           "field": "restrained_person_street_address",
@@ -468,10 +468,10 @@
       ],
       "conditional": {
         "onlyWhen": "knows_restrained_person_address",
-        "gateQuestion": "Do you know where the restrained person lives?"
+        "gateQuestion": "Do you know where the person you want protection from lives?"
       }
     },
-  { "nameId": "restrained_person_description", "question": "What does the restrained person look like?", "optional": true, "fields": [
+  { "nameId": "restrained_person_description", "question": "What does the person you want protection from look like?", "optional": true, "fields": [
       {"field":"restrained_person_height","label":"Height"},
       {"field":"restrained_person_weight","label":"Weight"},
       {"field":"restrained_person_hair_color","label":"Hair color"},

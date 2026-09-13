@@ -52,8 +52,11 @@ section at a time). `index.html` is a router - `index.html?mode=question` and
    many answers the minimum and maximum paths recorded.
 
    The build also records the debug menu's **Fill minimum path** and **Fill
-   maximum path**. It runs each fill in a hidden frame, twice, with Firebase
-   taken out and throwaway storage. It then writes where they end up into
+   maximum path**, for each page. It runs each fill in a hidden frame, with Firebase
+   taken out and throwaway storage, until two runs agree at the fewest empty
+   required boxes (up to five runs). A console warning that a recording leaves
+   fields empty, or that no two runs agreed, means the recording is not to be
+   trusted: find out why before handing over the link. It then writes where they end up into
    `dv-packet-gui.json` (as `fillPaths`), into the site's `gui.json`, and into
    both pages (as `window.__BAKED_FILLS__`). The buttons put that back in one
    sweep, in under a second rather than 3-9. A page whose questions changed since

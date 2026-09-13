@@ -27,7 +27,10 @@
  *   - no section the walk passes has an empty field on a question it shows -
  *     empty as drawn, not as stored: a value painted transparent is empty;
  *   - the page after the button is the page after the worked-out fill (run in
- *     a tab of its own): every answer, and every element drawn the same way.
+ *     a tab of its own): every answer, and every element drawn the same way;
+ *   - the same holds on a page that restored a saved draft first, eight
+ *     seconds on - a returning filer's page, where the restore used to land
+ *     over the fill and empty every repeating block.
  *
  * Drawn, because the next defect after the slow button was on the screen and
  * nowhere else. The recorded fill wrote every date, and 46 date boxes still
@@ -323,6 +326,7 @@ function appearanceInPage() {
   const classes = {};
   const off = {};
   const plumbing = {};
+  const undrawn = {};
   const reach = {};
   const counters = {};
   const sectionOpen = (sec) => {
@@ -341,9 +345,13 @@ function appearanceInPage() {
       counters[base] = (counters[base] || 0) + 1;
       key = base + counters[base];
     }
-    classes[key] = ((typeof el.className === 'string' ? el.className : '')
+    // question-step-hidden is where a question-at-a-time section's pointer
+    // stopped, not what the answers show: two fills can leave it on different
+    // questions of a section nobody is looking at, and the walk below checks
+    // the navigation itself.
+    classes[key] = ((typeof el.className === 'string' ? el.className.replace(/\bquestion-step-hidden\b/g, '') : '')
       + (el.style && el.style.display === 'none' ? ' [display:none]' : '')
-      + (el.hidden ? ' [hidden]' : '')).trim();
+      + (el.hidden ? ' [hidden]' : '')).replace(/\s+/g, ' ').trim();
     const sec = el.closest('.section');
     if (sec && !sectionOpen(sec)) off[key] = true;
     // Plumbing: an element outside every section that the page never draws -
@@ -351,11 +359,18 @@ function appearanceInPage() {
     // still compared; whether it exists is not, since an unticked box and no
     // box print the same and nobody sees either.
     if (!sec && getComputedStyle(el).display === 'none') plumbing[key] = true;
-    if (/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName) && el.id && el.type !== 'hidden' && el.type !== 'file') {
+    // Hidden fields too: the page derives them from what is typed (the ZIP the
+    // county lookup reads), they reach the PDF, and a fill that writes without
+    // keystrokes can leave them empty where the worked-out fill does not.
+    if (/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName) && el.id && el.type !== 'file') {
       values[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : String(el.value || '');
     }
+    // Drawn at all? An element on one page only that draws nothing - a
+    // validation message the worked-out fill left behind, display:none - is
+    // not a difference anyone sees.
+    if (getComputedStyle(el).display === 'none') undrawn[key] = true;
   });
-  return { values, classes, off, plumbing, reach };
+  return { values, classes, off, plumbing, undrawn, reach };
 }
 
 /** Runs inside the page: the worked-out fill, then how the page looks after it. */
@@ -365,6 +380,37 @@ function workedOutInPage(fillPath) {
       ? { markers: true, minimum: true, solve: true } : { markers: true, solve: true });
     await new Promise((r) => setTimeout(r, 3000));
     return window.__fwAppearance();
+  })();
+}
+
+/**
+ * Runs inside a page that restored a saved draft: press the button, then wait
+ * past every restore timer and check nothing the fill wrote was undone.
+ */
+function draftFillInPage(fillPath) {
+  return (async () => {
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const btnId = fillPath === 'minimum' ? 'fillMinimumPathBtn' : 'fillMaximumPathBtn';
+    if (typeof showDebugMenu === 'function') showDebugMenu();
+    await wait(300);
+    const btn = document.getElementById(btnId);
+    if (!btn) return { error: 'the page has no ' + btnId + ' button' };
+    const t0 = performance.now();
+    btn.click();
+    let fillMs = null;
+    for (let i = 0; i < 1800; i++) {
+      await wait(100);
+      const text = btn.textContent || '';
+      if (!window.__MAX_FILL_IN_PROGRESS__ && /✅|❌/.test(text)) { fillMs = Math.round(performance.now() - t0); break; }
+    }
+    if (fillMs === null) return { error: 'the fill never finished' };
+    if (typeof hideDebugMenu === 'function') hideDebugMenu();
+    // The restore's passes run on timers up to four seconds after load and
+    // replay the draft after that; eight seconds is past all of them.
+    await wait(8000);
+    const recorded = window.__BAKED_FILLS__ && window.__BAKED_FILLS__[fillPath];
+    const drift = (recorded && typeof bakedFillDifferences === 'function') ? bakedFillDifferences(recorded) : null;
+    return { fillMs, drift: drift && { differences: drift.differences, differ: drift.differ } };
   })();
 }
 
@@ -393,9 +439,10 @@ function appearanceDifferences(a, b) {
   });
   new Set([...Object.keys(a.classes), ...Object.keys(b.classes)]).forEach((k) => {
     if (off(k)) return;
-    // On one page only, and plumbing there: its value was compared above.
-    if (!(k in a.classes) && b.plumbing && b.plumbing[k]) return;
-    if (!(k in b.classes) && a.plumbing && a.plumbing[k]) return;
+    // On one page only, and plumbing there, or not drawn there: its value was
+    // compared above, and nobody sees it.
+    if (!(k in a.classes) && b.plumbing && (b.plumbing[k] || (b.undrawn && b.undrawn[k]))) return;
+    if (!(k in b.classes) && a.plumbing && (a.plumbing[k] || (a.undrawn && a.undrawn[k]))) return;
     if (!(k in a.classes)) { out.push('drawn ' + k + ': only after the button'); return; }
     if (!(k in b.classes)) { out.push('drawn ' + k + ': only after the worked-out fill'); return; }
     if (a.classes[k] === b.classes[k]) return;
@@ -413,7 +460,7 @@ function appearanceDifferences(a, b) {
  * as it fills, and one tab's must not come back in the next - run one
  * expression in it, and close it. Null when the page never loads.
  */
-async function inPage(send, url, expression) {
+async function inPage(send, url, expression, beforeReload) {
   const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
   try {
     const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
@@ -421,16 +468,28 @@ async function inPage(send, url, expression) {
     await send('Page.enable', {}, sessionId);
     await send('Storage.clearDataForOrigin', { origin: new URL(url).origin, storageTypes: 'all' }, sessionId);
     await send('Page.navigate', { url }, sessionId);
-    let ready = false;
-    for (let i = 0; i < 120 && !ready; i++) {
-      await new Promise((r) => setTimeout(r, 500));
-      try {
-        ready = await evaluate(send, sessionId,
-          "document.readyState === 'complete' && typeof fillMaximumPath === 'function' && !!document.querySelector('.section.active')", 5000);
-      } catch (e) { ready = false; }
+    const waitReady = async () => {
+      for (let i = 0; i < 120; i++) {
+        await new Promise((r) => setTimeout(r, 500));
+        try {
+          if (await evaluate(send, sessionId,
+            "document.readyState === 'complete' && typeof fillMaximumPath === 'function'"
+            + " && !!document.querySelector('.section.active') && !window.__navBeforeReload", 5000)) return true;
+        } catch (e) { /* mid-navigation */ }
+      }
+      return false;
+    };
+    if (!(await waitReady())) return null;
+    // A page loaded with a saved draft: the setup puts the draft in storage,
+    // and the page is loaded again so it restores it the way a returning
+    // filer's does. The button is pressed soon after, while the restore's
+    // timers are still running - which is when a restore used to land over it.
+    if (beforeReload) {
+      await evaluate(send, sessionId, beforeReload);
+      await send('Page.reload', {}, sessionId);
+      if (!(await waitReady())) return null;
     }
-    if (!ready) return null;
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, beforeReload ? 500 : 2000));
     await evaluate(send, sessionId, 'window.__fwAppearance = ' + appearanceInPage.toString());
     return await evaluate(send, sessionId, expression);
   } finally {
@@ -456,6 +515,20 @@ function check(result, fillPath) {
       + ' empty field' + (s.fields.length === 1 ? '' : 's') + ' after the fill: '
       + s.fields.slice(0, 6).join(', ') + (s.fields.length > 6 ? ', ...' : ''));
   });
+  if (result.withDraft) {
+    const w = result.withDraft;
+    if (w.error) problems.push('With a saved draft: ' + w.error);
+    if (w.fillMs > FILL_BUDGET_MS) {
+      problems.push('With a saved draft, pressing Fill ' + fillPath + ' path took ' + (w.fillMs / 1000).toFixed(1)
+        + ' s - the budget is ' + (FILL_BUDGET_MS / 1000).toFixed(1) + ' s');
+    }
+    if (w.drift && w.drift.differences) {
+      problems.push('With a saved draft, ' + w.drift.differences + ' answers the fill wrote were gone 8 s later (e.g. '
+        + w.drift.differ.slice(0, 5).join(', ') + ') - the draft\'s restore landed over the fill');
+    }
+  } else {
+    problems.push('The run with a saved draft never finished loading');
+  }
   const diffs = result.appearanceDifferences || [];
   const answers = diffs.filter((d) => d.indexOf('value ') === 0);
   if (answers.length) {
@@ -554,9 +627,20 @@ function check(result, fillPath) {
           }
           result.appearanceDifferences = differences;
         }
+        // The same button on a page that restored a saved draft first, the way
+        // a returning filer meets it. The draft is the other path's answers.
+        // Every other run starts with empty storage, and never saw a restore
+        // that landed after the fill and emptied 180 fields.
+        const other = fillPath === 'minimum' ? 'maximum' : 'minimum';
+        const seedDraft = "(function(){var b=window.__BAKED_FILLS__;var o=b&&b['" + other + "'];"
+          + "if(o){localStorage.setItem('formData_'+window.formId,JSON.stringify(o.values));}"
+          + "window.__navBeforeReload=true;return !!o;})()";
+        result.withDraft = await inPage(send, url,
+          '(' + draftFillInPage.toString() + ')(' + JSON.stringify(fillPath) + ')', seedDraft);
         const problems = check(result, fillPath);
         console.log((problems.length ? 'FAILS  ' : 'passes ') + label
           + (result.fillMs ? '   fill ' + (result.fillMs / 1000).toFixed(1) + ' s,' : '')
+          + (result.withDraft && result.withDraft.fillMs ? ' ' + (result.withDraft.fillMs / 1000).toFixed(1) + ' s with a draft,' : '')
           + (result.forward ? '   ' + result.forward.length + ' sections forward, ' + result.back.length + ' back' : ''));
         if (result.forward) {
           console.log('   Next: ' + result.forward.map((s) => s.section + ' ' + s.form).join(' > '));

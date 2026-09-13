@@ -58,7 +58,9 @@ let shown = 0;
     shown++;
     const id = 'q' + String(q.questionId).padEnd(4);
     console.log('');
-    console.log(id + '(' + q.type + ')  ' + (q.text || '(no text)'));
+    // The builder calls its Number type "money" internally ("currency" is money);
+    // printed as it is, a count of yards read as a sum of dollars.
+    console.log(id + '(' + (q.type === 'money' ? 'number' : q.type) + ')  ' + (q.text || '(no text)'));
     const g = gateOf(q);
     if (g) console.log('      ' + g.trim());
 

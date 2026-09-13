@@ -544,6 +544,60 @@ function ruledLineTextAppearance(field, widget, font) {
   return [pushGraphicsState(), translate(0, lift), ...appearance, popGraphicsState()];
 }
 
+/**
+ * Set an answer that does not fit its box smaller, until it does.
+ *
+ * A box is drawn at the size the form declared - 10 or 11pt - and an answer
+ * longer than that was drawn anyway and cut at the edge. The interview holds a
+ * single answer to what its box holds, but a box that joins several answers
+ * gets no such limit: DV-100 item 4b joins where, when and the number of a
+ * court case into one line, and the case number ran off the edge; CLETS-001
+ * lost the state of a driver's license and the address of an employer; DV-110
+ * printed three of six firearms. The text is set as large as fits, down to
+ * 6pt, which a court form in Helvetica still prints legibly. What does not fit
+ * even then is lost ink, so it is logged and named in the X-Fill-Unfitted
+ * header, which pipeline-fill.js fails on.
+ *
+ * Runs after spillOntoContinuationLines, so a box with a ruled line under it
+ * spills first and only what is left is shrunk. A ruled box keeps its rules -
+ * a smaller size puts more words on each, never more lines. An auto-sized
+ * field (0 in its appearance string) and a comb field are left to pdf-lib.
+ */
+const MIN_FIT_FONT_SIZE = 6;
+function fitToBox(field, font, text) {
+  const size = declaredFontSize(field);
+  const as = { size, fits: true, shrunk: false };
+  if (!size || !text) return as;
+  try { if (field.isCombed()) return as; } catch (e) { /* not combable */ }
+  let widget;
+  try { widget = field.acroField.getWidgets()[0]; } catch (e) { return as; }
+  if (!widget) return as;
+  const rect = widget.getRectangle();
+  let multiline = false;
+  try { multiline = field.isMultiline(); } catch (e) { multiline = false; }
+  const printed = multiline ? rulesUnder(widget) : [];
+  const fitsAt = (s) => {
+    const lineHeight = font.heightAtSize(s) * 1.2;
+    // One line: a single-line box, or a "multiline" one not as tall as a line,
+    // which ruledLineTextAppearance draws as a single line.
+    if (!multiline || rect.height < lineHeight + 2) {
+      return font.widthOfTextAtSize(text, s) <= rect.width - 4;
+    }
+    const lines = printed.length >= 2 ? printed.length : Math.floor((rect.height - 2) / lineHeight);
+    const laid = layoutMultilineText(text, {
+      alignment: TextAlignment.Left, fontSize: s, font,
+      bounds: { x: 2, y: 2, width: rect.width - 4, height: rect.height - 4 },
+    });
+    return laid.lines.length <= Math.max(1, lines);
+  };
+  if (fitsAt(size)) return as;
+  for (let s = size - 0.5; s >= MIN_FIT_FONT_SIZE; s -= 0.5) {
+    if (fitsAt(s)) { field.setFontSize(s); return { size: s, from: size, fits: true, shrunk: true }; }
+  }
+  field.setFontSize(MIN_FIT_FONT_SIZE);
+  return { size: MIN_FIT_FONT_SIZE, from: size, fits: false, shrunk: true };
+}
+
 app.post('/edit_pdf', async (req, res) => {
   try {
     // A page the form draws itself: entries past the rows the paper prints.
@@ -597,6 +651,16 @@ app.post('/edit_pdf', async (req, res) => {
       `[edit_pdf] ${outputName}: "${s.from}" ran past its ruled line; ` +
       `continued on ${s.onto.join(', ')}`));
 
+    const shrunk = [];
+    const unfitted = [];
+    const listCut = [];
+    // Which values are lists of joined parts, and their separators - the form
+    // sends them (fwListSeparators). A list that will not fit even at 6pt keeps
+    // the parts that fit, whole, and ends with "etc.": DV-110's firearms box
+    // copies all six of DV-100 item 9's rows into three lines, and prints
+    // "(Include information from form DV-100, item 9)" beside it.
+    let lists = {};
+    try { lists = JSON.parse((req.body && req.body.__lists) || '{}') || {}; } catch (e) { lists = {}; }
     form.getFields().forEach((field) => {
       const key = field.getName();
       const value = spill.values[key];
@@ -615,10 +679,29 @@ app.post('/edit_pdf', async (req, res) => {
           case 'PDFDropdown':
             field.select(String(value));
             break;
-          case 'PDFTextField':
-            field.setText(String(value));
+          case 'PDFTextField': {
+            let text = String(value);
+            field.setText(text);
+            let fit = fitToBox(field, helv, text);
+            const sep = typeof lists[key] === 'string' ? lists[key] : '';
+            if (!fit.fits && sep && text.indexOf(sep) !== -1) {
+              const from = fit.from;
+              const items = text.split(sep);
+              const all = items.length;
+              while (items.length > 1 && !fit.fits) {
+                items.pop();
+                text = items.join(sep) + sep + 'etc.';
+                field.setText(text);
+                fit = fitToBox(field, helv, text);
+              }
+              fit.from = from;
+              if (fit.fits) listCut.push(key + ' (' + items.length + ' of ' + all + ' parts)');
+            }
+            if (fit.shrunk && fit.fits) shrunk.push(key + ' ' + fit.from + '->' + fit.size + 'pt');
+            if (!fit.fits) unfitted.push(key);
             field.updateAppearances(helv, ruledLineTextAppearance);
             break;
+          }
           default:
             if (typeof field.setText === 'function') {
               field.setText(String(value));
@@ -638,7 +721,7 @@ app.post('/edit_pdf', async (req, res) => {
     // normal when a repeating block can produce more entries than the form has
     // rows: the DV-100 asks for up to six firearms and the DV-110 table holds
     // four, so entries five and six went nowhere and nothing said so.
-    const unmatched = Object.keys(req.body || {}).filter((key) => !fieldNames.has(key));
+    const unmatched = Object.keys(req.body || {}).filter((key) => !fieldNames.has(key) && key.indexOf('__') !== 0);
     if (unmatched.length) {
       const numbered = unmatched.filter((key) => /_\d+(_|$)/.test(key));
       console.log(
@@ -650,11 +733,20 @@ app.post('/edit_pdf', async (req, res) => {
 )}`);
     }
 
+    if (shrunk.length) console.log(`[edit_pdf] ${outputName}: set smaller to fit their boxes: ${shrunk.join(', ')}`);
+    if (listCut.length) console.log(`[edit_pdf] ${outputName}: lists kept to what fits, ending "etc.": ${listCut.join(', ')}`);
+    if (unfitted.length) {
+      console.log(`[edit_pdf] ${outputName}: DOES NOT FIT even at ${MIN_FIT_FONT_SIZE}pt - the rest is not printed: ${unfitted.join(', ')}`);
+    }
+
     const edited = await pdfDoc.save();
     res
       .set({
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="${outputName}"`
+        'Content-Disposition': `inline; filename="${outputName}"`,
+        'X-Fill-Shrunk': encodeURIComponent(shrunk.join(',')),
+        'X-Fill-Unfitted': encodeURIComponent(unfitted.join(',')),
+        'X-Fill-Listcut': encodeURIComponent(listCut.join(','))
       })
       .send(Buffer.from(edited));
   } catch (error) {

@@ -62,7 +62,12 @@ async function fillOne(base, data) {
     method: 'POST', headers: { 'Content-Type': type }, body
   });
   if (!res.ok) throw new Error(base + ': HTTP ' + res.status + ' ' + (await res.text()).slice(0, 200));
-  return Buffer.from(await res.arrayBuffer());
+  // Which answers the server set smaller to fit their box, and which did not
+  // fit even then (dev-server.js fitToBox). Reading the values back cannot see
+  // either: the value is whole in the field whatever the ink does.
+  const list = (h) => decodeURIComponent(res.headers.get(h) || '').split(',').filter(Boolean);
+  return { buffer: Buffer.from(await res.arrayBuffer()), shrunk: list('x-fill-shrunk'),
+           unfitted: list('x-fill-unfitted'), listCut: list('x-fill-listcut') };
 }
 
 /** What the filled PDF actually holds, field by field. */
@@ -248,6 +253,18 @@ function attachmentSpec(page, data, count) {
 async function main() {
   const data = JSON.parse(fs.readFileSync(ANSWERS, 'utf8'));
   fs.mkdirSync(OUT, { recursive: true });
+  let defects = 0;
+  // Which answers are lists of joined parts, as the form tells the server
+  // (fwListSeparators in generate.js), so a list too long for its box is kept
+  // to the parts that fit here exactly as it is for a filer.
+  try {
+    const gui = JSON.parse(fs.readFileSync(GUI, 'utf8'));
+    const lists = {};
+    (gui.linkedFields || []).forEach((l) => {
+      if (l && typeof l.join === 'string' && l.join && l.linkedFieldId) lists[l.linkedFieldId] = l.join;
+    });
+    data.__lists = JSON.stringify(lists);
+  } catch (e) { /* no GUI to read: no lists */ }
   console.log('answers: ' + Object.keys(data).length + ' values from ' + ANSWERS);
 
   // Decided before any form is filled: the box that says a page is attached
@@ -262,9 +279,10 @@ async function main() {
   });
 
   for (const base of FORMS) {
-    let buffer;
-    try { buffer = await fillOne(base, data); }
+    let filled;
+    try { filled = await fillOne(base, data); }
     catch (err) { console.log('\n' + base + ': ' + err.message); continue; }
+    const buffer = filled.buffer;
 
     const file = path.join(OUT, base + '-filled.pdf');
     fs.writeFileSync(file, buffer);
@@ -298,6 +316,18 @@ async function main() {
     if (wrong.length) {
       console.log('  DEFECT: ' + wrong.length + ' box(es) the court ticks were filled: '
         + wrong.map((f) => f.name).join(', '));
+      defects++;
+    }
+    if (filled.shrunk.length) {
+      console.log('  set smaller to fit (' + filled.shrunk.length + '): ' + filled.shrunk.join(', '));
+    }
+    if (filled.listCut.length) {
+      console.log('  lists kept to what fits, ending "etc." (' + filled.listCut.length + '): ' + filled.listCut.join(', '));
+    }
+    if (filled.unfitted.length) {
+      console.log('  DEFECT: ' + filled.unfitted.length + ' answer(s) do not fit their box even at 6pt, and the rest'
+        + ' of each is not printed: ' + filled.unfitted.join(', '));
+      defects++;
     }
     const emptyText = text.filter((f) => String(f.value).trim() === '');
     if (emptyText.length) {
@@ -333,7 +363,7 @@ async function main() {
     }
     const spec = attachmentSpec(a, data, a.count);
     let buffer;
-    try { buffer = await fillOne(att.name, { __attachment: JSON.stringify(spec) }); }
+    try { buffer = (await fillOne(att.name, { __attachment: JSON.stringify(spec) })).buffer; }
     catch (err) { console.log('\n' + att.name + ': ' + err.message); continue; }
     fs.writeFileSync(file, buffer);
     console.log('\n' + att.name + '  ->  ' + file);
@@ -347,6 +377,10 @@ async function main() {
       const n = await renderPages(file, pagesDir);
       console.log('  rendered ' + n + ' page(s) to ' + pagesDir);
     }
+  }
+  if (defects) {
+    console.log('\nNOT SHIPPABLE - ' + defects + ' form(s) with a defect above');
+    process.exitCode = 1;
   }
 }
 

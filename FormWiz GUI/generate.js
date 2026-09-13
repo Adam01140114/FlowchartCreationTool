@@ -2660,6 +2660,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                           }
                         }
                       });
+                      if (typeof fwListSeparators === 'function') fd.append('__lists', fwListSeparators());
                       // Send to server
                       const baseName = '${pdfPreviewFile}'.replace(/\\.pdf$/i, '');
                       // Keep extension and include credentials so the backend can locate the file using the current session
@@ -7332,7 +7333,14 @@ if (s > 1){
   formHTML += `window.__FORM_LOGIC__ = ${JSON.stringify(formLogicModel || {})};\n`;
   // The finished minimum and maximum paths, recorded when the site was built
   // (live-site-builder.js, kept in the GUI JSON as fillPaths). See bakedFillFor.
-  formHTML += `window.__BAKED_FILLS__ = ${JSON.stringify(window.__BUILDER_FILL_PATHS__ || null).replace(/</g, '\\u003c')};\n`;
+  // One recording per way of asking (live-site-builder.js records each page);
+  // an older, single recording is used as it is.
+  const fillPathsForPage = (function () {
+    const fp = window.__BUILDER_FILL_PATHS__;
+    if (!fp || !fp.byMode) return fp || null;
+    return fp.byMode[String(window.__FORM_QUESTION_STYLE__ || 'question').toLowerCase()] || null;
+  })();
+  formHTML += `window.__BAKED_FILLS__ = ${JSON.stringify(fillPathsForPage).replace(/</g, '\\u003c')};\n`;
   formHTML += `var linkedCheckboxes = ${JSON.stringify(linkedCheckboxes || [])};\n`;
   formHTML += `var inverseCheckboxes = ${JSON.stringify(inverseCheckboxes || [])};\n`;
   formHTML += `var checkboxRequiredMap = ${JSON.stringify(checkboxRequiredMap || {})};\n`;
@@ -14724,7 +14732,70 @@ function applyFieldCapacities(root){
         el.setAttribute("data-capacity", String(cap));
         applied++;
     });
+    // The parts of a joined box share its room. DV-100 item 4b prints where,
+    // when and the number of a court case on one 40-character line; the three
+    // boxes that ask them had no limit, so an answer could run to three lines'
+    // worth and the case number went off the edge. On the widest path each
+    // part is filled to an even share; typed, a part may take whatever the
+    // others leave, so a long court name typed first still fits. A part that is
+    // also a box of its own keeps the smaller of the two limits.
+    var links = (typeof linkedFields !== "undefined" && linkedFields) ? linkedFields : [];
+    links.forEach(function(link){
+        if (!link || typeof link.join !== "string" || !Array.isArray(link.fields)) return;
+        var joined = Number(caps[link.linkedFieldId] || 0);
+        if (!joined) return;
+        var parts = link.fields.map(function(f){
+            var id = typeof f === "string" ? f : (f && (f.id || f.nodeId || f.fieldId || f.name));
+            return id ? document.getElementById(id) : null;
+        }).filter(Boolean);
+        if (parts.length < 2) return;
+        // A part that is a box of its own is printed in full there and keeps
+        // its own limit: DV-110's firearms box copies DV-100 item 9, whose six
+        // rows must not shrink to fit the copy. Only the parts that exist to
+        // build this box share it, around whatever the others hold. A copy that
+        // still does not fit keeps the parts that fit (dev-server.js).
+        var shared = parts.filter(function(el){ return !Number(caps[el.name] || caps[el.id] || 0); });
+        if (!shared.length) return;
+        var owned = parts.filter(function(el){ return shared.indexOf(el) === -1; });
+        var room = joined - link.join.length * (parts.length - 1);
+        var ownedRoom = 0;
+        owned.forEach(function(el){ ownedRoom += Number(caps[el.name] || caps[el.id] || 0); });
+        var share = Math.max(4, Math.floor((room - ownedRoom) / shared.length));
+        shared.forEach(function(el){
+            var fill = String(share);
+            if (el.getAttribute("data-capacity") !== fill) { el.setAttribute("data-capacity", fill); applied++; }
+            if (!el.__fwJoinWatched) {
+                el.__fwJoinWatched = true;
+                el.addEventListener("input", function(){ fwShareJoinRoom(shared, owned, room); });
+            }
+        });
+        fwShareJoinRoom(shared, owned, room);
+    });
     return applied;
+}
+
+/** Each shared part may be as long as the joined box has room for after the rest. */
+function fwShareJoinRoom(shared, owned, room){
+    var used = 0;
+    shared.concat(owned).forEach(function(el){ used += String(el.value || "").length; });
+    shared.forEach(function(el){
+        var mine = String(el.value || "").length;
+        el.setAttribute("maxlength", String(Math.max(mine, room - (used - mine))));
+    });
+}
+
+/**
+ * Which posted values are lists of joined parts, and what separates them: the
+ * server keeps the parts that fit a box when a list will not fit even set at
+ * 6pt, rather than cutting the last one through.
+ */
+function fwListSeparators(){
+    var out = {};
+    var links = (typeof linkedFields !== "undefined" && linkedFields) ? linkedFields : [];
+    links.forEach(function(link){
+        if (link && typeof link.join === "string" && link.join && link.linkedFieldId) out[link.linkedFieldId] = link.join;
+    });
+    return JSON.stringify(out);
 }
 
 /**
@@ -15005,7 +15076,21 @@ function applyComputedFields(){
                     ? box.checked : String(box.value || "").trim() !== "");
                 if (on && words.indexOf(w.words) === -1) words.push(w.words);
             });
-            writeComputedField(rule.nameId, words.join(rule.separator == null ? "; " : rule.separator));
+            // What the box has room for, in the order the words are declared,
+            // and "etc." for the rest. DV-110 item 2 gives the relationship about
+            // 29 characters; a filer who ticked every relationship on DV-100 item
+            // 3 produced 105, which did not fit even set at 6pt, and the ink ran
+            // off the line mid-word. The whole list is on DV-100 item 3, which is
+            // filed with it.
+            var sep = rule.separator == null ? "; " : rule.separator;
+            var said = words.join(sep);
+            var room = (typeof fieldCapacity !== "undefined" && fieldCapacity) ? Number(fieldCapacity[rule.nameId] || 0) : 0;
+            if (room && said.length > room && words.length > 1) {
+                var kept = words.slice();
+                while (kept.length > 1 && (kept.join(sep) + sep + "etc.").length > room) kept.pop();
+                said = kept.join(sep) + sep + "etc.";
+            }
+            writeComputedField(rule.nameId, said);
             return;
         }
         var total = 0;
@@ -16422,6 +16507,7 @@ async function previewPdf(baseName, isUploaded, isLatex, isPdfPreview, questionI
 
         var previewAttachmentSpec = attachmentSpecFor(baseName);
         if (previewAttachmentSpec) fd.append("__attachment", JSON.stringify(previewAttachmentSpec));
+        if (typeof fwListSeparators === 'function') fd.append('__lists', fwListSeparators());
         // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
         const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
         const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
@@ -16673,6 +16759,7 @@ async function editAndDownloadPDF (pdfName) {
         // A page the form draws: send the rows it prints.
         var attachmentSpec = attachmentSpecFor(pdfName);
         if (attachmentSpec) fd.append("__attachment", JSON.stringify(attachmentSpec));
+        if (typeof fwListSeparators === 'function') fd.append('__lists', fwListSeparators());
         // Use the /edit_pdf endpoint with the PDF name as a query parameter.
         // Keep the extension and include credentials so the backend can find the file and respect the current session.
         const baseName = pdfName.replace(/\.pdf$/i, '');
@@ -17361,6 +17448,12 @@ if (typeof handleNext === 'function') {
         // after the page appeared in which nothing could be typed. It also hands
         // the page back between slices, so a box can be typed in while it runs.
         async function replayRestoredAnswers(fields) {
+            // Not over a debug fill. A draft is replayed on timers after the page
+            // loads, and a replay that landed after Fill maximum path re-announced
+            // the draft's answers over the fill's: the blocks those answers
+            // rebuilt came back empty - 180 fields on the DV packet, one load in
+            // two. A fill that starts mid-replay stops it too.
+            if (window.__fwDebugFillRan) return;
             const answered = fields.filter(function (el) {
                 if (el.type === 'checkbox' || el.type === 'radio') return el.checked;
                 return String(el.value || '') !== '';
@@ -17369,6 +17462,7 @@ if (typeof handleNext === 'function') {
             try {
                 let sliceStart = performance.now();
                 for (let i = 0; i < answered.length; i++) {
+                    if (window.__fwDebugFillRan) break;
                     answered[i].dispatchEvent(new Event('change', { bubbles: true }));
                     if (performance.now() - sliceStart > REPLAY_SLICE_MS) {
                         await (typeof fillYield === 'function'
@@ -17926,6 +18020,10 @@ if (typeof handleNext === 'function') {
                     // After autofilling, trigger visibility updates for dependent questions
                     // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
                     setTimeout(async () => {
+                        // A pass that began before a debug fill must not finish after
+                        // it: everything below re-runs the logic on the draft's answers
+                        // and rebuilds the blocks they open, empty.
+                        if (window.__fwDebugFillRan) return;
                         // Trigger change events on all autofilled elements to ensure conditional logic runs
                         await replayRestoredAnswers(fields);
                         // After conditional logic creates trigger fields, scrub hard-alert autofills
@@ -18212,6 +18310,9 @@ if (typeof handleNext === 'function') {
                 }
                 // 🔧 NEW: Additional fallback for numbered dropdown autofill - try again after a longer delay
                 setTimeout(() => {
+                    // showTextboxLabels below makes a block's entries anew, empty:
+                    // not once a debug fill has written them.
+                    if (window.__fwDebugFillRan) return;
                     const numberedDropdowns = document.querySelectorAll('select[id*="how_many"], select[id*="answer"]');
                     numberedDropdowns.forEach(dropdown => {
                         if (dropdown.value && parseInt(dropdown.value) > 0) {
@@ -18472,6 +18573,9 @@ if (typeof handleNext === 'function') {
         }, 2000); // Wait 2 seconds for conditional fields to be created
         // 🔧 NEW: Clear autofill flag after fallback autofill is complete
         setTimeout(() => {
+            // After a debug fill there is no autofill left to finish, and the
+            // fill manages isInitialAutofill itself.
+            if (window.__fwDebugFillRan) return;
 
             // CRITICAL: Dispatch radioGroupChanged events BEFORE clearing isInitialAutofill flag
             // This ensures conditional logic handlers see isAutofill=true and won't uncheck radios
@@ -18803,6 +18907,11 @@ if (typeof handleNext === 'function') {
                     }, 2000);
                     // Trigger visibility updates for dependent questions
                     setTimeout(async () => {
+                        // A pass that began before a debug fill must not finish after
+                        // it: everything below re-runs the logic on the draft's answers
+                        // and rebuilds the blocks they open - showTextboxLabels makes
+                        // a numbered block's entries anew, empty.
+                        if (window.__fwDebugFillRan) return;
                         // Trigger change events on all autofilled elements to ensure conditional logic runs
                         const fields = getFormFields();
                         await replayRestoredAnswers(fields);
@@ -20125,6 +20234,24 @@ function fwSettleVisibility(maxPasses) {
   }
   document.dispatchEvent(new CustomEvent('questionVisibilityChanged', { detail: { sectionId: null } }));
   return passes;
+}
+// A question that closes empties itself, and nothing tells the questions
+// waiting on it - the change that closed it was on another question. So a
+// moment after a person changes anything, every question is looked at again
+// until nothing moves. DV-101's second incident kept its description on
+// screen, holding what was typed, after the filer changed "Is there another
+// incident?" to No: the date closed and emptied, and the description, which
+// waits on the date, never looked again.
+if (typeof document !== 'undefined' && !window.__FW_CASCADE_BOUND__) {
+  window.__FW_CASCADE_BOUND__ = true;
+  var fwCascadeTimer = null;
+  document.addEventListener('change', function (e) {
+    if (!e.isTrusted || window.__MAX_FILL_IN_PROGRESS__ || window.__fwSettling) return;
+    clearTimeout(fwCascadeTimer);
+    fwCascadeTimer = setTimeout(function () {
+      if (typeof fwSettleVisibility === 'function') fwSettleVisibility();
+    }, 120);
+  }, true);
 }
 if (typeof document !== 'undefined' && !window.__FW_DATE_FIELDS_BOUND__) {
   window.__FW_DATE_FIELDS_BOUND__ = true;
@@ -21868,7 +21995,13 @@ function fillToLength(seed, length, mark) {
   // tenth line in a nine-line box. Where the sample is the whole content,
   // the fill is exactly the text the box was measured against.
   var text = String(seed == null ? '' : seed);
-  if (length < mark.length + 4) return text.slice(0, length);
+  // A box too small for the whole name keeps the end of it, not the start. The
+  // names in a block share their start - protected_animal_1_type, _breed and
+  // _color all printed "protec" - so the start could not tell a page audit
+  // which box was which. The end is the part that differs; the tilde says the
+  // name was cut.
+  var tailOf = function (s, n) { return s.length <= n ? s : '~' + s.slice(s.length - n + 1); };
+  if (length < mark.length + 4) return tailOf(text, length);
   var room = length - mark.length;
   // The same words the capacity was measured against.
   //
@@ -21887,7 +22020,7 @@ function fillToLength(seed, length, mark) {
   // separating space - so it is character-for-character the prefix of SAMPLE
   // that pipeline-capacity.js measured. One leading space is enough to move
   // every line break after it.
-  var out = text || filler.replace(/^ +/, '');
+  var out = text.length > room ? tailOf(text, room) : (text || filler.replace(/^ +/, ''));
   while (out.length < room) out += filler;
   out = out.slice(0, room);
   // Never end the body on a space, which would hide where the text really got
@@ -22876,6 +23009,12 @@ async function applyBakedFill(snap) {
     //    one, and only an event marks it: written silently, 46 dates held their
     //    values behind "Date of the order".
     if (typeof fwSyncDateFields === 'function') fwSyncDateFields();
+    // And the hidden fields the page derives from what the filer typed, which
+    // a keystroke updates and a silent write does not - the ZIP the county
+    // lookup reads (user_zip_hidden) came back empty. The draft restore calls
+    // the same two for the same reason.
+    if (typeof updateUserAddressFields === 'function') { try { updateUserAddressFields(); } catch (e) { /* not on this form */ } }
+    if (typeof updateUserFullName === 'function') { try { updateUserFullName(); } catch (e) { /* not on this form */ } }
   };
   sweep();
   // 3. Hold it there. The page answers those changes with work of its own a

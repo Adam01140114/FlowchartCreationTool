@@ -946,6 +946,7 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
       const groupSpec = (hints.groups || []).find((g) => g.nameId === group.nameId) || {};
       const groupHint = (hints.questions || {})[group.nameId] || {};
       if (groupSpec.optional === true || groupHint.optional === true) step.optional = true;
+      if (groupHint.subtitle || groupSpec.subtitle) step.subtitle = groupHint.subtitle || groupSpec.subtitle;
       place(step, hostFor(group.conditional ? { conditional: group.conditional } : field));
       notes.push(`${group.source}: ${group.members.length} ${group.multiSelect ? 'checkbox' : 'exclusive'} fields -> "${group.question}"`);
       return;
@@ -1598,6 +1599,10 @@ function layoutSequence(b, steps, startY, centerX) {
     if (step.combine) attachCombine(q, step.combine);
     // The editor exports it as required: false, and the form lets the filer past it.
     if (step.optional) q._optional = true;
+    // Words the filer reads under the question before answering it - that a No
+    // brings in a form this packet cannot fill, say. A "subtitle" on a group or
+    // its questions hint; the editor exports it as the question's subtitle.
+    if (step.subtitle) q._subtitle = step.subtitle;
     // Conditions the wiring cannot carry, in the style so they survive the
     // editor; the export adds one per option named (library.js).
     if (step.alsoWhen && step.alsoWhen.length) {

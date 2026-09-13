@@ -1,0 +1,101 @@
+COMPREHENSIVE AUDIT AND DOCUMENTATION UPDATE
+============================================
+Paste this whole file as your prompt. It is written for any AI agent - any
+model, any session, with no memory of earlier work. Everything you need to know
+is in the repository; this prompt tells you how to use it and how to leave it
+better than you found it.
+
+Your job in this session:
+  1. audit the project completely, by doing what the filer and the court do;
+  2. report every defect - do not silently fix or skip anything;
+  3. bring the documentation up to date, so the next agent is as capable as
+     the last one. Progress is kept in the repository's documents, not in
+     anyone's memory.
+
+
+PART 0 - ORIENT (do not skip)
+-----------------------------
+1. Read AGENTS.md at the repo root, then Hand Off/HANDOFF.md,
+   Hand Off/AUDIT.md and Hand Off/PIPELINE.md. Skim form-rules.html
+   (http://localhost:8080/form-rules.html once the server is up).
+2. Find what changed since the docs were last updated:
+   - the "last updated" date at the top of Hand Off/HANDOFF.md;
+   - git log --since=<that date> --stat - read every commit message and the
+     files it touched;
+   - git status - uncommitted work. Ask the user before touching changes you
+     did not make.
+3. Start the dev server if it is not running (npm start -> http://localhost:8080).
+4. Follow the safety rules in Hand Off/AUDIT.md section 0 for the whole
+   session. Above all: never touch the user's saved answers, never sign in
+   with credentials, never answer the editor's "Pick up where you left off?"
+   prompt, and back up and restore the browser draft around every browser test.
+
+
+PART 1 - THE FULL AUDIT (Hand Off/AUDIT.md section 3: every step, in order)
+---------------------------------------------------------------------------
+1. Static checks: npm run audit. Then read the full output of every script,
+   not only the exit codes, and list every non-blocking finding. Also run
+   node pipeline-sanitize.js --check.
+2. Reproducibility: recompile every form in dv-packet.spec.json
+   (node compile-form.js dv-field-configs/<form>-field-config.json
+   <form>-flowchart.json --hints <form>-hints.json), then
+   node pipeline-build-packet.js, then git diff. Any change other than an
+   exportedAt timestamp means a committed artifact drifted from its sources:
+   report it. Revert timestamp-only changes.
+3. Export: in a freshly loaded editor tab, applyProjectJson the rebuilt
+   dv-packet-project.json, wait for the builder, exportProjectGuiJson(false),
+   and compare with the committed dv-packet-gui.json (ignore fillPaths).
+   Report any difference before saving anything.
+4. Publish (the publish-live-site skill) if anything upstream changed, so the
+   live site is built from the current sources. Otherwise say it was current.
+5. node pipeline-nav-audit.js, then
+   node pipeline-nav-audit.js --modes question for the question-at-a-time page.
+   Run it on a quiet machine - it times the fill buttons.
+6. Fill and read back: capture a maximum-path answer set from the published
+   page into pipeline-answers.json, run node pipeline-fill.js --render, then
+   node pipeline-explain.js <form> for every form. The defect list must be empty.
+7. Read the interview: node pipeline-review.js, every line, as a filer would.
+   Note anything wrong, confusing, asked twice, or asked of the wrong person.
+   Then answer a few gates No in the browser and confirm their blocks close.
+8. Look at every rendered page of every filled PDF (pipeline-out/<form>-pages/),
+   against Hand Off/PDF-PAGE-AUDIT.md for what a legitimate blank is. Publish
+   the images you read with node pipeline-current-output.js.
+9. Use every feature changed since the last update the way the user would -
+   the real control, in the real state - and look at what it drew
+   (Hand Off/AUDIT.md section 4).
+Restore the browser draft after the last browser step and confirm it.
+
+
+PART 2 - THE DOCUMENTATION UPDATE
+---------------------------------
+For everything that changed since the last update, and everything the audit
+found:
+1. Verify that every command, path, flag, count and file the docs cite still
+   exists and is still true. Fix what is stale; delete what is wrong.
+2. Hand Off/HANDOFF.md - the "last updated" date, the repository map (new and
+   removed files), and where the work stands and what comes next.
+3. Hand Off/AUDIT.md - section 3 if a check was added or changed; a row in the
+   section 8 incident log for every defect that reached the user or a finished
+   build since the last update; section 9 for new scripts.
+4. Hand Off/PIPELINE.md - the account of any new rule or mechanism: what
+   happened, why the existing checks missed it, what changed.
+5. form-rules.html - every rule that exists in code or in an audit has an
+   entry (id, group, num, title, says, why, by).
+6. AGENTS.md - if a hard rule, a user preference or a trap changed.
+7. Any skill under .claude/skills/ whose procedure changed.
+8. This file - if the audit procedure itself changed.
+9. Anything you learned the hard way goes into these documents, not only into
+   your own memory. The next agent cannot read your memory.
+
+
+PART 3 - THE REPORT
+-------------------
+In plain English:
+- each audit step: what you ran, what it found, with numbers - and what you
+  could not run, and why;
+- every defect, with where it is and how to reproduce it (fix only what the
+  user asked you to fix);
+- every documentation change;
+- anything left undone.
+Do not commit or push unless the user tells you to. When they do, commit
+everything - including live-sites/ and auto-form/ - and push to main.

@@ -17,7 +17,9 @@ Related: [`HANDOFF.md`](./HANDOFF.md) (the project), [`PIPELINE.md`](./PIPELINE.
 (the packet pipeline and the story behind each rule),
 [`PDF-PAGE-AUDIT.md`](./PDF-PAGE-AUDIT.md) (reading the printed pages),
 [`../form-rules.html`](../form-rules.html) (every rule, one page, each addressable
-by id), [`../AGENTS.md`](../AGENTS.md) (the rules every agent follows).
+by id), [`../AGENTS.md`](../AGENTS.md) (the rules every agent follows),
+[`../update_docs_and_audit.txt`](../update_docs_and_audit.txt) (the prompt that
+runs this whole audit and a documentation update in any session).
 
 ---
 
@@ -130,8 +132,12 @@ output - an edit to generated JSON is lost at the next build (rule
   pages in `FormWiz GUI/gui.html` via `live-site-builder.js`, and the dev
   server writes `live-sites/<name>/`. It also **records the Fill minimum path
   and Fill maximum path results** (`fillPaths` in the GUI JSON,
-  `window.__BAKED_FILLS__` in the pages): each path is run twice in a hidden
-  frame and kept only if both runs agree. A build takes 50-95 s. After any
+  `window.__BAKED_FILLS__` in the pages): each path is run in a hidden frame,
+  up to five times, and kept when two runs agree *and* leave the fewest
+  required boxes on shown questions empty - two runs once agreed on a question
+  page with all 180 repeating-block entries blank. A `[live site] ... leaves N
+  required field(s) empty` or `No two ... fills agreed` warning in the builder
+  console is a finding. A build takes 1-4 min. After any
   change to the questions, publish again - a page whose form logic no longer
   matches its recording ignores the recording and works the path out (slower,
   still correct).
@@ -202,9 +208,12 @@ in a fresh headless tab with empty storage and:
 3. **Times it** against `--fill-budget` (3000 ms).
 4. **Waits 3 s and checks nothing the fill wrote is gone** - pages do deferred
    work after a burst of changes.
-5. **Compares the page against the reference**: every answer (unticked, empty
-   and absent count as equal), every element's classes and display state, and
-   which sections are reachable. A difference counts only if a second reference
+5. **Compares the page against the reference**: every answer - hidden fields
+   included, since the page derives them from what is typed and they reach the
+   PDF (unticked, empty and absent count as equal) - every element's classes and
+   display state, and which sections are reachable. An element on one page
+   only that draws nothing (display:none) is not a difference, and neither is
+   where a question-at-a-time section's pointer stopped (question-step-hidden). A difference counts only if a second reference
    run shows it too - the worked-out fill occasionally races the page.
    Sections the answers switched off, and invisible plumbing outside every
    section, are not compared for existence (their values still are).
@@ -214,6 +223,12 @@ in a fresh headless tab with empty storage and:
 7. **Walks Back to the first section** and requires Back to retrace Next: same
    sections in reverse, none twice, none in a form that is not in the packet.
    On the thank-you screen, Back must return to the last section.
+8. **Does it again on a page that restored a saved draft**: a third tab puts
+   the other path's recorded answers in storage as a draft, loads the page, and
+   presses the button half a second later, while the restore's timers are still
+   running. Anything the fill wrote that is gone eight seconds later fails -
+   a returning filer's page, where a restore once landed over the fill and
+   emptied every repeating block.
 
 Output: `passes|FAILS <mode> page, <path> path   fill 1.6 s, 11 sections forward,
 11 back`, then the Next and Back paths, then one line per problem. The last line
@@ -232,6 +247,12 @@ and page images to `pipeline-out/`. `node pipeline-current-output.js` publishes
 the exact images you read into `Current Form Output/`, so the user sees the
 same pages you did; `node pipeline-crop.js <pdf> <page> --field <name>` zooms
 into one box when a page-scale image cannot show whether text sits on its line.
+
+The dev server sets an answer too long for its box smaller, down to 6pt, and
+says so; `pipeline-fill.js` prints what it shrank and **fails (exit 1) on any
+answer that does not fit even at 6pt** - lost ink that no value check can see.
+A marker cut to fit a small box keeps the end of the field's name (`~color`),
+which is the part that tells one column from the next.
 
 ---
 
@@ -277,7 +298,12 @@ Every item below is here because skipping it let a defect reach the user.
    page and Firebase were each ruled out by experiment before the real cause -
    a race inside the fill - was found.*
 9. **A green audit is not evidence.** It is a regression test for defects
-   already seen. The human read (§3 step 9) and the page images (step 10) are
+   already seen.
+10. **Change your mind.** Answer a gate Yes, fill what it opens, then change it
+   to No with real keys: everything it opened must close and empty, all the
+   way down the chain. Every automated check fills forwards and never changes
+   an answer back. *A description stayed on screen, holding what was typed,
+   after "Is there another incident?" went to No.* The human read (§3 step 9) and the page images (step 10) are
    the only checks that can find a new kind of problem.
 
 Practical notes for the Browser pane:
@@ -310,6 +336,12 @@ Practical notes for the Browser pane:
 - **"drawn differently ... (missing <class>)"**: the page sets that class from
   an event the fast path did not fire. Find what sets the class
   (`grep -n "<class>" "FormWiz GUI/generate.js"`) and do the same after writing.
+- **"With a saved draft, N answers the fill wrote were gone 8 s later"**: a
+  step of the page's draft restore ran after the fill. Every deferred restore
+  step must return once `window.__fwDebugFillRan` is set.
+- **pipeline-fill "do not fit their box even at 6pt"**: a joined or computed box
+  is given more than it can print. Share the room among the parts or shorten
+  the words - never lift a limit past what the paper prints.
 - **`pipeline-explain.js` lists a defect**: a field whose question exists and
   whose gates are open, still empty. Trace the question in the review output.
 
@@ -364,8 +396,16 @@ of the day passed, and the check that now catches it.
 | DV-140 printed "children" ticked with no child named for a custody request | Each question worked alone; the gap was between the answer that brought the form in and the one that fed it | RULE 18 |
 | The fill buttons took 45 s with the debug menu open | Tested by calling the function with the menu shut | Nav audit presses the button with the menu open, 3 s budget |
 | A recorded path had the protected animals' entries blank | One fill run raced the page | The builder keeps a recording only when two runs agree |
+| The question page's recorded maximum had 781 values to the section page's 961 - every repeating-block entry blank - and no warning | Both runs agreed on the same blanks, and agreement was the only test | Runs are also held to the empty required boxes they leave (up to five runs, fewest wins); compare `fillPaths.byMode.*.maximum` value counts across pages after every publish |
 | Entries emptied 250 ms after a fast fill; Next locked | Checked immediately after the fill | Nav audit re-checks after 3 s; the fill holds its result until the page is quiet |
 | Dates blank on screen although every value was stored | Every check read stored values | Nav audit: empty-as-drawn, and every element's classes against the worked-out fill |
+| Every repeating block emptied a second after the fill, on a page with a saved draft - one load in two | Every audit started with empty storage, so no restore ever ran | Nav audit's saved-draft run; every restore step stops once a fill has run |
+| The question-at-a-time page worked its path out every time: 10.7 s | Only the section page was recorded; the question page's logic differs by a display flag | Each page records its own paths; `pipeline-nav-audit.js --modes question` |
+| Joined answers ran off the edge: case numbers, a license's state, an employer's address, firearms four to six | Every value was whole in its field; nothing measured the ink | The server shrinks to fit and names what still does not; `pipeline-fill.js` fails on it |
+| Child support asked as one choice where DV-100 says check all that apply | Nothing compared a question's type with the paper's instruction | The human read against the paper; rule `check-all-that-apply-is-asked-that-way` |
+| DV-105 item 4a's "complete form DV-105(A)" never mentioned to the filer | The interview followed the paper's skip and nothing said why | A subtitle names the form and where to get it; rule `a-form-the-packet-cannot-fill-is-named` |
+| DV-101 required a second incident of everyone | Each question worked; nothing asked whether there was a second | A gate before incident 2; rule `room-for-another-is-offered` |
+| Changing a gate back to No left the questions after it on screen, holding what was typed (DV-101's second incident, DV-105's custody order) | A closing question emptied itself and told nothing waiting on it; every check filled forwards and never changed an answer back | The page re-checks every question after a person's change; found and verified by changing gates back with real keys (§4.10) |
 
 ---
 

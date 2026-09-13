@@ -501,7 +501,8 @@
     },
     {
       "nameId": "child_support_situation",
-      "question": "What is your child support situation?",
+      "question": "Which of these apply to your child support request?",
+      "multiSelect": true,
       "members": [
         "child_support_no_existing_order_want_one",
         "child_support_existing_order_want_changed",
@@ -1099,7 +1100,8 @@
       "text": "What is your pay to?"
     },
     "child_support_situation": {
-      "text": "What is your child support situation?",
+      "text": "Which of these apply to your child support request?",
+      "_why": "DV-100 item 24 says 'check all that apply'. Asked as one choice, a filer on TANF who also wanted a child support order could say only one of the two, and the paper went out with half of their answer.",
       "conditional": {
         "onlyWhen": "child_support_order_requested"
       }

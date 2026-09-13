@@ -7088,20 +7088,20 @@
     },
     {
       "id": "297",
-      "value": "What is your child support situation?",
+      "value": "Which of these apply to your child support request?",
       "geometry": {
         "x": 3216,
         "y": 25946,
         "width": 300,
-        "height": 96
+        "height": 120
       },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=child_support_situation;section=9;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=checkbox;nodeId=child_support_situation;section=9;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
       "vertex": true,
       "edge": false,
       "source": null,
       "target": null,
       "_textboxes": null,
-      "_questionText": "What is your child support situation?",
+      "_questionText": "Which of these apply to your child support request?",
       "_questionId": "101",
       "_nameId": "child_support_situation",
       "_placeholder": "",
@@ -7115,7 +7115,7 @@
       "value": "",
       "geometry": {
         "x": 3361,
-        "y": 26082,
+        "y": 26106,
         "width": 10,
         "height": 10
       },
@@ -7134,11 +7134,11 @@
       "value": "I do not have a child support order and I want one",
       "geometry": {
         "x": 2954,
-        "y": 26148,
+        "y": 26172,
         "width": 260,
         "height": 120
       },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=9;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=checkbox;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=9;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
       "vertex": true,
       "edge": false,
       "source": null,
@@ -7153,11 +7153,11 @@
       "value": "I have a child support order and I want it changed",
       "geometry": {
         "x": 3236,
-        "y": 26148,
+        "y": 26172,
         "width": 260,
         "height": 120
       },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=9;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=checkbox;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=9;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
       "vertex": true,
       "edge": false,
       "source": null,
@@ -7172,11 +7172,11 @@
       "value": "I now receive or have applied for TANF, Welfare, or CalWORKS",
       "geometry": {
         "x": 3518,
-        "y": 26148,
+        "y": 26172,
         "width": 260,
         "height": 120
       },
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=9;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=checkbox;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=9;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
       "vertex": true,
       "edge": false,
       "source": null,
@@ -17086,11 +17086,11 @@
         "points": [
           {
             "x": 3366,
-            "y": 26112
+            "y": 26136
           },
           {
             "x": 3084,
-            "y": 26112
+            "y": 26136
           }
         ]
       }
@@ -17113,7 +17113,7 @@
         "points": [
           {
             "x": 3366,
-            "y": 26112
+            "y": 26136
           }
         ]
       }
@@ -17136,11 +17136,11 @@
         "points": [
           {
             "x": 3366,
-            "y": 26112
+            "y": 26136
           },
           {
             "x": 3648,
-            "y": 26112
+            "y": 26136
           }
         ]
       }
@@ -18293,7 +18293,7 @@
         "points": [
           {
             "x": 3084,
-            "y": 26284
+            "y": 26308
           },
           {
             "x": 3084,
@@ -18324,7 +18324,7 @@
         "points": [
           {
             "x": 3366,
-            "y": 26284
+            "y": 26308
           },
           {
             "x": 3366,
@@ -18355,7 +18355,7 @@
         "points": [
           {
             "x": 3648,
-            "y": 26284
+            "y": 26308
           },
           {
             "x": 3648,

@@ -57,6 +57,43 @@
   }
 
   /**
+   * Required typed boxes on shown questions that a fill left empty - read from
+   * the page's structure, not its layout, because a question-at-a-time page
+   * lays out one question at a time and a section page one section. A box
+   * inside a question or part marked optional, or inside something the page
+   * hid, does not count; nor does a question in a packet form the path never
+   * switched on (the minimum path leaves DV-101 out, and its first incident's
+   * questions wait unasked in a section nobody is shown).
+   */
+  function emptyRequiredFields(doc) {
+    const win = doc.defaultView || {};
+    const formOff = function (q) {
+      const section = q.closest('.section[id^="section"]');
+      const n = section ? parseInt(section.id.replace(/^section/, ''), 10) : NaN;
+      if (isNaN(n) || typeof win.formOwningSection !== 'function' || typeof win.isFormActivated !== 'function') return false;
+      const form = win.formOwningSection(n);
+      return !!form && !win.isFormActivated(form);
+    };
+    const hiddenWithin = function (el, q) {
+      for (let c = el; c && c !== q; c = c.parentElement) {
+        if (c.classList && c.classList.contains('hidden')) return true;
+        if (c.style && c.style.display === 'none') return true;
+      }
+      return false;
+    };
+    const empty = [];
+    Array.prototype.forEach.call(doc.querySelectorAll('.question-container:not(.hidden)'), function (q) {
+      if (q.getAttribute('data-optional') === '1' || formOff(q)) return;
+      Array.prototype.forEach.call(q.querySelectorAll('input[type=text], input[type=date], input[type=number], '
+        + 'input[type=email], input[type=tel], input:not([type]), textarea'), function (el) {
+        if (el.disabled || el.readOnly || el.closest('[data-optional]') || hiddenWithin(el, q)) return;
+        if (String(el.value || '').trim() === '') empty.push(el.id || el.name || q.id);
+      });
+    });
+    return empty;
+  }
+
+  /**
    * The page as the live site serves it, safe to run here. The site's copy has
    * Firebase, Stripe and the cart taken out (payload-html.js); so does this one,
    * because this frame shares the builder's origin and a signed-in Firebase
@@ -125,32 +162,60 @@
         await sleep(1500);
         await win.fillMaximumPath(Object.assign({ solve: true }, opts));
         await sleep(600);
+        const empty = emptyRequiredFields(win.document);
         return Object.assign(captureFill(win.document), {
           markers: !!opts.markers,
-          logic: typeof win.fwLogicSignature === 'function' ? win.fwLogicSignature() : ''
+          logic: typeof win.fwLogicSignature === 'function' ? win.fwLogicSignature() : '',
+          empties: empty.length,
+          emptyFields: empty
         });
       } finally {
         frame.remove();
       }
     };
-    // Twice each, and a third time when those two disagree. The fill races the
+    // Until two runs agree, at the fewest empty fields. The fill races the
     // page's own deferred work: one build recorded the protected animals'
-    // entries blank that every run on its own fills. A recording is what two
-    // runs agree on.
+    // entries blank that every run on its own fills, and a later one recorded
+    // the question page with all 180 entries of its repeating blocks blank -
+    // in both runs, which agreed, so agreement alone let it through. A run is
+    // held to what it leaves empty as well: a required box on a shown question
+    // with nothing in it. Up to five runs; the recording is the first pair
+    // that agrees with the fewest empties seen, and a build that never gets
+    // one says so.
     const same = function (a, b) {
       const ka = Object.keys(a.values);
       return ka.length === Object.keys(b.values).length
         && ka.every(function (k) { return String(a.values[k]) === String(b.values[k]); });
     };
     const agreed = async function (opts) {
-      const first = await run(opts);
-      const second = await run(opts);
-      if (same(first, second)) return first;
-      const third = await run(opts);
-      if (!same(third, first) && !same(third, second)) {
-        console.warn('[live site] Three ' + (opts.minimum ? 'minimum' : 'maximum') + ' fills disagreed; recording the last.');
+      const runs = [];
+      const label = (opts.minimum ? 'minimum' : 'maximum');
+      for (let i = 0; i < 5; i++) {
+        runs.push(await run(opts));
+        if (runs.length < 2) continue;
+        const fewest = Math.min.apply(null, runs.map(function (r) { return r.empties; }));
+        const best = runs.filter(function (r) { return r.empties === fewest; });
+        // A pair with something still empty is kept only after five tries:
+        // a later run may yet fill it.
+        if (fewest > 0 && runs.length < 5) continue;
+        for (let a = 0; a < best.length; a++) {
+          for (let b = a + 1; b < best.length; b++) {
+            if (same(best[a], best[b])) {
+              if (fewest > 0) {
+                console.warn('[live site] The ' + label + ' recording leaves ' + fewest + ' required field(s) empty: '
+                  + best[a].emptyFields.slice(0, 12).join(', '));
+              }
+              return best[a];
+            }
+          }
+        }
       }
-      return third;
+      const fullest = runs.slice().sort(function (x, y) {
+        return x.empties - y.empties || Object.keys(y.values).length - Object.keys(x.values).length;
+      })[0];
+      console.warn('[live site] No two ' + label + ' fills agreed at their fullest; recording the fullest ('
+        + fullest.empties + ' empty: ' + fullest.emptyFields.slice(0, 12).join(', ') + ').');
+      return fullest;
     };
     return {
       // The buttons' own settings: both fill with each field's name as marker.
@@ -207,10 +272,29 @@
     delete json.fillPaths;
     window.__BUILDER_FILL_PATHS__ = null;
     generatePages();
+    // One recording per way of asking. The pages share their questions but not
+    // what starts on screen - the section page keeps some questions open that
+    // the question-at-a-time page hides (alwaysVisibleStacked) - and a page only
+    // uses a recording made on its own form logic. Recording the section page
+    // alone left the question page working its path out every time: 10.7 s.
+    // Pages whose logic is identical share one recording.
+    const logicOf = function (html) {
+      const m = /window\.__FORM_LOGIC__ = (.*);\n/.exec(String(html || ''));
+      return m ? m[1] : '';
+    };
     let fills = null;
     if (opts.bakeFills !== false) {
       try {
-        fills = await bakeFills(pages.section || pages[modes[0]]);
+        const byMode = {};
+        const byLogic = {};
+        for (const mode of modes) {
+          const logic = logicOf(pages[mode]);
+          if (logic && byLogic[logic]) { byMode[mode] = byLogic[logic]; continue; }
+          byMode[mode] = await bakeFills(pages[mode]);
+          ['maximum', 'minimum'].forEach(function (p) { if (byMode[mode][p]) { delete byMode[mode][p].empties; delete byMode[mode][p].emptyFields; } });
+          if (logic) byLogic[logic] = byMode[mode];
+        }
+        fills = { byMode: byMode, bakedAt: new Date().toISOString() };
       } catch (err) {
         console.warn('[live site] The fill paths could not be recorded; the buttons will work them out:', err);
       }
@@ -260,10 +344,13 @@
     Object.keys(out.formLinks || {}).forEach(function (mode) {
       out.formLinks[mode] = location.origin + out.formLinks[mode];
     });
-    out.fillPaths = fills ? {
-      maximum: Object.keys(fills.maximum.values).length,
-      minimum: Object.keys(fills.minimum.values).length
-    } : null;
+    out.fillPaths = fills ? Object.keys(fills.byMode).reduce(function (o, mode) {
+      o[mode] = {
+        maximum: Object.keys(fills.byMode[mode].maximum.values).length,
+        minimum: Object.keys(fills.byMode[mode].minimum.values).length
+      };
+      return o;
+    }, {}) : null;
     out.questions = (json.sections || []).reduce(function (n, s) { return n + (s.questions || []).length; }, 0);
     out.sections = (json.sections || []).length;
     return out;

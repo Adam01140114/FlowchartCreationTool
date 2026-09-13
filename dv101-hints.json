@@ -120,26 +120,47 @@
     },
     "dv101_abuse_2_date": {
       "text": "When did that abuse happen?",
-      "type": "date"
+      "type": "date",
+      "conditional": {
+        "onlyWhen": "dv101_abuse_2_asked_yes"
+      }
+    },
+    "dv101_abuse_2_police_came": {
+      "conditional": {
+        "onlyWhen": "dv101_abuse_2_asked_yes"
+      }
     },
     "dv101_abuse_2_witnesses": {
       "text": "Who else was there?",
       "optional": true,
-      "type": "bigParagraph"
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "dv101_abuse_2_asked_yes"
+      }
     },
     "dv101_abuse_2_description": {
       "text": "Describe how the person abused you or your children that time.",
-      "type": "bigParagraph"
+      "type": "bigParagraph",
+      "_why": "Each question about the second incident names the gate as its condition. The compiler still chains them off the date and the description before them, as it does any text question, so what closes them on No is the page: the gate closes the date, and generate.js then looks at every question again until nothing moves (fwSettleVisibility after a person's change). Before that, the description stayed on screen holding what was typed.",
+      "conditional": {
+        "onlyWhen": "dv101_abuse_2_asked_yes"
+      }
     },
     "dv101_abuse_2_weapon_description": {
       "text": "Describe any use or threatened use of guns or other weapons.",
       "type": "bigParagraph",
-      "optional": true
+      "optional": true,
+      "conditional": {
+        "onlyWhen": "dv101_abuse_2_asked_yes"
+      }
     },
     "dv101_abuse_2_injuries": {
       "text": "Describe any injuries the person caused you.",
       "type": "bigParagraph",
-      "optional": true
+      "optional": true,
+      "conditional": {
+        "onlyWhen": "dv101_abuse_2_asked_yes"
+      }
     },
     "dv101_abuse_2_epo_given": {
       "conditional": {
@@ -195,10 +216,18 @@
     {
       "question": "dv101_abuse_1_police_came",
       "why": "Item 3f is asked about every incident, whatever the answers above it were."
-    },
+    }
+  ],
+  "choices": [
     {
-      "question": "dv101_abuse_2_police_came",
-      "why": "Item 4f, the same."
+      "nameId": "dv101_abuse_2_asked",
+      "question": "Is there another incident you want to describe?",
+      "before": "dv101_abuse_2_date",
+      "_why": "DV-101 has room for two incidents, and a filer may have only one more to tell. The second was asked of everyone, so a filer with one incident had to invent a date and a description to get past it. Item 4f - did the police come - is still asked about the second incident whenever there is one.",
+      "options": [
+        { "label": "Yes", "nameId": "dv101_abuse_2_asked_yes" },
+        { "label": "No", "nameId": "dv101_abuse_2_asked_no" }
+      ]
     }
   ],
   "overflowTargets": [

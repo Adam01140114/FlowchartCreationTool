@@ -104,6 +104,16 @@ DV-105, DV-108, DV-140, CLETS-001, DV-109, DV-110).
   for other definitions before editing a shared function name.
 - A tab nobody is looking at does not render; a `window.open()` after an
   `await` is popup-blocked.
+- Two fill runs that agree can agree on the same mistake. The publish keeps a
+  recorded path only at the fewest empty required boxes (`emptyRequiredFields`
+  in `live-site-builder.js`), and warns in the builder console when one stays
+  empty. After a publish, compare each page's recorded maximum value count - a
+  page far below the other lost something.
+- A page with a saved draft restores it on timers for seconds after it loads.
+  Anything that writes the form must survive a restore landing after it - the
+  debug fills are guarded by `window.__fwDebugFillRan`.
+- A box on the paper holds what it holds. The server shrinks an answer to fit,
+  down to 6pt, and `pipeline-fill.js` fails on one that still does not.
 - Checks that read data pass on pages and PDFs that are wrong. See the incident
   log in [`AUDIT.md` §8](Hand%20Off/AUDIT.md) before trusting a green run.
 
@@ -144,3 +154,4 @@ Several agents may work here at once. They share one machine, one dev server
 | Static audits | `npm run audit` |
 | Published-site audit | `npm run audit:nav` (`pipeline-nav-audit.js`) |
 | Every script | [`AUDIT.md` §9](Hand%20Off/AUDIT.md) |
+| A full audit and docs refresh | [`update_docs_and_audit.txt`](update_docs_and_audit.txt) - the user pastes it as a prompt; follow it end to end |

@@ -890,12 +890,6 @@
       "label": "Monday start"
     },
     {
-      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb1[0]",
-      "newName": "dv105_supervised_visit_monday_virtual_visit",
-      "type": "checkbox",
-      "label": "Monday virtual visit"
-    },
-    {
       "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf3[0]",
       "newName": "dv105_supervised_visit_monday_person_to_bring_dropoff",
       "type": "text",
@@ -930,12 +924,6 @@
       "newName": "dv105_supervised_visit_tuesday_start",
       "type": "text",
       "label": "Tuesday start"
-    },
-    {
-      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb2[0]",
-      "newName": "dv105_supervised_visit_tuesday_virtual_visit",
-      "type": "checkbox",
-      "label": "Tuesday virtual visit"
     },
     {
       "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf9[0]",
@@ -974,12 +962,6 @@
       "label": "Wednesday start"
     },
     {
-      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb3[0]",
-      "newName": "dv105_supervised_visit_wednesday_virtual_visit",
-      "type": "checkbox",
-      "label": "Wednesday virtual visit"
-    },
-    {
       "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf14[0]",
       "newName": "dv105_supervised_visit_wednesday_person_to_bring_dropoff",
       "type": "text",
@@ -1014,12 +996,6 @@
       "newName": "dv105_supervised_visit_thursday_start",
       "type": "text",
       "label": "Thursday start"
-    },
-    {
-      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb4[0]",
-      "newName": "dv105_supervised_visit_thursday_virtual_visit",
-      "type": "checkbox",
-      "label": "Thursday virtual visit"
     },
     {
       "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf20[0]",
@@ -1058,12 +1034,6 @@
       "label": "Friday start"
     },
     {
-      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb5[0]",
-      "newName": "dv105_supervised_visit_friday_virtual_visit",
-      "type": "checkbox",
-      "label": "Friday virtual visit"
-    },
-    {
       "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf26[0]",
       "newName": "dv105_supervised_visit_friday_person_to_bring_dropoff",
       "type": "text",
@@ -1098,12 +1068,6 @@
       "newName": "dv105_supervised_visit_saturday_start",
       "type": "text",
       "label": "Saturday start"
-    },
-    {
-      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb6[0]",
-      "newName": "dv105_supervised_visit_saturday_virtual_visit",
-      "type": "checkbox",
-      "label": "Saturday virtual visit"
     },
     {
       "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf32[0]",
@@ -1142,12 +1106,6 @@
       "label": "Sunday start"
     },
     {
-      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb7[0]",
-      "newName": "dv105_supervised_visit_sunday_virtual_visit",
-      "type": "checkbox",
-      "label": "Sunday virtual visit"
-    },
-    {
       "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].tf38[0]",
       "newName": "dv105_supervised_visit_sunday_person_to_bring_dropoff",
       "type": "text",
@@ -1176,6 +1134,48 @@
       "newName": "dv105_supervised_visit_sunday_location_pickup",
       "type": "text",
       "label": "Sunday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb1[0]",
+      "newName": "dv105_supervised_visit_monday_virtual_visit",
+      "type": "checkbox",
+      "label": "Monday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb2[0]",
+      "newName": "dv105_supervised_visit_tuesday_virtual_visit",
+      "type": "checkbox",
+      "label": "Tuesday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb3[0]",
+      "newName": "dv105_supervised_visit_wednesday_virtual_visit",
+      "type": "checkbox",
+      "label": "Wednesday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb4[0]",
+      "newName": "dv105_supervised_visit_thursday_virtual_visit",
+      "type": "checkbox",
+      "label": "Thursday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb5[0]",
+      "newName": "dv105_supervised_visit_friday_virtual_visit",
+      "type": "checkbox",
+      "label": "Friday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb6[0]",
+      "newName": "dv105_supervised_visit_saturday_virtual_visit",
+      "type": "checkbox",
+      "label": "Saturday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].itemc_VirtVist_cb7[0]",
+      "newName": "dv105_supervised_visit_sunday_virtual_visit",
+      "type": "checkbox",
+      "label": "Sunday virtual visit"
     },
     {
       "id": "DV-105[0].Page5[0].List12[0].List[0].Li3[0].CheckBoxRightCaption12b[0]",
@@ -1338,12 +1338,6 @@
       "label": "Monday start"
     },
     {
-      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb1[0]",
-      "newName": "dv105_unsupervised_visit_monday_virtual_visit",
-      "type": "checkbox",
-      "label": "Monday virtual visit"
-    },
-    {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf2[0]",
       "newName": "dv105_unsupervised_visit_monday_person_to_bring_dropoff",
       "type": "text",
@@ -1378,12 +1372,6 @@
       "newName": "dv105_unsupervised_visit_tuesday_start",
       "type": "text",
       "label": "Tuesday start"
-    },
-    {
-      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb2[0]",
-      "newName": "dv105_unsupervised_visit_tuesday_virtual_visit",
-      "type": "checkbox",
-      "label": "Tuesday virtual visit"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf8[0]",
@@ -1422,12 +1410,6 @@
       "label": "Wednesday start"
     },
     {
-      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb3[0]",
-      "newName": "dv105_unsupervised_visit_wednesday_virtual_visit",
-      "type": "checkbox",
-      "label": "Wednesday virtual visit"
-    },
-    {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf14[0]",
       "newName": "dv105_unsupervised_visit_wednesday_person_to_bring_dropoff",
       "type": "text",
@@ -1462,12 +1444,6 @@
       "newName": "dv105_unsupervised_visit_thursday_start",
       "type": "text",
       "label": "Thursday start"
-    },
-    {
-      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb4[0]",
-      "newName": "dv105_unsupervised_visit_thursday_virtual_visit",
-      "type": "checkbox",
-      "label": "Thursday virtual visit"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf20[0]",
@@ -1506,12 +1482,6 @@
       "label": "Friday start"
     },
     {
-      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb5[0]",
-      "newName": "dv105_unsupervised_visit_friday_virtual_visit",
-      "type": "checkbox",
-      "label": "Friday virtual visit"
-    },
-    {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf26[0]",
       "newName": "dv105_unsupervised_visit_friday_person_to_bring_dropoff",
       "type": "text",
@@ -1546,12 +1516,6 @@
       "newName": "dv105_unsupervised_visit_saturday_start",
       "type": "text",
       "label": "Saturday start"
-    },
-    {
-      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb6[0]",
-      "newName": "dv105_unsupervised_visit_saturday_virtual_visit",
-      "type": "checkbox",
-      "label": "Saturday virtual visit"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf32[0]",
@@ -1590,12 +1554,6 @@
       "label": "Sunday start"
     },
     {
-      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb7[0]",
-      "newName": "dv105_unsupervised_visit_sunday_virtual_visit",
-      "type": "checkbox",
-      "label": "Sunday virtual visit"
-    },
-    {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].tf39[0]",
       "newName": "dv105_unsupervised_visit_sunday_person_to_bring_dropoff",
       "type": "text",
@@ -1624,6 +1582,48 @@
       "newName": "dv105_unsupervised_visit_sunday_location_pickup",
       "type": "text",
       "label": "Sunday location pickup"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb1[0]",
+      "newName": "dv105_unsupervised_visit_monday_virtual_visit",
+      "type": "checkbox",
+      "label": "Monday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb2[0]",
+      "newName": "dv105_unsupervised_visit_tuesday_virtual_visit",
+      "type": "checkbox",
+      "label": "Tuesday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb3[0]",
+      "newName": "dv105_unsupervised_visit_wednesday_virtual_visit",
+      "type": "checkbox",
+      "label": "Wednesday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb4[0]",
+      "newName": "dv105_unsupervised_visit_thursday_virtual_visit",
+      "type": "checkbox",
+      "label": "Thursday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb5[0]",
+      "newName": "dv105_unsupervised_visit_friday_virtual_visit",
+      "type": "checkbox",
+      "label": "Friday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb6[0]",
+      "newName": "dv105_unsupervised_visit_saturday_virtual_visit",
+      "type": "checkbox",
+      "label": "Saturday virtual visit"
+    },
+    {
+      "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13b2_VirtVist_cb7[0]",
+      "newName": "dv105_unsupervised_visit_sunday_virtual_visit",
+      "type": "checkbox",
+      "label": "Sunday virtual visit"
     },
     {
       "id": "DV-105[0].Page6[0].List13[0].List[0].Li2[0].List[0].Li2[0].item13bSchedule[0]",

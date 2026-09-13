@@ -149,7 +149,7 @@
   },
   "sections": [
     {
-      "name": "The Person to Restrain",
+      "name": "About the Person to Restrain",
       "fields": [
         "case_number",
         "person_to_restrain_full_name",

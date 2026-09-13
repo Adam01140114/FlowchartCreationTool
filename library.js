@@ -696,6 +696,9 @@ window.exportGuiJson = function(download = true) {
       question.nameId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed");
       question.placeholder = cell._placeholder || "";
     }
+    // Words under the question, from a hint (compile-form.js puts them on the
+    // cell) - that a No brings in a form this packet does not fill, say.
+    if (cell._subtitle) question.subtitle = { enabled: true, text: String(cell._subtitle) };
     // Add uploadTitle and fileTitle for fileUpload questions
     if (questionType === "fileUpload") {
       question.uploadTitle = question.text;
@@ -4171,6 +4174,10 @@ window.exportBothJson = function() {
       }
       if (cell._optional !== undefined) {
         cellData._optional = cell._optional;
+      }
+      // Words under the question (a hint's "subtitle"), carried like _optional.
+      if (cell._subtitle !== undefined) {
+        cellData._subtitle = cell._subtitle;
       } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
       }
       if (cell._linkedCheckboxNodeId !== undefined) {
@@ -5596,6 +5603,9 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         }
         if (item._optional !== undefined) {
           newCell._optional = item._optional;
+        }
+        if (item._subtitle !== undefined) {
+          newCell._subtitle = item._subtitle;
         }
         if (item._linkedCheckboxNodeId !== undefined) {
           newCell._linkedCheckboxNodeId = item._linkedCheckboxNodeId;

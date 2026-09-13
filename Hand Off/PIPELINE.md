@@ -1290,8 +1290,16 @@ Run both. Neither is sufficient alone, and each takes a few seconds.
 Working a path out takes about twenty milliseconds; writing a thousand answers
 one change event at a time took 3 s for the maximum path and 9 s for the
 minimum. So publishing records both. `live-site-builder.js` runs each fill in a
-hidden frame, twice, with Firebase stripped and an in-memory `localStorage`, and
-keeps a recording only when both runs agree. The recording is every field's
+hidden frame with Firebase stripped and an in-memory `localStorage`, up to five
+times, and keeps a recording when two runs agree at the fewest empty required
+boxes (`emptyRequiredFields`: typed boxes on shown questions, not optional, not
+inside something hidden, not in a packet form the path left switched off -
+`formOwningSection` / `isFormActivated`, because a section page hides every
+section but the current one and layout cannot tell the two apart). Agreement alone was not enough: one build's two
+question-page runs agreed on 781 values with all 180 repeating-block entries
+blank, where the section page recorded 961. It records once for each page, because the
+section page and the question-at-a-time page do not start with the same
+questions on screen (`fillPaths.byMode`; pages with identical logic share one). The recording is every field's
 final value and which questions are shown, stored as `fillPaths` in the GUI JSON
 and as `window.__BAKED_FILLS__` in the pages. The buttons then put it back
 (`applyBakedFill`): choices first, with one change event each where the page
@@ -1376,3 +1384,100 @@ machine without `gs`. `--scale` sets the resolution (1.6 by default). `pipeline-
 empty field is empty: a gate the answers closed, a field the court fills, or a
 defect. A defect is a field whose question exists, whose gates are open, and
 which is still empty — that list should always be empty before shipping.
+
+## A saved draft is never restored over a fill
+
+A page with a saved draft restores it on timers - passes at one, two, three and
+four seconds after load, then a replay of every answer that re-runs the logic
+and rebuilds the blocks those answers open. Each pass checked, as it began,
+whether a debug fill had run; the deferred steps inside it did not. So a pass
+that began before Fill maximum path could finish after it, and its rebuild of
+the numbered blocks came back empty: 180 fields - restraining orders, protected
+people, children, animals, debts, expenses - one load in two, on exactly the
+page a returning filer has. The fill had finished and checked itself clean.
+
+Every deferred step of the restore now returns once `window.__fwDebugFillRan`
+is set, and `replayRestoredAnswers` stops mid-replay when a fill starts. No
+audit had caught it because every audit started with empty storage, and an
+empty store never restores anything. `pipeline-nav-audit.js` now loads each page
+a second time with a saved draft (the other path's recorded answers), presses
+the button half a second after load, and fails if anything the fill wrote is
+gone eight seconds later.
+
+## Each page has its own recorded paths
+
+The recording was made on the section page only. A recording names the form
+logic it came from, and the question-at-a-time page's logic differs in one
+display flag (`alwaysVisibleStacked`, which keeps some questions open on a
+stacked page) - so that page rejected the recording and worked the path out
+every time: 10.7 s for the minimum path. `live-site-builder.js` now records each
+page (`fillPaths.byMode`), sharing one recording between pages whose logic is
+identical, and `generate.js` gives each page its own.
+
+## What goes on the paper fits its box
+
+The interview holds a single answer to what its box holds, but a box that joins
+several answers had no such limit. DV-100 item 4b prints where, when and the
+number of a court case on one line, and the number ran off the edge; CLETS-001
+lost the state of a driver's license and an employer's address; DV-110 printed
+three of six firearms and cut the relationship mid-word. Every value was whole
+in its field, so every check that reads values passed.
+
+Three changes, each general:
+
+- `dev-server.js` `fitToBox`: an answer longer than its box at the declared size
+  is set smaller, half a point at a time, down to 6pt. A ruled box keeps its
+  rules (a smaller size puts more words on each line, never more lines). It runs
+  after the spill onto a ruled line below, so that happens first. The response
+  names what was shrunk (`X-Fill-Shrunk`) and what did not fit even at 6pt
+  (`X-Fill-Unfitted`), and `pipeline-fill.js` fails on the second.
+- `generate.js` `applyFieldCapacities`: the parts of a joined box share its room.
+  On the widest path each is filled to an even share; typed, a part may take
+  whatever the others leave, so a long court name typed first still fits.
+- `applyComputedFields`: a list of words the box cannot hold keeps what fits, in
+  the declared order, and ends with "etc." - DV-110 item 2's relationship, whose
+  full list is on DV-100 item 3.
+
+## Smaller fixes from the September 12 full audit
+
+- DV-100 item 24 says "check all that apply", and child support was asked as one
+  choice - a filer on TANF who wanted an order could say only one. It is a
+  check-all question now.
+- DV-105 item 4a: "If no, complete form DV-105(A)." The interview skipped the
+  section on No, as it should, and said nothing about DV-105(A), which the
+  packet does not include. A hint's `subtitle` - carried by `compile-form.js`
+  and `library.js` into the question's subtitle - now says so under the question.
+- DV-101 asked every filer about a second incident. It asks first whether there
+  is one (`choices` in `dv101-hints.json`).
+- "How is the other person they lived with related to the children?" became
+  "How is that person related to the children?"; DV-110 speaks of "the person
+  you want protection from", not "the restrained person"; no two sections share
+  a name ("The Children's Other Court Cases", "About the Person to Restrain").
+- DV-105's "Which of those days should be virtual visits?" came before Tuesday
+  to Sunday had been described, because each day's virtual box sits in that
+  day's row of the field config. The boxes now follow the Sunday row.
+- A test marker cut to fit a small box keeps the end of the field name, not the
+  start (`~color`, not `protec`), so a page audit can tell the columns apart.
+
+## A question that closes closes everything waiting on it
+
+A question's visibility is checked when a question it waits on changes. When a
+changed answer closes a question, that question empties itself - but it was
+closed by a change somewhere else, so it fires nothing, and the questions that
+wait on it never look again. Changing DV-101's "Is there another incident you
+want to describe?" to No closed and emptied the incident's date; the
+description after it, which waits on the date, stayed on screen holding what
+had been typed. DV-105's "What did the judge order?" and "Why do you want to
+change that order?" did the same when the custody-order question went to No.
+
+The page now runs `fwSettleVisibility` - every question looked at again until
+nothing moves - a moment after any change a person makes (never during a fill,
+which settles itself). Every automated check fills the form forwards and never
+changes an answer back, which is how this got through; it is found by answering
+a gate Yes, filling what it opens, and changing it to No with real keys.
+
+A joined list that will not fit its box even set at 6pt - DV-110's copy of six
+firearms into three lines - keeps its whole parts that fit and ends with
+"etc." (`dev-server.js`; the form names its lists in `__lists`, from
+`fwListSeparators`). DV-110 prints "(Include information from form DV-100, item
+9)" beside that box, and DV-100 item 9 holds all six.
