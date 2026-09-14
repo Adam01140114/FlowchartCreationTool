@@ -710,7 +710,7 @@
       "type": "date"
     },
     "most_recent_abuse_details": {
-      "text": "Describe how the person was abusive that day, including what they said, did, or sent to you, and how often it happened.",
+      "text": "Describe how the person was abusive that day, including what they said, did, or sent to you.",
       "type": "bigParagraph"
     },
     "most_recent_abuse_other_dates": {
@@ -729,7 +729,7 @@
       }
     },
     "different_abuse_incident_details": {
-      "text": "Describe how the person was abusive that time, including what they said, did, or sent to you, and how often it happened.",
+      "text": "Describe how the person was abusive that time, including what they said, did, or sent to you.",
       "type": "bigParagraph",
       "conditional": {
         "onlyWhen": "has_different_abuse"
@@ -744,7 +744,7 @@
       }
     },
     "other_abuse_incident_details": {
-      "text": "Describe how the person was abusive then, including what they said, did, or sent to you, and how often it happened.",
+      "text": "Describe how the person was abusive then, including what they said, did, or sent to you.",
       "type": "bigParagraph",
       "conditional": {
         "onlyWhen": "has_other_abuse"
@@ -1344,7 +1344,7 @@
       "text": "Why else should you have the animals?",
       "type": "bigParagraph",
       "conditional": {
-        "onlyWhen": "protect_animals_order_requested"
+        "onlyWhen": "animal_sole_possession_reason_other"
       }
     },
     "has_additional_pages": {

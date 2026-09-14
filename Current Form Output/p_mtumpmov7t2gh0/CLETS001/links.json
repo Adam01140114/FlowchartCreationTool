@@ -210,9 +210,42 @@
       "page": 1
      }
     ]
+   },
+   {
+    "name": "person_to_restrain_firearms_no_yes",
+    "kind": "checkbox",
+    "caption": false,
+    "to": [
+     {
+      "form": "DV100",
+      "page": 6
+     }
+    ]
+   },
+   {
+    "name": "person_to_restrain_firearms_unknown_yes",
+    "kind": "checkbox",
+    "caption": false,
+    "to": [
+     {
+      "form": "DV100",
+      "page": 6
+     }
+    ]
+   },
+   {
+    "name": "person_to_restrain_firearms_yes_yes",
+    "kind": "checkbox",
+    "caption": false,
+    "to": [
+     {
+      "form": "DV100",
+      "page": 6
+     }
+    ]
    }
   ],
-  "substantive": 1,
+  "substantive": 4,
   "forms": [
    "DV100",
    "DV101",
@@ -448,6 +481,17 @@
     ]
    },
    {
+    "name": "person_asking_protection_telephone",
+    "kind": "text",
+    "caption": false,
+    "to": [
+     {
+      "form": "DV100",
+      "page": 1
+     }
+    ]
+   },
+   {
     "name": "other_protected_person_1_full_name",
     "kind": "text",
     "caption": false,
@@ -508,7 +552,7 @@
     ]
    }
   ],
-  "substantive": 6,
+  "substantive": 7,
   "forms": [
    "DV100",
    "DV101",

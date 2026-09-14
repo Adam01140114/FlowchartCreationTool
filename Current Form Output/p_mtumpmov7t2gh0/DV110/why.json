@@ -1,14 +1,17 @@
 {
  "form": "dv110",
  "counts": {
-  "empty": 71,
+  "empty": 80,
   "closed": 0,
   "defect": 0,
   "unmapped": 0,
-  "court": 71,
+  "court": 80,
   "overflow": 0
  },
  "fields": {
+  "case_number": {
+   "verdict": "court"
+  },
   "amended_order_number": {
    "verdict": "court"
   },

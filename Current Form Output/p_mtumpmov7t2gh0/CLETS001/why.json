@@ -1,11 +1,11 @@
 {
  "form": "clets001",
  "counts": {
-  "empty": 3,
+  "empty": 5,
   "closed": 2,
   "defect": 0,
   "unmapped": 0,
-  "court": 1,
+  "court": 3,
   "overflow": 0
  },
  "fields": {
@@ -22,6 +22,9 @@
    "gate": "Do you speak English?",
    "wanted": "No",
    "given": "Yes"
+  },
+  "case_number": {
+   "verdict": "court"
   },
   "clets_date_received_by_court": {
    "verdict": "court"

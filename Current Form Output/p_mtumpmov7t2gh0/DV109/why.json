@@ -1,14 +1,17 @@
 {
  "form": "dv109",
  "counts": {
-  "empty": 11,
+  "empty": 14,
   "closed": 0,
   "defect": 0,
   "unmapped": 0,
-  "court": 11,
+  "court": 14,
   "overflow": 0
  },
  "fields": {
+  "case_number": {
+   "verdict": "court"
+  },
   "hearing_date": {
    "verdict": "court"
   },

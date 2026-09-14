@@ -3693,7 +3693,7 @@
         },
         {
           "questionId": 30,
-          "text": "Describe how the person was abusive that day, including what they said, did, or sent to you, and how often it happened.",
+          "text": "Describe how the person was abusive that day, including what they said, did, or sent to you.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
@@ -5047,7 +5047,7 @@
         },
         {
           "questionId": 43,
-          "text": "Describe how the person was abusive that time, including what they said, did, or sent to you, and how often it happened.",
+          "text": "Describe how the person was abusive that time, including what they said, did, or sent to you.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
@@ -6405,7 +6405,7 @@
         },
         {
           "questionId": 56,
-          "text": "Describe how the person was abusive then, including what they said, did, or sent to you, and how often it happened.",
+          "text": "Describe how the person was abusive then, including what they said, did, or sent to you.",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
@@ -10269,134 +10269,6 @@
         },
         {
           "questionId": 72,
-          "text": "How many expenses caused by the abuse do you want the person to pay?",
-          "type": "numberedDropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "65",
-                "prevAnswer": "Pay expenses caused by the abuse"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": true,
-            "conditions": [
-              {
-                "option": "1",
-                "to": "end"
-              },
-              {
-                "option": "2",
-                "to": "end"
-              },
-              {
-                "option": "3",
-                "to": "end"
-              },
-              {
-                "option": "4",
-                "to": "end"
-              }
-            ]
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": "",
-            "priceId": "",
-            "attachment": "Preview Only",
-            "filename": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "filename": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "hardAlert": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "min": "1",
-          "max": "4",
-          "nodeId": "abuse_expense",
-          "entryTitle": "Expense",
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Pay to",
-              "nodeId": "abuse_expense_{n}_pay_to",
-              "order": 1,
-              "prefill": ""
-            },
-            {
-              "type": "label",
-              "label": "For what",
-              "nodeId": "abuse_expense_{n}_for",
-              "order": 2,
-              "prefill": ""
-            },
-            {
-              "type": "amount",
-              "label": "Amount",
-              "nodeId": "abuse_expense_{n}_amount",
-              "order": 3
-            }
-          ]
-        },
-        {
-          "questionId": 73,
           "text": "Which of these apply to your child support request?",
           "type": "checkbox",
           "logic": {
@@ -10542,7 +10414,7 @@
           "nodeId": "child_support_situation"
         },
         {
-          "questionId": 74,
+          "questionId": 73,
           "text": "Why do you need more time to serve the person?",
           "type": "bigParagraph",
           "logic": {
@@ -10641,6 +10513,134 @@
           },
           "nameId": "extend_service_deadline_reason",
           "placeholder": ""
+        },
+        {
+          "questionId": 74,
+          "text": "How many expenses caused by the abuse do you want the person to pay?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "65",
+                "prevAnswer": "Pay expenses caused by the abuse"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "1",
+                "to": "end"
+              },
+              {
+                "option": "2",
+                "to": "end"
+              },
+              {
+                "option": "3",
+                "to": "end"
+              },
+              {
+                "option": "4",
+                "to": "end"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
+          "status": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "hardAlert": {
+            "enabled": false,
+            "trigger": "",
+            "title": ""
+          },
+          "options": [],
+          "labels": [],
+          "min": "1",
+          "max": "4",
+          "nodeId": "abuse_expense",
+          "entryTitle": "Expense",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Pay to",
+              "nodeId": "abuse_expense_{n}_pay_to",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "For what",
+              "nodeId": "abuse_expense_{n}_for",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "amount",
+              "label": "Amount",
+              "nodeId": "abuse_expense_{n}_amount",
+              "order": 3
+            }
+          ]
         },
         {
           "questionId": 75,
@@ -11965,13 +11965,18 @@
             ]
           },
           "jump": {
-            "enabled": false,
-            "conditions": []
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "No",
+                "to": "end"
+              }
+            ]
           },
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "Yes"
+            "answer": "No"
           },
           "hiddenLogic": {
             "enabled": true,
@@ -12068,13 +12073,26 @@
             ]
           },
           "jump": {
-            "enabled": false,
-            "conditions": []
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "The person abuses the animals",
+                "to": "end"
+              },
+              {
+                "option": "I take care of these animals",
+                "to": "end"
+              },
+              {
+                "option": "I purchased these animals",
+                "to": "end"
+              }
+            ]
           },
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "The person abuses the animals"
+            "answer": "I purchased these animals"
           },
           "hiddenLogic": {
             "enabled": true,
@@ -12210,23 +12228,7 @@
             "conditions": [
               {
                 "prevQuestion": "99",
-                "prevAnswer": "The person abuses the animals"
-              },
-              {
-                "prevQuestion": "99",
-                "prevAnswer": "I take care of these animals"
-              },
-              {
-                "prevQuestion": "99",
-                "prevAnswer": "I purchased these animals"
-              },
-              {
-                "prevQuestion": "99",
                 "prevAnswer": "Another reason"
-              },
-              {
-                "prevQuestion": "97",
-                "prevAnswer": "No"
               }
             ]
           },
@@ -17852,8 +17854,8 @@
         },
         {
           "questionId": 157,
-          "text": "Where and in what year was the custody case filed, and what is its case number?",
-          "type": "text",
+          "text": "What do you know about the custody case?",
+          "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
@@ -17878,8 +17880,10 @@
           },
           "pdfLogic": {
             "enabled": false,
-            "conditions": [],
-            "pdfs": []
+            "pdfName": "",
+            "pdfDisplayName": "",
+            "stripePriceId": "",
+            "conditions": []
           },
           "alertLogic": {
             "enabled": false,
@@ -17943,13 +17947,53 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv105_other_case_custody_details",
-          "placeholder": ""
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Where it was filed (city, state, or tribe)",
+              "nodeId": "dv105_other_case_custody_details_location",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Year it was filed",
+              "nodeId": "dv105_other_case_custody_details_year",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Case number",
+              "nodeId": "dv105_other_case_custody_details_number",
+              "order": 3,
+              "prefill": ""
+            }
+          ],
+          "textboxes": [
+            {
+              "label": "",
+              "nameId": "dv105_other_case_custody_details_location",
+              "placeholder": "location"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_custody_details_year",
+              "placeholder": "year"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_custody_details_number",
+              "placeholder": "number"
+            }
+          ],
+          "amounts": [],
+          "nodeId": "dv105_other_case_custody_details"
         },
         {
           "questionId": 158,
-          "text": "Where and in what year was the divorce case filed, and what is its case number?",
-          "type": "text",
+          "text": "What do you know about the divorce case?",
+          "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
@@ -17974,8 +18018,10 @@
           },
           "pdfLogic": {
             "enabled": false,
-            "conditions": [],
-            "pdfs": []
+            "pdfName": "",
+            "pdfDisplayName": "",
+            "stripePriceId": "",
+            "conditions": []
           },
           "alertLogic": {
             "enabled": false,
@@ -18039,13 +18085,53 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv105_other_case_divorce_details",
-          "placeholder": ""
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Where it was filed (city, state, or tribe)",
+              "nodeId": "dv105_other_case_divorce_details_location",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Year it was filed",
+              "nodeId": "dv105_other_case_divorce_details_year",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Case number",
+              "nodeId": "dv105_other_case_divorce_details_number",
+              "order": 3,
+              "prefill": ""
+            }
+          ],
+          "textboxes": [
+            {
+              "label": "",
+              "nameId": "dv105_other_case_divorce_details_location",
+              "placeholder": "location"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_divorce_details_year",
+              "placeholder": "year"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_divorce_details_number",
+              "placeholder": "number"
+            }
+          ],
+          "amounts": [],
+          "nodeId": "dv105_other_case_divorce_details"
         },
         {
           "questionId": 159,
-          "text": "Where and in what year was the juvenile case filed, and what is its case number?",
-          "type": "text",
+          "text": "What do you know about the juvenile court case?",
+          "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
@@ -18070,8 +18156,10 @@
           },
           "pdfLogic": {
             "enabled": false,
-            "conditions": [],
-            "pdfs": []
+            "pdfName": "",
+            "pdfDisplayName": "",
+            "stripePriceId": "",
+            "conditions": []
           },
           "alertLogic": {
             "enabled": false,
@@ -18135,13 +18223,53 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv105_other_case_juvenile_details",
-          "placeholder": ""
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Where it was filed (city, state, or tribe)",
+              "nodeId": "dv105_other_case_juvenile_details_location",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Year it was filed",
+              "nodeId": "dv105_other_case_juvenile_details_year",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Case number",
+              "nodeId": "dv105_other_case_juvenile_details_number",
+              "order": 3,
+              "prefill": ""
+            }
+          ],
+          "textboxes": [
+            {
+              "label": "",
+              "nameId": "dv105_other_case_juvenile_details_location",
+              "placeholder": "location"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_juvenile_details_year",
+              "placeholder": "year"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_juvenile_details_number",
+              "placeholder": "number"
+            }
+          ],
+          "amounts": [],
+          "nodeId": "dv105_other_case_juvenile_details"
         },
         {
           "questionId": 160,
-          "text": "Where and in what year was the guardianship case filed, and what is its case number?",
-          "type": "text",
+          "text": "What do you know about the guardianship case?",
+          "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
@@ -18166,8 +18294,10 @@
           },
           "pdfLogic": {
             "enabled": false,
-            "conditions": [],
-            "pdfs": []
+            "pdfName": "",
+            "pdfDisplayName": "",
+            "stripePriceId": "",
+            "conditions": []
           },
           "alertLogic": {
             "enabled": false,
@@ -18231,13 +18361,53 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv105_other_case_guardianship_details",
-          "placeholder": ""
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Where it was filed (city, state, or tribe)",
+              "nodeId": "dv105_other_case_guardianship_details_location",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Year it was filed",
+              "nodeId": "dv105_other_case_guardianship_details_year",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Case number",
+              "nodeId": "dv105_other_case_guardianship_details_number",
+              "order": 3,
+              "prefill": ""
+            }
+          ],
+          "textboxes": [
+            {
+              "label": "",
+              "nameId": "dv105_other_case_guardianship_details_location",
+              "placeholder": "location"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_guardianship_details_year",
+              "placeholder": "year"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_guardianship_details_number",
+              "placeholder": "number"
+            }
+          ],
+          "amounts": [],
+          "nodeId": "dv105_other_case_guardianship_details"
         },
         {
           "questionId": 161,
-          "text": "Where and in what year was the criminal case filed, and what is its case number?",
-          "type": "text",
+          "text": "What do you know about the criminal case?",
+          "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
@@ -18262,8 +18432,10 @@
           },
           "pdfLogic": {
             "enabled": false,
-            "conditions": [],
-            "pdfs": []
+            "pdfName": "",
+            "pdfDisplayName": "",
+            "stripePriceId": "",
+            "conditions": []
           },
           "alertLogic": {
             "enabled": false,
@@ -18327,13 +18499,53 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv105_other_case_criminal_details",
-          "placeholder": ""
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Where it was filed (city, state, or tribe)",
+              "nodeId": "dv105_other_case_criminal_details_location",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Year it was filed",
+              "nodeId": "dv105_other_case_criminal_details_year",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Case number",
+              "nodeId": "dv105_other_case_criminal_details_number",
+              "order": 3,
+              "prefill": ""
+            }
+          ],
+          "textboxes": [
+            {
+              "label": "",
+              "nameId": "dv105_other_case_criminal_details_location",
+              "placeholder": "location"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_criminal_details_year",
+              "placeholder": "year"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_criminal_details_number",
+              "placeholder": "number"
+            }
+          ],
+          "amounts": [],
+          "nodeId": "dv105_other_case_criminal_details"
         },
         {
           "questionId": 162,
-          "text": "Where and in what year was the other case filed, and what is its case number?",
-          "type": "text",
+          "text": "What do you know about the other court case?",
+          "type": "multipleTextboxes",
           "logic": {
             "enabled": true,
             "conditions": [
@@ -18358,8 +18570,10 @@
           },
           "pdfLogic": {
             "enabled": false,
-            "conditions": [],
-            "pdfs": []
+            "pdfName": "",
+            "pdfDisplayName": "",
+            "stripePriceId": "",
+            "conditions": []
           },
           "alertLogic": {
             "enabled": false,
@@ -18423,8 +18637,48 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "dv105_other_case_other_details",
-          "placeholder": ""
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Where it was filed (city, state, or tribe)",
+              "nodeId": "dv105_other_case_other_details_location",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Year it was filed",
+              "nodeId": "dv105_other_case_other_details_year",
+              "order": 2,
+              "prefill": ""
+            },
+            {
+              "type": "label",
+              "label": "Case number",
+              "nodeId": "dv105_other_case_other_details_number",
+              "order": 3,
+              "prefill": ""
+            }
+          ],
+          "textboxes": [
+            {
+              "label": "",
+              "nameId": "dv105_other_case_other_details_location",
+              "placeholder": "location"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_other_details_year",
+              "placeholder": "year"
+            },
+            {
+              "label": "",
+              "nameId": "dv105_other_case_other_details_number",
+              "placeholder": "number"
+            }
+          ],
+          "amounts": [],
+          "nodeId": "dv105_other_case_other_details"
         },
         {
           "questionId": 163,
@@ -18438,28 +18692,28 @@
                 "prevAnswer": "No"
               },
               {
-                "prevQuestion": "157",
-                "prevAnswer": "Any Text"
+                "prevQuestion": "156",
+                "prevAnswer": "Custody"
               },
               {
-                "prevQuestion": "158",
-                "prevAnswer": "Any Text"
+                "prevQuestion": "156",
+                "prevAnswer": "Divorce"
               },
               {
-                "prevQuestion": "159",
-                "prevAnswer": "Any Text"
+                "prevQuestion": "156",
+                "prevAnswer": "Juvenile court (child welfare, juvenile justice)"
               },
               {
-                "prevQuestion": "160",
-                "prevAnswer": "Any Text"
+                "prevQuestion": "156",
+                "prevAnswer": "Guardianship"
               },
               {
-                "prevQuestion": "161",
-                "prevAnswer": "Any Text"
+                "prevQuestion": "156",
+                "prevAnswer": "Criminal"
               },
               {
-                "prevQuestion": "162",
-                "prevAnswer": "Any Text"
+                "prevQuestion": "156",
+                "prevAnswer": "Another kind of case"
               }
             ]
           },
@@ -22307,7 +22561,7 @@
         },
         {
           "questionId": 198,
-          "text": "Where should the visits happen?",
+          "text": "Where else should the visits happen?",
           "type": "text",
           "logic": {
             "enabled": true,
@@ -22643,7 +22897,7 @@
         },
         {
           "questionId": 201,
-          "text": "Where should the visits happen?",
+          "text": "Where else should the visits happen?",
           "type": "text",
           "logic": {
             "enabled": true,
@@ -22931,7 +23185,7 @@
         },
         {
           "questionId": 204,
-          "text": "How often and how long should the visits be?",
+          "text": "Describe the schedule you want for the visits.",
           "type": "text",
           "logic": {
             "enabled": true,
@@ -26533,7 +26787,7 @@
         },
         {
           "questionId": 226,
-          "text": "How often should the plan repeat?",
+          "text": "Describe how often the plan should repeat.",
           "type": "text",
           "logic": {
             "enabled": true,
@@ -26629,7 +26883,7 @@
         },
         {
           "questionId": 227,
-          "text": "How often should the plan repeat?",
+          "text": "Describe how often the plan should repeat.",
           "type": "text",
           "logic": {
             "enabled": true,
@@ -31053,6 +31307,66 @@
       "join": ", "
     },
     {
+      "id": "linkedField6",
+      "linkedFieldId": "dv105_other_case_custody_details",
+      "fields": [
+        "dv105_other_case_custody_details_location",
+        "dv105_other_case_custody_details_year",
+        "dv105_other_case_custody_details_number"
+      ],
+      "join": ", "
+    },
+    {
+      "id": "linkedField7",
+      "linkedFieldId": "dv105_other_case_divorce_details",
+      "fields": [
+        "dv105_other_case_divorce_details_location",
+        "dv105_other_case_divorce_details_year",
+        "dv105_other_case_divorce_details_number"
+      ],
+      "join": ", "
+    },
+    {
+      "id": "linkedField8",
+      "linkedFieldId": "dv105_other_case_juvenile_details",
+      "fields": [
+        "dv105_other_case_juvenile_details_location",
+        "dv105_other_case_juvenile_details_year",
+        "dv105_other_case_juvenile_details_number"
+      ],
+      "join": ", "
+    },
+    {
+      "id": "linkedField9",
+      "linkedFieldId": "dv105_other_case_guardianship_details",
+      "fields": [
+        "dv105_other_case_guardianship_details_location",
+        "dv105_other_case_guardianship_details_year",
+        "dv105_other_case_guardianship_details_number"
+      ],
+      "join": ", "
+    },
+    {
+      "id": "linkedField10",
+      "linkedFieldId": "dv105_other_case_criminal_details",
+      "fields": [
+        "dv105_other_case_criminal_details_location",
+        "dv105_other_case_criminal_details_year",
+        "dv105_other_case_criminal_details_number"
+      ],
+      "join": ", "
+    },
+    {
+      "id": "linkedField11",
+      "linkedFieldId": "dv105_other_case_other_details",
+      "fields": [
+        "dv105_other_case_other_details_location",
+        "dv105_other_case_other_details_year",
+        "dv105_other_case_other_details_number"
+      ],
+      "join": ", "
+    },
+    {
       "id": "linkedField0",
       "linkedFieldId": "dv108_notify_state_county_and_state",
       "fields": [
@@ -31133,7 +31447,7 @@
   "alertRules": [
     {
       "id": "alertRule0",
-      "alertNodeId": "732",
+      "alertNodeId": "730",
       "mode": "all",
       "message": "You do not qualify for this kind of restraining order unless you checked one of the other relationships listed above.",
       "conditions": [
@@ -31176,7 +31490,7 @@
     },
     {
       "id": "alertRule1",
-      "alertNodeId": "740",
+      "alertNodeId": "738",
       "mode": "all",
       "message": "A property restraint order is only available if you are married to or a registered domestic partner of the person you want protection from.",
       "conditions": [
@@ -31194,7 +31508,7 @@
     },
     {
       "id": "alertRule2",
-      "alertNodeId": "743",
+      "alertNodeId": "741",
       "mode": "all",
       "message": "Spousal support is only available if you are married to or a registered domestic partner of the person you want protection from.",
       "conditions": [
@@ -31212,7 +31526,7 @@
     },
     {
       "id": "alertRule3",
-      "alertNodeId": "746",
+      "alertNodeId": "744",
       "mode": "all",
       "message": "Child support is only available if you have a minor child with the person you want protection from.",
       "conditions": [
@@ -32680,6 +32994,10 @@
             "wireless_transfer_phone_4_is_my_number_radio": true,
             "wireless_transfer_phone_4_number": "(555)-555-5555",
             "control_of_property_description": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one[end]",
+            "child_support_situation_i_do_not_have_a_child_support_order_and_i_want_one": true,
+            "child_support_situation_i_have_a_child_support_order_and_i_want_it_changed": true,
+            "child_support_situation_i_now_receive_or_have_applied_for_tanf_welfare_or_calworks": true,
+            "extend_service_deadline_reason": "extend_service_deadline_reason Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Av[end]",
             "abuse_expense": "4",
             "abuse_expense_4": true,
             "abuse_expense_1_pay_to": "abuse_expense_1_pay_to Mariax[end]",
@@ -32694,10 +33012,6 @@
             "abuse_expense_4_pay_to": "abuse_expense_4_pay_to Mariax[end]",
             "abuse_expense_4_for": "~4_for[end]",
             "abuse_expense_4_amount": "$100",
-            "child_support_situation_i_do_not_have_a_child_support_order_and_i_want_one": true,
-            "child_support_situation_i_have_a_child_support_order_and_i_want_it_changed": true,
-            "child_support_situation_i_now_receive_or_have_applied_for_tanf_welfare_or_calworks": true,
-            "extend_service_deadline_reason": "extend_service_deadline_reason Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Av[end]",
             "protected_animal": "4",
             "protected_animal_4": true,
             "protected_animal_1_name_or_id": "~ted_animal_1_name_or_id[end]",
@@ -32877,12 +33191,24 @@
             "dv105_other_case_kinds_guardianship": true,
             "dv105_other_case_kinds_criminal": true,
             "dv105_other_case_kinds_another_kind_of_case": true,
-            "dv105_other_case_custody_details": "dv105_other_case_custody_details Maria Elena Rodriguez-Vasquez 1847 Nort[end]",
-            "dv105_other_case_divorce_details": "dv105_other_case_divorce_details Maria Elena Rodriguez-Vasquez 1847 Nort[end]",
-            "dv105_other_case_juvenile_details": "dv105_other_case_juvenile_details M[end]",
-            "dv105_other_case_guardianship_details": "dv105_other_case_guardianship_details Maria Elena Rodriguez-Vasque[end]",
-            "dv105_other_case_criminal_details": "dv105_other_case_criminal_details Maria Elena Rodriguez-Vasquez 1847 Nor[end]",
-            "dv105_other_case_other_details": "dv105_other_case_other_details Maria Elena Rodr[end]",
+            "dv105_other_case_custody_details_location": "~y_details_location[end]",
+            "dv105_other_case_custody_details_year": "~stody_details_year[end]",
+            "dv105_other_case_custody_details_number": "~ody_details_number[end]",
+            "dv105_other_case_divorce_details_location": "~e_details_location[end]",
+            "dv105_other_case_divorce_details_year": "~vorce_details_year[end]",
+            "dv105_other_case_divorce_details_number": "~rce_details_number[end]",
+            "dv105_other_case_juvenile_details_location": "~cation[end]",
+            "dv105_other_case_juvenile_details_year": "~s_year[end]",
+            "dv105_other_case_juvenile_details_number": "~number[end]",
+            "dv105_other_case_guardianship_details_location": "~details_location[end]",
+            "dv105_other_case_guardianship_details_year": "~hip_details_year[end]",
+            "dv105_other_case_guardianship_details_number": "~p_details_number[end]",
+            "dv105_other_case_criminal_details_location": "~l_details_location[end]",
+            "dv105_other_case_criminal_details_year": "~minal_details_year[end]",
+            "dv105_other_case_criminal_details_number": "~nal_details_number[end]",
+            "dv105_other_case_other_details_location": "~s_location[end]",
+            "dv105_other_case_other_details_year": "~tails_year[end]",
+            "dv105_other_case_other_details_number": "~ils_number[end]",
             "dv105_current_custody_order": "Yes",
             "dv105_current_custody_order_dropdown": "Yes",
             "dv105_current_custody_order_terms": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and wouldx[end]",
@@ -33101,8 +33427,8 @@
             "other_court_case_guardianship_details": "~details_location[end], ~hip_details_year[end], ~p_details_number[end]",
             "other_court_case_criminal_details": "~details_location[end], ~nal_details_year[end], ~l_details_number[end]",
             "other_court_case_other_details": "~ils_location[end], ~details_year[end], ~tails_number[end]",
-            "person_asking_protection_signature_date": "09-12-2026",
-            "lawyer_signature_date": "09-12-2026",
+            "person_asking_protection_signature_date": "09-13-2026",
+            "lawyer_signature_date": "09-13-2026",
             "person_asking_protection_signature_printed_name": "~_asking_protection_name[end]",
             "lawyer_signature_printed_name": "~sking_protection_lawyer_name[end]",
             "dv105_child_home_1_city_and_state": "~_1_city[end], Wyoming",
@@ -33111,6 +33437,12 @@
             "dv105_child_home_4_city_and_state": "~_4_city[end], Wyoming",
             "dv105_child_home_5_city_and_state": "~_5_city[end], Wyoming",
             "dv105_child_home_6_city_and_state": "~_6_city[end], Wyoming",
+            "dv105_other_case_custody_details": "~y_details_location[end], ~stody_details_year[end], ~ody_details_number[end]",
+            "dv105_other_case_divorce_details": "~e_details_location[end], ~vorce_details_year[end], ~rce_details_number[end]",
+            "dv105_other_case_juvenile_details": "~cation[end], ~s_year[end], ~number[end]",
+            "dv105_other_case_guardianship_details": "~details_location[end], ~hip_details_year[end], ~p_details_number[end]",
+            "dv105_other_case_criminal_details": "~l_details_location[end], ~minal_details_year[end], ~nal_details_number[end]",
+            "dv105_other_case_other_details": "~s_location[end], ~tails_year[end], ~ils_number[end]",
             "dv108_notify_state_county_and_state": "~_county[end], Wyoming",
             "clets_restrained_person_drivers_license": "~nse_number[end], Test Value",
             "clets_restrained_person_employer": "~ned_person_employer_name[end], ~_person_employer_address[end]",
@@ -33535,7 +33867,7 @@
             "question-container-286"
           ],
           "markers": true,
-          "logic": "57067:jkcwu7"
+          "logic": "57007:1o97ltx"
         },
         "minimum": {
           "values": {
@@ -33619,8 +33951,8 @@
             "additional_pages_count": "0",
             "restrained_person_relationship_to_protected_person": "spouse/partner",
             "court_name_and_street_address": "court_name, court_street_address",
-            "person_asking_protection_signature_date": "09-12-2026",
-            "lawyer_signature_date": "09-12-2026",
+            "person_asking_protection_signature_date": "09-13-2026",
+            "lawyer_signature_date": "09-13-2026",
             "person_asking_protection_signature_printed_name": "person_asking_protection_name",
             "clets_restrained_person_drivers_license": "clets_restrained_person_drivers_license_number, Test Value",
             "clets_restrained_person_employer": "clets_restrained_person_employer_name, clets_restrained_person_employer_address",
@@ -33689,9 +34021,9 @@
             "question-container-285"
           ],
           "markers": true,
-          "logic": "57067:jkcwu7"
+          "logic": "57007:1o97ltx"
         },
-        "bakedAt": "2026-09-13T02:17:54.818Z"
+        "bakedAt": "2026-09-14T03:01:26.118Z"
       },
       "section": {
         "maximum": {
@@ -34024,6 +34356,10 @@
             "wireless_transfer_phone_4_is_my_number_radio": true,
             "wireless_transfer_phone_4_number": "(555)-555-5555",
             "control_of_property_description": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one[end]",
+            "child_support_situation_i_do_not_have_a_child_support_order_and_i_want_one": true,
+            "child_support_situation_i_have_a_child_support_order_and_i_want_it_changed": true,
+            "child_support_situation_i_now_receive_or_have_applied_for_tanf_welfare_or_calworks": true,
+            "extend_service_deadline_reason": "extend_service_deadline_reason Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Av[end]",
             "abuse_expense": "4",
             "abuse_expense_4": true,
             "abuse_expense_1_pay_to": "abuse_expense_1_pay_to Mariax[end]",
@@ -34038,10 +34374,6 @@
             "abuse_expense_4_pay_to": "abuse_expense_4_pay_to Mariax[end]",
             "abuse_expense_4_for": "~4_for[end]",
             "abuse_expense_4_amount": "$100",
-            "child_support_situation_i_do_not_have_a_child_support_order_and_i_want_one": true,
-            "child_support_situation_i_have_a_child_support_order_and_i_want_it_changed": true,
-            "child_support_situation_i_now_receive_or_have_applied_for_tanf_welfare_or_calworks": true,
-            "extend_service_deadline_reason": "extend_service_deadline_reason Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Av[end]",
             "protected_animal": "4",
             "protected_animal_4": true,
             "protected_animal_1_name_or_id": "~ted_animal_1_name_or_id[end]",
@@ -34221,12 +34553,24 @@
             "dv105_other_case_kinds_guardianship": true,
             "dv105_other_case_kinds_criminal": true,
             "dv105_other_case_kinds_another_kind_of_case": true,
-            "dv105_other_case_custody_details": "dv105_other_case_custody_details Maria Elena Rodriguez-Vasquez 1847 Nort[end]",
-            "dv105_other_case_divorce_details": "dv105_other_case_divorce_details Maria Elena Rodriguez-Vasquez 1847 Nort[end]",
-            "dv105_other_case_juvenile_details": "dv105_other_case_juvenile_details M[end]",
-            "dv105_other_case_guardianship_details": "dv105_other_case_guardianship_details Maria Elena Rodriguez-Vasque[end]",
-            "dv105_other_case_criminal_details": "dv105_other_case_criminal_details Maria Elena Rodriguez-Vasquez 1847 Nor[end]",
-            "dv105_other_case_other_details": "dv105_other_case_other_details Maria Elena Rodr[end]",
+            "dv105_other_case_custody_details_location": "~y_details_location[end]",
+            "dv105_other_case_custody_details_year": "~stody_details_year[end]",
+            "dv105_other_case_custody_details_number": "~ody_details_number[end]",
+            "dv105_other_case_divorce_details_location": "~e_details_location[end]",
+            "dv105_other_case_divorce_details_year": "~vorce_details_year[end]",
+            "dv105_other_case_divorce_details_number": "~rce_details_number[end]",
+            "dv105_other_case_juvenile_details_location": "~cation[end]",
+            "dv105_other_case_juvenile_details_year": "~s_year[end]",
+            "dv105_other_case_juvenile_details_number": "~number[end]",
+            "dv105_other_case_guardianship_details_location": "~details_location[end]",
+            "dv105_other_case_guardianship_details_year": "~hip_details_year[end]",
+            "dv105_other_case_guardianship_details_number": "~p_details_number[end]",
+            "dv105_other_case_criminal_details_location": "~l_details_location[end]",
+            "dv105_other_case_criminal_details_year": "~minal_details_year[end]",
+            "dv105_other_case_criminal_details_number": "~nal_details_number[end]",
+            "dv105_other_case_other_details_location": "~s_location[end]",
+            "dv105_other_case_other_details_year": "~tails_year[end]",
+            "dv105_other_case_other_details_number": "~ils_number[end]",
             "dv105_current_custody_order": "Yes",
             "dv105_current_custody_order_dropdown": "Yes",
             "dv105_current_custody_order_terms": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has been the only one caring for the children since March. Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and wouldx[end]",
@@ -34445,8 +34789,8 @@
             "other_court_case_guardianship_details": "~details_location[end], ~hip_details_year[end], ~p_details_number[end]",
             "other_court_case_criminal_details": "~details_location[end], ~nal_details_year[end], ~l_details_number[end]",
             "other_court_case_other_details": "~ils_location[end], ~details_year[end], ~tails_number[end]",
-            "person_asking_protection_signature_date": "09-12-2026",
-            "lawyer_signature_date": "09-12-2026",
+            "person_asking_protection_signature_date": "09-13-2026",
+            "lawyer_signature_date": "09-13-2026",
             "person_asking_protection_signature_printed_name": "~_asking_protection_name[end]",
             "lawyer_signature_printed_name": "~sking_protection_lawyer_name[end]",
             "dv105_child_home_1_city_and_state": "~_1_city[end], Wyoming",
@@ -34455,6 +34799,12 @@
             "dv105_child_home_4_city_and_state": "~_4_city[end], Wyoming",
             "dv105_child_home_5_city_and_state": "~_5_city[end], Wyoming",
             "dv105_child_home_6_city_and_state": "~_6_city[end], Wyoming",
+            "dv105_other_case_custody_details": "~y_details_location[end], ~stody_details_year[end], ~ody_details_number[end]",
+            "dv105_other_case_divorce_details": "~e_details_location[end], ~vorce_details_year[end], ~rce_details_number[end]",
+            "dv105_other_case_juvenile_details": "~cation[end], ~s_year[end], ~number[end]",
+            "dv105_other_case_guardianship_details": "~details_location[end], ~hip_details_year[end], ~p_details_number[end]",
+            "dv105_other_case_criminal_details": "~l_details_location[end], ~minal_details_year[end], ~nal_details_number[end]",
+            "dv105_other_case_other_details": "~s_location[end], ~tails_year[end], ~ils_number[end]",
             "dv108_notify_state_county_and_state": "~_county[end], Wyoming",
             "clets_restrained_person_drivers_license": "~nse_number[end], Test Value",
             "clets_restrained_person_employer": "~ned_person_employer_name[end], ~_person_employer_address[end]",
@@ -34879,7 +35229,7 @@
             "question-container-286"
           ],
           "markers": true,
-          "logic": "57044:s261he"
+          "logic": "56984:15nsyh4"
         },
         "minimum": {
           "values": {
@@ -34963,8 +35313,8 @@
             "additional_pages_count": "0",
             "restrained_person_relationship_to_protected_person": "spouse/partner",
             "court_name_and_street_address": "court_name, court_street_address",
-            "person_asking_protection_signature_date": "09-12-2026",
-            "lawyer_signature_date": "09-12-2026",
+            "person_asking_protection_signature_date": "09-13-2026",
+            "lawyer_signature_date": "09-13-2026",
             "person_asking_protection_signature_printed_name": "person_asking_protection_name",
             "clets_restrained_person_drivers_license": "clets_restrained_person_drivers_license_number, Test Value",
             "clets_restrained_person_employer": "clets_restrained_person_employer_name, clets_restrained_person_employer_address",
@@ -35038,11 +35388,11 @@
             "question-container-285"
           ],
           "markers": true,
-          "logic": "57044:s261he"
+          "logic": "56984:15nsyh4"
         },
-        "bakedAt": "2026-09-13T02:19:20.448Z"
+        "bakedAt": "2026-09-14T03:01:48.639Z"
       }
     },
-    "bakedAt": "2026-09-13T02:19:20.448Z"
+    "bakedAt": "2026-09-14T03:01:48.639Z"
   }
 }

@@ -84,6 +84,18 @@ function twoThingsInOneBox(label) {
   return TWO_THINGS.test(String(label == null ? '' : label));
 }
 
+// One box that is two questions: "Where and in what year was the custody case
+// filed, and what is its case number?" wants a place, a year and a number on
+// one line. Two question words, the second after "and" or a comma. For a
+// question of one box only: a narrative is meant to take several things, and a
+// question of several boxes has a box for each.
+const QUESTION_WORD = '(?:where|when|what|which|who|whom|whose|how|why)';
+const TWO_QUESTIONS = new RegExp('\\b' + QUESTION_WORD + '\\b[^?]*?(?:,|\\band\\b)\\s*(?:in\\s+)?'
+  + QUESTION_WORD + '\\b', 'i');
+function twoQuestionsInOneBox(text) {
+  return TWO_QUESTIONS.test(String(text == null ? '' : text));
+}
+
 // A box whose words say it holds a date, whatever its field is called:
 // "Lived there from (month/year)", "Living there since", "Until".
 const DATE_WORDS = /\b(date|dated|since)\b|\(\s*month\s*\/\s*(day\s*\/\s*)?year\s*\)|\bmm\s*\/\s*(dd\s*\/\s*)?yy|^\s*(from|until|start date|end date)\s*$/i;
@@ -93,7 +105,7 @@ function asksForDate(label) {
   return DATE_WORDS.test(t);
 }
 
-module.exports = { conditionTell, sentenceProblem, saysOptional, twoThingsInOneBox, asksForDate, CONDITION_TELLS };
+module.exports = { conditionTell, sentenceProblem, saysOptional, twoThingsInOneBox, twoQuestionsInOneBox, asksForDate, CONDITION_TELLS };
 
 // A checker that cannot fail is not a checker. Run: node wording-rules.js
 if (require.main === module) {
@@ -122,6 +134,11 @@ if (require.main === module) {
   expect('two things: "Driver\'s license number and state"', twoThingsInOneBox("Driver's license number and state"), true);
   expect('two things: "Employer (name and address)"', twoThingsInOneBox('Employer (name and address)'), true);
   expect('two things passes: "State bar number"', twoThingsInOneBox('State bar number'), false);
+  expect('two questions: "Where and in what year was it filed, and what is its case number?"', twoQuestionsInOneBox('Where and in what year was the custody case filed, and what is its case number?'), true);
+  expect('two questions: "How often and how long should the visits be?"', twoQuestionsInOneBox('How often and how long should the visits be?'), true);
+  expect('two questions passes: "Who else heard or saw what happened?"', twoQuestionsInOneBox('Who else heard or saw what happened?'), false);
+  expect('two questions passes: "Where else should the visits happen?"', twoQuestionsInOneBox('Where else should the visits happen?'), false);
+  expect('two questions passes: "Describe how often the plan should repeat."', twoQuestionsInOneBox('Describe how often the plan should repeat.'), false);
   expect('date: "Living there since (month/year)"', asksForDate('Living there since (month/year)'), true);
   expect('date: "Until"', asksForDate('Until'), true);
   expect('date passes: "State bar number"', asksForDate('State bar number'), false);

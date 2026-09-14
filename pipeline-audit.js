@@ -415,7 +415,7 @@ async function main() {
   // belonged and matched nothing. The patterns now live in wording-rules.js,
   // which the compiler reads too and which tests itself; and the check reads
   // every box label and choice, not only titles.
-  const { conditionTell, sentenceProblem, saysOptional, twoThingsInOneBox, asksForDate } = require('./wording-rules');
+  const { conditionTell, sentenceProblem, saysOptional, twoThingsInOneBox, twoQuestionsInOneBox, asksForDate } = require('./wording-rules');
   report.rule2wording = [];
   // Rule 11: a question that does not say what to enter. "What is your custody
   // case details?" is answerable only by someone holding the paper form, which
@@ -571,6 +571,8 @@ async function main() {
   // saw" is one answer despite the "or", so that is reported for a human to
   // read rather than failed.
   const VALUE_TYPES = new Set(['text', 'bigParagraph', 'number', 'date', 'money', 'phone', 'email']);
+  // The ones that are a single box. A narrative is meant to take several things.
+  const ONE_BOX = new Set(['text', 'number', 'date', 'money', 'phone', 'email']);
   const joined = new Set((gui.linkedFields || [])
     .filter((f) => typeof f.join === 'string').map((f) => f.linkedFieldId));
   report.rule8 = { compound: [], review: [] };
@@ -579,6 +581,12 @@ async function main() {
     const name = String(q.nameId || '');
     const text = String(q.text || '');
     if (/_and_/.test(name) && !joined.has(name)) {
+      report.rule8.compound.push({ name, text });
+    } else if (ONE_BOX.has(q.type) && twoQuestionsInOneBox(text)) {
+      // A title that is two questions, over one box. DV-105 asked "Where and
+      // in what year was the custody case filed, and what is its case
+      // number?" in one line for six kinds of case: it went to the review list
+      // below, for a person to read, and nobody did.
       report.rule8.compound.push({ name, text });
     } else if (/\b(?:and)\b|\s\/\s/.test(text) && !/_and_/.test(name)) {
       report.rule8.review.push({ name, text });
@@ -595,6 +603,32 @@ async function main() {
       if ((/_and_/.test(node) && !joined.has(node)) || twoThingsInOneBox(label)) {
         report.rule8.compound.push({ name: node || q.nodeId, text: label + '"   (a box inside "' + q.text });
       }
+    });
+  }));
+
+  // Rule 19: a follow-up does not repeat the question it follows. DV-105 asked
+  // "Where should the visits happen?" and on "Somewhere else" opened a box
+  // titled "Where should the visits happen?" - the same question twice in a
+  // row, the second wanting something the first never said. Five follow-ups
+  // did this, and every title was a full sentence, so rule 14 passed them all.
+  report.rule19 = [];
+  const sameWords = (t) => String(t || '').toLowerCase()
+    .replace(/\bthat\b/g, 'the').replace(/[^a-z0-9 ]+/g, '').replace(/\s+/g, ' ').trim();
+  const followedQuestion = {};
+  (gui.sections || []).forEach((s) => (s.questions || []).forEach((q) => { followedQuestion[String(q.questionId)] = q; }));
+  (gui.sections || []).forEach((s) => (s.questions || []).forEach((q) => {
+    const words = sameWords(q.text);
+    if (!words) return;
+    const seen = new Set();
+    (((q.logic || {}).conditions) || []).forEach((c) => {
+      const parent = followedQuestion[String(c.prevQuestion)];
+      if (!parent || seen.has(parent) || sameWords(parent.text) !== words) return;
+      seen.add(parent);
+      report.rule19.push({
+        question: q.nameId || q.nodeId || ('q' + q.questionId),
+        text: String(q.text),
+        after: parent.nameId || parent.nodeId || ('q' + parent.questionId)
+      });
     });
   }));
 
@@ -1155,6 +1189,14 @@ async function main() {
     report.rule14.forEach((r) => console.log('      - ' + r.question + ': "' + r.text + '"   (' + r.problem + ')'));
   }
   console.log('');
+  console.log('RULE 19 — a follow-up does not repeat the question it follows');
+  if (!(report.rule19 || []).length) {
+    console.log('  passes');
+  } else {
+    console.log('  FAILS  ' + report.rule19.length + ' question(s) read the same as the question they follow:');
+    report.rule19.forEach((r) => console.log('      - ' + r.question + ': "' + r.text + '"   (after ' + r.after + ')'));
+  }
+  console.log('');
   console.log('RULE 15 — optional is coded, never said');
   const markedOptional = (gui.sections || []).reduce((n, s) =>
     n + (s.questions || []).filter((q) => q.required === false).length, 0);
@@ -1222,7 +1264,8 @@ async function main() {
     ['RULE 8', report.rule8.compound.length],
     ['RULE 10', report.rule10.length],
     ['RULE 14', (report.rule14 || []).length],
-    ['RULE 15', (report.rule15 || []).length]
+    ['RULE 15', (report.rule15 || []).length],
+    ['RULE 19', (report.rule19 || []).length]
   ].filter((b) => b[1]);
   if (blocking.length) {
     console.log('');
@@ -1231,4 +1274,10 @@ async function main() {
   }
 }
 
-main().catch((err) => { console.error(err); process.exit(1); });
+// Run as a script. Required, it lends its reading of what the form posts to
+// the checks that need the same answer (pipeline-node-fields.js).
+if (require.main === module) {
+  main().catch((err) => { console.error(err); process.exit(1); });
+}
+
+module.exports = { postedNames };

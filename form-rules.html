@@ -200,9 +200,9 @@ const RULES = [
 
   { id: 'one-question-one-thing', group: 'interview', num: 'Rule 8',
     title: 'One question asks one thing',
-    says: 'A PDF box holding two answers is asked as two boxes and rejoined on the way out, even when the paper prints one line for both and even inside a question of several boxes. A city and a state are two boxes; a driver’s license number and the state that issued it are two; an employer’s name and address are two. Each box in a multi-part question is one thing.',
-    why: 'A single box wanting a name and a date gets one of them. DV-105 item 4 asked "City and state" in one box six times, inside combined questions this check never looked into: it read whole questions only.',
-    by: 'pipeline-audit.js — RULE 8, which reads every box inside a question by field name and by label, and fails the run; the splits hint, whose parts a combine can name' },
+    says: 'A PDF box holding two answers is asked as two boxes and rejoined on the way out, even when the paper prints one line for both and even inside a question of several boxes. A city and a state are two boxes; a driver’s license number and the state that issued it are two; an employer’s name and address are two. Each box in a multi-part question is one thing, and a one-box question whose title is two questions is two questions: "Where and in what year was it filed, and what is its case number?" is three boxes.',
+    why: 'A single box wanting a name and a date gets one of them. DV-105 item 4 asked "City and state" in one box six times, inside combined questions this check never looked into: it read whole questions only. Later DV-105 asked where, when and which case number in one box for six kinds of case; the wording check put it on a list for a person to read, and nobody did.',
+    by: 'pipeline-audit.js — RULE 8, which reads every box inside a question by field name and by label, and a one-box question’s title for two question words (twoQuestionsInOneBox in wording-rules.js), and fails the run; the splits hint, whose parts a combine can name' },
 
   { id: 'one-subject-one-question', group: 'interview', num: 'Rule 9',
     title: 'Questions about one subject are one question',
@@ -290,15 +290,21 @@ const RULES = [
 
   { id: 'what-prints-fits-its-box', group: 'page', num: 'Rule',
     title: 'What goes on the paper fits its box',
-    says: 'An answer longer than its box at the size the form declared is set smaller, down to 6pt, rather than cut at the edge. The parts of a joined box share its room, so together they fit, and a list the box cannot hold keeps the words that fit and ends with "etc.". An answer that does not fit even at 6pt fails the fill.',
-    why: 'Where several answers print in one box, nothing held them to its size: DV-100 item 4b ran each court case\'s number off the edge; CLETS-001 lost a license\'s state and an employer\'s address; DV-110 printed three of six firearms and cut the relationship mid-word. Every value was whole in its field, so every check that reads values passed.',
-    by: 'dev-server.js fitToBox (X-Fill-Shrunk, X-Fill-Unfitted headers), and a joined list that will not fit even at 6pt keeps its parts that do and ends "etc." (X-Fill-Listcut; the form names its lists with fwListSeparators); pipeline-fill.js fails on an answer that does not fit; generate.js applyFieldCapacities shares a joined box\'s room among the parts that have no box of their own, and applyComputedFields ends a long word list with "etc."' },
+    says: 'An answer longer than its box at the size the form declared is set smaller, down to 6pt, rather than cut at the edge. The parts of a joined box share its room, so together they fit, and a list the box cannot hold keeps the words that fit and ends with "etc.". An answer that does not fit even at 6pt fails the fill. Text is measured the way a viewer draws it - without kerning - and no line is drawn past the edge of its box.',
+    why: 'Where several answers print in one box, nothing held them to its size: DV-100 item 4b ran each court case\'s number off the edge; CLETS-001 lost a license\'s state and an employer\'s address; DV-110 printed three of six firearms and cut the relationship mid-word. Every value was whole in its field, so every check that reads values passed. Later, CLETS-001’s firearms answer lost a letter at the right edge and DV-110’s firearms list ran 2pt past its box: the server measured with pdf-lib’s kerned widths, about 2% narrower than the unkerned text every viewer draws.',
+    by: 'dev-server.js fitToBox (X-Fill-Shrunk, X-Fill-Unfitted headers), and a joined list that will not fit even at 6pt keeps its parts that do and ends "etc." (X-Fill-Listcut; the form names its lists with fwListSeparators); pipeline-fill.js fails on an answer that does not fit; generate.js applyFieldCapacities shares a joined box\'s room among the parts that have no box of their own, and applyComputedFields ends a long word list with "etc."; dev-server.js measureAsDrawn gives the fill’s font its drawn width; pipeline-fill.js fails any line an appearance stream draws past its box (--ink runs that check alone)' },
 
   { id: 'a-closing-question-closes-what-waits-on-it', group: 'interview', num: 'Rule',
     title: 'A question that closes closes everything waiting on it',
     says: 'When a changed answer closes a question, the question empties itself, and every question that waits on it looks again - and so on down the chain - so a filer who changes their mind never sees the questions their old answer opened, or files what they typed in them.',
     why: 'Changing DV-101\'s "Is there another incident?" to No closed and emptied the date of that incident, and the description after it stayed on screen holding what had been typed: it waits on the date, and hears the date only when the date itself changes. DV-105\'s custody order did the same. Every check filled the form forwards and never changed an answer back.',
     by: 'generate.js runs fwSettleVisibility a moment after any change a person makes (not during a fill); tested by changing gates back with real keys (Hand Off/AUDIT.md section 4)' },
+
+  { id: 'a-follow-up-does-not-repeat-its-question', group: 'interview', num: 'Rule 19',
+    title: 'A follow-up does not repeat the question it follows',
+    says: 'A question an answer opens - most often the box behind "Something else" - says what it wants in its own words, and never reads the same as the question it waits on. "Where should the visits happen?" answered "Somewhere else" opens "Where else should the visits happen?".',
+    why: 'DV-105 asked "Where should the visits happen?" and, on "Somewhere else", opened a box titled "Where should the visits happen?" - the same question twice in a row, the second wanting something the first never asked for. Five follow-ups did this. Every title was a full sentence, so every check passed; none compared a question with the one before it.',
+    by: 'pipeline-audit.js RULE 19 (blocking): each question against every question it waits on, word for word' },
 
   { id: 'section-names-speak-to-the-filer', group: 'interview', num: 'Rule 17',
     title: 'A section name is a short label, and every title speaks to the filer',
@@ -408,6 +414,12 @@ const RULES = [
     says: 'Section assignment walks every question in interview order, branches included, so a section may open inside a branch.',
     why: 'Assignment used to run along the spine and hand each branch its parent’s section, which emptied "Animals, Property and Support" the moment items 16 to 28 moved under the orders question.',
     by: 'compile-form.js — assignSections; the packet build reports any section dropped for being empty' },
+
+  { id: 'the-preview-marks-what-a-node-fills', group: 'process', num: 'Rule',
+    title: 'Selecting a node marks every box it fills on the paper, and nothing else',
+    says: 'The editor’s PDF preview names a node’s fields the way the generated form posts them: its own id, its mirrors, each box of a combined question (named in full or after the question), each entry of a numbered block, each option of a choice - through the split hub - and every joined box its answer is printed in. The rule lives in node-field-names.js, which the preview and the check both load.',
+    why: 'The preview said in red that 152 of the packet’s 288 questions matched no field, when every one was wired: checkbox and dropdown questions whose boxes are their options, combined questions whose boxes are named after the question, numbered blocks, and answers printed inside a joined box such as court_name_and_street_address. That red message is the one thing the preview is trusted to say. It had been tried only on questions that fill one box named after themselves.',
+    by: 'pipeline-node-fields.js (npm run audit): every question node of every form against what dv-packet-gui.json posts onto that form’s PDF, joins included - fails on a node shown red, on one marked only in part, and on one marking a box it does not fill' },
 
   { id: 'survive-a-rebuild', group: 'packet', num: 'Rule',
     title: 'Anything that must survive a rebuild lives in a source the rebuild reads',

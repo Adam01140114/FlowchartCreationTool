@@ -563,6 +563,30 @@ function ruledLineTextAppearance(field, widget, font) {
  * a smaller size puts more words on each, never more lines. An auto-sized
  * field (0 in its appearance string) and a comb field are left to pdf-lib.
  */
+/**
+ * Measure text the way a viewer draws it: without kerning.
+ *
+ * pdf-lib's widthOfTextAtSize for a standard font takes off the font's kerning
+ * pairs - "Te" is 120/1000 em narrower, "Va" 70 - but a PDF draws a Tj at the
+ * plain advance widths, and no viewer kerns it. So every "does this fit" here
+ * was decided on a width about 2% short of the ink, and the fullest line of a
+ * box ran past its edge: CLETS-001's firearms answer measured 505pt in a 509pt
+ * line, printed 516pt, and lost the "t" of a word at the margin - in pdf.js and
+ * in Ghostscript alike. Measured one character at a time no pair ever forms,
+ * and the width is the drawn one. Everything that lays text out here -
+ * fitToBox, the continuation spill, the ruled layout and pdf-lib's own
+ * appearance providers - asks the font, so all of them see it.
+ */
+function measureAsDrawn(font) {
+  const kerned = font.widthOfTextAtSize.bind(font);
+  font.widthOfTextAtSize = function (text, size) {
+    let width = 0;
+    for (const ch of String(text)) width += kerned(ch, size);
+    return width;
+  };
+  return font;
+}
+
 const MIN_FIT_FONT_SIZE = 6;
 function fitToBox(field, font, text) {
   const size = declaredFontSize(field);
@@ -635,7 +659,7 @@ app.post('/edit_pdf', async (req, res) => {
 
     const pdfDoc = await PDFDocument.load(pdfBytes);
     const form = pdfDoc.getForm();
-    const helv = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const helv = measureAsDrawn(await pdfDoc.embedFont(StandardFonts.Helvetica));
 
     const fieldNames = new Set(form.getFields().map((field) => field.getName()));
 

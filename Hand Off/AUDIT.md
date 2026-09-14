@@ -152,7 +152,7 @@ output - an edit to generated JSON is lost at the next build (rule
 
 ## 3. The full audit, in order
 
-Run from the repo root with the dev server up. `npm run audit` runs steps 1-5
+Run from the repo root with the dev server up. `npm run audit` runs steps 1-5a
 in one go and stops at the first failure; each also runs on its own.
 
 | # | Command | Proves | Cannot see |
@@ -162,6 +162,7 @@ in one go and stops at the first failure; each also runs on its own.
 | 3 | `node wording-rules.js` | The wording patterns the audit uses still catch their own test cases | Anything about this packet |
 | 4 | `node pipeline-audit.js` | The interview rules (below). **Exit 1 = not shippable** | What it was never taught (§8 is the list of what it was taught, and when) |
 | 5 | `node pipeline-disqualifiers.js --check` | Every disqualifying combination the paper form declares has an alert node | Disqualifiers nobody declared - run `--scan` on a new form |
+| 5a | `node pipeline-node-fields.js` | The editor's PDF preview marks every box a node fills and nothing else - held against what the exported form posts, joined boxes included, using the naming rule the editor itself loads (`node-field-names.js`) | Whether that box is the right one on the paper - step 10 |
 | 6 | Publish (§2) | The pages you are about to test are the pages that exist | - |
 | 7 | `node pipeline-nav-audit.js` | The published site, driven in headless Chrome like a person (below) | Question-at-a-time mode unless `--modes section,question` |
 | 8 | Fill and read back: capture the answers, then `node pipeline-fill.js --render` and `node pipeline-explain.js <form>` | Every field the answers reach carries a value; `pipeline-explain` sorts each empty field into gate-closed, court's, or **defect** - the defect list must be empty | Where the ink lands - step 10 |
@@ -191,6 +192,7 @@ It prints one block per rule. The rule numbers match `form-rules.html`.
 | JUMPS - every jump lands on a section that exists | **yes** |
 | RULE 17 - short section names; titles speak to the filer | **yes** |
 | RULE 18 - a form an answer brings in gets its data whenever that answer is given | **yes** |
+| RULE 19 - a follow-up does not repeat the question it follows | **yes** |
 | RULE 5 - one group per form, named after the form | no |
 
 The last line reads `NOT SHIPPABLE - <rules>` when a blocking rule fails. A
@@ -251,6 +253,10 @@ into one box when a page-scale image cannot show whether text sits on its line.
 The dev server sets an answer too long for its box smaller, down to 6pt, and
 says so; `pipeline-fill.js` prints what it shrank and **fails (exit 1) on any
 answer that does not fit even at 6pt** - lost ink that no value check can see.
+It also reads every text field's appearance stream and **fails on any line
+that is drawn past the edge of its box**, measured the way a viewer draws it
+(no kerning). `node pipeline-fill.js --ink <filled.pdf ...>` runs that check
+alone on PDFs already filled.
 A marker cut to fit a small box keeps the end of the field's name (`~color`),
 which is the part that tells one column from the next.
 
@@ -406,6 +412,12 @@ of the day passed, and the check that now catches it.
 | DV-105 item 4a's "complete form DV-105(A)" never mentioned to the filer | The interview followed the paper's skip and nothing said why | A subtitle names the form and where to get it; rule `a-form-the-packet-cannot-fill-is-named` |
 | DV-101 required a second incident of everyone | Each question worked; nothing asked whether there was a second | A gate before incident 2; rule `room-for-another-is-offered` |
 | Changing a gate back to No left the questions after it on screen, holding what was typed (DV-101's second incident, DV-105's custody order) | A closing question emptied itself and told nothing waiting on it; every check filled forwards and never changed an answer back | The page re-checks every question after a person's change; found and verified by changing gates back with real keys (§4.10) |
+| The editor's PDF preview reported 152 of the packet's 288 questions in red as matching no field - every checkbox and dropdown question, most multi-textbox questions, every numbered block | It was tried on questions that fill one box named after themselves | `pipeline-node-fields.js` (§3 step 5a) holds the preview to what the exported form posts: 274/274 nodes fully marked; on the old rule it fails with 138 shown red |
+| DV-100 asked "Why else should you have the animals?" after the filer said they did not want the animals | Its hint gated it on "Protect animals", not "Another reason"; each question worked, and no check knows which option a box belongs to | The human read (§3 step 9); fixed in `dv100-hints.json` |
+| DV-105 asked where, when and which case number in one box, six times | RULE 8 put titles with "and" on a review list, and nobody acted on it | RULE 8 fails a one-box question whose title is two questions (`twoQuestionsInOneBox`) - failed with 7 on the old build |
+| Five DV-105 follow-ups read the same as the question they follow ("Where should the visits happen?" twice in a row) | Every title was a full sentence; nothing compared a question with the one before it | RULE 19 (blocking) - failed with 5 on the old build |
+| The committed `dv-packet-gui.json` did not match what the sources export (one DV-100 question two places out) | It was exported before a last change to the sources, and §3 step 3 had not been run since | §3 step 3; re-exported and republished |
+| CLETS-001's firearms answer lost a letter at the right edge, and DV-110's firearms list ran 2pt past its box | The server measured text with pdf-lib's kerned widths and viewers draw it unkerned, about 2% wider; every value was whole, and the fit check trusted the same short measurement | The server measures as drawn (`measureAsDrawn` in `dev-server.js`); `pipeline-fill.js` fails any line drawn past its box - failed with 2 on the old output, 0 after |
 
 ---
 
@@ -418,6 +430,8 @@ of the day passed, and the check that now catches it.
 | `pipeline-nav-audit.js` | The published site in headless Chrome: fill buttons, appearance, Next/Back |
 | `wording-rules.js` | The wording patterns, with their own tests |
 | `pipeline-disqualifiers.js` | `--scan` for disqualifying language, `--check` that each declared one is wired |
+| `pipeline-node-fields.js` | The editor's PDF preview against what the form posts (§3 step 5a) |
+| `node-field-names.js` | Which fields a flowchart node fills - one copy, loaded by the editor's preview and by that check |
 | `pipeline-connect.js` | Cross-form shared names; `--check` writes nothing |
 | `pipeline-sanitize.js` | Rebuilds the sanitized PDFs from field configs; `--check` writes nothing |
 | `pipeline-capacity.js` | What each PDF box holds |

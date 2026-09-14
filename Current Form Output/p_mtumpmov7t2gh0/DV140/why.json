@@ -1,14 +1,17 @@
 {
  "form": "dv140",
  "counts": {
-  "empty": 102,
+  "empty": 108,
   "closed": 0,
   "defect": 0,
   "unmapped": 0,
-  "court": 102,
+  "court": 108,
   "overflow": 0
  },
  "fields": {
+  "case_number": {
+   "verdict": "court"
+  },
   "dv140_court_page1_list4_textfield2": {
    "verdict": "court"
   },

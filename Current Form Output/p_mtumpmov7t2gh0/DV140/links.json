@@ -335,6 +335,17 @@
     ]
    },
    {
+    "name": "child_custody_and_visitation_order_requested",
+    "kind": "checkbox",
+    "caption": false,
+    "to": [
+     {
+      "form": "DV100",
+      "page": 8
+     }
+    ]
+   },
+   {
     "name": "dv105_child_1_name",
     "kind": "text",
     "caption": false,
@@ -434,7 +445,7 @@
     ]
    }
   ],
-  "substantive": 19,
+  "substantive": 20,
   "forms": [
    "CLETS001",
    "DV100",
@@ -444,7 +455,20 @@
    "DV109",
    "DV110"
   ],
-  "connectors": []
+  "connectors": [
+   {
+    "name": "child_custody_and_visitation_order_requested",
+    "to": "DV-105",
+    "answer": "Child custody and visitation",
+    "on": true
+   },
+   {
+    "name": "child_custody_and_visitation_order_requested",
+    "to": "DV-140",
+    "answer": "Child custody and visitation",
+    "on": true
+   }
+  ]
  },
  "2": {
   "fields": [

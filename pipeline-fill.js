@@ -84,6 +84,81 @@ async function readBack(buffer) {
 }
 
 /**
+ * Every line of text a filled PDF draws past the right edge of its box.
+ *
+ * Read from each text field's appearance stream - the ink, not the value - and
+ * measured the way a viewer draws it: standard Helvetica at the stream's own
+ * size, character by character, so no kerning pair shortens it. pdf-lib's
+ * widthOfTextAtSize kerns and a PDF's Tj does not, and the server once laid
+ * text out on the shorter width: CLETS-001's firearms line was measured at
+ * 505pt for a 509pt line, printed 516pt, and lost a letter at the edge. The
+ * values were whole and every check that read them passed.
+ */
+async function inkPastTheEdge(buffer) {
+  const { PDFDocument: Doc, PDFName, PDFRawStream, decodePDFRawStream, StandardFonts } = require('pdf-lib');
+  const doc = await Doc.load(buffer, { ignoreEncryption: true });
+  const helv = await (await Doc.create()).embedFont(StandardFonts.Helvetica);
+  const WIN = { 0x80: '€', 0x82: '‚', 0x83: 'ƒ', 0x84: '„', 0x85: '…', 0x86: '†', 0x87: '‡', 0x88: 'ˆ',
+    0x89: '‰', 0x8A: 'Š', 0x8B: '‹', 0x8C: 'Œ', 0x8E: 'Ž', 0x91: '‘', 0x92: '’', 0x93: '“', 0x94: '”',
+    0x95: '•', 0x96: '–', 0x97: '—', 0x98: '˜', 0x99: '™', 0x9A: 'š', 0x9B: '›', 0x9C: 'œ', 0x9E: 'ž', 0x9F: 'Ÿ' };
+  const drawnWidth = (text, size) => {
+    let w = 0;
+    for (const ch of text) {
+      try { w += helv.widthOfTextAtSize(ch, size); } catch (e) { w += helv.widthOfTextAtSize('W', size); }
+    }
+    return w;
+  };
+  const fromHex = (hex) => {
+    let out = '';
+    for (let i = 0; i + 1 < hex.length; i += 2) {
+      const b = parseInt(hex.substr(i, 2), 16);
+      out += WIN[b] || String.fromCharCode(b);
+    }
+    return out;
+  };
+  const found = [];
+  doc.getForm().getFields().forEach((field) => {
+    if (field.constructor.name !== 'PDFTextField') return;
+    let widgets = [];
+    try { widgets = field.acroField.getWidgets(); } catch (e) { return; }
+    widgets.forEach((widget) => {
+      const ap = widget.dict.lookup(PDFName.of('AP'));
+      const n = ap && ap.lookup(PDFName.of('N'));
+      if (!n || !n.dict) return;
+      const bbox = n.dict.lookup(PDFName.of('BBox'));
+      const box = bbox ? bbox.asArray().map((v) => Number(String(v))) : null;
+      if (!box) return;
+      const right = box[2] - box[0];
+      // Only what the server drew, in the font it draws in.
+      const fonts = n.dict.lookup(PDFName.of('Resources'));
+      const fontDict = fonts && fonts.lookup(PDFName.of('Font'));
+      if (!fontDict || !/Helvetica/.test(String(fontDict))) return;
+      let content;
+      try {
+        content = Buffer.from(n instanceof PDFRawStream ? decodePDFRawStream(n).decode() : n.getContents()).toString('latin1');
+      } catch (e) { return; }
+      let size = 0, x = 0;
+      const ops = /([-\d.]+)\s+Tf|(?:[-\d.]+\s+){4}([-\d.]+)\s+[-\d.]+\s+Tm|([-\d.]+)\s+[-\d.]+\s+Td|<([0-9A-Fa-f]*)>\s*Tj|\(((?:\\.|[^\\)])*)\)\s*Tj/g;
+      let m;
+      while ((m = ops.exec(content))) {
+        if (m[1] !== undefined) size = Number(m[1]);
+        else if (m[2] !== undefined) x = Number(m[2]);
+        else if (m[3] !== undefined) x += Number(m[3]);
+        else {
+          const text = m[4] !== undefined ? fromHex(m[4]) : m[5].replace(/\\(.)/g, '$1');
+          if (!text || !size) continue;
+          const end = x + drawnWidth(text, size);
+          if (end > right + 0.5) {
+            found.push({ name: field.getName(), size, over: +(end - right).toFixed(1), text: text.slice(-24) });
+          }
+        }
+      }
+    });
+  });
+  return found;
+}
+
+/**
  * Rasterise every page, so a filled form can be read against the blank one.
  *
  * This used to shell out to Ghostscript, which the repo does not install - on a
@@ -339,6 +414,12 @@ async function main() {
       others.slice(0, 40).forEach((f) => console.log('      - ' + f.name + ' = ' + JSON.stringify(f.value).slice(0, 60)));
       if (others.length > 40) console.log('      ... ' + (others.length - 40) + ' more');
     }
+    const ink = await inkPastTheEdge(buffer);
+    if (ink.length) {
+      console.log('  DEFECT: ' + ink.length + ' line(s) print past the edge of their box:');
+      ink.forEach((i) => console.log('      - ' + i.name + ' at ' + i.size + 'pt runs ' + i.over + 'pt over, ending "' + i.text + '"'));
+      defects++;
+    }
     fs.writeFileSync(path.join(OUT, base + '-readback.json'), JSON.stringify(fields, null, 2));
     if (RENDER) {
       const n = await renderPages(file, path.join(OUT, base + '-pages'));
@@ -384,4 +465,20 @@ async function main() {
   }
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+// --ink <filled.pdf ...>: the ink check alone, on PDFs already filled.
+async function inkOnly(files) {
+  let bad = 0;
+  for (const file of files) {
+    const ink = await inkPastTheEdge(fs.readFileSync(file));
+    console.log((ink.length ? 'FAILS  ' : 'passes ') + file + (ink.length ? '  ' + ink.length + ' line(s) past the edge' : ''));
+    ink.forEach((i) => console.log('      - ' + i.name + ' at ' + i.size + 'pt runs ' + i.over + 'pt over, ending "' + i.text + '"'));
+    if (ink.length) bad++;
+  }
+  if (bad) process.exitCode = 1;
+}
+
+if (args.includes('--ink')) {
+  inkOnly(args.filter((a) => /\.pdf$/i.test(a))).catch((e) => { console.error(e); process.exit(1); });
+} else {
+  main().catch((e) => { console.error(e); process.exit(1); });
+}

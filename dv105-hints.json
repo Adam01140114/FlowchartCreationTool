@@ -1183,6 +1183,126 @@
         "onlyWhen": "dv105_unsupervised_plan_format_chart"
       },
       "optional": true
+    },
+    {
+      "question": "What do you know about the custody case?",
+      "fields": [
+        {
+          "field": "dv105_other_case_custody_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "field": "dv105_other_case_custody_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "field": "dv105_other_case_custody_details_number",
+          "label": "Case number"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_other_case_custody"
+      }
+    },
+    {
+      "question": "What do you know about the divorce case?",
+      "fields": [
+        {
+          "field": "dv105_other_case_divorce_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "field": "dv105_other_case_divorce_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "field": "dv105_other_case_divorce_details_number",
+          "label": "Case number"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_other_case_divorce"
+      }
+    },
+    {
+      "question": "What do you know about the juvenile court case?",
+      "fields": [
+        {
+          "field": "dv105_other_case_juvenile_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "field": "dv105_other_case_juvenile_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "field": "dv105_other_case_juvenile_details_number",
+          "label": "Case number"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_other_case_juvenile"
+      }
+    },
+    {
+      "question": "What do you know about the guardianship case?",
+      "fields": [
+        {
+          "field": "dv105_other_case_guardianship_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "field": "dv105_other_case_guardianship_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "field": "dv105_other_case_guardianship_details_number",
+          "label": "Case number"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_other_case_guardianship"
+      }
+    },
+    {
+      "question": "What do you know about the criminal case?",
+      "fields": [
+        {
+          "field": "dv105_other_case_criminal_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "field": "dv105_other_case_criminal_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "field": "dv105_other_case_criminal_details_number",
+          "label": "Case number"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_other_case_criminal"
+      }
+    },
+    {
+      "question": "What do you know about the other court case?",
+      "fields": [
+        {
+          "field": "dv105_other_case_other_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "field": "dv105_other_case_other_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "field": "dv105_other_case_other_details_number",
+          "label": "Case number"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "dv105_other_case_other"
+      }
     }
   ],
   "questions": {
@@ -1208,42 +1328,6 @@
       "text": "Is the current address private (confidential)?",
       "conditional": {
         "onlyWhen": "dv105_children_lived_together_five_years_yes"
-      }
-    },
-    "dv105_other_case_custody_details": {
-      "text": "Where and in what year was the custody case filed, and what is its case number?",
-      "conditional": {
-        "onlyWhen": "dv105_other_case_custody"
-      }
-    },
-    "dv105_other_case_divorce_details": {
-      "text": "Where and in what year was the divorce case filed, and what is its case number?",
-      "conditional": {
-        "onlyWhen": "dv105_other_case_divorce"
-      }
-    },
-    "dv105_other_case_juvenile_details": {
-      "text": "Where and in what year was the juvenile case filed, and what is its case number?",
-      "conditional": {
-        "onlyWhen": "dv105_other_case_juvenile"
-      }
-    },
-    "dv105_other_case_guardianship_details": {
-      "text": "Where and in what year was the guardianship case filed, and what is its case number?",
-      "conditional": {
-        "onlyWhen": "dv105_other_case_guardianship"
-      }
-    },
-    "dv105_other_case_criminal_details": {
-      "text": "Where and in what year was the criminal case filed, and what is its case number?",
-      "conditional": {
-        "onlyWhen": "dv105_other_case_criminal"
-      }
-    },
-    "dv105_other_case_other_details": {
-      "text": "Where and in what year was the other case filed, and what is its case number?",
-      "conditional": {
-        "onlyWhen": "dv105_other_case_other"
       }
     },
     "dv105_current_custody_order_terms": {
@@ -1323,7 +1407,7 @@
       }
     },
     "dv105_supervised_location_other_description": {
-      "text": "Where should the visits happen?",
+      "text": "Where else should the visits happen?",
       "conditional": {
         "onlyWhen": "dv105_supervised_location_other"
       }
@@ -1343,7 +1427,7 @@
       }
     },
     "dv105_supervised_frequency_other_description": {
-      "text": "How often and how long should the visits be?",
+      "text": "Describe the schedule you want for the visits.",
       "conditional": {
         "onlyWhen": "dv105_supervised_frequency_other"
       }
@@ -1355,7 +1439,7 @@
       }
     },
     "dv105_supervised_schedule_other_description": {
-      "text": "How often should the plan repeat?",
+      "text": "Describe how often the plan should repeat.",
       "conditional": {
         "onlyWhen": "dv105_supervised_schedule_other"
       }
@@ -1387,7 +1471,7 @@
       }
     },
     "dv105_unsupervised_location_other_description": {
-      "text": "Where should the visits happen?",
+      "text": "Where else should the visits happen?",
       "conditional": {
         "onlyWhen": "dv105_unsupervised_location_other"
       }
@@ -1400,7 +1484,7 @@
       }
     },
     "dv105_unsupervised_schedule_other_description": {
-      "text": "How often should the plan repeat?",
+      "text": "Describe how often the plan should repeat.",
       "conditional": {
         "onlyWhen": "dv105_unsupervised_schedule_other"
       }
@@ -2030,6 +2114,114 @@
         {
           "nameId": "dv105_child_home_6_state",
           "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105_other_case_custody_details",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_other_case_custody_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "nameId": "dv105_other_case_custody_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "nameId": "dv105_other_case_custody_details_number",
+          "label": "Case number"
+        }
+      ]
+    },
+    {
+      "field": "dv105_other_case_divorce_details",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_other_case_divorce_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "nameId": "dv105_other_case_divorce_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "nameId": "dv105_other_case_divorce_details_number",
+          "label": "Case number"
+        }
+      ]
+    },
+    {
+      "field": "dv105_other_case_juvenile_details",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_other_case_juvenile_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "nameId": "dv105_other_case_juvenile_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "nameId": "dv105_other_case_juvenile_details_number",
+          "label": "Case number"
+        }
+      ]
+    },
+    {
+      "field": "dv105_other_case_guardianship_details",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_other_case_guardianship_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "nameId": "dv105_other_case_guardianship_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "nameId": "dv105_other_case_guardianship_details_number",
+          "label": "Case number"
+        }
+      ]
+    },
+    {
+      "field": "dv105_other_case_criminal_details",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_other_case_criminal_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "nameId": "dv105_other_case_criminal_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "nameId": "dv105_other_case_criminal_details_number",
+          "label": "Case number"
+        }
+      ]
+    },
+    {
+      "field": "dv105_other_case_other_details",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105_other_case_other_details_location",
+          "label": "Where it was filed (city, state, or tribe)"
+        },
+        {
+          "nameId": "dv105_other_case_other_details_year",
+          "label": "Year it was filed"
+        },
+        {
+          "nameId": "dv105_other_case_other_details_number",
+          "label": "Case number"
         }
       ]
     }

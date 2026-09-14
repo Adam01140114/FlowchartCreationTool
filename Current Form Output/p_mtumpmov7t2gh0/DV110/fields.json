@@ -18,17 +18,17 @@
   {
    "name": "person_asking_protection_name",
    "kind": "text",
-   "value": "person_asking_protection[end]"
+   "value": "Test User Maria Elena Ro[end]"
   },
   {
    "name": "person_to_restrain_full_name",
    "kind": "text",
-   "value": "person_to_restrain_full_name Mariax[end]"
+   "value": "Test User Maria Elena Rodriguez-Vas[end]"
   },
   {
    "name": "person_to_restrain_race",
    "kind": "text",
-   "value": "person[end]"
+   "value": "~Value[end]"
   },
   {
    "name": "person_to_restrain_gender_male",
@@ -58,42 +58,42 @@
   {
    "name": "court_name_and_street_address",
    "kind": "text",
-   "value": "court_name, court_street_address"
+   "value": "Test User Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenuex[end], 123 Test Street Maria Elena Rodriguez-Vasquez 1847 North Willowbrook A[end]"
   },
   {
    "name": "restrained_person_height",
    "kind": "text",
-   "value": "restra[end]"
+   "value": "~Value[end]"
   },
   {
    "name": "restrained_person_weight",
    "kind": "text",
-   "value": "restr"
+   "value": "~alue"
   },
   {
    "name": "restrained_person_hair_color",
    "kind": "text",
-   "value": "restra[end]"
+   "value": "~Value[end]"
   },
   {
    "name": "restrained_person_eye_color",
    "kind": "text",
-   "value": "restr"
+   "value": "~alue"
   },
   {
    "name": "restrained_person_relationship_to_protected_person",
    "kind": "text",
-   "value": "restrained_person_relati[end]"
+   "value": "spouse/partner, etc."
   },
   {
    "name": "restrained_person_street_address",
    "kind": "text",
-   "value": "restrained_person_street[end]"
+   "value": "123 Test Street Maria El[end]"
   },
   {
    "name": "restrained_person_city",
    "kind": "text",
-   "value": "restra[end]"
+   "value": "~geles[end]"
   },
   {
    "name": "restrained_person_state",
@@ -108,12 +108,12 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "case_number Maria Elenax[end]"
+   "value": ""
   },
   {
    "name": "restrained_person_prohibited_items_details",
    "kind": "text",
-   "value": "Maria Elena Rodriguez-Vasquez 1847 North Willowbrook Avenue Los Angeles 90210 06-15-2024 He came to my work and would not leave until security asked him to go. She has[end]"
+   "value": "Test Value Maria Elena Rodriguez-Va[end]; 100; ~Value[end]; Test Value Maria Elena Rodriguez-Va[end]; 100; ~Value[end]; Test Value Maria Elena Rodriguez-Va[end]; 100; ~Value[end]; Test Value Maria Elena Rodriguez-Va[end]; 100; ~Value[end]; Test Value Maria Elena Rodriguez-Va[end]; 100; ~Value[end]; etc."
   },
   {
    "name": "other_protected_people_yes_yes",
@@ -123,12 +123,12 @@
   {
    "name": "other_protected_person_1_full_name",
    "kind": "text",
-   "value": "other_protected_person_1[end]"
+   "value": "Test User Maria Elena Ro[end]"
   },
   {
    "name": "other_protected_person_1_relationship",
    "kind": "text",
-   "value": "other_[end]"
+   "value": "~Value[end]"
   },
   {
    "name": "other_protected_person_1_age",
@@ -138,12 +138,12 @@
   {
    "name": "other_protected_person_2_full_name",
    "kind": "text",
-   "value": "other_protected_person_2[end]"
+   "value": "Test User Maria Elena Ro[end]"
   },
   {
    "name": "other_protected_person_2_relationship",
    "kind": "text",
-   "value": "other_[end]"
+   "value": "~Value[end]"
   },
   {
    "name": "other_protected_person_2_age",
@@ -153,12 +153,12 @@
   {
    "name": "other_protected_person_3_full_name",
    "kind": "text",
-   "value": "other_protected_person_3[end]"
+   "value": "Test User Maria Elena Ro[end]"
   },
   {
    "name": "other_protected_person_3_relationship",
    "kind": "text",
-   "value": "other_[end]"
+   "value": "~Value[end]"
   },
   {
    "name": "other_protected_person_3_age",
@@ -168,12 +168,12 @@
   {
    "name": "other_protected_person_4_full_name",
    "kind": "text",
-   "value": "other_protected_person_4[end]"
+   "value": "Test User Maria Elena Ro[end]"
   },
   {
    "name": "other_protected_person_4_relationship",
    "kind": "text",
-   "value": "other_[end]"
+   "value": "~Value[end]"
   },
   {
    "name": "other_protected_person_4_age",
@@ -210,7 +210,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "case_number Maria Elenax[end]"
+   "value": ""
   },
   {
    "name": "restrained_person_has_prohibited_items_yes",
@@ -352,7 +352,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "case_number Maria Elenax[end]"
+   "value": ""
   },
   {
    "name": "firearms_compliance_review_hearing_required_yes",
@@ -409,7 +409,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "case_number Maria Elenax[end]"
+   "value": ""
   },
   {
    "name": "no_contact_order_not_requested",
@@ -601,7 +601,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "case_number Maria Elenax[end]"
+   "value": ""
   },
   {
    "name": "child_custody_visitation_not_requested",
@@ -808,7 +808,7 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "case_number Maria Elenax[end]"
+   "value": ""
   },
   {
    "name": "property_restraint_not_requested",
@@ -955,21 +955,21 @@
   {
    "name": "case_number",
    "kind": "text",
-   "value": "case_number Maria Elenax[end]"
+   "value": ""
   }
  ],
  "8": [
   {
    "name": "case_number",
    "kind": "text",
-   "value": "case_number Maria Elenax[end]"
+   "value": ""
   }
  ],
  "9": [
   {
    "name": "case_number",
    "kind": "text",
-   "value": "case_number Maria Elenax[end]"
+   "value": ""
   },
   {
    "name": "clerk_certificate_date",

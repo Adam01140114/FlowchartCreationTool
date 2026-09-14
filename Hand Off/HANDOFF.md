@@ -1,6 +1,6 @@
 # Flowchart Creation Tool — Agent Handoff
 
-**Date:** September 8, 2026 · last updated September 12, 2026  
+**Date:** September 8, 2026 · last updated September 13, 2026  
 **Repository:** https://github.com/Adam01140114/FlowchartCreationTool  
 **Branch:** `main`
 
@@ -515,6 +515,19 @@ families; the other three carry per-entry checkboxes, which need `{n}` support i
 the entry-dropdown id paths. Before filing: run the minimum and typical paths,
 finish rule 3, and add DV-140, which DV-100 page 13 lists as required.
 
+*Superseded.* On September 13 the full audit (`AUDIT.md` §3) was run on the
+build published at `9-13-26_8-01pm`, after the fixes in `PIPELINE.md`
+("Found by reading the interview, September 13"). Every blocking rule passes,
+including the new RULE 19 and `pipeline-node-fields.js`; all eight forms have
+every filer field reachable; the flowcharts and project rebuild byte for byte;
+the export matches the sources (the committed one had been stale); the nav
+audit passes all four runs (fill 0.8-1.1 s, Back retraces Next); a
+maximum-path fill of 1,002 answers reads back with no defect on any form; and
+all 51 rendered pages were read. Reading them found text printed past its box,
+which the server now measures correctly (`PIPELINE.md`, "The ink is wider than
+pdf-lib measures it") and `pipeline-fill.js` now fails on. Not run: the minimum
+and typical paths through the PDFs, and production deployment mode.
+
 ---
 
 ## 6. Critical workflows
@@ -765,6 +778,8 @@ Ordered by what actually blocks shipping the DV packet.
 | `PIPELINE.md` | The packet pipeline: artifacts, commands, the two fill modes |
 | `PDF-PAGE-AUDIT.md` | **The last check before shipping** — render the filled PDF and read it |
 | `pipeline-disqualifiers.js` | *(repo root)* Scans the PDFs for disqualifying language and checks each declared one is wired |
+| `pipeline-node-fields.js` | *(repo root)* Holds the editor's PDF preview to what the form posts: every box a node fills is marked, nothing else |
+| `node-field-names.js` | *(repo root)* Which fields a flowchart node fills - loaded by the editor's preview and by that check |
 | `NEW-FORM.md` | **Taking on a new form** — the four artifacts, and writing a hints file |
 | `form_quality_check.txt` | The ten rules `pipeline-audit.js` enforces, and why each exists |
 | `flowchartfeatures.txt` | Feature reference for the editor |

@@ -20036,7 +20036,8 @@ if (typeof document !== 'undefined' && !window.__NAV_CONTEXT_MENU_BOUND__) {
 
 /**
  * Test mode: double-click a question to answer it the way the minimum path
- * would, so testing a form does not mean typing every box by hand.
+ * would, so testing a form does not mean typing every box by hand - and to
+ * copy what the page knows about it (questionDebugInfo) to the clipboard.
  *
  * Only that question - its answer, then the boxes inside it, including the
  * entries its answer opens - with the values the minimum-path button writes.
@@ -20264,6 +20265,241 @@ if (typeof document !== 'undefined' && !window.__FW_DATE_FIELDS_BOUND__) {
   else fwSyncDateFields();
 }
 
+/**
+ * What the page knows about one question, for troubleshooting: what it asks,
+ * where it sits in the packet, what it waits on, and every field it fills -
+ * each with the value it holds now and what would be posted to the PDF.
+ *
+ * Built from the page itself - its question model, packet forms, hidden-logic,
+ * join and capacity tables - so it describes the page that is open, not the
+ * flowchart it was built from. A posted value is what editAndDownloadPDF
+ * sends (null when it sends nothing). One payload fills every PDF in the
+ * packet, so a field reaches every form that has a field of that name, not
+ * only the form that asks it.
+ */
+function questionDebugInfo(container) {
+  const qid = container.getAttribute('data-question-id')
+    || String(container.id || '').replace('question-container-', '');
+  const model = solverModel()[qid] || null;
+  const names = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : {};
+  const nameId = (model && model.nameId) || names[qid] || '';
+  const titleEl = container.querySelector('.question-text');
+  const sectionEl = container.closest ? container.closest('.section') : null;
+  const sectionNumber = Number(container.getAttribute('data-section')
+    || (sectionEl ? String(sectionEl.id || '').replace('section', '') : '')) || null;
+  const sectionTitleEl = sectionEl ? sectionEl.querySelector('.section-title') : null;
+  const form = (window.__PROJECT_FORMS__ || []).find(function (f) {
+    return sectionNumber !== null && sectionNumber >= f.firstSection && sectionNumber <= f.lastSection;
+  }) || null;
+  const titleOf = function (id) {
+    const c = document.getElementById('question-container-' + id);
+    const t = c ? c.querySelector('.question-text') : null;
+    return t ? t.textContent.trim() : null;
+  };
+  const list = function (v) { return Array.isArray(v) ? v : []; };
+  const caps = (typeof fieldCapacity !== 'undefined' && fieldCapacity) ? fieldCapacity : {};
+  const joins = list(typeof linkedFields !== 'undefined' ? linkedFields : null);
+  const hidden = list(typeof hiddenLogicConfigs !== 'undefined' ? hiddenLogicConfigs : null);
+  const jumps = list(typeof jumpLogics !== 'undefined' ? jumpLogics : null);
+  const computed = list(typeof computedFields !== 'undefined' ? computedFields : null);
+  const overflow = list(typeof overflowLinks !== 'undefined' ? overflowLinks : null);
+
+  // What editAndDownloadPDF would send for this element: nothing for an
+  // unnamed, disabled, unticked or empty one; "on" for a ticked box; a date in
+  // the server's format; and every value through pdfValueForNamedField, which
+  // is where a currency sign comes off and a short form goes in.
+  const postedValue = function (el) {
+    if (!el.name || el.disabled) return null;
+    const type = String(el.type || '').toLowerCase();
+    if (type === 'checkbox' || type === 'radio') return el.checked ? 'on' : null;
+    let value = el.value;
+    if (type === 'date' && value && typeof formatDateForServer === 'function') value = formatDateForServer(value);
+    if (!value || String(value).trim() === '') return null;
+    return typeof pdfValueForNamedField === 'function' ? pdfValueForNamedField(el.name, value) : value;
+  };
+  const describe = function (el) {
+    const type = el.tagName === 'SELECT' ? 'select'
+      : (el.tagName === 'TEXTAREA' ? 'textarea' : String(el.type || 'text').toLowerCase());
+    const entry = {
+      pdfField: el.name || null,
+      elementId: el.id || null,
+      type: type,
+      label: el.getAttribute('placeholder') || el.getAttribute('aria-label') || null,
+      value: el.value,
+      postedValue: postedValue(el),
+      shown: !!(el.offsetParent || el.getClientRects().length),
+      disabled: !!el.disabled
+    };
+    if (type === 'checkbox' || type === 'radio') entry.checked = !!el.checked;
+    if (el.tagName === 'SELECT') {
+      entry.options = Array.prototype.map.call(el.options, function (o) { return o.value; });
+    }
+    if (el.name && caps[el.name] !== undefined) entry.capacity = caps[el.name];
+    const into = joins.filter(function (j) { return list(j.fields).indexOf(el.name) !== -1; })
+      .map(function (j) { return j.linkedFieldId; });
+    if (into.length) entry.joinedInto = into;
+    return entry;
+  };
+
+  const own = Array.prototype.slice.call(container.querySelectorAll('input, select, textarea'))
+    .filter(function (el) { return el.name || el.id; });
+  const ownSet = new Set(own);
+  // Fields outside the question that its answer fills: the boxes hidden logic
+  // ticks for an answer, and the joined boxes its fields are printed in.
+  const hiddenRules = hidden.filter(function (h) {
+    return String(h.questionId) === String(qid) || (nameId && h.questionNameId === nameId);
+  });
+  const outside = [];
+  const addOutside = function (name, why) {
+    if (!name) return;
+    const el = document.getElementById(name) || document.getElementsByName(name)[0];
+    if (!el || ownSet.has(el) || outside.some(function (o) { return o.el === el; })) return;
+    outside.push({ el: el, why: why });
+  };
+  hiddenRules.forEach(function (h) { addOutside(h.nodeId, 'ticked when the answer is "' + h.trigger + '"'); });
+  own.forEach(function (el) {
+    joins.forEach(function (j) {
+      if (list(j.fields).indexOf(el.name) !== -1) addOutside(j.linkedFieldId, 'joins ' + list(j.fields).join(' + '));
+    });
+  });
+
+  const ownNames = own.map(function (el) { return el.name; })
+    .concat(hiddenRules.map(function (h) { return h.nodeId; }))
+    .filter(Boolean);
+  const mentions = function (entry) {
+    const text = JSON.stringify(entry);
+    return ownNames.some(function (n) { return text.indexOf('"' + n + '"') !== -1; });
+  };
+  const mirrors = list(window.__PACKET_MIRRORS__).filter(function (m) {
+    return String(m.questionId) === String(qid)
+      || list(m.alsoAnswers).some(function (a) { return String(a.questionId) === String(qid); });
+  });
+  const activations = list(window.__FORM_ACTIVATIONS__).filter(function (a) {
+    return a.optionNameId && ownNames.indexOf(a.optionNameId) !== -1;
+  });
+  const allContainers = Array.prototype.slice.call(document.querySelectorAll('.question-container'));
+
+  return {
+    question: titleEl ? titleEl.textContent.trim() : null,
+    questionId: qid,
+    nameId: nameId || null,
+    type: model ? model.type : null,
+    positionInSection: Number(container.getAttribute('data-question-index')) || null,
+    positionOnPage: allContainers.indexOf(container) + 1,
+    section: { number: sectionNumber, name: sectionTitleEl ? sectionTitleEl.textContent.trim() : null },
+    form: form ? {
+      name: form.name, pdfFile: form.pdfFile, pdfName: form.pdfName,
+      sections: form.firstSection + '-' + form.lastSection
+    } : null,
+    required: container.getAttribute('data-optional') !== '1',
+    shown: !container.classList.contains('hidden'),
+    showsWhen: model ? list(model.logic).map(function (c) {
+      return { questionId: c.q, question: titleOf(c.q), answer: c.a, kind: c.t };
+    }) : [],
+    options: model ? list(model.options) : [],
+    fields: own.map(describe),
+    fieldsOutsideTheQuestion: outside.map(function (o) {
+      const d = describe(o.el);
+      d.why = o.why;
+      return d;
+    }),
+    jumps: jumps.filter(function (j) { return String(j.questionId) === String(qid); }),
+    askedOnceAcrossThePacket: mirrors,
+    bringsInForms: activations.map(function (a) {
+      return { form: a.targetForm, when: a.optionLabel || a.optionNameId };
+    }),
+    computedFields: computed.filter(mentions).map(function (c) { return { field: c.nameId, why: c._why || null }; }),
+    overflowLinks: overflow.filter(mentions).map(function (o) {
+      return { field: o.nameId, form: o.form || null, why: o._why || null };
+    }),
+    page: {
+      url: location.href,
+      projectId: window.__PROJECT_ID__ || null,
+      questionStyle: window.__FORM_QUESTION_STYLE__ || null,
+      copiedAt: new Date().toISOString()
+    }
+  };
+}
+
+/** Put text on the clipboard the old way, for when the async clipboard says no. */
+function copyTextTheOldWay(text) {
+  const area = document.createElement('textarea');
+  area.value = text;
+  area.setAttribute('readonly', '');
+  area.style.position = 'fixed';
+  area.style.top = '-1000px';
+  area.style.opacity = '0';
+  document.body.appendChild(area);
+  area.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  document.body.removeChild(area);
+  if (!ok) throw new Error('copy refused');
+}
+
+function showQuestionInfoNote(text, ok) {
+  let note = document.getElementById('fwQuestionInfoNote');
+  if (!note) {
+    note = document.createElement('div');
+    note.id = 'fwQuestionInfoNote';
+    note.setAttribute('role', 'status');
+    note.style.cssText = 'position:fixed;right:18px;bottom:18px;z-index:100003;padding:10px 14px;'
+      + 'border-radius:8px;font:13px/1.4 system-ui,sans-serif;color:#fff;pointer-events:none;'
+      + 'box-shadow:0 4px 14px rgba(0,0,0,0.25);transition:opacity 0.2s ease;';
+    document.body.appendChild(note);
+  }
+  note.textContent = text;
+  note.style.background = ok ? '#1f7a4d' : '#9a2b2b';
+  note.style.opacity = '1';
+  clearTimeout(note.__fwTimer);
+  note.__fwTimer = setTimeout(function () { note.style.opacity = '0'; }, 2200);
+}
+
+/**
+ * Copy questionDebugInfo() for a question once its fill is done, so it holds
+ * the values the fill wrote.
+ *
+ * The clipboard is asked for at once, with the text still to come: a browser
+ * lets a page copy only close to the click that asked, and the fill takes a
+ * moment. Where that is refused it falls back to writeText, then to a hidden
+ * textarea. The info is also logged and kept on window.__lastQuestionInfo, so
+ * a clipboard that says no never loses it.
+ */
+function copyQuestionInfo(container, afterFill) {
+  const textReady = Promise.resolve(afterFill).then(function () {
+    const info = questionDebugInfo(container);
+    window.__lastQuestionInfo = info;
+    console.log('[question info]', info);
+    return JSON.stringify(info, null, 2);
+  });
+  const viaWriteText = function () {
+    return textReady.then(function (text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).catch(function () { copyTextTheOldWay(text); });
+      }
+      copyTextTheOldWay(text);
+    });
+  };
+  let asked = null;
+  try {
+    if (navigator.clipboard && navigator.clipboard.write && typeof ClipboardItem === 'function') {
+      asked = navigator.clipboard.write([new ClipboardItem({
+        'text/plain': textReady.then(function (text) { return new Blob([text], { type: 'text/plain' }); })
+      })]);
+    }
+  } catch (e) { asked = null; }
+  (asked || Promise.reject(new Error('no async clipboard')))
+    .catch(viaWriteText)
+    .then(function () {
+      window.__lastQuestionInfoCopied = true;
+      showQuestionInfoNote('Question ' + (container.getAttribute('data-question-id') || '') + ' info copied to the clipboard', true);
+    }, function (err) {
+      window.__lastQuestionInfoCopied = false;
+      console.warn('[question info] could not copy it', err);
+      showQuestionInfoNote('Could not copy the question info - see the console', false);
+    });
+}
+
 if (typeof document !== 'undefined' && !window.__FILL_QUESTION_DBLCLICK_BOUND__) {
   window.__FILL_QUESTION_DBLCLICK_BOUND__ = true;
   document.addEventListener('dblclick', function (e) {
@@ -20280,9 +20516,11 @@ if (typeof document !== 'undefined' && !window.__FILL_QUESTION_DBLCLICK_BOUND__)
     container.__fwFilling = true;
     const selection = window.getSelection ? window.getSelection() : null;
     if (selection && selection.removeAllRanges) selection.removeAllRanges();
-    fillQuestionForTest(container)
+    const filled = fillQuestionForTest(container)
       .catch(function (err) { console.error('Could not fill the question', err); })
       .then(function () { container.__fwFilling = false; });
+    // Started now, inside the click, so the browser still lets it copy.
+    copyQuestionInfo(container, filled);
   });
 }
 

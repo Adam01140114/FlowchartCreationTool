@@ -1,25 +1,25 @@
 {
  "form": "dv105",
  "counts": {
-  "empty": 65,
+  "empty": 71,
   "closed": 65,
   "defect": 0,
   "unmapped": 0,
-  "court": 0,
+  "court": 6,
   "overflow": 0
  },
  "fields": {
   "dv105_records_withheld_children_names": {
    "verdict": "closed",
-   "question": "Which children?",
+   "question": "Which children's records should they not have access to?",
    "gate": "Whose records should they not have access to?",
    "wanted": "Only some of the children",
    "given": null
   },
   "dv105_records_other_description": {
    "verdict": "closed",
-   "question": "What other records or information?",
-   "gate": "Which records or information?",
+   "question": "Which other records should they not have access to?",
+   "gate": "Which of the children's records should they not have access to?",
    "wanted": "Other",
    "given": null
   },
@@ -39,7 +39,7 @@
   },
   "dv105_supervisor_professional_name": {
    "verdict": "closed",
-   "question": "What is the professional's name, if you know it?",
+   "question": "What is the professional supervisor's name?",
    "gate": "Who do you want to supervise the visits?",
    "wanted": "A professional",
    "given": "Someone trusted, like a relative or friend"
@@ -74,35 +74,35 @@
   },
   "dv105_supervised_location_other_description": {
    "verdict": "closed",
-   "question": "Where should the visits happen?",
+   "question": "Where else should the visits happen?",
    "gate": "Where should the visits happen?",
    "wanted": "Somewhere else",
    "given": "In person at a safe location"
   },
   "dv105_supervised_frequency_twice_a_week_hours": {
    "verdict": "closed",
-   "question": "How many hours each visit?",
+   "question": "How many hours should each of the two weekly visits last?",
    "gate": "How often and how long should the visits be?",
    "wanted": "Twice a week",
    "given": "Once a week"
   },
   "dv105_supervised_frequency_other_description": {
    "verdict": "closed",
-   "question": "How often and how long should the visits be?",
+   "question": "Describe the schedule you want for the visits.",
    "gate": "How often and how long should the visits be?",
    "wanted": "Something else",
    "given": "Once a week"
   },
   "dv105_supervised_schedule_other_description": {
    "verdict": "closed",
-   "question": "How often should the plan repeat?",
+   "question": "Describe how often the plan should repeat.",
    "gate": "How often should that plan repeat?",
    "wanted": "Something else",
    "given": "Every other week"
   },
   "dv105_exchange_supervisor_professional_name": {
    "verdict": "closed",
-   "question": "What is the professional's name, if you know it?",
+   "question": "What is the professional exchange supervisor's name?",
    "gate": "Who do you want to supervise the exchanges?",
    "wanted": "A professional",
    "given": null
@@ -144,7 +144,7 @@
   },
   "dv105_unsupervised_location_other_description": {
    "verdict": "closed",
-   "question": "Where should the visits happen?",
+   "question": "Where else should the visits happen?",
    "gate": "Where should the visits happen?",
    "wanted": "Somewhere else",
    "given": null
@@ -158,301 +158,301 @@
   },
   "dv105_unsupervised_visit_monday_start": {
    "verdict": "closed",
-   "question": "Monday: what should the visit look like?",
+   "question": "What should the visit on Monday look like?",
    "gate": "How do you want to describe the parenting time you want them to have?",
    "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_monday_person_to_bring_dropoff": {
    "verdict": "closed",
-   "question": "Monday: what should the visit look like?",
+   "question": "What should the visit on Monday look like?",
    "gate": "How do you want to describe the parenting time you want them to have?",
    "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_monday_location_dropoff": {
    "verdict": "closed",
-   "question": "Monday: what should the visit look like?",
+   "question": "What should the visit on Monday look like?",
    "gate": "How do you want to describe the parenting time you want them to have?",
    "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_monday_end": {
    "verdict": "closed",
-   "question": "Monday: what should the visit look like?",
+   "question": "What should the visit on Monday look like?",
    "gate": "How do you want to describe the parenting time you want them to have?",
    "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_monday_person_to_bring_pickup": {
    "verdict": "closed",
-   "question": "Monday: what should the visit look like?",
+   "question": "What should the visit on Monday look like?",
    "gate": "How do you want to describe the parenting time you want them to have?",
    "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_monday_location_pickup": {
    "verdict": "closed",
-   "question": "Monday: what should the visit look like?",
+   "question": "What should the visit on Monday look like?",
    "gate": "How do you want to describe the parenting time you want them to have?",
    "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_tuesday_start": {
    "verdict": "closed",
-   "question": "Tuesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Tuesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_tuesday_person_to_bring_dropoff": {
    "verdict": "closed",
-   "question": "Tuesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Tuesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_tuesday_location_dropoff": {
    "verdict": "closed",
-   "question": "Tuesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Tuesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_tuesday_end": {
    "verdict": "closed",
-   "question": "Tuesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Tuesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_tuesday_person_to_bring_pickup": {
    "verdict": "closed",
-   "question": "Tuesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Tuesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_tuesday_location_pickup": {
    "verdict": "closed",
-   "question": "Tuesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Tuesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_wednesday_start": {
    "verdict": "closed",
-   "question": "Wednesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Wednesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_wednesday_person_to_bring_dropoff": {
    "verdict": "closed",
-   "question": "Wednesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Wednesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_wednesday_location_dropoff": {
    "verdict": "closed",
-   "question": "Wednesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Wednesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_wednesday_end": {
    "verdict": "closed",
-   "question": "Wednesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Wednesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_wednesday_person_to_bring_pickup": {
    "verdict": "closed",
-   "question": "Wednesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Wednesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_wednesday_location_pickup": {
    "verdict": "closed",
-   "question": "Wednesday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Wednesday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_thursday_start": {
    "verdict": "closed",
-   "question": "Thursday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Thursday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_thursday_person_to_bring_dropoff": {
    "verdict": "closed",
-   "question": "Thursday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Thursday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_thursday_location_dropoff": {
    "verdict": "closed",
-   "question": "Thursday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Thursday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_thursday_end": {
    "verdict": "closed",
-   "question": "Thursday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Thursday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_thursday_person_to_bring_pickup": {
    "verdict": "closed",
-   "question": "Thursday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Thursday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_thursday_location_pickup": {
    "verdict": "closed",
-   "question": "Thursday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Thursday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_friday_start": {
    "verdict": "closed",
-   "question": "Friday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Friday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_friday_person_to_bring_dropoff": {
    "verdict": "closed",
-   "question": "Friday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Friday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_friday_location_dropoff": {
    "verdict": "closed",
-   "question": "Friday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Friday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_friday_end": {
    "verdict": "closed",
-   "question": "Friday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Friday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_friday_person_to_bring_pickup": {
    "verdict": "closed",
-   "question": "Friday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Friday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_friday_location_pickup": {
    "verdict": "closed",
-   "question": "Friday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Friday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_saturday_start": {
    "verdict": "closed",
-   "question": "Saturday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Saturday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_saturday_person_to_bring_dropoff": {
    "verdict": "closed",
-   "question": "Saturday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Saturday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_saturday_location_dropoff": {
    "verdict": "closed",
-   "question": "Saturday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Saturday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_saturday_end": {
    "verdict": "closed",
-   "question": "Saturday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Saturday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_saturday_person_to_bring_pickup": {
    "verdict": "closed",
-   "question": "Saturday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Saturday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_saturday_location_pickup": {
    "verdict": "closed",
-   "question": "Saturday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Saturday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_sunday_start": {
    "verdict": "closed",
-   "question": "Sunday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Sunday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_sunday_person_to_bring_dropoff": {
    "verdict": "closed",
-   "question": "Sunday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Sunday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_sunday_location_dropoff": {
    "verdict": "closed",
-   "question": "Sunday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Sunday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_sunday_end": {
    "verdict": "closed",
-   "question": "Sunday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Sunday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_sunday_person_to_bring_pickup": {
    "verdict": "closed",
-   "question": "Sunday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Sunday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_visit_sunday_location_pickup": {
    "verdict": "closed",
-   "question": "Sunday: what should the visit look like?",
-   "gate": "Which of those days should be virtual visits, rather than in person?",
-   "wanted": "Monday",
+   "question": "What should the visit on Sunday look like?",
+   "gate": "How do you want to describe the parenting time you want them to have?",
+   "wanted": "On a week-by-week chart",
    "given": null
   },
   "dv105_unsupervised_schedule_other_description": {
    "verdict": "closed",
-   "question": "How often should the plan repeat?",
+   "question": "Describe how often the plan should repeat.",
    "gate": "How often should that plan repeat?",
    "wanted": "Something else",
    "given": null
@@ -463,6 +463,9 @@
    "gate": "When should the visits happen, how often, and who is responsible for transporting the children?",
    "wanted": "Any Text",
    "given": null
+  },
+  "case_number": {
+   "verdict": "court"
   }
  }
 }

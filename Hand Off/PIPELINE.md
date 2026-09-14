@@ -257,6 +257,62 @@ Three things about it are worth keeping in mind if it is ever touched:
   annotations five times to end up back where it started is seconds spent on a
   panel nobody is looking at.
 
+### Which boxes a node points at
+
+Measured on September 13, the preview found a field for 136 of the packet's 288
+question nodes and reported the other 152 in red as matching nothing - and the
+red message is the one thing this preview is trusted to say. Three kinds of
+question were wired correctly and shown as broken:
+
+- **Checkbox and dropdown questions.** On the paper such a question is often
+  only a heading; the boxes belong to its options. The question now reaches
+  through to the option nodes it leads to, through its split hub.
+- **Multi-textbox questions.** A box's `nameId` is spelled two ways and both
+  are in use: some carry the whole field name (`person_asking_protection_name`),
+  others only the part after the question's (`address`, printed as
+  `<question>_address`). Both are looked for.
+- **Numbered blocks.** `{n}_name` was looked up as written. The entry number now
+  goes where `{n}` stands - or after the name when there is none - over the
+  block's own "how many?" range.
+
+Mirrors, the parts of an address, a block's own choices and a combined
+question's own dropdown (a gender between the name and the age, in
+`_dropdowns`) are named too, and names compare without case.
+
+- **Joined boxes.** Two answers printed in one box - "court name" and "court
+  street address" in `court_name_and_street_address` - are joined by a Linked
+  Logic node, which records the box in `_linkedLogicNodeId` and the answers in
+  `_linkedFields`, with no arrows. The rule reads those the way the export does
+  (`library.js`, which turns them into `linkedFields`), so an answer that is
+  printed inside a joined box marks that box.
+
+When nothing matches, the node's own id is still looked for as whole words
+inside a longer field name, drawn dashed and grey and labelled as partial. With
+joins read from the chart it rarely fires. Dropping the name's first word to
+widen that search is not done: it made `other_abuse_incident_police` point at
+`different_abuse_incident_police`, another question's boxes.
+
+After, in the editor on DV-100: 99 questions marked, 0 partial, 4 with no field
+(three flow-only gates, and DV-105's child block, whose fields are on
+dv105.pdf) - against 49 marked and 54 in red before.
+
+**One copy of the rule.** It lives in `node-field-names.js`, which the editor
+loads ahead of `pdf-preview.js` and which `pipeline-node-fields.js` requires.
+The check runs in `npm run audit` (AUDIT.md §3 step 5a). For every question node
+of every form it takes what that node's question posts - `postedNames()` from
+`pipeline-audit.js`, asked about the one question, plus every joined box in the
+export's `linkedFields` fed by it - keeps what exists on the form's own
+sanitized PDF, and requires the preview to mark all of it and nothing else. A
+node whose question is asked once in another form has no GUI question of its
+own; there the preview must find the node's own field, and must not mark a box
+nothing in the packet fills. Today: 274 of 274 nodes fully marked. Run against
+the old rule it fails with 138 nodes shown red, which is the defect it was
+written for.
+
+Why nothing caught it before: the feature was tried on questions that fill one
+box named after themselves. Nothing selected a question whose boxes are its
+options, and nothing compared the preview with what the form posts.
+
 ## Adding a form to the packet
 
 The packet is eight forms: DV-100, DV-101, DV-105, DV-108, DV-140, CLETS-001,
@@ -1349,6 +1405,22 @@ work; `refreshNav` puts it back within a few hundred milliseconds.
 Fields the form validates - dates, zips, phones, amounts - keep valid data in
 either mode, because a marker there fails validation and stops the run.
 
+**Double-click copies what the page knows about the question.** In test mode,
+double-clicking a question fills it the way the minimum path would and, once
+the fill is done, copies a JSON of that question to the clipboard: its title,
+id, `nameId`, type and position; its section and the packet form (and PDF) it
+belongs to; whether it is required and showing; what it waits on, with those
+questions' titles; every field it fills, each with its value now, the value
+that would be posted to the PDF, its capacity and any joined box it prints in;
+the boxes outside it that its answer ticks or joins into; its jumps, the forms
+it brings in, and the questions elsewhere in the packet it also answers.
+`questionDebugInfo()` in `generate.js` builds it from the page's own tables, so
+it describes the page that is open, not the flowchart. The copy is asked for
+inside the click with the text still to come - a page may copy only close to
+the click - and falls back to `writeText`, then to a hidden textarea; the JSON
+is always logged and kept on `window.__lastQuestionInfo`, and a note in the
+corner says whether it copied.
+
 ### How a path is found
 
 Both modes solve the interview as data and then write the answer to the page
@@ -1481,3 +1553,67 @@ firearms into three lines - keeps its whole parts that fit and ends with
 "etc." (`dev-server.js`; the form names its lists in `__lists`, from
 `fwListSeparators`). DV-110 prints "(Include information from form DV-100, item
 9)" beside that box, and DV-100 item 9 holds all six.
+
+## Found by reading the interview, September 13
+
+The full audit's human read (`pipeline-review.js`, AUDIT.md §3 step 9) found
+four things every automated check had passed:
+
+- **DV-100 asked "Why else should you have the animals?" of a filer who had
+  just said they did not want the animals.** The box is the line beside
+  "Another reason", and its hint gated it on "Protect animals" - so it opened
+  after every reason, and after No. It now waits on "Another reason". No check
+  can tell which option a box belongs to; this is what the read is for.
+- **The three abuse narratives asked "how often it happened", and the next
+  question asked how often.** The narrative now asks what happened; frequency
+  is the next question's.
+- **DV-105 asked where, when and which case number in one box, six times.**
+  RULE 8 had put it on its review list - wording with an "and" - for a person
+  to read, and nobody did. The six are now asked in three boxes and joined for
+  the one line the paper has, as DV-100 already did, and RULE 8 fails a one-box
+  question whose title is two questions (`twoQuestionsInOneBox` in
+  `wording-rules.js`). On the build before the fix it failed with 7: the six,
+  and "How often and how long should the visits be?".
+- **Five DV-105 follow-ups repeated the question they follow word for word.**
+  "Where should the visits happen?", answered "Somewhere else", opened a box
+  titled "Where should the visits happen?". RULE 19 (blocking) compares each
+  question with every question it waits on; before the fix it failed with 5.
+
+The same audit found that the committed `dv-packet-gui.json` did not match what
+the sources export: one question in DV-100's "Animals, Property and Support"
+sat two places earlier than the flowchart puts it. Everything else matched, two
+fresh exports agreed with each other, and the flowcharts and project rebuilt
+byte for byte - so the committed export had been taken before a last change to
+the sources. It was re-exported and the site republished.
+
+## The ink is wider than pdf-lib measures it
+
+Reading the pages on September 13, CLETS-001's firearms answer ended "... Tes"
+at the right edge of its box, and the next line began "Value". Two renderers -
+pdf.js and Ghostscript - agreed, so it was the PDF, not the renderer.
+
+pdf-lib's `widthOfTextAtSize` for a standard font subtracts the font's kerning
+pairs ("Te" is 120/1000 em narrower, "Va" 70). A PDF's `Tj` is drawn at the
+plain advance widths; no viewer kerns it. So every "does this fit" in the
+server - the shrink-to-fit, the continuation spill, the ruled layout and
+pdf-lib's own appearance providers - was decided on a width about 2% short of
+the ink. The firearms line measured 505pt in a 509pt line and printed 516pt.
+A plain line drawn on a blank page, with a tick where pdf-lib said it ended,
+ran past the tick in Ghostscript: that is how the renderer was ruled out.
+
+`measureAsDrawn` in `dev-server.js` gives the Helvetica each fill embeds a
+width function that measures one character at a time, so no pair ever forms
+and every layout decision sees the drawn width. `pipeline-fill.js` now reads
+each text field's appearance stream and fails any line drawn past the edge of
+its box (`--ink` runs that check alone). On the output of the old server it
+failed on two lines - the CLETS-001 answer, 5.2pt over, and DV-110's firearms
+list, 2.1pt over at 6pt, which the page read had missed; after the fix, none.
+Three narratives that had filled their boxes exactly now set at 10.5pt instead
+of 11, which is the right answer: at 11 they did not fit.
+
+Not yet done: `pipeline-capacity.js` measures what each box holds with the same
+kerned width, so the limits the interview puts on a box are about 2% generous.
+Nothing is lost on paper - the server shrinks to the true width and the ink
+check fails anything that does not fit - but the limits should be measured the
+same way, and rebuilding them means a re-export and a publish.
+

@@ -1,12 +1,16 @@
 {
  "form": "dv108",
  "counts": {
-  "empty": 0,
+  "empty": 2,
   "closed": 0,
   "defect": 0,
   "unmapped": 0,
-  "court": 0,
+  "court": 2,
   "overflow": 0
  },
- "fields": {}
+ "fields": {
+  "case_number": {
+   "verdict": "court"
+  }
+ }
 }

@@ -238,6 +238,17 @@
     ]
    },
    {
+    "name": "person_asking_protection_telephone",
+    "kind": "text",
+    "caption": false,
+    "to": [
+     {
+      "form": "CLETS001",
+      "page": 2
+     }
+    ]
+   },
+   {
     "name": "person_to_restrain_full_name",
     "kind": "text",
     "caption": false,
@@ -339,7 +350,7 @@
     ]
    }
   ],
-  "substantive": 10,
+  "substantive": 11,
   "forms": [
    "CLETS001",
    "DV101",
@@ -1432,9 +1443,42 @@
       "page": 1
      }
     ]
+   },
+   {
+    "name": "person_to_restrain_firearms_unknown_yes",
+    "kind": "checkbox",
+    "caption": false,
+    "to": [
+     {
+      "form": "CLETS001",
+      "page": 1
+     }
+    ]
+   },
+   {
+    "name": "person_to_restrain_firearms_no_yes",
+    "kind": "checkbox",
+    "caption": false,
+    "to": [
+     {
+      "form": "CLETS001",
+      "page": 1
+     }
+    ]
+   },
+   {
+    "name": "person_to_restrain_firearms_yes_yes",
+    "kind": "checkbox",
+    "caption": false,
+    "to": [
+     {
+      "form": "CLETS001",
+      "page": 1
+     }
+    ]
    }
   ],
-  "substantive": 14,
+  "substantive": 17,
   "forms": [
    "CLETS001",
    "DV110"
@@ -1799,22 +1843,35 @@
       "page": 6
      }
     ]
+   },
+   {
+    "name": "child_custody_and_visitation_order_requested",
+    "kind": "checkbox",
+    "caption": false,
+    "to": [
+     {
+      "form": "DV140",
+      "page": 1
+     }
+    ]
    }
   ],
-  "substantive": 0,
-  "forms": [],
+  "substantive": 1,
+  "forms": [
+   "DV140"
+  ],
   "connectors": [
    {
     "name": "child_custody_and_visitation_order_requested",
     "to": "DV-105",
     "answer": "Child custody and visitation",
-    "on": false
+    "on": true
    },
    {
     "name": "child_custody_and_visitation_order_requested",
     "to": "DV-140",
     "answer": "Child custody and visitation",
-    "on": false
+    "on": true
    }
   ]
  },

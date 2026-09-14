@@ -30,6 +30,7 @@
   let task = null;           // the render in flight, so pages cannot overtake
   let generation = 0;        // which draw is the current one
   let wanted = [];           // names to light up once the page is drawn
+  let partialMatch = false;  // wanted carries the node's name only inside a longer one
   let deferred = false;      // a draw waiting for the tab to be looked at
 
   const $ = (id) => document.getElementById(id);
@@ -239,7 +240,7 @@
         if (hit.page !== pageNumber) return;
         const [x1, y1, x2, y2] = viewport.convertToViewportRectangle(hit.rect);
         const box = document.createElement('div');
-        box.className = 'pdf-preview-hit';
+        box.className = 'pdf-preview-hit' + (partialMatch ? ' partial' : '');
         box.style.left = Math.min(x1, x2) + 'px';
         box.style.top = Math.min(y1, y2) + 'px';
         box.style.width = Math.abs(x2 - x1) + 'px';
@@ -264,16 +265,38 @@
    * name per box - and a name can be printed on more than one page, so the view
    * goes to the first page that has any of them and marks every one it finds
    * there.
+   *
+   * The first name is the node's own. When none of the names is a field, the
+   * node's own name is looked for inside longer ones - two questions joined
+   * into one box, as "court name" is into court_name_and_street_address. Those
+   * are drawn dashed and labelled as a partial match, because they are a guess.
    */
   function highlight(names) {
-    wanted = (names || []).filter(function (n) { return n && fields[n]; });
+    const asked = (names || []).filter(Boolean);
+    // Compared without case: a node id and the field it fills are the same
+    // words, and nothing about the wiring depends on how they are capitalised.
+    const lower = {};
+    Object.keys(fields).forEach(function (f) { lower[f.toLowerCase()] = f; });
+    const seen = {};
+    wanted = [];
+    asked.forEach(function (n) {
+      const f = fields[n] ? n : lower[String(n).toLowerCase()];
+      if (f && !seen[f]) { seen[f] = true; wanted.push(f); }
+    });
+    partialMatch = false;
+    if (!wanted.length && asked.length) {
+      wanted = partialMatches(asked[0]);
+      partialMatch = wanted.length > 0;
+    }
+
     const label = $('pdfPreviewFieldLabel');
     if (label) {
-      label.textContent = wanted.length
-        ? wanted.join(', ')
-        : ((names || []).length ? (names[0] + ' — no such field on this PDF') : '');
+      label.textContent = !wanted.length
+        ? (asked.length ? asked[0] + ' — no such field on this PDF' : '')
+        : wanted.join(', ') + (partialMatch ? ' — only part of the name matches' : '');
       label.hidden = !label.textContent;
-      label.className = 'pdf-preview-field' + (wanted.length ? '' : ' miss');
+      label.className = 'pdf-preview-field'
+        + (!wanted.length ? ' miss' : (partialMatch ? ' partial' : ''));
     }
     if (!wanted.length) { paintHighlights(); return; }
 
@@ -283,18 +306,39 @@
     if (target !== pageNumber) { pageNumber = target; draw(); } else { paintHighlights(); }
   }
 
-  /** Every field name a cell could be pointing at. */
+  // Which fields a node fills is decided in node-field-names.js, which
+  // pipeline-node-fields.js also loads to hold this preview to what the
+  // exported form really posts. Kept there, and only there, so the check
+  // tests the rule this preview runs.
+
+  /** The cells an arrow leads to from `cell`, as mxGraph has them now. */
+  function graphTargets(cell) {
+    const graph = window.graph;
+    if (!graph || typeof graph.getOutgoingEdges !== 'function') return [];
+    try {
+      return (graph.getOutgoingEdges(cell) || [])
+        .map(function (edge) { return edge && edge.target; })
+        .filter(Boolean);
+    } catch (e) { return []; }
+  }
+
+  /** The chart's joined boxes, from its Linked Logic nodes as they are now. */
+  function graphJoins() {
+    const graph = window.graph;
+    if (!graph || !window.NodeFieldNames) return [];
+    try {
+      return window.NodeFieldNames.joinsFromCells(Object.values(graph.getModel().cells || {}));
+    } catch (e) { return []; }
+  }
+
   function namesOf(cell) {
-    if (!cell) return [];
-    const out = [];
-    if (cell._nameId) out.push(String(cell._nameId));
-    // A multi-textbox question names one field per box, and it is the boxes
-    // that exist on the paper - the question itself may name nothing.
-    const boxes = cell._textboxes;
-    if (Array.isArray(boxes)) {
-      boxes.forEach((b) => { if (b && b.nameId) out.push(String(b.nameId)); });
-    }
-    return out.filter((n, i) => out.indexOf(n) === i);
+    if (!cell || !window.NodeFieldNames) return [];
+    return window.NodeFieldNames.namesOf(cell, graphTargets, graphJoins());
+  }
+
+  function partialMatches(name) {
+    if (!window.NodeFieldNames) return [];
+    return window.NodeFieldNames.partialMatches(name, Object.keys(fields));
   }
 
   /* ------------------------------------------------------------------ */
@@ -399,7 +443,7 @@
         if (hit.page !== n) return;
         const [x1, y1, x2, y2] = vp.convertToViewportRectangle(hit.rect);
         const box = document.createElement('div');
-        box.className = 'pdf-preview-hit';
+        box.className = 'pdf-preview-hit' + (partialMatch ? ' partial' : '');
         box.style.left = Math.min(x1, x2) + 'px';
         box.style.top = Math.min(y1, y2) + 'px';
         box.style.width = Math.abs(x2 - x1) + 'px';

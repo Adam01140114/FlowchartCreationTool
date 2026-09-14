@@ -1333,6 +1333,8 @@ body.ctrl-pressed::after {
   padding: 2px 0 6px;
 }
 .pdf-preview-field.miss { color: #b02a37; }
+/* Matched only as part of a longer field's name: shown, but not claimed. */
+.pdf-preview-field.partial { color: #6c757d; }
 
 #pdfPreviewStage {
   position: relative;
@@ -1359,6 +1361,13 @@ body.ctrl-pressed::after {
   border-radius: 2px;
   box-shadow: 0 0 0 2px rgba(214, 51, 108, .25);
   animation: pdfPreviewPulse 1.1s ease-out 2;
+}
+.pdf-preview-hit.partial {
+  border-style: dashed;
+  border-color: #6c757d;
+  background: rgba(108, 117, 125, .14);
+  box-shadow: none;
+  animation: none;
 }
 @keyframes pdfPreviewPulse {
   0%   { box-shadow: 0 0 0 2px rgba(214, 51, 108, .55); }
