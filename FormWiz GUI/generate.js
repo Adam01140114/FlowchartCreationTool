@@ -20443,12 +20443,15 @@ function showQuestionInfoNote(text, ok) {
     note = document.createElement('div');
     note.id = 'fwQuestionInfoNote';
     note.setAttribute('role', 'status');
-    note.style.cssText = 'position:fixed;right:18px;bottom:18px;z-index:100003;padding:10px 14px;'
+    note.style.cssText = 'position:fixed;right:18px;bottom:18px;z-index:100005;padding:10px 14px;'
       + 'border-radius:8px;font:13px/1.4 system-ui,sans-serif;color:#fff;pointer-events:none;'
       + 'box-shadow:0 4px 14px rgba(0,0,0,0.25);transition:opacity 0.2s ease;';
     document.body.appendChild(note);
   }
   note.textContent = text;
+  const promptPanel = document.getElementById('fwPromptPanel');
+  const panelOpen = !!promptPanel && promptPanel.style.display !== 'none';
+  note.style.right = (panelOpen ? promptPanel.offsetWidth + 18 : 18) + 'px';
   note.style.background = ok ? '#1f7a4d' : '#9a2b2b';
   note.style.opacity = '1';
   clearTimeout(note.__fwTimer);
@@ -20456,20 +20459,19 @@ function showQuestionInfoNote(text, ok) {
 }
 
 /**
- * Copy questionDebugInfo() for a question once its fill is done, so it holds
- * the values the fill wrote.
+ * Copy a JSON of what the page knows once it is ready, and say whether it worked.
  *
  * The clipboard is asked for at once, with the text still to come: a browser
- * lets a page copy only close to the click that asked, and the fill takes a
+ * lets a page copy only close to the click that asked, and a fill takes a
  * moment. Where that is refused it falls back to writeText, then to a hidden
- * textarea. The info is also logged and kept on window.__lastQuestionInfo, so
- * a clipboard that says no never loses it.
+ * textarea. The info is also logged and kept on window[store], so a clipboard
+ * that says no never loses it.
  */
-function copyQuestionInfo(container, afterFill) {
-  const textReady = Promise.resolve(afterFill).then(function () {
-    const info = questionDebugInfo(container);
-    window.__lastQuestionInfo = info;
-    console.log('[question info]', info);
+function copyInfoWhenReady(build, afterReady, label, store) {
+  const textReady = Promise.resolve(afterReady).then(function () {
+    const info = build();
+    window[store] = info;
+    console.log('[' + label + ']', info);
     return JSON.stringify(info, null, 2);
   });
   const viaWriteText = function () {
@@ -20491,13 +20493,193 @@ function copyQuestionInfo(container, afterFill) {
   (asked || Promise.reject(new Error('no async clipboard')))
     .catch(viaWriteText)
     .then(function () {
-      window.__lastQuestionInfoCopied = true;
-      showQuestionInfoNote('Question ' + (container.getAttribute('data-question-id') || '') + ' info copied to the clipboard', true);
+      window[store + 'Copied'] = true;
+      showQuestionInfoNote(label + ' copied to the clipboard', true);
     }, function (err) {
-      window.__lastQuestionInfoCopied = false;
-      console.warn('[question info] could not copy it', err);
-      showQuestionInfoNote('Could not copy the question info - see the console', false);
+      window[store + 'Copied'] = false;
+      console.warn('[' + label + '] could not copy it', err);
+      showQuestionInfoNote('Could not copy ' + label.charAt(0).toLowerCase() + label.slice(1)
+        + ' - see the console', false);
     });
+}
+
+/** questionDebugInfo() for one question, once its fill is done. */
+function copyQuestionInfo(container, afterFill) {
+  copyInfoWhenReady(function () { return questionDebugInfo(container); }, afterFill,
+    'Question ' + (container.getAttribute('data-question-id') || '') + ' info', '__lastQuestionInfo');
+}
+
+/**
+ * Everything the page knows about one section, for troubleshooting: its name,
+ * its form, and every question in it as questionDebugInfo() describes it -
+ * with which of them the answers so far have switched on, and which are drawn
+ * on screen this moment (on the question-at-a-time page, one at most).
+ */
+function sectionDebugInfo(sectionEl) {
+  const number = Number(String(sectionEl.id || '').replace('section', '')) || null;
+  const titleEl = sectionEl.querySelector('.section-title');
+  const form = (window.__PROJECT_FORMS__ || []).find(function (f) {
+    return number !== null && number >= f.firstSection && number <= f.lastSection;
+  }) || null;
+  const questions = Array.prototype.slice.call(sectionEl.querySelectorAll('.question-container'))
+    .map(function (c) {
+      const info = questionDebugInfo(c);
+      info.onScreenNow = !!c.getClientRects().length;
+      delete info.page;
+      return info;
+    });
+  const brief = function (q) { return { questionId: q.questionId, question: q.question }; };
+  return {
+    section: {
+      number: number,
+      name: titleEl ? titleEl.textContent.trim() : null,
+      elementId: sectionEl.id || null,
+      current: sectionEl.classList.contains('active'),
+      onScreenNow: !!sectionEl.getClientRects().length
+    },
+    form: form ? {
+      name: form.name, pdfFile: form.pdfFile, pdfName: form.pdfName,
+      sections: form.firstSection + '-' + form.lastSection
+    } : null,
+    questionCount: questions.length,
+    shownNow: questions.filter(function (q) { return q.shown; }).map(brief),
+    onScreenNow: questions.filter(function (q) { return q.onScreenNow; }).map(brief),
+    hiddenNow: questions.filter(function (q) { return !q.shown; }).map(brief),
+    questions: questions,
+    page: {
+      url: location.href,
+      projectId: window.__PROJECT_ID__ || null,
+      questionStyle: window.__FORM_QUESTION_STYLE__ || null,
+      copiedAt: new Date().toISOString()
+    }
+  };
+}
+
+/** Put text on the clipboard now, inside the click that asked. */
+function copyTextNow(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).catch(function () { copyTextTheOldWay(text); });
+  }
+  return new Promise(function (resolve) { copyTextTheOldWay(text); resolve(); });
+}
+
+/**
+ * Test mode: a side panel to write a prompt in and copy it. Typing "prompt" -
+ * or holding p, r, o, m and t together - anywhere but inside a box opens it.
+ *
+ * A place to write down what is wrong while looking at it, next to the JSON a
+ * double-click copies. What is typed stays while the page is open and is not
+ * saved anywhere.
+ */
+function openPromptPanel() {
+  let panel = document.getElementById('fwPromptPanel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'fwPromptPanel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-label', 'Prompt');
+    panel.style.cssText = 'position:fixed;top:0;right:0;bottom:0;width:380px;max-width:92vw;z-index:100004;'
+      + 'background:#fff;box-shadow:-6px 0 24px rgba(0,0,0,0.18);display:flex;flex-direction:column;'
+      + 'padding:16px;box-sizing:border-box;font:14px/1.4 system-ui,sans-serif;color:#1c2733;';
+    const head = document.createElement('div');
+    head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;';
+    const title = document.createElement('strong');
+    title.textContent = 'Prompt';
+    title.style.fontSize = '16px';
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.id = 'fwPromptClose';
+    close.textContent = '×';
+    close.setAttribute('aria-label', 'Close the prompt panel');
+    close.style.cssText = 'border:none;background:none;font-size:22px;line-height:1;cursor:pointer;color:#555;';
+    close.addEventListener('click', closePromptPanel);
+    head.appendChild(title);
+    head.appendChild(close);
+    const area = document.createElement('textarea');
+    area.id = 'fwPromptText';
+    area.placeholder = 'Write your prompt here';
+    area.setAttribute('aria-label', 'Prompt');
+    area.style.cssText = 'flex:1;width:100%;box-sizing:border-box;resize:none;padding:10px;'
+      + 'border:1px solid #c9d3dd;border-radius:6px;font:14px/1.45 system-ui,sans-serif;';
+    const copy = document.createElement('button');
+    copy.type = 'button';
+    copy.id = 'fwPromptCopy';
+    copy.textContent = 'Copy';
+    copy.style.cssText = 'margin-top:10px;width:100%;box-sizing:border-box;padding:9px 12px;border:none;border-radius:6px;background:#2980b9;'
+      + 'color:#fff;font-weight:600;cursor:pointer;';
+    copy.addEventListener('click', function () {
+      copyTextNow(area.value).then(function () {
+        window.__lastPromptCopied = true;
+        showQuestionInfoNote('Prompt copied to the clipboard', true);
+      }, function (err) {
+        window.__lastPromptCopied = false;
+        console.warn('[prompt] could not copy it', err);
+        showQuestionInfoNote('Could not copy the prompt', false);
+      });
+    });
+    panel.appendChild(head);
+    panel.appendChild(area);
+    panel.appendChild(copy);
+    document.body.appendChild(panel);
+  }
+  panel.style.display = 'flex';
+  const text = document.getElementById('fwPromptText');
+  if (text) text.focus();
+}
+
+function closePromptPanel() {
+  const panel = document.getElementById('fwPromptPanel');
+  if (panel) panel.style.display = 'none';
+}
+
+if (typeof document !== 'undefined' && !window.__FW_PROMPT_KEYS_BOUND__) {
+  window.__FW_PROMPT_KEYS_BOUND__ = true;
+  var fwPromptKeys = { held: {}, typed: '', last: 0 };
+  document.addEventListener('keydown', function (e) {
+    if (!isTestDeployment() || e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target;
+    // Never while typing an answer: the word is not a command inside a box.
+    if (t && (t.isContentEditable || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+    var k = String(e.key || '').toLowerCase();
+    if (k.length !== 1 || k < 'a' || k > 'z') return;
+    var now = Date.now();
+    if (now - fwPromptKeys.last > 1500) fwPromptKeys.typed = '';
+    fwPromptKeys.last = now;
+    fwPromptKeys.typed = (fwPromptKeys.typed + k).slice(-6);
+    fwPromptKeys.held[k] = true;
+    var h = fwPromptKeys.held;
+    if (fwPromptKeys.typed === 'prompt' || (h.p && h.r && h.o && h.m && h.t)) {
+      fwPromptKeys.typed = '';
+      fwPromptKeys.held = {};
+      e.preventDefault();
+      openPromptPanel();
+    }
+  });
+  document.addEventListener('keyup', function (e) { delete fwPromptKeys.held[String(e.key || '').toLowerCase()]; });
+  window.addEventListener('blur', function () { fwPromptKeys.held = {}; });
+  // Heard wherever focus is. On the panel it missed the common case: a click
+  // on Copy leaves focus on the page, so Escape never reached the panel.
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var panel = document.getElementById('fwPromptPanel');
+    if (panel && panel.style.display !== 'none') closePromptPanel();
+  });
+}
+
+// Test mode: double-click a section's title to copy sectionDebugInfo().
+if (typeof document !== 'undefined' && !window.__FW_SECTION_DBLCLICK_BOUND__) {
+  window.__FW_SECTION_DBLCLICK_BOUND__ = true;
+  document.addEventListener('dblclick', function (e) {
+    if (!isTestDeployment()) return;
+    const title = e.target && e.target.closest ? e.target.closest('.section-title') : null;
+    if (!title || title.closest('.question-container')) return;
+    const sectionEl = title.closest('.section');
+    if (!sectionEl) return;
+    const selection = window.getSelection ? window.getSelection() : null;
+    if (selection && selection.removeAllRanges) selection.removeAllRanges();
+    copyInfoWhenReady(function () { return sectionDebugInfo(sectionEl); }, null,
+      'Section "' + title.textContent.trim() + '" info', '__lastSectionInfo');
+  });
 }
 
 if (typeof document !== 'undefined' && !window.__FILL_QUESTION_DBLCLICK_BOUND__) {

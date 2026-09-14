@@ -1421,6 +1421,21 @@ the click - and falls back to `writeText`, then to a hidden textarea; the JSON
 is always logged and kept on `window.__lastQuestionInfo`, and a note in the
 corner says whether it copied.
 
+**Double-click a section's title** to copy the same for the whole section:
+its number, name and form, whether it is the section showing, and every
+question in it as a double-click on the question describes it - with
+`shownNow` (the questions the answers so far have switched on), `hiddenNow`,
+and `onScreenNow` (the ones actually drawn this moment, which on the
+question-at-a-time page is one at most). `sectionDebugInfo()` builds it; it is
+kept on `window.__lastSectionInfo`.
+
+**Type "prompt"** - or hold p, r, o, m and t together - anywhere on the page
+but inside a box, and a side panel opens with a box to write a prompt in and a
+Copy button; Escape or the × closes it. Keys typed into an answer never open
+it. What is written stays while the page is open and is not saved anywhere
+(`openPromptPanel()` in `generate.js`). Both of these, like the double-click
+fill, exist only in test mode.
+
 ### How a path is found
 
 Both modes solve the interview as data and then write the answer to the page
