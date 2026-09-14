@@ -1,0 +1,854 @@
+{
+  "formName": "MC-030 Declaration",
+  "edgeStyle": "curved",
+  "cells": [
+    {
+      "id": "2",
+      "value": "What is your name?",
+      "geometry": {
+        "x": 610,
+        "y": 60,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=person_asking_protection_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is your name?",
+      "_questionId": "1",
+      "_nameId": "person_asking_protection_name",
+      "_placeholder": "",
+      "_mirrorTargets": [
+        "FillText35",
+        "FillText22"
+      ],
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "3",
+      "value": "What is your street address?",
+      "geometry": {
+        "x": 610,
+        "y": 326,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=person_asking_protection_mailing_address;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is your street address?",
+      "_questionId": "2",
+      "_nameId": "person_asking_protection_mailing_address",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "4",
+      "value": "What is your phone number?",
+      "geometry": {
+        "x": 610,
+        "y": 592,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=phone;nodeId=person_asking_protection_telephone;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is your phone number?",
+      "_questionId": "3",
+      "_nameId": "person_asking_protection_telephone",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_optional": true
+    },
+    {
+      "id": "5",
+      "value": "What is your fax number?",
+      "geometry": {
+        "x": 610,
+        "y": 858,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=phone;nodeId=person_asking_protection_fax;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is your fax number?",
+      "_questionId": "4",
+      "_nameId": "person_asking_protection_fax",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_optional": true
+    },
+    {
+      "id": "6",
+      "value": "What is your email address?",
+      "geometry": {
+        "x": 610,
+        "y": 1124,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=email;nodeId=person_asking_protection_email;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is your email address?",
+      "_questionId": "5",
+      "_nameId": "person_asking_protection_email",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_optional": true
+    },
+    {
+      "id": "7",
+      "value": "Which county is the court in?",
+      "geometry": {
+        "x": 610,
+        "y": 1390,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=mc030_court_county;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Which county is the court in?",
+      "_questionId": "6",
+      "_nameId": "mc030_court_county",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "8",
+      "value": "What is the court's street address?",
+      "geometry": {
+        "x": 610,
+        "y": 1656,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=court_street_address;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is the court's street address?",
+      "_questionId": "7",
+      "_nameId": "court_street_address",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "9",
+      "value": "What is the court's mailing address?",
+      "geometry": {
+        "x": 610,
+        "y": 1922,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=mc030_court_mailing_address;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is the court's mailing address?",
+      "_questionId": "8",
+      "_nameId": "mc030_court_mailing_address",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_optional": true
+    },
+    {
+      "id": "10",
+      "value": "What city and ZIP code is the court in?",
+      "geometry": {
+        "x": 610,
+        "y": 2188,
+        "width": 300,
+        "height": 420
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=mc030_court_location;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": [
+        {
+          "nameId": "mc030_court_city",
+          "fullNameId": "mc030_court_city",
+          "label": "City",
+          "placeholder": "City",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": ""
+        },
+        {
+          "nameId": "mc030_court_zip_code",
+          "fullNameId": "mc030_court_zip_code",
+          "label": "ZIP code",
+          "placeholder": "ZIP code",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": ""
+        }
+      ],
+      "_questionText": "What city and ZIP code is the court in?",
+      "_questionId": "9",
+      "_nameId": "mc030_court_location",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_itemOrder": [
+        {
+          "type": "textbox",
+          "index": 0
+        },
+        {
+          "type": "textbox",
+          "index": 1
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "value": "What is the name of the court's branch or courthouse?",
+      "geometry": {
+        "x": 610,
+        "y": 2778,
+        "width": 300,
+        "height": 120
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=mc030_court_branch_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is the name of the court's branch or courthouse?",
+      "_questionId": "10",
+      "_nameId": "mc030_court_branch_name",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_optional": true
+    },
+    {
+      "id": "12",
+      "value": "Who do you want protection from?",
+      "geometry": {
+        "x": 610,
+        "y": 3068,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=person_to_restrain_full_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Who do you want protection from?",
+      "_questionId": "11",
+      "_nameId": "person_to_restrain_full_name",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "13",
+      "value": "What do you want to say in your statement?",
+      "geometry": {
+        "x": 610,
+        "y": 3334,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=bigParagraph;nodeId=mc030_declaration_text;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What do you want to say in your statement?",
+      "_questionId": "12",
+      "_nameId": "mc030_declaration_text",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "14",
+      "value": "End",
+      "geometry": {
+        "x": 700,
+        "y": 3600,
+        "width": 120,
+        "height": 60
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "15",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">mc030_court_city_and_zip</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 60,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "mc030_court_city_and_zip",
+      "_linkedFields": [
+        "mc030_court_city",
+        "mc030_court_zip_code"
+      ],
+      "_linkedJoin": " ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "16",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">mc030_signature_date</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 200,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "mc030_signature_date",
+      "_linkedFields": [
+        "current_date"
+      ],
+      "_linkedJoin": " ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "17",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">mc030_signature_printed_name</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 340,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "mc030_signature_printed_name",
+      "_linkedFields": [
+        "person_asking_protection_name"
+      ],
+      "_linkedJoin": " ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "18",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">mc030_party_city_state_zip</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 480,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "mc030_party_city_state_zip",
+      "_linkedFields": [
+        "person_asking_protection_mailing_city",
+        "person_asking_protection_mailing_state",
+        "person_asking_protection_mailing_zip_code"
+      ],
+      "_linkedJoin": " ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "19",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "2",
+      "target": "3",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 168
+          },
+          {
+            "x": 760,
+            "y": 320
+          }
+        ]
+      }
+    },
+    {
+      "id": "20",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "3",
+      "target": "4",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 432
+          },
+          {
+            "x": 760,
+            "y": 584
+          }
+        ]
+      }
+    },
+    {
+      "id": "21",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "4",
+      "target": "5",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 696
+          },
+          {
+            "x": 760,
+            "y": 848
+          }
+        ]
+      }
+    },
+    {
+      "id": "22",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "5",
+      "target": "6",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 960
+          },
+          {
+            "x": 760,
+            "y": 1120
+          }
+        ]
+      }
+    },
+    {
+      "id": "23",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "6",
+      "target": "7",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 1232
+          },
+          {
+            "x": 760,
+            "y": 1384
+          }
+        ]
+      }
+    },
+    {
+      "id": "24",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "7",
+      "target": "8",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 1496
+          },
+          {
+            "x": 760,
+            "y": 1648
+          }
+        ]
+      }
+    },
+    {
+      "id": "25",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "8",
+      "target": "9",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 1760
+          },
+          {
+            "x": 760,
+            "y": 1912
+          }
+        ]
+      }
+    },
+    {
+      "id": "26",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "9",
+      "target": "10",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 2024
+          },
+          {
+            "x": 760,
+            "y": 2184
+          }
+        ]
+      }
+    },
+    {
+      "id": "27",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "10",
+      "target": "11",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 2616
+          },
+          {
+            "x": 760,
+            "y": 2768
+          }
+        ]
+      }
+    },
+    {
+      "id": "28",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "11",
+      "target": "12",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 2904
+          },
+          {
+            "x": 760,
+            "y": 3064
+          }
+        ]
+      }
+    },
+    {
+      "id": "29",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "12",
+      "target": "13",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 3176
+          },
+          {
+            "x": 760,
+            "y": 3328
+          }
+        ]
+      }
+    },
+    {
+      "id": "30",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "13",
+      "target": "14",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 3440
+          },
+          {
+            "x": 760,
+            "y": 3592
+          }
+        ]
+      }
+    }
+  ],
+  "sectionPrefs": {
+    "1": {
+      "borderColor": "hsl(0, 100%, 80%)",
+      "name": "Your Statement"
+    }
+  },
+  "groups": [],
+  "defaultPdfProperties": {
+    "pdfName": "MC-030 Declaration",
+    "pdfFile": "form.pdf",
+    "pdfPrice": "0"
+  },
+  "overflowLinks": [
+    {
+      "nameId": "mc030_declaration_text",
+      "_why": "Rule the-packet-uses-mc025-for-more-space: a statement longer than MC-030's box continues on MC-025, which says that when the item it continues is made under penalty of perjury, so is the attachment. MC-030 has no \"more space\" box to tick.",
+      "page": {
+        "name": "MC030_Declaration",
+        "heading": "MC-030, Declaration",
+        "item": "",
+        "itemTitle": "",
+        "form": "MC-030"
+      }
+    }
+  ],
+  "computedFields": [
+    {
+      "nameId": "mc030_attorney_for",
+      "_why": "ATTORNEY FOR (name) is the filer's name when a lawyer represents them, and blank when the filer has no lawyer - as on FL-150.",
+      "joinWhenTicked": {
+        "when": "has_lawyer_yes",
+        "separator": ", ",
+        "fields": [
+          "person_asking_protection_name"
+        ]
+      }
+    },
+    {
+      "nameId": "mc030_party_lawyer_line",
+      "_why": "The caption's attorney-or-party block names the lawyer, State Bar number and firm when the filer has one (DV-100 item 1d), and is left blank when not.",
+      "joinWhenTicked": {
+        "when": "has_lawyer_yes",
+        "separator": ", ",
+        "fields": [
+          "person_asking_protection_lawyer_name",
+          "person_asking_protection_lawyer_state_bar_number",
+          "person_asking_protection_lawyer_firm_name"
+        ]
+      }
+    }
+  ],
+  "unreviewedWording": [
+    {
+      "question": "person_asking_protection_fax",
+      "text": "What is your fax number?"
+    },
+    {
+      "question": "person_asking_protection_email",
+      "text": "What is your email address?"
+    }
+  ],
+  "autofilledFields": [
+    {
+      "field": "mc030_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "A signature date has one correct answer and the form already knows it."
+    },
+    {
+      "field": "mc030_signature_printed_name",
+      "from": [
+        "person_asking_protection_name"
+      ],
+      "why": "The filer is the declarant: the name under the signature is the name given on DV-100 item 1a."
+    },
+    {
+      "field": "mc030_party_city_state_zip",
+      "from": [
+        "person_asking_protection_mailing_city",
+        "person_asking_protection_mailing_state",
+        "person_asking_protection_mailing_zip_code"
+      ],
+      "why": "The caption's third address line: the city, state and ZIP code the filer gave on DV-100 item 1c."
+    }
+  ]
+}

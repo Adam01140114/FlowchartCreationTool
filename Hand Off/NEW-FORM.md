@@ -26,6 +26,46 @@ the repo.
 
 ---
 
+## 0. Get the blank PDF
+
+Which forms the packet still needs is in [`FORMS.md`](./FORMS.md), and
+`node pipeline-form-refs.js` lists every form the paperwork mentions and what
+covers it.
+
+Judicial Council forms download with a plain request - no browser, no login,
+no human check. Every form is at `https://courts.ca.gov/documents/<form>.pdf`,
+the form number in lower case with its punctuation dropped (`dv105a.pdf` for
+DV-105(A), `clets001.pdf` for CLETS-001), and that address forwards to the
+current revision. This is exactly how DV-105(A) was fetched on September 14,
+2026:
+
+```bash
+curl -sSL --max-time 60 \
+  -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36" \
+  -o dv105a.pdf \
+  -w 'http %{http_code}  type %{content_type}  bytes %{size_download}  final %{url_effective}\n' \
+  https://courts.ca.gov/documents/dv105a.pdf
+file dv105a.pdf                 # must say "PDF document"
+qpdf --show-npages dv105a.pdf   # and have pages
+```
+
+It answered `http 200  type application/pdf  bytes 1494750  final
+https://courts.ca.gov/sites/default/files/courts/default/2024-11/dv105a.pdf`
+(the form's January 1, 2025 revision). The browser user-agent is a precaution,
+not a requirement: a `curl -I` with curl's own reached the same PDF.
+
+- **Check what came back before using it.** A site that ever puts a
+  "prove you are human" page in the way answers with HTML and status 200;
+  `file` saying "HTML document" is how you find out. Then a person has to
+  download it - ask the user.
+- Save it in the repo root, named like the others (`dv105a.pdf`), and put the
+  address in the spec entry's `_source`.
+- The user has given standing permission to download court PDFs (September
+  14, 2026: "you always have full permission to download any pdfs you want").
+  Download, verify, and say in your report what you fetched, from where and
+  how big. A court guide the audit should read, rather than a form to fill,
+  goes in `reference-forms/` and in the spec's `referenceSources`.
+
 ## 1. Get the real field names out of the PDF
 
 Judicial Council forms are encrypted and pdf-lib reports **zero fields** until
@@ -123,6 +163,97 @@ A PDF that ruled two lines for one answer. Ask once, fill the first, leave the
 second blank on purpose. Expect these to show up as blanks in the page audit
 and do not "fix" them.
 
+### `overflow` - a long answer continues on MC-025
+```json
+"overflow": { "other_abuse_incident_details": {
+  "marks": "other_abuse_incident_additional_space_attached_yes",
+  "page": { "name": "DV100_Item_7f", "heading": "DV-100, Item 7(f)", "item": "7(f)",
+            "itemTitle": "Description of the abuse", "form": "DV-100" } } }
+```
+Rule `the-packet-uses-mc025-for-more-space`: **anything that needs more space
+continues on MC-025.** A narrative box with a "need more space" / "not enough
+space" box beside it gets an overflow link: past what the box prints, `marks`
+ticks and the rest is filled onto an MC-025 page, as many sheets as it takes,
+with no limit on the answer. Never continue onto another form's box (DV-101,
+MC-020) and never hold an answer to its box and mark the "more space" box
+`courtUse` - RULE 21 and RULE 13 fail both. `page.name` must be unique in the
+packet; `attachmentNumber` is optional (default "<form>, Item <item>"). Several
+answers may share one `marks` (DV-160 item 8). A table's entries past its rows
+go on MC-025 the same way, through `repeats[].attachment`. DV-105, DV-108,
+FL-150 and DV-160 are forms of their own and are never replaced by MC-025.
+
+### `computed` - `tickWhen`, a box other answers tick
+```json
+"financial_statement_simplified_allowed": { "tickWhen": {
+  "all": ["child_support_order_requested", "dv570_other_income_no"],
+  "none": ["spousal_support_order_requested", "lawyers_fees_and_costs_order_requested"] } }
+```
+A checkbox the form ticks while every box in `all` is ticked and none in `none`
+is. Use it when a form comes in on a combination of answers: an activation
+(`whenFieldTicked` in the spec) reads a single box, and a gate's `onlyWhen`
+only ORs its conditions. It is how DV-570's verdict brings in FL-155.
+
+### `computed` - `remainderOf`, the rest of a whole
+```json
+"fl150_percent_time_with_other_parent": { "remainderOf": { "field": "fl150_percent_time_with_me", "total": 100 } }
+```
+Two boxes that must add up to a whole (the children's time with each parent)
+are asked once: the filer gives their part, the form writes the rest. Asked
+both, a filer could answer 100 and 100. Blank unless the part is a number
+within the whole.
+
+**Anchor a gate before the first field that waits on it.** A `choice` placed
+`before` a later field is not there yet when an earlier field names its answer
+in `onlyWhen`, and the compiler invents a second Yes/No gate for that field
+(`created gate "..._yes"` in the compile notes, and an extra question). FL-150's
+and FL-155's time-share gates had to move from the field after the percentage
+to the percentage itself.
+
+**Before adding a form at all:** the packet's forms are the user's list
+(`scope` in `dv-packet.spec.json`). A form the paper mentions outside it goes in
+`formsOutOfScope`, saying why; add to `scope` only when the user asks.
+
+### A checkbox field with several boxes - `widget`
+Older forms (FL-155) put several boxes in one checkbox field, told apart by
+export value (`/Yes`, `/1`, `/2`...). pdf-lib ticks a field, not a box, so only
+the first could ever print. Name each other box with the field's `id` and its
+export value, and the sanitizer splits it into a field of its own:
+```json
+{ "id": "CB.0.0.1.0a", "newName": "fl155_tax_status_single", "type": "checkbox" },
+{ "id": "CB.0.0.1.0a", "widget": "1", "newName": "fl155_tax_status_married_jointly", "type": "checkbox" }
+```
+Find the values and which box is which by position (`getOnValue()` and each
+widget's rectangle against the printed label). RULE 22 fails an unsplit field.
+
+**A question whose answers are PDF boxes is a hint `group`**, members the box
+names: each answer then ticks its own box. As a `choice` with the boxes'
+names, the boxes are also asked again on their own (and the preview check fails).
+An answer with no box ("I have never had a job") is a Yes/No gate before the
+group.
+
+### A question no box holds - a `choice` with no options, and `noBox`
+"Other information ... attach extra sheet" (FL-155 item 12) has no box on the
+paper. Ask it as a `choice` with no `options` and `"type": "bigParagraph"`
+(`optional` and `subtitle` are carried), and give it an overflow link with
+`"noBox": true` and a `page`: the whole answer is an MC-025 page. When a box on
+the paper asks for that sheet ("specify reasons for expenses on separate
+sheet"), name it in `"sheetFor"` so RULE 13 knows the page serves it; the form
+does not tick or untick it.
+
+### A multi-line box inside a block or a multi-part question
+A block's column or a combined question's part that the paper rules over
+several lines (DV-160's redaction columns, FL-150's insurance company address)
+takes `"type": "bigParagraph"` in `repeats[].fields` or `combines[].fields`.
+The compiler keeps it, the export passes it through (`FIELD_TYPE_PASSTHROUGH`
+in `library.js`), and the generated form draws a textarea for it. RULE 12 fails
+a multi-line box asked on one line.
+
+### An address line built from parts
+A caption line joined from city, state and ZIP (`splits` or `autofill` with a
+`join`/`separator`) prints the state as its postal code: the form joins each
+part's hidden `<id>_short` where there is one. Join with a space: "Los Angeles
+CA 90210".
+
 ### `autofill`
 ```json
 { "field": "person_asking_protection_signature_date", "from": ["current_date"],
@@ -133,6 +264,20 @@ Write the `why`. It is the difference between a rule and a mystery.
 ### `alwaysShown`
 Questions the gate inference would hide but that the paper form asks
 unconditionally. Each needs a `why` naming the item number on the form.
+
+### `choices`
+```json
+{ "nameId": "papers_served_by_sheriff", "question": "Do you want the sheriff or marshal to serve ...?",
+  "at": "end", "options": [{ "label": "Yes", "nameId": "papers_served_by_sheriff_yes" },
+                           { "label": "No",  "nameId": "papers_served_by_sheriff_no" }] }
+```
+A question no PDF field holds - a gate the form implies, or the answer that
+brings another form in. `"before": "<field>"` asks it just before that field;
+`"at": "end"` asks it after everything the form's own fields ask (DV-100's last
+fields are signatures the form fills itself, so nothing came after them).
+`onlyWhen` gates it. List its `nameId` in a section. A choice whose `before`
+names no field the form asks is reported as NOT ASKED by `compile-form.js` -
+it used to vanish silently.
 
 ---
 

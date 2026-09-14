@@ -1,0 +1,250 @@
+{
+  "formTitle": "INT-300 Request for Interpreter (Civil)",
+  "_comment": "INT-300 comes into the packet when the filer says they need an interpreter in court. The filer completes page 1 and the name line at the top of page 2; the case number is the court's, as on every form in the packet. Item 1 is the filer's own details with their lawyer's information beside them, so it carries the packet's names (person_asking_protection_*, court_name_and_street_address) and is asked once. Item 3's box, 'I need an interpreter in the following language when I am in court', is exactly the answer that switches this form on, so it carries that answer's name (needs_interpreter_yes) and is ticked by it, the way DV-105(A) box 1 carries DV-105's No. Names come from the printed labels and the rectangles, not the XFA paths, which reuse OldHearingTime_dt for three unrelated boxes (item 2's description, item 3's other language, item 4's witness language), ProtectedEmail_ft for the town of origin, and HearingPetitionerRequest_cb for three separate 'Other' boxes. The form has no push buttons.",
+  "fields": [
+    {
+      "id": "topmostSubform[0].Page1[0].ReqFullName_ft[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "1. Name"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].ProtectedStreet_ft[0]",
+      "newName": "person_asking_protection_mailing_address",
+      "type": "text",
+      "label": "1. Address"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].ProtectedCity_ft[0]",
+      "newName": "person_asking_protection_mailing_city",
+      "type": "text",
+      "label": "1. City"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].ProtectedState_ft[0]",
+      "newName": "person_asking_protection_mailing_state",
+      "type": "text",
+      "label": "1. State"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].ProtectedZip_ft[0]",
+      "newName": "person_asking_protection_mailing_zip_code",
+      "type": "text",
+      "label": "1. Zip"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].ProtectedPhone_ft[0]",
+      "newName": "person_asking_protection_telephone",
+      "type": "text",
+      "label": "1. Telephone"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].ProtectedEmail_ft[0]",
+      "newName": "person_asking_protection_email",
+      "type": "text",
+      "label": "1. E-mail address"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].ProtectedLawyerBar_no[0]",
+      "newName": "person_asking_protection_lawyer_state_bar_number",
+      "type": "text",
+      "label": "1. State Bar No. (your lawyer's)",
+      "blankWhenNotAsked": "Only a filer with a lawyer names one (DV-100: \"Do you have a lawyer?\"). With no lawyer these lines are rightly blank."
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].ProtectedLawyerFirm_ft[0]",
+      "newName": "person_asking_protection_lawyer_firm_name",
+      "type": "text",
+      "label": "1. Firm name (your lawyer's)",
+      "blankWhenNotAsked": "Only a filer with a lawyer names one (DV-100: \"Do you have a lawyer?\"). With no lawyer these lines are rightly blank."
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Stamp_court_case[0].CourtInfo_ft[0]",
+      "newName": "court_name_and_street_address",
+      "type": "text",
+      "label": "Court name and street address (Superior Court of California, County of)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Stamp_court_case[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 1)",
+      "courtUse": true
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].HearingPetitionerRequest_cb[0]",
+      "newName": "int300_party_role_petitioner",
+      "type": "checkbox",
+      "label": "2. Plaintiff/Petitioner"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].HearingPetitionerRequest_cb[2]",
+      "newName": "int300_party_role_respondent",
+      "type": "checkbox",
+      "label": "2. Defendant/Respondent"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].HearingPetitionerRequest_cb[1]",
+      "newName": "int300_party_role_other",
+      "type": "checkbox",
+      "label": "2. Other"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].OldHearingTime_dt[0]",
+      "newName": "int300_party_role_other_description",
+      "type": "text",
+      "label": "2. Other (describe)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].T227[0]",
+      "newName": "needs_interpreter_yes",
+      "type": "checkbox",
+      "label": "3. I need an interpreter in the following language when I am in court"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CheckBox64[9]",
+      "newName": "int300_language_spanish",
+      "type": "checkbox",
+      "label": "3. Spanish (espanol)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CheckBox64[1]",
+      "newName": "int300_language_vietnamese",
+      "type": "checkbox",
+      "label": "3. Vietnamese"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CheckBox64[4]",
+      "newName": "int300_language_korean",
+      "type": "checkbox",
+      "label": "3. Korean"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CheckBox64[6]",
+      "newName": "int300_language_mandarin",
+      "type": "checkbox",
+      "label": "3. Mandarin"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CheckBox64[8]",
+      "newName": "int300_language_cantonese",
+      "type": "checkbox",
+      "label": "3. Cantonese"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CheckBox64[2]",
+      "newName": "int300_language_farsi",
+      "type": "checkbox",
+      "label": "3. Farsi/Persian"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CheckBox64[5]",
+      "newName": "int300_language_russian",
+      "type": "checkbox",
+      "label": "3. Russian"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CheckBox64[7]",
+      "newName": "int300_language_tagalog",
+      "type": "checkbox",
+      "label": "3. Tagalog"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].#area[5].CheckBox64[10]",
+      "newName": "int300_language_arabic",
+      "type": "checkbox",
+      "label": "3. Arabic"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CheckBox64[3]",
+      "newName": "int300_language_punjabi",
+      "type": "checkbox",
+      "label": "3. Punjabi"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].HearingPetitionerRequest_cb[3]",
+      "newName": "int300_language_other",
+      "type": "checkbox",
+      "label": "3. Other language"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].OldHearingTime_dt[1]",
+      "newName": "int300_language_other_name",
+      "type": "text",
+      "label": "3. Other language (name it)"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].ProtectedEmail_ft[1]",
+      "newName": "int300_indigenous_town_of_origin",
+      "type": "text",
+      "label": "3. Town of origin, for an indigenous language"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].#field[33]",
+      "newName": "int300_witness_needs_interpreter",
+      "type": "checkbox",
+      "label": "4. I have a witness who needs an interpreter for the following court date"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CheckBox64[0]",
+      "newName": "int300_witness_no_date_set",
+      "type": "checkbox",
+      "label": "4a. No date is set yet"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].HearingDate_dt[0]",
+      "newName": "int300_witness_hearing_date",
+      "type": "text",
+      "label": "4a. Date"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].HearingTime_dt[0]",
+      "newName": "int300_witness_hearing_time",
+      "type": "text",
+      "label": "4a. Time"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].HearingRoom_ft[0]",
+      "newName": "int300_witness_hearing_department_and_judicial_officer",
+      "type": "text",
+      "label": "4a. Department and judicial officer"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CheckBox64[11]",
+      "newName": "int300_witness_language_same",
+      "type": "checkbox",
+      "label": "4b. The language marked above"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].HearingPetitionerRequest_cb[4]",
+      "newName": "int300_witness_language_other",
+      "type": "checkbox",
+      "label": "4b. Other language"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].OldHearingTime_dt[2]",
+      "newName": "int300_witness_language_other_name",
+      "type": "text",
+      "label": "4b. The language the witness speaks"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].CH116Signature_dt[0]",
+      "newName": "int300_signature_date",
+      "type": "text",
+      "label": "Signature date"
+    },
+    {
+      "id": "topmostSubform[0].Page2[0].ReqFullName_ft[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Your name (page 2 header)"
+    },
+    {
+      "id": "topmostSubform[0].Page2[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 2)",
+      "courtUse": true
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "_comment": "DV-200 comes in when DV-100's \"Do you want the sheriff or marshal to serve the papers ... for free?\" is answered No: someone else serves, and this is their proof. Items 5 to 7 are the server's - when, where, who they are, and their signature - and are courtUse. The filer pre-fills only what identifies the case: the two names (items 1 and 2), the court, and the papers in item 4 the packet knows it is serving. Each carries the name of the answer that already decides it, so DV-200 asks nothing new, like DV-140: the names and the court are DV-100's, the No that brings DV-200 in ticks 4a and 4b (DV-109 with DV-100 and a blank DV-120; DV-110), and DV-100's custody box ticks 4c (DV-105 and DV-140). The No box is an attachmentTarget - a box another form's answer ticks - so it is never asked here.",
+  "splits": [
+    {
+      "field": "court_name_and_street_address",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "court_name",
+          "label": "Court name",
+          "question": "What is the name of the court?"
+        },
+        {
+          "nameId": "court_street_address",
+          "label": "Court street address",
+          "question": "What is the court's street address?"
+        }
+      ]
+    }
+  ],
+  "questions": {
+    "person_asking_protection_name": {
+      "text": "What is your full name?",
+      "_why": "Item 1. DV-100 item 1 asks it under this name."
+    },
+    "person_to_restrain_full_name": {
+      "text": "What is the full name of the person you want protection from?",
+      "_why": "Item 2. DV-100 item 2 asks it under this name."
+    },
+    "child_custody_and_visitation_order_requested": {
+      "text": "Are you asking for child custody and visitation orders?",
+      "_why": "Item 4c (DV-105 and DV-140) is ticked exactly when the filer asks for custody orders on DV-100 - the box carries DV-100 choice's name, so the packet never asks this; the wording is for the form compiled on its own."
+    }
+  },
+  "attachmentTargets": [
+    "papers_served_by_sheriff_no"
+  ],
+  "order": [
+    "person_asking_protection_name",
+    "person_to_restrain_full_name",
+    "court_name",
+    "court_street_address",
+    "child_custody_and_visitation_order_requested"
+  ],
+  "sections": [
+    {
+      "name": "Papers to Be Served",
+      "fields": [
+        "case_number",
+        "person_asking_protection_name",
+        "person_to_restrain_full_name",
+        "court_name_and_street_address",
+        "court_name",
+        "court_street_address",
+        "papers_served_by_sheriff_no",
+        "child_custody_and_visitation_order_requested"
+      ]
+    }
+  ],
+  "computed": {
+    "dv200_served_fl150": {
+      "_why": "DV-200 item 4d: FL-150 is served, with a blank FL-150, whenever the packet makes it - exactly when DV-100 asks for child or spousal support. The server ticks a checkbox that receives Yes; two conditions with the same word write it once.",
+      "separator": ", ",
+      "wordsWhenTicked": [
+        {
+          "when": "child_support_order_requested",
+          "words": "Yes"
+        },
+        {
+          "when": "spousal_support_order_requested",
+          "words": "Yes"
+        }
+      ]
+    },
+    "dv200_served_other": {
+      "_why": "DV-200 item 4i: RA-010 goes with the papers when the filer will attend by phone or video.",
+      "separator": ", ",
+      "wordsWhenTicked": [
+        {
+          "when": "appear_remotely_yes",
+          "words": "Yes"
+        }
+      ]
+    },
+    "dv200_served_other_description": {
+      "_why": "DV-200 item 4i names the other document served.",
+      "separator": ", ",
+      "wordsWhenTicked": [
+        {
+          "when": "appear_remotely_yes",
+          "words": "RA-010 (Notice of Remote Appearance)"
+        }
+      ]
+    }
+  }
+}

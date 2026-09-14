@@ -1026,7 +1026,13 @@
     "other_protected_people_additional_list_attached": {
       "text": "Do you have an additional protected people list attached?"
     },
-    "other_protected_people_reason_for_protection": {"text":"Why do these people need protection?","type":"bigParagraph","conditional":{"onlyWhen":"other_protected_people_yes_yes"}},
+    "other_protected_people_reason_for_protection": {
+      "text": "Why do these people need protection?",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "other_protected_people_yes_yes"
+      }
+    },
     "person_to_restrain_firearms_unknown": {
       "text": "Do you have an i don’t know?"
     },
@@ -1583,6 +1589,125 @@
       "courtUse": false
     }
   },
+  "choices": [
+    {
+      "nameId": "dv570_self_employed",
+      "question": "Do you work for yourself as a self-employed person?",
+      "at": "end",
+      "onlyWhen": "child_support_order_requested",
+      "_whyOnlyWhen": "Hung straight off the \"Child support\" order, so the chain is part of the child-support branch: its answers carry that order on to the children block, which is gated on child support among other things. Hung on item 24 instead, the chain left that branch and the children block stopped showing for a child-support filer (RULE 18 caught FL-150 printing the count blank).",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv570_self_employed_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv570_self_employed_no"
+        }
+      ],
+      "_why": "DV-100 page 13 sends a filer asking only for child support to DV-570, Which Financial Form - FL-155 or FL-150?, and says they may be eligible for the simpler FL-155. DV-570 is six Yes/No questions: any Yes means FL-150, all No allows FL-155. Two of the six are already answered by the orders requested (spousal support, lawyer's fees); these four are the rest, each asked only after a No, because the first Yes settles it. The packet reads DV-570 for the filer (formsToRead) and fills whichever form it allows - FL-155 when it can, being the simpler of the two."
+    },
+    {
+      "nameId": "dv570_other_party_spousal_support",
+      "question": "Is the person you want protection from asking the court for spousal support, or for a change in spousal support?",
+      "at": "end",
+      "onlyWhen": "dv570_self_employed_no",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv570_other_party_spousal_support_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv570_other_party_spousal_support_no"
+        }
+      ],
+      "_why": "DV-570: \"Is your spouse (husband or wife) asking for spousal support or a change in spousal support?\""
+    },
+    {
+      "nameId": "dv570_other_party_lawyer_fees",
+      "question": "Is the person you want protection from asking the court to make you pay their lawyer's fees?",
+      "at": "end",
+      "onlyWhen": "dv570_other_party_spousal_support_no",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv570_other_party_lawyer_fees_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv570_other_party_lawyer_fees_no"
+        }
+      ],
+      "_why": "DV-570: \"Is the other person asking you to pay his or her attorney fees?\""
+    },
+    {
+      "nameId": "dv570_other_income",
+      "question": "Do you have any income other than pay from a job, welfare (CalWORKs, TANF, General Relief or General Assistance), disability, unemployment, workers' compensation, Social Security or retirement?",
+      "at": "end",
+      "onlyWhen": "dv570_other_party_lawyer_fees_no",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv570_other_income_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv570_other_income_no"
+        }
+      ],
+      "_why": "DV-570: \"Do you have income that is not listed below?\" - welfare (CalWORKS, TANF, GR, or GA), salary from your job, disability, unemployment, worker's compensation, Social Security, retirement."
+    },
+    {
+      "nameId": "keep_minor_information_confidential",
+      "question": "Does your request include private information about a child under 18 that you want kept confidential?",
+      "at": "end",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "keep_minor_information_confidential_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "keep_minor_information_confidential_no"
+        }
+      ],
+      "_why": "DV-100 page 1: \"If this case includes sensitive information about a minor child (under 18 years old), see form DV-160-INFO.\" Yes brings in DV-160, the request, and DV-165, the order the judge signs."
+    },
+    {
+      "nameId": "add_sworn_statement",
+      "question": "Do you want to add a separate written statement of your own to your papers, signed under penalty of perjury?",
+      "at": "end",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "add_sworn_statement_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "add_sworn_statement_no"
+        }
+      ],
+      "_why": "MC-030, Declaration: a standalone sworn statement a petitioner may file with the first papers. Yes brings in MC-030."
+    },
+    {
+      "nameId": "witness_statement",
+      "question": "Does someone else, such as a person who saw the abuse, want to give a signed statement to go with your request?",
+      "at": "end",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "witness_statement_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "witness_statement_no"
+        }
+      ],
+      "_why": "MC-031, Attached Declaration: a sworn statement, here a witness's, attached to the request (\"This form must be attached to another form or court paper before it can be filed in court\"). Yes brings in MC-031."
+    }
+  ],
   "sections": [
     {
       "name": "About You",
@@ -1689,7 +1814,20 @@
         "animal_stay_away_distance",
         "control_of_property_description",
         "property_debt_special_finding",
-        "child_support_situation"
+        "child_support_situation",
+        "dv570_self_employed",
+        "dv570_other_party_spousal_support",
+        "dv570_other_party_lawyer_fees",
+        "dv570_other_income",
+        "dv105_child"
+      ]
+    },
+    {
+      "name": "More Papers",
+      "fields": [
+        "keep_minor_information_confidential",
+        "add_sworn_statement",
+        "witness_statement"
       ]
     },
     {
@@ -1832,7 +1970,12 @@
         "itemTitle": "Other Protected People",
         "marks": "other_protected_people_additional_list_attached_yes",
         "most": 12,
-        "fields": ["{n}_full_name", "{n}_age", "{n}_relationship", "Lives with you?"],
+        "fields": [
+          "{n}_full_name",
+          "{n}_age",
+          "{n}_relationship",
+          "Lives with you?"
+        ],
         "otherPages": [
           {
             "form": "DV-110",
@@ -1841,7 +1984,11 @@
             "item": "3",
             "itemTitle": "Other Protected People",
             "marks": "other_protected_people_additional_list_attached_yes",
-            "fields": ["{n}_full_name", "{n}_relationship", "{n}_age"]
+            "fields": [
+              "{n}_full_name",
+              "{n}_relationship",
+              "{n}_age"
+            ]
           },
           {
             "form": "CLETS-001",
@@ -1850,7 +1997,12 @@
             "item": "4",
             "itemTitle": "Other People You Want Protected",
             "marks": "clets_other_protected_people_attached_page",
-            "fields": ["{n}_full_name", "{n}_gender", "{n}_race", "{n}_date_of_birth"]
+            "fields": [
+              "{n}_full_name",
+              "{n}_gender",
+              "{n}_race",
+              "{n}_date_of_birth"
+            ]
           }
         ]
       },
@@ -1939,7 +2091,8 @@
         "relationship_children_names_line_2"
       ],
       "conditional": {
-        "onlyWhen": "relationship_have_children_together,child_custody_and_visitation_order_requested",
+        "onlyWhen": "relationship_have_children_together,child_custody_and_visitation_order_requested,child_support_order_requested",
+        "_whyChildSupport": "And whenever they ask for child support: FL-150 item 16a prints how many children the support is for, the children the filer has with the person in 2, and it came in on the child support box with the count blank.",
         "_why": "Asked when the filer has children with the person, and whenever they ask for custody orders: DV-105 and DV-140 list the children, and a custody request without the relationship box ticked used to reach them with no child named. It is asked after the orders question so both answers are known when it is reached."
       },
       "fields": [
@@ -2284,26 +2437,76 @@
         "onlyWhen": "other_court_case_other_selected"
       }
     },
-  { "nameId": "person_asking_protection_identity", "question": "What is your name and age?", "fields": [
-      {"field":"person_asking_protection_name","label":"Name"},
-      {"field":"person_asking_protection_age","label":"Age","type":"number"} ] },
-  { "question": "Who do you want protection from?", "fields": [
-      {"field":"person_to_restrain_full_name","label":"Name"},
-      {"field":"person_to_restrain_age","label":"Age","type":"number"},
-      {"field":"person_to_restrain_date_of_birth","label":"Date of birth","type":"date"},
-      {"group":"person_to_restrain_gender","label":"Gender"},
-      {"field":"person_to_restrain_race","label":"Race"} ] },
-  { "nameId": "move_out_length_of_residence", "question": "How long have you lived at this address?", "fields": [
-      {"field":"move_out_years_at_address","label":"Years","type":"number"},
-      {"field":"move_out_months_at_address","label":"Additional months","type":"number"} ],
-    "conditional": {"onlyWhen":"move_out_right_to_live_length_of_residence"} }
-],
+    {
+      "nameId": "person_asking_protection_identity",
+      "question": "What is your name and age?",
+      "fields": [
+        {
+          "field": "person_asking_protection_name",
+          "label": "Name"
+        },
+        {
+          "field": "person_asking_protection_age",
+          "label": "Age",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "question": "Who do you want protection from?",
+      "fields": [
+        {
+          "field": "person_to_restrain_full_name",
+          "label": "Name"
+        },
+        {
+          "field": "person_to_restrain_age",
+          "label": "Age",
+          "type": "number"
+        },
+        {
+          "field": "person_to_restrain_date_of_birth",
+          "label": "Date of birth",
+          "type": "date"
+        },
+        {
+          "group": "person_to_restrain_gender",
+          "label": "Gender"
+        },
+        {
+          "field": "person_to_restrain_race",
+          "label": "Race"
+        }
+      ]
+    },
+    {
+      "nameId": "move_out_length_of_residence",
+      "question": "How long have you lived at this address?",
+      "fields": [
+        {
+          "field": "move_out_years_at_address",
+          "label": "Years",
+          "type": "number"
+        },
+        {
+          "field": "move_out_months_at_address",
+          "label": "Additional months",
+          "type": "number"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "move_out_right_to_live_length_of_residence"
+      }
+    }
+  ],
   "continuations": [
     {
       "field": "relationship_children_names",
       "_why": "Item 3a prints the names on two ruled lines. The first is filled from the children block (computed, and only while the box is ticked); the second is where the filler runs a long list on to, not a question.",
       "keep": "relationship_children_names_line_1",
-      "drop": ["relationship_children_names_line_2"]
+      "drop": [
+        "relationship_children_names_line_2"
+      ]
     },
     {
       "field": "move_out_right_to_live_other_explanation",
@@ -2386,6 +2589,22 @@
     {
       "question": "other_protected_people_reason_for_protection",
       "why": "Item 8(2) follows 8(1) whatever the extra-page answer. It waits on the protect-others Yes: it used to be asked after No as well, which this note once claimed had been verified."
+    },
+    {
+      "question": "keep_minor_information_confidential",
+      "why": "Asked of every filer: whether a child's information needs protecting does not depend on anything asked before it."
+    },
+    {
+      "question": "add_sworn_statement",
+      "why": "Asked of every filer: any petitioner may add a sworn statement of their own (MC-030)."
+    },
+    {
+      "question": "witness_statement",
+      "why": "Asked of every filer: anyone may give a sworn statement to attach to the request (MC-031)."
+    },
+    {
+      "question": "dv105_child",
+      "why": "The children follow the DV-570 questions on the child-support branch whatever those answers are: they are gated by the orders (custody or child support) and item 3a, not by DV-570. The audit sees the chain's last Yes and No leading to them."
     }
   ],
   "computed": {
@@ -2394,28 +2613,56 @@
       "joinWhenTicked": {
         "when": "relationship_have_children_together",
         "separator": ", ",
-        "fields": ["dv105_child_1_name", "dv105_child_2_name", "dv105_child_3_name", "dv105_child_4_name"]
+        "fields": [
+          "dv105_child_1_name",
+          "dv105_child_2_name",
+          "dv105_child_3_name",
+          "dv105_child_4_name"
+        ]
       }
     },
     "additional_pages_count": {
-      "_why": "DV-100 item 32 asks for the number of extra pages attached. A filer cannot count them and the debug fill answered 100. The packet knows: the pages of every attachment being filed, plus one for each separate sheet already promised.",
+      "_why": "DV-100 item 32 asks for the number of extra pages attached. A filer cannot count them and the debug fill answered 100. The packet knows: the pages of every attachment being filed, and every MC-025 sheet continuing one of them.",
       "_whyAttachedTo": "Counted along what each form says it is attached to, not along what switches it on. DV-108 is attached to DV-105, which is attached to DV-100, so its pages are part of the stack handed in with this form; DV-140 is attached to DV-110, a separate order, so its pages are not - and counting every conditional form as an attachment had put DV-140 in, making this 18 where it is 12.",
-      "pagesOfFormsAttachedTo": "DV-100",
-      "onePageEachWhenYes": [
-        "other_protected_people_additional_list_attached_yes",
-        "dv101_additional_pages_attached",
-        "dv105_children_additional_list_attached"
-      ]
+      "_whyMc025": "The MC-025 sheets are counted with the layout that draws them (FormWiz GUI/continuation-layout.js): one per list was the old count, and wrong the moment a list or the description of abuse took two sheets.",
+      "pagesOfFormsAttachedTo": "DV-100"
+    },
+    "financial_statement_simplified_allowed": {
+      "_why": "DV-570 decides between FL-150 and the simpler FL-155: any Yes means FL-150, all No allows FL-155. Two of its six questions are the orders requested (spousal support, lawyer's fees); the other four are asked in a chain, each only after a No, so a No to the last means all four were No. The box ticks exactly then, and it is what brings in FL-155 (dv-packet.spec.json). No PDF field of its own.",
+      "tickWhen": {
+        "all": [
+          "child_support_order_requested",
+          "dv570_other_income_no"
+        ],
+        "none": [
+          "spousal_support_order_requested",
+          "lawyers_fees_and_costs_order_requested"
+        ]
+      }
+    },
+    "case_short_title": {
+      "_why": "MC-025, the page every continuation is drawn on, asks for a SHORT TITLE - the case name, \"Mora v. Smith\": the filer against the person to be restrained, both named on DV-100 items 1 and 2. No PDF field of its own; FormWiz GUI/generate.js reads it into each MC-025 page's header.",
+      "joinFields": {
+        "fields": [
+          "person_asking_protection_name",
+          "person_to_restrain_full_name"
+        ],
+        "separator": " v. "
+      }
     }
   },
   "overflow": {
     "other_abuse_incident_details": {
       "_why": "DV-100 item 7 ends with \"Check this box if you need more space to describe the abuse. You can use form DV-101\" - which asks a filer to predict, before writing a word, whether what they are about to say fits in a box whose size they cannot see. They need more space exactly when they have used more than the box holds, and the box has been measured.",
-      "form": "DV-101",
-      "field": "dv101_further_abuse_description",
+      "_whyMc025": "Rule the-packet-uses-mc025-for-more-space: what the box cannot print continues on MC-025, the Judicial Council's attachment page for any form, headed \"DV-100, Item 7(f)\". It used to continue on DV-101 item 5, which held 387 characters more and then needed a sheet of the filer's own; MC-025 takes another sheet for as long as the account runs, so nothing the filer writes is capped or cut.",
       "marks": "other_abuse_incident_additional_space_attached_yes",
-      "_whyBeyond": "DV-101 item 5 carries the same escape - \"Check here if you need more space. Attach a sheet of paper\" - and asking it was the same mistake one form further on. Past what both boxes hold there is a third thing that is true and knowable: the filer has more to say than the packet can print, and a sheet of their own is the only place left for it.",
-      "marksBeyond": "dv101_additional_pages_attached"
+      "page": {
+        "name": "DV100_Item_7f",
+        "heading": "DV-100, Item 7(f)",
+        "item": "7(f)",
+        "itemTitle": "Description of the abuse",
+        "form": "DV-100"
+      }
     }
   }
 }

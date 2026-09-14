@@ -952,7 +952,11 @@ function loadFormData(formData) {
                                         }
                                     }
                                 } else if (field.type === 'phone' || field.type === 'email'
-                                           || field.type === 'number' || field.type === 'text') {
+                                           || field.type === 'number' || field.type === 'text'
+                                           || field.type === 'bigParagraph') {
+                                    // bigParagraph: a box the paper rules over several
+                                    // lines (FL-150's insurance company address),
+                                    // drawn as a textarea by the generated form.
                                     // Typed text boxes all reuse the label UI and
                                     // keep their type on the row. Anything not
                                     // named here used to fall off the end of this
@@ -1845,12 +1849,15 @@ function loadFormData(formData) {
                                         lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
                                     }
                                 }
-                            } else if (field.type === 'number' || field.type === 'email') {
+                            } else if (field.type === 'number' || field.type === 'email'
+                                       || field.type === 'text' || field.type === 'bigParagraph') {
                                 // Same shape as phone: a label field carrying its
                                 // own type. Without this the import dropped the
                                 // field entirely, so an age or email column inside
                                 // a repeating block never reached the generated
-                                // form and its PDF box stayed blank.
+                                // form and its PDF box stayed blank - and DV-160's
+                                // redaction columns (bigParagraph, drawn as a
+                                // textarea) vanished the same way.
                                 addTextboxLabel(question.questionId);
                                 const lastField = unifiedFieldsDiv.lastElementChild;
                                 if (lastField) {
@@ -1861,7 +1868,7 @@ function loadFormData(formData) {
                                     if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
                                     lastField.setAttribute('data-type', field.type);
                                     const typeTextEl = lastField.querySelector('#typeText' + question.questionId + '_' + fieldOrder);
-                                    if (typeTextEl) typeTextEl.textContent = field.type === 'number' ? 'Number' : 'Email';
+                                    if (typeTextEl) typeTextEl.textContent = ({ number: 'Number', email: 'Email', text: 'Text', bigParagraph: 'Paragraph' })[field.type] || field.type;
                                     if (field.prefill !== undefined) {
                                         lastField.setAttribute('data-prefill', field.prefill || '');
                                     }

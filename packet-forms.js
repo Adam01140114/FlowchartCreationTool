@@ -54,4 +54,19 @@ function packetForms(opts) {
   } catch (err) { return []; }
 }
 
-module.exports = { packetForms, baseOf };
+/**
+ * The downloaded blank a form is made from: "blank" in its spec entry, or its
+ * own PDF. A second copy of a form (DV-105(A) (2)) has a PDF of its own, named
+ * for its own field config, and the first copy's blank.
+ */
+function blankOf(base, opts) {
+  const options = opts || {};
+  try {
+    const spec = JSON.parse(fs.readFileSync(options.spec || SPEC, 'utf8'));
+    const entry = (spec.forms || []).find((e) => baseOf(e) === base);
+    if (entry && entry.blank) return entry.blank;
+  } catch (err) { /* no spec here - the form is its own blank */ }
+  return base + '.pdf';
+}
+
+module.exports = { packetForms, baseOf, blankOf };

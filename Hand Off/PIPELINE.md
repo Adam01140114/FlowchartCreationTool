@@ -315,10 +315,62 @@ options, and nothing compared the preview with what the form posts.
 
 ## Adding a form to the packet
 
-The packet is eight forms: DV-100, DV-101, DV-105, DV-108, DV-140, CLETS-001,
-DV-109 and DV-110. Adding one is six steps and about half of it is naming.
+The packet's forms are in `dv-packet.spec.json` and, with what each is for and
+when it comes in, in `Hand Off/FORMS.md`; every continuation is drawn on MC-025.
+
+**The packet's scope is the user's list, not the paper's.** On September 14,
+2026 the user limited the packet to the sixteen first-filing forms (`scope` in
+the spec). SER-001, DV-200, INT-300, MC-410 and RA-010 left the packet, with
+the four DV-100 questions that existed only to bring them in (sheriff service,
+interpreter, disability accommodation, remote appearance); DV-145, FL-155,
+MC-030 and MC-031 came in. A form the paper mentions outside the list goes in
+`formsOutOfScope`, saying why. `pipeline-form-refs.js --check` fails a packet
+form outside `scope`, or a `scope` form nothing makes. Add a form to `scope`
+only when the user asks.
+
+**The numbered steps grow with the answers.** The bar at the top of the form
+starts with only the forms every filer fills: the one nothing switches on
+(DV-100), any marked always included, and what those bring in unconditionally
+(CLETS-001, DV-109, and DV-110 through DV-109 - DV-109 asks nothing, so it has
+no step). `generate.js` works this out at build time from the activation rules
+and builds the other steps hidden. When an answer brings a form in, the step
+appears in its place in the packet order, the steps after it renumber, and the
+new one is marked for a moment; when the answer is taken back, the step goes.
+`updateProgressBar` runs 150 ms after any change or keystroke and when a fill
+finishes. The bar used to list the whole packet and hide what was not needed,
+and it only redrew when the filer changed page - after Fill maximum path
+brought in six forms it still showed three. The nav audit reads the bar on a
+fresh page and after each fill and fails it if it is wrong.
+
+**FL-150 or FL-155 is DV-570's decision, made in the interview.** FL-150 comes
+in on spousal support or lawyer's fees among DV-100's orders, or on a Yes to any
+of DV-570's four remaining questions (self-employed; the other person asking for
+spousal support; the other person asking for lawyer's fees; other income). Those
+four are asked only when child support is requested, each only after a No to the
+one before, so a No to the last means all four were No. FL-155 comes in on
+`financial_statement_simplified_allowed`, a box the form ticks itself (a
+`tickWhen` computed field in `dv100-hints.json`: child support and the last No
+ticked, spousal support and lawyer's fees not). The activation reads the box's
+tick, so `tickWhen` makes a real checkbox. A gate's `onlyWhen` can only OR its
+conditions, which is why the questions are chained rather than each gated on
+three answers.
+
+**Where the chain hangs matters.** The first DV-570 question hangs straight off
+the "Child support" order, so the chain is part of the child-support branch and
+its answers carry that order on. DV-100's children block (`dv105_child`) is
+gated on custody, child support or "We have a child together", and the compiler
+feeds it the exits that still carry one of those orders. Hung on item 24's
+answers instead, the chain left the branch: the children block stopped showing
+for a child-support filer and FL-150 printed the count blank (RULE 18 caught it).
+The pipeline audit then says the children block shows on both Yes and No of the
+last DV-570 question; that is declared in `alwaysShown`, because DV-570 is not
+what gates it. The questions and the children block share the "Animals,
+Property and Support" page, after item 24: a question cannot be listed on a page
+before the answers it waits on.
+Adding one is seven steps and about half of it is naming.
 
 ```bash
+curl -sSL -o dv108.pdf https://courts.ca.gov/documents/dv108.pdf   # NEW-FORM.md §0 - PDFs are pre-approved
 qpdf --decrypt dv108.pdf plain.pdf            # Judicial Council PDFs are encrypted XFA
 node pipeline-field-labels.js plain.pdf       # what each field sits next to on the page
 #  write dv-field-configs/dv108-field-config.json  - every field, named
@@ -559,7 +611,9 @@ the same answer that decides whether their questions get asked at all. An
 attachment is a form switched on **conditionally** - DV-109 and DV-110 are
 switched on unconditionally and travel with the packet rather than being
 attached to it, which is the distinction the activation rules already draw.
-The maximum path gives 11: DV-101 (2) + DV-105 (6) + three separate sheets.
+The count is the pages of every form attached, plus every MC-025 sheet
+continuing one of them, counted with the layout that draws them ("MC-025, the
+one continuation form", below).
 
 It crosses four layers, so a change to any of them has to keep all four:
 `compile-form.js` drops the field and records it, `pipeline-build-packet.js`
@@ -745,7 +799,7 @@ and the lines it has. A clean run prints none.
 Filling every box to capacity is what made all of this visible. With one short
 line in a four-line box there was nothing to drift.
 
-## Running out of space is what brings in the continuation form
+## Running out of space continues on MC-025
 
 DV-100 item 7 ends with *"Check this box if you need more space to describe the
 abuse. You can use form DV-101"* — and asked as a question, that is asking
@@ -753,57 +807,55 @@ someone to predict, before they have written a word, whether what they are about
 to say will fit in a box whose size they cannot see. Nobody knows that.
 
 They need more space exactly when they have used more than the box holds, and
-the box has been measured. So the question is gone. Both ends of the link are
-dropped from the interview by the compiler, and the form simply notices:
+the box has been measured. So the question is gone. The box is dropped from the
+interview by the compiler, and the form simply notices:
 
 ```json
 "overflow": {
   "other_abuse_incident_details": {
-    "form": "DV-101",
-    "field": "dv101_further_abuse_description",
-    "marks": "other_abuse_incident_additional_space_attached_yes"
+    "marks": "other_abuse_incident_additional_space_attached_yes",
+    "page": { "name": "DV100_Item_7f", "heading": "DV-100, Item 7(f)", "item": "7(f)",
+              "itemTitle": "Description of the abuse", "form": "DV-100" }
   }
 }
 ```
 
-Past the printable length the attachment box is ticked, DV-101 switches on, and
-what the first box cannot print is carried onto DV-101 item 5. The limit the
-filer meets is the sum of what the two boxes hold — 1115 + 387 — which is the
-extra space, honestly counted.
-
-**Nothing in the chain is asked about.** DV-101 item 5 carries the same escape
-DV-100 item 7 does - *"Check here if you need more space. Attach a sheet of
-paper"* - and removing one while leaving the other still asked a filer to
-predict, one form further on. There are three states and each is knowable at
-the moment it happens:
-
 | what the filer wrote | what happens |
 | --- | --- |
-| within DV-100 item 7's 1115 | it prints there, nothing else switches on |
-| more than that | DV-101 switches on, `…additional_space_attached_yes` ticks, the rest prints on DV-101 item 5 |
-| more than 1115 + 387 | `dv101_additional_pages_attached` ticks too, and the limit comes off |
+| within DV-100 item 7's 1115 characters | it prints there, nothing else happens |
+| more than that | `…additional_space_attached_yes` ticks, the box prints what it holds ending on a whole word, and the rest continues on an MC-025 page headed "DV-100, Item 7(f)" - as many sheets as it takes |
 
-That last row is `marksBeyond` on the overflow declaration. The limit has to
-come off there, because stopping someone dead at the end of the second box is
-the form deciding how much of their account is worth having, when the paper
-itself offers them a sheet to carry on writing on.
+There is no limit. The page takes another sheet, so the form never decides how
+much of someone's account is worth having.
 
-**A field driven from another form's declaration must be named in its own
-form's `overflowTargets`.** A form is compiled against its own hints, so
-`dv101_additional_pages_attached` stayed a question until DV-101's hints named
-it - and `compile-form.js` has to be re-run per form before
-`pipeline-build-packet.js`, which only assembles flowcharts that already exist.
+**It used to continue on DV-101.** DV-101 item 5 held 387 characters more, and
+carried the same escape again - *"Check here if you need more space. Attach a
+sheet of paper"* - which needed a third box (`marksBeyond`) and a limit that
+came off only past both. California's own instructions name MC-025,
+Attachment, for any form that runs out of room, so the packet now uses it for
+every continuation (next section). The runtime still reads a link with a
+`field` on another form so an old project opens; `pipeline-audit.js` RULE 21
+fails one.
 
-**The continuation carries the remainder, not a copy.** The intent was to put
-the whole answer on DV-101 so the attachment reads on its own, and the paper
-does not allow it: DV-100 item 7 holds 1115 characters and DV-101 item 5, the
-box that continues it, holds 387. Copying the whole answer there would print a
-clipped one, and a court document that is unreadable at the bottom is worse than
-one that is split. The two boxes read as one passage instead, nothing is lost,
-and nothing is cut. `overflowSplit()` is one function for both readers — the
-live form writing the tail as it is typed, and the payload trimming the head on
-the way out — because a split computed twice drops a word between the two pages
-or prints it on both.
+**A box two answers share.** DV-160 prints one "not enough space (Attachment 8)"
+box under both 8b and 8c. Each answer has its own overflow link and its own
+MC-025 page; `applyOverflowLinks` ticks the shared box while either runs over.
+Until MC-025 these three DV-160 answers were held to what their boxes printed and
+their boxes were `courtUse`.
+
+**The continuation carries the remainder, not a copy.** The first box keeps
+what it can print and MC-025 takes the rest, so the two read as one passage.
+`overflowSplit()` in `FormWiz GUI/continuation-layout.js` is one function for
+all three readers - the live page, the payload trimming the box's own answer on
+the way out, and `pipeline-fill.js` - because a split computed twice drops a word
+between the two pages or prints it on both.
+
+**The payload carries the rest.** The box's own value is cut on the way out, so
+an answer set captured from what the form posts held no trace of what went on
+MC-025. Every `/edit_pdf` request now also posts `__continued_<name>` with the
+remainder (`overflowContinuedFields`); the server has no field by that name, and
+`pipeline-fill.js` draws the MC-025 page from it. A captured set whose "more
+space" box is ticked but that holds nothing past the box fails the fill.
 
 Three things had to be got right for this to work at all, and each looked like
 the feature not working:
@@ -811,14 +863,58 @@ the feature not working:
 - The condition lives in the **connector cell's style**, beside
   `connectorTarget`. Set as a property on the cell it did not survive the
   editor's canvas round trip, and the rule exported as `unconditional: true`.
+  (This was DV-101's connector; a continuation on MC-025 needs no connector.)
 - `applyFieldCapacities` runs again every time the form grows a field, and put
   the narrow cap back within a frame of `applyOverflowLinks` removing it. A box
   that can spill is now skipped by that sweep.
 - The maximum path has to **go over the edge on purpose**. Stopping at what the
-  box prints leaves the continuation form switched off and its page blank, and
-  the value is built so the split lands exactly on the two boxes' limits rather
-  than wherever a word boundary falls — letting it fall put ten characters more
-  on DV-101 than DV-101 holds, which is testing the overflow by overflowing.
+  box prints leaves the continuation off and its page blank. The value is built
+  so the split lands exactly on the box's limit (`[cont]` ends the box's part)
+  and then runs `OVERFLOW_TEST_SPILL` (6,000) characters further, past one MC-025
+  sheet, so the run shows "Page 1 of 2" (`[end]` ends the page's part).
+
+## MC-025, the one continuation form
+
+Rule `the-packet-uses-mc025-for-more-space`. MC-025 *"may be used with any
+Judicial Council form"*, and anything in the packet that needs more space
+continues on it: a long answer past its box (the overflow above: DV-100 item
+7(f), DV-160 items 6a, 6b, 8b, 8c) and a table's entries past its rows (the next
+section: DV-105 item 3, the other protected people on DV-100, DV-110 and
+CLETS-001, DV-160's minors and redactions). The forms the paper names for the
+same job - DV-101, MC-020 - are never used; `dv-packet.spec.json` says so in
+`continuation.replaces`, which `pipeline-form-refs.js` reads. Substantive forms
+that hold more information - DV-105, DV-108, FL-150, DV-160 - are forms of their
+own and MC-025 never stands in for them.
+
+| MC-025 box | what the packet puts there |
+| --- | --- |
+| SHORT TITLE | `case_short_title`, "Mora v. Smith" - a `joinFields` computed field in `dv100-hints.json` (filer v. restrained person), filled once both names are given |
+| CASE NUMBER | nothing: the clerk's, as on every form |
+| ATTACHMENT (Number) | the page's `attachmentNumber`, or its form and item: "DV-100, Item 7(f)", "DV-105, Item 3" |
+| body | the heading the form asks for, "Continues Item X - title.", then the text or the lettered rows |
+| Page __ of __ | numbered across the sheets of that one page |
+
+How it is drawn:
+
+- `FormWiz GUI/attachment-page.js` fills a fresh copy of the sanitized blank
+  (`FormWiz GUI/mc025.pdf`, named by `dv-field-configs/mc025-field-config.json`)
+  for each sheet and flattens it. The form's Save/Print/Clear buttons and its red
+  on-screen notices are removed first, or they print.
+- `FormWiz GUI/continuation-layout.js` works out the lines and the page breaks:
+  Helvetica widths **without kerning** (pdf-lib kerns, so a line measured here is
+  never narrower than the one printed), 12pt a line, 48 lines a sheet. The drawer
+  requires it; `gui.html` loads it and `generate.js` embeds its source in every
+  page as `fwContinuationLayout`. No backslashes in that file - it is written into
+  the page as a string. The drawer refuses a replaced MC-025 whose body box is a
+  different size.
+- **The count is the drawing.** DV-100 item 32, DV-160 item 10 and FL-150's pages
+  attached use `pagesOfFormsAttachedTo`, which now adds every MC-025 sheet
+  continuing a form in that stack, counted with the same layout
+  (`continuationSheets`). One page per list, the old count, was wrong the moment
+  a list took two sheets. `pipeline-fill.js` fails a page drawn with a different
+  number of sheets than the layout counts.
+- `attachment-page.js` is required by the dev server at start: **restart it**
+  after changing either file.
 
 ## Asked once across the packet
 
@@ -859,9 +955,9 @@ none, and the days after it open on the chart choice as well as on its boxes
 
 A connector an answer decides hangs off that answer's option. One that waits on
 a box the writing ticks hangs beside the question whose answer ticks it, with
-its condition written under it: DV-101 hangs off item 7f's "Describe how the
-person was abusive then" (`overflowQuestionFor` finds it from the overflow link),
-labelled "only if item 7f needs more space". Every connector nothing decides - a
+its condition written under it (`overflowQuestionFor` finds the question from an
+overflow link; DV-101 once hung off item 7f's description this way, labelled
+"only if item 7f needs more space", before MC-025 replaced it). Every connector nothing decides - a
 form that always travels with this one (DV-109, CLETS-001) - is a child of the
 form's central **End** node, chained one below the other in the order the spec's
 `activates` lists them: **most important at the top, least important at the
@@ -1005,7 +1101,19 @@ pitch, ends at the same right edge, is the same height, and has nothing in it.
 A fixed few-point tolerance is not enough for the vertical test: the gap is
 0.33pt on the animals pair and 3.42pt on the move-out pair, so it is measured
 against the line's own height, which is also what separates the next line from
-the one after it.
+the one after it. It is measured bottom to bottom, line to line, not from one
+box's bottom to the next box's top: FL-155 item 3c's two lines are 8.8pt apart
+in boxes 15.8pt tall, so the boxes overlap, the old box-to-box test never found
+the second line, and the first printed its whole part at 6pt, 84pt past the edge.
+The capacity (the declared `continuations` chain, 96 characters) had counted
+both lines all along; the server now agrees with it.
+
+**A short answer stays on its own line.** An answer that fits its line at three
+quarters of its declared size or more (and at least 8pt) is set smaller there,
+not broken over the next line: FL-155's phone number, "(310) 555-0142", was
+printed as "(310)" over "555-0142". Only an answer that would have to shrink
+further runs on - DV-100 item 16b(3) needs 8.1pt of an 11pt line, so it still
+does.
 
 Two things it deliberately does not do. An auto-sized field is left alone -
 there the layout shrinks the text to fit rather than clipping it, so there is
@@ -1436,6 +1544,22 @@ it. What is written stays while the page is open and is not saved anywhere
 (`openPromptPanel()` in `generate.js`). Both of these, like the double-click
 fill, exist only in test mode.
 
+A question or section JSON pasted into the panel - what a double-click copies -
+shows as a small labelled block, "Question JSON" or "Section JSON", instead of
+hundreds of lines; Backspace removes it whole, and Copy puts the full JSON back
+where the block sits (`promptJsonKind`, `promptText`). The box is a
+contenteditable editor for that reason: a textarea can only hold text. Its
+styles are set by id, because the form's stylesheet styles every button - that
+`margin: 0 auto` is what floated the close button toward the middle.
+
+**Test mode never uses Firebase.** A test page exists to check that the form is
+built right, and nothing typed into it is meant to be saved or remembered, so
+`generate.js` leaves the Firebase SDK out of a test-mode page and the publish
+and the payload strip it. For a few hours on September 14 test mode signed
+each browser in anonymously to a separate Firebase project and saved there;
+that was taken out for this reason. `pipeline-nav-audit.js` still blocks
+Firebase in every tab it opens, so an audit can never write to a database.
+
 ### How a path is found
 
 Both modes solve the interview as data and then write the answer to the page
@@ -1532,8 +1656,10 @@ Three changes, each general:
   check-all question now.
 - DV-105 item 4a: "If no, complete form DV-105(A)." The interview skipped the
   section on No, as it should, and said nothing about DV-105(A), which the
-  packet does not include. A hint's `subtitle` - carried by `compile-form.js`
-  and `library.js` into the question's subtitle - now says so under the question.
+  packet did not include. The fix made that day - a subtitle telling the filer
+  to get DV-105(A) from the court clerk and fill it out - was the wrong fix; see
+  "Every form the paper asks for, the packet makes" below. DV-105(A) is in the
+  packet now.
 - DV-101 asked every filer about a second incident. It asks first whether there
   is one (`choices` in `dv101-hints.json`).
 - "How is the other person they lived with related to the children?" became
@@ -1631,4 +1757,197 @@ kerned width, so the limits the interview puts on a box are about 2% generous.
 Nothing is lost on paper - the server shrinks to the true width and the ink
 check fails anything that does not fit - but the limits should be measured the
 same way, and rebuilding them means a re-export and a publish.
+
+## Every form the paper asks for, the packet makes
+
+DV-105 item 4a asks "Have all the children listed in 3 lived together for the
+last five years?" and says beside No: *"If no, complete form DV-105(A). Do not
+complete the section below."* The packet had no DV-105(A). The interview
+skipped the section on No, as the paper says, and on September 12 gained a
+subtitle under the question: "This packet does not include it: get it from your
+court clerk or at courts.ca.gov, fill it out, and attach it to DV-105." A rule
+on `form-rules.html` required that sentence.
+
+It is the one thing this tool exists never to say. The filer answers
+questions; the packet hands back finished paperwork. So:
+
+- **DV-105(A) is in the packet.** A No to item 4a brings it in (`activates` on
+  DV-105, as item 8 brings in DV-108). Its interview goes one group of children
+  at a time - one child, or several who have always lived together - asking
+  their names, then their homes from the current one back, one address at a
+  time behind "Did these children live somewhere else ...?", up to the seven
+  rows the paper prints. There are always two groups, because the children did
+  not all live together. Box 1, "This form is attached to DV-105", carries the
+  name of DV-105's No box, so the one answer ticks both.
+- **A form the paper asks for more of gets a second copy.** DV-105(A) holds two
+  groups, and its last box says "Check here to list other children with a
+  different residence history ... Use another form DV-105(A)". Asked as "Are
+  there other children whose homes were different from all the children you
+  have listed?", a Yes ticks it and brings in `DV-105(A) (2)`: its own field
+  config (`dv105a2`, the same paths with groups 3 and 4) and its own sanitized
+  PDF, made from the first copy's download - `"blank": "dv105a.pdf"` in the
+  spec, read by `blankOf()` in `packet-forms.js` and `pipeline-sanitize.js`.
+  Four groups is the most the packet takes; the second copy's own "use another"
+  box is `courtUse`, and its `_why` says so.
+- **Why every check missed it.** Every check read the forms the packet had;
+  none read what those forms send the filer to get. `pipeline-form-refs.js`
+  does. It reads each PDF in reading order - pdf.js returns a linked form number
+  after the sentence it sits in ("complete form , Income and Expense
+  Declaration" ... "FL-150"), so the runs are sorted by position first - finds
+  each sentence that tells someone to complete, fill out, attach, file or turn
+  in another form, and fails any form that is neither in the packet nor in the
+  spec's `formsNotInPacket`, which says whose form it is. On the old spec it
+  failed six: DV-105(A), DV-120 (the restrained person's response), DV-145 (the
+  judge's decision), FL-150, FL-155 and SER-001.
+  It was first written to follow only sentences that tell the filer to
+  complete or attach a form. That is still how DV-105(A) could have slipped:
+  a form the paper only points at ("See form SER-001") or lists is just as
+  much paperwork. So every form number mentioned anywhere - in the packet's
+  PDFs and in the court's own guides to the process, the spec's
+  `referenceSources` - must be in the packet, in `formsStillToBuild`, in
+  `formsNotInPacket` saying whose it is, or a guide (`-INFO`, or `formsToRead`).
+  Its first strict run found twenty that nobody had decided about.
+- **The known gaps are printed, not hidden.** FL-150 (DV-100 page 13: "If you
+  are asking for child support or spousal support you must also complete form
+  FL-150"), its simpler alternative FL-155, and SER-001 (the request for the
+  sheriff to serve) are the filer's and not built yet. They are in
+  `formsStillToBuild`, and every run of the check prints them. The interview
+  does not tell the filer to get them; the fix is to build them.
+- **And the wording cannot come back.** `sendsFilerForAForm` in
+  `wording-rules.js` ("get it from your court clerk", "fill it out", "attach
+  it", "this packet does not include") is refused by `compile-form.js` in any
+  question, subtitle or alert, and RULE 20 in `pipeline-audit.js` fails the
+  export on any question, subtitle, box, choice or alert. On the old build it
+  found the one sentence, and the compiler refused the old DV-105 hints.
+
+The blank came from courts.ca.gov with a plain `curl`; NEW-FORM.md §0 has the
+exact command and how to check what came back.
+
+### A form is on only for an answer in a form that is on
+
+The first publish with DV-105(A) passed every check, and its minimum path -
+which asks for no custody orders - walked twenty sections, DV-105 and both
+copies of DV-105(A) among them. Two things were wrong in the page, and neither
+was DV-105(A)'s own:
+
+- `activationNamesForm` accepted a name that is the start of another, so that
+  a connector drawn to "DV-109" still found "DV-109 Notice of Court Hearing".
+  "DV-105(A)" starts with "DV-105", so DV-105(A)'s rule switched DV-105 on -
+  and "DV-105(A) (2)" starts with "DV-105(A)". A rule now belongs to the form it
+  names exactly, and a leading name counts only up to a space, and only when no
+  form carries the exact name.
+- The fill works the path out as if every form were on and then lets the page
+  switch forms off. It had answered item 4a No inside DV-105, a form that stays
+  off on the minimum path, and that No switched DV-105(A) on. A filer can do
+  the same: answer item 4a, then untick the custody request. So an answer now
+  brings a form in only while the form it is asked in is itself on
+  (`isFormActivatedAt`, following `fromForm` up the chain). The same held for
+  DV-108 behind DV-105's abduction answer, which nobody had noticed.
+
+A third thing came out once those two were fixed: the recorded maximum path
+held thirty answers inside DV-105(A), a form that path leaves off, and the live
+button left none - the nav audit's drift check failed on it. The fill answers a
+question, and a round later takes the answer back when its form turns out to be
+off; the select empties, but the hidden "<id>_yes" box beside it stayed ticked,
+because `createHiddenCheckboxesForAutofilledDropdowns` only ever looked at a
+dropdown that holds an answer. It now unticks every box for an answer the
+dropdown does not hold. A stale box is not harmless: activation reads it, and
+the one for "Are there other children ...?" put the second copy of DV-105(A) in
+the step bar of a filer who had never been asked.
+
+The nav audit passed the first build because it checked only that Back retraces
+Next. It now also fails any form that is on without a rule that names it
+exactly and is unconditional, or is answered in a form that is itself on; on
+the old build it named DV-105, DV-105(A) and DV-105(A) (2).
+
+The widest path answers item 4a Yes - the solver prefers Yes - so it fills
+DV-105's own table and leaves DV-105(A) off; two branches of one question
+cannot both be on one path. DV-105(A) is checked with an answer set that says
+No (`pipeline-fill.js <answers> --forms dv105a,dv105a2 --render`) and by hand.
+
+### The questions that bring the rest of the process in
+
+The strict check's first run left the filer's own forms for serving the papers
+and going to the hearing: SER-001 or DV-200, DV-160 and DV-165, INT-300, MC-410
+and RA-010. None of them hangs off an answer DV-100 already had, so DV-100 now
+ends with a short section, "Serving and Your Hearing", of five Yes/No
+questions (`choices` in `dv100-hints.json`), and each answer brings its forms
+in: the sheriff serving (SER-001) or someone else (DV-200); private information
+about a child (DV-160, DV-165); an interpreter (INT-300); a disability
+accommodation (MC-410); attending by phone or video (RA-010). FL-150 needs no
+new question: it hangs off DV-100's own "Child support" and "Spousal support"
+choices under the orders requested.
+
+They sit after DV-100's last asked field, which no `before` could say: that
+field is followed only by signatures the form fills itself. `"at": "end"` on a
+choice asks it there. And a choice whose `before` names no asked field is now a
+NOT ASKED note from the compiler; it used to be dropped without a word.
+
+### What eight new forms taught the audit
+
+Wiring FL-150, SER-001, DV-200, DV-160, DV-165, INT-300, MC-410 and RA-010 in
+turned up six places where a check was wrong, not a form:
+
+- **RULE 18 could not see a question reached down two branches.** SER-001
+  prints DV-100's firearms answer, asked "when q60 = No, or when q62 is
+  answered" - and q62 is asked on q60 = Yes. Neither branch alone proves the
+  question is asked, so the rule failed an answer every filer gives. It now
+  also tries a question under each answer of a question it depends on, as deep
+  as DV-100's three incidents need, counting a step only when it assumes an
+  answer: the first version counted every question it looked at and ran out
+  of depth four questions short of the first incident. It still catches a real
+  gap - with its note removed, DV-160's lawyer name fails again.
+- **A blank that is the answer is said, not guessed.** "Who is your lawyer?"
+  is asked only after "Do you have a lawyer?" Yes, so a form that prints the
+  lawyer's name prints it blank for a filer without one, correctly. The rule
+  cannot tell that from DV-140's children, which were blank by mistake, so the
+  form's author says it: `"blankWhenNotAsked": "<why>"` on the field in the
+  form's field config, and RULE 18 honours it.
+- **A block's count posts under the block's own id.** FL-150 item 16a prints
+  how many children DV-100's children block holds. The page posts the count as
+  `<select name="dv105_child">`, but `postedNames()` read a question by its
+  `nameId`, which a block does not have, so RULE 1 called the box unreachable
+  and the preview check called it unfilled. Both read `postedNames()`, which
+  now adds the block's id.
+- **A dropdown ticks `<question>_<answer>`.** SER-001's "home" box is DV-110's
+  "Do you know where the person lives?" Yes, posted as the page mirrors every
+  dropdown answer. The preview's naming (`node-field-names.js`) knows that
+  shape now.
+- **RULE 13 reads "not enough space".** DV-160 prints it three times and the
+  pattern knew only "need more space". Those three boxes are `courtUse` with
+  their reason: the interview holds each answer to what its box prints, and a
+  drawn continuation page for longer answers is still to build.
+- **The compiler says when it drops a question.** It caught one at once:
+  splitting FL-150's "names and ages" box left two hardship questions anchored
+  before a field that no longer existed.
+
+And the ink check needs real words: a marker is one long word, which a box
+that wraps lines cannot break. DV-160's and MC-410's multi-line boxes failed
+with markers and passed with real text.
+
+Four more came out of the nav audit and the page read:
+
+- **A box with a character limit took nothing.** FL-150's and RA-010's caption
+  STATE boxes hold two characters; the filer's state arrives spelled out, and
+  pdf-lib throws on text longer than a box's limit - the error was caught and
+  the answer vanished. `/edit_pdf` now fits a value to the limit first: a US
+  state or territory becomes its two-letter code (`stateCode` in
+  `dev-server.js`), and anything else is cut and reported as not fitting, so
+  `pipeline-fill.js` fails on it. "California" printed "CA" on both.
+- **The fill guessed a money box from its name.** `hasValidatedShape` knew an
+  amount by the word "amount", so FL-150's household members'
+  `monthly_income` got a marker, the money box stripped the letters, and five
+  required boxes stayed empty with Next locked. The page draws every amount
+  with `inputmode="decimal"`; the fill reads that now.
+- **A section that holds only a block is dropped by the export.** FL-150's
+  "People Who Live With You" held only the household block and vanished,
+  folding the block into "Your Assets". The block now sits behind "Does anyone
+  else live with you?" - a question of the section's own, and a list that
+  starts at one for everyone who answers Yes. List every row of a block's first
+  field in the section, as DV-100 does for other protected people.
+- **A choice anchored to a block's row is never asked.** `before` has to name a
+  field the form asks, and a block's rows are not; the compiler says NOT ASKED,
+  and then invents a gate for whatever waited on the missing choice - worded
+  "Do you want to answer this question?". Anchor before the first real field
+  that follows the block on the paper.
 

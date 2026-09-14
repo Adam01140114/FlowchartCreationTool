@@ -1,0 +1,53 @@
+{
+  "_comment": "MC-031, Attached Declaration: a witness's sworn statement attached to DV-100, brought in when the filer says someone else wants to give one. The parties are DV-100's answers; the packet asks only who the witness is and what they want to say. The witness reads it and signs it. The wording of the shared questions below is for the form compiled on its own.",
+  "sections": [
+    {
+      "name": "The Witness's Statement",
+      "fields": [
+        "person_asking_protection_name",
+        "person_to_restrain_full_name",
+        "mc031_declarant_name",
+        "mc031_declaration_text"
+      ]
+    }
+  ],
+  "questions": {
+    "person_asking_protection_name": {
+      "text": "What is your name?",
+      "_why": "The caption's PLAINTIFF/PETITIONER. DV-100 asks it, so the packet never does here."
+    },
+    "person_to_restrain_full_name": {
+      "text": "Who do you want protection from?",
+      "_why": "The caption's DEFENDANT/RESPONDENT. DV-100 asks it, so the packet never does here."
+    },
+    "mc031_declarant_name": {
+      "text": "What is the full name of the person giving the statement?",
+      "_why": "The name typed under the declarant's signature."
+    },
+    "mc031_declaration_text": {
+      "text": "What does that person want to say in their statement?",
+      "type": "bigParagraph",
+      "subtitle": "Write it in their words: what they saw or heard, and when. They sign it under penalty of perjury, so everything in it must be true. It can be as long as they need.",
+      "_why": "The body of MC-031. What its box cannot print continues on MC-025 (overflow below)."
+    }
+  },
+  "autofill": [
+    {
+      "field": "mc031_signature_date",
+      "from": ["current_date"],
+      "why": "The packet dates every signature the day the papers are prepared, as it does for the filer's."
+    }
+  ],
+  "overflow": {
+    "mc031_declaration_text": {
+      "_why": "Rule the-packet-uses-mc025-for-more-space: a statement longer than MC-031's box continues on MC-025, which says that when the item it continues is made under penalty of perjury, so is the attachment. MC-031 has no \"more space\" box to tick.",
+      "page": {
+        "name": "MC031_Declaration",
+        "heading": "MC-031, Attached Declaration",
+        "item": "",
+        "itemTitle": "",
+        "form": "MC-031"
+      }
+    }
+  }
+}

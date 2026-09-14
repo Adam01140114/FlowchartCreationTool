@@ -1,0 +1,1613 @@
+{
+  "formTitle": "FL-150 Income and Expense Declaration",
+  "_comment": "FL-150 is the filer's financial statement. DV-100 page 13: \"If you are asking for child support or spousal support you must also complete form FL-150.\" Every field is the filer's except the case number, which the court fills in, and the four footer buttons, which are not questions. Names follow the answer, not the form: the caption's party block, the two parties, the court's street address, the filer's age (item 2a), the lawyer's name (item 15 signature) and the number of children (item 16a) carry the names DV-100 and DV-105 already ask them under; everything the packet never asks is fl150_. Columns and rows are read from the rectangles (pipeline-field-labels.js), not the XFA names: item 5 is a last-month column at x=482 and an average-monthly column at x=530; item 12 prints five rows of name, age, relationship, income and a Yes/No; item 14 six rows whose boxes are numbered across the row (TextField 1-12, FillText 1-12, DateField 1-6); item 13 is two columns, a-g at x=257 and h-s at x=517. Item 7's second box is 'business partner' though the label-finder reads '(specify):'. The config lists item 14 before items 13p-s so the interview asks the debts before their total, and the page-3 attorney name beside the header so the lawyer is asked with the lawyer's other details.",
+  "fields": [
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].CourtInfo[0].CrtCounty_ft[0]",
+      "newName": "fl150_court_county",
+      "type": "text",
+      "label": "Superior Court of California, County of"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].CourtInfo[0].Street_ft[0]",
+      "newName": "court_street_address",
+      "type": "text",
+      "label": "Court street address (DV-100 caption)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].CourtInfo[0].MailingAdd_ft[0]",
+      "newName": "fl150_court_mailing_address",
+      "type": "text",
+      "label": "Court mailing address"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].CourtInfo[0].CityZip_ft[0]",
+      "newName": "fl150_court_city_and_zip",
+      "type": "text",
+      "label": "Court city and ZIP code"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].CourtInfo[0].Branch_ft[0]",
+      "newName": "fl150_court_branch_name",
+      "type": "text",
+      "label": "Court branch name"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].AttyInfo[0].AttyName_ft[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Party without attorney or attorney - name (the filer's name, as DV-100 item 1a)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].AttyInfo[0].AttyStreet_ft[0]",
+      "newName": "person_asking_protection_mailing_address",
+      "type": "text",
+      "label": "Street address (DV-100 item 1c)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].AttyInfo[0].AttyCity_ft[0]",
+      "newName": "person_asking_protection_mailing_city",
+      "type": "text",
+      "label": "City (DV-100 item 1c)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].AttyInfo[0].AttyState_ft[0]",
+      "newName": "person_asking_protection_mailing_state",
+      "type": "text",
+      "label": "State (DV-100 item 1c)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].AttyInfo[0].AttyZip_ft[0]",
+      "newName": "person_asking_protection_mailing_zip_code",
+      "type": "text",
+      "label": "ZIP code (DV-100 item 1c)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].AttyInfo[0].Phone_ft[0]",
+      "newName": "person_asking_protection_telephone",
+      "type": "phone",
+      "label": "Telephone number (DV-100 item 1c)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].AttyInfo[0].Fax_ft[0]",
+      "newName": "person_asking_protection_fax",
+      "type": "phone",
+      "label": "Fax number (DV-100 item 1c)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].AttyInfo[0].Email_ft[0]",
+      "newName": "person_asking_protection_email",
+      "type": "email",
+      "label": "Email address (DV-100 item 1c)"
+    },
+    {
+      "id": "FL-150[0].Page3[0].Signsub[0].FillText56[0]",
+      "newName": "person_asking_protection_lawyer_name",
+      "type": "text",
+      "label": "Item 15 - type or print name of attorney (DV-100 item 1d)",
+      "blankWhenNotAsked": "Only a filer with a lawyer names one (DV-100: \"Do you have a lawyer?\"). With no lawyer these lines are rightly blank."
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].AttyInfo[0].BarNo_ft[0]",
+      "newName": "person_asking_protection_lawyer_state_bar_number",
+      "type": "text",
+      "label": "State bar number (DV-100 item 1d)",
+      "blankWhenNotAsked": "Only a filer with a lawyer names one (DV-100: \"Do you have a lawyer?\"). With no lawyer these lines are rightly blank."
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].AttyInfo[0].AttyFirm_ft[0]",
+      "newName": "person_asking_protection_lawyer_firm_name",
+      "type": "text",
+      "label": "Firm name (DV-100 item 1d)",
+      "blankWhenNotAsked": "Only a filer with a lawyer names one (DV-100: \"Do you have a lawyer?\"). With no lawyer these lines are rightly blank."
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].AttyInfo[0].AttyFor_ft[0]",
+      "newName": "fl150_attorney_for",
+      "type": "text",
+      "label": "Attorney for (name) - the filer, only when a lawyer is named"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].TitlePartyName[0].Party1_ft[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Petitioner (Page1)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].TitlePartyName[0].Party2_ft[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "Respondent (Page1)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].TitlePartyName[0].Party3_ft[0]",
+      "newName": "fl150_other_party_name",
+      "type": "text",
+      "label": "Other party/parent/claimant (Page1)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].StdP1Header_sf[0].CaseNumber[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (Page1)",
+      "courtUse": true
+    },
+    {
+      "id": "FL-150[0].Page2[0].PxCaption_sf[0].TitlePartyName[0].Party1_ft[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Petitioner (Page2)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].PxCaption_sf[0].TitlePartyName[0].Party2_ft[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "Respondent (Page2)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].PxCaption_sf[0].TitlePartyName[0].Party3_ft[0]",
+      "newName": "fl150_other_party_name",
+      "type": "text",
+      "label": "Other party/parent/claimant (Page2)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].PxCaption_sf[0].CaseNumber[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (Page2)",
+      "courtUse": true
+    },
+    {
+      "id": "FL-150[0].Page3[0].PxCaption_sf[0].TitlePartyName[0].Party1_ft[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Petitioner (Page3)"
+    },
+    {
+      "id": "FL-150[0].Page3[0].PxCaption_sf[0].TitlePartyName[0].Party2_ft[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "Respondent (Page3)"
+    },
+    {
+      "id": "FL-150[0].Page3[0].PxCaption_sf[0].TitlePartyName[0].Party3_ft[0]",
+      "newName": "fl150_other_party_name",
+      "type": "text",
+      "label": "Other party/parent/claimant (Page3)"
+    },
+    {
+      "id": "FL-150[0].Page3[0].PxCaption_sf[0].CaseNumber[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (Page3)",
+      "courtUse": true
+    },
+    {
+      "id": "FL-150[0].Page4[0].PxCaption_sf[0].TitlePartyName[0].Party1_ft[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Petitioner (Page4)"
+    },
+    {
+      "id": "FL-150[0].Page4[0].PxCaption_sf[0].TitlePartyName[0].Party2_ft[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "Respondent (Page4)"
+    },
+    {
+      "id": "FL-150[0].Page4[0].PxCaption_sf[0].TitlePartyName[0].Party3_ft[0]",
+      "newName": "fl150_other_party_name",
+      "type": "text",
+      "label": "Other party/parent/claimant (Page4)"
+    },
+    {
+      "id": "FL-150[0].Page4[0].PxCaption_sf[0].CaseNumber[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (Page4)",
+      "courtUse": true
+    },
+    {
+      "id": "FL-150[0].Page1[0].List1[0].Li1[0].Employer_tf[0]",
+      "newName": "fl150_employer_name",
+      "type": "text",
+      "label": "1a. Employer"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List1[0].Li2[0].Employer_address_tf[0]",
+      "newName": "fl150_employer_address",
+      "type": "text",
+      "label": "1b. Employer's address"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List1[0].Li3[0].Employer_phone\\.ft[0]",
+      "newName": "fl150_employer_phone",
+      "type": "phone",
+      "label": "1c. Employer's phone number"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List1[0].Li4[0].Party_occupation_tf[0]",
+      "newName": "fl150_occupation",
+      "type": "text",
+      "label": "1d. Occupation"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List1[0].Li5[0].Date_started_job_tf[0]",
+      "newName": "fl150_job_start_date",
+      "type": "date",
+      "label": "1e. Date job started"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List1[0].Li6[0].FillText1[0]",
+      "newName": "fl150_job_end_date",
+      "type": "date",
+      "label": "1f. If unemployed, date job ended"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List1[0].Li7[0].hours_tf[0]",
+      "newName": "fl150_hours_per_week",
+      "type": "number",
+      "label": "1g. I work about ___ hours per week"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List1[0].Li8[0].gross_tf[0]",
+      "newName": "fl150_gross_pay_amount",
+      "type": "money",
+      "label": "1h. I get paid $ ___ gross (before taxes)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List1[0].Li8[0].Gross_cb[0]",
+      "newName": "fl150_gross_pay_per_month",
+      "type": "checkbox",
+      "label": "1h. per month"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List1[0].Li8[0].Gross_cb[1]",
+      "newName": "fl150_gross_pay_per_week",
+      "type": "checkbox",
+      "label": "1h. per week"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List1[0].Li8[0].Gross_cb[2]",
+      "newName": "fl150_gross_pay_per_hour",
+      "type": "checkbox",
+      "label": "1h. per hour"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li1[0].FillText1[0]",
+      "newName": "person_asking_protection_age",
+      "type": "number",
+      "label": "2a. My age is (DV-100 item 1b)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li2[0].HSchl_cb[0]",
+      "newName": "fl150_high_school_completed_yes",
+      "type": "checkbox",
+      "label": "2b. I have completed high school or the equivalent - Yes"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li2[0].HSchl_cb[1]",
+      "newName": "fl150_high_school_completed_no",
+      "type": "checkbox",
+      "label": "2b. I have completed high school or the equivalent - No"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li2[0].FillText1[0]",
+      "newName": "fl150_highest_grade_completed",
+      "type": "text",
+      "label": "2b. If no, highest grade completed"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li3[0].FillText1[0]",
+      "newName": "fl150_college_years_completed",
+      "type": "number",
+      "label": "2c. Number of years of college completed"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li3[0].RB2Choices[0]",
+      "newName": "fl150_college_degree_obtained",
+      "type": "checkbox",
+      "label": "2c. Degree(s) obtained"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li3[0].FillText109[0]",
+      "newName": "fl150_college_degrees",
+      "type": "text",
+      "label": "2c. Degree(s) obtained (specify)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li4[0].FillText1[0]",
+      "newName": "fl150_graduate_years_completed",
+      "type": "number",
+      "label": "2d. Number of years of graduate school completed"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li4[0].RB2Choices[0]",
+      "newName": "fl150_graduate_degree_obtained",
+      "type": "checkbox",
+      "label": "2d. Degree(s) obtained"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li4[0].FillText109[0]",
+      "newName": "fl150_graduate_degrees",
+      "type": "text",
+      "label": "2d. Degree(s) obtained (specify)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li5[0].RB2Choices[0]",
+      "newName": "fl150_has_professional_license",
+      "type": "checkbox",
+      "label": "2e. I have professional/occupational license(s)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li5[0].FillText10[0]",
+      "newName": "fl150_professional_licenses",
+      "type": "text",
+      "label": "2e. Professional/occupational license(s) (specify)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li5[0].RB2Choices[1]",
+      "newName": "fl150_has_vocational_training",
+      "type": "checkbox",
+      "label": "2e. I have vocational training"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List2[0].Li5[0].FillText109[0]",
+      "newName": "fl150_vocational_training",
+      "type": "text",
+      "label": "2e. Vocational training (specify)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List3[0].Li1[0].RB2Choices[0]",
+      "newName": "fl150_filed_taxes",
+      "type": "checkbox",
+      "label": "3a. I last filed taxes for tax year"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List3[0].Li1[0].FillText109[0]",
+      "newName": "fl150_last_tax_year",
+      "type": "number",
+      "label": "3a. Tax year (specify year)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List3[0].Li2[0].Tax_cb1[0]",
+      "newName": "fl150_tax_status_single",
+      "type": "checkbox",
+      "label": "3b. Filing status single"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List3[0].Li2[0].Tax_cb2[0]",
+      "newName": "fl150_tax_status_head_of_household",
+      "type": "checkbox",
+      "label": "3b. Filing status head of household"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List3[0].Li2[0].Tax_cb3[0]",
+      "newName": "fl150_tax_status_married_separately",
+      "type": "checkbox",
+      "label": "3b. Filing status married, filing separately"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List3[0].Li2[0].RB2Choices[0]",
+      "newName": "fl150_tax_status_married_jointly",
+      "type": "checkbox",
+      "label": "3b. Filing status married, filing jointly with"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List3[0].Li2[0].FillText109[0]",
+      "newName": "fl150_tax_joint_filer_name",
+      "type": "text",
+      "label": "3b. Married, filing jointly with (specify name)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List3[0].Li3[0].TaxSt_cb[0]",
+      "newName": "fl150_state_tax_california",
+      "type": "checkbox",
+      "label": "3c. I file state tax returns in California"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List3[0].Li3[0].TaxSt_CB[0]",
+      "newName": "fl150_state_tax_other",
+      "type": "checkbox",
+      "label": "3c. I file state tax returns in another state"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List3[0].Li3[0].FillText109[0]",
+      "newName": "fl150_state_tax_other_state",
+      "type": "text",
+      "label": "3c. Other (specify state)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List3[0].Li4[0].FillText1[0]",
+      "newName": "fl150_tax_exemptions",
+      "type": "number",
+      "label": "3d. Number of exemptions (including myself)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List4[0].Li1[0].FillTextincm[0]",
+      "newName": "fl150_other_party_monthly_income",
+      "type": "money",
+      "label": "4. Other party's gross monthly income (estimate)"
+    },
+    {
+      "id": "FL-150[0].Page1[0].List4[0].Li1[0].FillText1[0]",
+      "newName": "fl150_other_party_income_basis",
+      "type": "text",
+      "label": "4. This estimate is based on (explain)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li1[0].FillText1[0]",
+      "newName": "fl150_income_salary_last_month",
+      "type": "money",
+      "label": "5a. Salary or wages - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li1[0].TextField7[0]",
+      "newName": "fl150_income_salary_average",
+      "type": "money",
+      "label": "5a. Salary or wages - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li2[0].FillText1[0]",
+      "newName": "fl150_income_overtime_last_month",
+      "type": "money",
+      "label": "5b. Overtime - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li2[0].TextField8[0]",
+      "newName": "fl150_income_overtime_average",
+      "type": "money",
+      "label": "5b. Overtime - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li3[0].FillText1[0]",
+      "newName": "fl150_income_commissions_last_month",
+      "type": "money",
+      "label": "5c. Commissions or bonuses - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li3[0].TextField9[0]",
+      "newName": "fl150_income_commissions_average",
+      "type": "money",
+      "label": "5c. Commissions or bonuses - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li4[0].FillText1[0]",
+      "newName": "fl150_income_public_assistance_last_month",
+      "type": "money",
+      "label": "5d. Public assistance - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li4[0].TextField10[0]",
+      "newName": "fl150_income_public_assistance_average",
+      "type": "money",
+      "label": "5d. Public assistance - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li4[0].CBChoice1_cb[0]",
+      "newName": "fl150_public_assistance_currently_receiving",
+      "type": "checkbox",
+      "label": "5d. Currently receiving"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li5[0].FillText1[0]",
+      "newName": "fl150_income_spousal_support_last_month",
+      "type": "money",
+      "label": "5e. Spousal support - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li5[0].TextField11[0]",
+      "newName": "fl150_income_spousal_support_average",
+      "type": "money",
+      "label": "5e. Spousal support - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li5[0].CBChoice1_cb[0]",
+      "newName": "fl150_spousal_support_from_this_marriage",
+      "type": "checkbox",
+      "label": "5e. From this marriage"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li5[0].CBChoice1_cb2[0]",
+      "newName": "fl150_spousal_support_from_different_marriage",
+      "type": "checkbox",
+      "label": "5e. From a different marriage"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li5[0].CBChoice1_cb3[0]",
+      "newName": "fl150_spousal_support_received_taxable",
+      "type": "checkbox",
+      "label": "5e. Federally taxable*"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li6[0].FillText1[0]",
+      "newName": "fl150_income_partner_support_last_month",
+      "type": "money",
+      "label": "5f. Partner support - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li6[0].TextField12[0]",
+      "newName": "fl150_income_partner_support_average",
+      "type": "money",
+      "label": "5f. Partner support - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li6[0].CBChoice1_cb[0]",
+      "newName": "fl150_partner_support_from_this_partnership",
+      "type": "checkbox",
+      "label": "5f. From this domestic partnership"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li6[0].CBChoice1_cb2[0]",
+      "newName": "fl150_partner_support_from_different_partnership",
+      "type": "checkbox",
+      "label": "5f. From a different domestic partnership"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li7[0].FillText1[0]",
+      "newName": "fl150_income_pension_last_month",
+      "type": "money",
+      "label": "5g. Pension/retirement fund payments - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li7[0].TextField13[0]",
+      "newName": "fl150_income_pension_average",
+      "type": "money",
+      "label": "5g. Pension/retirement fund payments - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li8[0].FillText1[0]",
+      "newName": "fl150_income_social_security_last_month",
+      "type": "money",
+      "label": "5h. Social Security retirement (not SSI) - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li8[0].TextField14[0]",
+      "newName": "fl150_income_social_security_average",
+      "type": "money",
+      "label": "5h. Social Security retirement (not SSI) - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li9[0].FillText1[0]",
+      "newName": "fl150_income_disability_last_month",
+      "type": "money",
+      "label": "5i. Disability - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li9[0].TextField15[0]",
+      "newName": "fl150_income_disability_average",
+      "type": "money",
+      "label": "5i. Disability - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li9[0].CBChoice1_cb[0]",
+      "newName": "fl150_disability_social_security",
+      "type": "checkbox",
+      "label": "5i. Social Security (not SSI)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li9[0].CBChoice1_cb1[0]",
+      "newName": "fl150_disability_state",
+      "type": "checkbox",
+      "label": "5i. State disability (SDI)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li9[0].CBChoice1_cb2[0]",
+      "newName": "fl150_disability_private_insurance",
+      "type": "checkbox",
+      "label": "5i. Private insurance"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li10[0].FillText1[0]",
+      "newName": "fl150_income_unemployment_last_month",
+      "type": "money",
+      "label": "5j. Unemployment compensation - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li10[0].TextField16[0]",
+      "newName": "fl150_income_unemployment_average",
+      "type": "money",
+      "label": "5j. Unemployment compensation - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li11[0].FillText1[0]",
+      "newName": "fl150_income_workers_comp_last_month",
+      "type": "money",
+      "label": "5k. Workers' compensation - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li11[0].TextField17[0]",
+      "newName": "fl150_income_workers_comp_average",
+      "type": "money",
+      "label": "5k. Workers' compensation - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li12[0].FillText1[0]",
+      "newName": "fl150_income_other_description",
+      "type": "text",
+      "label": "5l. Other (specify)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li12[0].FillText2[0]",
+      "newName": "fl150_income_other_last_month",
+      "type": "money",
+      "label": "5l. Other (military allowances, royalty payments) - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List5[0].Li12[0].TextField18[0]",
+      "newName": "fl150_income_other_average",
+      "type": "money",
+      "label": "5l. Other (military allowances, royalty payments) - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List6[0].Li1[0].FillText1[0]",
+      "newName": "fl150_income_dividends_last_month",
+      "type": "money",
+      "label": "6a. Dividends/interest - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List6[0].Li1[0].TextField23[0]",
+      "newName": "fl150_income_dividends_average",
+      "type": "money",
+      "label": "6a. Dividends/interest - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List6[0].L2[0].FillText1[0]",
+      "newName": "fl150_income_rental_last_month",
+      "type": "money",
+      "label": "6b. Rental property income - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List6[0].L2[0].TextField22[0]",
+      "newName": "fl150_income_rental_average",
+      "type": "money",
+      "label": "6b. Rental property income - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List6[0].L3[0].FillText1[0]",
+      "newName": "fl150_income_trust_last_month",
+      "type": "money",
+      "label": "6c. Trust income - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List6[0].L3[0].TextField21[0]",
+      "newName": "fl150_income_trust_average",
+      "type": "money",
+      "label": "6c. Trust income - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List6[0].L4[0].FillText1[0]",
+      "newName": "fl150_income_other_investment_description",
+      "type": "text",
+      "label": "6d. Other (specify)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List6[0].L4[0].FillText2[0]",
+      "newName": "fl150_income_other_investment_last_month",
+      "type": "money",
+      "label": "6d. Other investment income - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List6[0].L4[0].TextField20[0]",
+      "newName": "fl150_income_other_investment_average",
+      "type": "money",
+      "label": "6d. Other investment income - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List7[0].L1[0].FillTxt1[0]",
+      "newName": "fl150_income_self_employment_last_month",
+      "type": "money",
+      "label": "7. Income from self-employment - last month"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List7[0].L1[0].TextField[0]",
+      "newName": "fl150_income_self_employment_average",
+      "type": "money",
+      "label": "7. Income from self-employment - average monthly"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List7[0].L1[0].CBChoice1_cb[0]",
+      "newName": "fl150_business_role_owner",
+      "type": "checkbox",
+      "label": "7. I am the owner/sole proprietor"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List7[0].L1[0].CBChoice1_cb1[0]",
+      "newName": "fl150_business_role_partner",
+      "type": "checkbox",
+      "label": "7. I am a business partner"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List7[0].L1[0].RB2Choices[0]",
+      "newName": "fl150_business_role_other",
+      "type": "checkbox",
+      "label": "7. I am other"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List7[0].L1[0].FillText109[0]",
+      "newName": "fl150_business_role_other_description",
+      "type": "text",
+      "label": "7. Other (specify)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List7[0].L1[0].FillText2[0]",
+      "newName": "fl150_business_name",
+      "type": "text",
+      "label": "7. Name of business"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List7[0].L1[0].FillText3[0]",
+      "newName": "fl150_business_type",
+      "type": "text",
+      "label": "7. Type of business"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List7[0].L1[0].FillText1[0]",
+      "newName": "fl150_business_years",
+      "type": "number",
+      "label": "7. Number of years in this business"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List8[0].Li1[0].CheckBox19[0]",
+      "newName": "fl150_one_time_money_received",
+      "type": "checkbox",
+      "label": "8. Additional income - I received one-time money in the last 12 months"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List8[0].Li1[0].TextField6[0]",
+      "newName": "fl150_one_time_money_details",
+      "type": "text",
+      "label": "8. One-time money (specify source and amount)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List9[0].L1[0].CheckBox1[0]",
+      "newName": "fl150_income_changed",
+      "type": "checkbox",
+      "label": "9. Change in income - my financial situation has changed significantly over the last 12 months"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List9[0].L1[0].TextField6[0]",
+      "newName": "fl150_income_change_description",
+      "type": "text",
+      "label": "9. Because (specify)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List10[0].L1[0].FillText1[0]",
+      "newName": "fl150_deduction_union_dues",
+      "type": "money",
+      "label": "10a. Required union dues"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List10[0].L2[0].FillText1[0]",
+      "newName": "fl150_deduction_retirement",
+      "type": "money",
+      "label": "10b. Required retirement payments"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List10[0].L3[0].FillText1[0]",
+      "newName": "fl150_deduction_health_insurance",
+      "type": "money",
+      "label": "10c. Health insurance premiums (total monthly amount)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List10[0].L4[0].FillText1[0]",
+      "newName": "fl150_deduction_child_support",
+      "type": "money",
+      "label": "10d. Child support I pay for children from other relationships"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List10[0].L5[0].FillText1[0]",
+      "newName": "fl150_deduction_spousal_support",
+      "type": "money",
+      "label": "10e. Spousal support I pay by court order from a different marriage"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List10[0].L5[0].CBChoice1_cb[0]",
+      "newName": "fl150_deduction_spousal_support_deductible",
+      "type": "checkbox",
+      "label": "10e. Federally tax deductible*"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List10[0].L6[0].FillText1[0]",
+      "newName": "fl150_deduction_partner_support",
+      "type": "money",
+      "label": "10f. Partner support I pay by court order from a different domestic partnership"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List10[0].L7[0].FillText1[0]",
+      "newName": "fl150_deduction_job_expenses",
+      "type": "money",
+      "label": "10g. Necessary job-related expenses not reimbursed by my employer"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List11[0].L1[0].FillText1[0]",
+      "newName": "fl150_assets_cash",
+      "type": "money",
+      "label": "11a. Cash and checking accounts, savings, credit union, money market, and other deposit accounts"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List11[0].L2[0].FillText1[0]",
+      "newName": "fl150_assets_stocks",
+      "type": "money",
+      "label": "11b. Stocks, bonds, and other assets I could easily sell"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List11[0].L3[0].FillText1[0]",
+      "newName": "fl150_assets_other_property",
+      "type": "money",
+      "label": "11c. All other property (fair market value minus debts owed)"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List11[0].L3[0].realcb[0]",
+      "newName": "fl150_assets_other_property_real",
+      "type": "checkbox",
+      "label": "11c. Real"
+    },
+    {
+      "id": "FL-150[0].Page2[0].List11[0].L3[0].persncb[0]",
+      "newName": "fl150_assets_other_property_personal",
+      "type": "checkbox",
+      "label": "11c. Personal"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L1[0].FillText1[0]",
+      "newName": "fl150_household_member_1_name",
+      "type": "text",
+      "label": "12a. Name"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L1[0].TextField1[0]",
+      "newName": "fl150_household_member_1_age",
+      "type": "number",
+      "label": "12a. Age"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L1[0].TextField2[0]",
+      "newName": "fl150_household_member_1_relationship",
+      "type": "text",
+      "label": "12a. How the person is related to me"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L1[0].TextField3[0]",
+      "newName": "fl150_household_member_1_monthly_income",
+      "type": "money",
+      "label": "12a. That person's gross monthly income"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L1[0].item12a_cb[0]",
+      "newName": "fl150_household_member_1_pays_expenses_yes",
+      "type": "checkbox",
+      "label": "12a. Pays some of the household expenses - Yes"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L1[0].item12a_cb[1]",
+      "newName": "fl150_household_member_1_pays_expenses_no",
+      "type": "checkbox",
+      "label": "12a. Pays some of the household expenses - No"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L2[0].FillText1[0]",
+      "newName": "fl150_household_member_2_name",
+      "type": "text",
+      "label": "12b. Name"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L2[0].TextField[0]",
+      "newName": "fl150_household_member_2_age",
+      "type": "number",
+      "label": "12b. Age"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L2[0].TextField1[0]",
+      "newName": "fl150_household_member_2_relationship",
+      "type": "text",
+      "label": "12b. How the person is related to me"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L2[0].TextField2[0]",
+      "newName": "fl150_household_member_2_monthly_income",
+      "type": "money",
+      "label": "12b. That person's gross monthly income"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L2[0].People2_cb[0]",
+      "newName": "fl150_household_member_2_pays_expenses_yes",
+      "type": "checkbox",
+      "label": "12b. Pays some of the household expenses - Yes"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L2[0].People2_cb[1]",
+      "newName": "fl150_household_member_2_pays_expenses_no",
+      "type": "checkbox",
+      "label": "12b. Pays some of the household expenses - No"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L3[0].FillText1[0]",
+      "newName": "fl150_household_member_3_name",
+      "type": "text",
+      "label": "12c. Name"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L3[0].TextField[0]",
+      "newName": "fl150_household_member_3_age",
+      "type": "number",
+      "label": "12c. Age"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L3[0].TextField1[0]",
+      "newName": "fl150_household_member_3_relationship",
+      "type": "text",
+      "label": "12c. How the person is related to me"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L3[0].TextField6[0]",
+      "newName": "fl150_household_member_3_monthly_income",
+      "type": "money",
+      "label": "12c. That person's gross monthly income"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L3[0].People3_cb[0]",
+      "newName": "fl150_household_member_3_pays_expenses_yes",
+      "type": "checkbox",
+      "label": "12c. Pays some of the household expenses - Yes"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L3[0].People3_cb[1]",
+      "newName": "fl150_household_member_3_pays_expenses_no",
+      "type": "checkbox",
+      "label": "12c. Pays some of the household expenses - No"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L4[0].FillText1[0]",
+      "newName": "fl150_household_member_4_name",
+      "type": "text",
+      "label": "12d. Name"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L4[0].TextField[0]",
+      "newName": "fl150_household_member_4_age",
+      "type": "number",
+      "label": "12d. Age"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L4[0].TextField1[0]",
+      "newName": "fl150_household_member_4_relationship",
+      "type": "text",
+      "label": "12d. How the person is related to me"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L4[0].TextField6[0]",
+      "newName": "fl150_household_member_4_monthly_income",
+      "type": "money",
+      "label": "12d. That person's gross monthly income"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L4[0].People4_cb[0]",
+      "newName": "fl150_household_member_4_pays_expenses_yes",
+      "type": "checkbox",
+      "label": "12d. Pays some of the household expenses - Yes"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L4[0].People4_cb[1]",
+      "newName": "fl150_household_member_4_pays_expenses_no",
+      "type": "checkbox",
+      "label": "12d. Pays some of the household expenses - No"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L5[0].FillText1[0]",
+      "newName": "fl150_household_member_5_name",
+      "type": "text",
+      "label": "12e. Name"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L5[0].TextField[0]",
+      "newName": "fl150_household_member_5_age",
+      "type": "number",
+      "label": "12e. Age"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L5[0].TextField1[0]",
+      "newName": "fl150_household_member_5_relationship",
+      "type": "text",
+      "label": "12e. How the person is related to me"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L5[0].TextField6[0]",
+      "newName": "fl150_household_member_5_monthly_income",
+      "type": "money",
+      "label": "12e. That person's gross monthly income"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L5[0].People5_cb[0]",
+      "newName": "fl150_household_member_5_pays_expenses_yes",
+      "type": "checkbox",
+      "label": "12e. Pays some of the household expenses - Yes"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List12[0].L5[0].People5_cb[1]",
+      "newName": "fl150_household_member_5_pays_expenses_no",
+      "type": "checkbox",
+      "label": "12e. Pays some of the household expenses - No"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].MonthEx_cb[0]",
+      "newName": "fl150_expense_basis_estimated",
+      "type": "checkbox",
+      "label": "13. Estimated expenses"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].MonthEx_cb[1]",
+      "newName": "fl150_expense_basis_actual",
+      "type": "checkbox",
+      "label": "13. Actual expenses"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].MonthEx_cb[2]",
+      "newName": "fl150_expense_basis_proposed",
+      "type": "checkbox",
+      "label": "13. Proposed needs"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li1[0].List[0].L1[0].EXPN[0]",
+      "newName": "fl150_expense_rent_or_mortgage",
+      "type": "money",
+      "label": "13a(1). Rent or mortgage"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li1[0].List[0].L1[0].CBChoice1_cb[0]",
+      "newName": "fl150_expense_home_rent",
+      "type": "checkbox",
+      "label": "13a(1). Rent"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li1[0].List[0].L1[0].CBChoice1_cb1[0]",
+      "newName": "fl150_expense_home_mortgage",
+      "type": "checkbox",
+      "label": "13a(1). Mortgage"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li1[0].List[0].L1[0].List[0].L1[0].MortPrin[0]",
+      "newName": "fl150_expense_mortgage_principal",
+      "type": "money",
+      "label": "13a(1)(a). If mortgage, average principal"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li1[0].List[0].L1[0].List[0].L2[0].MortInt[0]",
+      "newName": "fl150_expense_mortgage_interest",
+      "type": "money",
+      "label": "13a(1)(b). If mortgage, average interest"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li1[0].List[0].L2[0].EXPN[0]",
+      "newName": "fl150_expense_property_taxes",
+      "type": "money",
+      "label": "13a(2). Real property taxes"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li1[0].List[0].L3[0].EXPN[0]",
+      "newName": "fl150_expense_home_insurance",
+      "type": "money",
+      "label": "13a(3). Homeowner's or renter's insurance"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li1[0].List[0].L4[0].EXPN[0]",
+      "newName": "fl150_expense_maintenance",
+      "type": "money",
+      "label": "13a(4). Maintenance and repair"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li2[0].EXPN[0]",
+      "newName": "fl150_expense_health_care",
+      "type": "money",
+      "label": "13b. Health-care costs not paid by insurance"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li3[0].EXPN[0]",
+      "newName": "fl150_expense_child_care",
+      "type": "money",
+      "label": "13c. Child care"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li4[0].EXPN[0]",
+      "newName": "fl150_expense_groceries",
+      "type": "money",
+      "label": "13d. Groceries and household supplies"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li5[0].EXPN[0]",
+      "newName": "fl150_expense_eating_out",
+      "type": "money",
+      "label": "13e. Eating out"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li6[0].EXPN[0]",
+      "newName": "fl150_expense_utilities",
+      "type": "money",
+      "label": "13f. Utilities (gas, electric, water, trash)"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li7[0].EXPN[0]",
+      "newName": "fl150_expense_telephone_cost",
+      "type": "money",
+      "label": "13g. Telephone, cell phone, and e-mail"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li8[0].EXPN[0]",
+      "newName": "fl150_expense_laundry",
+      "type": "money",
+      "label": "13h. Laundry and cleaning"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li9[0].EXPN[0]",
+      "newName": "fl150_expense_clothes",
+      "type": "money",
+      "label": "13i. Clothes"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li10[0].EXPN[0]",
+      "newName": "fl150_expense_education",
+      "type": "money",
+      "label": "13j. Education"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li11[0].EXPN[0]",
+      "newName": "fl150_expense_entertainment",
+      "type": "money",
+      "label": "13k. Entertainment, gifts, and vacation"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li12[0].EXPN[0]",
+      "newName": "fl150_expense_auto",
+      "type": "money",
+      "label": "13l. Auto expenses and transportation"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li13[0].EXPN[0]",
+      "newName": "fl150_expense_insurance",
+      "type": "money",
+      "label": "13m. Insurance (life, accident, etc.)"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li14[0].EXPN[0]",
+      "newName": "fl150_expense_savings",
+      "type": "money",
+      "label": "13n. Savings and investments"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li15[0].EXPN[0]",
+      "newName": "fl150_expense_charitable",
+      "type": "money",
+      "label": "13o. Charitable contributions"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField1[0]",
+      "newName": "fl150_debt_1_paid_to",
+      "type": "text",
+      "label": "14 row 1. Paid to"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField2[0]",
+      "newName": "fl150_debt_1_for",
+      "type": "text",
+      "label": "14 row 1. For"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText1[0]",
+      "newName": "fl150_debt_1_monthly_payment",
+      "type": "money",
+      "label": "14 row 1. Amount"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText2[0]",
+      "newName": "fl150_debt_1_balance",
+      "type": "money",
+      "label": "14 row 1. Balance"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].DateField1[0]",
+      "newName": "fl150_debt_1_last_payment_date",
+      "type": "date",
+      "label": "14 row 1. Date of last payment"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField3[0]",
+      "newName": "fl150_debt_2_paid_to",
+      "type": "text",
+      "label": "14 row 2. Paid to"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField4[0]",
+      "newName": "fl150_debt_2_for",
+      "type": "text",
+      "label": "14 row 2. For"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText3[0]",
+      "newName": "fl150_debt_2_monthly_payment",
+      "type": "money",
+      "label": "14 row 2. Amount"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText4[0]",
+      "newName": "fl150_debt_2_balance",
+      "type": "money",
+      "label": "14 row 2. Balance"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].DateField2[0]",
+      "newName": "fl150_debt_2_last_payment_date",
+      "type": "date",
+      "label": "14 row 2. Date of last payment"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField5[0]",
+      "newName": "fl150_debt_3_paid_to",
+      "type": "text",
+      "label": "14 row 3. Paid to"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField6[0]",
+      "newName": "fl150_debt_3_for",
+      "type": "text",
+      "label": "14 row 3. For"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText5[0]",
+      "newName": "fl150_debt_3_monthly_payment",
+      "type": "money",
+      "label": "14 row 3. Amount"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText6[0]",
+      "newName": "fl150_debt_3_balance",
+      "type": "money",
+      "label": "14 row 3. Balance"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].DateField3[0]",
+      "newName": "fl150_debt_3_last_payment_date",
+      "type": "date",
+      "label": "14 row 3. Date of last payment"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField7[0]",
+      "newName": "fl150_debt_4_paid_to",
+      "type": "text",
+      "label": "14 row 4. Paid to"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField8[0]",
+      "newName": "fl150_debt_4_for",
+      "type": "text",
+      "label": "14 row 4. For"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText7[0]",
+      "newName": "fl150_debt_4_monthly_payment",
+      "type": "money",
+      "label": "14 row 4. Amount"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText8[0]",
+      "newName": "fl150_debt_4_balance",
+      "type": "money",
+      "label": "14 row 4. Balance"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].DateField4[0]",
+      "newName": "fl150_debt_4_last_payment_date",
+      "type": "date",
+      "label": "14 row 4. Date of last payment"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField9[0]",
+      "newName": "fl150_debt_5_paid_to",
+      "type": "text",
+      "label": "14 row 5. Paid to"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField10[0]",
+      "newName": "fl150_debt_5_for",
+      "type": "text",
+      "label": "14 row 5. For"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText9[0]",
+      "newName": "fl150_debt_5_monthly_payment",
+      "type": "money",
+      "label": "14 row 5. Amount"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText10[0]",
+      "newName": "fl150_debt_5_balance",
+      "type": "money",
+      "label": "14 row 5. Balance"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].DateField5[0]",
+      "newName": "fl150_debt_5_last_payment_date",
+      "type": "date",
+      "label": "14 row 5. Date of last payment"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField11[0]",
+      "newName": "fl150_debt_6_paid_to",
+      "type": "text",
+      "label": "14 row 6. Paid to"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].TextField12[0]",
+      "newName": "fl150_debt_6_for",
+      "type": "text",
+      "label": "14 row 6. For"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText11[0]",
+      "newName": "fl150_debt_6_monthly_payment",
+      "type": "money",
+      "label": "14 row 6. Amount"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].FillText12[0]",
+      "newName": "fl150_debt_6_balance",
+      "type": "money",
+      "label": "14 row 6. Balance"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List14[0].L1[0].DateField6[0]",
+      "newName": "fl150_debt_6_last_payment_date",
+      "type": "date",
+      "label": "14 row 6. Date of last payment"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li16[0].EXPN[0]",
+      "newName": "fl150_expense_installment_payments_total",
+      "type": "money",
+      "label": "13p. Monthly payments listed in item 14 (total)"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li17[0].FillText1[0]",
+      "newName": "fl150_expense_other_description",
+      "type": "text",
+      "label": "13q. Other (specify)"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li17[0].EXPN[0]",
+      "newName": "fl150_expense_other_amount",
+      "type": "money",
+      "label": "13q. Other - amount"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li18[0].TOTAL[0]",
+      "newName": "fl150_expense_total",
+      "type": "money",
+      "label": "13r. TOTAL EXPENSES (a-q)"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List13[0].Li19[0].EXPNother[0]",
+      "newName": "fl150_expense_paid_by_others",
+      "type": "money",
+      "label": "13s. Amount of expenses paid by others"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List15[0].L1[0].FillText1[0]",
+      "newName": "fl150_attorney_fees_paid",
+      "type": "money",
+      "label": "15a. Paid my attorney to date for fees and costs"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List15[0].L2[0].FillText1[0]",
+      "newName": "fl150_attorney_fees_source",
+      "type": "text",
+      "label": "15b. The source of this money was"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List15[0].L3[0].FillText1[0]",
+      "newName": "fl150_attorney_fees_owed",
+      "type": "money",
+      "label": "15c. I still owe my attorney (total owed)"
+    },
+    {
+      "id": "FL-150[0].Page3[0].List15[0].L4[0].FillText1[0]",
+      "newName": "fl150_attorney_hourly_rate",
+      "type": "money",
+      "label": "15d. My attorney's hourly rate"
+    },
+    {
+      "id": "FL-150[0].Page3[0].Signsub[0].FillText1140[0]",
+      "newName": "fl150_attorney_signature_date",
+      "type": "date",
+      "label": "15. Attorney's signature date"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List16[0].L1[0].TextField6[0]",
+      "newName": "dv105_child",
+      "type": "number",
+      "label": "16a. I have (specify number) children under the age of 18 with the other parent (the count DV-100 item 3 / DV-105 item 3 asks)"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List16[0].L2[0].TextField[0]",
+      "newName": "fl150_percent_time_with_me",
+      "type": "number",
+      "label": "16b. Percent of their time with me"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List16[0].L2[0].TextField1[0]",
+      "newName": "fl150_percent_time_with_other_parent",
+      "type": "number",
+      "label": "16b. Percent of their time with the other parent"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List16[0].L2[0].TextField6[0]",
+      "newName": "fl150_parenting_schedule_description",
+      "type": "textarea",
+      "label": "16b. Describe your parenting schedule"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List17[0].L1[0].ChildHC_cb[0]",
+      "newName": "fl150_child_health_insurance_available_yes",
+      "type": "checkbox",
+      "label": "17a. I do have health insurance available to me for the children through my job"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List17[0].L1[0].ChildHC_cb[1]",
+      "newName": "fl150_child_health_insurance_available_no",
+      "type": "checkbox",
+      "label": "17a. I do not have health insurance available to me for the children through my job"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List17[0].L2[0].FillText1[0]",
+      "newName": "fl150_child_health_insurance_company",
+      "type": "text",
+      "label": "17b. Name of insurance company"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List17[0].L3[0].TextField6[0]",
+      "newName": "fl150_child_health_insurance_company_address",
+      "type": "textarea",
+      "label": "17c. Address of insurance company"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List17[0].L4[0].FillText1[0]",
+      "newName": "fl150_child_health_insurance_monthly_cost",
+      "type": "money",
+      "label": "17d. Monthly cost for the children's health insurance"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List18[0].L1[0].FillText1[0]",
+      "newName": "fl150_child_expense_childcare",
+      "type": "money",
+      "label": "18a. Childcare so I can work or get job training"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List18[0].L2[0].FillText1[0]",
+      "newName": "fl150_child_expense_health_care",
+      "type": "money",
+      "label": "18b. Children's health care not covered by insurance"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List18[0].L3[0].FillText1[0]",
+      "newName": "fl150_child_expense_travel",
+      "type": "money",
+      "label": "18c. Travel expenses for visitation"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List18[0].L4[0].FillText1[0]",
+      "newName": "fl150_child_special_needs_description",
+      "type": "text",
+      "label": "18d. Children's educational or other special needs (specify)"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List18[0].L4[0].FillText2[0]",
+      "newName": "fl150_child_expense_special_needs",
+      "type": "money",
+      "label": "18d. Children's educational or other special needs - amount per month"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List19[0].L1[0].FillText1[0]",
+      "newName": "fl150_hardship_health_amount",
+      "type": "money",
+      "label": "19a. Extraordinary health expenses - amount per month"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List19[0].L1[0].TextField24[0]",
+      "newName": "fl150_hardship_health_months",
+      "type": "number",
+      "label": "19a. For how many months"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List19[0].L2[0].FillText1[0]",
+      "newName": "fl150_hardship_losses_amount",
+      "type": "money",
+      "label": "19b. Major losses not covered by insurance - amount per month"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List19[0].L2[0].TextField25[0]",
+      "newName": "fl150_hardship_losses_months",
+      "type": "number",
+      "label": "19b. For how many months"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List19[0].L3[0].List[0].L1[0].FillText1[0]",
+      "newName": "fl150_hardship_other_children_amount",
+      "type": "money",
+      "label": "19c(1). Expenses for my minor children from other relationships living with me - amount per month"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List19[0].L3[0].List[0].L1[0].TextField26[0]",
+      "newName": "fl150_hardship_other_children_months",
+      "type": "number",
+      "label": "19c(1). For how many months"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List19[0].L3[0].List[0].L2[0].TextField6[0]",
+      "newName": "fl150_hardship_other_children_names_and_ages",
+      "type": "textarea",
+      "label": "19c(2). Names and ages of those children"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List19[0].L3[0].List[0].L3[0].FillText1[0]",
+      "newName": "fl150_hardship_other_children_support_received",
+      "type": "money",
+      "label": "19c(3). Child support I receive for those children"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List19[0].L3[0].TextField6[0]",
+      "newName": "fl150_hardship_explanation",
+      "type": "textarea",
+      "label": "19. The expenses listed create an extreme financial hardship because (explain)"
+    },
+    {
+      "id": "FL-150[0].Page4[0].List20[0].L1[0].TextField6[0]",
+      "newName": "fl150_other_support_information",
+      "type": "textarea",
+      "label": "20. Other information I want the court to know concerning support in my case"
+    },
+    {
+      "id": "FL-150[0].Page1[0].FillTextpage[0]",
+      "newName": "fl150_pages_attached",
+      "type": "number",
+      "label": "Number of pages attached"
+    },
+    {
+      "id": "FL-150[0].Page1[0].Signdate[0]",
+      "newName": "fl150_signature_date",
+      "type": "date",
+      "label": "Declarant's signature date"
+    },
+    {
+      "id": "FL-150[0].Page1[0].FillText56[0]",
+      "newName": "fl150_signature_printed_name",
+      "type": "text",
+      "label": "Declarant - type or print name"
+    },
+    {
+      "id": "FL-150[0].#pageSet[0].LastPage[0].T23[0]",
+      "newName": "fl150_title_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "FL-150[0].#pageSet[0].LastPage[0].Print_bt[0]",
+      "newName": "fl150_print_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "FL-150[0].#pageSet[0].LastPage[0].Save_bt[0]",
+      "newName": "fl150_save_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "FL-150[0].#pageSet[0].LastPage[0].Reset_bt[0]",
+      "newName": "fl150_reset_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    }
+  ]
+}

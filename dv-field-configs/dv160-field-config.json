@@ -1,0 +1,501 @@
+{
+  "formTitle": "DV-160 Request to Keep Minor's Information Confidential",
+  "_comment": "DV-160 is the filer's request, filed with DV-100 when the case includes sensitive information about a minor (DV-100 page 1 points to DV-160-INFO). Every field but the case number and the form's buttons is the filer's. What the packet already knows carries the packet's names: the court and the two parties (DV-100 items 1 and 2), the filer's mailing address, phone, fax, email and lawyer (DV-100 item 1), and the minors, which are the children DV-100 asks under DV-105's block name - the same four rows DV-140 item 3 fills. The person making the request (item 2a) is the filer. Everything new is dv160_. The 5c(2) table is mapped by geometry, not XFA order: the left column is the location, the right the information, and the rows run (a)=[0], (b)=[3], (c)=[2], (d)=[1].",
+  "fields": [
+    {
+      "id": "DV-160[0].Page1[0].Caption_sf[0].CourtInfo_ft[0]",
+      "newName": "court_name_and_street_address",
+      "type": "text",
+      "label": "Court name and street address (caption)"
+    },
+    {
+      "id": "DV-160[0].Page1[0].Caption_sf[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 1)",
+      "courtUse": true
+    },
+    {
+      "id": "DV-160[0].Page1[0].ProtectedFullName_ft[5]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "1a. Person who requested restraining order - full name"
+    },
+    {
+      "id": "DV-160[0].Page1[0].ProtectedFullName_ft[6]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "1b. Person to be restrained - full name"
+    },
+    {
+      "id": "DV-160[0].Page1[0].ProtectedFullName_ft[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "2a. Person making request for confidentiality - full name"
+    },
+    {
+      "id": "DV-160[0].Page1[0].ProtectedDescription[0]",
+      "newName": "dv160_requester_is_minor",
+      "type": "checkbox",
+      "label": "2b(1). I am the minor requesting confidentiality"
+    },
+    {
+      "id": "DV-160[0].Page1[0].ProtectedDescription[1]",
+      "newName": "dv160_requester_is_parent_or_guardian",
+      "type": "checkbox",
+      "label": "2b(2). I am the parent or legal guardian of the minors listed below"
+    },
+    {
+      "id": "DV-160[0].Page1[0].parent[0]",
+      "newName": "dv160_requester_parent",
+      "type": "checkbox",
+      "label": "2b(2). Parent"
+    },
+    {
+      "id": "DV-160[0].Page1[0].parent[1]",
+      "newName": "dv160_requester_legal_guardian",
+      "type": "checkbox",
+      "label": "2b(2). Legal guardian"
+    },
+    {
+      "id": "DV-160[0].Page1[0].ProtectedFullName_ft[1]",
+      "newName": "dv160_minor_1_name",
+      "type": "text",
+      "label": "2b(2). Minor 1 - name"
+    },
+    {
+      "id": "DV-160[0].Page1[0].ProtectedFullName_ft[2]",
+      "newName": "dv160_minor_2_name",
+      "type": "text",
+      "label": "2b(2). Minor 2 - name"
+    },
+    {
+      "id": "DV-160[0].Page1[0].ProtectedFullName_ft[3]",
+      "newName": "dv160_minor_3_name",
+      "type": "text",
+      "label": "2b(2). Minor 3 - name"
+    },
+    {
+      "id": "DV-160[0].Page1[0].ProtectedFullName_ft[4]",
+      "newName": "dv160_minor_4_name",
+      "type": "text",
+      "label": "2b(2). Minor 4 - name"
+    },
+    {
+      "id": "DV-160[0].Page1[0].OtherProtectedTable_OF_cb[0]",
+      "newName": "dv160_minor_additional_list_attached",
+      "type": "checkbox",
+      "label": "2b(2). Check here if there are additional minors (Attachment 2b(2))",
+      "_why": "Ticked by the packet when more minors are listed than the four rows hold; the rest go on the Attachment 2b(2) page the form draws (the dv160_minor block's attachment)."
+    },
+    {
+      "id": "DV-160[0].Page2[0].PxCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 2)",
+      "courtUse": true
+    },
+    {
+      "id": "DV-160[0].Page2[0].TextField3[0]",
+      "newName": "person_asking_protection_mailing_address",
+      "type": "text",
+      "label": "3. Mailing address - street"
+    },
+    {
+      "id": "DV-160[0].Page2[0].TextField3[1]",
+      "newName": "person_asking_protection_mailing_city",
+      "type": "text",
+      "label": "3. Mailing address - city"
+    },
+    {
+      "id": "DV-160[0].Page2[0].TextField3[2]",
+      "newName": "person_asking_protection_mailing_state",
+      "type": "text",
+      "label": "3. Mailing address - state"
+    },
+    {
+      "id": "DV-160[0].Page2[0].TextField3[3]",
+      "newName": "person_asking_protection_mailing_zip_code",
+      "type": "text",
+      "label": "3. Mailing address - zip"
+    },
+    {
+      "id": "DV-160[0].Page2[0].TextField3[4]",
+      "newName": "person_asking_protection_telephone",
+      "type": "text",
+      "label": "3. Telephone"
+    },
+    {
+      "id": "DV-160[0].Page2[0].TextField3[6]",
+      "newName": "person_asking_protection_fax",
+      "type": "text",
+      "label": "3. Fax"
+    },
+    {
+      "id": "DV-160[0].Page2[0].TextField3[5]",
+      "newName": "person_asking_protection_email",
+      "type": "text",
+      "label": "3. E-mail address"
+    },
+    {
+      "id": "DV-160[0].Page2[0].TextField3[7]",
+      "newName": "person_asking_protection_lawyer_name",
+      "type": "text",
+      "label": "3. Lawyer's name",
+      "blankWhenNotAsked": "Only a filer with a lawyer names one (DV-100: \"Do you have a lawyer?\"). With no lawyer these lines are rightly blank."
+    },
+    {
+      "id": "DV-160[0].Page2[0].TextField3[8]",
+      "newName": "person_asking_protection_lawyer_state_bar_number",
+      "type": "text",
+      "label": "3. Lawyer's State Bar number",
+      "blankWhenNotAsked": "Only a filer with a lawyer names one (DV-100: \"Do you have a lawyer?\"). With no lawyer these lines are rightly blank."
+    },
+    {
+      "id": "DV-160[0].Page2[0].ProtectedDescription[0]",
+      "newName": "dv160_request_for_more_than_one_minor",
+      "type": "checkbox",
+      "label": "4. I am making this request for two or more minors"
+    },
+    {
+      "id": "DV-160[0].Page2[0].confi[0]",
+      "newName": "dv160_same_information_for_all_minors",
+      "type": "checkbox",
+      "label": "4a. The information I want confidential is the SAME for all minors"
+    },
+    {
+      "id": "DV-160[0].Page2[0].confi[1]",
+      "newName": "dv160_different_information_for_each_minor",
+      "type": "checkbox",
+      "label": "4b. The information I want confidential is NOT the same for all minors"
+    },
+    {
+      "id": "DV-160[0].Page2[0].OtherProtectedText_OF_cb1[0]",
+      "newName": "dv160_public_confidential_name",
+      "type": "checkbox",
+      "label": "5a. Minor's name"
+    },
+    {
+      "id": "DV-160[0].Page2[0].OtherProtectedText_OF_cb1[1]",
+      "newName": "dv160_public_confidential_address",
+      "type": "checkbox",
+      "label": "5b. Minor's address"
+    },
+    {
+      "id": "DV-160[0].Page2[0].TextField[0]",
+      "newName": "dv160_confidential_address",
+      "type": "text",
+      "label": "5b. The address I want kept confidential is"
+    },
+    {
+      "id": "DV-160[0].Page3[0].PxCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 3)",
+      "courtUse": true
+    },
+    {
+      "id": "DV-160[0].Page3[0].OtherProtectedText_OF_cb[0]",
+      "newName": "dv160_public_confidential_other_information",
+      "type": "checkbox",
+      "label": "5c. Information relating to the minor"
+    },
+    {
+      "id": "DV-160[0].Page3[0].OtherProtectedText_OF_cb5[0]",
+      "newName": "dv160_other_information_circled_on_copy",
+      "type": "checkbox",
+      "label": "5c(1). Attach a copy of DV-100 or other document with the information circled",
+      "courtUse": true,
+      "_why": "The packet lists the information itself, in the 5c(2) table; a paper copy with the information circled by hand is not something it can produce, so this box stays blank by design and the 5c(2) box is ticked instead."
+    },
+    {
+      "id": "DV-160[0].Page3[0].OtherProtectedText_OF_cb5[1]",
+      "newName": "dv160_public_confidential_other_information",
+      "type": "checkbox",
+      "label": "5c(2). List the information below",
+      "_why": "Carries the 5c box's name: the packet always lists the information in the table, so the one answer \"other information about the minor\" ticks 5c and 5c(2) together."
+    },
+    {
+      "id": "DV-160[0].Page3[0].DocFilingDate_ft[0]",
+      "newName": "dv160_redaction_1_location",
+      "type": "text",
+      "label": "5c(2)(a). Location of information"
+    },
+    {
+      "id": "DV-160[0].Page3[0].DocTitle_ft[0]",
+      "newName": "dv160_redaction_1_information",
+      "type": "text",
+      "label": "5c(2)(a). Information to be redacted"
+    },
+    {
+      "id": "DV-160[0].Page3[0].DocFilingDate_ft[3]",
+      "newName": "dv160_redaction_2_location",
+      "type": "text",
+      "label": "5c(2)(b). Location of information"
+    },
+    {
+      "id": "DV-160[0].Page3[0].DocTitle_ft[3]",
+      "newName": "dv160_redaction_2_information",
+      "type": "text",
+      "label": "5c(2)(b). Information to be redacted"
+    },
+    {
+      "id": "DV-160[0].Page3[0].DocFilingDate_ft[2]",
+      "newName": "dv160_redaction_3_location",
+      "type": "text",
+      "label": "5c(2)(c). Location of information"
+    },
+    {
+      "id": "DV-160[0].Page3[0].DocTitle_ft[2]",
+      "newName": "dv160_redaction_3_information",
+      "type": "text",
+      "label": "5c(2)(c). Information to be redacted"
+    },
+    {
+      "id": "DV-160[0].Page3[0].DocFilingDate_ft[1]",
+      "newName": "dv160_redaction_4_location",
+      "type": "text",
+      "label": "5c(2)(d). Location of information"
+    },
+    {
+      "id": "DV-160[0].Page3[0].DocTitle_ft[1]",
+      "newName": "dv160_redaction_4_information",
+      "type": "text",
+      "label": "5c(2)(d). Information to be redacted"
+    },
+    {
+      "id": "DV-160[0].Page3[0].OtherProtectedText_OF_cb[1]",
+      "newName": "dv160_redaction_additional_list_attached",
+      "type": "checkbox",
+      "label": "5c(2). Check here if there is not enough space (Attachment 5c(2))",
+      "_why": "Ticked by the packet when more redactions are listed than the four rows hold; the rest go on the page it draws."
+    },
+    {
+      "id": "DV-160[0].Page4[0].PxCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 4)",
+      "courtUse": true
+    },
+    {
+      "id": "DV-160[0].Page4[0].OtherProtectedReasons_ft[0]",
+      "newName": "dv160_reason_public_confidential",
+      "type": "text",
+      "label": "6a. Why should the information be kept private or confidential from the public?"
+    },
+    {
+      "id": "DV-160[0].Page4[0].CheckBox2[0]",
+      "newName": "dv160_reason_public_confidential_attachment",
+      "type": "checkbox",
+      "label": "6a. Check here if there is not enough space (Attachment 6a)",
+      "_why": "Never asked: ticked by the writing when the 6a answer outgrows its box, and the rest continues on MC-025 (dv160-hints.json overflow; rule the-packet-uses-mc025-for-more-space)."
+    },
+    {
+      "id": "DV-160[0].Page4[0].OtherProtectedReasons_ft[1]",
+      "newName": "dv160_harm_if_public",
+      "type": "text",
+      "label": "6b. What do you think would happen if the information was NOT made private or confidential?"
+    },
+    {
+      "id": "DV-160[0].Page4[0].CheckBox2[1]",
+      "newName": "dv160_harm_if_public_attachment",
+      "type": "checkbox",
+      "label": "6b. Check here if there is not enough space (Attachment 6b)",
+      "_why": "Never asked: ticked by the writing when the 6b answer outgrows its box, and the rest continues on MC-025 (dv160-hints.json overflow)."
+    },
+    {
+      "id": "DV-160[0].Page5[0].PxCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 5)",
+      "courtUse": true
+    },
+    {
+      "id": "DV-160[0].Page5[0].OtherProtectedText_OF_cb4[0]",
+      "newName": "dv160_if_public_denied_cancel",
+      "type": "checkbox",
+      "label": "7a. If denied: cancel my request for restraining order"
+    },
+    {
+      "id": "DV-160[0].Page5[0].OtherProtectedText_OF_cb4[1]",
+      "newName": "dv160_if_public_denied_proceed",
+      "type": "checkbox",
+      "label": "7b. If denied: move forward with my request for restraining order"
+    },
+    {
+      "id": "DV-160[0].Page5[0].OtherOrders_cb[0]",
+      "newName": "dv160_restrained_person_confidential",
+      "type": "checkbox",
+      "label": "8. I do not want the restrained person to have access to some of the information in item 5"
+    },
+    {
+      "id": "DV-160[0].Page5[0].ConfMinorsName_cb[0]",
+      "newName": "dv160_restrained_confidential_name",
+      "type": "checkbox",
+      "label": "8a(1). Minor's name"
+    },
+    {
+      "id": "DV-160[0].Page5[0].ConfMinorsAdd_cb[0]",
+      "newName": "dv160_restrained_confidential_address",
+      "type": "checkbox",
+      "label": "8a(2). Minor's address"
+    },
+    {
+      "id": "DV-160[0].Page5[0].ConfMinorOth_cb[0]",
+      "newName": "dv160_restrained_confidential_other",
+      "type": "checkbox",
+      "label": "8a(3). Other information relating to the minor from item 5"
+    },
+    {
+      "id": "DV-160[0].Page5[0].TextField[2]",
+      "newName": "dv160_restrained_confidential_other_description",
+      "type": "text",
+      "label": "8a(3). Other information (specify)"
+    },
+    {
+      "id": "DV-160[0].Page5[0].TextField[0]",
+      "newName": "dv160_reason_restrained_confidential",
+      "type": "text",
+      "label": "8b. Why should the information in 8a be kept from the restrained person?"
+    },
+    {
+      "id": "DV-160[0].Page5[0].TextField[1]",
+      "newName": "dv160_harm_if_restrained_told",
+      "type": "text",
+      "label": "8c. What would happen if the information in 8a is given to the restrained person?"
+    },
+    {
+      "id": "DV-160[0].Page5[0].CheckBox2[0]",
+      "newName": "dv160_restrained_confidential_attachment",
+      "type": "checkbox",
+      "label": "8. Check here if there is not enough space (Attachment 8)",
+      "_why": "Never asked: ticked by the writing while either the 8b or the 8c answer outgrows its box, and the rest of each continues on MC-025 (dv160-hints.json overflow)."
+    },
+    {
+      "id": "DV-160[0].Page6[0].PxCaption[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 6)",
+      "courtUse": true
+    },
+    {
+      "id": "DV-160[0].Page6[0].OtherOrders_cb[0]",
+      "newName": "dv160_restrained_person_confidential",
+      "type": "checkbox",
+      "label": "8d. If any portion of the request in item 8 is denied",
+      "_why": "Box d. is ticked whenever item 8 is asked for - 8d is asked of every filer who asks for item 8 - so it carries item 8's own name and the one answer ticks both."
+    },
+    {
+      "id": "DV-160[0].Page6[0].OtherProtectedText_OF_cb2[0]",
+      "newName": "dv160_if_restrained_denied_cancel",
+      "type": "checkbox",
+      "label": "8d(1). Cancel my request for restraining order"
+    },
+    {
+      "id": "DV-160[0].Page6[0].OtherProtectedText_OF_cb2[1]",
+      "newName": "dv160_if_restrained_denied_proceed",
+      "type": "checkbox",
+      "label": "8d(2). Move forward with my request for restraining order"
+    },
+    {
+      "id": "DV-160[0].Page6[0].CheckBox4[2]",
+      "newName": "dv160_share_with_school",
+      "type": "checkbox",
+      "label": "9a(1). Minor's school and after-school program"
+    },
+    {
+      "id": "DV-160[0].Page6[0].CheckBox4[0]",
+      "newName": "dv160_share_with_childcare",
+      "type": "checkbox",
+      "label": "9a(2). Minor's childcare provider"
+    },
+    {
+      "id": "DV-160[0].Page6[0].CheckBox4[1]",
+      "newName": "dv160_share_with_supervised_visitation",
+      "type": "checkbox",
+      "label": "9a(3). Supervised visitation provider"
+    },
+    {
+      "id": "DV-160[0].Page6[0].CheckBox4[6]",
+      "newName": "dv160_share_with_other",
+      "type": "checkbox",
+      "label": "9a(4). Other"
+    },
+    {
+      "id": "DV-160[0].Page6[0].TextField[0]",
+      "newName": "dv160_share_with_other_name",
+      "type": "text",
+      "label": "9a(4). Other (name of person or entity)"
+    },
+    {
+      "id": "DV-160[0].Page6[0].CheckBox4[5]",
+      "newName": "dv160_share_name",
+      "type": "checkbox",
+      "label": "9b(1). Minor's name"
+    },
+    {
+      "id": "DV-160[0].Page6[0].CheckBox4[3]",
+      "newName": "dv160_share_address",
+      "type": "checkbox",
+      "label": "9b(2). Minor's address"
+    },
+    {
+      "id": "DV-160[0].Page6[0].CheckBox4[4]",
+      "newName": "dv160_share_other_information",
+      "type": "checkbox",
+      "label": "9b(3). Information listed in item 5c"
+    },
+    {
+      "id": "DV-160[0].Page6[0].PagesAttached_no[0]",
+      "newName": "dv160_pages_attached_count",
+      "type": "text",
+      "label": "10. Number of pages attached to this form"
+    },
+    {
+      "id": "DV-160[0].Page6[0].SigDate[0]",
+      "newName": "dv160_signature_date",
+      "type": "text",
+      "label": "11. Signature date"
+    },
+    {
+      "id": "DV-160[0].Page6[0].T14[0]",
+      "newName": "dv160_signature_printed_name",
+      "type": "text",
+      "label": "11. Type or print your name"
+    },
+    {
+      "id": "DV-160[0].Page6[0].LawyerSignature_dt[0]",
+      "newName": "dv160_lawyer_signature_date",
+      "type": "text",
+      "label": "12. Lawyer's signature date"
+    },
+    {
+      "id": "DV-160[0].Page6[0].#area[2].T23[0]",
+      "newName": "dv160_warning_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-160[0].Page6[0].#area[2].Print_bt[0]",
+      "newName": "dv160_print_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-160[0].Page6[0].#area[2].Save_bt[0]",
+      "newName": "dv160_save_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-160[0].Page6[0].#area[2].Reset_bt[0]",
+      "newName": "dv160_reset_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    }
+  ]
+}

@@ -390,7 +390,8 @@ async function main() {
   // default rebuilt three of five, so a field-config edit to one of the other
   // two was silently not live in the PDF being filled.
   for (const base of (FORMS.length ? FORMS : packetForms())) {
-    const source = base + '.pdf';
+    // Usually <base>.pdf; a second copy of a form is made from the first's blank.
+    const source = require('./packet-forms').blankOf(base);
     const config = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, base + '-field-config.json'), 'utf8'));
     const result = await sanitizePdfFields(decrypt(source), config);
     const moved = await unoverlapLabels(result.bytes);

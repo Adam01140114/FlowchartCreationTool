@@ -1,0 +1,2165 @@
+{
+  "_comment": "Interview knowledge the FL-150 field config cannot express. FL-150 comes in when DV-100 asks for child support or spousal support (DV-100 page 13: \"If you are asking for child support or spousal support you must also complete form FL-150\"), so nothing here asks whether support is wanted. The caption (party block, parties, court street, age, lawyer) is asked in the shapes DV-100 asks it, under DV-100's names, so in the packet every one of those collapses into DV-100's answer. Page 4 is headed \"Fill out this page only if your case involves child support\": its questions wait on DV-100's own \"Child support\" option through a choice that carries DV-100's orders question name and option names, which the packet collapses into DV-100 item 24's answer. Each table on the paper is asked the way the paper lists it: a check-all-that-apply list of what applies, then the amounts for what was ticked, last month and average per month side by side.",
+  "groups": [
+    {
+      "nameId": "fl150_gross_pay_period",
+      "question": "How often are you paid that amount?",
+      "members": [
+        "fl150_gross_pay_per_month",
+        "fl150_gross_pay_per_week",
+        "fl150_gross_pay_per_hour"
+      ],
+      "labels": [
+        "Per month",
+        "Per week",
+        "Per hour"
+      ]
+    },
+    {
+      "nameId": "fl150_high_school_completed",
+      "question": "Have you completed high school or the equivalent?",
+      "members": [
+        "fl150_high_school_completed_yes",
+        "fl150_high_school_completed_no"
+      ],
+      "labels": [
+        "Yes",
+        "No"
+      ]
+    },
+    {
+      "nameId": "fl150_licenses_and_training",
+      "question": "Do you have a professional license or vocational training?",
+      "multiSelect": true,
+      "optional": true,
+      "members": [
+        "fl150_has_professional_license",
+        "fl150_has_vocational_training"
+      ],
+      "labels": [
+        "A professional or occupational license",
+        "Vocational training"
+      ]
+    },
+    {
+      "nameId": "fl150_tax_status",
+      "question": "What is your tax filing status?",
+      "conditional": {
+        "onlyWhen": "fl150_filed_taxes"
+      },
+      "members": [
+        "fl150_tax_status_single",
+        "fl150_tax_status_head_of_household",
+        "fl150_tax_status_married_separately",
+        "fl150_tax_status_married_jointly"
+      ],
+      "labels": [
+        "Single",
+        "Head of household",
+        "Married, filing separately",
+        "Married, filing jointly"
+      ]
+    },
+    {
+      "nameId": "fl150_state_tax",
+      "question": "Which state do you file state tax returns in?",
+      "conditional": {
+        "onlyWhen": "fl150_filed_taxes"
+      },
+      "members": [
+        "fl150_state_tax_california",
+        "fl150_state_tax_other"
+      ],
+      "labels": [
+        "California",
+        "Another state"
+      ]
+    },
+    {
+      "nameId": "fl150_spousal_support_source",
+      "question": "Which marriage is the spousal support from?",
+      "multiSelect": true,
+      "conditional": {
+        "onlyWhen": "fl150_has_spousal_support"
+      },
+      "members": [
+        "fl150_spousal_support_from_this_marriage",
+        "fl150_spousal_support_from_different_marriage"
+      ],
+      "labels": [
+        "My marriage to the other person in this case",
+        "A different marriage"
+      ]
+    },
+    {
+      "nameId": "fl150_partner_support_source",
+      "question": "Which domestic partnership is the partner support from?",
+      "multiSelect": true,
+      "conditional": {
+        "onlyWhen": "fl150_has_partner_support"
+      },
+      "members": [
+        "fl150_partner_support_from_this_partnership",
+        "fl150_partner_support_from_different_partnership"
+      ],
+      "labels": [
+        "My domestic partnership with the other person in this case",
+        "A different domestic partnership"
+      ]
+    },
+    {
+      "nameId": "fl150_disability_kind",
+      "question": "What kind of disability payments do you receive?",
+      "multiSelect": true,
+      "conditional": {
+        "onlyWhen": "fl150_has_disability"
+      },
+      "members": [
+        "fl150_disability_social_security",
+        "fl150_disability_state",
+        "fl150_disability_private_insurance"
+      ],
+      "labels": [
+        "Social Security disability (not SSI)",
+        "State disability (SDI)",
+        "Private insurance"
+      ]
+    },
+    {
+      "nameId": "fl150_business_role",
+      "question": "What is your role in the business?",
+      "conditional": {
+        "onlyWhen": "fl150_has_self_employment"
+      },
+      "members": [
+        "fl150_business_role_owner",
+        "fl150_business_role_partner",
+        "fl150_business_role_other"
+      ],
+      "labels": [
+        "Owner or sole proprietor",
+        "Business partner",
+        "Something else"
+      ]
+    },
+    {
+      "nameId": "fl150_other_property_kind",
+      "question": "What kinds of other property do you own?",
+      "multiSelect": true,
+      "optional": true,
+      "members": [
+        "fl150_assets_other_property_real",
+        "fl150_assets_other_property_personal"
+      ],
+      "labels": [
+        "Real property, such as land or a building",
+        "Personal property, such as a car or furniture"
+      ]
+    },
+    {
+      "nameId": "fl150_expense_basis",
+      "question": "Are the monthly expenses you list estimates, actual amounts, or the amounts you will need?",
+      "members": [
+        "fl150_expense_basis_estimated",
+        "fl150_expense_basis_actual",
+        "fl150_expense_basis_proposed"
+      ],
+      "labels": [
+        "Estimated expenses",
+        "Actual expenses",
+        "Proposed needs"
+      ]
+    },
+    {
+      "nameId": "fl150_housing_payment_kind",
+      "question": "Is that payment rent or a mortgage?",
+      "conditional": {
+        "onlyWhen": "fl150_pays_housing_yes"
+      },
+      "members": [
+        "fl150_expense_home_rent",
+        "fl150_expense_home_mortgage"
+      ],
+      "labels": [
+        "Rent",
+        "Mortgage"
+      ]
+    },
+    {
+      "nameId": "fl150_child_health_insurance_available",
+      "question": "Is health insurance for the children available to you through your job?",
+      "conditional": {
+        "onlyWhen": "child_support_order_requested"
+      },
+      "members": [
+        "fl150_child_health_insurance_available_yes",
+        "fl150_child_health_insurance_available_no"
+      ],
+      "labels": [
+        "Yes",
+        "No"
+      ]
+    }
+  ],
+  "splits": [
+    {
+      "field": "fl150_court_city_and_zip",
+      "join": " ",
+      "parts": [
+        {
+          "nameId": "fl150_court_city",
+          "label": "City"
+        },
+        {
+          "nameId": "fl150_court_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    },
+    {
+      "field": "fl150_one_time_money_details",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "fl150_one_time_money_source",
+          "label": "Where the money came from"
+        },
+        {
+          "nameId": "fl150_one_time_money_amount",
+          "label": "Amount",
+          "type": "money"
+        }
+      ]
+    },
+    {
+      "field": "fl150_hardship_other_children_names_and_ages",
+      "join": "; ",
+      "parts": [
+        {
+          "nameId": "fl150_hardship_other_children_names",
+          "label": "Names",
+          "question": "What are the names of those children?"
+        },
+        {
+          "nameId": "fl150_hardship_other_children_ages",
+          "label": "Ages",
+          "question": "How old is each of those children?"
+        }
+      ],
+      "_why": "FL-150 item 19b prints the names and ages in one box; asked as two questions and joined back for the paper."
+    }
+  ],
+  "combines": [
+    {
+      "question": "What city and ZIP code is the court in?",
+      "nameId": "fl150_court_location",
+      "fields": [
+        {
+          "field": "fl150_court_city",
+          "label": "City"
+        },
+        {
+          "field": "fl150_court_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    },
+    {
+      "nameId": "person_asking_protection_identity",
+      "question": "What is your name and age?",
+      "fields": [
+        {
+          "field": "person_asking_protection_name",
+          "label": "Name"
+        },
+        {
+          "field": "person_asking_protection_age",
+          "label": "Age",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "question": "Where can the court send you papers?",
+      "fields": [
+        {
+          "field": "person_asking_protection_mailing_address",
+          "label": "Street address"
+        },
+        {
+          "field": "person_asking_protection_mailing_city",
+          "label": "City"
+        },
+        {
+          "field": "person_asking_protection_mailing_state",
+          "label": "State"
+        },
+        {
+          "field": "person_asking_protection_mailing_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    },
+    {
+      "question": "How can the court reach you?",
+      "optional": true,
+      "fields": [
+        {
+          "field": "person_asking_protection_telephone",
+          "label": "Phone number",
+          "type": "phone"
+        },
+        {
+          "field": "person_asking_protection_fax",
+          "label": "Fax number",
+          "type": "phone"
+        },
+        {
+          "field": "person_asking_protection_email",
+          "label": "Email address",
+          "type": "email"
+        }
+      ]
+    },
+    {
+      "question": "Who is your lawyer?",
+      "fields": [
+        {
+          "field": "person_asking_protection_lawyer_name",
+          "label": "Lawyer's name"
+        },
+        {
+          "field": "person_asking_protection_lawyer_state_bar_number",
+          "label": "State bar number"
+        },
+        {
+          "field": "person_asking_protection_lawyer_firm_name",
+          "label": "Law firm name"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "has_lawyer",
+        "gateQuestion": "Do you have a lawyer?"
+      }
+    },
+    {
+      "nameId": "fl150_job",
+      "question": "What are the details of your job, or of your most recent job?",
+      "conditional": {
+        "onlyWhen": "fl150_work_situation_employed,fl150_work_situation_unemployed"
+      },
+      "fields": [
+        {
+          "field": "fl150_employer_name",
+          "label": "Employer's name"
+        },
+        {
+          "field": "fl150_employer_address",
+          "label": "Employer's address"
+        },
+        {
+          "field": "fl150_employer_phone",
+          "label": "Employer's phone number",
+          "type": "phone"
+        },
+        {
+          "field": "fl150_occupation",
+          "label": "Your occupation"
+        },
+        {
+          "field": "fl150_job_start_date",
+          "label": "Date you started the job",
+          "type": "date"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_gross_pay",
+      "question": "How much are you paid, before taxes?",
+      "conditional": {
+        "onlyWhen": "fl150_work_situation_employed"
+      },
+      "fields": [
+        {
+          "field": "fl150_gross_pay_amount",
+          "label": "Amount before taxes",
+          "type": "amount"
+        },
+        {
+          "group": "fl150_gross_pay_period",
+          "label": "How often"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_salary",
+      "question": "How much did you earn in salary or wages, before taxes?",
+      "conditional": {
+        "onlyWhen": "fl150_has_salary"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_salary_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_salary_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_overtime",
+      "question": "How much did you earn in overtime, before taxes?",
+      "conditional": {
+        "onlyWhen": "fl150_has_overtime"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_overtime_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_overtime_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_commissions",
+      "question": "How much did you receive in commissions or bonuses?",
+      "conditional": {
+        "onlyWhen": "fl150_has_commissions"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_commissions_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_commissions_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_public_assistance",
+      "question": "How much did you receive in public assistance?",
+      "conditional": {
+        "onlyWhen": "fl150_has_public_assistance"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_public_assistance_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_public_assistance_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_spousal_support",
+      "question": "How much did you receive in spousal support?",
+      "conditional": {
+        "onlyWhen": "fl150_has_spousal_support"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_spousal_support_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_spousal_support_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_partner_support",
+      "question": "How much did you receive in partner support?",
+      "conditional": {
+        "onlyWhen": "fl150_has_partner_support"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_partner_support_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_partner_support_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_pension",
+      "question": "How much did you receive in pension or retirement fund payments?",
+      "conditional": {
+        "onlyWhen": "fl150_has_pension"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_pension_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_pension_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_social_security",
+      "question": "How much did you receive in Social Security retirement?",
+      "conditional": {
+        "onlyWhen": "fl150_has_social_security"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_social_security_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_social_security_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_disability",
+      "question": "How much did you receive in disability payments?",
+      "conditional": {
+        "onlyWhen": "fl150_has_disability"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_disability_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_disability_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_unemployment",
+      "question": "How much did you receive in unemployment compensation?",
+      "conditional": {
+        "onlyWhen": "fl150_has_unemployment"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_unemployment_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_unemployment_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_workers_comp",
+      "question": "How much did you receive in workers' compensation?",
+      "conditional": {
+        "onlyWhen": "fl150_has_workers_comp"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_workers_comp_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_workers_comp_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_other",
+      "question": "What other income did you receive, and how much was it?",
+      "conditional": {
+        "onlyWhen": "fl150_has_other_income"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_other_description",
+          "label": "Kind of income, such as a military allowance or royalties"
+        },
+        {
+          "field": "fl150_income_other_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_other_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_dividends",
+      "question": "How much did you receive in dividends or interest?",
+      "conditional": {
+        "onlyWhen": "fl150_has_dividends"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_dividends_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_dividends_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_rental",
+      "question": "How much did you receive in rental property income?",
+      "conditional": {
+        "onlyWhen": "fl150_has_rental_income"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_rental_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_rental_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_trust",
+      "question": "How much did you receive in trust income?",
+      "conditional": {
+        "onlyWhen": "fl150_has_trust_income"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_trust_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_trust_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_other_investment",
+      "question": "What other investment income did you receive, and how much was it?",
+      "conditional": {
+        "onlyWhen": "fl150_has_other_investment_income"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_other_investment_description",
+          "label": "Kind of investment income"
+        },
+        {
+          "field": "fl150_income_other_investment_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_other_investment_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_self_employment",
+      "question": "How much did you earn from self-employment, after business expenses, for all your businesses?",
+      "conditional": {
+        "onlyWhen": "fl150_has_self_employment"
+      },
+      "fields": [
+        {
+          "field": "fl150_income_self_employment_last_month",
+          "label": "Last month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_income_self_employment_average",
+          "label": "Average per month over the last 12 months",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_business",
+      "question": "What are the details of your business?",
+      "conditional": {
+        "onlyWhen": "fl150_has_self_employment"
+      },
+      "fields": [
+        {
+          "field": "fl150_business_name",
+          "label": "Name of the business"
+        },
+        {
+          "field": "fl150_business_type",
+          "label": "Type of business"
+        },
+        {
+          "field": "fl150_business_years",
+          "label": "Number of years in this business",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_one_time_money",
+      "question": "Where did the one-time money come from, and how much was it?",
+      "conditional": {
+        "onlyWhen": "fl150_one_time_money_received"
+      },
+      "fields": [
+        {
+          "field": "fl150_one_time_money_source",
+          "label": "Where the money came from"
+        },
+        {
+          "field": "fl150_one_time_money_amount",
+          "label": "Amount",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_assets",
+      "question": "About how much are your assets worth?",
+      "fields": [
+        {
+          "field": "fl150_assets_cash",
+          "label": "Cash, checking, savings, credit union, money market, and other deposit accounts",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_assets_stocks",
+          "label": "Stocks, bonds, and other assets you could easily sell",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_assets_other_property",
+          "label": "All other property, at fair market value minus the debts you owe on it",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_expense_mortgage",
+      "question": "How much of your average monthly mortgage payment is principal, and how much is interest?",
+      "conditional": {
+        "onlyWhen": "fl150_expense_home_mortgage"
+      },
+      "fields": [
+        {
+          "field": "fl150_expense_mortgage_principal",
+          "label": "Average principal",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_mortgage_interest",
+          "label": "Average interest",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_expense_home",
+      "question": "What else do you spend each month on your home?",
+      "optional": true,
+      "fields": [
+        {
+          "field": "fl150_expense_property_taxes",
+          "label": "Real property taxes",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_home_insurance",
+          "label": "Homeowner's or renter's insurance not included in your rent or mortgage",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_maintenance",
+          "label": "Maintenance and repair",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_expense_living",
+      "question": "What do you spend each month on these everyday costs?",
+      "optional": true,
+      "fields": [
+        {
+          "field": "fl150_expense_health_care",
+          "label": "Health-care costs not paid by insurance",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_child_care",
+          "label": "Child care",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_groceries",
+          "label": "Groceries and household supplies",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_eating_out",
+          "label": "Eating out",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_utilities",
+          "label": "Utilities (gas, electric, water, trash)",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_telephone_cost",
+          "label": "Telephone, cell phone, and email",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_laundry",
+          "label": "Laundry and cleaning",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_clothes",
+          "label": "Clothes",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_expense_other_costs",
+      "question": "What do you spend each month on these other costs?",
+      "optional": true,
+      "fields": [
+        {
+          "field": "fl150_expense_education",
+          "label": "Education",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_entertainment",
+          "label": "Entertainment, gifts, and vacation",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_auto",
+          "label": "Auto expenses and transportation, such as insurance, gas, repairs, or bus fare",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_insurance",
+          "label": "Life, accident, or other insurance, not counting auto, home, or health insurance",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_savings",
+          "label": "Savings and investments",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_expense_charitable",
+          "label": "Charitable contributions",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_expense_other",
+      "question": "What is the other monthly expense, and how much is it?",
+      "conditional": {
+        "onlyWhen": "fl150_has_other_expense_yes"
+      },
+      "fields": [
+        {
+          "field": "fl150_expense_other_description",
+          "label": "What the expense is for"
+        },
+        {
+          "field": "fl150_expense_other_amount",
+          "label": "Amount per month",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_attorney_fees",
+      "question": "What have you paid your lawyer, and what do you still owe?",
+      "conditional": {
+        "onlyWhen": "fl150_attorney_fees_to_report_yes"
+      },
+      "fields": [
+        {
+          "field": "fl150_attorney_fees_paid",
+          "label": "Paid so far for fees and costs",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_attorney_fees_source",
+          "label": "Where the money you paid came from"
+        },
+        {
+          "field": "fl150_attorney_fees_owed",
+          "label": "Total you still owe for fees and costs",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_attorney_hourly_rate",
+          "label": "Your lawyer's hourly rate",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_child_health_insurance_provider",
+      "question": "Which insurance company provides that insurance?",
+      "conditional": {
+        "onlyWhen": "fl150_child_health_insurance_available_yes"
+      },
+      "fields": [
+        {
+          "field": "fl150_child_health_insurance_company",
+          "label": "Name of the insurance company"
+        },
+        {
+          "field": "fl150_child_health_insurance_company_address",
+          "label": "Address of the insurance company",
+          "type": "bigParagraph",
+          "_whyType": "FL-150 item 18 rules the insurance company's address over several lines; asked as a paragraph (Rule 12)."
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_child_special_needs",
+      "question": "What are the children's educational or other special needs, and what do they cost each month?",
+      "conditional": {
+        "onlyWhen": "fl150_child_expense_has_special_needs"
+      },
+      "fields": [
+        {
+          "field": "fl150_child_special_needs_description",
+          "label": "The needs"
+        },
+        {
+          "field": "fl150_child_expense_special_needs",
+          "label": "Amount per month",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_hardship_health",
+      "question": "How much are the extraordinary health expenses each month, and for how many months?",
+      "conditional": {
+        "onlyWhen": "fl150_hardship_has_health"
+      },
+      "fields": [
+        {
+          "field": "fl150_hardship_health_amount",
+          "label": "Amount per month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_hardship_health_months",
+          "label": "Number of months",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_hardship_losses",
+      "question": "How much are the major losses each month, and for how many months?",
+      "conditional": {
+        "onlyWhen": "fl150_hardship_has_losses"
+      },
+      "fields": [
+        {
+          "field": "fl150_hardship_losses_amount",
+          "label": "Amount per month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_hardship_losses_months",
+          "label": "Number of months",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_hardship_other_children",
+      "question": "How much do you spend each month on your minor children from other relationships who live with you, and for how many months?",
+      "conditional": {
+        "onlyWhen": "fl150_hardship_has_other_children"
+      },
+      "fields": [
+        {
+          "field": "fl150_hardship_other_children_amount",
+          "label": "Amount per month",
+          "type": "amount"
+        },
+        {
+          "field": "fl150_hardship_other_children_months",
+          "label": "Number of months",
+          "type": "number"
+        }
+      ]
+    }
+  ],
+  "repeats": [
+    {
+      "nameId": "fl150_household_member",
+      "_why": "Item 12, \"The following people live with me\", prints five rows: name, age, how the person is related to me, that person's gross monthly income, and whether they pay some of the household expenses.",
+      "question": "How many people live with you?",
+      "entryTitle": "Person",
+      "min": 0,
+      "max": 5,
+      "fields": [
+        {
+          "label": "Name",
+          "nameId": "{n}_name"
+        },
+        {
+          "label": "Age",
+          "nameId": "{n}_age",
+          "type": "number"
+        },
+        {
+          "label": "How the person is related to you",
+          "nameId": "{n}_relationship"
+        },
+        {
+          "label": "The person's gross monthly income",
+          "nameId": "{n}_monthly_income",
+          "type": "amount"
+        },
+        {
+          "label": "Does the person pay some of the household expenses?",
+          "selection": "single",
+          "options": [
+            {
+              "label": "Yes",
+              "nameId": "{n}_pays_expenses_yes"
+            },
+            {
+              "label": "No",
+              "nameId": "{n}_pays_expenses_no"
+            }
+          ]
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "fl150_has_household_members_yes"
+      }
+    },
+    {
+      "nameId": "fl150_debt",
+      "_why": "Item 14, \"Installment payments and debts not listed above\", prints six rows: paid to, for, amount, balance, and date of last payment.",
+      "question": "How many other debts or installment payments do you pay, such as a car loan or a credit card?",
+      "entryTitle": "Debt",
+      "min": 0,
+      "max": 6,
+      "fields": [
+        {
+          "label": "Paid to",
+          "nameId": "{n}_paid_to"
+        },
+        {
+          "label": "What it is for",
+          "nameId": "{n}_for"
+        },
+        {
+          "label": "Monthly payment",
+          "nameId": "{n}_monthly_payment",
+          "type": "amount"
+        },
+        {
+          "label": "Balance owed",
+          "nameId": "{n}_balance",
+          "type": "amount"
+        },
+        {
+          "label": "Date of your last payment",
+          "nameId": "{n}_last_payment_date",
+          "type": "date"
+        }
+      ]
+    }
+  ],
+  "choices": [
+    {
+      "nameId": "fl150_other_party_in_case",
+      "question": "Is anyone else a party in this case, such as a local child support agency or another parent?",
+      "before": "fl150_other_party_name",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl150_other_party_in_case_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl150_other_party_in_case_no"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_work_situation",
+      "question": "Which of these describes your work right now?",
+      "before": "fl150_job_end_date",
+      "options": [
+        {
+          "label": "I have a job",
+          "nameId": "fl150_work_situation_employed"
+        },
+        {
+          "label": "I do not have a job now, but I have worked before",
+          "nameId": "fl150_work_situation_unemployed"
+        },
+        {
+          "label": "I have never had a job",
+          "nameId": "fl150_work_situation_never_worked"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_attended_college",
+      "question": "Have you gone to college?",
+      "before": "fl150_college_years_completed",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl150_attended_college_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl150_attended_college_no"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_attended_graduate_school",
+      "question": "Have you gone to graduate school?",
+      "before": "fl150_graduate_years_completed",
+      "onlyWhen": "fl150_attended_college_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl150_attended_graduate_school_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl150_attended_graduate_school_no"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_other_party_income_known",
+      "question": "Do you have an idea of how much the other person earns?",
+      "before": "fl150_other_party_monthly_income",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl150_other_party_income_known_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl150_other_party_income_known_no"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_income_kinds",
+      "type": "checkbox",
+      "question": "Which kinds of income have you received in the last 12 months?",
+      "before": "fl150_public_assistance_currently_receiving",
+      "options": [
+        {
+          "label": "Salary or wages",
+          "nameId": "fl150_has_salary"
+        },
+        {
+          "label": "Overtime",
+          "nameId": "fl150_has_overtime"
+        },
+        {
+          "label": "Commissions or bonuses",
+          "nameId": "fl150_has_commissions"
+        },
+        {
+          "label": "Public assistance, such as TANF, SSI, or GA/GR",
+          "nameId": "fl150_has_public_assistance"
+        },
+        {
+          "label": "Spousal support",
+          "nameId": "fl150_has_spousal_support"
+        },
+        {
+          "label": "Partner support from a domestic partnership",
+          "nameId": "fl150_has_partner_support"
+        },
+        {
+          "label": "Pension or retirement fund payments",
+          "nameId": "fl150_has_pension"
+        },
+        {
+          "label": "Social Security retirement (not SSI)",
+          "nameId": "fl150_has_social_security"
+        },
+        {
+          "label": "Disability payments",
+          "nameId": "fl150_has_disability"
+        },
+        {
+          "label": "Unemployment compensation",
+          "nameId": "fl150_has_unemployment"
+        },
+        {
+          "label": "Workers' compensation",
+          "nameId": "fl150_has_workers_comp"
+        },
+        {
+          "label": "Other income, such as military allowances or royalties",
+          "nameId": "fl150_has_other_income"
+        },
+        {
+          "label": "Dividends or interest",
+          "nameId": "fl150_has_dividends"
+        },
+        {
+          "label": "Rental property income",
+          "nameId": "fl150_has_rental_income"
+        },
+        {
+          "label": "Trust income",
+          "nameId": "fl150_has_trust_income"
+        },
+        {
+          "label": "Other investment income",
+          "nameId": "fl150_has_other_investment_income"
+        },
+        {
+          "label": "Income from self-employment",
+          "nameId": "fl150_has_self_employment"
+        },
+        {
+          "label": "None of these",
+          "nameId": "fl150_has_no_income"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_deduction_kinds",
+      "type": "checkbox",
+      "question": "Which of these amounts did you pay last month?",
+      "before": "fl150_deduction_union_dues",
+      "options": [
+        {
+          "label": "Required union dues",
+          "nameId": "fl150_pays_union_dues"
+        },
+        {
+          "label": "Required retirement payments (not Social Security, FICA, 401(k), or IRA)",
+          "nameId": "fl150_pays_retirement"
+        },
+        {
+          "label": "Medical, hospital, dental, or other health insurance premiums",
+          "nameId": "fl150_pays_health_insurance"
+        },
+        {
+          "label": "Child support for children from other relationships",
+          "nameId": "fl150_pays_child_support"
+        },
+        {
+          "label": "Court-ordered spousal support from a different marriage",
+          "nameId": "fl150_pays_spousal_support"
+        },
+        {
+          "label": "Court-ordered partner support from a different domestic partnership",
+          "nameId": "fl150_pays_partner_support"
+        },
+        {
+          "label": "Necessary job expenses your employer does not pay back",
+          "nameId": "fl150_pays_job_expenses"
+        },
+        {
+          "label": "None of these",
+          "nameId": "fl150_pays_none"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_pays_housing",
+      "question": "Do you pay rent or a mortgage for your home?",
+      "before": "fl150_expense_rent_or_mortgage",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl150_pays_housing_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl150_pays_housing_no"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_has_other_expense",
+      "question": "Do you have another monthly expense that none of these questions has covered?",
+      "before": "fl150_expense_total",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl150_has_other_expense_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl150_has_other_expense_no"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_attorney_fees_to_report",
+      "question": "Have you paid a lawyer, or do you owe a lawyer, for fees and costs in this case?",
+      "before": "dv105_child",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl150_attorney_fees_to_report_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl150_attorney_fees_to_report_no"
+        }
+      ]
+    },
+    {
+      "nameId": "orders_requested",
+      "_why": "Page 4 is headed \"Fill out this page only if your case involves child support.\" This is DV-100 item 24/25's own orders question: the same question name and the same option names and labels, so in the packet it collapses into DV-100's answer (collapseSharedQuestions in project-gui-export.js) and the page-4 questions wait on DV-100's \"Child support\". FL-150 never asks it; the wording is for the form compiled on its own.",
+      "type": "checkbox",
+      "question": "Which orders are you asking for?",
+      "before": "dv105_child",
+      "options": [
+        {
+          "label": "Child support",
+          "nameId": "child_support_order_requested"
+        },
+        {
+          "label": "Spousal support",
+          "nameId": "spousal_support_order_requested"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_time_share_known",
+      "question": "Do you know what percent of the time the children spend with each parent?",
+      "before": "fl150_percent_time_with_me",
+      "onlyWhen": "child_support_order_requested",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl150_time_share_known_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl150_time_share_known_no"
+        }
+      ],
+      "_whyBefore": "Asked just before the one percentage the filer gives, which waits on its Yes. Anchored after it, the compiler met the percentage first and invented a second gate for it."
+    },
+    {
+      "nameId": "fl150_child_expense_kinds",
+      "type": "checkbox",
+      "question": "Which of these extra expenses do you pay for the children in this case?",
+      "before": "fl150_child_expense_childcare",
+      "onlyWhen": "child_support_order_requested",
+      "options": [
+        {
+          "label": "Childcare so I can work or get job training",
+          "nameId": "fl150_child_expense_has_childcare"
+        },
+        {
+          "label": "Health care not covered by insurance",
+          "nameId": "fl150_child_expense_has_health_care"
+        },
+        {
+          "label": "Travel expenses for visitation",
+          "nameId": "fl150_child_expense_has_travel"
+        },
+        {
+          "label": "Educational or other special needs",
+          "nameId": "fl150_child_expense_has_special_needs"
+        },
+        {
+          "label": "None of these",
+          "nameId": "fl150_child_expense_has_none"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_has_hardship",
+      "_why": "Item 19, special hardships: \"I ask the court to consider the following special financial circumstances\". Asked first as a gate so the explanation under 19c waits on it and follows the list.",
+      "question": "Do you want the court to consider any special financial hardship when it decides support?",
+      "before": "fl150_hardship_other_children_names",
+      "onlyWhen": "child_support_order_requested",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl150_has_hardship_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl150_has_hardship_no"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_hardship_kinds",
+      "type": "checkbox",
+      "question": "Which of these special financial hardships do you have?",
+      "before": "fl150_hardship_other_children_names",
+      "onlyWhen": "fl150_has_hardship_yes",
+      "options": [
+        {
+          "label": "Extraordinary health expenses not already listed for the children",
+          "nameId": "fl150_hardship_has_health"
+        },
+        {
+          "label": "Major losses not covered by insurance, such as a fire or theft",
+          "nameId": "fl150_hardship_has_losses"
+        },
+        {
+          "label": "Expenses for my minor children from other relationships who live with me",
+          "nameId": "fl150_hardship_has_other_children"
+        }
+      ]
+    },
+    {
+      "nameId": "fl150_has_household_members",
+      "question": "Does anyone else live with you?",
+      "before": "fl150_expense_basis_estimated",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl150_has_household_members_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl150_has_household_members_no"
+        }
+      ],
+      "_why": "FL-150 item 12 lists the people living in your home. Asked first, so a filer who lives alone is not asked how many people live with them, and the list starts at one for everyone else."
+    }
+  ],
+  "questions": {
+    "fl150_court_county": {
+      "text": "Which county is the court in?",
+      "_why": "The caption prints \"SUPERIOR COURT OF CALIFORNIA, COUNTY OF\" and a box for the county alone. DV-100's court box takes the court's whole name, so this is a different answer and has its own name."
+    },
+    "court_street_address": {
+      "text": "What is the court's street address?",
+      "_why": "The caption's STREET ADDRESS is the court address DV-100's caption already asks, under the same name."
+    },
+    "fl150_court_mailing_address": {
+      "text": "What is the court's mailing address?",
+      "optional": true,
+      "_why": "The caption's MAILING ADDRESS is left blank on the paper when the court has none of its own."
+    },
+    "fl150_court_branch_name": {
+      "text": "What is the name of the court's branch?",
+      "optional": true,
+      "_why": "The caption's BRANCH NAME applies only to a court with branches."
+    },
+    "person_to_restrain_full_name": {
+      "text": "What is the name of the person you want protection from?",
+      "_why": "The caption's RESPONDENT is the person DV-100 item 2 names; asked there, under this name."
+    },
+    "fl150_other_party_name": {
+      "text": "What is the name of that other party?",
+      "conditional": {
+        "onlyWhen": "fl150_other_party_in_case_yes"
+      },
+      "_why": "The caption's OTHER PARTY/PARENT/CLAIMANT line, on all four pages."
+    },
+    "fl150_job_end_date": {
+      "text": "When did that job end?",
+      "type": "date",
+      "conditional": {
+        "onlyWhen": "fl150_work_situation_unemployed"
+      },
+      "_why": "Item 1f, \"If unemployed, date job ended\"."
+    },
+    "fl150_hours_per_week": {
+      "text": "About how many hours do you work each week?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "fl150_work_situation_employed"
+      },
+      "_why": "Item 1g, \"I work about ___ hours per week\" - the current job only."
+    },
+    "fl150_highest_grade_completed": {
+      "text": "What is the highest grade you completed?",
+      "conditional": {
+        "onlyWhen": "fl150_high_school_completed_no"
+      },
+      "_why": "Item 2b, \"If no, highest grade completed\"."
+    },
+    "fl150_college_years_completed": {
+      "text": "How many years of college have you completed?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "fl150_attended_college_yes"
+      },
+      "_why": "Item 2c, number of years of college completed."
+    },
+    "fl150_college_degree_obtained": {
+      "text": "Did you earn a college degree?",
+      "conditional": {
+        "onlyWhen": "fl150_attended_college_yes"
+      },
+      "_why": "Item 2c's \"Degree(s) obtained\" box."
+    },
+    "fl150_college_degrees": {
+      "text": "Which college degrees did you earn?",
+      "conditional": {
+        "onlyWhen": "fl150_college_degree_obtained"
+      },
+      "_why": "Item 2c, degree(s) obtained (specify)."
+    },
+    "fl150_graduate_years_completed": {
+      "text": "How many years of graduate school have you completed?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "fl150_attended_graduate_school_yes"
+      },
+      "_why": "Item 2d, number of years of graduate school completed."
+    },
+    "fl150_graduate_degree_obtained": {
+      "text": "Did you earn a graduate degree?",
+      "conditional": {
+        "onlyWhen": "fl150_attended_graduate_school_yes"
+      },
+      "_why": "Item 2d's \"Degree(s) obtained\" box."
+    },
+    "fl150_graduate_degrees": {
+      "text": "Which graduate degrees did you earn?",
+      "conditional": {
+        "onlyWhen": "fl150_graduate_degree_obtained"
+      },
+      "_why": "Item 2d, degree(s) obtained (specify)."
+    },
+    "fl150_professional_licenses": {
+      "text": "Which professional or occupational licenses do you have?",
+      "conditional": {
+        "onlyWhen": "fl150_has_professional_license"
+      },
+      "_why": "Item 2e, professional/occupational license(s) (specify)."
+    },
+    "fl150_vocational_training": {
+      "text": "What vocational training have you had?",
+      "conditional": {
+        "onlyWhen": "fl150_has_vocational_training"
+      },
+      "_why": "Item 2e, vocational training (specify)."
+    },
+    "fl150_filed_taxes": {
+      "text": "Have you ever filed a tax return?",
+      "_why": "Item 3a's box, \"I last filed taxes for tax year\". Items 3b-3d are about the return, so they wait on it."
+    },
+    "fl150_last_tax_year": {
+      "text": "For which tax year did you last file taxes?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "fl150_filed_taxes"
+      },
+      "_why": "Item 3a, tax year (specify year)."
+    },
+    "fl150_tax_joint_filer_name": {
+      "text": "Who do you file jointly with?",
+      "conditional": {
+        "onlyWhen": "fl150_tax_status_married_jointly"
+      },
+      "_why": "Item 3b, married, filing jointly with (specify name)."
+    },
+    "fl150_state_tax_other_state": {
+      "text": "Which other state do you file in?",
+      "conditional": {
+        "onlyWhen": "fl150_state_tax_other"
+      },
+      "_why": "Item 3c, other (specify state)."
+    },
+    "fl150_tax_exemptions": {
+      "text": "How many exemptions, including yourself, do you claim on your taxes?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "fl150_filed_taxes"
+      },
+      "_why": "Item 3d, the number of exemptions claimed."
+    },
+    "fl150_other_party_monthly_income": {
+      "text": "About how much do you think the other person earns each month, before taxes?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_other_party_income_known_yes"
+      },
+      "_why": "Item 4, \"I estimate the gross monthly income (before taxes) of the other party\"."
+    },
+    "fl150_other_party_income_basis": {
+      "text": "What is your estimate of their income based on?",
+      "conditional": {
+        "onlyWhen": "fl150_other_party_income_known_yes"
+      },
+      "_why": "Item 4, \"This estimate is based on (explain)\"."
+    },
+    "fl150_public_assistance_currently_receiving": {
+      "text": "Are you receiving public assistance now?",
+      "conditional": {
+        "onlyWhen": "fl150_has_public_assistance"
+      },
+      "_why": "Item 5d's \"currently receiving\" box."
+    },
+    "fl150_spousal_support_received_taxable": {
+      "text": "Was your spousal support order made before January 1, 2019, or has a court kept the payments taxable to you?",
+      "conditional": {
+        "onlyWhen": "fl150_has_spousal_support"
+      },
+      "_why": "Item 5e's \"federally taxable*\" box; the footnote on page 2 says when to check it."
+    },
+    "fl150_business_role_other_description": {
+      "text": "How would you describe your role in the business?",
+      "conditional": {
+        "onlyWhen": "fl150_business_role_other"
+      },
+      "_why": "Item 7, other (specify)."
+    },
+    "fl150_one_time_money_received": {
+      "text": "In the last 12 months, did you receive any one-time money, such as lottery winnings or an inheritance?",
+      "_why": "Item 8, additional income."
+    },
+    "fl150_income_changed": {
+      "text": "Has your financial situation changed a lot over the last 12 months?",
+      "_why": "Item 9, change in income."
+    },
+    "fl150_income_change_description": {
+      "text": "Describe the change in your financial situation and what caused it.",
+      "conditional": {
+        "onlyWhen": "fl150_income_changed"
+      },
+      "_why": "Item 9, \"because (specify)\"."
+    },
+    "fl150_deduction_union_dues": {
+      "text": "How much did you pay in required union dues last month?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_pays_union_dues"
+      },
+      "_why": "Item 10a."
+    },
+    "fl150_deduction_retirement": {
+      "text": "How much did you pay in required retirement payments last month?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_pays_retirement"
+      },
+      "_why": "Item 10b."
+    },
+    "fl150_deduction_health_insurance": {
+      "text": "How much did you pay in health insurance premiums last month, in total?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_pays_health_insurance"
+      },
+      "_why": "Item 10c, total monthly amount."
+    },
+    "fl150_deduction_child_support": {
+      "text": "How much child support did you pay last month for children from other relationships?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_pays_child_support"
+      },
+      "_why": "Item 10d."
+    },
+    "fl150_deduction_spousal_support": {
+      "text": "How much court-ordered spousal support did you pay last month?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_pays_spousal_support"
+      },
+      "_why": "Item 10e."
+    },
+    "fl150_deduction_spousal_support_deductible": {
+      "text": "Was that spousal support order made before January 1, 2019, or has a court kept the payments tax deductible for you?",
+      "conditional": {
+        "onlyWhen": "fl150_pays_spousal_support"
+      },
+      "_why": "Item 10e's \"federally tax deductible*\" box; the footnote on page 2 says when to check it."
+    },
+    "fl150_deduction_partner_support": {
+      "text": "How much court-ordered partner support did you pay last month?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_pays_partner_support"
+      },
+      "_why": "Item 10f."
+    },
+    "fl150_deduction_job_expenses": {
+      "text": "How much did you spend last month on necessary job expenses your employer did not pay back?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_pays_job_expenses"
+      },
+      "_why": "Item 10g."
+    },
+    "fl150_expense_rent_or_mortgage": {
+      "text": "How much do you pay each month for your home?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_pays_housing_yes"
+      },
+      "_why": "Item 13a(1), rent or mortgage."
+    },
+    "fl150_expense_installment_payments_total": {
+      "text": "What is the total of the monthly payments on those debts?",
+      "type": "money",
+      "optional": true,
+      "_why": "Item 13p, \"Monthly payments listed in item 14 (itemize below in 14 and insert total here)\"."
+    },
+    "fl150_expense_total": {
+      "text": "What do all your monthly expenses add up to, counting your rent or mortgage payment once?",
+      "type": "money",
+      "_why": "Item 13r, TOTAL EXPENSES (a-q), \"do not add in the amounts in a(1)(a) and (b)\"."
+    },
+    "fl150_expense_paid_by_others": {
+      "text": "How much of your monthly expenses do other people pay?",
+      "type": "money",
+      "optional": true,
+      "_why": "Item 13s, amount of expenses paid by others."
+    },
+    "dv105_child": {
+      "text": "How many children under 18 do you have with the other person?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "child_support_order_requested"
+      },
+      "_why": "Item 16a, \"I have (specify number) children under the age of 18 with the other parent\". That is the count of DV-100 item 3 / DV-105 item 3's children block, which posts it under the block's own name, dv105_child - so in the packet this question collapses into that block and the box prints its count."
+    },
+    "fl150_parenting_schedule_description": {
+      "text": "Describe your parenting schedule.",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "fl150_time_share_known_no"
+      },
+      "_why": "Item 16b: \"If you're not sure about percentage or it has not been agreed on, please describe your parenting schedule here.\""
+    },
+    "fl150_child_health_insurance_monthly_cost": {
+      "text": "How much does the children's health insurance cost you each month, or how much would it cost, not counting what your employer pays?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "child_support_order_requested"
+      },
+      "_why": "Item 17d, \"is or would be\" - asked whether or not the insurance is available now."
+    },
+    "fl150_child_expense_childcare": {
+      "text": "How much do you pay each month for childcare so you can work or get job training?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_child_expense_has_childcare"
+      },
+      "_why": "Item 18a."
+    },
+    "fl150_child_expense_health_care": {
+      "text": "How much do you pay each month for the children's health care that insurance does not cover?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_child_expense_has_health_care"
+      },
+      "_why": "Item 18b."
+    },
+    "fl150_child_expense_travel": {
+      "text": "How much do you pay each month in travel expenses for visitation?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_child_expense_has_travel"
+      },
+      "_why": "Item 18c."
+    },
+    "fl150_hardship_other_children_support_received": {
+      "text": "How much child support do you receive each month for those children?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl150_hardship_has_other_children"
+      },
+      "_why": "Item 19c(3)."
+    },
+    "fl150_hardship_explanation": {
+      "text": "Why do these expenses create an extreme financial hardship for you?",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "fl150_has_hardship_yes"
+      },
+      "_why": "Item 19: \"The expenses listed in a, b, and c create an extreme financial hardship because (explain)\"."
+    },
+    "fl150_other_support_information": {
+      "text": "What else do you want the court to know about support in your case?",
+      "type": "bigParagraph",
+      "optional": true,
+      "conditional": {
+        "onlyWhen": "child_support_order_requested"
+      },
+      "_why": "Item 20, on page 4, which the paper says to fill out only when the case involves child support."
+    },
+    "fl150_hardship_other_children_names": {
+      "conditional": {
+        "onlyWhen": "fl150_hardship_has_other_children"
+      }
+    },
+    "fl150_hardship_other_children_ages": {
+      "conditional": {
+        "onlyWhen": "fl150_hardship_has_other_children"
+      }
+    },
+    "fl150_percent_time_with_me": {
+      "text": "What percent of the time do the children spend with you?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "fl150_time_share_known_yes"
+      },
+      "subtitle": "The rest of the time is counted as the other parent's.",
+      "_why": "The paper prints the children's time with the filer and with the other parent, and the two make 100. Asked both, a filer could answer 100 and 100 - so only this one is asked and the other is worked out (computed remainderOf)."
+    }
+  },
+  "autofill": [
+    {
+      "field": "fl150_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "The declarant's signature date on page 1 has one correct answer and the form already knows it."
+    },
+    {
+      "field": "fl150_signature_printed_name",
+      "from": [
+        "person_asking_protection_name"
+      ],
+      "why": "The printed name under the page 1 signature is the name the filer gave on DV-100 item 1a."
+    }
+  ],
+  "computed": {
+    "fl150_attorney_for": {
+      "_why": "The caption's ATTORNEY FOR (name) is the filer's name when a lawyer represents them, and blank when the filer has no lawyer. DV-100's \"Do you have a lawyer?\" ticks has_lawyer_yes.",
+      "joinWhenTicked": {
+        "when": "has_lawyer_yes",
+        "separator": ", ",
+        "fields": [
+          "person_asking_protection_name"
+        ]
+      }
+    },
+    "fl150_attorney_signature_date": {
+      "_why": "Item 15's attorney signature date is dated with the fee information it confirms, and only when item 15 is answered.",
+      "joinWhenTicked": {
+        "when": "fl150_attorney_fees_to_report_yes",
+        "separator": ", ",
+        "fields": [
+          "current_date"
+        ]
+      }
+    },
+    "fl150_pages_attached": {
+      "_why": "Page 1's \"Number of pages attached\" counts the sheets added for more space. The packet adds none to FL-150, so the count is what is attached to it in the packet, which the form works out rather than asking.",
+      "pagesOfFormsAttachedTo": "FL-150",
+      "onePageEachWhenYes": []
+    },
+    "fl150_percent_time_with_other_parent": {
+      "_why": "The other parent's share of the children's time is what is left of 100 after the filer's: the two numbers the paper prints always add up.",
+      "remainderOf": {
+        "field": "fl150_percent_time_with_me",
+        "total": 100
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "Your Case Details",
+      "fields": [
+        "fl150_court_county",
+        "court_street_address",
+        "fl150_court_mailing_address",
+        "fl150_court_city",
+        "fl150_court_zip_code",
+        "fl150_court_branch_name",
+        "person_asking_protection_name",
+        "person_asking_protection_age",
+        "person_asking_protection_mailing_address",
+        "person_asking_protection_mailing_city",
+        "person_asking_protection_mailing_state",
+        "person_asking_protection_mailing_zip_code",
+        "person_asking_protection_telephone",
+        "person_asking_protection_fax",
+        "person_asking_protection_email",
+        "has_lawyer",
+        "person_asking_protection_lawyer_name",
+        "person_asking_protection_lawyer_state_bar_number",
+        "person_asking_protection_lawyer_firm_name",
+        "person_to_restrain_full_name",
+        "fl150_other_party_in_case",
+        "fl150_other_party_name"
+      ]
+    },
+    {
+      "name": "Your Job",
+      "fields": [
+        "fl150_work_situation",
+        "fl150_employer_name",
+        "fl150_employer_address",
+        "fl150_employer_phone",
+        "fl150_occupation",
+        "fl150_job_start_date",
+        "fl150_job_end_date",
+        "fl150_hours_per_week",
+        "fl150_gross_pay_amount",
+        "fl150_gross_pay_per_month",
+        "fl150_gross_pay_per_week",
+        "fl150_gross_pay_per_hour"
+      ]
+    },
+    {
+      "name": "Your Education",
+      "fields": [
+        "fl150_high_school_completed_yes",
+        "fl150_high_school_completed_no",
+        "fl150_highest_grade_completed",
+        "fl150_attended_college",
+        "fl150_college_years_completed",
+        "fl150_college_degree_obtained",
+        "fl150_college_degrees",
+        "fl150_attended_graduate_school",
+        "fl150_graduate_years_completed",
+        "fl150_graduate_degree_obtained",
+        "fl150_graduate_degrees",
+        "fl150_has_professional_license",
+        "fl150_professional_licenses",
+        "fl150_has_vocational_training",
+        "fl150_vocational_training"
+      ]
+    },
+    {
+      "name": "Your Taxes",
+      "fields": [
+        "fl150_filed_taxes",
+        "fl150_last_tax_year",
+        "fl150_tax_status_single",
+        "fl150_tax_status_head_of_household",
+        "fl150_tax_status_married_separately",
+        "fl150_tax_status_married_jointly",
+        "fl150_tax_joint_filer_name",
+        "fl150_state_tax_california",
+        "fl150_state_tax_other",
+        "fl150_state_tax_other_state",
+        "fl150_tax_exemptions"
+      ]
+    },
+    {
+      "name": "The Other Person's Income",
+      "fields": [
+        "fl150_other_party_income_known",
+        "fl150_other_party_monthly_income",
+        "fl150_other_party_income_basis"
+      ]
+    },
+    {
+      "name": "Your Income",
+      "fields": [
+        "fl150_income_kinds",
+        "fl150_public_assistance_currently_receiving",
+        "fl150_spousal_support_from_this_marriage",
+        "fl150_spousal_support_from_different_marriage",
+        "fl150_spousal_support_received_taxable",
+        "fl150_partner_support_from_this_partnership",
+        "fl150_partner_support_from_different_partnership",
+        "fl150_disability_social_security",
+        "fl150_disability_state",
+        "fl150_disability_private_insurance",
+        "fl150_business_role_owner",
+        "fl150_business_role_partner",
+        "fl150_business_role_other",
+        "fl150_business_role_other_description",
+        "fl150_one_time_money_received",
+        "fl150_one_time_money_source",
+        "fl150_one_time_money_amount",
+        "fl150_income_changed",
+        "fl150_income_change_description"
+      ]
+    },
+    {
+      "name": "Your Deductions",
+      "fields": [
+        "fl150_deduction_kinds",
+        "fl150_deduction_union_dues",
+        "fl150_deduction_retirement",
+        "fl150_deduction_health_insurance",
+        "fl150_deduction_child_support",
+        "fl150_deduction_spousal_support",
+        "fl150_deduction_spousal_support_deductible",
+        "fl150_deduction_partner_support",
+        "fl150_deduction_job_expenses"
+      ]
+    },
+    {
+      "name": "Your Assets",
+      "fields": [
+        "fl150_assets_cash",
+        "fl150_assets_stocks",
+        "fl150_assets_other_property",
+        "fl150_assets_other_property_real",
+        "fl150_assets_other_property_personal"
+      ]
+    },
+    {
+      "name": "People Who Live With You",
+      "fields": [
+        "fl150_has_household_members",
+        "fl150_household_member_1_name",
+        "fl150_household_member_2_name",
+        "fl150_household_member_3_name",
+        "fl150_household_member_4_name",
+        "fl150_household_member_5_name"
+      ]
+    },
+    {
+      "name": "Your Monthly Expenses",
+      "fields": [
+        "fl150_expense_basis_estimated",
+        "fl150_expense_basis_actual",
+        "fl150_expense_basis_proposed",
+        "fl150_pays_housing",
+        "fl150_expense_rent_or_mortgage",
+        "fl150_expense_home_rent",
+        "fl150_expense_home_mortgage",
+        "fl150_expense_mortgage_principal",
+        "fl150_expense_mortgage_interest",
+        "fl150_expense_property_taxes",
+        "fl150_expense_health_care",
+        "fl150_expense_education",
+        "fl150_debt_1_paid_to",
+        "fl150_expense_installment_payments_total",
+        "fl150_has_other_expense",
+        "fl150_expense_other_description",
+        "fl150_expense_total",
+        "fl150_expense_paid_by_others"
+      ]
+    },
+    {
+      "name": "Lawyer's Fees",
+      "fields": [
+        "fl150_attorney_fees_to_report",
+        "fl150_attorney_fees_paid",
+        "fl150_attorney_fees_source",
+        "fl150_attorney_fees_owed",
+        "fl150_attorney_hourly_rate"
+      ]
+    },
+    {
+      "name": "Children and Support",
+      "fields": [
+        "orders_requested",
+        "dv105_child",
+        "fl150_time_share_known",
+        "fl150_percent_time_with_me",
+        "fl150_parenting_schedule_description",
+        "fl150_child_health_insurance_available_yes",
+        "fl150_child_health_insurance_company",
+        "fl150_child_health_insurance_monthly_cost",
+        "fl150_child_expense_kinds",
+        "fl150_child_expense_childcare",
+        "fl150_child_special_needs_description",
+        "fl150_has_hardship",
+        "fl150_hardship_health_amount",
+        "fl150_hardship_other_children_names",
+        "fl150_hardship_other_children_ages",
+        "fl150_hardship_explanation",
+        "fl150_other_support_information"
+      ]
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "fl150_one_time_money_received",
+      "why": "Item 8, additional income, is asked of every filer. It follows item 5d's \"currently receiving\" and item 5e's \"federally taxable\" boxes only because each is the last question of its branch of item 5."
+    },
+    {
+      "question": "fl150_assets",
+      "why": "Item 11, assets, is asked of every filer. It follows item 10e's \"federally tax deductible\" box only because that box is the last question of item 10."
+    },
+    {
+      "question": "fl150_income_changed",
+      "why": "Asked whatever the answer to the question before it: the paper prints this item for everyone, and it follows that question only because it comes next."
+    },
+    {
+      "question": "fl150_other_property_kind",
+      "why": "Asked whatever the answer to the question before it: the paper prints this item for everyone, and it follows that question only because it comes next."
+    },
+    {
+      "question": "fl150_household_member",
+      "why": "Asked whatever the answer to the question before it: the paper prints this item for everyone, and it follows that question only because it comes next."
+    },
+    {
+      "question": "fl150_expense_basis",
+      "why": "Asked whatever the answer to the question before it: the paper prints this item for everyone, and it follows that question only because it comes next."
+    },
+    {
+      "question": "fl150_expense_total",
+      "why": "Asked whatever the answer to the question before it: the paper prints this item for everyone, and it follows that question only because it comes next."
+    },
+    {
+      "question": "fl150_child_health_insurance_monthly_cost",
+      "why": "Asked whatever the answer to the question before it: the paper prints this item for everyone, and it follows that question only because it comes next."
+    },
+    {
+      "question": "fl150_has_household_members",
+      "why": "Item 12 is asked of every FL-150 filer; it follows item 11 only because it comes next on the paper."
+    }
+  ]
+}

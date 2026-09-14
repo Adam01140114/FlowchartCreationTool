@@ -30,11 +30,14 @@ that cannot be rebuilt.
 
 1. **The user's saved answers are theirs.** The test account holds a saved copy
    of the DV packet in Firestore under formId
-   `DV-100 Request for Domestic Violence Restraining Order`. Never delete it,
+   `DV-100 Request for Domestic Violence Restraining Order`. A page generated in
+   test mode never loads Firebase (`generate.js` leaves the SDK out, and the
+   publish and the payload strip it), so a test-mode page cannot reach it. Never delete it,
    overwrite it, or run anything that saves over it. A page in the editor's
    preview (`FormWiz GUI/gui.html`) can be signed in; stub Firestore writes
    before filling there. The published live site has Firebase stripped out, and
-   `pipeline-nav-audit.js` uses a throwaway Chrome profile - prefer those.
+   `pipeline-nav-audit.js` uses a throwaway Chrome profile with Firebase
+   blocked - prefer those.
 2. **Never sign in with credentials.** Do not type the test account's password,
    do not write code that reads credentials from `.env` to sign in, and do not
    paste credentials into any doc. If a task needs a signed-in page, ask the user.
@@ -152,7 +155,7 @@ output - an edit to generated JSON is lost at the next build (rule
 
 ## 3. The full audit, in order
 
-Run from the repo root with the dev server up. `npm run audit` runs steps 1-5a
+Run from the repo root with the dev server up. `npm run audit` runs steps 1-5b
 in one go and stops at the first failure; each also runs on its own.
 
 | # | Command | Proves | Cannot see |
@@ -163,6 +166,7 @@ in one go and stops at the first failure; each also runs on its own.
 | 4 | `node pipeline-audit.js` | The interview rules (below). **Exit 1 = not shippable** | What it was never taught (§8 is the list of what it was taught, and when) |
 | 5 | `node pipeline-disqualifiers.js --check` | Every disqualifying combination the paper form declares has an alert node | Disqualifiers nobody declared - run `--scan` on a new form |
 | 5a | `node pipeline-node-fields.js` | The editor's PDF preview marks every box a node fills and nothing else - held against what the exported form posts, joined boxes included, using the naming rule the editor itself loads (`node-field-names.js`) | Whether that box is the right one on the paper - step 10 |
+| 5b | `node pipeline-form-refs.js --check` | Every form mentioned anywhere in the packet's PDFs and the court's guides (`referenceSources`) is in the packet, still to build, declared as someone else's (saying whose), or a guide; prints the forms still to build | A form no document mentions - which is why the guides are read too; whether the packet fills them right - steps 8-10 |
 | 6 | Publish (§2) | The pages you are about to test are the pages that exist | - |
 | 7 | `node pipeline-nav-audit.js` | The published site, driven in headless Chrome like a person (below) | Question-at-a-time mode unless `--modes section,question` |
 | 8 | Fill and read back: capture the answers, then `node pipeline-fill.js --render` and `node pipeline-explain.js <form>` | Every field the answers reach carries a value; `pipeline-explain` sorts each empty field into gate-closed, court's, or **defect** - the defect list must be empty | Where the ink lands - step 10 |
@@ -244,7 +248,12 @@ and Back retraces Next on every path walked`. Exit 1 on any failure. A run takes
 `pipeline-fill.js` fills the PDFs from `pipeline-answers.json` - the answers a
 debug fill posted, saved from the generated form. Fill the form (debug menu,
 Ctrl+Shift, Fill maximum path), capture the payload, save it with
-`/api/dev-save`, then run `pipeline-fill.js --render`. It writes the filled PDFs
+`/api/dev-save`, then run `pipeline-fill.js --render`. The payload is every
+`/edit_pdf` request the form posts, merged (stub the downloads while you do it);
+leave out `__attachment`, which is one MC-025 page's spec. A long answer posts
+only what its box prints, and the rest rides along as `__continued_<name>`:
+`pipeline-fill.js` draws the MC-025 page from it, and fails when a "more space"
+box is ticked but the set holds nothing past the box. It writes the filled PDFs
 and page images to `pipeline-out/`. `node pipeline-current-output.js` publishes
 the exact images you read into `Current Form Output/`, so the user sees the
 same pages you did; `node pipeline-crop.js <pdf> <page> --field <name>` zooms
@@ -409,7 +418,7 @@ of the day passed, and the check that now catches it.
 | The question-at-a-time page worked its path out every time: 10.7 s | Only the section page was recorded; the question page's logic differs by a display flag | Each page records its own paths; `pipeline-nav-audit.js --modes question` |
 | Joined answers ran off the edge: case numbers, a license's state, an employer's address, firearms four to six | Every value was whole in its field; nothing measured the ink | The server shrinks to fit and names what still does not; `pipeline-fill.js` fails on it |
 | Child support asked as one choice where DV-100 says check all that apply | Nothing compared a question's type with the paper's instruction | The human read against the paper; rule `check-all-that-apply-is-asked-that-way` |
-| DV-105 item 4a's "complete form DV-105(A)" never mentioned to the filer | The interview followed the paper's skip and nothing said why | A subtitle names the form and where to get it; rule `a-form-the-packet-cannot-fill-is-named` |
+| DV-105 item 4a's "complete form DV-105(A)" never mentioned to the filer - and then answered with a subtitle telling the filer to get DV-105(A) from the court clerk, fill it out and attach it | Every check read the forms the packet had; none read what the paper asks for. A rule on `form-rules.html` required the subtitle | DV-105(A) is in the packet (two copies, spec `blank`); `pipeline-form-refs.js --check` in `npm run audit` - failed on the old spec with DV-105(A) and five other forms; RULE 20 and `compile-form.js` refuse wording that sends the filer for a form - found the one sentence on the old build; rules `the-packet-makes-every-form-the-paper-asks-for`, `the-interview-never-sends-the-filer-for-a-form` |
 | DV-101 required a second incident of everyone | Each question worked; nothing asked whether there was a second | A gate before incident 2; rule `room-for-another-is-offered` |
 | Changing a gate back to No left the questions after it on screen, holding what was typed (DV-101's second incident, DV-105's custody order) | A closing question emptied itself and told nothing waiting on it; every check filled forwards and never changed an answer back | The page re-checks every question after a person's change; found and verified by changing gates back with real keys (§4.10) |
 | The editor's PDF preview reported 152 of the packet's 288 questions in red as matching no field - every checkbox and dropdown question, most multi-textbox questions, every numbered block | It was tried on questions that fill one box named after themselves | `pipeline-node-fields.js` (§3 step 5a) holds the preview to what the exported form posts: 274/274 nodes fully marked; on the old rule it fails with 138 shown red |
@@ -418,6 +427,26 @@ of the day passed, and the check that now catches it.
 | Five DV-105 follow-ups read the same as the question they follow ("Where should the visits happen?" twice in a row) | Every title was a full sentence; nothing compared a question with the one before it | RULE 19 (blocking) - failed with 5 on the old build |
 | The committed `dv-packet-gui.json` did not match what the sources export (one DV-100 question two places out) | It was exported before a last change to the sources, and §3 step 3 had not been run since | §3 step 3; re-exported and republished |
 | CLETS-001's firearms answer lost a letter at the right edge, and DV-110's firearms list ran 2pt past its box | The server measured text with pdf-lib's kerned widths and viewers draw it unkerned, about 2% wider; every value was whole, and the fit check trusted the same short measurement | The server measures as drawn (`measureAsDrawn` in `dev-server.js`); `pipeline-fill.js` fails any line drawn past its box - failed with 2 on the old output, 0 after |
+| The minimum path - no custody orders asked for - walked DV-105, DV-105(A) and its second copy: 20 sections where it had walked 11 | Activation matched a form name on its first letters, so DV-105(A)'s rule switched on DV-105 and "DV-105(A) (2)"; and an answer inside a switched-off form still counted. The nav audit checked only that Back retraces Next | Exact names in `activationNamesForm`, and an answer counts only in a form that is on (`isFormActivatedAt`); `pipeline-nav-audit.js` fails a form that is on with no exact rule to explain it - it named all three on the old build; rule `a-form-is-on-only-for-an-answer-in-a-form-that-is-on` |
+| The recorded maximum path held 30 answers inside DV-105(A), a form that path leaves off; one of them put DV-105(A) (2) in the step bar | The fill takes back answers in a form that turns out to be off, and the hidden "<id>_yes" box beside each dropdown stayed ticked | The nav audit's drift check (it failed with 30); `createHiddenCheckboxesForAutofilledDropdowns` unticks the box of every answer a dropdown does not hold |
+| RULE 18 failed SER-001's firearms box and DV-200's custody box, answers DV-100 asks every filer | The rule proved "shown" one condition at a time and could not see two branches that rejoin | RULE 18 tries each answer of a question it depends on; `blankWhenNotAsked` in a field config for a blank that is the answer. With the note removed it fails DV-160's lawyer name again |
+| FL-150's children count was called unreachable (RULE 1) and unfilled (preview check) though the page fills it | `postedNames()` read a question by `nameId`, and a block's count has only its id | `postedNames()` adds a block's id: FL-150 258/258 reachable, 106/106 nodes marked |
+| DV-160's three "not enough space" boxes were never ticked and no check said so | RULE 13's pattern knew "need more space", not "not enough space" | RULE 13's pattern; the boxes were `courtUse` until MC-025 (next row) - now 6a, 6b, 8b and 8c continue on MC-025 and the boxes tick themselves |
+| Continuations went three different ways: DV-100 item 7 onto DV-101 (387 characters more, then a sheet of the filer's own), DV-160's answers held to their boxes, tables' extra rows on a sheet drawn from scratch; DV-100 item 32 counted one page per list | Nothing said which form carries more space, and the page count was worked out apart from the drawing | Rule `the-packet-uses-mc025-for-more-space`: every continuation is filled on MC-025 (`attachment-page.js`), the lines and page breaks come from one file both sides run (`continuation-layout.js`), RULE 21 fails an overflow onto any other form, and `pipeline-fill.js` fails a page drawn with more sheets than counted. The form now posts `__continued_<name>`, because a captured answer set held only what each box prints |
+| FL-155's tax status, rent or mortgage, and current or most recent job could print only their first box | One checkbox field held several boxes told apart by export value, and pdf-lib ticks a field, not a box; the agent that built the form found it by test-filling | `widget` entries split each box into its own field (`auto-form/pdf-field-sanitizer.js`); RULE 22 fails an unsplit field |
+| FL-155 asked the rent, mortgage and job boxes twice ("Do you have a 8g. Monthly housing costs: rent?") and the tax statuses twice | A `choice` whose answers had the boxes' names left the boxes to be asked on their own, and the compiler grouped the tax boxes by their shared id into a question of its own | The preview check (`pipeline-node-fields.js`) failed tax status; the three are hint `groups` with the boxes as members, and the job question has a Yes/No gate for "never had a job" |
+| FL-155 item 3c printed its whole first part on one line at 6pt, 84pt past the edge, with the ruled line under it empty | The capacity counts both ruled lines (the declared chain), but the dev server finds the line beneath by geometry, and its test assumed the boxes do not overlap: FL-155's are 15.8pt tall on lines 8.8pt apart | `pipeline-fill.js` (answer not fitting at 6pt, ink past the edge) on a test fill of FL-155; `spillOntoContinuationLines` measures line to line, bottom to bottom |
+| An idle page raised about 7,600 change events a second, and ticking an answer never redrew the numbered steps | When `updateVisibility` hid a question it reset the question's dropdowns and always raised a change on each; two hidden questions that listen to each other's dropdown then reset each other without end. Nothing checked what an idle page does | Found by counting change events on the published page while testing the step bar; the reset raises a change only when it changed the value or cleared mirror boxes. The step bar redraws at most every 150 ms instead of after a quiet moment, so no event storm can stall it |
+| After an answer brought in a form, the numbered steps did not show it: pressing Fill maximum path switched on six forms and the bar still read "1 DV-100, 2 CLETS-001, 3 DV-110" | The bar was built with every form and hidden to the ones on only when the page moved section; nothing redrew it when an answer changed | The user; `pipeline-nav-audit.js` now reads the bar on a fresh page and after each fill and fails a step shown for a form that is off, left out for one that is on, or numbered out of order. The bar is built with only the forms needed at the start and redraws after any change |
+| FL-150 item 16b printed 100 percent of the children's time with each parent (FL-155 items 3a-3b the same) | Both percentages were asked, as two boxes of one question, and nothing held them to 100 | The page read of FL-150 page 4; only the filer's share is asked and the other is computed (`remainderOf`). Splitting the question first invented a second gate - the real one was anchored after the percentage - which the question counts (124 for 123) showed |
+| MC-030's and FL-155's caption address line printed the state in full ("Los Angeles Wyoming 90210") | A line joined from city, state and ZIP took each answer's raw value, and a state dropdown's value is the name | The page read of the filled MC-030; the join uses the state's hidden `_short` code, and the two lines join with a space |
+| FL-155's phone number printed as "(310)" over "555-0142" | The ruled-line spill moved any answer too wide for its line at the declared size, however little too wide | The page read of FL-155; the spill leaves an answer that fits at three quarters of its size (and at least 8pt) on its own line, set smaller |
+| Nine multi-line boxes were asked on one line - DV-160's redaction columns and FL-150's insurance company address - and RULE 12 reported them on every run as an accepted note | A block's or combined question's field could only be a one-line input: the export turned every such field into "label" and the form drew no textarea | `bigParagraph` passes through the export and the form draws a textarea for it; RULE 12 accepts an entry field typed so, and now blocks the build. The first fix still drew nothing: the builder's loader (`FormWiz GUI/download.js`) had no branch for the type and dropped the field, which the published maximum path showed by recording 25 fewer answers (24 redaction boxes and the address). Reported notes are defects to fix, not a baseline |
+| The published maximum path failed: FL-155's tax status, mortgage and job boxes stayed ticked on a path where FL-155 is off | A fill empties a dropdown without a change event when it takes back answers in a switched-off form; an answer that ticks a box by name goes through hidden logic, and the stale-box cleanup only ran hidden logic for a value held | The nav audit's drift check (3 answers differed); `createHiddenCheckboxesForAutofilledDropdowns` runs `updateHiddenLogic` for an emptied dropdown too |
+| Moving the DV-570 questions off the "Child support" order made the children block stop showing for a child-support filer | The compiler feeds a block gated on several orders only the exits that still carry one of them; hung on item 24's answers, the chain's exits no longer did | RULE 18 (FL-150 printing the child count blank); the chain hangs off "Child support" again. PIPELINE.md, "Where the chain hangs matters" |
+| FL-150's and RA-010's STATE box printed blank | pdf-lib throws on text longer than a box's character limit, and the error was swallowed; every value check read the answer, not the PDF | The page read (§3 step 10); `/edit_pdf` fits a state to its code and reports any other cut as not fitting |
+| FL-150's household incomes stayed empty on the maximum path and Next locked | The fill knew a money box by the word "amount" in its name | The nav audit (empty fields, Next disabled); `hasValidatedShape` reads `inputmode="decimal"` |
+| FL-150's "People Who Live With You" section vanished and its list landed in "Your Assets" | The export drops a section holding only a block | The nav audit found the stranded list; the block now follows its own Yes/No question |
 
 ---
 
@@ -431,6 +460,7 @@ of the day passed, and the check that now catches it.
 | `wording-rules.js` | The wording patterns, with their own tests |
 | `pipeline-disqualifiers.js` | `--scan` for disqualifying language, `--check` that each declared one is wired |
 | `pipeline-node-fields.js` | The editor's PDF preview against what the form posts (§3 step 5a) |
+| `pipeline-form-refs.js` | Every form the packet's paper tells the filer to complete is in the packet or declared (§3 step 5b); prints the forms still to build |
 | `node-field-names.js` | Which fields a flowchart node fills - one copy, loaded by the editor's preview and by that check |
 | `pipeline-connect.js` | Cross-form shared names; `--check` writes nothing |
 | `pipeline-sanitize.js` | Rebuilds the sanitized PDFs from field configs; `--check` writes nothing |

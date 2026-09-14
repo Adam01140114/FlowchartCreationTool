@@ -6,7 +6,7 @@
     "start:static": "npx --yes http-server -p 8080 -c-1 -o index.html",
     "start:gui": "npx --yes http-server \"FormWiz GUI\" -p 6767 -c-1 -o gui.html",
     "start:formwiz-server": "node \"FormWiz GUI/server.js\"",
-    "audit": "node pipeline-connect.js --check && node pipeline-audit-flowchart.js && node wording-rules.js && node pipeline-audit.js && node pipeline-disqualifiers.js --check && node pipeline-node-fields.js",
+    "audit": "node pipeline-connect.js --check && node pipeline-audit-flowchart.js && node wording-rules.js && node pipeline-audit.js && node pipeline-disqualifiers.js --check && node pipeline-form-refs.js --check && node pipeline-node-fields.js",
     "audit:nav": "node pipeline-nav-audit.js"
   },
   "dependencies": {

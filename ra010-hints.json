@@ -1,0 +1,341 @@
+{
+  "_comment": "RA-010 tells the court and the other side that the filer will appear remotely. It comes into the packet on the filer's answer that they will, so item 1's Plaintiff/Petitioner box carries that answer's name and is ticked by it, and the name beside it is the filer's. Filed with the request, it meets the deadline page 3 gives the party asking for a protective-order hearing ('with the moving papers'). At filing the court has not yet set the hearing date - it does that on DV-109 - so item 2 explains that 'the whole case' needs no date; 'one hearing' asks for the date only when it is known. The Declaration of Notice on page 2 is not asked: it swears that notice was already given, which at filing it has not been, and the form lets a proof of service show it instead - the other side is told when this form is served on them with the rest of the papers. The caption is the packet's names; only the county and the courthouse branch are new. The questions after item 1's box are asked whenever the form is here; they follow that box only because it is printed first.",
+  "groups": [
+    {
+      "nameId": "ra010_others_appearing_remotely",
+      "question": "Who else on your side will appear remotely?",
+      "subtitle": "Leave both unticked when it is only you.",
+      "multiSelect": true,
+      "optional": true,
+      "members": [
+        "ra010_lawyer_appears_remotely",
+        "ra010_other_appears_remotely"
+      ],
+      "labels": [
+        "My lawyer",
+        "Someone else, such as a witness"
+      ]
+    },
+    {
+      "nameId": "ra010_appear_when",
+      "question": "Do you want to appear remotely for the whole case or only at one hearing?",
+      "subtitle": "The court sets your hearing date after it reads your request, so the date is not known yet. Choosing the whole case means this one notice covers every hearing.",
+      "members": [
+        "ra010_appear_throughout_case",
+        "ra010_appear_at_one_proceeding"
+      ],
+      "labels": [
+        "For the whole case",
+        "Only at one hearing"
+      ]
+    },
+    {
+      "nameId": "ra010_appear_by",
+      "question": "How will you appear remotely?",
+      "subtitle": "The court's website says which ways its courtrooms allow.",
+      "members": [
+        "ra010_appear_by_videoconference",
+        "ra010_appear_by_audio_only"
+      ],
+      "labels": [
+        "By video",
+        "By phone or other audio only"
+      ]
+    }
+  ],
+  "questions": {
+    "person_asking_protection_name": {
+      "text": "What is your name?",
+      "_why": "The caption, item 1's name line and the page 2 caption print the filer's name, which DV-100 item 1 already asks under this name; the packet asks it once and this wording is for the form compiled on its own."
+    },
+    "ra010_court_county": {
+      "text": "In which county is the court hearing your case?"
+    },
+    "court_street_address": {
+      "text": "What is the court's street address?",
+      "_why": "The caption's STREET ADDRESS line is the court address DV-100's caption already asks under this name; the packet asks it once."
+    },
+    "ra010_court_branch_name": {
+      "text": "What is the name of the courthouse where your case is heard?",
+      "subtitle": "Some counties have several courthouses, called branches.",
+      "optional": true
+    },
+    "person_to_restrain_full_name": {
+      "text": "Who do you want protection from?",
+      "_why": "The DEFENDANT/RESPONDENT line of both captions is the person DV-100 item 2 names under this name; the packet asks it once."
+    },
+    "appear_remotely_yes": {
+      "text": "Will you appear at your hearing remotely, by video or by phone?",
+      "_why": "Item 1's Plaintiff/Petitioner box is ticked exactly when the filer answers on DV-100 that they will appear remotely - the box carries that answer's name, so the packet never asks this; the wording is for the form compiled on its own."
+    },
+    "ra010_proceeding_type": {
+      "text": "What kind of hearing is it?",
+      "subtitle": "For example: the hearing on my request for a domestic violence restraining order.",
+      "conditional": {
+        "onlyWhen": "ra010_appear_at_one_proceeding"
+      }
+    },
+    "ra010_other_remote_aspects_requested": {
+      "text": "Do you want any other part of the hearing done remotely, such as a witness testifying by video?",
+      "subtitle": "Item 4 is for hearings where people testify, and the hearing on a restraining order is one."
+    },
+    "ra010_other_remote_aspects_description": {
+      "text": "Describe the parts of the hearing you want done remotely and the reasons for it.",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "ra010_other_remote_aspects_requested"
+      }
+    },
+    "ra010_agree_to_keep_confidential": {
+      "text": "Do you agree to keep the hearing as confidential as you would in the courtroom?"
+    }
+  },
+  "choices": [
+    {
+      "nameId": "ra010_proceeding_date_set",
+      "question": "Has the court set the date of that hearing?",
+      "before": "ra010_appear_by_videoconference",
+      "onlyWhen": "ra010_appear_at_one_proceeding",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "ra010_proceeding_date_set_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "ra010_proceeding_date_set_no"
+        }
+      ]
+    }
+  ],
+  "splits": [
+    {
+      "field": "ra010_other_person_name_and_role",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "ra010_other_person_name",
+          "label": "Name"
+        },
+        {
+          "nameId": "ra010_other_person_role",
+          "label": "Role in the case"
+        }
+      ]
+    }
+  ],
+  "continuations": [
+    {
+      "field": "ra010_other_person_name_and_role",
+      "keep": "ra010_other_person_name_and_role",
+      "drop": [
+        "ra010_other_person_name_and_role_line_2"
+      ],
+      "_why": "Item 1's 'Other (name and role in case)' is ruled over two lines for one answer; a name and a role fit on the first."
+    },
+    {
+      "field": "court_street_address",
+      "keep": "court_street_address",
+      "drop": [
+        "ra010_court_mailing_address",
+        "ra010_court_city_and_zip"
+      ],
+      "_why": "The caption rules three lines for the court's address - street, mailing, city and ZIP. The packet holds the court's address as one answer (DV-100's caption box is 'Court name and street address'), and it prints whole on the street line, so the mailing and city lines are left as a filer leaves them when one line holds the address."
+    }
+  ],
+  "combines": [
+    {
+      "question": "Where can the court send you papers?",
+      "fields": [
+        {
+          "field": "person_asking_protection_mailing_address",
+          "label": "Street address"
+        },
+        {
+          "field": "person_asking_protection_mailing_city",
+          "label": "City"
+        },
+        {
+          "field": "person_asking_protection_mailing_state",
+          "label": "State"
+        },
+        {
+          "field": "person_asking_protection_mailing_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    },
+    {
+      "question": "How can the court reach you?",
+      "optional": true,
+      "fields": [
+        {
+          "field": "person_asking_protection_telephone",
+          "label": "Phone number",
+          "type": "phone"
+        },
+        {
+          "field": "person_asking_protection_fax",
+          "label": "Fax number",
+          "type": "phone"
+        },
+        {
+          "field": "person_asking_protection_email",
+          "label": "Email address",
+          "type": "email"
+        }
+      ]
+    },
+    {
+      "question": "What are your lawyer's State Bar number and law firm?",
+      "fields": [
+        {
+          "field": "person_asking_protection_lawyer_state_bar_number",
+          "label": "State bar number"
+        },
+        {
+          "field": "person_asking_protection_lawyer_firm_name",
+          "label": "Law firm name"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "has_lawyer",
+        "gateQuestion": "Do you have a lawyer?"
+      }
+    },
+    {
+      "question": "Who is the other person who will appear remotely?",
+      "fields": [
+        {
+          "field": "ra010_other_person_name",
+          "label": "Name"
+        },
+        {
+          "field": "ra010_other_person_role",
+          "label": "Their role in the case, such as witness"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "ra010_other_appears_remotely"
+      }
+    },
+    {
+      "question": "When and where is that hearing?",
+      "fields": [
+        {
+          "field": "ra010_proceeding_date",
+          "label": "Date",
+          "type": "date"
+        },
+        {
+          "field": "ra010_proceeding_time",
+          "label": "Time"
+        },
+        {
+          "field": "ra010_proceeding_department",
+          "label": "Department",
+          "optional": true
+        },
+        {
+          "field": "ra010_proceeding_judicial_officer",
+          "label": "Judicial officer",
+          "optional": true
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "ra010_proceeding_date_set_yes"
+      }
+    }
+  ],
+  "computed": {
+    "ra010_attorney_for": {
+      "_why": "The caption's ATTORNEY FOR (name) line names the party a lawyer represents - the filer - and is printed only when the filer has a lawyer. It is the filer's name, written while the lawyer answer is Yes.",
+      "joinWhenTicked": {
+        "when": "has_lawyer_yes",
+        "separator": ", ",
+        "fields": [
+          "person_asking_protection_name"
+        ]
+      }
+    },
+    "ra010_lawyer_appears_remotely_name": {
+      "_why": "Item 1's 'Attorney for Plaintiff/Petitioner (name)' is the lawyer's name, which DV-100 item 1 already asks; it prints only beside a ticked box, so a lawyer who is not appearing remotely is not named here.",
+      "joinWhenTicked": {
+        "when": "ra010_lawyer_appears_remotely",
+        "separator": ", ",
+        "fields": [
+          "person_asking_protection_lawyer_name"
+        ]
+      }
+    }
+  },
+  "autofill": [
+    {
+      "field": "ra010_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "The date beside the signature under item 5 has one correct answer and the form already knows it."
+    },
+    {
+      "field": "ra010_signature_printed_name",
+      "from": [
+        "person_asking_protection_name"
+      ],
+      "why": "The typed name under the item 5 signature is the filer's, given in the caption."
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "ra010_court_county",
+      "why": "The court's county in the caption is asked whether or not the filer has a lawyer; the lawyer question is the last of the filer's own block."
+    },
+    {
+      "question": "ra010_others_appearing_remotely",
+      "why": "RA-010 is in the packet only because the filer said they will appear remotely, so the rest of item 1 is asked whenever the form is here. It follows item 1's first box only because that box is printed first."
+    },
+    {
+      "question": "ra010_appear_by",
+      "why": "Item 3, how the filer will appear, is asked whether or not item 2's hearing date is known; it follows item 2 only because item 2 is printed first."
+    },
+    {
+      "question": "ra010_agree_to_keep_confidential",
+      "why": "Item 5 is asked whatever the answer to item 4; it follows item 4 only because it is printed after it."
+    }
+  ],
+  "sections": [
+    {
+      "name": "Your Information",
+      "fields": [
+        "person_asking_protection_name",
+        "person_asking_protection_mailing_address",
+        "person_asking_protection_telephone",
+        "has_lawyer",
+        "person_asking_protection_lawyer_state_bar_number",
+        "ra010_court_county",
+        "court_street_address",
+        "ra010_court_branch_name",
+        "person_to_restrain_full_name"
+      ]
+    },
+    {
+      "name": "Appearing Remotely",
+      "fields": [
+        "appear_remotely_yes",
+        "ra010_lawyer_appears_remotely",
+        "ra010_other_appears_remotely",
+        "ra010_other_person_name",
+        "ra010_appear_throughout_case",
+        "ra010_appear_at_one_proceeding",
+        "ra010_proceeding_type",
+        "ra010_proceeding_date_set",
+        "ra010_proceeding_date",
+        "ra010_appear_by_videoconference",
+        "ra010_appear_by_audio_only",
+        "ra010_other_remote_aspects_requested",
+        "ra010_other_remote_aspects_description",
+        "ra010_agree_to_keep_confidential"
+      ]
+    }
+  ]
+}

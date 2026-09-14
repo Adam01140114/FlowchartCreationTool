@@ -1,0 +1,1267 @@
+{
+  "_comment": "The second copy of DV-105(A): groups 3 and 4, the same questions as the first copy with the groups renumbered. It comes in when the first copy's \"Are there other children whose homes were different ...?\" is answered Yes, so group 3 is always asked and group 4 waits on its own question.",
+  "groups": [
+    {
+      "nameId": "dv105a_group_3_home_1_lived_with",
+      "question": "Who do these children live with at their current address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_3_home_1_lived_with_me",
+        "dv105a_group_3_home_1_lived_with_restrained_person",
+        "dv105a_group_3_home_1_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_3_home_2_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_3_home_2_lived_with_me",
+        "dv105a_group_3_home_2_lived_with_restrained_person",
+        "dv105a_group_3_home_2_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_3_home_3_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_3_home_3_lived_with_me",
+        "dv105a_group_3_home_3_lived_with_restrained_person",
+        "dv105a_group_3_home_3_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_3_home_4_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_3_home_4_lived_with_me",
+        "dv105a_group_3_home_4_lived_with_restrained_person",
+        "dv105a_group_3_home_4_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_3_home_5_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_3_home_5_lived_with_me",
+        "dv105a_group_3_home_5_lived_with_restrained_person",
+        "dv105a_group_3_home_5_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_3_home_6_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_3_home_6_lived_with_me",
+        "dv105a_group_3_home_6_lived_with_restrained_person",
+        "dv105a_group_3_home_6_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_3_home_7_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_3_home_7_lived_with_me",
+        "dv105a_group_3_home_7_lived_with_restrained_person",
+        "dv105a_group_3_home_7_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_1_lived_with",
+      "question": "Who do these children live with at their current address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_4_home_1_lived_with_me",
+        "dv105a_group_4_home_1_lived_with_restrained_person",
+        "dv105a_group_4_home_1_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_2_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_4_home_2_lived_with_me",
+        "dv105a_group_4_home_2_lived_with_restrained_person",
+        "dv105a_group_4_home_2_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_3_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_4_home_3_lived_with_me",
+        "dv105a_group_4_home_3_lived_with_restrained_person",
+        "dv105a_group_4_home_3_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_4_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_4_home_4_lived_with_me",
+        "dv105a_group_4_home_4_lived_with_restrained_person",
+        "dv105a_group_4_home_4_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_5_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_4_home_5_lived_with_me",
+        "dv105a_group_4_home_5_lived_with_restrained_person",
+        "dv105a_group_4_home_5_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_6_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_4_home_6_lived_with_me",
+        "dv105a_group_4_home_6_lived_with_restrained_person",
+        "dv105a_group_4_home_6_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_7_lived_with",
+      "question": "Who did these children live with at that address?",
+      "multiSelect": true,
+      "members": [
+        "dv105a_group_4_home_7_lived_with_me",
+        "dv105a_group_4_home_7_lived_with_restrained_person",
+        "dv105a_group_4_home_7_lived_with_other"
+      ],
+      "labels": [
+        "Me",
+        "The other person",
+        "Someone else"
+      ]
+    }
+  ],
+  "splits": [
+    {
+      "field": "dv105a_group_3_home_1_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_3_home_1_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_3_home_1_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_3_home_2_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_3_home_2_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_3_home_2_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_3_home_3_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_3_home_3_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_3_home_3_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_3_home_4_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_3_home_4_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_3_home_4_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_3_home_5_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_3_home_5_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_3_home_5_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_3_home_6_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_3_home_6_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_3_home_6_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_3_home_7_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_3_home_7_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_3_home_7_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_4_home_1_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_4_home_1_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_4_home_1_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_4_home_2_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_4_home_2_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_4_home_2_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_4_home_3_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_4_home_3_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_4_home_3_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_4_home_4_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_4_home_4_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_4_home_4_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_4_home_5_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_4_home_5_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_4_home_5_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_4_home_6_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_4_home_6_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_4_home_6_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "field": "dv105a_group_4_home_7_city_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv105a_group_4_home_7_city",
+          "label": "City"
+        },
+        {
+          "nameId": "dv105a_group_4_home_7_state",
+          "label": "State"
+        }
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "Where do these children live now, and since when?",
+      "fields": [
+        {
+          "field": "dv105a_group_3_home_1_from",
+          "label": "Living there since",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_1_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_3_home_1_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before their current address?",
+      "fields": [
+        {
+          "field": "dv105a_group_3_home_2_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_2_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_2_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_3_home_2_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before the address you just gave?",
+      "fields": [
+        {
+          "field": "dv105a_group_3_home_3_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_3_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_3_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_3_home_3_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before the address you just gave?",
+      "fields": [
+        {
+          "field": "dv105a_group_3_home_4_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_4_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_4_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_3_home_4_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before the address you just gave?",
+      "fields": [
+        {
+          "field": "dv105a_group_3_home_5_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_5_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_5_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_3_home_5_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before the address you just gave?",
+      "fields": [
+        {
+          "field": "dv105a_group_3_home_6_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_6_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_6_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_3_home_6_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before the address you just gave?",
+      "fields": [
+        {
+          "field": "dv105a_group_3_home_7_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_7_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_3_home_7_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_3_home_7_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where do these children live now, and since when?",
+      "fields": [
+        {
+          "field": "dv105a_group_4_home_1_from",
+          "label": "Living there since",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_1_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_4_home_1_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before their current address?",
+      "fields": [
+        {
+          "field": "dv105a_group_4_home_2_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_2_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_2_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_4_home_2_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before the address you just gave?",
+      "fields": [
+        {
+          "field": "dv105a_group_4_home_3_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_3_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_3_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_4_home_3_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before the address you just gave?",
+      "fields": [
+        {
+          "field": "dv105a_group_4_home_4_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_4_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_4_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_4_home_4_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before the address you just gave?",
+      "fields": [
+        {
+          "field": "dv105a_group_4_home_5_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_5_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_5_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_4_home_5_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before the address you just gave?",
+      "fields": [
+        {
+          "field": "dv105a_group_4_home_6_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_6_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_6_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_4_home_6_state",
+          "label": "State"
+        }
+      ]
+    },
+    {
+      "question": "Where did these children live before the address you just gave?",
+      "fields": [
+        {
+          "field": "dv105a_group_4_home_7_from",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_7_until",
+          "label": "Until",
+          "type": "date"
+        },
+        {
+          "field": "dv105a_group_4_home_7_city",
+          "label": "City"
+        },
+        {
+          "field": "dv105a_group_4_home_7_state",
+          "label": "State"
+        }
+      ]
+    }
+  ],
+  "choices": [
+    {
+      "nameId": "dv105a_group_3_home_2_asked",
+      "question": "Did these children live somewhere else in the last five years?",
+      "before": "dv105a_group_3_home_2_lived_with_me",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_3_home_2_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_3_home_2_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_3_home_3_asked",
+      "question": "Did these children live somewhere else before the address you just gave?",
+      "before": "dv105a_group_3_home_3_lived_with_me",
+      "onlyWhen": "dv105a_group_3_home_2_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_3_home_3_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_3_home_3_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_3_home_4_asked",
+      "question": "Did these children live somewhere else before the address you just gave?",
+      "before": "dv105a_group_3_home_4_lived_with_me",
+      "onlyWhen": "dv105a_group_3_home_3_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_3_home_4_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_3_home_4_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_3_home_5_asked",
+      "question": "Did these children live somewhere else before the address you just gave?",
+      "before": "dv105a_group_3_home_5_lived_with_me",
+      "onlyWhen": "dv105a_group_3_home_4_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_3_home_5_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_3_home_5_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_3_home_6_asked",
+      "question": "Did these children live somewhere else before the address you just gave?",
+      "before": "dv105a_group_3_home_6_lived_with_me",
+      "onlyWhen": "dv105a_group_3_home_5_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_3_home_6_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_3_home_6_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_3_home_7_asked",
+      "question": "Did these children live somewhere else before the address you just gave?",
+      "before": "dv105a_group_3_home_7_lived_with_me",
+      "onlyWhen": "dv105a_group_3_home_6_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_3_home_7_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_3_home_7_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_2_asked",
+      "question": "Did these children live somewhere else in the last five years?",
+      "before": "dv105a_group_4_home_2_lived_with_me",
+      "onlyWhen": "dv105a_group_4_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_4_home_2_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_4_home_2_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_3_asked",
+      "question": "Did these children live somewhere else before the address you just gave?",
+      "before": "dv105a_group_4_home_3_lived_with_me",
+      "onlyWhen": "dv105a_group_4_home_2_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_4_home_3_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_4_home_3_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_4_asked",
+      "question": "Did these children live somewhere else before the address you just gave?",
+      "before": "dv105a_group_4_home_4_lived_with_me",
+      "onlyWhen": "dv105a_group_4_home_3_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_4_home_4_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_4_home_4_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_5_asked",
+      "question": "Did these children live somewhere else before the address you just gave?",
+      "before": "dv105a_group_4_home_5_lived_with_me",
+      "onlyWhen": "dv105a_group_4_home_4_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_4_home_5_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_4_home_5_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_6_asked",
+      "question": "Did these children live somewhere else before the address you just gave?",
+      "before": "dv105a_group_4_home_6_lived_with_me",
+      "onlyWhen": "dv105a_group_4_home_5_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_4_home_6_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_4_home_6_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_home_7_asked",
+      "question": "Did these children live somewhere else before the address you just gave?",
+      "before": "dv105a_group_4_home_7_lived_with_me",
+      "onlyWhen": "dv105a_group_4_home_6_asked_yes",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_4_home_7_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_4_home_7_asked_no"
+        }
+      ]
+    },
+    {
+      "nameId": "dv105a_group_4_asked",
+      "question": "Are there still other children whose homes were different from all the children you have listed?",
+      "before": "dv105a_group_4_names",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv105a_group_4_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv105a_group_4_asked_no"
+        }
+      ]
+    }
+  ],
+  "questions": {
+    "dv105_children_lived_together_five_years_no": {
+      "text": "Have the children lived apart at any time in the last five years?",
+      "_why": "Box 1 (attached to DV-105) is ticked exactly when DV-105 item 4a is answered No - the box carries the name of DV-105's No box, so the packet never asks this; the wording is for the form compiled on its own."
+    },
+    "dv105a_group_3_names": {
+      "text": "Which children do you want to list next? Name one child, or several who have always lived together.",
+      "type": "text"
+    },
+    "dv105a_group_3_home_1_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_1_lived_with_other"
+      }
+    },
+    "dv105a_group_3_home_1_address_private": {
+      "text": "Is the current address private (confidential)?"
+    },
+    "dv105a_group_3_home_2_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_2_lived_with_other"
+      }
+    },
+    "dv105a_group_3_home_2": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_2_asked_yes"
+      }
+    },
+    "dv105a_group_3_home_2_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_2_asked_yes"
+      }
+    },
+    "dv105a_group_3_home_3_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_3_lived_with_other"
+      }
+    },
+    "dv105a_group_3_home_3": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_3_asked_yes"
+      }
+    },
+    "dv105a_group_3_home_3_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_3_asked_yes"
+      }
+    },
+    "dv105a_group_3_home_4_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_4_lived_with_other"
+      }
+    },
+    "dv105a_group_3_home_4": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_4_asked_yes"
+      }
+    },
+    "dv105a_group_3_home_4_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_4_asked_yes"
+      }
+    },
+    "dv105a_group_3_home_5_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_5_lived_with_other"
+      }
+    },
+    "dv105a_group_3_home_5": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_5_asked_yes"
+      }
+    },
+    "dv105a_group_3_home_5_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_5_asked_yes"
+      }
+    },
+    "dv105a_group_3_home_6_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_6_lived_with_other"
+      }
+    },
+    "dv105a_group_3_home_6": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_6_asked_yes"
+      }
+    },
+    "dv105a_group_3_home_6_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_6_asked_yes"
+      }
+    },
+    "dv105a_group_3_home_7_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_7_lived_with_other"
+      }
+    },
+    "dv105a_group_3_home_7": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_7_asked_yes"
+      }
+    },
+    "dv105a_group_3_home_7_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_3_home_7_asked_yes"
+      }
+    },
+    "dv105a_group_4_names": {
+      "text": "Which children do you want to list next? Name one child, or several who have always lived together.",
+      "type": "text",
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_1_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_1_lived_with_other"
+      }
+    },
+    "dv105a_group_4_home_1": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_1_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_1_address_private": {
+      "text": "Is the current address private (confidential)?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_2_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_2_lived_with_other"
+      }
+    },
+    "dv105a_group_4_home_2": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_2_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_2_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_2_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_3_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_3_lived_with_other"
+      }
+    },
+    "dv105a_group_4_home_3": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_3_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_3_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_3_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_4_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_4_lived_with_other"
+      }
+    },
+    "dv105a_group_4_home_4": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_4_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_4_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_4_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_5_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_5_lived_with_other"
+      }
+    },
+    "dv105a_group_4_home_5": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_5_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_5_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_5_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_6_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_6_lived_with_other"
+      }
+    },
+    "dv105a_group_4_home_6": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_6_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_6_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_6_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_7_other_relationship": {
+      "text": "How is that person related to these children?",
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_7_lived_with_other"
+      }
+    },
+    "dv105a_group_4_home_7": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_7_asked_yes"
+      }
+    },
+    "dv105a_group_4_home_7_lived_with": {
+      "conditional": {
+        "onlyWhen": "dv105a_group_4_home_7_asked_yes"
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "Children's Homes, More Groups",
+      "fields": [
+        "dv105a_group_3_names",
+        "dv105a_group_3_home_1_from",
+        "dv105a_group_3_home_1_lived_with",
+        "dv105a_group_3_home_1_other_relationship",
+        "dv105a_group_3_home_1_address_private",
+        "dv105a_group_3_home_2_asked",
+        "dv105a_group_3_home_2_from",
+        "dv105a_group_3_home_2_lived_with",
+        "dv105a_group_3_home_2_other_relationship",
+        "dv105a_group_3_home_3_asked",
+        "dv105a_group_3_home_3_from",
+        "dv105a_group_3_home_3_lived_with",
+        "dv105a_group_3_home_3_other_relationship",
+        "dv105a_group_3_home_4_asked",
+        "dv105a_group_3_home_4_from",
+        "dv105a_group_3_home_4_lived_with",
+        "dv105a_group_3_home_4_other_relationship",
+        "dv105a_group_3_home_5_asked",
+        "dv105a_group_3_home_5_from",
+        "dv105a_group_3_home_5_lived_with",
+        "dv105a_group_3_home_5_other_relationship",
+        "dv105a_group_3_home_6_asked",
+        "dv105a_group_3_home_6_from",
+        "dv105a_group_3_home_6_lived_with",
+        "dv105a_group_3_home_6_other_relationship",
+        "dv105a_group_3_home_7_asked",
+        "dv105a_group_3_home_7_from",
+        "dv105a_group_3_home_7_lived_with",
+        "dv105a_group_3_home_7_other_relationship",
+        "dv105a_group_4_asked",
+        "dv105a_group_4_names",
+        "dv105a_group_4_home_1_from",
+        "dv105a_group_4_home_1_lived_with",
+        "dv105a_group_4_home_1_other_relationship",
+        "dv105a_group_4_home_1_address_private",
+        "dv105a_group_4_home_2_asked",
+        "dv105a_group_4_home_2_from",
+        "dv105a_group_4_home_2_lived_with",
+        "dv105a_group_4_home_2_other_relationship",
+        "dv105a_group_4_home_3_asked",
+        "dv105a_group_4_home_3_from",
+        "dv105a_group_4_home_3_lived_with",
+        "dv105a_group_4_home_3_other_relationship",
+        "dv105a_group_4_home_4_asked",
+        "dv105a_group_4_home_4_from",
+        "dv105a_group_4_home_4_lived_with",
+        "dv105a_group_4_home_4_other_relationship",
+        "dv105a_group_4_home_5_asked",
+        "dv105a_group_4_home_5_from",
+        "dv105a_group_4_home_5_lived_with",
+        "dv105a_group_4_home_5_other_relationship",
+        "dv105a_group_4_home_6_asked",
+        "dv105a_group_4_home_6_from",
+        "dv105a_group_4_home_6_lived_with",
+        "dv105a_group_4_home_6_other_relationship",
+        "dv105a_group_4_home_7_asked",
+        "dv105a_group_4_home_7_from",
+        "dv105a_group_4_home_7_lived_with",
+        "dv105a_group_4_home_7_other_relationship"
+      ]
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "dv105a_group_3_home_1_lived_with",
+      "why": "Every row of the table asks who the children lived with, including the rows that follow the confidential-address box. That box is about the current address only."
+    },
+    {
+      "question": "dv105a_group_3_home_2_asked",
+      "why": "Whether there is an earlier address does not depend on whether the current one is confidential. It follows that box only because the box is the last thing the first row asks."
+    },
+    {
+      "question": "dv105a_group_3_names",
+      "why": "This copy is here because the filer said there were more children with different homes, so its first group is always asked."
+    },
+    {
+      "question": "dv105a_group_4_home_1_lived_with",
+      "why": "Every row of the table asks who the children lived with, including the rows that follow the confidential-address box. That box is about the current address only."
+    },
+    {
+      "question": "dv105a_group_4_home_2_asked",
+      "why": "Whether there is an earlier address does not depend on whether the current one is confidential. It follows that box only because the box is the last thing the first row asks."
+    },
+    {
+      "question": "dv105a_group_4_asked",
+      "why": "Whether there is a fourth group does not depend on the third group's last address."
+    }
+  ]
+}

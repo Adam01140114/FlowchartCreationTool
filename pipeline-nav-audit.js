@@ -57,6 +57,15 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
+// Firebase's SDK and the services a test-mode page reaches: blocked in every
+// tab this audit opens (see inPage).
+const FIREBASE_URLS = [
+  '*gstatic.com/firebasejs/*',
+  '*firestore.googleapis.com*',
+  '*identitytoolkit.googleapis.com*',
+  '*securetoken.googleapis.com*'
+];
+
 const args = process.argv.slice(2);
 const flag = (name, fallback) => {
   const i = args.indexOf('--' + name);
@@ -69,6 +78,9 @@ const SERVER = flag('server', 'http://localhost:8080').replace(/\/+$/, '');
 const MODES = flag('modes', 'section').split(',').map((s) => s.trim()).filter(Boolean);
 const PATHS = flag('paths', 'minimum,maximum').split(',').map((s) => s.trim()).filter(Boolean);
 const FILL_BUDGET_MS = Number(flag('fill-budget', '3000'));
+// Change/input events an idle page may raise in one second - a few land just
+// after load; the loop that got through raised about 7,600.
+const IDLE_EVENT_LIMIT = Number(flag('idle-events', '50'));
 
 function findChrome() {
   const candidates = [
@@ -199,7 +211,38 @@ function walkInPage(fillPath) {
     });
     return out;
   };
+  // The numbered steps at the top, as drawn: each form's step, whether it is
+  // shown, whether its form is on, and its number. The bar lists exactly the
+  // forms the answers call for, numbered 1, 2, 3 - a form an answer brings in
+  // is added when the answer is given, not when the filer next moves page.
+  const stepperState = () => {
+    const bar = document.getElementById('stepperProgressBar');
+    if (!bar) return null;
+    const forms = (typeof getProjectForms === 'function') ? getProjectForms() : [];
+    return [...bar.querySelectorAll('.stepper-step')].map((s) => {
+      const name = ((s.querySelector('.stepper-label') || {}).textContent || '').trim();
+      const f = forms.find((x) => x && x.name === name);
+      return {
+        name,
+        shown: getComputedStyle(s).display !== 'none',
+        needed: !f || !!f.alwaysIncluded || (typeof isFormActivated === 'function' && isFormActivated(f)),
+        number: ((s.querySelector('.stepper-circle') || {}).textContent || '').trim()
+      };
+    });
+  };
   return (async () => {
+    const stepperLoad = stepperState();
+    // An idle page raises no events of its own. Two hidden questions once
+    // reset each other's dropdowns without end - about 7,600 change events a
+    // second while nobody touched the page - and every check here passed,
+    // because none of them measured what the page does while it waits.
+    let idleEvents = 0;
+    const countIdle = () => { idleEvents++; };
+    document.addEventListener('change', countIdle, true);
+    document.addEventListener('input', countIdle, true);
+    await wait(1000);
+    document.removeEventListener('change', countIdle, true);
+    document.removeEventListener('input', countIdle, true);
     // Press the button the way a person does: the debug menu open - it is
     // where the buttons are - and the clock running.
     const btnId = fillPath === 'minimum' ? 'fillMinimumPathBtn' : 'fillMaximumPathBtn';
@@ -226,6 +269,7 @@ function walkInPage(fillPath) {
     // How the page looks now, before the walk moves anything, to hold against
     // the worked-out fill: what is drawn, not only what is stored.
     const appearance = window.__fwAppearance ? window.__fwAppearance() : null;
+    const stepperFilled = stepperState();
 
     if (typeof sectionStack !== 'undefined' && Array.isArray(sectionStack)) sectionStack.length = 0;
     navigateSection(1);
@@ -299,12 +343,33 @@ function walkInPage(fillPath) {
 
     const on = (typeof getProjectForms === 'function')
       ? getProjectForms().filter((f) => isFormActivated(f)).map((f) => f.name) : [];
+    // Every form that is on is on for a reason the walk can name: a rule that
+    // names it exactly and is unconditional, or whose answer was given in a
+    // form that is itself on. DV-105(A)'s rule once switched on DV-105 and
+    // "DV-105(A) (2)" as well, because their names start the same, and the
+    // minimum path walked all three; a No left in a switched-off DV-105 kept
+    // DV-105(A) on besides.
+    const byName = {};
+    ((typeof getProjectForms === 'function') ? getProjectForms() : []).forEach((f) => { byName[f.name] = f; });
+    const activationRules = (typeof getFormActivations === 'function') ? getFormActivations() : [];
+    const explained = (name, depth) => {
+      const f = byName[name];
+      if (!f || depth > 12) return false;
+      if (f.alwaysIncluded) return true;
+      return activationRules.some((r) => r && r.targetForm === name && (r.unconditional
+        || (typeof isActivationOptionChosen === 'function' && isActivationOptionChosen(r)
+          && (!r.fromForm || explained(r.fromForm, depth + 1)))));
+    };
     return {
       fillMs,
       appearance,
       drift: drift && { differences: drift.differences, differ: drift.differ },
       empty: Object.keys(empty).map((n) => Object.assign(describe(Number(n)), { fields: empty[n] })),
       formsOn: on,
+      formsUnexplained: on.filter((name) => !explained(name, 0)),
+      stepperLoad,
+      stepperFilled,
+      idleEvents,
       thankYouBack: thankYouBack && { expected: describe(thankYouBack.expected), went: describe(thankYouBack.went) },
       stuck: stuck === null ? null : describe(stuck),
       forward: forward.map(describe),
@@ -466,6 +531,11 @@ async function inPage(send, url, expression, beforeReload) {
     const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
     await send('Runtime.enable', {}, sessionId);
     await send('Page.enable', {}, sessionId);
+    // A test-mode page carries no Firebase. Blocked here as well, so that an
+    // audit can never sign in or write its fills to a database even if a page
+    // that does is ever published.
+    await send('Network.enable', {}, sessionId);
+    await send('Network.setBlockedURLs', { urls: FIREBASE_URLS }, sessionId);
     await send('Storage.clearDataForOrigin', { origin: new URL(url).origin, storageTypes: 'all' }, sessionId);
     await send('Page.navigate', { url }, sessionId);
     const waitReady = async () => {
@@ -509,6 +579,26 @@ function check(result, fillPath) {
   if (result.drift && result.drift.differences) {
     problems.push(result.drift.differences + ' answers the fill wrote were gone 3 s later (e.g. '
       + result.drift.differ.slice(0, 5).join(', ') + ')');
+  }
+  // The numbered steps list exactly the forms the answers call for, numbered
+  // 1, 2, 3 - on a fresh page, and after the fill has brought forms in.
+  const stepperProblems = (when, steps) => {
+    if (!steps) return;
+    const wrong = steps.filter((s) => s.shown !== s.needed);
+    if (wrong.length) {
+      problems.push('The numbered steps ' + when + ' ' + wrong.map((s) => (s.shown ? 'show ' : 'leave out ') + s.name).join(', ')
+        + ' - they should list exactly the forms the answers call for');
+    }
+    const numbers = steps.filter((s) => s.shown).map((s) => s.number);
+    if (numbers.some((n, i) => n !== String(i + 1))) {
+      problems.push('The numbered steps ' + when + ' read ' + numbers.join(', ') + ', not 1 to ' + numbers.length);
+    }
+  };
+  stepperProblems('on a fresh page', result.stepperLoad);
+  stepperProblems('after pressing Fill ' + fillPath + ' path', result.stepperFilled);
+  if (result.idleEvents > IDLE_EVENT_LIMIT) {
+    problems.push('An idle page raised ' + result.idleEvents + ' change/input events in 1 s - something re-raises'
+      + ' events in a loop (the limit is ' + IDLE_EVENT_LIMIT + ')');
   }
   (result.empty || []).forEach((s) => {
     problems.push('section ' + s.section + ' (' + s.form + ' "' + s.title + '") shows ' + s.fields.length
@@ -561,6 +651,10 @@ function check(result, fillPath) {
   fwd.forEach((n) => {
     if (seen.has(n)) problems.push('Next visits section ' + n + ' twice - the walk loops');
     seen.add(n);
+  });
+  (result.formsUnexplained || []).forEach((name) => {
+    problems.push(name + ' is switched on, and no rule naming it is unconditional or answered in a form'
+      + ' that is itself on - nothing the filer chose puts it in the packet');
   });
   result.forward.concat(result.back).forEach((s) => {
     if (s.form && result.formsOn.length && !result.formsOn.includes(s.form)) {

@@ -1,5 +1,9 @@
 /**
  * Prepare generated form HTML for standalone test payload folders.
+ *
+ * A test page never uses Firebase - it exists to check that the form is built
+ * right, and nothing typed into it is meant to be saved - so Firebase goes,
+ * with Stripe and the cart.
  */
 function preparePayloadHtml(html) {
   let out = String(html || '');

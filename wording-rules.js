@@ -105,7 +105,30 @@ function asksForDate(label) {
   return DATE_WORDS.test(t);
 }
 
-module.exports = { conditionTell, sentenceProblem, saysOptional, twoThingsInOneBox, twoQuestionsInOneBox, asksForDate, CONDITION_TELLS };
+// A sentence that sends the filer off to find, fill in or attach a form by
+// themselves. The packet brings in every form the answers call for and fills
+// it - pipeline-form-refs.js holds it to that - so the interview never hands
+// the job back. Under "Have all the children lived together for the last five
+// years?" DV-105 once said: "This packet does not include it: get it from your
+// court clerk or at courts.ca.gov, fill it out, and attach it to DV-105."
+const SENDS_FOR_A_FORM = [
+  /\b(get|obtain|download|pick up|print out)\b[^.?!]*\b(forms?\b|clerk|courts\.ca\.gov|self-?help)/i,
+  /\bfill (it|them|this|that|one) (out|in)\b/i,
+  /\b(complete|fill out|fill in|file)\b[^.?!]*\bform [A-Z]{2,5}-\d{3}/i,
+  /\battach (it|them|this|that|a copy)\b/i,
+  /\b(this|the) packet (does not|doesn't|cannot|can't|will not|won't) (include|fill|make|prepare|cover)\b/i,
+  /\byou (will )?(also )?(need|have) to (get|file|complete|fill|find)\b[^.?!]*\bforms?\b/i
+];
+function sendsFilerForAForm(text) {
+  const t = String(text == null ? '' : text);
+  for (const re of SENDS_FOR_A_FORM) {
+    const m = re.exec(t);
+    if (m) return m[0].trim();
+  }
+  return null;
+}
+
+module.exports = { conditionTell, sentenceProblem, saysOptional, twoThingsInOneBox, twoQuestionsInOneBox, asksForDate, sendsFilerForAForm, CONDITION_TELLS };
 
 // A checker that cannot fail is not a checker. Run: node wording-rules.js
 if (require.main === module) {
@@ -142,4 +165,12 @@ if (require.main === module) {
   expect('date: "Living there since (month/year)"', asksForDate('Living there since (month/year)'), true);
   expect('date: "Until"', asksForDate('Until'), true);
   expect('date passes: "State bar number"', asksForDate('State bar number'), false);
+  expect('sends for a form: the DV-105(A) subtitle', sendsFilerForAForm('If you answer No, the court also needs form DV-105(A), about where each child has lived. This packet does not include it: get it from your court clerk or at courts.ca.gov, fill it out, and attach it to DV-105.'), true);
+  expect('sends for a form: "You will need to complete form FL-150 before your hearing."', sendsFilerForAForm('You will need to complete form FL-150 before your hearing.'), true);
+  expect('sends for a form: "Download the form and fill it in."', sendsFilerForAForm('Download the form and fill it in.'), true);
+  expect('sends for a form: "Attach it to your request."', sendsFilerForAForm('Attach it to your request.'), true);
+  expect('sends for a form passes: "Who will pick up the children from school?"', sendsFilerForAForm('Who will pick up the children from school?'), false);
+  expect('sends for a form passes: "Did the police get a copy of the report?"', sendsFilerForAForm('Did the police get a copy of the report?'), false);
+  expect('sends for a form passes: "What is the name of the court?"', sendsFilerForAForm('What is the name of the court?'), false);
+  expect('sends for a form passes: "Do you want to attach a photo?"', sendsFilerForAForm('Do you want to attach a photo?'), false);
 }

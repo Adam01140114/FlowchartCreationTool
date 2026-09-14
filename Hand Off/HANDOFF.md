@@ -572,6 +572,11 @@ Before calling a form done (this is the short form - the complete, current proce
    The compiler cannot infer these and the interview audit cannot see them;
    see [`PIPELINE.md`](./PIPELINE.md) for the artifact and
    [`NEW-FORM.md`](./NEW-FORM.md) for how one is wired.
+   Then `node pipeline-form-refs.js --check` — every form mentioned anywhere in
+   the packet's PDFs and the court's guides (`referenceSources`) is in the
+   packet, still to build, declared as someone else's with whose it is, or a
+   guide. The filer is never sent to get a form; the forms the packet does not
+   make yet are printed on every run. Download a new blank: `NEW-FORM.md` §0.
 9. **Look at the filled PDF, page by page — always, and last.**
    `node audit-pdf-pages.js ./audit 1.6 dv100-filled.pdf ...`, then read every
    PNG. Steps 1-7 all read data: the DOM, the payload, the field dictionary. A
@@ -780,6 +785,7 @@ Ordered by what actually blocks shipping the DV packet.
 | `pipeline-disqualifiers.js` | *(repo root)* Scans the PDFs for disqualifying language and checks each declared one is wired |
 | `pipeline-node-fields.js` | *(repo root)* Holds the editor's PDF preview to what the form posts: every box a node fills is marked, nothing else |
 | `node-field-names.js` | *(repo root)* Which fields a flowchart node fills - loaded by the editor's preview and by that check |
+| `pipeline-form-refs.js` | *(repo root)* Every form the packet's PDFs tell the filer to complete is in the packet or declared with whose it is; prints the forms still to build |
 | `NEW-FORM.md` | **Taking on a new form** — the four artifacts, and writing a hints file |
 | `form_quality_check.txt` | The ten rules `pipeline-audit.js` enforces, and why each exists |
 | `flowchartfeatures.txt` | Feature reference for the editor |

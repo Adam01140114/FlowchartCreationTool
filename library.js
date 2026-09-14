@@ -204,7 +204,9 @@ function buildAlertRules(vertices) {
  * render as a text box, so the entry asked for a date and offered no date
  * picker - and the same box outside a block did.
  */
-const FIELD_TYPE_PASSTHROUGH = new Set(['phone', 'currency', 'date', 'email', 'number']);
+// bigParagraph: a block's entry or a multi-part question's box the paper rules
+// over several lines (DV-160's redaction columns), asked as a textarea.
+const FIELD_TYPE_PASSTHROUGH = new Set(['phone', 'currency', 'date', 'email', 'number', 'bigParagraph']);
 
 // A combined question's box can carry its own PDF field name. Otherwise its id is
 // <question nodeId>_<box nameId>, which only works while the question is named

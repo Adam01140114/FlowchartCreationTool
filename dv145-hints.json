@@ -1,0 +1,236 @@
+{
+  "_comment": "DV-145 asks nothing new in the packet, like DV-140 and DV-165. It is the judge's order on the DV-108 request - 'This is a Court Order.' on both pages - and it is attached to DV-140. The filer prepares items 1 and 2 and the proposed orders in items 4-10; every one of those is a question the packet already asks. Items 1 and 2 are the two names (DV-100) and their relationships to the children (DV-105), and items 4-10 are DV-108 items 4-10 box for box, so each field carries the name the asking form uses and one answer fills both. The judge's parts - item 3's findings, item 4's choice of area, items 11 and 12 and the case number - are courtUse in the field config. Nothing on DV-145 that the filer owns has a 'need more space' box, so nothing here continues on MC-025: the only continuation lines (3b(8) and 12) belong to the court. The groups, questions, combines and split below repeat DV-105's and DV-108's word for word, so the form compiled on its own reads the same and the packet collapses them into the questions already asked.",
+  "sections": [
+    {
+      "name": "The Order to Prevent Abduction",
+      "fields": [
+        "case_number",
+        "person_asking_protection_name",
+        "dv105_your_relationship_parent",
+        "dv105_your_relationship_legal_guardian",
+        "dv105_your_relationship_other",
+        "dv105_your_relationship_other_description",
+        "person_to_restrain_full_name",
+        "dv105_their_relationship_parent",
+        "dv105_their_relationship_legal_guardian",
+        "dv105_their_relationship_other",
+        "dv105_their_relationship_other_description",
+        "dv108_order_no_move_without_permission",
+        "dv108_order_turn_in_travel_documents",
+        "dv108_order_provide_travel_plan",
+        "dv108_order_notify_other_state",
+        "dv108_order_notify_foreign_embassy",
+        "dv108_order_foreign_custody_order",
+        "dv108_order_post_a_bond",
+        "dv108_travel_documents_to_turn_in",
+        "dv108_travel_documents_due_date",
+        "dv108_travel_documents_recipient_name",
+        "dv108_travel_plan_schedule",
+        "dv108_travel_plan_round_trip_tickets",
+        "dv108_travel_plan_contact_details",
+        "dv108_travel_plan_open_ticket_for_me",
+        "dv108_travel_plan_other",
+        "dv108_travel_plan_other_description",
+        "dv108_notify_state_county_and_state",
+        "dv108_embassy_or_consulate_name",
+        "dv108_embassy_proof_due_date",
+        "dv108_foreign_custody_country",
+        "dv108_bond_amount"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "nameId": "dv105_your_relationship_to_children",
+      "question": "What is your relationship to the children?",
+      "members": [
+        "dv105_your_relationship_parent",
+        "dv105_your_relationship_legal_guardian",
+        "dv105_your_relationship_other"
+      ],
+      "labels": [
+        "Parent",
+        "Legal guardian",
+        "Other"
+      ]
+    },
+    {
+      "nameId": "dv105_their_relationship_to_children",
+      "question": "What is the other person's relationship to the children?",
+      "members": [
+        "dv105_their_relationship_parent",
+        "dv105_their_relationship_legal_guardian",
+        "dv105_their_relationship_other"
+      ],
+      "labels": [
+        "Parent",
+        "Legal guardian",
+        "Other"
+      ]
+    },
+    {
+      "nameId": "dv108_orders_requested",
+      "multiSelect": true,
+      "question": "Which orders do you want the judge to make to prevent an abduction?",
+      "_why": "DV-145 items 4-10 are the orders DV-108 items 4-10 ask for, in the same order. The same group as DV-108's, so the packet asks it once, there.",
+      "members": [
+        "dv108_order_no_move_without_permission",
+        "dv108_order_turn_in_travel_documents",
+        "dv108_order_provide_travel_plan",
+        "dv108_order_notify_other_state",
+        "dv108_order_notify_foreign_embassy",
+        "dv108_order_foreign_custody_order",
+        "dv108_order_post_a_bond"
+      ],
+      "labels": [
+        "Do not move with the children without my permission or the judge's",
+        "Turn in passports and other travel documents, and do not apply for more",
+        "Give me a travel plan and documents before travelling with the children",
+        "Register this order in another state before the children travel there",
+        "Notify a foreign embassy or consulate of the passport restrictions",
+        "Get a foreign custody and visitation order before the children travel",
+        "Post a bond"
+      ]
+    },
+    {
+      "nameId": "dv108_travel_plan",
+      "multiSelect": true,
+      "question": "What should they have to give you before they travel with the children?",
+      "conditional": {
+        "onlyWhen": "dv108_order_provide_travel_plan"
+      },
+      "members": [
+        "dv108_travel_plan_schedule",
+        "dv108_travel_plan_round_trip_tickets",
+        "dv108_travel_plan_contact_details",
+        "dv108_travel_plan_open_ticket_for_me",
+        "dv108_travel_plan_other"
+      ],
+      "labels": [
+        "The children's travel schedule",
+        "Copies of round-trip airline tickets",
+        "Addresses and telephone numbers where the children can be reached",
+        "An open airline ticket for me, in case the children are not returned",
+        "Something else"
+      ]
+    }
+  ],
+  "questions": {
+    "person_asking_protection_name": {
+      "text": "What is your name?",
+      "_why": "Item 1, the protected person. DV-100 asks it, so the packet never does here."
+    },
+    "person_to_restrain_full_name": {
+      "text": "Who do you want protection from?",
+      "_why": "Item 2, the restrained person. DV-100 asks it, so the packet never does here."
+    },
+    "dv105_your_relationship_other_description": {
+      "text": "Describe your relationship to the children.",
+      "conditional": {
+        "onlyWhen": "dv105_your_relationship_other"
+      }
+    },
+    "dv105_their_relationship_other_description": {
+      "text": "Describe their relationship to the children.",
+      "conditional": {
+        "onlyWhen": "dv105_their_relationship_other"
+      }
+    },
+    "dv108_travel_documents_to_turn_in": {
+      "text": "Which documents should they turn in?",
+      "conditional": {
+        "onlyWhen": "dv108_order_turn_in_travel_documents"
+      }
+    },
+    "dv108_travel_documents_due_date": {
+      "text": "By what date must they turn the documents in?",
+      "type": "date",
+      "conditional": {
+        "onlyWhen": "dv108_order_turn_in_travel_documents"
+      }
+    },
+    "dv108_travel_documents_recipient_name": {
+      "text": "Who should they give the documents to?",
+      "conditional": {
+        "onlyWhen": "dv108_order_turn_in_travel_documents"
+      }
+    },
+    "dv108_travel_plan_other_description": {
+      "text": "What else should they have to give you?",
+      "conditional": {
+        "onlyWhen": "dv108_travel_plan_other"
+      }
+    },
+    "dv108_embassy_or_consulate_name": {
+      "text": "Which embassy or consulate should be notified?",
+      "conditional": {
+        "onlyWhen": "dv108_order_notify_foreign_embassy"
+      }
+    },
+    "dv108_embassy_proof_due_date": {
+      "text": "By what date must they file proof of that notice with the court?",
+      "type": "date",
+      "conditional": {
+        "onlyWhen": "dv108_order_notify_foreign_embassy"
+      }
+    },
+    "dv108_foreign_custody_country": {
+      "text": "Which country would the children be travelling to?",
+      "conditional": {
+        "onlyWhen": "dv108_order_foreign_custody_order"
+      }
+    },
+    "dv108_bond_amount": {
+      "text": "How much should the bond be?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "dv108_order_post_a_bond"
+      }
+    }
+  },
+  "splits": [
+    {
+      "field": "dv108_notify_state_county_and_state",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "dv108_notify_county",
+          "label": "County",
+          "question": "Which county should this order be registered with?"
+        },
+        {
+          "nameId": "dv108_notify_state",
+          "label": "State",
+          "question": "Which state is that county in?"
+        }
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "Which documents should they turn in, by when, and to whom?",
+      "fields": [
+        { "field": "dv108_travel_documents_to_turn_in", "label": "Documents to turn in" },
+        { "field": "dv108_travel_documents_due_date", "label": "Turn them in by", "type": "date" },
+        { "field": "dv108_travel_documents_recipient_name", "label": "Give them to" }
+      ],
+      "conditional": { "onlyWhen": "dv108_order_turn_in_travel_documents" }
+    },
+    {
+      "question": "Which embassy or consulate should be notified?",
+      "fields": [
+        { "field": "dv108_embassy_or_consulate_name", "label": "Embassy or consulate" },
+        { "field": "dv108_embassy_proof_due_date", "label": "File proof of the notice by", "type": "date" }
+      ],
+      "conditional": { "onlyWhen": "dv108_order_notify_foreign_embassy" }
+    },
+    {
+      "question": "Where should this order be registered?",
+      "fields": [
+        { "field": "dv108_notify_county", "label": "County" },
+        { "field": "dv108_notify_state", "label": "State" }
+      ],
+      "conditional": { "onlyWhen": "dv108_order_notify_other_state" }
+    }
+  ]
+}

@@ -1,0 +1,351 @@
+{
+  "formTitle": "MC-410 Disability Accommodation Request",
+  "_comment": "MC-410 is CONFIDENTIAL and is not filed in the case file: it goes to the court's ADA coordinator, not into the record the other side can read (Cal. Rules of Court, rule 1.100; the form prints CONFIDENTIAL under its number). It comes into the packet when the filer says they need an accommodation for a disability at court. Page 1 is the filer's; page 2 says 'Court fills out below' and every field under it - the court's contact line, granted or denied, the reasons, the dates it covers and the signature - is marked courtUse. The case number is courtUse as on every form in the packet. The filer's own details carry the packet's names (person_asking_protection_*, court_name_and_street_address) so they are asked once. Names come from the printed labels and the rectangles: the XFA path for the accommodation box is List4[0].LI1[0].Medical-Condition[0] and for the helper's name SignSub[0].Name[0], neither of which says what the box is. The eight push buttons (print, save, clear, three links and the footer link) are type button and courtUse; the sanitizer drops them and draws the caption of any that was printing words.",
+  "fields": [
+    {
+      "id": "MC-410[0].Page1[0].List1[0].LI1[0].NameInfo[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "1. Your name"
+    },
+    {
+      "id": "MC-410[0].Page1[0].List1[0].LI1[0].Address[0]",
+      "newName": "person_asking_protection_mailing_address",
+      "type": "text",
+      "label": "1. Address (street)"
+    },
+    {
+      "id": "MC-410[0].Page1[0].List1[0].LI1[0].Address1[0]",
+      "newName": "mc410_city_state_zip",
+      "type": "text",
+      "label": "1. Address (city, state, and ZIP code)"
+    },
+    {
+      "id": "MC-410[0].Page1[0].List1[0].LI1[0].Phone[0]",
+      "newName": "person_asking_protection_telephone",
+      "type": "text",
+      "label": "1. Phone"
+    },
+    {
+      "id": "MC-410[0].Page1[0].List1[0].LI1[0].Email[0]",
+      "newName": "person_asking_protection_email",
+      "type": "text",
+      "label": "1. Email"
+    },
+    {
+      "id": "MC-410[0].Page1[0].CaptionP1Right_sf[0].TextField6[0]",
+      "newName": "court_name_and_street_address",
+      "type": "text",
+      "label": "Court name and address"
+    },
+    {
+      "id": "MC-410[0].Page1[0].CaptionP1Right_sf[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 1)",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page1[0].CaptionP1Right_sf[0].CaseNumber_ft1[0]",
+      "newName": "mc410_case_name_or_type",
+      "type": "text",
+      "label": "Case name or type"
+    },
+    {
+      "id": "MC-410[0].Page1[0].List2[0].LI1[0].CheckJuror[0]",
+      "newName": "mc410_involvement_juror",
+      "type": "checkbox",
+      "label": "2. Juror",
+      "courtUse": true,
+      "_why": "For a witness, juror, lawyer or someone else asking for an accommodation. The filer asking in this packet is a party, so this stays blank by design."
+    },
+    {
+      "id": "MC-410[0].Page1[0].List2[0].LI1[0].CheckParty[0]",
+      "newName": "needs_disability_accommodation_yes",
+      "type": "checkbox",
+      "label": "2. Party",
+      "_why": "MC-410 is in the packet only because the filer asked for an accommodation on DV-100, and the filer is a party to the case: that answer ticks this box, so it is never asked."
+    },
+    {
+      "id": "MC-410[0].Page1[0].List2[0].LI1[0].CheckWitness[0]",
+      "newName": "mc410_involvement_witness",
+      "type": "checkbox",
+      "label": "2. Witness",
+      "courtUse": true,
+      "_why": "For a witness, juror, lawyer or someone else asking for an accommodation. The filer asking in this packet is a party, so this stays blank by design."
+    },
+    {
+      "id": "MC-410[0].Page1[0].List2[0].LI1[0].CheckLawyer[0]",
+      "newName": "mc410_involvement_lawyer",
+      "type": "checkbox",
+      "label": "2. Lawyer",
+      "courtUse": true,
+      "_why": "For a witness, juror, lawyer or someone else asking for an accommodation. The filer asking in this packet is a party, so this stays blank by design."
+    },
+    {
+      "id": "MC-410[0].Page1[0].List2[0].LI1[0].CheckOther[0]",
+      "newName": "mc410_involvement_other",
+      "type": "checkbox",
+      "label": "2. Other",
+      "courtUse": true,
+      "_why": "For a witness, juror, lawyer or someone else asking for an accommodation. The filer asking in this packet is a party, so this stays blank by design."
+    },
+    {
+      "id": "MC-410[0].Page1[0].List2[0].LI1[0].Name[0]",
+      "newName": "mc410_involvement_other_explanation",
+      "type": "text",
+      "label": "2. Other (explain)",
+      "courtUse": true,
+      "_why": "For a witness, juror, lawyer or someone else asking for an accommodation. The filer asking in this packet is a party, so this stays blank by design."
+    },
+    {
+      "id": "MC-410[0].Page1[0].List3[0].LI1[0].TextField4[0]",
+      "newName": "mc410_when_and_where",
+      "type": "text",
+      "label": "3. When and where do you need the accommodation? (dates, times, and court location)"
+    },
+    {
+      "id": "MC-410[0].Page1[0].List4[0].LI1[0].Medical-Condition[0]",
+      "newName": "mc410_accommodation_needed",
+      "type": "text",
+      "label": "4. What accommodation do you need at the court?"
+    },
+    {
+      "id": "MC-410[0].Page1[0].List5[0].LI1[0].TextField4[0]",
+      "newName": "mc410_accommodation_reason",
+      "type": "text",
+      "label": "5. Why do you need this accommodation to assist you in court?"
+    },
+    {
+      "id": "MC-410[0].Page1[0].List5[0].LI1[0].CheckBox3[0]",
+      "newName": "mc410_more_information_attached",
+      "type": "checkbox",
+      "label": "5. More information on this request is attached"
+    },
+    {
+      "id": "MC-410[0].Page1[0].SignSub[0].DateTimeField1[0]",
+      "newName": "mc410_signature_date",
+      "type": "text",
+      "label": "Signature date"
+    },
+    {
+      "id": "MC-410[0].Page1[0].SignSub[0].NameInfo[0]",
+      "newName": "mc410_signature_printed_name",
+      "type": "text",
+      "label": "Type or print name (under the signature)"
+    },
+    {
+      "id": "MC-410[0].Page1[0].SignSub[0].Name[0]",
+      "newName": "mc410_helper_name",
+      "type": "text",
+      "label": "Person who helped fill out this form - name"
+    },
+    {
+      "id": "MC-410[0].Page1[0].SignSub[0].Email[0]",
+      "newName": "mc410_helper_email",
+      "type": "text",
+      "label": "Person who helped fill out this form - email"
+    },
+    {
+      "id": "MC-410[0].Page1[0].SignSub[0].Phone[0]",
+      "newName": "mc410_helper_phone",
+      "type": "text",
+      "label": "Person who helped fill out this form - phone"
+    },
+    {
+      "id": "MC-410[0].Page2[0].HeaderSub[0].NameInfo[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Name (page 2 header)"
+    },
+    {
+      "id": "MC-410[0].Page2[0].HeaderSub[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 2)",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].InstructionSub[0].TextField1[0]",
+      "newName": "mc410_court_contact_phone",
+      "type": "text",
+      "label": "Court fills out: phone to contact the court if the accommodation is no longer needed",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].InstructionSub[0].TextField2[0]",
+      "newName": "mc410_court_contact_email",
+      "type": "text",
+      "label": "Court fills out: email to contact the court if the accommodation is no longer needed",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].Subform1[0].FieldName_cb[0]",
+      "newName": "mc410_court_request_granted",
+      "type": "checkbox",
+      "label": "Court fills out: your request is granted",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].Subform1[0].FieldName_cb1[0]",
+      "newName": "mc410_court_request_denied",
+      "type": "checkbox",
+      "label": "Court fills out: your request is denied in whole or in part",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].Subform1[0].CheckBox1[0]",
+      "newName": "mc410_court_denied_not_rule_1_100",
+      "type": "checkbox",
+      "label": "Court fills out: does not meet the requirements of rule 1.100",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].Subform1[0].CheckBox2[0]",
+      "newName": "mc410_court_denied_undue_burden",
+      "type": "checkbox",
+      "label": "Court fills out: creates an undue financial or administrative burden",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].Subform1[0].CheckBox3[0]",
+      "newName": "mc410_court_denied_changes_nature",
+      "type": "checkbox",
+      "label": "Court fills out: changes the basic nature of the court's service",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].Subform1[0].TextField4[0]",
+      "newName": "mc410_court_denial_reasons",
+      "type": "text",
+      "label": "Court fills out: reasons supporting the boxes checked",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].Subform1[0].CheckBox4[0]",
+      "newName": "mc410_court_alternative_provided",
+      "type": "checkbox",
+      "label": "Court fills out: instead, the court will provide",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].Subform1[0].TextField5[0]",
+      "newName": "mc410_court_alternative_description",
+      "type": "text",
+      "label": "Court fills out: the accommodation the court will provide instead",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].SignSub[0].CheckB1[0]",
+      "newName": "mc410_court_period_as_requested",
+      "type": "checkbox",
+      "label": "Court fills out: for the dates and times requested",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].SignSub[0].CheckB1[1]",
+      "newName": "mc410_court_period_indefinitely",
+      "type": "checkbox",
+      "label": "Court fills out: indefinitely",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].SignSub[0].CheckB1[2]",
+      "newName": "mc410_court_period_on_dates",
+      "type": "checkbox",
+      "label": "Court fills out: on dates",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].SignSub[0].TextField2[0]",
+      "newName": "mc410_court_period_dates",
+      "type": "text",
+      "label": "Court fills out: the dates",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].SignSub[0].CheckBox4[0]",
+      "newName": "mc410_court_more_information_attached",
+      "type": "checkbox",
+      "label": "Court fills out: more information on this decision is attached",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].SignSub[0].DateTimeField1[0]",
+      "newName": "mc410_court_signature_date",
+      "type": "text",
+      "label": "Court fills out: signature date",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].SignSub[0].YourName_ft[0]",
+      "newName": "mc410_court_signature_printed_name",
+      "type": "text",
+      "label": "Court fills out: printed name under the signature",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].SignSub[0].DateField1[0]",
+      "newName": "mc410_court_response_date",
+      "type": "text",
+      "label": "Court fills out: the court responded in person, by phone, or mail/email on",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].#pageSet[0].PageArea1[0].FooterSub[0].Button1[0]",
+      "newName": "mc410_button_footer_link",
+      "type": "button",
+      "label": "Footer link to courts.ca.gov (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page1[0].InstructionsSub[0].Button1[0]",
+      "newName": "mc410_button_info_link",
+      "type": "button",
+      "label": "Link to MC-410-INFO (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].Subform1[0].Button_rule[0]",
+      "newName": "mc410_button_rule_link",
+      "type": "button",
+      "label": "Link to rule 1.100 (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].Page2[0].SignSub[0].Button_rule_g[0]",
+      "newName": "mc410_button_rule_g_link",
+      "type": "button",
+      "label": "Link to rule 1.100(g) (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].#pageSet[0].Page3[0].FooterSub[0].Warning[0]",
+      "newName": "mc410_button_privacy_warning",
+      "type": "button",
+      "label": "Privacy warning (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].#pageSet[0].Page3[0].FooterSub[0].Print_bt[0]",
+      "newName": "mc410_button_print",
+      "type": "button",
+      "label": "Print this form (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].#pageSet[0].Page3[0].FooterSub[0].Save_bt[0]",
+      "newName": "mc410_button_save",
+      "type": "button",
+      "label": "Save this form (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "MC-410[0].#pageSet[0].Page3[0].FooterSub[0].Reset_bt[0]",
+      "newName": "mc410_button_reset",
+      "type": "button",
+      "label": "Clear this form (push button)",
+      "courtUse": true
+    }
+  ]
+}

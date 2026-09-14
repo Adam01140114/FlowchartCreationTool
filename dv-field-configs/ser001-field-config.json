@@ -1,0 +1,632 @@
+{
+  "formTitle": "SER-001 Request for Sheriff to Serve Court Papers",
+  "_comment": "SER-001 is the filer's form - the sheriff completes only the file number at the top - and it is in the packet because DV-100 asked \"Do you want the sheriff or marshal to serve the papers ... for free?\" and the answer was Yes. Most of it is what the packet already knows about the person to serve, so those fields carry the names of the questions that ask them: the names and contact details from DV-100 item 1 and 2, the description from DV-100 item 2 and DV-110 item 2, the nicknames, telephone, marks, vehicle and language from CLETS-001, the firearms answer from DV-100 item 9, and the home address from DV-110 item 2. Four boxes are true whenever SER-001 is in the packet (3a, the Yes of 3a(3), the Yes of 3a(4) and \"history of violence or abuse\") and carry the name of that Yes. What is left - the county, the picture, the safety checklist, how and when to find the person, and item 5 - is asked here under ser001_ names. Item 3b (serving a business) and item 6 (writs and levies) never apply to a domestic violence restraining order and are courtUse with a _why, the way DV-105(A) leaves its DV-125 box. Case number is courtUse on every page, as on every form in the packet.",
+  "fields": [
+    {
+      "id": "SER-001[0].Page1[0].CaptionRight[0].Sheriff[0].SheriffNumber[0]",
+      "newName": "ser001_sheriff_file_number",
+      "type": "text",
+      "label": "Sheriff file number",
+      "courtUse": true,
+      "_why": "The page says \"Sheriff File Number (for sheriff to complete, if needed)\" - the sheriff's box."
+    },
+    {
+      "id": "SER-001[0].Page1[0].CaptionRight[0].CaseNo[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Court case number (page 1)",
+      "courtUse": true,
+      "_why": "case_number is courtUse on every form in the packet: there is no case number until the court files DV-100, so no form asks it."
+    },
+    {
+      "id": "SER-001[0].Page1[0].List1[0].Li1[0].NameofCounty[0]",
+      "newName": "ser001_sheriff_county",
+      "type": "text",
+      "label": "1. Sheriff or marshal of (name of county)"
+    },
+    {
+      "id": "SER-001[0].Page1[0].List2[0].Li2a[0].Yourname[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "2a. Your name (party requesting service)"
+    },
+    {
+      "id": "SER-001[0].Page1[0].List2[0].Li2b[0].lawyersname\\.2b[0]",
+      "newName": "person_asking_protection_lawyer_name",
+      "type": "text",
+      "label": "2b. Your lawyer - name",
+      "blankWhenNotAsked": "Only a filer with a lawyer names one (DV-100: \"Do you have a lawyer?\"). With no lawyer, SER-001's lawyer lines are rightly blank."
+    },
+    {
+      "id": "SER-001[0].Page1[0].List2[0].Li2b[0].firmname[0]",
+      "newName": "person_asking_protection_lawyer_firm_name",
+      "type": "text",
+      "label": "2b. Your lawyer - firm name",
+      "blankWhenNotAsked": "Only a filer with a lawyer names one (DV-100: \"Do you have a lawyer?\"). With no lawyer, SER-001's lawyer lines are rightly blank."
+    },
+    {
+      "id": "SER-001[0].Page1[0].List2[0].Li2c[0].TextField[0]",
+      "newName": "ser001_court_case_name",
+      "type": "text",
+      "label": "2c. Court case name (example: Garcia v. Smith)"
+    },
+    {
+      "id": "SER-001[0].Page1[0].List2[0].Li2d[0].address\\.2d[0]",
+      "newName": "person_asking_protection_mailing_address",
+      "type": "text",
+      "label": "2d. Address to receive mail"
+    },
+    {
+      "id": "SER-001[0].Page1[0].List2[0].Li2d[0].city\\.2d[0]",
+      "newName": "person_asking_protection_mailing_city",
+      "type": "text",
+      "label": "2d. City"
+    },
+    {
+      "id": "SER-001[0].Page1[0].List2[0].Li2d[0].state\\.2d[0]",
+      "newName": "person_asking_protection_mailing_state",
+      "type": "text",
+      "label": "2d. State"
+    },
+    {
+      "id": "SER-001[0].Page1[0].List2[0].Li2d[0].zip\\.2d[0]",
+      "newName": "person_asking_protection_mailing_zip_code",
+      "type": "text",
+      "label": "2d. Zip"
+    },
+    {
+      "id": "SER-001[0].Page1[0].List2[0].Li2d[0].telephone\\.2d[0]",
+      "newName": "person_asking_protection_telephone",
+      "type": "text",
+      "label": "2d. Telephone number"
+    },
+    {
+      "id": "SER-001[0].Page1[0].List2[0].Li2d[0].email\\.2d[0]",
+      "newName": "person_asking_protection_email",
+      "type": "text",
+      "label": "2d. Email address"
+    },
+    {
+      "id": "SER-001[0].Page2[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Court case number (page 2)",
+      "courtUse": true,
+      "_why": "case_number is courtUse on every form in the packet: there is no case number until the court files DV-100, so no form asks it."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].servePerson[0]",
+      "newName": "papers_served_by_sheriff_yes",
+      "type": "checkbox",
+      "label": "3a. I ask the sheriff to serve a person",
+      "_why": "SER-001 is in the packet only because DV-100's \"Do you want the sheriff or marshal to serve the papers ... for free?\" was answered Yes, and this box is true exactly then, so the Yes box of that answer (papers_served_by_sheriff_yes) ticks it. One answer, every box it decides."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a1[0].personName[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "3a(1). Name of person"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a1[0].nicknames[0]",
+      "newName": "clets_restrained_person_other_names",
+      "type": "text",
+      "label": "3a(1). Nicknames or aliases"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a2[0].Telephone[0]",
+      "newName": "clets_restrained_person_telephone",
+      "type": "text",
+      "label": "3a(2). Telephone number"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].Description[0]",
+      "newName": "ser001_no_description_known",
+      "type": "checkbox",
+      "label": "3a(3). No, I do not have any information about the person's description",
+      "courtUse": true,
+      "_why": "Never true in this packet: DV-100 item 2 always asks the person's age, date of birth, gender and race, so there is always a description to give and this box stays blank by design."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].Description[1]",
+      "newName": "papers_served_by_sheriff_yes",
+      "type": "checkbox",
+      "label": "3a(3). Yes, I can describe the person",
+      "_why": "Always true when SER-001 is in the packet: DV-100 item 2 asks the person's age, date of birth, gender and race before anything else, so the Yes of the answer that brings SER-001 in ticks it. SER-001 is in the packet only because DV-100's \"Do you want the sheriff or marshal to serve the papers ... for free?\" was answered Yes, and this box is true exactly then, so the Yes box of that answer (papers_served_by_sheriff_yes) ticks it. One answer, every box it decides."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].gender[0]",
+      "newName": "person_to_restrain_gender_male",
+      "type": "checkbox",
+      "label": "3a(3). Gender - Male"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].gender[1]",
+      "newName": "person_to_restrain_gender_female",
+      "type": "checkbox",
+      "label": "3a(3). Gender - Female"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].gender[2]",
+      "newName": "person_to_restrain_gender_nonbinary",
+      "type": "checkbox",
+      "label": "3a(3). Gender - Nonbinary"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].Height[0]",
+      "newName": "restrained_person_height",
+      "type": "text",
+      "label": "3a(3). Height"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].Weight[0]",
+      "newName": "restrained_person_weight",
+      "type": "text",
+      "label": "3a(3). Weight"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].Hair[0]",
+      "newName": "restrained_person_hair_color",
+      "type": "text",
+      "label": "3a(3). Hair color"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].Eye[0]",
+      "newName": "restrained_person_eye_color",
+      "type": "text",
+      "label": "3a(3). Eye color"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].DOB\\.age[0]",
+      "newName": "ser001_person_date_of_birth_or_age",
+      "type": "text",
+      "label": "3a(3). Date of birth or age (give estimate)"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].raceEth[0]",
+      "newName": "person_to_restrain_race",
+      "type": "text",
+      "label": "3a(3). Race/Ethnicity"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].specialMarks[0]",
+      "newName": "clets_restrained_person_marks_scars_tattoos",
+      "type": "text",
+      "label": "3a(3). Special marks or features (tattoos, scars, etc.)"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].Vehicle[0]",
+      "newName": "ser001_person_vehicle",
+      "type": "text",
+      "label": "3a(3). Vehicle (type, model, year, color, plate number)"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a3[0].incPicture[0]",
+      "newName": "ser001_including_picture",
+      "type": "checkbox",
+      "label": "3a(3). Check here if you are including a picture of the person"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].SafetyAccessibility[0]",
+      "newName": "ser001_no_safety_issues_known",
+      "type": "checkbox",
+      "label": "3a(4). No safety or accessibility issues known",
+      "courtUse": true,
+      "_why": "Never true in this packet: the person has a history of abuse - it is what DV-100 is about - so item 3a(4) is always answered Yes and this box stays blank by design."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].SafetyAccessibility[1]",
+      "newName": "papers_served_by_sheriff_yes",
+      "type": "checkbox",
+      "label": "3a(4). Yes, I know of safety or accessibility issues",
+      "_why": "Always true in this packet, because \"Has a history of violence or abuse\" under it always is. SER-001 is in the packet only because DV-100's \"Do you want the sheriff or marshal to serve the papers ... for free?\" was answered Yes, and this box is true exactly then, so the Yes box of that answer (papers_served_by_sheriff_yes) ticks it. One answer, every box it decides."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].hasGun[0]",
+      "newName": "person_to_restrain_firearms_yes_yes",
+      "type": "checkbox",
+      "label": "3a(4). Has a gun or other weapon",
+      "_why": "The Yes of DV-100 item 9, \"Does the person have firearms (guns), firearm parts, or ammunition?\" - the same box CLETS-001 prints under this name - so it is asked once."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].probationParole[0]",
+      "newName": "ser001_safety_probation_or_parole",
+      "type": "checkbox",
+      "label": "3a(4). Is on probation or parole"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].violence[0]",
+      "newName": "papers_served_by_sheriff_yes",
+      "type": "checkbox",
+      "label": "3a(4). Has a history of violence or abuse",
+      "_why": "Always true in this packet: DV-100 is the filer's sworn account of this person's abuse (items 5 to 7), so the box is ticked whenever SER-001 is in. SER-001 is in the packet only because DV-100's \"Do you want the sheriff or marshal to serve the papers ... for free?\" was answered Yes, and this box is true exactly then, so the Yes box of that answer (papers_served_by_sheriff_yes) ticks it. One answer, every box it decides."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].aggressiveAnimal[0]",
+      "newName": "ser001_safety_aggressive_animal",
+      "type": "checkbox",
+      "label": "3a(4). Has an aggressive animal"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].specialtraining[0]",
+      "newName": "ser001_safety_special_training",
+      "type": "checkbox",
+      "label": "3a(4). Has special training (examples: military, first responder)"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].mentalHealth[0]",
+      "newName": "ser001_safety_mental_health",
+      "type": "checkbox",
+      "label": "3a(4). Has mental health issues"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].hardOfHearing[0]",
+      "newName": "ser001_safety_deaf_or_hard_of_hearing",
+      "type": "checkbox",
+      "label": "3a(4). Is deaf or hard of hearing"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].noEng[0]",
+      "newName": "clets_restrained_person_speaks_english_no",
+      "type": "checkbox",
+      "label": "3a(4). Does not speak English",
+      "_why": "The No of CLETS-001 item 1, \"Does the person speak English?\", so it is asked once."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].language[0]",
+      "newName": "clets_restrained_person_language",
+      "type": "text",
+      "label": "3a(4). Language they speak",
+      "_why": "CLETS-001 item 1 asks the same language under this name.",
+      "blankWhenNotAsked": "Asked only when CLETS-001 says the person to be served does not speak English; otherwise SER-001 needs no language."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].Other[0]",
+      "newName": "ser001_safety_other",
+      "type": "checkbox",
+      "label": "3a(4). Other safety or accessibility information"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].other[0]",
+      "newName": "ser001_safety_other_details",
+      "type": "text",
+      "label": "3a(4). Other information about safety or accessibility"
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3b[0].servePerson[0]",
+      "newName": "ser001_serve_entity",
+      "type": "checkbox",
+      "label": "3b. I ask the sheriff to serve an entity",
+      "courtUse": true,
+      "_why": "Item 3b is for serving a business or government agency. A domestic violence restraining order is against a person - item 3a, the person DV-100 item 2 names - so 3b stays blank by design."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3b[0].Li3bList[0].Li3b1[0].NameType[0]",
+      "newName": "ser001_entity_name_and_type",
+      "type": "text",
+      "label": "3b(1). Name and type of entity",
+      "courtUse": true,
+      "_why": "Item 3b is for serving a business or government agency. A domestic violence restraining order is against a person - item 3a, the person DV-100 item 2 names - so 3b stays blank by design."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3b[0].Li3bList[0].Li3b1[0].telephone[0]",
+      "newName": "ser001_entity_telephone",
+      "type": "text",
+      "label": "3b(1). Entity telephone number",
+      "courtUse": true,
+      "_why": "Item 3b is for serving a business or government agency. A domestic violence restraining order is against a person - item 3a, the person DV-100 item 2 names - so 3b stays blank by design."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3b[0].Li3bList[0].Li3b2[0].nameofperson[0]",
+      "newName": "ser001_entity_person_to_serve",
+      "type": "text",
+      "label": "3b(2). Specific person who should be served",
+      "courtUse": true,
+      "_why": "Item 3b is for serving a business or government agency. A domestic violence restraining order is against a person - item 3a, the person DV-100 item 2 names - so 3b stays blank by design."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3b[0].Li3bList[0].Li3b3[0].nameofagent[0]",
+      "newName": "ser001_entity_agent_for_service",
+      "type": "text",
+      "label": "3b(3). Agent for service of process",
+      "courtUse": true,
+      "_why": "Item 3b is for serving a business or government agency. A domestic violence restraining order is against a person - item 3a, the person DV-100 item 2 names - so 3b stays blank by design."
+    },
+    {
+      "id": "SER-001[0].Page2[0].List3[0].Li3b[0].Li3bList[0].Li3b4[0].listsafetyAccessibility[0]",
+      "newName": "ser001_entity_safety_issues",
+      "type": "text",
+      "label": "3b(4). Safety or accessibility issues at the entity",
+      "courtUse": true,
+      "_why": "Item 3b is for serving a business or government agency. A domestic violence restraining order is against a person - item 3a, the person DV-100 item 2 names - so 3b stays blank by design."
+    },
+    {
+      "id": "SER-001[0].Page3[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Court case number (page 3)",
+      "courtUse": true,
+      "_why": "case_number is courtUse on every form in the packet: there is no case number until the court files DV-100, so no form asks it."
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].Address[0]",
+      "newName": "restrained_person_street_address",
+      "type": "text",
+      "label": "4. Address where the person should be served",
+      "_why": "DV-110 item 2 asks where the person lives under this name; that home is where the sheriff serves them.",
+      "blankWhenNotAsked": "Asked only when the filer knows where the person lives (DV-110). When they do not, SER-001 asks for another place to find them, and the home address is rightly blank."
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].addDef[0]",
+      "newName": "knows_restrained_person_address_yes",
+      "type": "checkbox",
+      "label": "4. Address is a home",
+      "_why": "The address in item 4 is the one DV-110 item 2 asks as where the person lives, so it is a home exactly when that address was given: the Yes of \"Do you know where the person you want protection from lives?\" (the knows_restrained_person_address gate) ticks this box."
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].addDef[1]",
+      "newName": "ser001_service_address_business",
+      "type": "checkbox",
+      "label": "4. Address is a business",
+      "courtUse": true,
+      "_why": "The address in item 4 is where the person lives (DV-110 item 2), so it is never a business and this box stays blank by design. A business address goes in the alternate address below."
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].City[0]",
+      "newName": "restrained_person_city",
+      "type": "text",
+      "label": "4. City",
+      "blankWhenNotAsked": "Asked only when the filer knows where the person lives (DV-110). When they do not, SER-001 asks for another place to find them, and the home address is rightly blank."
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].State[0]",
+      "newName": "restrained_person_state",
+      "type": "text",
+      "label": "4. State",
+      "blankWhenNotAsked": "Asked only when the filer knows where the person lives (DV-110). When they do not, SER-001 asks for another place to find them, and the home address is rightly blank."
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].Zip[0]",
+      "newName": "restrained_person_zip_code",
+      "type": "text",
+      "label": "4. Zip",
+      "blankWhenNotAsked": "Asked only when the filer knows where the person lives (DV-110). When they do not, SER-001 asks for another place to find them, and the home address is rightly blank."
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].gateCode[0]",
+      "newName": "ser001_service_address_gate_code",
+      "type": "text",
+      "label": "4. Gate code or special instructions"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].serveTime[0]",
+      "newName": "ser001_service_address_best_time",
+      "type": "text",
+      "label": "4. Best time to serve at this address (example: 8 a.m. to noon)"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].jail[0]",
+      "newName": "ser001_person_in_jail",
+      "type": "checkbox",
+      "label": "4. The person is in jail or prison"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].jailName[0]",
+      "newName": "ser001_jail_facility_name",
+      "type": "text",
+      "label": "4. Name of jail or prison facility"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].altAdd[0]",
+      "newName": "ser001_alternate_address_street",
+      "type": "text",
+      "label": "4. Alternate address"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].altAddDef[0]",
+      "newName": "ser001_alternate_address_home",
+      "type": "checkbox",
+      "label": "4. Alternate address is a home"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].altAddDef[1]",
+      "newName": "ser001_alternate_address_business",
+      "type": "checkbox",
+      "label": "4. Alternate address is a business"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].altCity[0]",
+      "newName": "ser001_alternate_address_city",
+      "type": "text",
+      "label": "4. Alternate address - City"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].altState[0]",
+      "newName": "ser001_alternate_address_state",
+      "type": "text",
+      "label": "4. Alternate address - State"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].altZip[0]",
+      "newName": "ser001_alternate_address_zip_code",
+      "type": "text",
+      "label": "4. Alternate address - Zip"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].altGateCode[0]",
+      "newName": "ser001_alternate_address_gate_code",
+      "type": "text",
+      "label": "4. Alternate address - gate code or special instructions"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List4[0].Li4[0].altServeTime[0]",
+      "newName": "ser001_alternate_address_best_time",
+      "type": "text",
+      "label": "4. Alternate address - best time to serve"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List5[0].Li5a[0].typePapers[0]",
+      "newName": "ser001_type_of_papers",
+      "type": "text",
+      "label": "5a. Type of court papers you are giving the sheriff to serve"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List5[0].Li5b[0].listForms[0]",
+      "newName": "ser001_forms_to_serve",
+      "type": "text",
+      "label": "5b. Forms or court papers you want served"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List5[0].Li5c[0].Hearing[0]",
+      "newName": "ser001_hearing_unknown",
+      "type": "checkbox",
+      "label": "5c. Is there a court hearing - I don't know"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List5[0].Li5c[0].Hearing[1]",
+      "newName": "ser001_hearing_no",
+      "type": "checkbox",
+      "label": "5c. Is there a court hearing - No"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List5[0].Li5c[0].Hearing[2]",
+      "newName": "ser001_hearing_yes",
+      "type": "checkbox",
+      "label": "5c. Is there a court hearing - Yes"
+    },
+    {
+      "id": "SER-001[0].Page3[0].List5[0].Li5c[0].hearingDate[0]",
+      "newName": "ser001_hearing_date",
+      "type": "date",
+      "label": "5c. Date of hearing"
+    },
+    {
+      "id": "SER-001[0].Page4[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Court case number (page 4)",
+      "courtUse": true,
+      "_why": "case_number is courtUse on every form in the packet: there is no case number until the court files DV-100, so no form asks it."
+    },
+    {
+      "id": "SER-001[0].Page4[0].List5Continued[0].Li5d[0].deadline[0]",
+      "newName": "ser001_service_deadline_unknown",
+      "type": "checkbox",
+      "label": "5d. Deadline for service - I don't know"
+    },
+    {
+      "id": "SER-001[0].Page4[0].List5Continued[0].Li5d[0].deadline[1]",
+      "newName": "ser001_service_deadline_no",
+      "type": "checkbox",
+      "label": "5d. Deadline for service - No"
+    },
+    {
+      "id": "SER-001[0].Page4[0].List5Continued[0].Li5d[0].deadline[2]",
+      "newName": "ser001_service_deadline_yes",
+      "type": "checkbox",
+      "label": "5d. Deadline for service - Yes"
+    },
+    {
+      "id": "SER-001[0].Page4[0].List5Continued[0].Li5d[0].deadlineDate[0]",
+      "newName": "ser001_service_deadline_date",
+      "type": "date",
+      "label": "5d. Deadline for service"
+    },
+    {
+      "id": "SER-001[0].Page4[0].List5Continued[0].Li5e[0].altService[0]",
+      "newName": "ser001_other_service_allowed_unknown",
+      "type": "checkbox",
+      "label": "5e. Court allowed another way of service - I don't know"
+    },
+    {
+      "id": "SER-001[0].Page4[0].List5Continued[0].Li5e[0].altService[1]",
+      "newName": "ser001_other_service_allowed_no",
+      "type": "checkbox",
+      "label": "5e. Court allowed another way of service - No"
+    },
+    {
+      "id": "SER-001[0].Page4[0].List5Continued[0].Li5e[0].altService[2]",
+      "newName": "ser001_other_service_allowed_yes",
+      "type": "checkbox",
+      "label": "5e. Court allowed another way of service - Yes"
+    },
+    {
+      "id": "SER-001[0].Page4[0].List5Continued[0].Li5f[0].othInfo[0]",
+      "newName": "ser001_other_information_no",
+      "type": "checkbox",
+      "label": "5f. Other information for the sheriff - No"
+    },
+    {
+      "id": "SER-001[0].Page4[0].List5Continued[0].Li5f[0].othInfo[1]",
+      "newName": "ser001_other_information_yes",
+      "type": "checkbox",
+      "label": "5f. Other information for the sheriff - Yes"
+    },
+    {
+      "id": "SER-001[0].Page4[0].List5Continued[0].Li5f[0].TextField[0]",
+      "newName": "ser001_other_information_details",
+      "type": "text",
+      "label": "5f. Other information for the sheriff"
+    },
+    {
+      "id": "SER-001[0].Page4[0].List6[0].Li6[0].levy[0]",
+      "newName": "ser001_levy_serve_and_levy",
+      "type": "checkbox",
+      "label": "6. Sheriff to serve and act as levying officer - Yes",
+      "courtUse": true,
+      "_why": "Item 6 is only for asking the sheriff to enforce a writ or levy (form SER-001A). Serving a restraining order is not one, so the item stays blank by design."
+    },
+    {
+      "id": "SER-001[0].Page4[0].List6[0].Li6[0].levy[1]",
+      "newName": "ser001_levy_only",
+      "type": "checkbox",
+      "label": "6. Sheriff to act as levying officer only - No",
+      "courtUse": true,
+      "_why": "Item 6 is only for asking the sheriff to enforce a writ or levy (form SER-001A). Serving a restraining order is not one, so the item stays blank by design."
+    },
+    {
+      "id": "SER-001[0].Page4[0].sig[0].SigDate[0]",
+      "newName": "ser001_signature_date",
+      "type": "text",
+      "label": "Signature date"
+    },
+    {
+      "id": "SER-001[0].Page4[0].sig[0].typeName[0]",
+      "newName": "ser001_signature_printed_name",
+      "type": "text",
+      "label": "Type or print your name"
+    },
+    {
+      "id": "SER-001[0].#pageSet[0].MPLast[0].Print[0]",
+      "newName": "ser001_print_button",
+      "type": "button",
+      "label": "Print button",
+      "courtUse": true,
+      "_why": "A form control (print, save, reset), not something that prints an answer."
+    },
+    {
+      "id": "SER-001[0].#pageSet[0].MPLast[0].Save[0]",
+      "newName": "ser001_save_button",
+      "type": "button",
+      "label": "Save button",
+      "courtUse": true,
+      "_why": "A form control (print, save, reset), not something that prints an answer."
+    },
+    {
+      "id": "SER-001[0].#pageSet[0].MPLast[0].Reset[0]",
+      "newName": "ser001_reset_button",
+      "type": "button",
+      "label": "Clear (reset) button",
+      "courtUse": true,
+      "_why": "A form control (print, save, reset), not something that prints an answer."
+    },
+    {
+      "id": "SER-001[0].Page5[0].PxCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Court case number (page 5)",
+      "courtUse": true,
+      "_why": "case_number is courtUse on every form in the packet: there is no case number until the court files DV-100, so no form asks it."
+    }
+  ]
+}

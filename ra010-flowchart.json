@@ -1,0 +1,2686 @@
+{
+  "formName": "RA-010 Notice of Remote Appearance",
+  "edgeStyle": "curved",
+  "cells": [
+    {
+      "id": "2",
+      "value": "What is your name?",
+      "geometry": {
+        "x": 610,
+        "y": 60,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=person_asking_protection_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is your name?",
+      "_questionId": "1",
+      "_nameId": "person_asking_protection_name",
+      "_placeholder": "",
+      "_mirrorTargets": [
+        "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].Name[0]",
+        "RA-010[0].Page1[0].Header_sf[0].TitlePartyName[0].Party1[0]",
+        "RA-010[0].Page1[0].List1[0].item1[0].TextField1[0]",
+        "RA-010[0].Page2[0].PxCaption[0].TitlePartyName[0].Party1[0]"
+      ],
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "3",
+      "value": "Where can the court send you papers?",
+      "geometry": {
+        "x": 610,
+        "y": 326,
+        "width": 300,
+        "height": 640
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=person_asking_protection_mailing;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": [
+        {
+          "nameId": "address",
+          "fullNameId": "person_asking_protection_mailing_address",
+          "label": "Street address",
+          "placeholder": "Street address",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": ""
+        },
+        {
+          "nameId": "city",
+          "fullNameId": "person_asking_protection_mailing_city",
+          "label": "City",
+          "placeholder": "City",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": ""
+        },
+        {
+          "nameId": "state",
+          "fullNameId": "person_asking_protection_mailing_state",
+          "label": "State",
+          "placeholder": "State",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": ""
+        },
+        {
+          "nameId": "zip_code",
+          "fullNameId": "person_asking_protection_mailing_zip_code",
+          "label": "ZIP code",
+          "placeholder": "ZIP code",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": ""
+        }
+      ],
+      "_questionText": "Where can the court send you papers?",
+      "_questionId": "2",
+      "_nameId": "person_asking_protection_mailing",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_itemOrder": [
+        {
+          "type": "textbox",
+          "index": 0
+        },
+        {
+          "type": "textbox",
+          "index": 1
+        },
+        {
+          "type": "textbox",
+          "index": 2
+        },
+        {
+          "type": "textbox",
+          "index": 3
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "value": "How can the court reach you?",
+      "geometry": {
+        "x": 610,
+        "y": 1136,
+        "width": 300,
+        "height": 530
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=person_asking_protection;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": [
+        {
+          "nameId": "telephone",
+          "fullNameId": "person_asking_protection_telephone",
+          "label": "Phone number",
+          "placeholder": "Phone number",
+          "isAmountOption": false,
+          "type": "phone",
+          "prefill": "",
+          "optional": true
+        },
+        {
+          "nameId": "fax",
+          "fullNameId": "person_asking_protection_fax",
+          "label": "Fax number",
+          "placeholder": "Fax number",
+          "isAmountOption": false,
+          "type": "phone",
+          "prefill": "",
+          "optional": true
+        },
+        {
+          "nameId": "email",
+          "fullNameId": "person_asking_protection_email",
+          "label": "Email address",
+          "placeholder": "Email address",
+          "isAmountOption": false,
+          "type": "email",
+          "prefill": "",
+          "optional": true
+        }
+      ],
+      "_questionText": "How can the court reach you?",
+      "_questionId": "3",
+      "_nameId": "person_asking_protection",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_itemOrder": [
+        {
+          "type": "textbox",
+          "index": 0
+        },
+        {
+          "type": "textbox",
+          "index": 1
+        },
+        {
+          "type": "textbox",
+          "index": 2
+        }
+      ],
+      "_optional": true
+    },
+    {
+      "id": "5",
+      "value": "Do you have a lawyer?",
+      "geometry": {
+        "x": 610,
+        "y": 1836,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=has_lawyer;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Do you have a lawyer?",
+      "_questionId": "4",
+      "_nameId": "has_lawyer",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "6",
+      "value": "Yes",
+      "geometry": {
+        "x": 581,
+        "y": 2012,
+        "width": 168,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=1;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "yes",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "7",
+      "value": "No",
+      "geometry": {
+        "x": 771,
+        "y": 2012,
+        "width": 168,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=1;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "no",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "8",
+      "value": "What are your lawyer's State Bar number and law firm?",
+      "geometry": {
+        "x": 515,
+        "y": 2212,
+        "width": 300,
+        "height": 420
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=person_asking_protection_lawyer;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": [
+        {
+          "nameId": "state_bar_number",
+          "fullNameId": "person_asking_protection_lawyer_state_bar_number",
+          "label": "State bar number",
+          "placeholder": "State bar number",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": ""
+        },
+        {
+          "nameId": "firm_name",
+          "fullNameId": "person_asking_protection_lawyer_firm_name",
+          "label": "Law firm name",
+          "placeholder": "Law firm name",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": ""
+        }
+      ],
+      "_questionText": "What are your lawyer's State Bar number and law firm?",
+      "_questionId": "5",
+      "_nameId": "person_asking_protection_lawyer",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_itemOrder": [
+        {
+          "type": "textbox",
+          "index": 0
+        },
+        {
+          "type": "textbox",
+          "index": 1
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "value": "",
+      "geometry": {
+        "x": 755,
+        "y": 2752,
+        "width": 10,
+        "height": 10
+      },
+      "style": "ellipse;whiteSpace=wrap;html=1;nodeType=mergeHub;fillColor=#4a6fa5;strokeColor=#4a6fa5;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_court_county_join",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "10",
+      "value": "In which county is the court hearing your case?",
+      "geometry": {
+        "x": 610,
+        "y": 2810,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=ra010_court_county;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "In which county is the court hearing your case?",
+      "_questionId": "6",
+      "_nameId": "ra010_court_county",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "11",
+      "value": "What is the court's street address?",
+      "geometry": {
+        "x": 610,
+        "y": 3076,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=court_street_address;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is the court's street address?",
+      "_questionId": "7",
+      "_nameId": "court_street_address",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "12",
+      "value": "What is the name of the courthouse where your case is heard?",
+      "geometry": {
+        "x": 610,
+        "y": 3342,
+        "width": 300,
+        "height": 120
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=ra010_court_branch_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is the name of the courthouse where your case is heard?",
+      "_questionId": "8",
+      "_nameId": "ra010_court_branch_name",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_optional": true
+    },
+    {
+      "id": "13",
+      "value": "Who do you want protection from?",
+      "geometry": {
+        "x": 610,
+        "y": 3632,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=person_to_restrain_full_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Who do you want protection from?",
+      "_questionId": "9",
+      "_nameId": "person_to_restrain_full_name",
+      "_placeholder": "",
+      "_mirrorTargets": [
+        "RA-010[0].Page1[0].Header_sf[0].TitlePartyName[0].Party2[0]",
+        "RA-010[0].Page2[0].PxCaption[0].TitlePartyName[0].Party2[0]"
+      ],
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "14",
+      "value": "Will you appear at your hearing remotely, by video or by phone?",
+      "geometry": {
+        "x": 610,
+        "y": 3898,
+        "width": 300,
+        "height": 120
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=appear_remotely_yes;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Will you appear at your hearing remotely, by video or by phone?",
+      "_questionId": "10",
+      "_nameId": "appear_remotely_yes",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "15",
+      "value": "Yes",
+      "geometry": {
+        "x": 581,
+        "y": 4098,
+        "width": 168,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "yes",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "16",
+      "value": "No",
+      "geometry": {
+        "x": 771,
+        "y": 4098,
+        "width": 168,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "no",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "17",
+      "value": "",
+      "geometry": {
+        "x": 755,
+        "y": 4418,
+        "width": 10,
+        "height": 10
+      },
+      "style": "ellipse;whiteSpace=wrap;html=1;nodeType=mergeHub;fillColor=#4a6fa5;strokeColor=#4a6fa5;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_others_appearing_remotely_join",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "18",
+      "value": "Who else on your side will appear remotely?",
+      "geometry": {
+        "x": 610,
+        "y": 4476,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=checkbox;nodeId=ra010_others_appearing_remotely;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Who else on your side will appear remotely?",
+      "_questionId": "11",
+      "_nameId": "ra010_others_appearing_remotely",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_optional": true,
+      "_subtitle": "Leave both unticked when it is only you."
+    },
+    {
+      "id": "20",
+      "value": "My lawyer",
+      "geometry": {
+        "x": 557,
+        "y": 4652,
+        "width": 168,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=checkbox;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_lawyer_appears_remotely",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "21",
+      "value": "Someone else, such as a witness",
+      "geometry": {
+        "x": 747,
+        "y": 4652,
+        "width": 216,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=checkbox;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_other_appears_remotely",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "22",
+      "value": "Who is the other person who will appear remotely?",
+      "geometry": {
+        "x": 705,
+        "y": 4868,
+        "width": 300,
+        "height": 420
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=ra010_other_person;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": [
+        {
+          "nameId": "name",
+          "fullNameId": "ra010_other_person_name",
+          "label": "Name",
+          "placeholder": "Name",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": ""
+        },
+        {
+          "nameId": "role",
+          "fullNameId": "ra010_other_person_role",
+          "label": "Their role in the case, such as witness",
+          "placeholder": "Their role in the case, such as witness",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": ""
+        }
+      ],
+      "_questionText": "Who is the other person who will appear remotely?",
+      "_questionId": "12",
+      "_nameId": "ra010_other_person",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_itemOrder": [
+        {
+          "type": "textbox",
+          "index": 0
+        },
+        {
+          "type": "textbox",
+          "index": 1
+        }
+      ]
+    },
+    {
+      "id": "23",
+      "value": "",
+      "geometry": {
+        "x": 755,
+        "y": 5408,
+        "width": 10,
+        "height": 10
+      },
+      "style": "ellipse;whiteSpace=wrap;html=1;nodeType=mergeHub;fillColor=#4a6fa5;strokeColor=#4a6fa5;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_appear_when_join",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "24",
+      "value": "Do you want to appear remotely for the whole case or only at one hearing?",
+      "geometry": {
+        "x": 610,
+        "y": 5466,
+        "width": 300,
+        "height": 144
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=ra010_appear_when;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Do you want to appear remotely for the whole case or only at one hearing?",
+      "_questionId": "13",
+      "_nameId": "ra010_appear_when",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_subtitle": "The court sets your hearing date after it reads your request, so the date is not known yet. Choosing the whole case means this one notice covers every hearing."
+    },
+    {
+      "id": "25",
+      "value": "For the whole case",
+      "geometry": {
+        "x": 581,
+        "y": 5690,
+        "width": 168,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_appear_throughout_case",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "26",
+      "value": "Only at one hearing",
+      "geometry": {
+        "x": 771,
+        "y": 5690,
+        "width": 168,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_appear_at_one_proceeding",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "27",
+      "value": "What kind of hearing is it?",
+      "geometry": {
+        "x": 738,
+        "y": 5906,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=ra010_proceeding_type;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What kind of hearing is it?",
+      "_questionId": "14",
+      "_nameId": "ra010_proceeding_type",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "28",
+      "value": "Has the court set the date of that hearing?",
+      "geometry": {
+        "x": 738,
+        "y": 6172,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=ra010_proceeding_date_set;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Has the court set the date of that hearing?",
+      "_questionId": "15",
+      "_nameId": "ra010_proceeding_date_set",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "29",
+      "value": "Yes",
+      "geometry": {
+        "x": 709,
+        "y": 6348,
+        "width": 168,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_proceeding_date_set_yes",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "30",
+      "value": "No",
+      "geometry": {
+        "x": 899,
+        "y": 6348,
+        "width": 168,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_proceeding_date_set_no",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "31",
+      "value": "When and where is that hearing?",
+      "geometry": {
+        "x": 643,
+        "y": 6548,
+        "width": 300,
+        "height": 640
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=multipleTextboxes;nodeId=ra010_proceeding;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": [
+        {
+          "nameId": "date",
+          "fullNameId": "ra010_proceeding_date",
+          "label": "Date",
+          "placeholder": "Date",
+          "isAmountOption": false,
+          "type": "date",
+          "prefill": ""
+        },
+        {
+          "nameId": "time",
+          "fullNameId": "ra010_proceeding_time",
+          "label": "Time",
+          "placeholder": "Time",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": ""
+        },
+        {
+          "nameId": "department",
+          "fullNameId": "ra010_proceeding_department",
+          "label": "Department",
+          "placeholder": "Department",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": "",
+          "optional": true
+        },
+        {
+          "nameId": "judicial_officer",
+          "fullNameId": "ra010_proceeding_judicial_officer",
+          "label": "Judicial officer",
+          "placeholder": "Judicial officer",
+          "isAmountOption": false,
+          "type": "label",
+          "prefill": "",
+          "optional": true
+        }
+      ],
+      "_questionText": "When and where is that hearing?",
+      "_questionId": "16",
+      "_nameId": "ra010_proceeding",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_itemOrder": [
+        {
+          "type": "textbox",
+          "index": 0
+        },
+        {
+          "type": "textbox",
+          "index": 1
+        },
+        {
+          "type": "textbox",
+          "index": 2
+        },
+        {
+          "type": "textbox",
+          "index": 3
+        }
+      ]
+    },
+    {
+      "id": "32",
+      "value": "",
+      "geometry": {
+        "x": 755,
+        "y": 7308,
+        "width": 10,
+        "height": 10
+      },
+      "style": "ellipse;whiteSpace=wrap;html=1;nodeType=mergeHub;fillColor=#4a6fa5;strokeColor=#4a6fa5;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_appear_by_join",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "33",
+      "value": "How will you appear remotely?",
+      "geometry": {
+        "x": 610,
+        "y": 7366,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=ra010_appear_by;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "How will you appear remotely?",
+      "_questionId": "17",
+      "_nameId": "ra010_appear_by",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": "",
+      "_subtitle": "The court's website says which ways its courtrooms allow."
+    },
+    {
+      "id": "34",
+      "value": "By video",
+      "geometry": {
+        "x": 557,
+        "y": 7542,
+        "width": 168,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_appear_by_videoconference",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "35",
+      "value": "By phone or other audio only",
+      "geometry": {
+        "x": 747,
+        "y": 7542,
+        "width": 216,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_appear_by_audio_only",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "36",
+      "value": "",
+      "geometry": {
+        "x": 755,
+        "y": 7878,
+        "width": 10,
+        "height": 10
+      },
+      "style": "ellipse;whiteSpace=wrap;html=1;nodeType=mergeHub;fillColor=#4a6fa5;strokeColor=#4a6fa5;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_other_remote_aspects_requested_join",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "37",
+      "value": "Do you want any other part of the hearing done remotely, such as a witness testifying by video?",
+      "geometry": {
+        "x": 610,
+        "y": 7936,
+        "width": 300,
+        "height": 168
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=ra010_other_remote_aspects_requested;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Do you want any other part of the hearing done remotely, such as a witness testifying by video?",
+      "_questionId": "18",
+      "_nameId": "ra010_other_remote_aspects_requested",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "38",
+      "value": "Yes",
+      "geometry": {
+        "x": 581,
+        "y": 8184,
+        "width": 168,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "yes",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "39",
+      "value": "No",
+      "geometry": {
+        "x": 771,
+        "y": 8184,
+        "width": 168,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "no",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "40",
+      "value": "Describe the parts of the hearing you want done remotely and the reasons for it.",
+      "geometry": {
+        "x": 515,
+        "y": 8384,
+        "width": 300,
+        "height": 144
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=bigParagraph;nodeId=ra010_other_remote_aspects_description;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Describe the parts of the hearing you want done remotely and the reasons for it.",
+      "_questionId": "19",
+      "_nameId": "ra010_other_remote_aspects_description",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "41",
+      "value": "",
+      "geometry": {
+        "x": 755,
+        "y": 8648,
+        "width": 10,
+        "height": 10
+      },
+      "style": "ellipse;whiteSpace=wrap;html=1;nodeType=mergeHub;fillColor=#4a6fa5;strokeColor=#4a6fa5;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "ra010_agree_to_keep_confidential_join",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "42",
+      "value": "Do you agree to keep the hearing as confidential as you would in the courtroom?",
+      "geometry": {
+        "x": 610,
+        "y": 8706,
+        "width": 300,
+        "height": 144
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=dropdown;nodeId=ra010_agree_to_keep_confidential;section=2;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Do you agree to keep the hearing as confidential as you would in the courtroom?",
+      "_questionId": "20",
+      "_nameId": "ra010_agree_to_keep_confidential",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "43",
+      "value": "Yes",
+      "geometry": {
+        "x": 581,
+        "y": 8930,
+        "width": 168,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "yes",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "44",
+      "value": "No",
+      "geometry": {
+        "x": 771,
+        "y": 8930,
+        "width": 168,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=16;fontSize=16;align=center;verticalAlign=middle;section=2;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(30, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "no",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "45",
+      "value": "",
+      "geometry": {
+        "x": 755,
+        "y": 9250,
+        "width": 10,
+        "height": 10
+      },
+      "style": "ellipse;whiteSpace=wrap;html=1;nodeType=mergeHub;fillColor=#4a6fa5;strokeColor=#4a6fa5;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_nameId": "end_join",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "46",
+      "value": "End",
+      "geometry": {
+        "x": 700,
+        "y": 9308,
+        "width": 120,
+        "height": 60
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "47",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">ra010_other_person_name_and_role</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 60,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "ra010_other_person_name_and_role",
+      "_linkedFields": [
+        "ra010_other_person_name",
+        "ra010_other_person_role"
+      ],
+      "_linkedJoin": ", ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "48",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">ra010_signature_date</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 200,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "ra010_signature_date",
+      "_linkedFields": [
+        "current_date"
+      ],
+      "_linkedJoin": " ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "49",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">ra010_signature_printed_name</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 340,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "ra010_signature_printed_name",
+      "_linkedFields": [
+        "person_asking_protection_name"
+      ],
+      "_linkedJoin": " ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "50",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "2",
+      "target": "3",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 168
+          },
+          {
+            "x": 760,
+            "y": 320
+          }
+        ]
+      }
+    },
+    {
+      "id": "51",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "3",
+      "target": "4",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 976
+          },
+          {
+            "x": 760,
+            "y": 1128
+          }
+        ]
+      }
+    },
+    {
+      "id": "52",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "4",
+      "target": "5",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 1672
+          },
+          {
+            "x": 760,
+            "y": 1832
+          }
+        ]
+      }
+    },
+    {
+      "id": "53",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "5",
+      "target": "6",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 1952
+          },
+          {
+            "x": 665,
+            "y": 1952
+          }
+        ]
+      }
+    },
+    {
+      "id": "54",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "5",
+      "target": "7",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 1952
+          },
+          {
+            "x": 855,
+            "y": 1952
+          }
+        ]
+      }
+    },
+    {
+      "id": "55",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "6",
+      "target": "8",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 665,
+            "y": 2104
+          },
+          {
+            "x": 665,
+            "y": 2208
+          }
+        ]
+      }
+    },
+    {
+      "id": "56",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "8",
+      "target": "9",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 665,
+            "y": 2648
+          },
+          {
+            "x": 665,
+            "y": 2736
+          },
+          {
+            "x": 760,
+            "y": 2736
+          }
+        ]
+      }
+    },
+    {
+      "id": "57",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "7",
+      "target": "9",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 855,
+            "y": 2108
+          },
+          {
+            "x": 855,
+            "y": 2736
+          },
+          {
+            "x": 760,
+            "y": 2736
+          }
+        ]
+      }
+    },
+    {
+      "id": "58",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "9",
+      "target": "10"
+    },
+    {
+      "id": "59",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "10",
+      "target": "11",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 2912
+          },
+          {
+            "x": 760,
+            "y": 3072
+          }
+        ]
+      }
+    },
+    {
+      "id": "60",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "11",
+      "target": "12",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 3184
+          },
+          {
+            "x": 760,
+            "y": 3336
+          }
+        ]
+      }
+    },
+    {
+      "id": "61",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "12",
+      "target": "13",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 3472
+          },
+          {
+            "x": 760,
+            "y": 3624
+          }
+        ]
+      }
+    },
+    {
+      "id": "62",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "13",
+      "target": "14",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 3736
+          },
+          {
+            "x": 760,
+            "y": 3888
+          }
+        ]
+      }
+    },
+    {
+      "id": "63",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "14",
+      "target": "15",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 4032
+          },
+          {
+            "x": 665,
+            "y": 4032
+          }
+        ]
+      }
+    },
+    {
+      "id": "64",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "14",
+      "target": "16",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 4032
+          },
+          {
+            "x": 855,
+            "y": 4032
+          }
+        ]
+      }
+    },
+    {
+      "id": "65",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "15",
+      "target": "17",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 665,
+            "y": 4194
+          },
+          {
+            "x": 665,
+            "y": 4400
+          },
+          {
+            "x": 760,
+            "y": 4400
+          }
+        ]
+      }
+    },
+    {
+      "id": "66",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "16",
+      "target": "17",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 855,
+            "y": 4194
+          },
+          {
+            "x": 855,
+            "y": 4400
+          },
+          {
+            "x": 760,
+            "y": 4400
+          }
+        ]
+      }
+    },
+    {
+      "id": "67",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "17",
+      "target": "18"
+    },
+    {
+      "id": "68",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "18",
+      "target": "20",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 4592
+          },
+          {
+            "x": 641,
+            "y": 4592
+          }
+        ]
+      }
+    },
+    {
+      "id": "69",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "18",
+      "target": "21",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 4592
+          },
+          {
+            "x": 855,
+            "y": 4592
+          }
+        ]
+      }
+    },
+    {
+      "id": "70",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "21",
+      "target": "22",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 855,
+            "y": 4760
+          },
+          {
+            "x": 855,
+            "y": 4864
+          }
+        ]
+      }
+    },
+    {
+      "id": "71",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "20",
+      "target": "23",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 641,
+            "y": 4764
+          },
+          {
+            "x": 641,
+            "y": 5392
+          },
+          {
+            "x": 760,
+            "y": 5392
+          }
+        ]
+      }
+    },
+    {
+      "id": "72",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "22",
+      "target": "23",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 855,
+            "y": 5304
+          },
+          {
+            "x": 855,
+            "y": 5392
+          },
+          {
+            "x": 760,
+            "y": 5392
+          }
+        ]
+      }
+    },
+    {
+      "id": "73",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "23",
+      "target": "24"
+    },
+    {
+      "id": "74",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "24",
+      "target": "25",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 5624
+          },
+          {
+            "x": 665,
+            "y": 5624
+          }
+        ]
+      }
+    },
+    {
+      "id": "75",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "24",
+      "target": "26",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 5624
+          },
+          {
+            "x": 855,
+            "y": 5624
+          }
+        ]
+      }
+    },
+    {
+      "id": "76",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "27",
+      "target": "28",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 888,
+            "y": 6008
+          },
+          {
+            "x": 888,
+            "y": 6168
+          }
+        ]
+      }
+    },
+    {
+      "id": "77",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "28",
+      "target": "29",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 888,
+            "y": 6288
+          },
+          {
+            "x": 793,
+            "y": 6288
+          }
+        ]
+      }
+    },
+    {
+      "id": "78",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "28",
+      "target": "30",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 888,
+            "y": 6288
+          },
+          {
+            "x": 983,
+            "y": 6288
+          }
+        ]
+      }
+    },
+    {
+      "id": "79",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "29",
+      "target": "31",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 793,
+            "y": 6440
+          },
+          {
+            "x": 793,
+            "y": 6544
+          }
+        ]
+      }
+    },
+    {
+      "id": "80",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "26",
+      "target": "27",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 855,
+            "y": 5792
+          },
+          {
+            "x": 888,
+            "y": 5792
+          },
+          {
+            "x": 888,
+            "y": 5896
+          }
+        ]
+      }
+    },
+    {
+      "id": "81",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "25",
+      "target": "32",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 633,
+            "y": 5802
+          },
+          {
+            "x": 633,
+            "y": 7296
+          },
+          {
+            "x": 760,
+            "y": 7296
+          }
+        ]
+      }
+    },
+    {
+      "id": "82",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "31",
+      "target": "32",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 793,
+            "y": 7204
+          },
+          {
+            "x": 793,
+            "y": 7296
+          },
+          {
+            "x": 760,
+            "y": 7296
+          }
+        ]
+      }
+    },
+    {
+      "id": "83",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "30",
+      "target": "32",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 983,
+            "y": 6444
+          },
+          {
+            "x": 983,
+            "y": 7296
+          },
+          {
+            "x": 760,
+            "y": 7296
+          }
+        ]
+      }
+    },
+    {
+      "id": "84",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "32",
+      "target": "33"
+    },
+    {
+      "id": "85",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "33",
+      "target": "34",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 7480
+          },
+          {
+            "x": 641,
+            "y": 7480
+          }
+        ]
+      }
+    },
+    {
+      "id": "86",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "33",
+      "target": "35",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 7480
+          },
+          {
+            "x": 855,
+            "y": 7480
+          }
+        ]
+      }
+    },
+    {
+      "id": "87",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "34",
+      "target": "36",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 641,
+            "y": 7654
+          },
+          {
+            "x": 641,
+            "y": 7864
+          },
+          {
+            "x": 760,
+            "y": 7864
+          }
+        ]
+      }
+    },
+    {
+      "id": "88",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "35",
+      "target": "36",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 855,
+            "y": 7654
+          },
+          {
+            "x": 855,
+            "y": 7864
+          },
+          {
+            "x": 760,
+            "y": 7864
+          }
+        ]
+      }
+    },
+    {
+      "id": "89",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "36",
+      "target": "37"
+    },
+    {
+      "id": "90",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "37",
+      "target": "38",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 8120
+          },
+          {
+            "x": 665,
+            "y": 8120
+          }
+        ]
+      }
+    },
+    {
+      "id": "91",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "37",
+      "target": "39",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 8120
+          },
+          {
+            "x": 855,
+            "y": 8120
+          }
+        ]
+      }
+    },
+    {
+      "id": "92",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "38",
+      "target": "40",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 665,
+            "y": 8272
+          },
+          {
+            "x": 665,
+            "y": 8376
+          }
+        ]
+      }
+    },
+    {
+      "id": "93",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "40",
+      "target": "41",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 665,
+            "y": 8544
+          },
+          {
+            "x": 665,
+            "y": 8632
+          },
+          {
+            "x": 760,
+            "y": 8632
+          }
+        ]
+      }
+    },
+    {
+      "id": "94",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "39",
+      "target": "41",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 855,
+            "y": 8280
+          },
+          {
+            "x": 855,
+            "y": 8632
+          },
+          {
+            "x": 760,
+            "y": 8632
+          }
+        ]
+      }
+    },
+    {
+      "id": "95",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "41",
+      "target": "42"
+    },
+    {
+      "id": "96",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "42",
+      "target": "43",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 8864
+          },
+          {
+            "x": 665,
+            "y": 8864
+          }
+        ]
+      }
+    },
+    {
+      "id": "97",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "42",
+      "target": "44",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 8864
+          },
+          {
+            "x": 855,
+            "y": 8864
+          }
+        ]
+      }
+    },
+    {
+      "id": "98",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "43",
+      "target": "45",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 665,
+            "y": 9026
+          },
+          {
+            "x": 665,
+            "y": 9232
+          },
+          {
+            "x": 760,
+            "y": 9232
+          }
+        ]
+      }
+    },
+    {
+      "id": "99",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;startArrow=none;",
+      "vertex": false,
+      "edge": true,
+      "source": "44",
+      "target": "45",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 855,
+            "y": 9026
+          },
+          {
+            "x": 855,
+            "y": 9232
+          },
+          {
+            "x": 760,
+            "y": 9232
+          }
+        ]
+      }
+    },
+    {
+      "id": "100",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "45",
+      "target": "46"
+    }
+  ],
+  "sectionPrefs": {
+    "1": {
+      "borderColor": "hsl(0, 100%, 80%)",
+      "name": "Your Information"
+    },
+    "2": {
+      "borderColor": "hsl(30, 100%, 80%)",
+      "name": "Appearing Remotely"
+    }
+  },
+  "groups": [],
+  "defaultPdfProperties": {
+    "pdfName": "RA-010 Notice of Remote Appearance",
+    "pdfFile": "form.pdf",
+    "pdfPrice": "0"
+  },
+  "continuationLines": [
+    {
+      "keep": "ra010_other_person_name_and_role",
+      "drop": [
+        "ra010_other_person_name_and_role_line_2"
+      ]
+    },
+    {
+      "keep": "court_street_address",
+      "drop": [
+        "ra010_court_mailing_address",
+        "ra010_court_city_and_zip"
+      ]
+    }
+  ],
+  "computedFields": [
+    {
+      "nameId": "ra010_attorney_for",
+      "_why": "The caption's ATTORNEY FOR (name) line names the party a lawyer represents - the filer - and is printed only when the filer has a lawyer. It is the filer's name, written while the lawyer answer is Yes.",
+      "joinWhenTicked": {
+        "when": "has_lawyer_yes",
+        "separator": ", ",
+        "fields": [
+          "person_asking_protection_name"
+        ]
+      }
+    },
+    {
+      "nameId": "ra010_lawyer_appears_remotely_name",
+      "_why": "Item 1's 'Attorney for Plaintiff/Petitioner (name)' is the lawyer's name, which DV-100 item 1 already asks; it prints only beside a ticked box, so a lawyer who is not appearing remotely is not named here.",
+      "joinWhenTicked": {
+        "when": "ra010_lawyer_appears_remotely",
+        "separator": ", ",
+        "fields": [
+          "person_asking_protection_lawyer_name"
+        ]
+      }
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "ra010_court_county",
+      "why": "The court's county in the caption is asked whether or not the filer has a lawyer; the lawyer question is the last of the filer's own block."
+    },
+    {
+      "question": "ra010_others_appearing_remotely",
+      "why": "RA-010 is in the packet only because the filer said they will appear remotely, so the rest of item 1 is asked whenever the form is here. It follows item 1's first box only because that box is printed first."
+    },
+    {
+      "question": "ra010_appear_by",
+      "why": "Item 3, how the filer will appear, is asked whether or not item 2's hearing date is known; it follows item 2 only because item 2 is printed first."
+    },
+    {
+      "question": "ra010_agree_to_keep_confidential",
+      "why": "Item 5 is asked whatever the answer to item 4; it follows item 4 only because it is printed after it."
+    }
+  ],
+  "autofilledFields": [
+    {
+      "field": "ra010_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "The date beside the signature under item 5 has one correct answer and the form already knows it."
+    },
+    {
+      "field": "ra010_signature_printed_name",
+      "from": [
+        "person_asking_protection_name"
+      ],
+      "why": "The typed name under the item 5 signature is the filer's, given in the caption."
+    }
+  ]
+}

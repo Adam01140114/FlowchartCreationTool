@@ -1,0 +1,913 @@
+{
+  "_comment": "Interview knowledge the FL-155 field config cannot express. FL-155 comes in when DV-100 asks for child support and the DV-570 screening DV-100 asks is all No, so nothing here asks whether support is wanted or whether the filer may use this form. The caption is asked in the shapes FL-150 and MC-410 ask it, under DV-100's names where DV-100 already asks the answer, so in the packet those collapse into DV-100's; everything else is fl155_*, because FL-150's sections are switched off when FL-155 is on and a shared fl150_ name would print FL-155 blank. Each checklist on the paper (items 5, 6 and 8) is asked the way the paper lists it: which boxes apply, then the amount for each box ticked. Totals are asked, not added up, as FL-150 asks its total expenses. Item 3c's two ruled lines are one answer that continues on MC-025 past what they print (\"using extra sheet if necessary\").",
+  "groups": [
+    {
+      "nameId": "fl155_income_kinds",
+      "question": "Which kinds of income do you receive now?",
+      "multiSelect": true,
+      "optional": true,
+      "members": [
+        "fl155_has_salary",
+        "fl155_has_retirement",
+        "fl155_has_unemployment",
+        "fl155_has_workers_comp",
+        "fl155_has_social_security",
+        "fl155_has_disability",
+        "fl155_has_interest"
+      ],
+      "labels": [
+        "Salary or wages",
+        "Retirement",
+        "Unemployment compensation",
+        "Workers' compensation",
+        "Social Security, including SSI",
+        "Disability",
+        "Interest, such as from a bank account"
+      ],
+      "_why": "Item 5, \"This income comes from the following\", prints a box beside each source. None may apply: a filer whose only income is TANF or GA/GR (item 1a) ticks none of them."
+    },
+    {
+      "nameId": "fl155_social_security_kind",
+      "question": "What kind of Social Security do you receive?",
+      "multiSelect": true,
+      "conditional": {
+        "onlyWhen": "fl155_has_social_security"
+      },
+      "members": [
+        "fl155_social_security_ssi",
+        "fl155_social_security_other"
+      ],
+      "labels": [
+        "SSI (Supplemental Security Income)",
+        "Other Social Security, such as retirement or disability benefits"
+      ],
+      "_why": "Item 5, \"Social security: SSI / Other\"."
+    },
+    {
+      "nameId": "fl155_child_expense_kinds",
+      "question": "Which of these do you pay each month for the children in this case?",
+      "multiSelect": true,
+      "optional": true,
+      "members": [
+        "fl155_child_expense_has_childcare",
+        "fl155_child_expense_has_health_care",
+        "fl155_child_expense_has_education",
+        "fl155_child_expense_has_travel"
+      ],
+      "labels": [
+        "Day care or preschool so you can work or go to school",
+        "Health care that insurance does not pay for",
+        "School, education, tuition, or other special needs",
+        "Travel expenses for visitation"
+      ],
+      "_why": "Item 6, \"I pay the following monthly expenses for the children in this case\", a box and an amount for each of a to d."
+    },
+    {
+      "nameId": "fl155_monthly_expense_kinds",
+      "question": "Which of these costs do you pay each month?",
+      "multiSelect": true,
+      "optional": true,
+      "members": [
+        "fl155_pays_job_expenses",
+        "fl155_pays_union_dues",
+        "fl155_pays_retirement",
+        "fl155_pays_health_insurance",
+        "fl155_pays_child_support",
+        "fl155_pays_spousal_support",
+        "fl155_pays_housing"
+      ],
+      "labels": [
+        "Job-related expenses your employer does not pay",
+        "Required union dues",
+        "Required retirement payments (not Social Security, FICA, 401(k), or IRA)",
+        "Health insurance",
+        "Child support for your other children under 18 who do not live with you",
+        "Spousal support you pay under a court order from another relationship",
+        "Rent or a mortgage for your home"
+      ],
+      "_why": "Item 8, \"I spend the following average monthly amounts\", a box and an amount for each of a to g."
+    },
+    {
+      "nameId": "fl155_tax_status",
+      "question": "What is your tax filing status?",
+      "members": [
+        "fl155_tax_status_single",
+        "fl155_tax_status_married_jointly",
+        "fl155_tax_status_head_of_household",
+        "fl155_tax_status_married_separately"
+      ],
+      "labels": [
+        "Single",
+        "Married, filing jointly",
+        "Head of household",
+        "Married, filing separately"
+      ],
+      "_why": "Item 4, \"My tax filing status is: single / married filing jointly / head of household / married filing separately\" (/Yes, /1, /2, /3). The paper prints these boxes as one AcroForm field told apart by export value, so only the first box has a name of its own; it is computed from its option, and the other options have no box the fill can tick until the pipeline names each box of such a field. A group, not a choice: each answer is the PDF box itself (split off its shared field by the sanitizer), so choosing it ticks that box."
+    },
+    {
+      "nameId": "fl155_housing_payment_kind",
+      "question": "Which do you pay for your home, rent or a mortgage?",
+      "members": [
+        "fl155_housing_rent",
+        "fl155_housing_mortgage"
+      ],
+      "labels": [
+        "Rent",
+        "Mortgage"
+      ],
+      "conditional": {
+        "onlyWhen": "fl155_pays_housing"
+      },
+      "_why": "Item 8g, \"Monthly housing costs: rent or mortgage\" (/Yes rent, /No mortgage). Asked before the amount so the mortgage's interest and taxes follow it. The paper prints these boxes as one AcroForm field told apart by export value, so only the first box has a name of its own; it is computed from its option, and the other options have no box the fill can tick until the pipeline names each box of such a field. A group, not a choice: each answer is the PDF box itself (split off its shared field by the sanitizer), so choosing it ticks that box."
+    },
+    {
+      "nameId": "fl155_work_situation",
+      "question": "Which of these describes your work right now?",
+      "members": [
+        "fl155_employment_current",
+        "fl155_employment_most_recent"
+      ],
+      "labels": [
+        "I have a job",
+        "I do not have a job now, but I have worked before"
+      ],
+      "_why": "Item 9, \"Information concerning my current employment / my most recent employment\" (/Yes current, /No most recent), asked the way FL-150 asks its item 1, with a third answer for a filer who has never worked, whose item 9 stays empty. The paper prints these boxes as one AcroForm field told apart by export value, so only the first box has a name of its own; it is computed from its option, and the other options have no box the fill can tick until the pipeline names each box of such a field. A group, not a choice: each answer is the PDF box itself (split off its shared field by the sanitizer), so choosing it ticks that box.",
+      "conditional": {
+        "onlyWhen": "fl155_ever_worked_yes"
+      }
+    }
+  ],
+  "splits": [
+    {
+      "field": "fl155_party_city_state_zip",
+      "join": " ",
+      "parts": [
+        {
+          "nameId": "person_asking_protection_mailing_city",
+          "label": "City"
+        },
+        {
+          "nameId": "person_asking_protection_mailing_state",
+          "label": "State"
+        },
+        {
+          "nameId": "person_asking_protection_mailing_zip_code",
+          "label": "ZIP code"
+        }
+      ],
+      "_why": "The caption's name-and-address block is four free lines. The third holds the city, state and ZIP code DV-100 item 1c asks as three answers; joined back for the paper, as MC-410 does.",
+      "_whyJoin": "City, state code and ZIP on one caption line, as MC-030 prints them: \"Los Angeles CA 90210\". The form uses the state's postal code for a joined part."
+    },
+    {
+      "field": "fl155_lawyer_name_and_firm",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "person_asking_protection_lawyer_name",
+          "label": "Lawyer's name"
+        },
+        {
+          "nameId": "person_asking_protection_lawyer_firm_name",
+          "label": "Law firm name"
+        }
+      ],
+      "_why": "The block is headed \"Your name and address or attorney's name and address\". Its fourth line names the lawyer DV-100 item 1d asks about, and is empty when the filer has no lawyer."
+    },
+    {
+      "field": "fl155_court_city_and_zip",
+      "join": " ",
+      "parts": [
+        {
+          "nameId": "fl155_court_city",
+          "label": "City"
+        },
+        {
+          "nameId": "fl155_court_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "Where can the court send you papers?",
+      "fields": [
+        {
+          "field": "person_asking_protection_mailing_address",
+          "label": "Street address"
+        },
+        {
+          "field": "person_asking_protection_mailing_city",
+          "label": "City"
+        },
+        {
+          "field": "person_asking_protection_mailing_state",
+          "label": "State"
+        },
+        {
+          "field": "person_asking_protection_mailing_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    },
+    {
+      "question": "Who is your lawyer?",
+      "fields": [
+        {
+          "field": "person_asking_protection_lawyer_name",
+          "label": "Lawyer's name"
+        },
+        {
+          "field": "person_asking_protection_lawyer_firm_name",
+          "label": "Law firm name"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "has_lawyer",
+        "gateQuestion": "Do you have a lawyer?"
+      }
+    },
+    {
+      "question": "What city and ZIP code is the court in?",
+      "nameId": "fl155_court_location",
+      "fields": [
+        {
+          "field": "fl155_court_city",
+          "label": "City"
+        },
+        {
+          "field": "fl155_court_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    },
+    {
+      "nameId": "fl155_other_children",
+      "question": "How many of those children live with you, and how much do you pay for their expenses each month?",
+      "conditional": {
+        "onlyWhen": "fl155_has_other_children_living_with_me"
+      },
+      "fields": [
+        {
+          "field": "fl155_other_children_count",
+          "label": "Number of children",
+          "type": "number"
+        },
+        {
+          "field": "fl155_other_children_expenses",
+          "label": "Their expenses you pay each month",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl155_mortgage",
+      "question": "How much of your monthly mortgage cost is interest, and how much is real property taxes?",
+      "conditional": {
+        "onlyWhen": "fl155_housing_mortgage"
+      },
+      "fields": [
+        {
+          "field": "fl155_mortgage_interest",
+          "label": "Interest payments",
+          "type": "amount"
+        },
+        {
+          "field": "fl155_property_taxes",
+          "label": "Real property taxes",
+          "type": "amount"
+        }
+      ]
+    },
+    {
+      "nameId": "fl155_job",
+      "question": "What are the details of your job, or of your most recent job?",
+      "conditional": {
+        "onlyWhen": "fl155_employment_current,fl155_employment_most_recent"
+      },
+      "fields": [
+        {
+          "field": "fl155_employer_name",
+          "label": "Employer's name"
+        },
+        {
+          "field": "fl155_employer_address",
+          "label": "Employer's address"
+        },
+        {
+          "field": "fl155_employer_phone",
+          "label": "Employer's phone number",
+          "type": "phone"
+        },
+        {
+          "field": "fl155_occupation",
+          "label": "Your occupation"
+        },
+        {
+          "field": "fl155_job_start_date",
+          "label": "Date you started the job",
+          "type": "date"
+        }
+      ]
+    }
+  ],
+  "choices": [
+    {
+      "nameId": "fl155_other_parent_in_case",
+      "question": "Is another parent a party in this case, besides you and the person you want protection from?",
+      "before": "fl155_other_parent_name",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl155_other_parent_in_case_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl155_other_parent_in_case_no"
+        }
+      ],
+      "_why": "The caption's OTHER PARENT line, on both pages. Asked first, as FL-150 asks its other party, so a case between two parents leaves it empty."
+    },
+    {
+      "nameId": "fl155_time_share_known",
+      "question": "Do you know about what percent of the time the children spend with each parent?",
+      "before": "fl155_percent_time_with_me",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl155_time_share_known_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl155_time_share_known_no"
+        }
+      ],
+      "_why": "Items 3a and 3b ask the percentages; FL-150 item 16b asks the same only of a filer who knows them, and item 3c's description is asked of everyone.",
+      "_whyBefore": "Asked just before the one percentage the filer gives, which waits on its Yes. Anchored after it, the compiler met the percentage first and invented a second gate for it."
+    },
+    {
+      "nameId": "fl155_other_party_income_known",
+      "question": "Do you have an idea of how much the other person earns?",
+      "before": "fl155_other_party_monthly_income",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl155_other_party_income_known_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl155_other_party_income_known_no"
+        }
+      ],
+      "_why": "Item 10 is an estimate; FL-150 item 4 asks it only of a filer who has one."
+    },
+    {
+      "nameId": "fl155_has_new_spouse",
+      "question": "Are you married now to someone other than the person you want protection from?",
+      "before": "fl155_spouse_monthly_income",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl155_has_new_spouse_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl155_has_new_spouse_no"
+        }
+      ],
+      "_why": "Item 11, \"My current spouse's monthly income\", is about a spouse who is not the other party - the other party's income is item 10."
+    },
+    {
+      "nameId": "fl155_job_expense_reasons",
+      "question": "Why do you have job-related expenses that your employer does not pay?",
+      "type": "bigParagraph",
+      "before": "fl155_expense_union_dues",
+      "onlyWhen": "fl155_pays_job_expenses",
+      "subtitle": "For example, tools, uniforms or travel your job requires.",
+      "_why": "Item 8a: \"Job-related expenses that are not paid by my employer (specify reasons for expenses on separate sheet)\". No box on the paper holds the reasons, so they go on MC-025 (overflow, noBox)."
+    },
+    {
+      "nameId": "fl155_other_child_support_information",
+      "question": "Is there anything else you want the court to know about child support in your case?",
+      "type": "bigParagraph",
+      "at": "end",
+      "optional": true,
+      "_why": "Item 12: \"Other information I want the court to know concerning child support in my case (attach extra sheet with the information).\" No box on the paper holds it, so it goes on MC-025 (overflow, noBox)."
+    },
+    {
+      "nameId": "fl155_ever_worked",
+      "question": "Have you ever had a job?",
+      "before": "fl155_employment_current",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "fl155_ever_worked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "fl155_ever_worked_no"
+        }
+      ],
+      "_why": "Item 9 gives the current or most recent job; a filer who never had one ticks neither. The gate carries the answer the paper has no box for, and the group after it ticks the box for the other two."
+    }
+  ],
+  "questions": {
+    "person_asking_protection_name": {
+      "text": "What is your full name?",
+      "_why": "The caption's name line and PETITIONER/PLAINTIFF; DV-100 item 1a asks it under this name."
+    },
+    "person_asking_protection_telephone": {
+      "text": "What is your phone number?",
+      "type": "phone",
+      "optional": true,
+      "_why": "The caption's TELEPHONE NO.; DV-100 item 1c asks it, and a filer may leave it out."
+    },
+    "fl155_court_county": {
+      "text": "Which county is the court in?",
+      "_why": "The caption prints \"SUPERIOR COURT OF CALIFORNIA, COUNTY OF\" and a box for the county alone. DV-100's court box takes the court's whole name, so this is a different answer; FL-150's county is fl150_ and switched off with FL-150."
+    },
+    "court_street_address": {
+      "text": "What is the court's street address?",
+      "_why": "The caption's STREET ADDRESS is the court address DV-100's caption already asks, under the same name."
+    },
+    "fl155_court_mailing_address": {
+      "text": "What is the court's mailing address?",
+      "optional": true,
+      "_why": "The caption's MAILING ADDRESS is left blank on the paper when the court has none of its own."
+    },
+    "fl155_court_branch_name": {
+      "text": "What is the name of the court's branch?",
+      "optional": true,
+      "_why": "The caption's BRANCH NAME applies only to a court with branches."
+    },
+    "person_to_restrain_full_name": {
+      "text": "What is the name of the person you want protection from?",
+      "_why": "The caption's RESPONDENT/DEFENDANT is the person DV-100 item 2 names; asked there, under this name."
+    },
+    "fl155_other_parent_name": {
+      "text": "What is the name of that other parent?",
+      "conditional": {
+        "onlyWhen": "fl155_other_parent_in_case_yes"
+      },
+      "_why": "The caption's OTHER PARENT line, on both pages."
+    },
+    "fl155_only_income_public_assistance": {
+      "text": "Is TANF, SSI, or GA/GR your only source of income?",
+      "_why": "Item 1a, \"My only source of income is TANF, SSI, or GA/GR.\""
+    },
+    "fl155_applied_public_assistance": {
+      "text": "Have you applied for TANF, SSI, or GA/GR?",
+      "_why": "Item 1b, \"I have applied for TANF, SSI, or GA/GR.\""
+    },
+    "dv105_child": {
+      "text": "How many children, by birth or adoption, do you have with the other person?",
+      "type": "number",
+      "_why": "Item 2, \"I am the parent of the following number of natural or adopted children from this relationship\". That is the count of DV-100 item 3 / DV-105 item 3's children block, which posts it under the block's own name, dv105_child - so in the packet this question collapses into that block and the box prints its count, as on FL-150 item 16a."
+    },
+    "fl155_custody_arrangement_line_1": {
+      "text": "Describe your arrangement for custody and visitation.",
+      "type": "bigParagraph",
+      "_why": "Item 3c, \"Our arrangement for custody and visitation is (specify, using extra sheet if necessary)\", ruled over two lines. Past what they print it continues on MC-025 (overflow)."
+    },
+    "fl155_income_salary": {
+      "text": "How much do you earn each month in salary or wages, before taxes?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_has_salary"
+      },
+      "_why": "Item 5, \"Salary/wages: Amount before taxes per month\"."
+    },
+    "fl155_income_retirement": {
+      "text": "How much retirement income do you receive each month, before taxes?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_has_retirement"
+      },
+      "_why": "Item 5, \"Retirement: Amount before taxes per month\"."
+    },
+    "fl155_income_unemployment": {
+      "text": "How much do you receive each month in unemployment compensation?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_has_unemployment"
+      },
+      "_why": "Item 5, \"Unemployment compensation: Amount per month\"."
+    },
+    "fl155_income_workers_comp": {
+      "text": "How much do you receive each month in workers' compensation?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_has_workers_comp"
+      },
+      "_why": "Item 5, \"Workers' compensation: Amount per month\"."
+    },
+    "fl155_income_social_security": {
+      "text": "How much do you receive each month in Social Security?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_has_social_security"
+      },
+      "_why": "Item 5, \"Social security: ... Amount per month\"."
+    },
+    "fl155_income_disability": {
+      "text": "How much do you receive each month in disability payments?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_has_disability"
+      },
+      "_why": "Item 5, \"Disability: Amount per month\"."
+    },
+    "fl155_income_interest": {
+      "text": "How much interest income do you receive each month?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_has_interest"
+      },
+      "_why": "Item 5, \"Interest income (from bank accounts or other): Amount per month\"."
+    },
+    "fl155_income_total": {
+      "text": "What is your total income each month, before taxes?",
+      "subtitle": "Count everything you receive, including TANF, SSI, or GA/GR.",
+      "type": "money",
+      "_why": "Item 5, \"My current gross income (before taxes) per month is\". Asked, not added up, as FL-150 asks its total expenses: the total includes public assistance, which item 5's list has no line for."
+    },
+    "fl155_child_expense_childcare": {
+      "text": "How much do you pay each month for day care or preschool?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_child_expense_has_childcare"
+      },
+      "_why": "Item 6a."
+    },
+    "fl155_child_expense_health_care": {
+      "text": "How much do you pay each month for the children's health care that insurance does not pay for?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_child_expense_has_health_care"
+      },
+      "_why": "Item 6b."
+    },
+    "fl155_child_expense_education": {
+      "text": "How much do you pay each month for the children's school, tuition, or other special needs?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_child_expense_has_education"
+      },
+      "_why": "Item 6c."
+    },
+    "fl155_child_expense_travel": {
+      "text": "How much do you pay each month in travel expenses for visitation?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_child_expense_has_travel"
+      },
+      "_why": "Item 6d."
+    },
+    "fl155_has_other_children_living_with_me": {
+      "text": "Do other children of yours under 18, not from this relationship, live with you?",
+      "_why": "Item 7's box, \"There are (number) other minor children of mine living with me\"."
+    },
+    "fl155_expense_job": {
+      "text": "How much do you spend on average each month on job-related expenses your employer does not pay?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_pays_job_expenses"
+      },
+      "_why": "Item 8a."
+    },
+    "fl155_expense_union_dues": {
+      "text": "How much do you pay on average each month in required union dues?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_pays_union_dues"
+      },
+      "_why": "Item 8b."
+    },
+    "fl155_expense_retirement": {
+      "text": "How much do you pay on average each month in required retirement payments?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_pays_retirement"
+      },
+      "_why": "Item 8c."
+    },
+    "fl155_expense_health_insurance": {
+      "text": "How much do you pay on average each month for health insurance?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_pays_health_insurance"
+      },
+      "_why": "Item 8d."
+    },
+    "fl155_expense_child_support": {
+      "text": "How much child support do you pay on average each month for those other children?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_pays_child_support"
+      },
+      "_why": "Item 8e."
+    },
+    "fl155_expense_spousal_support": {
+      "text": "How much spousal support do you pay on average each month under that court order?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_pays_spousal_support"
+      },
+      "_why": "Item 8f."
+    },
+    "fl155_expense_housing": {
+      "text": "How much do you pay on average each month for your home?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_pays_housing"
+      },
+      "_why": "Item 8g, monthly housing costs."
+    },
+    "fl155_job_end_date": {
+      "text": "When did your most recent job end?",
+      "type": "date",
+      "conditional": {
+        "onlyWhen": "fl155_employment_most_recent"
+      },
+      "_why": "Item 9, \"Date work stopped (if applicable)\"."
+    },
+    "fl155_income_before_job_ended": {
+      "text": "How much did you earn each month, before taxes, before your most recent job ended?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_employment_most_recent"
+      },
+      "_why": "Item 9, \"What was your gross income (before taxes) before work stopped?\" Asked per month, as every other amount on FL-155 is."
+    },
+    "fl155_other_party_monthly_income": {
+      "text": "About how much do you think the other person earns each month, before taxes?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_other_party_income_known_yes"
+      },
+      "_why": "Item 10, \"My estimate of the other party's gross monthly income (before taxes)\"."
+    },
+    "fl155_spouse_monthly_income": {
+      "text": "How much does your spouse earn each month, before taxes?",
+      "type": "money",
+      "conditional": {
+        "onlyWhen": "fl155_has_new_spouse_yes"
+      },
+      "_why": "Item 11, \"My current spouse's monthly income (before taxes)\"."
+    },
+    "fl155_percent_time_with_me": {
+      "text": "What percent of the time do the children spend with you?",
+      "type": "number",
+      "conditional": {
+        "onlyWhen": "fl155_time_share_known_yes"
+      },
+      "subtitle": "The rest of the time is counted as the other parent's.",
+      "_why": "The paper prints the children's time with the filer and with the other parent, and the two make 100. Asked both, a filer could answer 100 and 100 - so only this one is asked and the other is worked out (computed remainderOf)."
+    }
+  },
+  "continuations": [
+    {
+      "field": "fl155_custody_arrangement",
+      "keep": "fl155_custody_arrangement_line_1",
+      "drop": [
+        "fl155_custody_arrangement_line_2"
+      ],
+      "_why": "Item 3c prints the arrangement on two ruled lines, the first beside the label and the second under it at the same right edge. One answer; the server runs a long one onto the second line, and past both onto MC-025."
+    }
+  ],
+  "overflow": {
+    "fl155_custody_arrangement_line_1": {
+      "_why": "Item 3c: \"(specify, using extra sheet if necessary)\". Rule the-packet-uses-mc025-for-more-space: what the two lines cannot print continues on MC-025. The paper prints no box that says a sheet is attached, so the link has no marks.",
+      "page": {
+        "name": "FL155_Item_3c",
+        "heading": "FL-155, Item 3c",
+        "item": "3c",
+        "itemTitle": "Arrangement for custody and visitation",
+        "form": "FL-155"
+      }
+    },
+    "fl155_job_expense_reasons": {
+      "_why": "Rule the-packet-uses-mc025-for-more-space: item 8a asks for the reasons on a separate sheet, and no box on FL-155 holds them - the whole answer is an MC-025 page.",
+      "noBox": true,
+      "page": {
+        "name": "FL155_Item_8a",
+        "heading": "FL-155, Item 8a",
+        "item": "8a",
+        "itemTitle": "Reasons for job-related expenses my employer does not pay",
+        "form": "FL-155"
+      },
+      "sheetFor": "fl155_pays_job_expenses",
+      "_whySheetFor": "The 8a box itself says \"(specify reasons for expenses on separate sheet)\"; this MC-025 page is that sheet. sheetFor tells the audit (RULE 13) which box the page serves, without the form ticking or unticking it - the box is the filer's own answer."
+    },
+    "fl155_other_child_support_information": {
+      "_why": "Rule the-packet-uses-mc025-for-more-space: item 12 says to attach an extra sheet with the information, and no box on FL-155 holds it - the whole answer is an MC-025 page.",
+      "noBox": true,
+      "page": {
+        "name": "FL155_Item_12",
+        "heading": "FL-155, Item 12",
+        "item": "12",
+        "itemTitle": "Other information about child support",
+        "form": "FL-155"
+      }
+    }
+  },
+  "autofill": [
+    {
+      "field": "fl155_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "The declarant's signature date on page 2 has one correct answer and the form already knows it."
+    },
+    {
+      "field": "fl155_signature_printed_name",
+      "from": [
+        "person_asking_protection_name"
+      ],
+      "why": "The typed or printed name under the page 2 signature is the name the filer gave on DV-100 item 1a."
+    }
+  ],
+  "computed": {
+    "fl155_attorney_for": {
+      "_why": "The caption's ATTORNEY FOR (Name) is the filer's name when a lawyer represents them, and blank when the filer has no lawyer. DV-100's \"Do you have a lawyer?\" ticks has_lawyer_yes.",
+      "joinWhenTicked": {
+        "when": "has_lawyer_yes",
+        "separator": ", ",
+        "fields": [
+          "person_asking_protection_name"
+        ]
+      }
+    },
+    "fl155_declarant_petitioner": {
+      "_why": "The PETITIONER/PLAINTIFF box under the signature says who signs, and the filer asking for protection is the petitioner. It ticks on DV-100's \"Child support\" order, the answer that brings FL-155 into the packet, so every FL-155 filer has it. The respondent box beside it is split into a field of its own by the sanitizer.",
+      "separator": ", ",
+      "wordsWhenTicked": [
+        {
+          "when": "child_support_order_requested",
+          "words": "Yes"
+        }
+      ]
+    },
+    "fl155_percent_time_with_other_parent": {
+      "_why": "The other parent's share of the children's time is what is left of 100 after the filer's: the two numbers the paper prints always add up.",
+      "remainderOf": {
+        "field": "fl155_percent_time_with_me",
+        "total": 100
+      }
+    }
+  },
+  "sections": [
+    {
+      "name": "Court and Parties",
+      "fields": [
+        "person_asking_protection_name",
+        "person_asking_protection_mailing_address",
+        "person_asking_protection_mailing_city",
+        "person_asking_protection_mailing_state",
+        "person_asking_protection_mailing_zip_code",
+        "has_lawyer",
+        "person_asking_protection_lawyer_name",
+        "person_asking_protection_lawyer_firm_name",
+        "person_asking_protection_telephone",
+        "fl155_court_county",
+        "court_street_address",
+        "fl155_court_mailing_address",
+        "fl155_court_city",
+        "fl155_court_zip_code",
+        "fl155_court_branch_name",
+        "person_to_restrain_full_name",
+        "fl155_other_parent_in_case",
+        "fl155_other_parent_name"
+      ]
+    },
+    {
+      "name": "Children and Parenting Time",
+      "fields": [
+        "dv105_child",
+        "fl155_time_share_known",
+        "fl155_percent_time_with_me",
+        "fl155_custody_arrangement_line_1"
+      ]
+    },
+    {
+      "name": "Your Monthly Income",
+      "fields": [
+        "fl155_only_income_public_assistance",
+        "fl155_applied_public_assistance",
+        "fl155_tax_status_single",
+        "fl155_tax_status_married_jointly",
+        "fl155_tax_status_head_of_household",
+        "fl155_tax_status_married_separately",
+        "fl155_has_salary",
+        "fl155_income_salary",
+        "fl155_has_retirement",
+        "fl155_income_retirement",
+        "fl155_has_unemployment",
+        "fl155_income_unemployment",
+        "fl155_has_workers_comp",
+        "fl155_income_workers_comp",
+        "fl155_has_social_security",
+        "fl155_social_security_ssi",
+        "fl155_social_security_other",
+        "fl155_income_social_security",
+        "fl155_has_disability",
+        "fl155_income_disability",
+        "fl155_has_interest",
+        "fl155_income_interest",
+        "fl155_income_total"
+      ]
+    },
+    {
+      "name": "Costs for the Children",
+      "fields": [
+        "fl155_child_expense_has_childcare",
+        "fl155_child_expense_childcare",
+        "fl155_child_expense_has_health_care",
+        "fl155_child_expense_health_care",
+        "fl155_child_expense_has_education",
+        "fl155_child_expense_education",
+        "fl155_child_expense_has_travel",
+        "fl155_child_expense_travel",
+        "fl155_has_other_children_living_with_me",
+        "fl155_other_children_count",
+        "fl155_other_children_expenses"
+      ]
+    },
+    {
+      "name": "Your Monthly Costs",
+      "fields": [
+        "fl155_pays_job_expenses",
+        "fl155_expense_job",
+        "fl155_job_expense_reasons",
+        "fl155_pays_union_dues",
+        "fl155_expense_union_dues",
+        "fl155_pays_retirement",
+        "fl155_expense_retirement",
+        "fl155_pays_health_insurance",
+        "fl155_expense_health_insurance",
+        "fl155_pays_child_support",
+        "fl155_expense_child_support",
+        "fl155_pays_spousal_support",
+        "fl155_expense_spousal_support",
+        "fl155_pays_housing",
+        "fl155_housing_rent",
+        "fl155_housing_mortgage",
+        "fl155_expense_housing",
+        "fl155_mortgage_interest",
+        "fl155_property_taxes"
+      ]
+    },
+    {
+      "name": "Your Work",
+      "fields": [
+        "fl155_ever_worked",
+        "fl155_employment_current",
+        "fl155_employment_most_recent",
+        "fl155_employer_name",
+        "fl155_employer_address",
+        "fl155_employer_phone",
+        "fl155_occupation",
+        "fl155_job_start_date",
+        "fl155_job_end_date",
+        "fl155_income_before_job_ended"
+      ]
+    },
+    {
+      "name": "Other Household Income",
+      "fields": [
+        "fl155_other_party_income_known",
+        "fl155_other_party_monthly_income",
+        "fl155_has_new_spouse",
+        "fl155_spouse_monthly_income"
+      ]
+    },
+    {
+      "name": "Anything Else",
+      "fields": [
+        "fl155_other_child_support_information"
+      ]
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "fl155_court_county",
+      "why": "The caption is on every FL-155: the county is asked of every filer, whatever the answer to \"Do you have a lawyer?\" before it."
+    },
+    {
+      "question": "fl155_custody_arrangement_line_1",
+      "why": "Item 3c, the custody and visitation arrangement, follows item 3b whether or not the filer knows the percentage of time."
+    },
+    {
+      "question": "fl155_applied_public_assistance",
+      "why": "Item 5's question about applying for TANF, SSI or GA/GR is asked whatever the answer about it being the only income."
+    },
+    {
+      "question": "fl155_tax_status",
+      "why": "Item 4, tax filing status, is asked of every filer after the public-assistance questions, whatever their answers."
+    },
+    {
+      "question": "fl155_monthly_expense_kinds",
+      "why": "Item 8, the monthly costs, follows item 7 whether or not other children live with the filer."
+    }
+  ]
+}

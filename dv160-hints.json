@@ -1,0 +1,562 @@
+{
+  "_comment": "DV-160 is the filer's request to keep a minor's information confidential. DV-100 page 1 sends a filer here when the case includes sensitive information about a minor, and the packet brings it in on DV-100's keep_minor_information_confidential Yes - so nothing here asks whether to make the request. What the packet already knows is not asked again: the court, the two parties, the filer's mailing address, phone and lawyer carry DV-100's names. The minors are DV-160's own block (dv160_minor): the request may be about a minor who is not a child the filer shares with the other person, and DV-100's children block is asked only for shared children or a custody request. The rest is the request itself: who is asking, what is to be kept from the public (item 5) and why (item 6), what happens to the restraining order request when the court says no (item 7), what is also to be kept from the restrained person (item 8), and who else may see it (item 9). Signature dates, the printed name and the page count are filled, not asked.",
+  "sections": [
+    {
+      "name": "Parties and Minors",
+      "fields": [
+        "case_number",
+        "court_name_and_street_address",
+        "person_asking_protection_name",
+        "person_to_restrain_full_name",
+        "dv160_requester_is_minor",
+        "dv160_requester_is_parent_or_guardian",
+        "dv160_requester_parent",
+        "dv160_requester_legal_guardian",
+        "dv160_minor_1_name",
+        "dv160_minor_2_name",
+        "dv160_minor_3_name",
+        "dv160_minor_4_name",
+        "dv160_minor_additional_list_attached",
+        "dv160_request_for_more_than_one_minor",
+        "dv160_same_information_for_all_minors",
+        "dv160_different_information_for_each_minor"
+      ]
+    },
+    {
+      "name": "Your Contact Information",
+      "fields": [
+        "person_asking_protection_mailing_address",
+        "person_asking_protection_mailing_city",
+        "person_asking_protection_mailing_state",
+        "person_asking_protection_mailing_zip_code",
+        "person_asking_protection_telephone",
+        "person_asking_protection_fax",
+        "person_asking_protection_email",
+        "person_asking_protection_lawyer_name",
+        "person_asking_protection_lawyer_state_bar_number"
+      ]
+    },
+    {
+      "name": "Information to Keep Private",
+      "fields": [
+        "dv160_public_confidential_name",
+        "dv160_public_confidential_address",
+        "dv160_confidential_address",
+        "dv160_public_confidential_other_information",
+        "dv160_redaction_1_location",
+        "dv160_redaction_1_information",
+        "dv160_redaction_2_location",
+        "dv160_redaction_2_information",
+        "dv160_redaction_3_location",
+        "dv160_redaction_3_information",
+        "dv160_redaction_4_location",
+        "dv160_redaction_4_information",
+        "dv160_redaction_additional_list_attached"
+      ]
+    },
+    {
+      "name": "Reasons for Your Request",
+      "fields": [
+        "dv160_reason_public_confidential",
+        "dv160_harm_if_public",
+        "dv160_if_public_denied_cancel",
+        "dv160_if_public_denied_proceed"
+      ]
+    },
+    {
+      "name": "Privacy From the Other Person",
+      "fields": [
+        "dv160_restrained_person_confidential",
+        "dv160_restrained_confidential_name",
+        "dv160_restrained_confidential_address",
+        "dv160_restrained_confidential_other",
+        "dv160_restrained_confidential_other_description",
+        "dv160_reason_restrained_confidential",
+        "dv160_harm_if_restrained_told",
+        "dv160_if_restrained_denied_cancel",
+        "dv160_if_restrained_denied_proceed"
+      ]
+    },
+    {
+      "name": "Sharing With Caregivers",
+      "fields": [
+        "dv160_share_asked",
+        "dv160_share_with_school",
+        "dv160_share_with_childcare",
+        "dv160_share_with_supervised_visitation",
+        "dv160_share_with_other",
+        "dv160_share_with_other_name",
+        "dv160_share_name",
+        "dv160_share_address",
+        "dv160_share_other_information",
+        "dv160_pages_attached_count",
+        "dv160_signature_date",
+        "dv160_signature_printed_name",
+        "dv160_lawyer_signature_date"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "nameId": "dv160_requester",
+      "question": "Who is asking to keep the minor's information private?",
+      "_why": "Item 2b: the person making the request is either the minor (2b(1)) or the parent or legal guardian of the minors listed (2b(2)) - check one.",
+      "members": [
+        "dv160_requester_is_minor",
+        "dv160_requester_is_parent_or_guardian"
+      ],
+      "labels": [
+        "I am the minor, and I am asking for myself",
+        "I am the parent or legal guardian of the minor or minors"
+      ]
+    },
+    {
+      "nameId": "dv160_requester_relationship",
+      "question": "Are you the minor's parent or legal guardian?",
+      "_why": "Item 2b(2) prints a box for parent and a box for legal guardian after its own box; they are asked only once 2b(2) is chosen.",
+      "conditional": {
+        "onlyWhen": "dv160_requester_is_parent_or_guardian"
+      },
+      "members": [
+        "dv160_requester_parent",
+        "dv160_requester_legal_guardian"
+      ],
+      "labels": [
+        "Parent",
+        "Legal guardian"
+      ]
+    },
+    {
+      "nameId": "dv160_information_same_for_all",
+      "question": "Is the information you want kept private the same for every minor?",
+      "_why": "Item 4a and 4b - check one - asked only of a parent or guardian making the request for two or more minors, as item 4 says.",
+      "subtitle": "When it is different, say which minor each piece of information is about when you list it.",
+      "conditional": {
+        "onlyWhen": "dv160_request_for_more_than_one_minor"
+      },
+      "members": [
+        "dv160_same_information_for_all_minors",
+        "dv160_different_information_for_each_minor"
+      ],
+      "labels": [
+        "Yes, it is the same for every minor",
+        "No, it is different for some of them"
+      ]
+    },
+    {
+      "nameId": "dv160_public_confidential",
+      "multiSelect": true,
+      "question": "What information about the minor do you want kept from the public?",
+      "_why": "Item 5 - check all that apply: 5a the minor's name, 5b the minor's address, 5c information relating to the minor.",
+      "subtitle": "Law enforcement is still given the minor's name. You do not need to keep an address private when you use a mailing address that is safe to share on all your court papers.",
+      "members": [
+        "dv160_public_confidential_name",
+        "dv160_public_confidential_address",
+        "dv160_public_confidential_other_information"
+      ],
+      "labels": [
+        "The minor's name",
+        "The minor's address",
+        "Other information about the minor in the papers you are filing"
+      ]
+    },
+    {
+      "nameId": "dv160_if_public_denied",
+      "question": "What should happen to your request for a restraining order when the court denies any part of your request to keep information from the public?",
+      "_why": "Item 7 - check one: 7a cancel the restraining order request, 7b move forward with it. Item 7 is skipped only by someone not asking for a restraining order at the same time, and in this packet the DV-100 is always filed with it.",
+      "subtitle": "Cancelling means you will not get a restraining order now, though you can ask again later. Going ahead means everything in your request and the other papers in this case will be public, and the person you want protection from will see it.",
+      "members": [
+        "dv160_if_public_denied_cancel",
+        "dv160_if_public_denied_proceed"
+      ],
+      "labels": [
+        "Cancel my request for a restraining order",
+        "Go ahead with my request for a restraining order"
+      ]
+    },
+    {
+      "nameId": "dv160_restrained_confidential",
+      "multiSelect": true,
+      "question": "What information do you want kept from the person you want protection from?",
+      "_why": "Item 8a - the boxes (1) name, (2) address and (3) other information are a list the filer may tick several of.",
+      "conditional": {
+        "onlyWhen": "dv160_restrained_person_confidential"
+      },
+      "members": [
+        "dv160_restrained_confidential_name",
+        "dv160_restrained_confidential_address",
+        "dv160_restrained_confidential_other"
+      ],
+      "labels": [
+        "The minor's name",
+        "The minor's address",
+        "Other information about the minor"
+      ]
+    },
+    {
+      "nameId": "dv160_if_restrained_denied",
+      "question": "What should happen to your request for a restraining order when the court will not keep this information from the person you want protection from?",
+      "_why": "Item 8d - check one: (1) cancel the restraining order request, (2) move forward with it. It is asked of every filer who asks for item 8; the d. box carries item 8's name and is ticked with it.",
+      "subtitle": "Going ahead means the person you want protection from will see everything in your request and the other papers in this case.",
+      "conditional": {
+        "onlyWhen": "dv160_restrained_person_confidential"
+      },
+      "members": [
+        "dv160_if_restrained_denied_cancel",
+        "dv160_if_restrained_denied_proceed"
+      ],
+      "labels": [
+        "Cancel my request for a restraining order",
+        "Go ahead with my request for a restraining order"
+      ]
+    },
+    {
+      "nameId": "dv160_share_with",
+      "multiSelect": true,
+      "question": "Who do you want to be allowed to give copies to?",
+      "_why": "Item 9a - check all that apply.",
+      "conditional": {
+        "onlyWhen": "dv160_share_asked_yes"
+      },
+      "members": [
+        "dv160_share_with_school",
+        "dv160_share_with_childcare",
+        "dv160_share_with_supervised_visitation",
+        "dv160_share_with_other"
+      ],
+      "labels": [
+        "The minor's school and after-school program",
+        "The minor's childcare provider",
+        "The supervised visitation provider",
+        "Someone else"
+      ]
+    },
+    {
+      "nameId": "dv160_share_information",
+      "multiSelect": true,
+      "question": "What information should the copies you give them show?",
+      "_why": "Item 9b - check all that apply.",
+      "conditional": {
+        "onlyWhen": "dv160_share_asked_yes"
+      },
+      "members": [
+        "dv160_share_name",
+        "dv160_share_address",
+        "dv160_share_other_information"
+      ],
+      "labels": [
+        "The minor's name",
+        "The minor's address",
+        "The other information about the minor you listed"
+      ]
+    }
+  ],
+  "choices": [
+    {
+      "nameId": "dv160_share_asked",
+      "question": "Do you want to be allowed to give copies of the papers in this case to people who look after the minor, such as a school or childcare provider?",
+      "_why": "Item 9 is for a filer who wants others to have unredacted copies - 'you should complete this item' only then - so it is asked as a Yes/No first and its boxes open on Yes.",
+      "before": "dv160_share_with_school",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "dv160_share_asked_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "dv160_share_asked_no"
+        }
+      ]
+    }
+  ],
+  "repeats": [
+    {
+      "nameId": "dv160_minor",
+      "_why": "Item 2b(2) lists the minors a parent or legal guardian makes the request for, a name on each of four rows. It is DV-160's own block: the minor may not be a child the filer shares with the other person, and DV-100's children block is asked only for shared children or a custody request. More than four go on the Attachment 2b(2) page the form draws, and item 2b(2)'s 'additional minors' box is ticked for them.",
+      "question": "How many minors is this request about?",
+      "entryTitle": "Minor",
+      "min": 1,
+      "max": 4,
+      "conditional": {
+        "onlyWhen": "dv160_requester_is_parent_or_guardian"
+      },
+      "attachment": {
+        "name": "DV160_Additional_Minors",
+        "heading": "DV-160, Attachment 2b(2)",
+        "item": "2b(2)",
+        "itemTitle": "Additional Minors",
+        "marks": "dv160_minor_additional_list_attached",
+        "most": 12
+      },
+      "fields": [
+        {
+          "label": "Minor's full name",
+          "nameId": "{n}_name"
+        }
+      ]
+    },
+    {
+      "nameId": "dv160_redaction",
+      "_why": "Item 5c(2) is a four-row table: where each piece of information is, and what it is. Both columns are boxes ruled for several lines, so each is asked as a narrative. More than four go on the page the form draws, and the 'not enough space' box under the table is ticked for them.",
+      "question": "How many pieces of information in your papers do you want kept private?",
+      "entryTitle": "Information to Keep Private",
+      "min": 1,
+      "max": 4,
+      "conditional": {
+        "onlyWhen": "dv160_public_confidential_other_information"
+      },
+      "attachment": {
+        "name": "DV160_Redactions",
+        "heading": "DV-160, Attachment 5c(2)",
+        "item": "5c(2)",
+        "itemTitle": "Information to Be Redacted",
+        "marks": "dv160_redaction_additional_list_attached",
+        "most": 12
+      },
+      "fields": [
+        {
+          "label": "What you want kept private",
+          "nameId": "{n}_information",
+          "type": "bigParagraph"
+        },
+        {
+          "label": "Where it appears in your papers, such as the form, page and item",
+          "nameId": "{n}_location",
+          "type": "bigParagraph"
+        }
+      ]
+    }
+  ],
+  "splits": [
+    {
+      "field": "court_name_and_street_address",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "court_name",
+          "label": "Court name",
+          "question": "What is the name of the court?"
+        },
+        {
+          "nameId": "court_street_address",
+          "label": "Court street address",
+          "question": "What is the court's street address?"
+        }
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "Where can the court send you papers?",
+      "fields": [
+        {
+          "field": "person_asking_protection_mailing_address",
+          "label": "Street address"
+        },
+        {
+          "field": "person_asking_protection_mailing_city",
+          "label": "City"
+        },
+        {
+          "field": "person_asking_protection_mailing_state",
+          "label": "State"
+        },
+        {
+          "field": "person_asking_protection_mailing_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    },
+    {
+      "question": "How can the court reach you?",
+      "optional": true,
+      "fields": [
+        {
+          "field": "person_asking_protection_telephone",
+          "label": "Phone number",
+          "type": "phone"
+        },
+        {
+          "field": "person_asking_protection_fax",
+          "label": "Fax number",
+          "type": "phone"
+        },
+        {
+          "field": "person_asking_protection_email",
+          "label": "Email address",
+          "type": "email"
+        }
+      ]
+    },
+    {
+      "question": "Who is your lawyer?",
+      "fields": [
+        {
+          "field": "person_asking_protection_lawyer_name",
+          "label": "Lawyer's name"
+        },
+        {
+          "field": "person_asking_protection_lawyer_state_bar_number",
+          "label": "State bar number"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "has_lawyer",
+        "gateQuestion": "Do you have a lawyer?"
+      }
+    }
+  ],
+  "questions": {
+    "person_asking_protection_name": {
+      "text": "What is your name?",
+      "_why": "Items 1a and 2a: the filer asked for the restraining order and is the one making this request. DV-100 asks it; the wording is for the form compiled on its own."
+    },
+    "person_to_restrain_full_name": {
+      "text": "Who do you want protection from?",
+      "_why": "Item 1b. DV-100 asks it; the wording is for the form compiled on its own."
+    },
+    "dv160_request_for_more_than_one_minor": {
+      "text": "Are you making this request for two or more minors?",
+      "_why": "Item 4, which is only for parents or legal guardians.",
+      "conditional": {
+        "onlyWhen": "dv160_requester_is_parent_or_guardian"
+      }
+    },
+    "dv160_confidential_address": {
+      "text": "What address do you want kept private?",
+      "_why": "Item 5b's line for the address - a box ruled for two lines, so it is asked as a narrative.",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "dv160_public_confidential_address"
+      }
+    },
+    "dv160_reason_public_confidential": {
+      "text": "Why should what you listed about the minor be kept private from the public?",
+      "_why": "Item 6a.",
+      "type": "bigParagraph",
+      "subtitle": "To agree, the judge must find that the minor's right to privacy outweighs the public's right to see the information, that the minor is likely to be harmed when it is not kept private, that the order goes no further than it needs to, and that nothing less would protect the minor's privacy."
+    },
+    "dv160_harm_if_public": {
+      "text": "What do you think would happen to the minor once the public could see what you listed?",
+      "_why": "Item 6b.",
+      "type": "bigParagraph"
+    },
+    "dv160_restrained_person_confidential": {
+      "text": "Do you want to keep some of the information about the minor from the person you want protection from?",
+      "_why": "Item 8's own box. They must still be given what they need to follow the order and to respond to it, as the note under item 8 says.",
+      "subtitle": "They will still be given what they need to follow the order and to respond to your request."
+    },
+    "dv160_restrained_confidential_other_description": {
+      "text": "What else about the minor do you want kept from the person you want protection from?",
+      "_why": "Item 8a(3)'s 'specify' box, ruled for several lines, so it is asked as a narrative.",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "dv160_restrained_confidential_other"
+      }
+    },
+    "dv160_reason_restrained_confidential": {
+      "text": "Why should what you listed be kept from the person you want protection from?",
+      "_why": "Item 8b.",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "dv160_restrained_person_confidential"
+      }
+    },
+    "dv160_harm_if_restrained_told": {
+      "text": "What harm do you think would come from the person you want protection from learning it?",
+      "_why": "Item 8c.",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "dv160_restrained_person_confidential"
+      }
+    },
+    "dv160_share_with_other_name": {
+      "text": "Who else do you want to be allowed to give copies to?",
+      "_why": "Item 9a(4)'s 'name of person or entity' line.",
+      "conditional": {
+        "onlyWhen": "dv160_share_with_other"
+      }
+    }
+  },
+  "alwaysShown": [
+    {
+      "question": "dv160_public_confidential",
+      "why": "Item 5 is asked whatever the answer to 'Do you have a lawyer?' - the lawyer's block is merely the last thing item 3 asks."
+    }
+  ],
+  "computed": {
+    "dv160_pages_attached_count": {
+      "_why": "Item 10 asks for the number of pages attached. A filer cannot count them; the packet knows: every MC-025 sheet continuing DV-160 - more minors than item 2b(2) holds (Attachment 2b(2)), more information than the 5c(2) table holds (Attachment 5c(2)), and answers to 6a, 6b, 8b and 8c longer than their boxes. Counted with the layout that draws them, so a list that takes two sheets counts two.",
+      "pagesOfFormsAttachedTo": "DV-160"
+    }
+  },
+  "overflow": {
+    "dv160_reason_public_confidential": {
+      "_why": "Item 6a: \"Check here if there is not enough space (Attachment 6a)\". The answer used to be held to the 856 characters its box prints - the form deciding how much of a reason to keep a child's information private was worth having. Rule the-packet-uses-mc025-for-more-space: the rest continues on MC-025 and the box ticks itself.",
+      "marks": "dv160_reason_public_confidential_attachment",
+      "page": {
+        "name": "DV160_Attachment_6a",
+        "heading": "DV-160, Attachment 6a",
+        "item": "6a",
+        "itemTitle": "Why the information should be kept private or confidential from the public",
+        "form": "DV-160"
+      }
+    },
+    "dv160_harm_if_public": {
+      "_why": "Item 6b: \"Check here if there is not enough space (Attachment 6b)\". Held to 951 characters until now; the rest continues on MC-025.",
+      "marks": "dv160_harm_if_public_attachment",
+      "page": {
+        "name": "DV160_Attachment_6b",
+        "heading": "DV-160, Attachment 6b",
+        "item": "6b",
+        "itemTitle": "What would happen if the information were not kept private or confidential",
+        "form": "DV-160"
+      }
+    },
+    "dv160_reason_restrained_confidential": {
+      "_why": "Item 8 prints one \"not enough space (Attachment 8)\" box under both 8b and 8c; it ticks while either runs over, and each continues on its own MC-025 page under \"DV-160, Attachment 8\".",
+      "marks": "dv160_restrained_confidential_attachment",
+      "page": {
+        "name": "DV160_Attachment_8b",
+        "heading": "DV-160, Attachment 8",
+        "item": "8b",
+        "itemTitle": "Why the information in 8a should be kept from the restrained person",
+        "form": "DV-160"
+      }
+    },
+    "dv160_harm_if_restrained_told": {
+      "_why": "Item 8c, continued like 8b under the one Attachment 8 box.",
+      "marks": "dv160_restrained_confidential_attachment",
+      "page": {
+        "name": "DV160_Attachment_8c",
+        "heading": "DV-160, Attachment 8",
+        "item": "8c",
+        "itemTitle": "What would happen if the information in 8a were given to the restrained person",
+        "form": "DV-160"
+      }
+    }
+  },
+  "autofill": [
+    {
+      "field": "dv160_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "Item 11: a signature date has one correct answer and the form already knows it."
+    },
+    {
+      "field": "dv160_signature_printed_name",
+      "from": [
+        "person_asking_protection_name"
+      ],
+      "why": "Item 11: the printed name under the signature is the name of the person making the request, given in item 2a."
+    },
+    {
+      "field": "dv160_lawyer_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "Item 12: the same date, for the lawyer's signature block - as DV-100 fills its own."
+    }
+  ]
+}

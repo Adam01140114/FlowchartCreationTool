@@ -193,7 +193,19 @@
     };
     ownNames(cell, add);
     if (!styled(cell, 'nodeType=options')) {
-      optionCellsOf(cell, targetsOf).forEach(function (option) { ownNames(option, add); });
+      const base = nodeIdOf(cell);
+      const dropdown = styled(cell, 'questionType=dropdown');
+      optionCellsOf(cell, targetsOf).forEach(function (option) {
+        ownNames(option, add);
+        // A dropdown's answer also ticks a box of its own, "<question>_<answer>",
+        // named as the page names it (createHiddenCheckboxesForAutofilledDropdowns).
+        // SER-001 prints DV-110's "Do you know where they live?" Yes that way.
+        if (dropdown && base) {
+          const label = String(option.value == null ? '' : option.value).replace(/<[^>]*>/g, '').trim();
+          const suffix = label.replace(/[^A-Za-z0-9_]+/g, '_').toLowerCase().replace(/^_+|_+$/g, '');
+          if (suffix) add(base + '_' + suffix);
+        }
+      });
     }
     if (joins && joins.length) {
       const have = {};

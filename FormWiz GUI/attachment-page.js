@@ -1,175 +1,102 @@
 /**
- * Draw an attachment page: the entries a block holds past what the PDF prints.
+ * Continuation pages on MC-025, the one form the packet uses for more space.
  *
- * DV-105 item 3 prints four rows for children and says "Check here if you need
- * more space. Write 'DV-105, Children' at the top and attach it to this form."
- * There is no template for that sheet - the filer's own paper is the page - so
- * it is drawn here from the rows the form sends: the heading the form asks for
- * at the top, the item it continues, and one lettered row per extra entry,
- * carrying on from the last letter the PDF prints (a-d on the form, e onward
- * here).
+ * Rule the-packet-uses-mc025-for-more-space: anything that needs more room goes
+ * on MC-025, "Attachment", which "may be used with any Judicial Council form" -
+ * the rows of a table past what the paper prints (DV-105 item 3: "Write 'DV-105,
+ * Children' at the top and attach it"), and a narrative past what its box holds
+ * (DV-100 item 7(f), DV-160 items 6a, 6b and 8). It used to be a blank sheet
+ * drawn from scratch, and DV-100 item 7 continued onto DV-101; California's own
+ * instructions name MC-025 for both, and one form for every continuation is one
+ * thing a clerk recognises.
+ *
+ * The lines and the page breaks come from continuation-layout.js, the same code
+ * the interview runs to count the pages for DV-100 item 32 - so the count the
+ * filer signs is the number of sheets drawn here.
+ *
+ * Each sheet is filled on its own copy of the sanitized blank
+ * (FormWiz GUI/mc025.pdf, named by dv-field-configs/mc025-field-config.json) and
+ * flattened, so the sheets do not share one set of field values, and they are
+ * numbered on the form's own "Page __ of __". The form's buttons and on-screen
+ * notices are taken off before flattening, so nothing but the form prints.
  *
  * Used by POST /edit_pdf in dev-server.js and FormWiz GUI/server.js: a request
  * that carries an "__attachment" field is drawn, not filled.
  *
  * spec = {
- *   name, heading, item, itemTitle, caseNumber,
- *   entries: [{ number, values: [{ label, value }] }]
+ *   name, heading, item, itemTitle, caseNumber, shortTitle, attachmentNumber,
+ *   entries: [{ number, values: [{ label, value }] }],   rows past the paper's
+ *   text: 'the narrative that did not fit'                or a box continued
  * }
  */
-const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
+const fs = require('fs');
+const path = require('path');
+const { PDFDocument, StandardFonts } = require('pdf-lib');
+const layout = require('./continuation-layout');
 
-const PAGE_W = 612;          // US Letter, as the Judicial Council forms are
-const PAGE_H = 792;
-const MARGIN = 54;
-const LINE = rgb(0.25, 0.25, 0.25);
-const INK = rgb(0, 0, 0);
-const GREY = rgb(0.35, 0.35, 0.35);
+const BLANK = path.join(__dirname, 'mc025.pdf');
+const PAD = 4;
 
-/** a, b, ... z, then aa, ab ... - the lettering the form's rows use. */
-function letterFor(n) {
-  let s = '';
-  let k = n;
-  while (k > 0) {
-    const r = (k - 1) % 26;
-    s = String.fromCharCode(97 + r) + s;
-    k = Math.floor((k - 1) / 26);
-  }
-  return s;
+/** Set a one-line box, shrinking it to fit down to 6pt. */
+function setFitted(form, font, name, text, largest) {
+  let field;
+  try { field = form.getTextField(name); } catch (e) { return; }
+  const value = layout.drawable(text || '').split(String.fromCharCode(10)).join(' ');
+  field.setText(value);
+  const w = field.acroField.getWidgets()[0];
+  const width = w ? w.getRectangle().width - PAD : 200;
+  let size = largest || 10;
+  while (size > 6 && layout.widthOf(value, size) > width) size -= 0.5;
+  field.setFontSize(size);
 }
 
-/** Keep only what the standard font can draw; anything else becomes "?". */
-function drawable(font, text) {
-  let out = '';
-  for (const ch of String(text == null ? '' : text).replace(/\s+/g, ' ')) {
-    try { font.encodeText(ch); out += ch; } catch (e) { out += '?'; }
+/**
+ * The body box the layout was worked out for. A replaced MC-025 laid out
+ * differently would put lines under the footer, so it is refused, not drawn.
+ */
+function checkBody(doc) {
+  const r = doc.getForm().getTextField('mc025_text').acroField.getWidgets()[0].getRectangle();
+  const want = layout.BODY;
+  if (Math.abs(r.width - want.width) > 1 || Math.abs(r.height - want.height) > 1) {
+    throw new Error('mc025.pdf body box is ' + r.width.toFixed(1) + ' x ' + r.height.toFixed(1)
+      + 'pt; continuation-layout.js is laid out for ' + want.width.toFixed(1) + ' x ' + want.height.toFixed(1)
+      + ' - update BODY there to the new form');
   }
-  return out;
-}
-
-/** Break text into lines no wider than width. */
-function wrap(font, size, text, width) {
-  const words = String(text || '').split(' ');
-  const lines = [];
-  let line = '';
-  words.forEach((word) => {
-    const next = line ? line + ' ' + word : word;
-    if (font.widthOfTextAtSize(next, size) <= width || !line) {
-      line = next;
-    } else {
-      lines.push(line);
-      line = word;
-    }
-  });
-  if (line) lines.push(line);
-  return lines.length ? lines : [''];
 }
 
 async function drawAttachmentPage(spec) {
-  const pdf = await PDFDocument.create();
-  const regular = await pdf.embedFont(StandardFonts.Helvetica);
-  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-  const heading = drawable(bold, spec.heading || spec.name || 'Attachment');
-  const continues = [spec.item ? 'Item ' + spec.item : '', spec.itemTitle || '']
-    .filter(Boolean).join(' - ');
-  const subtitle = drawable(regular, continues
-    ? 'Attached to continue ' + continues + '.'
-    : 'Attached page.');
-  const caseNumber = drawable(regular, spec.caseNumber || '');
-  pdf.setTitle(heading);
+  const blank = fs.readFileSync(BLANK);
+  const pages = layout.paginate(spec);
+  const heading = layout.bodyLines(spec)[0];
+  const number = spec.attachmentNumber || layout.defaultAttachmentNumber(spec);
 
-  const pages = [];
-  let page = null;
-  let y = 0;
-
-  const newPage = () => {
-    page = pdf.addPage([PAGE_W, PAGE_H]);
-    pages.push(page);
-    y = PAGE_H - MARGIN;
-    // The heading the form tells the filer to write at the top, on every sheet.
-    // It shares the row with the case number, so it is sized to the room the
-    // case number leaves: "DV-110, Other Protected People (continued)" at 16pt
-    // printed its last word over "Case Number:". Below 10pt it would stop being
-    // a heading, so a title that still does not fit puts the case number on a
-    // line of its own instead.
-    const title = heading + (pages.length > 1 ? ' (continued)' : '');
-    const label = caseNumber ? 'Case Number: ' + caseNumber : '';
-    const labelW = label ? regular.widthOfTextAtSize(label, 10) : 0;
-    const room = PAGE_W - MARGIN * 2 - (label ? labelW + 14 : 0);
-    let titleSize = 16;
-    while (titleSize > 10 && bold.widthOfTextAtSize(title, titleSize) > room) titleSize -= 0.5;
-    const ownLine = !!label && bold.widthOfTextAtSize(title, titleSize) > room;
-    page.drawText(title, { x: MARGIN, y: y - 16, size: titleSize, font: bold, color: INK });
-    if (label) {
-      page.drawText(label, {
-        x: PAGE_W - MARGIN - labelW,
-        y: ownLine ? y - 30 : y - 14, size: 10, font: regular, color: INK
-      });
-    }
-    y -= ownLine ? 46 : 34;
-    page.drawText(subtitle, { x: MARGIN, y, size: 10, font: regular, color: GREY });
-    y -= 12;
-    page.drawLine({ start: { x: MARGIN, y }, end: { x: PAGE_W - MARGIN, y }, thickness: 0.8, color: LINE });
-    y -= 26;
-  };
-  newPage();
-
-  const entries = Array.isArray(spec.entries) ? spec.entries : [];
-  const contentW = PAGE_W - MARGIN * 2;
-  const letterW = 22;
-  const size = 11;
-
-  entries.forEach((entry) => {
-    const values = (entry.values || []).map((v) => ({
-      label: drawable(regular, (v.label || '').replace(/[:\s]+$/, '')) + ':',
-      value: drawable(regular, v.value || '')
-    }));
-    // One line per field, like the form's own row but with room for a long
-    // name: "e.  Name: ____________  Date of birth: ______" when it fits,
-    // otherwise each field on its own ruled line under the letter.
-    const cells = values.map((v) => {
-      const labelW = regular.widthOfTextAtSize(v.label + ' ', size);
-      const valueW = Math.max(regular.widthOfTextAtSize(v.value, size) + 12, 110);
-      return { v, labelW, valueW };
-    });
-    const oneLineW = cells.reduce((s, c) => s + c.labelW + c.valueW + 16, 0);
-    const rows = oneLineW <= contentW - letterW ? [cells] : cells.map((c) => [c]);
-    const needed = rows.length * 24 + 6;
-    if (y - needed < MARGIN + 20) newPage();
-
-    page.drawText(letterFor(entry.number) + '.', { x: MARGIN, y, size, font: regular, color: INK });
-    rows.forEach((row) => {
-      let x = MARGIN + letterW;
-      row.forEach((c) => {
-        page.drawText(c.v.label, { x, y, size, font: regular, color: INK });
-        x += c.labelW;
-        const valueW = row.length === 1 ? (MARGIN + contentW - x) : c.valueW;
-        const lines = wrap(regular, size, c.v.value, valueW - 4);
-        lines.forEach((text, i) => {
-          if (i > 0) { y -= 16; if (y < MARGIN + 20) { newPage(); x = MARGIN + letterW + c.labelW; } }
-          page.drawText(text, { x: x + 2, y, size, font: regular, color: INK });
-          page.drawLine({ start: { x, y: y - 3 }, end: { x: x + valueW, y: y - 3 }, thickness: 0.6, color: LINE });
-        });
-        x += valueW + 16;
-      });
-      y -= 24;
-    });
-    y -= 6;
-  });
-
-  if (!entries.length) {
-    page.drawText('(No further entries.)', { x: MARGIN, y, size, font: regular, color: GREY });
+  const out = await PDFDocument.create();
+  for (let i = 0; i < pages.length; i++) {
+    const doc = await PDFDocument.load(blank);
+    if (i === 0) checkBody(doc);
+    const font = await doc.embedFont(StandardFonts.Helvetica);
+    const form = doc.getForm();
+    // The buttons and the on-screen notices ("please press the Clear This Form
+    // button", and the red frames around it) are for someone filling the PDF by
+    // hand. Flattened they print, so they come off first.
+    form.getFields().filter((x) => x.constructor.name === 'PDFButton' || /^mc025_(notice_|white_out)/.test(x.getName()))
+      .forEach((b) => form.removeField(b));
+    setFitted(form, font, 'mc025_short_title', spec.shortTitle, 10);
+    setFitted(form, font, 'mc025_case_number', spec.caseNumber, 10);
+    setFitted(form, font, 'mc025_attachment_number', number, 10);
+    setFitted(form, font, 'mc025_page', String(i + 1), 10);
+    setFitted(form, font, 'mc025_page_count', String(pages.length), 10);
+    const text = form.getTextField('mc025_text');
+    text.enableMultiline();
+    text.setText(pages[i].join('\n'));
+    text.setFontSize(layout.BODY_SIZE);
+    form.updateFieldAppearances(font);
+    form.flatten();
+    const [copied] = await out.copyPages(doc, [0]);
+    out.addPage(copied);
   }
-
-  pages.forEach((p, i) => {
-    const label = 'Page ' + (i + 1) + ' of ' + pages.length;
-    p.drawText(label, {
-      x: PAGE_W - MARGIN - regular.widthOfTextAtSize(label, 9),
-      y: MARGIN - 24, size: 9, font: regular, color: GREY
-    });
-  });
-
-  return pdf.save();
+  out.setTitle(heading);
+  return out.save();
 }
 
-module.exports = { drawAttachmentPage, letterFor };
+module.exports = { drawAttachmentPage, letterFor: layout.letterFor, bodyLines: layout.bodyLines };

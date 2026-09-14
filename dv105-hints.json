@@ -1724,10 +1724,6 @@
         "onlyWhen": "dv105_other_guardian_exists"
       }
     },
-    "dv105_children_lived_together_five_years": {
-      "subtitle": "If you answer No, the court also needs form DV-105(A), about where each child has lived. This packet does not include it: get it from your court clerk or at courts.ca.gov, fill it out, and attach it to DV-105.",
-      "_why": "DV-105 item 4a: 'If no, complete form DV-105(A). Do not complete the section below.' The interview skipped the section as the paper says, and told the filer nothing - so a No sent DV-105 with item 4 blank and no DV-105(A)."
-    },
     "dv105_child_home_1_other_relationship": {
       "text": "How is that person related to the children?",
       "conditional": {

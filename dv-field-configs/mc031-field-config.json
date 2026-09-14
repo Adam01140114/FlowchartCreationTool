@@ -1,0 +1,24 @@
+{
+  "formTitle": "MC-031 Attached Declaration",
+  "_comment": "MC-031 is a sworn statement attached to another court paper (\"This form must be attached to another form or court paper before it can be filed in court\"); in this packet it is a witness's statement attached to DV-100, brought in by DV-100's \"Does someone else ... want to give a signed statement...?\". The parties are answers DV-100 already has. The declarant is the witness, so the name and the statement are asked; the witness signs it. The statement continues on MC-025. Field names come from the rectangles (pipeline-field-labels.js): FillText10 and 9 are the parties, 11 the case number, 8 the statement, 14 the date, 7 the printed name; the role boxes under the signature are for a lawyer signing for a party.",
+  "fields": [
+    { "id": "FillText10", "newName": "person_asking_protection_name", "type": "text", "label": "Plaintiff/Petitioner (the filer)" },
+    { "id": "FillText9", "newName": "person_to_restrain_full_name", "type": "text", "label": "Defendant/Respondent (the person to be restrained)" },
+    { "id": "FillText11", "newName": "case_number", "type": "text", "label": "Case number", "courtUse": true, "_why": "The court gives the case number when the request is filed; like every case number in the packet it is left for the clerk." },
+    { "id": "FillText8", "newName": "mc031_declaration_text", "type": "text", "label": "Attached declaration - the declarant's statement" },
+    { "id": "FillText14", "newName": "mc031_signature_date", "type": "text", "label": "Date" },
+    { "id": "FillText7", "newName": "mc031_declarant_name", "type": "text", "label": "Type or print name (the declarant)" },
+    { "id": "CheckBox61", "newName": "mc031_signer_attorney_for", "type": "checkbox", "label": "Attorney for (under the signature)", "courtUse": true, "_why": "Only when a lawyer signs for a party; the declarant signs as themself." },
+    { "id": "CheckBox6", "newName": "mc031_signer_plaintiff", "type": "checkbox", "label": "Plaintiff (under the signature)", "courtUse": true, "_why": "The party a signing lawyer represents; the declarant signs as themself." },
+    { "id": "CheckBx6", "newName": "mc031_signer_petitioner", "type": "checkbox", "label": "Petitioner (under the signature)", "courtUse": true, "_why": "The party a signing lawyer represents; the declarant signs as themself." },
+    { "id": "ChckBox6", "newName": "mc031_signer_defendant", "type": "checkbox", "label": "Defendant (under the signature)", "courtUse": true, "_why": "The party a signing lawyer represents; the declarant signs as themself." },
+    { "id": "Chck6", "newName": "mc031_signer_respondent", "type": "checkbox", "label": "Respondent (under the signature)", "courtUse": true, "_why": "The party a signing lawyer represents; the declarant signs as themself." },
+    { "id": "Ck6", "newName": "mc031_signer_other", "type": "checkbox", "label": "Other (under the signature)", "courtUse": true, "_why": "The party a signing lawyer represents; the declarant signs as themself." },
+    { "id": "FillText13", "newName": "mc031_signer_other_specify", "type": "text", "label": "Other (specify), under the signature", "courtUse": true, "_why": "Only with the lawyer's Other box." },
+    { "id": "NoticeHeader1", "newName": "mc031_notice_header", "type": "text", "label": "Form notice header - not a question", "courtUse": true },
+    { "id": "NoticeFooter1", "newName": "mc031_notice_footer", "type": "text", "label": "Form notice footer - not a question", "courtUse": true },
+    { "id": "Save", "newName": "mc031_save_button", "type": "button", "label": "Form button - not a question", "courtUse": true },
+    { "id": "Print", "newName": "mc031_print_button", "type": "button", "label": "Form button - not a question", "courtUse": true },
+    { "id": "ResetForm", "newName": "mc031_reset_button", "type": "button", "label": "Form button - not a question", "courtUse": true }
+  ]
+}

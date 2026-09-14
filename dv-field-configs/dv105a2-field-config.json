@@ -1,0 +1,680 @@
+{
+  "formTitle": "DV-105(A) City and State Where Children Lived (second copy)",
+  "_comment": "The second copy of DV-105(A), from the same blank (spec \"blank\": \"dv105a.pdf\"). The first copy's last box says \"Check here to list other children with a different residence history ... Use another form DV-105(A)\"; answered Yes, this copy comes in and holds groups 3 and 4 with the first copy's field names renumbered.",
+  "fields": [
+    {
+      "id": "DV-105A[0].#pageSet[0].MP1[0].Warning[0]",
+      "newName": "dv105a2_warning_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-105A[0].#pageSet[0].MP1[0].Print[0]",
+      "newName": "dv105a2_print_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-105A[0].#pageSet[0].MP1[0].Save[0]",
+      "newName": "dv105a2_save_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-105A[0].#pageSet[0].MP1[0].Reset[0]",
+      "newName": "dv105a2_reset_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-105A[0].Page1[0].caseNumber[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number",
+      "courtUse": true
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List1[0].li1[0].item1[0]",
+      "newName": "dv105_children_lived_together_five_years_no",
+      "type": "checkbox",
+      "label": "1. This form is attached to DV-105",
+      "_why": "DV-105(A) is in the packet because DV-105 item 4a was answered No, so the No box's own name ticks it: one answer, both boxes."
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List1[0].li1[0].item1[1]",
+      "newName": "dv105a2_attached_to_dv125",
+      "type": "checkbox",
+      "label": "1. This form is attached to DV-125",
+      "courtUse": true,
+      "_why": "DV-125 is the other person's response to a custody request; this packet attaches DV-105(A) to DV-105 only, so the box stays blank by design."
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List1[0].li1[0].item1[2]",
+      "newName": "dv105a2_attached_to_dv305",
+      "type": "checkbox",
+      "label": "1. This form is attached to DV-305",
+      "courtUse": true,
+      "_why": "DV-305 is a juvenile-court request; this packet attaches DV-105(A) to DV-105 only, so the box stays blank by design."
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List1[0].li1[0].item1[3]",
+      "newName": "dv105a2_attached_to_dv325",
+      "type": "checkbox",
+      "label": "1. This form is attached to DV-325",
+      "courtUse": true,
+      "_why": "DV-325 is a response in a juvenile-court case; this packet attaches DV-105(A) to DV-105 only, so the box stays blank by design."
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lia[0].namechild[0]",
+      "newName": "dv105a_group_3_names",
+      "type": "text",
+      "label": "Item 2a. Name of child or children"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow1[0].tf1[0]",
+      "newName": "dv105a_group_3_home_1_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow1[0].tf2[0]",
+      "newName": "dv105a_group_3_home_1_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow1[0].ChoiceChildLiveW8[0]",
+      "newName": "dv105a_group_3_home_1_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow1[0].ChoiceChildLiveW8[1]",
+      "newName": "dv105a_group_3_home_1_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow1[0].ChoiceChildLiveW8[2]",
+      "newName": "dv105a_group_3_home_1_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow1[0].TextField1[0]",
+      "newName": "dv105a_group_3_home_1_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow1[0].chb1[0]",
+      "newName": "dv105a_group_3_home_1_address_private",
+      "type": "checkbox",
+      "label": "This address is private (list the state only)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow2[0].tf3[0]",
+      "newName": "dv105a_group_3_home_2_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow2[0].tf4[0]",
+      "newName": "dv105a_group_3_home_2_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow2[0].tf6[0]",
+      "newName": "dv105a_group_3_home_2_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow2[0].ChoiceChildLiveW9[0]",
+      "newName": "dv105a_group_3_home_2_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow2[0].ChoiceChildLiveW9[1]",
+      "newName": "dv105a_group_3_home_2_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow2[0].ChoiceChildLiveW9[2]",
+      "newName": "dv105a_group_3_home_2_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow2[0].TextField2[0]",
+      "newName": "dv105a_group_3_home_2_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow3[0].tf7[0]",
+      "newName": "dv105a_group_3_home_3_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow3[0].tf8[0]",
+      "newName": "dv105a_group_3_home_3_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow3[0].tf9[0]",
+      "newName": "dv105a_group_3_home_3_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow3[0].ChoiceChildLiveW10[0]",
+      "newName": "dv105a_group_3_home_3_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow3[0].ChoiceChildLiveW10[1]",
+      "newName": "dv105a_group_3_home_3_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow3[0].ChoiceChildLiveW10[2]",
+      "newName": "dv105a_group_3_home_3_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow3[0].TextField3[0]",
+      "newName": "dv105a_group_3_home_3_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow4[0].tf10[0]",
+      "newName": "dv105a_group_3_home_4_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow4[0].tf11[0]",
+      "newName": "dv105a_group_3_home_4_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow4[0].tf12[0]",
+      "newName": "dv105a_group_3_home_4_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow4[0].ChoiceChildLiveW11[0]",
+      "newName": "dv105a_group_3_home_4_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow4[0].ChoiceChildLiveW11[1]",
+      "newName": "dv105a_group_3_home_4_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow4[0].ChoiceChildLiveW11[2]",
+      "newName": "dv105a_group_3_home_4_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow4[0].TextField3[0]",
+      "newName": "dv105a_group_3_home_4_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow5[0].tf13[0]",
+      "newName": "dv105a_group_3_home_5_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow5[0].tf14[0]",
+      "newName": "dv105a_group_3_home_5_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow5[0].tf15[0]",
+      "newName": "dv105a_group_3_home_5_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow5[0].ChoiceChildLiveW12[0]",
+      "newName": "dv105a_group_3_home_5_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow5[0].ChoiceChildLiveW12[1]",
+      "newName": "dv105a_group_3_home_5_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow5[0].ChoiceChildLiveW12[2]",
+      "newName": "dv105a_group_3_home_5_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow5[0].TextField4[0]",
+      "newName": "dv105a_group_3_home_5_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow6[0].tf16[0]",
+      "newName": "dv105a_group_3_home_6_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow6[0].tf17[0]",
+      "newName": "dv105a_group_3_home_6_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow6[0].tf18[0]",
+      "newName": "dv105a_group_3_home_6_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow6[0].ChoiceChildLiveW13[0]",
+      "newName": "dv105a_group_3_home_6_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow6[0].ChoiceChildLiveW13[1]",
+      "newName": "dv105a_group_3_home_6_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow6[0].ChoiceChildLiveW13[2]",
+      "newName": "dv105a_group_3_home_6_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow6[0].TextField5[0]",
+      "newName": "dv105a_group_3_home_6_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow7[0].tf19[0]",
+      "newName": "dv105a_group_3_home_7_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow7[0].tf20[0]",
+      "newName": "dv105a_group_3_home_7_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow7[0].tf21[0]",
+      "newName": "dv105a_group_3_home_7_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow7[0].ChoiceChildLiveW14[0]",
+      "newName": "dv105a_group_3_home_7_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow7[0].ChoiceChildLiveW14[1]",
+      "newName": "dv105a_group_3_home_7_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow7[0].ChoiceChildLiveW14[2]",
+      "newName": "dv105a_group_3_home_7_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List2[0].lib[0].tblChildLocation[0].bodyRow7[0].TextField6[0]",
+      "newName": "dv105a_group_3_home_7_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lia[0].TextField[0]",
+      "newName": "dv105a_group_4_names",
+      "type": "text",
+      "label": "Item 3a. Name of child or children"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow1[0].tf1[0]",
+      "newName": "dv105a_group_4_home_1_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow1[0].tf2[0]",
+      "newName": "dv105a_group_4_home_1_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow1[0].ChoiceChildLiveW15[0]",
+      "newName": "dv105a_group_4_home_1_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow1[0].ChoiceChildLiveW15[2]",
+      "newName": "dv105a_group_4_home_1_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow1[0].ChoiceChildLiveW15[1]",
+      "newName": "dv105a_group_4_home_1_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow1[0].TextField1[0]",
+      "newName": "dv105a_group_4_home_1_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow1[0].chb1[0]",
+      "newName": "dv105a_group_4_home_1_address_private",
+      "type": "checkbox",
+      "label": "This address is private (list the state only)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow2[0].tf3[0]",
+      "newName": "dv105a_group_4_home_2_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow2[0].tf4[0]",
+      "newName": "dv105a_group_4_home_2_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow2[0].tf6[0]",
+      "newName": "dv105a_group_4_home_2_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow2[0].ChoiceChildLiveW16[0]",
+      "newName": "dv105a_group_4_home_2_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow2[0].ChoiceChildLiveW16[1]",
+      "newName": "dv105a_group_4_home_2_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow2[0].ChoiceChildLiveW16[2]",
+      "newName": "dv105a_group_4_home_2_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow2[0].TextField2[0]",
+      "newName": "dv105a_group_4_home_2_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow3[0].tf7[0]",
+      "newName": "dv105a_group_4_home_3_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow3[0].tf8[0]",
+      "newName": "dv105a_group_4_home_3_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow3[0].tf9[0]",
+      "newName": "dv105a_group_4_home_3_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow3[0].ChoiceChildLiveW17[0]",
+      "newName": "dv105a_group_4_home_3_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow3[0].ChoiceChildLiveW17[1]",
+      "newName": "dv105a_group_4_home_3_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow3[0].ChoiceChildLiveW17[2]",
+      "newName": "dv105a_group_4_home_3_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow3[0].TextField3[0]",
+      "newName": "dv105a_group_4_home_3_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow4[0].tf10[0]",
+      "newName": "dv105a_group_4_home_4_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow4[0].tf11[0]",
+      "newName": "dv105a_group_4_home_4_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow4[0].tf12[0]",
+      "newName": "dv105a_group_4_home_4_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow4[0].ChoiceChildLiveW18[0]",
+      "newName": "dv105a_group_4_home_4_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow4[0].ChoiceChildLiveW18[1]",
+      "newName": "dv105a_group_4_home_4_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow4[0].ChoiceChildLiveW18[2]",
+      "newName": "dv105a_group_4_home_4_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow4[0].TextField4[0]",
+      "newName": "dv105a_group_4_home_4_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow5[0].tf13[0]",
+      "newName": "dv105a_group_4_home_5_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow5[0].tf14[0]",
+      "newName": "dv105a_group_4_home_5_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow5[0].tf15[0]",
+      "newName": "dv105a_group_4_home_5_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow5[0].ChoiceChildLiveW19[0]",
+      "newName": "dv105a_group_4_home_5_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow5[0].ChoiceChildLiveW19[1]",
+      "newName": "dv105a_group_4_home_5_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow5[0].ChoiceChildLiveW19[2]",
+      "newName": "dv105a_group_4_home_5_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow5[0].TextField5[0]",
+      "newName": "dv105a_group_4_home_5_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow6[0].tf16[0]",
+      "newName": "dv105a_group_4_home_6_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow6[0].tf17[0]",
+      "newName": "dv105a_group_4_home_6_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow6[0].tf18[0]",
+      "newName": "dv105a_group_4_home_6_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow6[0].ChoiceChildLiveW20[0]",
+      "newName": "dv105a_group_4_home_6_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow6[0].ChoiceChildLiveW20[1]",
+      "newName": "dv105a_group_4_home_6_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow6[0].ChoiceChildLiveW20[2]",
+      "newName": "dv105a_group_4_home_6_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow6[0].TextField6[0]",
+      "newName": "dv105a_group_4_home_6_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow7[0].tf19[0]",
+      "newName": "dv105a_group_4_home_7_from",
+      "type": "text",
+      "label": "Lived there from (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow7[0].tf20[0]",
+      "newName": "dv105a_group_4_home_7_until",
+      "type": "text",
+      "label": "Until (month/year)"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow7[0].tf21[0]",
+      "newName": "dv105a_group_4_home_7_city_and_state",
+      "type": "text",
+      "label": "City and state"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow7[0].ChoiceChildLiveW21[0]",
+      "newName": "dv105a_group_4_home_7_lived_with_me",
+      "type": "checkbox",
+      "label": "Lived with me"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow7[0].ChoiceChildLiveW21[1]",
+      "newName": "dv105a_group_4_home_7_lived_with_restrained_person",
+      "type": "checkbox",
+      "label": "Lived with the person in 2"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow7[0].ChoiceChildLiveW21[2]",
+      "newName": "dv105a_group_4_home_7_lived_with_other",
+      "type": "checkbox",
+      "label": "Lived with someone else"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].lib[0].tblLocationChild2[0].bodyRow7[0].TextField7[0]",
+      "newName": "dv105a_group_4_home_7_other_relationship",
+      "type": "text",
+      "label": "Their relationship to the child"
+    },
+    {
+      "id": "DV-105A[0].Page1[0].List3[0].MultilineCheckBox[0]",
+      "newName": "dv105a2_other_children_on_another_form",
+      "type": "checkbox",
+      "label": "More children listed on another DV-105(A)",
+      "courtUse": true,
+      "_why": "The second copy holds groups 3 and 4, the most the packet takes; nothing asks for a fifth group, so this box stays blank."
+    }
+  ]
+}

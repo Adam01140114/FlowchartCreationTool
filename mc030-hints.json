@@ -1,0 +1,148 @@
+{
+  "_comment": "MC-030, Declaration: the filer's own sworn statement, added to the first papers when they ask for it on DV-100. Everything in the caption but the court's county, mailing address, city and ZIP, and branch is an answer DV-100 already has, under the same name, so the packet asks only the statement and those four. The wording of the shared questions below is for the form compiled on its own.",
+  "sections": [
+    {
+      "name": "Your Statement",
+      "fields": [
+        "mc030_court_county",
+        "court_street_address",
+        "mc030_court_mailing_address",
+        "mc030_court_city",
+        "mc030_court_zip_code",
+        "mc030_court_branch_name",
+        "person_asking_protection_name",
+        "person_asking_protection_mailing_address",
+        "person_asking_protection_telephone",
+        "person_asking_protection_fax",
+        "person_asking_protection_email",
+        "person_to_restrain_full_name",
+        "mc030_declaration_text"
+      ]
+    }
+  ],
+  "splits": [
+    {
+      "field": "mc030_court_city_and_zip",
+      "join": " ",
+      "parts": [
+        { "nameId": "mc030_court_city", "label": "City" },
+        { "nameId": "mc030_court_zip_code", "label": "ZIP code" }
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "What city and ZIP code is the court in?",
+      "nameId": "mc030_court_location",
+      "fields": [
+        { "field": "mc030_court_city", "label": "City" },
+        { "field": "mc030_court_zip_code", "label": "ZIP code" }
+      ]
+    }
+  ],
+  "questions": {
+    "mc030_court_county": {
+      "text": "Which county is the court in?",
+      "_why": "The caption prints \"SUPERIOR COURT OF CALIFORNIA, COUNTY OF\" and a box for the county alone; DV-100's court box takes the court's whole name."
+    },
+    "court_street_address": {
+      "text": "What is the court's street address?",
+      "_why": "The caption's STREET ADDRESS is the court address DV-100's caption already asks, under the same name."
+    },
+    "mc030_court_mailing_address": {
+      "text": "What is the court's mailing address?",
+      "optional": true,
+      "subtitle": "Leave this empty when the court gets mail at its street address.",
+      "_why": "The caption's MAILING ADDRESS. Many courts have none apart from the street address."
+    },
+    "mc030_court_branch_name": {
+      "text": "What is the name of the court's branch or courthouse?",
+      "optional": true,
+      "_why": "The caption's BRANCH NAME. A county with one courthouse has none."
+    },
+    "person_asking_protection_name": {
+      "text": "What is your name?",
+      "_why": "The declarant, the party in the caption and the name under the signature. DV-100 asks it, so the packet never does here."
+    },
+    "person_asking_protection_mailing_address": {
+      "text": "What is your street address?",
+      "_why": "The caption's address lines. DV-100 asks it, so the packet never does here."
+    },
+    "person_asking_protection_telephone": {
+      "text": "What is your phone number?",
+      "optional": true,
+      "type": "phone",
+      "_why": "DV-100 asks it, so the packet never does here."
+    },
+    "person_asking_protection_fax": {
+      "text": "What is your fax number?",
+      "optional": true,
+      "type": "phone",
+      "_why": "DV-100 asks it, so the packet never does here."
+    },
+    "person_asking_protection_email": {
+      "text": "What is your email address?",
+      "optional": true,
+      "type": "email",
+      "_why": "DV-100 asks it, so the packet never does here."
+    },
+    "person_to_restrain_full_name": {
+      "text": "Who do you want protection from?",
+      "_why": "The caption's DEFENDANT/RESPONDENT. DV-100 asks it, so the packet never does here."
+    },
+    "mc030_declaration_text": {
+      "text": "What do you want to say in your statement?",
+      "type": "bigParagraph",
+      "subtitle": "Write it in your own words. You sign it under penalty of perjury, so everything in it must be true. It can be as long as you need.",
+      "_why": "The body of MC-030. What its box cannot print continues on MC-025 (overflow below)."
+    }
+  },
+  "autofill": [
+    {
+      "field": "mc030_signature_date",
+      "from": ["current_date"],
+      "why": "A signature date has one correct answer and the form already knows it."
+    },
+    {
+      "field": "mc030_signature_printed_name",
+      "from": ["person_asking_protection_name"],
+      "why": "The filer is the declarant: the name under the signature is the name given on DV-100 item 1a."
+    },
+    {
+      "field": "mc030_party_city_state_zip",
+      "from": ["person_asking_protection_mailing_city", "person_asking_protection_mailing_state", "person_asking_protection_mailing_zip_code"],
+      "separator": " ",
+      "why": "The caption's third address line: the city, state and ZIP code the filer gave on DV-100 item 1c."
+    }
+  ],
+  "computed": {
+    "mc030_attorney_for": {
+      "_why": "ATTORNEY FOR (name) is the filer's name when a lawyer represents them, and blank when the filer has no lawyer - as on FL-150.",
+      "joinWhenTicked": {
+        "when": "has_lawyer_yes",
+        "separator": ", ",
+        "fields": ["person_asking_protection_name"]
+      }
+    },
+    "mc030_party_lawyer_line": {
+      "_why": "The caption's attorney-or-party block names the lawyer, State Bar number and firm when the filer has one (DV-100 item 1d), and is left blank when not.",
+      "joinWhenTicked": {
+        "when": "has_lawyer_yes",
+        "separator": ", ",
+        "fields": ["person_asking_protection_lawyer_name", "person_asking_protection_lawyer_state_bar_number", "person_asking_protection_lawyer_firm_name"]
+      }
+    }
+  },
+  "overflow": {
+    "mc030_declaration_text": {
+      "_why": "Rule the-packet-uses-mc025-for-more-space: a statement longer than MC-030's box continues on MC-025, which says that when the item it continues is made under penalty of perjury, so is the attachment. MC-030 has no \"more space\" box to tick.",
+      "page": {
+        "name": "MC030_Declaration",
+        "heading": "MC-030, Declaration",
+        "item": "",
+        "itemTitle": "",
+        "form": "MC-030"
+      }
+    }
+  }
+}

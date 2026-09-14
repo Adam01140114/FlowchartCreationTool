@@ -1,0 +1,638 @@
+{
+  "_comment": "SER-001 comes in when DV-100's \"Do you want the sheriff or marshal to serve the papers ... for free?\" is answered Yes (papers_served_by_sheriff_yes). It is the filer's form; the sheriff completes only the file number. Most of it the packet already knows, so those fields carry the names of the questions that ask them and are declared here only so the form compiles on its own: DV-100 items 1 and 2 (names, mailing address, lawyer, gender, race, age and date of birth), DV-100 item 9 (firearms), DV-110 item 2 (height, weight, hair, eyes, and the home address behind its knows_restrained_person_address gate) and CLETS-001 item 1 (nicknames, telephone, marks, vehicle, language). They are written as the plain questions or the same named declarations those forms use, so in the packet each collapses into the one that asked it first - SER-001 has to come after DV-110 and CLETS-001 for that. Four boxes are true whenever SER-001 is in the packet and carry the Yes that brings it in; the home box carries the Yes of DV-110's address gate; both are attachmentTargets, boxes another form's answer ticks, so neither is asked here. What SER-001 asks that nothing else does: the county, the picture, the rest of the safety checklist, gate codes and best times, jail, a second address, and item 5.",
+  "groups": [
+    {
+      "nameId": "person_to_restrain_gender",
+      "_why": "DV-100 item 2 asks the gender under these names (DV-110 declares the same group), so the packet asks it once and this declaration collapses into DV-100's.",
+      "question": "What is their gender?",
+      "members": [
+        "person_to_restrain_gender_male",
+        "person_to_restrain_gender_female",
+        "person_to_restrain_gender_nonbinary"
+      ],
+      "labels": [
+        "Male",
+        "Female",
+        "Nonbinary"
+      ]
+    },
+    {
+      "nameId": "ser001_safety_issues",
+      "_why": "Item 3a(4) \"The person (check all that apply)\". The three boxes the packet already knows - a gun (DV-100 item 9), a history of abuse (all of DV-100) and not speaking English (CLETS-001) - are filled from those answers, so the list asks only the rest.",
+      "multiSelect": true,
+      "optional": true,
+      "question": "Which of these are true of the person you want protection from? Check any you know of.",
+      "members": [
+        "ser001_safety_probation_or_parole",
+        "ser001_safety_aggressive_animal",
+        "ser001_safety_special_training",
+        "ser001_safety_mental_health",
+        "ser001_safety_deaf_or_hard_of_hearing",
+        "ser001_safety_other"
+      ],
+      "labels": [
+        "They are on probation or parole",
+        "They have an aggressive animal",
+        "They have special training, such as military or first responder training",
+        "They have mental health issues",
+        "They are deaf or hard of hearing",
+        "Something else the sheriff should know for safety or access"
+      ]
+    },
+    {
+      "nameId": "ser001_alternate_address_type",
+      "_why": "Item 4, alternate address: Home or Business, check one.",
+      "question": "Is that other address a home or a business?",
+      "conditional": {
+        "onlyWhen": "ser001_has_alternate_address"
+      },
+      "members": [
+        "ser001_alternate_address_home",
+        "ser001_alternate_address_business"
+      ],
+      "labels": [
+        "A home",
+        "A business"
+      ]
+    },
+    {
+      "nameId": "ser001_hearing",
+      "_why": "Item 5c, \"Is there a court hearing (court date)?\" - I don't know, No, Yes, check one; the date only on Yes.",
+      "question": "Has the court set a date for a hearing in your case?",
+      "members": [
+        "ser001_hearing_yes",
+        "ser001_hearing_no",
+        "ser001_hearing_unknown"
+      ],
+      "labels": [
+        "Yes",
+        "No",
+        "I don't know"
+      ]
+    },
+    {
+      "nameId": "ser001_service_deadline",
+      "_why": "Item 5d, \"Is there a deadline for service?\" - I don't know, No, Yes, check one; the deadline only on Yes.",
+      "question": "Is there a deadline for serving your papers?",
+      "members": [
+        "ser001_service_deadline_yes",
+        "ser001_service_deadline_no",
+        "ser001_service_deadline_unknown"
+      ],
+      "labels": [
+        "Yes",
+        "No",
+        "I don't know"
+      ]
+    },
+    {
+      "nameId": "ser001_other_service_allowed",
+      "_why": "Item 5e - I don't know, No, Yes, check one.",
+      "question": "Has the court allowed you to serve your papers some other way than handing them to the person, such as substituted service?",
+      "members": [
+        "ser001_other_service_allowed_yes",
+        "ser001_other_service_allowed_no",
+        "ser001_other_service_allowed_unknown"
+      ],
+      "labels": [
+        "Yes",
+        "No",
+        "I don't know"
+      ]
+    },
+    {
+      "nameId": "ser001_other_information",
+      "_why": "Item 5f - No or Yes, and the information only on Yes.",
+      "question": "Is there anything else the sheriff needs to know to serve your papers?",
+      "members": [
+        "ser001_other_information_yes",
+        "ser001_other_information_no"
+      ],
+      "labels": [
+        "Yes",
+        "No"
+      ]
+    }
+  ],
+  "questions": {
+    "person_asking_protection_name": {
+      "text": "What is your full name?",
+      "_why": "Item 2a. DV-100 item 1 asks it under this name."
+    },
+    "person_asking_protection_lawyer_name": {
+      "text": "What is your lawyer's name?",
+      "_why": "Item 2b. DV-100 item 1 asks it under this name, behind the same has_lawyer gate.",
+      "conditional": {
+        "onlyWhen": "has_lawyer",
+        "gateQuestion": "Do you have a lawyer?"
+      }
+    },
+    "person_asking_protection_lawyer_firm_name": {
+      "text": "What is the name of your lawyer's firm?",
+      "optional": true,
+      "conditional": {
+        "onlyWhen": "has_lawyer"
+      }
+    },
+    "person_asking_protection_mailing_address": {
+      "text": "What address can you receive mail at? It can be a post office box, a Safe at Home address, or another safe address.",
+      "_why": "Item 2d. DV-100 item 1 asks the same address, where the court sends papers, under these names."
+    },
+    "person_asking_protection_mailing_city": {
+      "text": "What city is that mailing address in?"
+    },
+    "person_asking_protection_mailing_state": {
+      "text": "What state is that mailing address in?"
+    },
+    "person_asking_protection_mailing_zip_code": {
+      "text": "What is the ZIP code of that mailing address?"
+    },
+    "person_asking_protection_telephone": {
+      "text": "What telephone number can the sheriff reach you at?",
+      "type": "phone",
+      "optional": true
+    },
+    "person_asking_protection_email": {
+      "text": "What email address can the sheriff reach you at?",
+      "type": "email",
+      "optional": true
+    },
+    "person_to_restrain_full_name": {
+      "text": "What is the full name of the person you want protection from?",
+      "_why": "Item 3a(1). The person to serve is the person DV-100 item 2 names."
+    },
+    "clets_restrained_person_other_names": {
+      "text": "Does that person go by any nicknames or other names? Enter any you know of.",
+      "optional": true,
+      "_why": "Item 3a(1). CLETS-001 item 1 asks the other names under this name."
+    },
+    "clets_restrained_person_telephone": {
+      "text": "What is their telephone number?",
+      "type": "phone",
+      "optional": true,
+      "_why": "Item 3a(2). CLETS-001 item 1 asks it under this name."
+    },
+    "person_to_restrain_race": {
+      "text": "What is their race or ethnicity?",
+      "_why": "Item 3a(3). DV-100 item 2 asks it under this name."
+    },
+    "clets_restrained_person_marks_scars_tattoos": {
+      "text": "Do they have any marks, scars, or tattoos? Describe any you know of.",
+      "optional": true,
+      "_why": "Item 3a(3), special marks or features. CLETS-001 item 1 asks it under this name."
+    },
+    "ser001_including_picture": {
+      "text": "Will you give the sheriff a picture of the person you want protection from?"
+    },
+    "person_to_restrain_firearms_yes_yes": {
+      "text": "Does the person you want protection from have a gun or other weapon?",
+      "_why": "Item 3a(4), \"Has a gun or other weapon\". The box carries the name of the Yes to DV-100 item 9, so the packet never asks it here; the wording is for the form compiled on its own."
+    },
+    "ser001_safety_other_details": {
+      "text": "What else should the sheriff know about safety or access when serving them?",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "ser001_safety_other"
+      }
+    },
+    "clets_restrained_person_speaks_english_no": {
+      "text": "Does the person you want protection from need an interpreter because they do not speak English?",
+      "_why": "Item 3a(4), \"Does not speak English\". The box carries the name of the No to CLETS-001's \"Does the person speak English?\", so the packet never asks it here; the wording is for the form compiled on its own."
+    },
+    "clets_restrained_person_language": {
+      "text": "Which language do they speak?",
+      "conditional": {
+        "onlyWhen": "clets_restrained_person_speaks_english_no"
+      }
+    },
+    "restrained_person_street_address": {
+      "text": "What is the street address where the person you want protection from lives?",
+      "_why": "Item 4. DV-110 item 2 asks where the person lives, behind the same knows_restrained_person_address gate, under these names; that home is where the sheriff serves them.",
+      "conditional": {
+        "onlyWhen": "knows_restrained_person_address",
+        "gateQuestion": "Do you know where the person you want protection from lives?"
+      }
+    },
+    "restrained_person_city": {
+      "text": "What city do they live in?",
+      "conditional": {
+        "onlyWhen": "knows_restrained_person_address"
+      }
+    },
+    "restrained_person_state": {
+      "text": "What state do they live in?",
+      "conditional": {
+        "onlyWhen": "knows_restrained_person_address"
+      }
+    },
+    "restrained_person_zip_code": {
+      "text": "What is the ZIP code where they live?",
+      "conditional": {
+        "onlyWhen": "knows_restrained_person_address"
+      }
+    },
+    "ser001_service_address_gate_code": {
+      "text": "What gate code or special instructions will the sheriff need at their home?",
+      "optional": true,
+      "conditional": {
+        "onlyWhen": "knows_restrained_person_address"
+      }
+    },
+    "ser001_service_address_best_time": {
+      "text": "What is the best time for the sheriff to find them at home? For example, 8 a.m. to noon.",
+      "optional": true,
+      "conditional": {
+        "onlyWhen": "knows_restrained_person_address"
+      }
+    },
+    "ser001_person_in_jail": {
+      "text": "Is the person you want protection from in jail or prison?"
+    },
+    "ser001_jail_facility_name": {
+      "text": "What is the name of the jail or prison?",
+      "conditional": {
+        "onlyWhen": "ser001_person_in_jail"
+      }
+    },
+    "ser001_alternate_address_gate_code": {
+      "text": "What gate code or special instructions will the sheriff need at that other address?",
+      "optional": true,
+      "conditional": {
+        "onlyWhen": "ser001_has_alternate_address"
+      }
+    },
+    "ser001_alternate_address_best_time": {
+      "text": "What is the best time for the sheriff to find them at that other address?",
+      "optional": true,
+      "conditional": {
+        "onlyWhen": "ser001_has_alternate_address"
+      }
+    },
+    "ser001_sheriff_county": {
+      "text": "Which county is the person you want protection from in? Your papers go to the sheriff or marshal of that county.",
+      "_why": "Item 1, \"To the Sheriff or Marshal of (name of county)\". The form says to give the papers to the sheriff where the person is, which need not be the court's county."
+    },
+    "ser001_hearing_date": {
+      "text": "What is the date of the hearing?",
+      "type": "date",
+      "conditional": {
+        "onlyWhen": "ser001_hearing_yes"
+      }
+    },
+    "ser001_service_deadline_date": {
+      "text": "What is the deadline for serving your papers?",
+      "type": "date",
+      "conditional": {
+        "onlyWhen": "ser001_service_deadline_yes"
+      }
+    },
+    "ser001_other_information_details": {
+      "text": "What else does the sheriff need to know to serve your papers?",
+      "type": "bigParagraph",
+      "conditional": {
+        "onlyWhen": "ser001_other_information_yes"
+      }
+    }
+  },
+  "combines": [
+    {
+      "nameId": "restrained_person_description",
+      "_why": "Item 3a(3), height, weight, hair color, eye color. DV-110 item 2 asks them in this same named question, so the packet asks it once.",
+      "question": "What does the person you want protection from look like?",
+      "optional": true,
+      "fields": [
+        {
+          "field": "restrained_person_height",
+          "label": "Height"
+        },
+        {
+          "field": "restrained_person_weight",
+          "label": "Weight"
+        },
+        {
+          "field": "restrained_person_hair_color",
+          "label": "Hair color"
+        },
+        {
+          "field": "restrained_person_eye_color",
+          "label": "Eye color"
+        }
+      ]
+    },
+    {
+      "question": "What is the other address where the sheriff could find them?",
+      "fields": [
+        {
+          "field": "ser001_alternate_address_street",
+          "label": "Street address"
+        },
+        {
+          "field": "ser001_alternate_address_city",
+          "label": "City"
+        },
+        {
+          "field": "ser001_alternate_address_state",
+          "label": "State"
+        },
+        {
+          "field": "ser001_alternate_address_zip_code",
+          "label": "ZIP code"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "ser001_has_alternate_address",
+        "gateQuestion": "Do you know another address where the sheriff could find the person you want protection from?"
+      }
+    }
+  ],
+  "autofill": [
+    {
+      "field": "ser001_court_case_name",
+      "from": [
+        "person_asking_protection_name",
+        "person_to_restrain_full_name"
+      ],
+      "separator": " v. ",
+      "why": "Item 2c asks for the case name, \"example: Garcia v. Smith\" - the filer against the person to be restrained, both already named on DV-100 items 1 and 2."
+    },
+    {
+      "field": "ser001_person_date_of_birth_or_age",
+      "from": [
+        "person_to_restrain_date_of_birth",
+        "person_to_restrain_age"
+      ],
+      "separator": ", age ",
+      "why": "Item 3a(3), \"Date of birth or age\". DV-100 item 2 asks both; the box gets the date of birth and the age, or whichever one was given."
+    },
+    {
+      "field": "ser001_person_vehicle",
+      "from": [
+        "clets_restrained_person_vehicle_type",
+        "clets_restrained_person_vehicle_model",
+        "clets_restrained_person_vehicle_year",
+        "clets_restrained_person_vehicle_plate"
+      ],
+      "separator": ", ",
+      "why": "Item 3a(3), \"Vehicle (type, model, year, color, plate number)\". CLETS-001 item 1 asks the type, model, year and plate; they are carried over instead of typed twice."
+    },
+    {
+      "field": "ser001_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "A signature date has one correct answer and the form already knows it."
+    },
+    {
+      "field": "ser001_signature_printed_name",
+      "from": [
+        "person_asking_protection_name"
+      ],
+      "why": "The printed name under the signature is the name given in item 2a."
+    }
+  ],
+  "computed": {
+    "ser001_type_of_papers": {
+      "_why": "Item 5a asks what type of court papers the sheriff is serving. In this packet it is always a domestic violence restraining order - that is what SER-001 is here for - so the words are written whenever there is a person to serve. Two conditions with the same words, so either one is enough and the words appear once.",
+      "separator": ", ",
+      "wordsWhenTicked": [
+        {
+          "when": "papers_served_by_sheriff_yes",
+          "words": "Domestic violence restraining order"
+        },
+        {
+          "when": "person_to_restrain_full_name",
+          "words": "Domestic violence restraining order"
+        }
+      ]
+    },
+    "ser001_forms_to_serve": {
+      "_why": "Item 5b lists the forms to serve. The packet knows them: DV-109 with DV-100, DV-110 and a blank DV-120 always (the same set DV-200 item 4a and 4b print), and each attachment exactly when the answer that brings it in was given. CLETS-001 is confidential and never served, so it is not listed. FL-150 is served with a blank FL-150 whenever the packet makes it (either support box), and RA-010 whenever the filer will attend by phone or video.",
+      "separator": ", ",
+      "wordsWhenTicked": [
+        {
+          "when": "papers_served_by_sheriff_yes",
+          "words": "DV-109, DV-100, DV-110, blank DV-120"
+        },
+        {
+          "when": "person_to_restrain_full_name",
+          "words": "DV-109, DV-100, DV-110, blank DV-120"
+        },
+        {
+          "when": "child_custody_and_visitation_order_requested",
+          "words": "DV-105, DV-140"
+        },
+        {
+          "when": "dv105_children_lived_together_five_years_no",
+          "words": "DV-105(A)"
+        },
+        {
+          "when": "dv105_abduction_risk_yes",
+          "words": "DV-108"
+        },
+        {
+          "when": "child_support_order_requested",
+          "words": "FL-150, blank FL-150"
+        },
+        {
+          "when": "spousal_support_order_requested",
+          "words": "FL-150, blank FL-150"
+        },
+        {
+          "when": "appear_remotely_yes",
+          "words": "RA-010"
+        },
+        {
+          "when": "other_abuse_incident_additional_space_attached_yes",
+          "words": "MC-025"
+        },
+        {
+          "when": "other_protected_people_additional_list_attached_yes",
+          "words": "MC-025"
+        },
+        {
+          "when": "dv105_children_additional_list_attached",
+          "words": "MC-025"
+        }
+      ]
+    }
+  },
+  "attachmentTargets": [
+    "papers_served_by_sheriff_yes",
+    "knows_restrained_person_address_yes"
+  ],
+  "order": [
+    "case_number",
+    "person_asking_protection_name",
+    "person_asking_protection_lawyer_name",
+    "person_asking_protection_lawyer_firm_name",
+    "ser001_court_case_name",
+    "person_asking_protection_mailing_address",
+    "person_asking_protection_mailing_city",
+    "person_asking_protection_mailing_state",
+    "person_asking_protection_mailing_zip_code",
+    "person_asking_protection_telephone",
+    "person_asking_protection_email",
+    "person_to_restrain_full_name",
+    "clets_restrained_person_other_names",
+    "clets_restrained_person_telephone",
+    "person_to_restrain_gender_male",
+    "person_to_restrain_gender_female",
+    "person_to_restrain_gender_nonbinary",
+    "restrained_person_height",
+    "restrained_person_weight",
+    "restrained_person_hair_color",
+    "restrained_person_eye_color",
+    "ser001_person_date_of_birth_or_age",
+    "person_to_restrain_race",
+    "clets_restrained_person_marks_scars_tattoos",
+    "ser001_person_vehicle",
+    "ser001_including_picture",
+    "person_to_restrain_firearms_yes_yes",
+    "ser001_safety_probation_or_parole",
+    "ser001_safety_aggressive_animal",
+    "ser001_safety_special_training",
+    "ser001_safety_mental_health",
+    "ser001_safety_deaf_or_hard_of_hearing",
+    "ser001_safety_other",
+    "ser001_safety_other_details",
+    "clets_restrained_person_speaks_english_no",
+    "clets_restrained_person_language",
+    "restrained_person_street_address",
+    "restrained_person_city",
+    "restrained_person_state",
+    "restrained_person_zip_code",
+    "ser001_service_address_gate_code",
+    "ser001_service_address_best_time",
+    "ser001_person_in_jail",
+    "ser001_jail_facility_name",
+    "ser001_alternate_address_street",
+    "ser001_alternate_address_home",
+    "ser001_alternate_address_business",
+    "ser001_alternate_address_city",
+    "ser001_alternate_address_state",
+    "ser001_alternate_address_zip_code",
+    "ser001_alternate_address_gate_code",
+    "ser001_alternate_address_best_time",
+    "ser001_sheriff_county",
+    "ser001_type_of_papers",
+    "ser001_forms_to_serve",
+    "ser001_hearing_yes",
+    "ser001_hearing_no",
+    "ser001_hearing_unknown",
+    "ser001_hearing_date",
+    "ser001_service_deadline_yes",
+    "ser001_service_deadline_no",
+    "ser001_service_deadline_unknown",
+    "ser001_service_deadline_date",
+    "ser001_other_service_allowed_yes",
+    "ser001_other_service_allowed_no",
+    "ser001_other_service_allowed_unknown",
+    "ser001_other_information_yes",
+    "ser001_other_information_no",
+    "ser001_other_information_details",
+    "ser001_signature_date",
+    "ser001_signature_printed_name"
+  ],
+  "sections": [
+    {
+      "name": "Your Information",
+      "fields": [
+        "case_number",
+        "person_asking_protection_name",
+        "has_lawyer",
+        "person_asking_protection_lawyer_name",
+        "person_asking_protection_lawyer_firm_name",
+        "ser001_court_case_name",
+        "person_asking_protection_mailing_address",
+        "person_asking_protection_mailing_city",
+        "person_asking_protection_mailing_state",
+        "person_asking_protection_mailing_zip_code",
+        "person_asking_protection_telephone",
+        "person_asking_protection_email"
+      ]
+    },
+    {
+      "name": "The Person to Serve",
+      "fields": [
+        "person_to_restrain_full_name",
+        "clets_restrained_person_other_names",
+        "clets_restrained_person_telephone",
+        "person_to_restrain_gender_male",
+        "person_to_restrain_gender_female",
+        "person_to_restrain_gender_nonbinary",
+        "restrained_person_height",
+        "restrained_person_weight",
+        "restrained_person_hair_color",
+        "restrained_person_eye_color",
+        "ser001_person_date_of_birth_or_age",
+        "person_to_restrain_race",
+        "clets_restrained_person_marks_scars_tattoos",
+        "ser001_person_vehicle",
+        "ser001_including_picture"
+      ]
+    },
+    {
+      "name": "Safety When Serving",
+      "fields": [
+        "person_to_restrain_firearms_yes_yes",
+        "ser001_safety_probation_or_parole",
+        "ser001_safety_aggressive_animal",
+        "ser001_safety_special_training",
+        "ser001_safety_mental_health",
+        "ser001_safety_deaf_or_hard_of_hearing",
+        "ser001_safety_other",
+        "ser001_safety_other_details",
+        "clets_restrained_person_speaks_english_no",
+        "clets_restrained_person_language"
+      ]
+    },
+    {
+      "name": "Where to Find Them",
+      "fields": [
+        "knows_restrained_person_address",
+        "restrained_person_street_address",
+        "restrained_person_city",
+        "restrained_person_state",
+        "restrained_person_zip_code",
+        "ser001_service_address_gate_code",
+        "ser001_service_address_best_time",
+        "ser001_person_in_jail",
+        "ser001_jail_facility_name",
+        "ser001_has_alternate_address",
+        "ser001_alternate_address_street",
+        "ser001_alternate_address_home",
+        "ser001_alternate_address_business",
+        "ser001_alternate_address_city",
+        "ser001_alternate_address_state",
+        "ser001_alternate_address_zip_code",
+        "ser001_alternate_address_gate_code",
+        "ser001_alternate_address_best_time",
+        "ser001_sheriff_county"
+      ]
+    },
+    {
+      "name": "About Your Request",
+      "fields": [
+        "ser001_type_of_papers",
+        "ser001_forms_to_serve",
+        "ser001_hearing_yes",
+        "ser001_hearing_no",
+        "ser001_hearing_unknown",
+        "ser001_hearing_date",
+        "ser001_service_deadline_yes",
+        "ser001_service_deadline_no",
+        "ser001_service_deadline_unknown",
+        "ser001_service_deadline_date",
+        "ser001_other_service_allowed_yes",
+        "ser001_other_service_allowed_no",
+        "ser001_other_service_allowed_unknown",
+        "ser001_other_information_yes",
+        "ser001_other_information_no",
+        "ser001_other_information_details",
+        "ser001_signature_date",
+        "ser001_signature_printed_name"
+      ]
+    }
+  ],
+  "_orderNote": "The order the filer meets the fields. Without it the county (item 1) came first, before the person or the address it depends on; it is asked once the addresses are known."
+}

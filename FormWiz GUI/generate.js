@@ -685,6 +685,12 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '        .stepper-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; flex: 0 1 auto; min-width: max-content; padding: 0 10px; }',
     '        .stepper-label { margin-top: 8px; font-size: 14px; font-weight: 600; text-align: center; white-space: nowrap; width: max-content; min-width: 0; line-height: 1.25; }',
     '        .stepper-line { flex: 1 1 16px; min-width: 12px; max-width: 40px; height: 4px; margin: 14px 0 0; }',
+    // A form an answer has just brought in: its step is added and marked for a
+    // moment, so the filer sees the packet grow.
+    '        .stepper-step.stepper-step-new .stepper-circle { animation: fwStepAdded 1.6s ease-out; }',
+    '        .stepper-step.stepper-step-new .stepper-label { animation: fwStepLabelAdded 1.6s ease-out; }',
+    '        @keyframes fwStepAdded { 0% { transform: scale(0.6); box-shadow: 0 0 0 0 rgba(41, 128, 185, 0.6); } 40% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(41, 128, 185, 0.25); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(41, 128, 185, 0); } }',
+    '        @keyframes fwStepLabelAdded { 0% { opacity: 0; } 100% { opacity: 1; } }',
     '        @media (max-width: 640px) { .stepper-label { white-space: normal; max-width: 160px; } }',
     '        #box { padding-top: 100px; margin: 50px; }',
     // Half the gap above a step bar: 100px of padding plus the bar's own 12px
@@ -1692,9 +1698,14 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     "",
     "<!-- Firebase includes -->",
     '<script src="https://js.stripe.com/v3/"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
+    // Test mode never loads Firebase: a test page exists to check that the form is
+    // built right, and nothing a tester types is meant to be saved or remembered.
+    // Every Firebase call below is guarded, so the page runs the same without it.
+    ...(formDeploymentStyle === 'test' ? [] : [
+      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
+      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
+      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
+    ]),
     // Cart manager (Firebase-backed). Assumes this page lives beside cart.js; adjust path if relocated.
     '<script src="cart.js"></script>',
     "",
@@ -1929,13 +1940,41 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     // Insert stepper progress bar based on groups
     formHTML += `<div class="stepper-progress-bar" id="stepperProgressBar">`;
     const groupIds = Object.keys(groupToSectionMap).sort((a, b) => parseInt(a) - parseInt(b));
+    // Only the forms every filer fills are numbered to begin with: the forms
+    // nothing switches on (the one the packet opens with), the ones marked as
+    // always included, and whatever those switch on unconditionally. A form an
+    // answer brings in is added in its place, numbered, when the answer is
+    // given (updateProgressBar). The bar used to list the whole packet and
+    // hide what was not needed, and a form an answer brought in did not appear
+    // until the filer moved to another page.
+    const builderForms = getBuilderProjectForms();
+    const builderRules = getBuilderFormActivations();
+    const targeted = new Set(builderRules.filter(r => r && r.targetForm).map(r => r.targetForm));
+    const neededAtStart = new Set(builderForms
+      .filter(f => f && (f.alwaysIncluded || !targeted.has(f.name))).map(f => f.name));
+    for (let grew = true; grew;) {
+      grew = false;
+      builderRules.forEach(r => {
+        if (r && r.unconditional && r.targetForm && !neededAtStart.has(r.targetForm)
+            && (!r.fromForm || neededAtStart.has(r.fromForm))) {
+          neededAtStart.add(r.targetForm);
+          grew = true;
+        }
+      });
+    }
+    const knownForm = name => builderForms.some(f => f && f.name === name);
+    const shownAtStart = groupIds.map(g => !builderForms.length || !knownForm(groupNames[g]) || neededAtStart.has(groupNames[g]));
+    let shownNumber = 0;
     groupIds.forEach((groupId, index) => {
-      formHTML += `<div class="stepper-step" data-group="${groupId}" data-step="${index + 1}">`;
-      formHTML += `<div class="stepper-circle">${index + 1}</div>`;
+      const shown = shownAtStart[index];
+      if (shown) shownNumber++;
+      formHTML += `<div class="stepper-step" data-group="${groupId}" data-step="${index + 1}"${shown ? '' : ' style="display:none"'}>`;
+      formHTML += `<div class="stepper-circle">${shown ? shownNumber : index + 1}</div>`;
       formHTML += `<div class="stepper-label">${groupNames[groupId]}</div>`;
       formHTML += `</div>`;
       if (index < groupIds.length - 1) {
-        formHTML += `<div class="stepper-line"></div>`;
+        const lineShown = shown && shownAtStart.slice(index + 1).some(Boolean);
+        formHTML += `<div class="stepper-line"${lineShown ? '' : ' style="display:none"'}></div>`;
       }
     });
     formHTML += `</div>`;
@@ -3783,6 +3822,29 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
                       const createdInput = document.getElementById(fieldId);
                   }, 100);
                 }
+            } else if (field.type === 'bigParagraph') {
+                // A box the paper rules over several lines - FL-150's insurance
+                // company address - asked as a paragraph rather than one line.
+                const fieldId = field.nodeId;
+                const areaDiv = document.createElement('div');
+                areaDiv.className = 'address-field';
+                const area = document.createElement('textarea');
+                area.id = fieldId;
+                area.name = fieldId;
+                area.placeholder = field.label || '';
+                area.className = 'address-input';
+                area.rows = 3;
+                area.style.textAlign = 'left';
+                area.style.width = '100%';
+                area.style.maxWidth = '400px';
+                if (field.prefill) area.value = field.prefill;
+                area.addEventListener('input', function () { if (typeof updateLinkedFields === 'function') updateLinkedFields(); });
+                area.addEventListener('change', function () { if (typeof updateLinkedFields === 'function') updateLinkedFields(); });
+                areaDiv.appendChild(area);
+                entryContainer.appendChild(areaDiv);
+                if (allFieldsInOrder.slice(fieldIndex + 1).length > 0) {
+                  entryContainer.appendChild(document.createElement('br'));
+                }
             } else if (field.type === 'amount') {
                 // For multipleTextboxes, use the base nodeId without numbering
                 const fieldId = field.nodeId;
@@ -5380,6 +5442,13 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
           logicScriptBuffer += `     var dropdown = allDropdowns[d];\n`;
           logicScriptBuffer += `     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)\n`;
           logicScriptBuffer += `     if(dropdown.closest('[id^="triggerFields"]')) continue;\n`;
+          // What the dropdown held before the reset: the change event below is
+          // raised only when the reset changed something. Raised always, two
+          // hidden questions that each listen to the other's dropdown reset each
+          // other without end - an idle page raised thousands of change events a
+          // second, and anything waiting for a quiet moment never ran.
+          logicScriptBuffer += `     var valueBeforeReset = dropdown.value;\n`;
+          logicScriptBuffer += `     var mirrorHadBoxes = false;\n`;
           logicScriptBuffer += `     // Reset to default "Select an option"\n`;
           logicScriptBuffer += `     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');\n`;
           logicScriptBuffer += `     if(placeholderOption){\n`;
@@ -5396,10 +5465,12 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
           logicScriptBuffer += `     // Clear hidden checkboxes created by dropdownMirror\n`;
           logicScriptBuffer += `     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);\n`;
           logicScriptBuffer += `     if(dropdownWrapper){\n`;
+          logicScriptBuffer += `       mirrorHadBoxes = dropdownWrapper.innerHTML !== '';\n`;
           logicScriptBuffer += `       dropdownWrapper.innerHTML = '';\n`;
           logicScriptBuffer += `     }\n`;
-          logicScriptBuffer += `     // Trigger change event to update any dependent logic\n`;
-          logicScriptBuffer += `     dropdown.dispatchEvent(new Event('change'));\n`;
+          logicScriptBuffer += `     // Trigger change event to update any dependent logic - only when the\n`;
+          logicScriptBuffer += `     // reset changed something, or the questions listening would reset back\n`;
+          logicScriptBuffer += `     if(dropdown.value !== valueBeforeReset || mirrorHadBoxes) dropdown.dispatchEvent(new Event('change'));\n`;
           logicScriptBuffer += `   }\n`;
           // An answer to a question nobody is being asked must not reach the PDF.
           // Only the dropdowns inside a closing question were reset, so a filer who
@@ -9813,6 +9884,15 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var projectId = ${JSON.stringify(window.projectIdConfig || '')};\n`;
   formHTML += `var fieldCapacity = ${JSON.stringify(window.fieldCapacityConfig || {})};\n`;
   formHTML += `var overflowLinks = ${JSON.stringify(window.overflowLinksConfig || [])};\n`;
+  // The MC-025 layout (continuation-layout.js, loaded by gui.html) - the same
+  // code attachment-page.js draws with - so where a narrative is split, and how
+  // many sheets DV-100 item 32 counts, are what the server will draw. Its own
+  // name here: gui.html's window.ContinuationLayout must keep its source.
+  if (!(window.ContinuationLayout && window.ContinuationLayout.source)) {
+    console.error('continuation-layout.js is not loaded: this form cannot split a long answer onto MC-025 or count its sheets');
+  }
+  formHTML += 'var fwContinuationLayout = (' + ((window.ContinuationLayout && window.ContinuationLayout.source)
+    || 'function () { return null; }') + ')();\n';
   formHTML += `var attachmentPages = ${JSON.stringify(attachmentPages)};\n`;
   formHTML += `window.__PROJECT_ID__ = projectId;\n`;
   formHTML += `var isHandlingLink = false;\n`;
@@ -12590,6 +12670,30 @@ function showTextboxLabels(questionId, count){
                 if (allFieldsInOrder.slice(fieldIndex + 1).length > 0) {
                   entryContainer.appendChild(document.createElement('br'));
                 }
+            } else if (field.type === 'bigParagraph') {
+                // An entry column the paper rules over several lines - DV-160's
+                // "what you want kept private" and "where it appears" - asked as
+                // a paragraph in each entry rather than one line.
+                const fieldId = entryFieldId(field.nodeId, j);
+                const areaDiv = document.createElement('div');
+                areaDiv.className = 'address-field';
+                const area = document.createElement('textarea');
+                area.id = fieldId;
+                area.name = fieldId;
+                area.placeholder = field.label || '';
+                area.className = 'address-input';
+                area.rows = 3;
+                area.style.textAlign = 'left';
+                area.style.width = '100%';
+                area.style.maxWidth = '400px';
+                if (field.prefill) area.value = field.prefill;
+                area.addEventListener('input', function () { if (typeof updateLinkedFields === 'function') updateLinkedFields(); });
+                area.addEventListener('change', function () { if (typeof updateLinkedFields === 'function') updateLinkedFields(); });
+                areaDiv.appendChild(area);
+                entryContainer.appendChild(areaDiv);
+                if (allFieldsInOrder.slice(fieldIndex + 1).length > 0) {
+                  entryContainer.appendChild(document.createElement('br'));
+                }
             } else if (field.type === 'amount') {
                 const fieldId = entryFieldId(field.nodeId, j);
                 const inputDiv = document.createElement('div');
@@ -13932,10 +14036,18 @@ function updateLinkedFields() {
         // the fields were declared, without asking anyone to type both into one
         // box.
         if (linkedField.join != null) {
+            // A state joined into one line is printed as its postal code - the
+            // hidden "<id>_short" beside every state dropdown - as the paper
+            // writes it: MC-030's caption read "Los Angeles Wyoming 90210". Only
+            // a dropdown whose twin holds a two-letter code is shortened.
             const parts = fields
                 .map(fieldId => document.getElementById(fieldId))
                 .filter(el => el && String(el.value).trim() !== '')
-                .map(el => String(el.value).trim());
+                .map(el => {
+                    const twin = (el.tagName === 'SELECT' && el.id) ? document.getElementById(el.id + '_short') : null;
+                    const code = twin ? String(twin.value || '').trim() : '';
+                    return /^[A-Z][A-Z]$/.test(code) ? code : String(el.value).trim();
+                });
             hiddenField.value = parts.join(linkedField.join);
             return;
         }
@@ -14036,7 +14148,18 @@ function updateLinkedFields() {
                     const separator = typeof linkedField.join === 'string'
                         ? linkedField.join
                         : ', ';
-                    hiddenField.value = distinctValues.join(separator);
+                    // A part joined into one line is printed the way the paper
+                    // writes it: a state as its postal code, the hidden
+                    // "<id>_short" kept beside every state dropdown. MC-030's
+                    // caption read "Los Angeles Wyoming 90210".
+                    const joinedParts = [];
+                    sourceBoxes.forEach(function (tb) {
+                        const twin = (tb.tagName === 'SELECT' && tb.id) ? document.getElementById(tb.id + '_short') : null;
+                        const code = twin ? String(twin.value || '').trim() : '';
+                        const v = /^[A-Z][A-Z]$/.test(code) ? code : tb.value.trim();
+                        if (joinedParts.indexOf(v) === -1) joinedParts.push(v);
+                    });
+                    hiddenField.value = joinedParts.join(separator);
                     if (typeof linkedField.join !== 'string') {
                         window.__fwJoinInferred = window.__fwJoinInferred || {};
                         if (!window.__fwJoinInferred[linkedFieldId]) {
@@ -14503,23 +14626,59 @@ function activationNamesForm(rule, form){
     if (!target) return false;
     if (target === form.name) return true;
     var a = target.toLowerCase();
-    var candidates = [form.name, form.pdfName, form.pdfFile];
-    for (var i = 0; i < candidates.length; i++){
-        var b = String(candidates[i] == null ? '' : candidates[i]).trim().toLowerCase();
-        if (!b) continue;
-        if (a === b) return true;
-        if (b.indexOf(a) === 0 || a.indexOf(b) === 0) return true;
+    var namesOf = function(f){
+        return [f && f.name, f && f.pdfName, f && f.pdfFile].map(function(c){
+            return String(c == null ? '' : c).trim().toLowerCase();
+        }).filter(Boolean);
+    };
+    var mine = namesOf(form);
+    if (mine.indexOf(a) !== -1) return true;
+    // A rule that names some form exactly is that form's and no other's.
+    // "DV-105(A)" starts with "DV-105", and matching on that switched DV-105
+    // on - and "DV-105(A) (2)" with it - whenever DV-105(A) was.
+    var exactElsewhere = getProjectForms().some(function(f){
+        return f !== form && namesOf(f).indexOf(a) !== -1;
+    });
+    if (exactElsewhere) return false;
+    // Otherwise a name that is the start of the other, up to a space:
+    // "DV-109" is "DV-109 Notice of Court Hearing".
+    var startsWord = function(long, short){
+        return long.indexOf(short) === 0 && (long.length === short.length || long.charAt(short.length) === ' ');
+    };
+    for (var i = 0; i < mine.length; i++){
+        if (startsWord(mine[i], a) || startsWord(a, mine[i])) return true;
     }
     return false;
 }
 
+/** The project form of this name: exactly, or as an activation rule would match it. */
+function projectFormNamed(name){
+    var forms = getProjectForms();
+    for (var i = 0; i < forms.length; i++) if (forms[i].name === name) return forms[i];
+    for (var j = 0; j < forms.length; j++) if (activationNamesForm({ targetForm: name }, forms[j])) return forms[j];
+    return null;
+}
+
 function isFormActivated(form){
+    return isFormActivatedAt(form, 0);
+}
+
+function isFormActivatedAt(form, depth){
     if (!form) return false;
     if (form.alwaysIncluded) return true;
+    if (depth > 12) return false;
     var rules = getFormActivations().filter(function(r){ return activationNamesForm(r, form); });
     for (var i = 0; i < rules.length; i++){
         if (rules[i].unconditional) return true;
-        if (isActivationOptionChosen(rules[i])) return true;
+        if (!isActivationOptionChosen(rules[i])) continue;
+        // An answer brings a form in only while the form it is asked in is in
+        // the packet. DV-105's "Have all the children lived together ...?"
+        // answered No brings in DV-105(A); drop the custody request and DV-105
+        // goes, and the No still sitting in it must not keep DV-105(A) - or
+        // DV-108, behind DV-105's abduction answer - in the packet.
+        var from = rules[i].fromForm ? projectFormNamed(rules[i].fromForm) : null;
+        if (from && from !== form && !isFormActivatedAt(from, depth + 1)) continue;
+        return true;
     }
     return false;
 }
@@ -14583,7 +14742,34 @@ function writeComputedField(nameId, value){
  *    "need more space" box ticks itself whenever the page exists.
  *-----------------------------------------------------------------*/
 function attachmentPageList(){
-    return (typeof attachmentPages !== "undefined" && Array.isArray(attachmentPages)) ? attachmentPages : [];
+    var list = (typeof attachmentPages !== "undefined" && Array.isArray(attachmentPages)) ? attachmentPages.slice() : [];
+    // A narrative that outgrows its box continues on MC-025 as well: an
+    // overflow link that names a page, where DV-100 item 7 once named a box on
+    // DV-101 (rule the-packet-uses-mc025-for-more-space).
+    var links = (typeof overflowLinks !== "undefined" && overflowLinks) ? overflowLinks : [];
+    links.forEach(function(link){
+        if (!link || !link.page || !link.page.name) return;
+        list.push({
+            kind: "text", link: link, name: link.page.name, heading: link.page.heading,
+            item: link.page.item, itemTitle: link.page.itemTitle,
+            attachmentNumber: link.page.attachmentNumber || "", form: link.page.form || "",
+            marks: link.marks || ""
+        });
+    });
+    return list;
+}
+/** What of a narrative its own box cannot print: the part its page carries. */
+function overflowTail(link){
+    var el = overflowSourceEl(link);
+    if (!el) return "";
+    // An answer no box on the paper holds (FL-155 item 12, "attach extra
+    // sheet") goes on MC-025 whole.
+    if (link.noBox) return String(el.value || "").trim();
+    var caps = (typeof fieldCapacity !== "undefined" && fieldCapacity) ? fieldCapacity : {};
+    var cap = Number(el.getAttribute("data-overflow-cap") || el.getAttribute("data-capacity") || 0)
+        || Number(caps[link.nameId] || 0);
+    if (!cap) return "";
+    return overflowSplit(String(el.value || ""), cap).tail;
 }
 function attachmentBaseName(pdfName){
     var base = String(pdfName || "");
@@ -14601,8 +14787,31 @@ function attachmentCount(att){
  * children page came out for a filer who never asked for custody orders - the
  * block was answerable, but DV-105 itself was never switched on.
  */
+/** Where a page's answers are asked: the block, or the box a narrative outgrew. */
+function attachmentAnchor(att){
+    if (att.kind === "text") return att.link ? overflowSourceEl(att.link) : null;
+    return document.getElementById(att.block);
+}
+/** The form a page belongs to: the one it names, or the one that asks for it. */
+function attachmentOwnerForm(att){
+    if (typeof getProjectForms !== "function") return null;
+    if (att.form){
+        var named = getProjectForms().filter(function(f){ return f && f.name === att.form; })[0];
+        if (named) return named;
+    }
+    var el = attachmentAnchor(att);
+    var sec = el ? el.closest(".section") : null;
+    if (sec && typeof formOwningSection === "function") return formOwningSection(Number(String(sec.id || "").slice(7))) || null;
+    return null;
+}
+/** How many MC-025 sheets a page in use takes - what the server will draw. */
+function continuationSheets(att){
+    var spec = attachmentSpecFor(att.name);
+    var lay = (typeof fwContinuationLayout !== "undefined") ? fwContinuationLayout : null;
+    return (spec && lay) ? lay.pageCount(spec) : 1;
+}
 function attachmentInUse(att){
-    var sel = document.getElementById(att.block);
+    var sel = attachmentAnchor(att);
     if (!sel) return false;
     var q = sel.closest(".question-container");
     if (q && q.classList.contains("hidden")) return false;
@@ -14615,6 +14824,7 @@ function attachmentInUse(att){
         var named = getProjectForms().filter(function(f){ return f && f.name === att.form; })[0];
         if (named && !isFormActivated(named)) return false;
     }
+    if (att.kind === "text") return !!overflowTail(att.link);
     return attachmentCount(att) > att.pdfRows;
 }
 /** Tick - or clear - the box that says the page is attached. */
@@ -14657,18 +14867,29 @@ function attachmentSpecFor(pdfName){
     var base = attachmentBaseName(pdfName);
     var att = attachmentPageList().filter(function(a){ return a.name === base; })[0];
     if (!att) return null;
+    // MC-025's header: the case number (the clerk's, like every case number in
+    // the packet) and the short title - "Mora v. Smith" - which the packet
+    // works out once as case_short_title.
+    var caseEl = document.getElementById("case_number");
+    var titleEl = document.getElementById("case_short_title");
+    var spec = {
+        name: att.name, heading: att.heading, item: att.item, itemTitle: att.itemTitle,
+        attachmentNumber: att.attachmentNumber || "",
+        caseNumber: caseEl ? String(caseEl.value || "").trim() : "",
+        shortTitle: titleEl ? String(titleEl.value || "").trim() : ""
+    };
+    if (att.kind === "text"){
+        spec.text = overflowTail(att.link);
+        return spec;
+    }
     var count = attachmentCount(att);
     var entries = [];
     for (var n = att.pdfRows + 1; n <= count; n++){
         var values = (att.fields || []).map(function(f){ return { label: f.label, value: attachmentValue(f, n) }; });
         if (values.some(function(v){ return v.value; })) entries.push({ number: n, values: values });
     }
-    var caseEl = document.getElementById("case_number");
-    return {
-        name: att.name, heading: att.heading, item: att.item, itemTitle: att.itemTitle,
-        caseNumber: caseEl ? String(caseEl.value || "").trim() : "",
-        entries: entries
-    };
+    spec.entries = entries;
+    return spec;
 }
 if (typeof document !== "undefined" && !window.__FW_ATTACHMENT_MARKS_BOUND__){
     window.__FW_ATTACHMENT_MARKS_BOUND__ = true;
@@ -14859,130 +15080,103 @@ function overflowSourceEl(link){
  * clean stop looks like, and what tells a reader it was not clipped.
  */
 function overflowSplit(value, cap, tailCap){
-    var text = String(value == null ? "" : value);
-    if (!cap || text.length <= cap) return { head: text, tail: "", beyond: false };
-    var at = cap;
-    var space = text.slice(0, cap).lastIndexOf(" ");
-    if (space > cap * 0.6) at = space;
-    var head = text.slice(0, at);
-    var tail = text.slice(at).replace(/^ +/, "");
-    // Past what the second box holds there is nothing else to print, and the
-    // form should say so rather than quietly keeping it.
-    var beyond = false;
-    if (tailCap && tail.length > tailCap) {
-        var cut = tail.slice(0, tailCap);
-        var brk = cut.lastIndexOf(" ");
-        if (brk > tailCap * 0.6) cut = cut.slice(0, brk);
-        tail = cut;
-        beyond = true;
-    }
-    return { head: head, tail: tail, beyond: beyond };
+    // The split lives in FormWiz GUI/continuation-layout.js, embedded in every
+    // page, because pipeline-fill.js must cut a captured answer exactly where
+    // the page does.
+    var lay = (typeof fwContinuationLayout !== "undefined") ? fwContinuationLayout : null;
+    if (lay) return lay.overflowSplit(value, cap, tailCap);
+    return { head: String(value == null ? "" : value), tail: "", beyond: false };
 }
+
+/** A box no question asks - ticked or filled by the form - made on first use. */
+function overflowHiddenBox(id, tag){
+    var box = document.getElementById(id);
+    if (box) return box;
+    box = document.createElement(tag === "textarea" ? "textarea" : "input");
+    if (tag !== "textarea") box.type = "checkbox";
+    box.id = id;
+    box.name = id;
+    box.style.display = "none";
+    var host = document.getElementById("hidden_pdf_fields") || document.getElementById("customForm");
+    if (host) host.appendChild(box);
+    return box;
+}
+
+/*
+ * How much the widest debug path writes into a box that continues on MC-025:
+ * its own capacity and then this much more - past one MC-025 sheet (about
+ * 4,500 characters), so the run shows a continuation numbered "Page 1 of 2".
+ */
+var OVERFLOW_TEST_SPILL = 6000;
 
 function applyOverflowLinks(){
     var links = (typeof overflowLinks !== "undefined" && overflowLinks) ? overflowLinks : [];
     if (!links.length) return;
+    var caps = (typeof fieldCapacity !== "undefined" && fieldCapacity) ? fieldCapacity : {};
+    // A "not enough space" box two narratives share: DV-160 prints one
+    // "Attachment 8" box under both 8b and 8c, ticked while either runs over.
+    var marksOn = {};
     links.forEach(function(link){
         var el = overflowSourceEl(link);
         if (!el) return;
+        // No box on the paper: the whole answer is the MC-025 page, and any
+        // box that says a sheet is attached ticks while there is an answer.
+        if (link.noBox){
+            if (link.marks) marksOn[link.marks] = !!marksOn[link.marks] || String(el.value || "").trim() !== "";
+            return;
+        }
 
         // A box that can spill is never capped: the cap is what decides the
         // spill, not what prevents it.
-        var caps = (typeof fieldCapacity !== "undefined" && fieldCapacity)
-            ? fieldCapacity : {};
         var cap = Number(el.getAttribute("data-capacity") || 0)
             || Number(caps[link.nameId] || 0);
         if (!cap) return;
 
-        // How much more space the continuation actually is.
-        //
-        // The intent was to carry the whole answer over, so the attachment
-        // reads on its own. The paper does not allow it: DV-100 item 7 holds
-        // 1152 characters and DV-101 item 5, the box that continues it, holds
-        // 400. Copying the whole answer there would print a clipped one, and
-        // a court document that is unreadable at the bottom is worse than one
-        // that is split. So the continuation carries the part the first box
-        // could not print, the two boxes read as one passage, and the limit
-        // the filer meets is the sum of what the two of them hold - which is
-        // the extra space, honestly counted.
-        var room = cap + Number(caps[link.field] || 0);
+        // How much more space the continuation is. On MC-025 there is no end
+        // to it - the page takes another sheet - so the box takes whatever the
+        // filer has to say (rule the-packet-uses-mc025-for-more-space). A
+        // continuation onto another form's box holds only what that box holds,
+        // which is how DV-101 item 5 once capped DV-100 item 7 at the two
+        // boxes' sum; the audit now refuses such a link, and the code keeps it
+        // only so an old project still opens.
+        var onPage = !!link.page;
+        var tailCap = onPage ? 0 : Number(caps[link.field] || 0);
+        var room = onPage ? cap + OVERFLOW_TEST_SPILL : cap + tailCap;
         el.setAttribute("data-overflow-cap", String(cap));
         el.setAttribute("data-overflow-room", String(room));
-        // The limit comes off once there is a third place for the words to go.
-        // Stopping someone dead at the end of the second box would be the form
-        // deciding how much of their account is worth having, when the paper
-        // itself offers them a sheet to carry on writing on.
-        if (link.marksBeyond) {
+        if (onPage || link.marksBeyond) {
             if (el.hasAttribute("maxlength")) el.removeAttribute("maxlength");
         } else if (String(el.getAttribute("maxlength") || "") !== String(room)) {
             el.setAttribute("maxlength", String(room));
         }
 
-        var full = String(el.value || "");
-        var split = overflowSplit(full, cap, Number(caps[link.field] || 0));
+        var split = overflowSplit(String(el.value || ""), cap, tailCap);
         var over = !!split.tail;
-
         // The box that says an attachment is coming. No question makes it any
         // more - it is ticked by the writing - so the form creates it, the same
-        // way it creates the boxes a dropdown answer mirrors into. The
-        // activation rule finds it by name and the PDF gets its tick.
-        if (link.marks){
-            var mark = document.getElementById(link.marks);
-            if (!mark){
-                mark = document.createElement("input");
-                mark.type = "checkbox";
-                mark.id = link.marks;
-                mark.name = link.marks;
-                mark.style.display = "none";
-                var host = document.getElementById("hidden_pdf_fields")
-                    || document.getElementById("customForm");
-                if (host) host.appendChild(mark);
-            }
-            if (mark && mark.checked !== over){
-                mark.checked = over;
-                triggerFieldChange(mark);
+        // way it creates the boxes a dropdown answer mirrors into.
+        if (link.marks) marksOn[link.marks] = !!marksOn[link.marks] || over;
+
+        if (link.field){
+            var target = overflowHiddenBox(link.field, "textarea");
+            if (String(target.value || "") !== split.tail){
+                target.value = split.tail;
+                triggerFieldChange(target);
             }
         }
-
-        // The continuation form gets the whole account, so it reads on its own.
-        var target = link.field ? document.getElementById(link.field) : null;
-        if (!target && link.field){
-            target = document.createElement("textarea");
-            target.id = link.field;
-            target.name = link.field;
-            target.style.display = "none";
-            var host2 = document.getElementById("hidden_pdf_fields")
-                || document.getElementById("customForm");
-            if (host2) host2.appendChild(target);
-        }
-        if (target && String(target.value || "") !== split.tail){
-            target.value = split.tail;
-            triggerFieldChange(target);
-        }
-
-        // And the box that says a sheet of their own is coming.
-        //
-        // DV-101 item 5 carries the same escape DV-100 item 7 does - "Check
-        // here if you need more space. Attach a sheet of paper" - and asking it
-        // was the same mistake one form further on. Past what both printed
-        // boxes hold, this is knowable rather than predictable: the filer has
-        // more to say than the packet can print.
         if (link.marksBeyond){
-            var far = document.getElementById(link.marksBeyond);
-            if (!far){
-                far = document.createElement("input");
-                far.type = "checkbox";
-                far.id = link.marksBeyond;
-                far.name = link.marksBeyond;
-                far.style.display = "none";
-                var host3 = document.getElementById("hidden_pdf_fields")
-                    || document.getElementById("customForm");
-                if (host3) host3.appendChild(far);
-            }
-            if (far && far.checked !== split.beyond){
+            var far = overflowHiddenBox(link.marksBeyond, "checkbox");
+            if (far.checked !== split.beyond){
                 far.checked = split.beyond;
                 triggerFieldChange(far);
             }
+        }
+    });
+    Object.keys(marksOn).forEach(function(name){
+        var mark = overflowHiddenBox(name, "checkbox");
+        if (mark.checked !== marksOn[name]){
+            mark.checked = marksOn[name];
+            triggerFieldChange(mark);
         }
     });
 }
@@ -14995,6 +15189,24 @@ function applyOverflowLinks(){
  * on the way out, and only because the continuation form is carrying the whole
  * thing. The cut lands on a word boundary where it can.
  */
+/**
+ * The rest of each long answer, posted beside it as "__continued_<name>".
+ *
+ * The box's own value is cut to what it prints on the way out, so an answer set
+ * captured from what the form posts (pipeline-answers.json) held no trace of
+ * what went on MC-025, and pipeline-fill.js could not draw the page a filer
+ * gets. The server fills fields by name and has none by this one.
+ */
+function overflowContinuedFields(){
+    var out = [];
+    attachmentPageList().forEach(function(att){
+        if (att.kind !== "text" || !att.link) return;
+        var tail = overflowTail(att.link);
+        if (tail) out.push(["__continued_" + att.link.nameId, tail]);
+    });
+    return out;
+}
+
 function overflowPostValue(name, value){
     var links = (typeof overflowLinks !== "undefined" && overflowLinks) ? overflowLinks : [];
     for (var i = 0; i < links.length; i++){
@@ -15053,6 +15265,50 @@ function applyComputedFields(){
         // children together"; the children are also asked for a custody
         // request made without that box, and their names must not print
         // beside an empty one.
+        // The rest of a whole the filer gave part of. FL-150 item 16b and FL-155
+        // items 3a-3b print the children's time with the filer and with the
+        // other parent, and the two make 100; asked both, a filer could answer
+        // 100 and 100. Blank unless the filer's part is a number within the whole.
+        if (rule.remainderOf && rule.remainderOf.field){
+            var rsrc = document.getElementById(rule.remainderOf.field);
+            var rtotal = Number(rule.remainderOf.total == null ? 100 : rule.remainderOf.total);
+            var rraw = rsrc ? String(rsrc.value || '').split('%').join('').trim() : '';
+            var rnum = rraw === '' ? NaN : Number(rraw);
+            writeComputedField(rule.nameId, (!isNaN(rnum) && rnum >= 0 && rnum <= rtotal) ? String(rtotal - rnum) : '');
+            return;
+        }
+        // A box other answers tick: every one in "all" ticked and none in
+        // "none". DV-570's verdict - child support asked for, neither spousal
+        // support nor lawyer's fees asked for, and the last screening question
+        // answered No - is what brings in FL-155. A real checkbox, because an
+        // activation rule reads a box's tick (isActivationOptionChosen).
+        if (rule.tickWhen && typeof rule.tickWhen === "object"){
+            var tw = rule.tickWhen;
+            var twOn = function(id){
+                var tb = document.getElementById(id);
+                if (!tb) return false;
+                return (tb.type === "checkbox" || tb.type === "radio") ? !!tb.checked : String(tb.value || "").trim() !== "";
+            };
+            var twWant = (tw.all || []).every(twOn) && !(tw.none || []).some(twOn);
+            var twBox = overflowHiddenBox(rule.nameId, "checkbox");
+            if (twBox.checked !== twWant){
+                twBox.checked = twWant;
+                if (typeof triggerFieldChange === "function") triggerFieldChange(twBox);
+            }
+            return;
+        }
+        // Answers joined into one line once every one of them is given - MC-025's
+        // short title, "Mora v. Smith", from the two names DV-100 asks first. A
+        // half-made title ("Mora v.") is worse than none, so it waits for both.
+        if (rule.joinFields && Array.isArray(rule.joinFields.fields)){
+            var jparts = rule.joinFields.fields.map(function(id){
+                var jel = document.getElementById(id);
+                return jel ? String(jel.value || "").trim() : "";
+            });
+            var jall = jparts.length > 0 && jparts.every(function(p){ return !!p; });
+            writeComputedField(rule.nameId, jall ? jparts.join(rule.joinFields.separator == null ? " " : rule.joinFields.separator) : "");
+            return;
+        }
         if (rule.joinWhenTicked && Array.isArray(rule.joinWhenTicked.fields)){
             var jw = rule.joinWhenTicked;
             var gateBox = document.getElementById(jw.when);
@@ -15117,6 +15373,21 @@ function applyComputedFields(){
                     hops++;
                 }
                 if (at === target) total += Number(form.pdfPages) || 0;
+            });
+            // And the MC-025 sheets continuing any form in that stack - a list
+            // past its rows, a narrative past its box - counted with the layout
+            // the server draws them with, so the number is the sheets drawn.
+            // Counting one per list was wrong the moment a list took two.
+            attachmentPageList().forEach(function(att){
+                if (!attachmentInUse(att)) return;
+                var owner = attachmentOwnerForm(att);
+                var up = owner ? owner.name : '';
+                var steps = 0;
+                while (up && up !== target && byName[up] && steps < 8){
+                    up = byName[up].attachedTo || '';
+                    steps++;
+                }
+                if (up === target) total += continuationSheets(att);
             });
         } else if (rule.pagesOfAttachedForms){
             // The older rule, for a project whose forms do not say what they
@@ -16507,6 +16778,7 @@ async function previewPdf(baseName, isUploaded, isLatex, isPdfPreview, questionI
 
         var previewAttachmentSpec = attachmentSpecFor(baseName);
         if (previewAttachmentSpec) fd.append("__attachment", JSON.stringify(previewAttachmentSpec));
+        if (typeof overflowContinuedFields === "function") overflowContinuedFields().forEach(function(p){ fd.append(p[0], p[1]); });
         if (typeof fwListSeparators === 'function') fd.append('__lists', fwListSeparators());
         // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
         const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
@@ -16759,6 +17031,7 @@ async function editAndDownloadPDF (pdfName) {
         // A page the form draws: send the rows it prints.
         var attachmentSpec = attachmentSpecFor(pdfName);
         if (attachmentSpec) fd.append("__attachment", JSON.stringify(attachmentSpec));
+        if (typeof overflowContinuedFields === "function") overflowContinuedFields().forEach(function(p){ fd.append(p[0], p[1]); });
         if (typeof fwListSeparators === 'function') fd.append('__lists', fwListSeparators());
         // Use the /edit_pdf endpoint with the PDF name as a query parameter.
         // Keep the extension and include credentials so the backend can find the file and respect the current session.
@@ -17216,13 +17489,21 @@ function updateProgressBar() {
       const name = labelEl ? labelEl.textContent.trim() : '';
       const form = forms.find(function (f) { return f && f.name === name; });
       const off = !!form && !form.alwaysIncluded && !isFormActivated(form);
+      const wasHidden = step.style.display === 'none';
       step.style.display = off ? 'none' : '';
       if (!off) {
         shownCount++;
         const circle = step.querySelector('.stepper-circle');
         if (circle) circle.textContent = String(shownCount);
+        // A form an answer has just brought in is added where it belongs in
+        // the packet, the steps after it renumbered, and marked for a moment.
+        if (wasHidden && window.__fwStepperReady) {
+          step.classList.add('stepper-step-new');
+          setTimeout(function () { step.classList.remove('stepper-step-new'); }, 1600);
+        }
       }
     });
+    window.__fwStepperReady = true;
     const all = Array.prototype.slice.call(steps);
     stepper.querySelectorAll('.stepper-line').forEach(function (line) {
       const before = line.previousElementSibling;
@@ -17300,6 +17581,26 @@ function updateProgressBar() {
       }
     });
   }
+}
+// The numbered steps follow the answers as they are given, not only when the
+// filer moves to another page: a form an answer brings in is added straight
+// away, and a form whose answer is taken back is taken off.
+if (typeof document !== 'undefined' && !window.__fwStepperWatch) {
+  window.__fwStepperWatch = true;
+  // At most once every 150 ms, never "after 150 ms of quiet": a page that
+  // raises change events without pause - it once raised thousands a second -
+  // would otherwise never redraw the bar at all.
+  var fwStepperPending = false;
+  var fwStepperSoon = function () {
+    if (fwStepperPending) return;
+    fwStepperPending = true;
+    setTimeout(function () {
+      fwStepperPending = false;
+      if (typeof updateProgressBar === 'function') updateProgressBar();
+    }, 150);
+  };
+  document.addEventListener('change', fwStepperSoon, true);
+  document.addEventListener('input', fwStepperSoon, true);
 }
 // Animate the progress bar fill width smoothly
 function animateProgressBarFill(fillEl, targetPercent) {
@@ -20567,11 +20868,180 @@ function copyTextNow(text) {
  * Test mode: a side panel to write a prompt in and copy it. Typing "prompt" -
  * or holding p, r, o, m and t together - anywhere but inside a box opens it.
  *
- * A place to write down what is wrong while looking at it, next to the JSON a
- * double-click copies. What is typed stays while the page is open and is not
- * saved anywhere.
+ * A question or section JSON pasted in - what a double-click copies - shows as
+ * a labelled block rather than hundreds of lines of text, and Copy puts the
+ * full JSON back where the block sits. What is written stays while the page is
+ * open and is not saved anywhere.
  */
+var FW_PROMPT_NL = String.fromCharCode(10);
+
+/** "Question JSON", "Section JSON", or null when the text is neither. */
+function promptJsonKind(text) {
+  var t = String(text || '').trim();
+  if (t.charAt(0) !== '{') return null;
+  var data;
+  try { data = JSON.parse(t); } catch (e) { return null; }
+  if (!data || typeof data !== 'object') return null;
+  if (Array.isArray(data.questions) && data.section && typeof data.section === 'object') return 'Section JSON';
+  if (data.questionId !== undefined && Array.isArray(data.fields)) return 'Question JSON';
+  return null;
+}
+
+function promptChip(kind, text) {
+  var chip = document.createElement('span');
+  chip.className = 'fw-prompt-chip';
+  chip.contentEditable = 'false';
+  chip.setAttribute('data-json', text);
+  chip.setAttribute('title', kind + ' - copied in full');
+  var mark = document.createElement('span');
+  mark.className = 'fw-prompt-chip-mark';
+  mark.textContent = '{ }';
+  var label = document.createElement('span');
+  label.textContent = kind;
+  // A span, not a button: the form's stylesheet styles every button.
+  var remove = document.createElement('span');
+  remove.className = 'fw-prompt-chip-x';
+  remove.setAttribute('role', 'button');
+  remove.setAttribute('tabindex', '0');
+  remove.setAttribute('aria-label', 'Remove ' + kind);
+  remove.setAttribute('title', 'Remove');
+  remove.textContent = '×';
+  // Pressing it must not take the caret out of the prompt.
+  remove.addEventListener('mousedown', function (e) { e.preventDefault(); });
+  remove.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    removePromptChip(chip);
+  });
+  remove.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      removePromptChip(chip);
+    }
+  });
+  chip.appendChild(mark);
+  chip.appendChild(label);
+  chip.appendChild(remove);
+  return chip;
+}
+
+/** Take a block out of the prompt, with the space that was put after it. */
+function removePromptChip(chip) {
+  var editor = chip.closest('#fwPromptText');
+  var after = chip.nextSibling;
+  // The space goes only where one is left standing: "one: [block] and" loses
+  // the block and keeps one space between the words either side of it.
+  // Character codes, not a pattern: this runs inside a template literal, which
+  // drops a backslash - a "space at the end" pattern read "ends in s" here.
+  var before = chip.previousSibling;
+  var lastChar = before && before.nodeType === 3 ? before.nodeValue.slice(-1) : '';
+  var spaceBefore = !before
+    || (before.nodeType === 3
+      ? !before.nodeValue || [32, 160, 10, 9].indexOf(lastChar.charCodeAt(0)) !== -1
+      : before.tagName === 'BR' || before.tagName === 'DIV' || before.tagName === 'P');
+  if (spaceBefore && after && after.nodeType === 3 && after.nodeValue.charAt(0) === ' ') {
+    if (after.nodeValue.length === 1) after.parentNode.removeChild(after);
+    else after.nodeValue = after.nodeValue.slice(1);
+  }
+  if (chip.parentNode) chip.parentNode.removeChild(chip);
+  if (editor) {
+    editor.dispatchEvent(new Event('input', { bubbles: true }));
+    editor.focus();
+  }
+}
+
+/** The prompt as it is copied: its text, with each block's full JSON in its place. */
+function promptText(editor) {
+  var out = '';
+  var endLine = function () {
+    if (out && out.charAt(out.length - 1) !== FW_PROMPT_NL) out += FW_PROMPT_NL;
+  };
+  var walk = function (node) {
+    Array.prototype.forEach.call(node.childNodes, function (child) {
+      if (child.nodeType === 3) {
+        var value = child.nodeValue;
+        // The space kept after a block to type from is not part of the prompt.
+        var before = child.previousSibling;
+        if (before && before.classList && before.classList.contains('fw-prompt-chip') && value.charAt(0) === ' ') {
+          value = value.slice(1);
+        }
+        out += value;
+        return;
+      }
+      if (child.nodeType !== 1) return;
+      if (child.classList.contains('fw-prompt-chip')) {
+        endLine();
+        out += child.getAttribute('data-json') + FW_PROMPT_NL;
+        return;
+      }
+      if (child.tagName === 'BR') { out += FW_PROMPT_NL; return; }
+      // A line the editor wraps in a block of its own starts on a line of its own.
+      if (child.tagName === 'DIV' || child.tagName === 'P') endLine();
+      walk(child);
+    });
+  };
+  walk(editor);
+  while (out.charAt(out.length - 1) === FW_PROMPT_NL) out = out.slice(0, -1);
+  return out;
+}
+
+/** Put a node at the caret, with a space after it to go on typing from. */
+function insertPromptNode(editor, node) {
+  var selection = window.getSelection();
+  var range = selection && selection.rangeCount ? selection.getRangeAt(0) : null;
+  if (!range || !editor.contains(range.commonAncestorContainer)) {
+    range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+  }
+  range.deleteContents();
+  var after = document.createTextNode(' ');
+  range.insertNode(after);
+  range.insertNode(node);
+  range.setStartAfter(after);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
+/**
+ * The panel's own styles. The form's stylesheet styles every button - padding
+ * 5px 30px, margin 0 auto, a blue hover - which floated the close button toward
+ * the middle of the header; these are by id, so they win.
+ */
+function ensurePromptStyles() {
+  if (document.getElementById('fwPromptStyles')) return;
+  var style = document.createElement('style');
+  style.id = 'fwPromptStyles';
+  style.textContent = [
+    '#fwPromptPanel #fwPromptClose { width:32px; height:32px; min-width:0; margin:0; padding:0; flex:0 0 auto;',
+    '  display:inline-flex; align-items:center; justify-content:center; border:none; border-radius:6px;',
+    '  background:transparent; color:#4a5663; font:400 22px/1 system-ui, sans-serif; cursor:pointer; }',
+    '#fwPromptPanel #fwPromptClose:hover { background:#eef2f6; color:#1c2733; }',
+    '#fwPromptPanel #fwPromptClose:focus-visible { outline:2px solid #2980b9; outline-offset:1px; }',
+    '#fwPromptText { flex:1; overflow-y:auto; white-space:pre-wrap; word-break:break-word; padding:10px 12px;',
+    '  border:1px solid #c9d3dd; border-radius:8px; background:#fff; color:#1c2733; outline:none;',
+    '  font:14px/1.55 system-ui, sans-serif; text-align:left; cursor:text; }',
+    '#fwPromptText:focus { border-color:#2980b9; box-shadow:0 0 0 3px rgba(41,128,185,0.15); }',
+    '#fwPromptText:empty::before { content:attr(data-placeholder); color:#8a97a6; pointer-events:none; }',
+    '.fw-prompt-chip { display:inline-flex; align-items:center; gap:7px; margin:2px; padding:3px 4px 3px 4px;',
+    '  border:1px solid #b9cde2; border-radius:999px; background:#eef4fb; color:#1f4e79;',
+    '  font:600 12px/1.6 system-ui, sans-serif; vertical-align:baseline; white-space:nowrap;',
+    '  user-select:none; cursor:default; box-shadow:0 1px 2px rgba(31,78,121,0.08); }',
+    '.fw-prompt-chip-mark { display:inline-flex; align-items:center; justify-content:center; min-width:24px;',
+    '  height:18px; padding:0 5px; border-radius:999px; background:#2980b9; color:#fff;',
+    '  font:700 10px/1 ui-monospace, Menlo, monospace; }',
+    '.fw-prompt-chip-x { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px;',
+    '  margin-left:-2px; border-radius:50%; color:#1f4e79; font:700 14px/1 system-ui, sans-serif;',
+    '  cursor:pointer; opacity:0.7; }',
+    '.fw-prompt-chip-x:hover { background:#d6e4f2; opacity:1; }',
+    '.fw-prompt-chip-x:focus-visible { outline:2px solid #2980b9; outline-offset:1px; opacity:1; }'
+  ].join(FW_PROMPT_NL);
+  document.head.appendChild(style);
+}
+
 function openPromptPanel() {
+  ensurePromptStyles();
   let panel = document.getElementById('fwPromptPanel');
   if (!panel) {
     panel = document.createElement('div');
@@ -20591,16 +21061,28 @@ function openPromptPanel() {
     close.id = 'fwPromptClose';
     close.textContent = '×';
     close.setAttribute('aria-label', 'Close the prompt panel');
-    close.style.cssText = 'border:none;background:none;font-size:22px;line-height:1;cursor:pointer;color:#555;';
     close.addEventListener('click', closePromptPanel);
     head.appendChild(title);
     head.appendChild(close);
-    const area = document.createElement('textarea');
-    area.id = 'fwPromptText';
-    area.placeholder = 'Write your prompt here';
-    area.setAttribute('aria-label', 'Prompt');
-    area.style.cssText = 'flex:1;width:100%;box-sizing:border-box;resize:none;padding:10px;'
-      + 'border:1px solid #c9d3dd;border-radius:6px;font:14px/1.45 system-ui,sans-serif;';
+    const editor = document.createElement('div');
+    editor.id = 'fwPromptText';
+    editor.contentEditable = 'true';
+    editor.setAttribute('role', 'textbox');
+    editor.setAttribute('aria-multiline', 'true');
+    editor.setAttribute('aria-label', 'Prompt');
+    editor.setAttribute('data-placeholder', 'Write your prompt here');
+    editor.addEventListener('paste', function (e) {
+      const text = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
+      e.preventDefault();
+      const kind = promptJsonKind(text);
+      if (kind) insertPromptNode(editor, promptChip(kind, text.trim()));
+      else document.execCommand('insertText', false, text);
+    });
+    editor.addEventListener('input', function () {
+      // Emptied by hand, the editor keeps a stray line break; clear it so the
+      // placeholder comes back.
+      if (!editor.textContent && !editor.querySelector('.fw-prompt-chip')) editor.innerHTML = '';
+    });
     const copy = document.createElement('button');
     copy.type = 'button';
     copy.id = 'fwPromptCopy';
@@ -20608,7 +21090,7 @@ function openPromptPanel() {
     copy.style.cssText = 'margin-top:10px;width:100%;box-sizing:border-box;padding:9px 12px;border:none;border-radius:6px;background:#2980b9;'
       + 'color:#fff;font-weight:600;cursor:pointer;';
     copy.addEventListener('click', function () {
-      copyTextNow(area.value).then(function () {
+      copyTextNow(promptText(editor)).then(function () {
         window.__lastPromptCopied = true;
         showQuestionInfoNote('Prompt copied to the clipboard', true);
       }, function (err) {
@@ -20618,13 +21100,13 @@ function openPromptPanel() {
       });
     });
     panel.appendChild(head);
-    panel.appendChild(area);
+    panel.appendChild(editor);
     panel.appendChild(copy);
     document.body.appendChild(panel);
   }
   panel.style.display = 'flex';
-  const text = document.getElementById('fwPromptText');
-  if (text) text.focus();
+  const editor = document.getElementById('fwPromptText');
+  if (editor) editor.focus();
 }
 
 function closePromptPanel() {
@@ -20707,12 +21189,46 @@ if (typeof document !== 'undefined' && !window.__FILL_QUESTION_DBLCLICK_BOUND__)
 }
 
 function createHiddenCheckboxesForAutofilledDropdowns() {
+  // A choice drawn as radio buttons keeps a hidden checkbox of the same id
+  // without "_radio", which is what the payload posts. It follows the radio:
+  // a fill that answered FL-150's "Does the person pay some of the household
+  // expenses?" and then took the answer back left the twin ticked in a form
+  // the path had switched off.
+  document.querySelectorAll('input[type="radio"][id$="_radio"]').forEach(function (radio) {
+    const twin = document.getElementById(radio.id.slice(0, -6));
+    if (twin && twin.type === 'checkbox' && twin.checked !== radio.checked) twin.checked = radio.checked;
+  });
   // Find all dropdown/select elements
   const dropdowns = document.querySelectorAll('select');
   dropdowns.forEach(dropdown => {
     if (!dropdown.id || dropdown.id.startsWith('answer')) return; // Skip numbered dropdowns
     const baseName = dropdown.id;
     const selectedValue = dropdown.value.trim();
+    // A mirror box stays ticked only for the answer the dropdown holds now.
+    // The fill answers a question and, a round later, takes the answer back
+    // when the form it is in turns out to be switched off: the select empties
+    // and its "<id>_yes" box stayed ticked, so thirty of DV-105(A)'s were
+    // recorded as answers on a path where DV-105(A) never appears.
+    const mirrorIdFor = function (value) {
+      const suffix = String(value).trim().replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
+      const cut = baseName.lastIndexOf('_');
+      if (cut !== -1 && /^[0-9]+$/.test(baseName.substring(cut + 1))) {
+        return baseName.substring(0, cut) + "_" + suffix + "_" + baseName.substring(cut + 1);
+      }
+      return baseName + "_" + suffix;
+    };
+    Array.prototype.forEach.call(dropdown.options || [], function (opt) {
+      const v = String(opt.value || '').trim();
+      if (!v || v === selectedValue) return;
+      const stale = document.getElementById(mirrorIdFor(v));
+      if (stale && stale.type === 'checkbox' && stale.checked) stale.checked = false;
+    });
+    // The same for a box an answer ticks by name through hidden logic: FL-155's
+    // tax status ticks fl155_tax_status_married_separately for "Married, filing
+    // separately". A fill that takes the answer back empties the select without
+    // a change event, and the box stayed ticked in a form the path had switched
+    // off. updateHiddenLogic clears every box whose answer is not the one held.
+    if (!selectedValue && typeof updateHiddenLogic === 'function') updateHiddenLogic(baseName, '');
     if (selectedValue) {
       // Generate checkbox ID using the same pattern as dropdownMirror
       // Sanitize option value: replace all non-word characters (including spaces) with underscores
@@ -22344,7 +22860,12 @@ function triggerSelectSideEffects(select) {
 function hasValidatedShape(el) {
   const id = (el.id || el.name || '').toLowerCase();
   const type = (el.type || '').toLowerCase();
-  return type === 'date' || type === 'number' || type === 'email'
+  // A money box says so itself - the page draws every amount with
+  // inputmode="decimal" - whatever it is called. FL-150's household members'
+  // "monthly_income" is an amount without the word, took a marker, and the box
+  // stripped the letters: five empty required boxes and Next locked.
+  const mode = String(el.inputMode || (el.getAttribute && el.getAttribute('inputmode')) || '').toLowerCase();
+  return type === 'date' || type === 'number' || type === 'email' || mode === 'decimal'
     || type === 'tel' || id.indexOf('zip') !== -1 || id.indexOf('phone') !== -1
     || id.indexOf('date') !== -1 || id.indexOf('amount') !== -1
     || id.indexOf('percent') !== -1 || id.indexOf('_state') !== -1
@@ -23551,7 +24072,10 @@ async function fillMaximumPath(options) {
         btn.disabled = false;
       }, 2800);
     }
-    if (debugMenuVisible) populateDebugContent();
+    // No rebuild of the menu's list here: a fill pressed from the menu closes
+    // it (closeDebugMenuAfterFill), and showDebugMenu rebuilds the list when
+    // it next opens.
+    return filledCount;
   } catch (err) {
     console.error('Fill maximum path failed', err);
     if (btn) {
@@ -23561,12 +24085,16 @@ async function fillMaximumPath(options) {
         btn.disabled = false;
       }, 2200);
     }
+    return null;
   } finally {
     fillProgress(null);
     window.__MAX_FILL_IN_PROGRESS__ = false;
     window.__FILL_MARKER_VALUES__ = false;
     window.__FILL_MINIMUM__ = false;
     restoreSectionViewState(viewState);
+    // The forms the fill brought in join the numbered steps now, not when
+    // the filer next moves page.
+    if (typeof updateProgressBar === 'function') updateProgressBar();
     window.isInitialAutofill = false;
   }
 }
@@ -23720,13 +24248,20 @@ document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNam
 // WITHOUT them, and having both invited reading a "Test Value" run as if it
 // proved rule 4b.
 document.getElementById('fillMaximumPathBtn').addEventListener('click', function() {
-  fillMaximumPath({ markers: true });
+  fillMaximumPath({ markers: true }).then(closeDebugMenuAfterFill);
 });
+// A finished path is looked at on the form, so the menu that started it steps
+// out of the way. A fill that failed leaves it open, its button saying so.
+function closeDebugMenuAfterFill(filled) {
+  if (typeof filled !== 'number') return;
+  if (debugMenuVisible) hideDebugMenu();
+  if (typeof showQuestionInfoNote === 'function') showQuestionInfoNote(filled + ' fields filled', true);
+}
 // The other half of rule 4: every gate answered the way that opens the least.
 // It is how you check that saying No really does close a block, which the
 // widest path can never show.
 document.getElementById('fillMinimumPathBtn').addEventListener('click', function() {
-  fillMaximumPath({ markers: true, minimum: true });
+  fillMaximumPath({ markers: true, minimum: true }).then(closeDebugMenuAfterFill);
 });
 // Back to an empty form without reloading the page, so the next path can be
 // walked from the same generated HTML.

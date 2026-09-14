@@ -114,6 +114,32 @@ function shouldCheck(v) {
   return s === 'on' || s === 'true' || s === 'yes' || s === '1' || s === 'checked';
 }
 
+/**
+ * The two-letter code for a US state or territory spelled out, or null.
+ *
+ * A box with a two-character limit - FL-150's and RA-010's caption "STATE" -
+ * takes the code, and the filer's state arrives spelled out. pdf-lib throws on
+ * text longer than a box's limit, and the answer used to vanish without a word.
+ */
+const STATE_CODES = {
+  alabama: 'AL', alaska: 'AK', arizona: 'AZ', arkansas: 'AR', california: 'CA', colorado: 'CO',
+  connecticut: 'CT', delaware: 'DE', 'district of columbia': 'DC', florida: 'FL', georgia: 'GA',
+  hawaii: 'HI', idaho: 'ID', illinois: 'IL', indiana: 'IN', iowa: 'IA', kansas: 'KS', kentucky: 'KY',
+  louisiana: 'LA', maine: 'ME', maryland: 'MD', massachusetts: 'MA', michigan: 'MI', minnesota: 'MN',
+  mississippi: 'MS', missouri: 'MO', montana: 'MT', nebraska: 'NE', nevada: 'NV', 'new hampshire': 'NH',
+  'new jersey': 'NJ', 'new mexico': 'NM', 'new york': 'NY', 'north carolina': 'NC', 'north dakota': 'ND',
+  ohio: 'OH', oklahoma: 'OK', oregon: 'OR', pennsylvania: 'PA', 'rhode island': 'RI',
+  'south carolina': 'SC', 'south dakota': 'SD', tennessee: 'TN', texas: 'TX', utah: 'UT', vermont: 'VT',
+  virginia: 'VA', washington: 'WA', 'west virginia': 'WV', wisconsin: 'WI', wyoming: 'WY',
+  'puerto rico': 'PR', guam: 'GU', 'american samoa': 'AS', 'virgin islands': 'VI',
+  'u.s. virgin islands': 'VI', 'northern mariana islands': 'MP'
+};
+function stateCode(text) {
+  const t = String(text == null ? '' : text).trim().toLowerCase().replace(/\s+/g, ' ');
+  if (/^[a-z]{2}$/.test(t)) return t.toUpperCase();
+  return STATE_CODES[t] || null;
+}
+
 function mapRadioValue(field, value) {
   try {
     const options = field.getOptions();
@@ -318,6 +344,13 @@ function spillOntoContinuationLines(pdfDoc, form, body, font) {
     const size = declaredFontSize(line.field);
     if (!size) return;
     if (font.widthOfTextAtSize(String(value), size) <= room(line)) return;
+    // A short answer that fits its own line at a readable size stays on it and
+    // is set smaller (fitToBox): FL-155's phone number, "(310) 555-0142", was
+    // broken over the caption's second and third lines. Only an answer that
+    // would have to shrink below three quarters of its size, or below 8pt,
+    // runs on - DV-100 item 16b(3) needs 8.1pt of an 11pt line, so it still does.
+    const fitsAt = size * room(line) / font.widthOfTextAtSize(String(value), size);
+    if (fitsAt >= Math.max(8, size * 0.75)) return;
 
     const chain = [line];
     let current = line;
@@ -325,13 +358,16 @@ function spillOntoContinuationLines(pdfDoc, form, body, font) {
       const next = lines.find((other) =>
         other !== current && other.page === current.page && other.page >= 0
         && !taken.has(other.name) && body[other.name] === undefined && !other.filled
-        // Below it, by no more than the pitch of one ruled line. A fixed
-        // tolerance of a few points is not enough: the gap between two rules
-        // is 0.33pt on the animals pair and 3.42pt on the move-out pair, and
-        // measuring it against the line's own height is what tells a next line
-        // apart from the one after that.
-        && other.top <= current.bottom + 2
-        && current.bottom - other.top <= current.height
+        // Below it, by no more than the pitch of one ruled line, measured
+        // bottom to bottom. A fixed tolerance of a few points is not enough:
+        // the gap between two rules is 0.33pt on the animals pair and 3.42pt
+        // on the move-out pair, and measuring it against the line's own height
+        // is what tells a next line apart from the one after that. Measured
+        // box to box, it also missed boxes that overlap: FL-155 item 3c's two
+        // lines are 8.8pt apart in boxes 15.8pt tall, so the second box's top
+        // sits above the first one's bottom, and the answer ran off the edge.
+        && current.bottom - other.bottom > 2
+        && current.bottom - other.bottom <= current.height + 4
         && Math.abs(other.right - current.right) <= 3
         && Math.abs(other.height - current.height) <= 2);
       if (!next) break;
@@ -678,6 +714,10 @@ app.post('/edit_pdf', async (req, res) => {
     const shrunk = [];
     const unfitted = [];
     const listCut = [];
+    // Answers fitted to a box's character limit: a state spelled out becomes
+    // its two-letter code. Anything else longer than the limit is cut and
+    // counted as not fitting - it used to throw inside pdf-lib and vanish.
+    const limitFit = [];
     // Which values are lists of joined parts, and their separators - the form
     // sends them (fwListSeparators). A list that will not fit even at 6pt keeps
     // the parts that fit, whole, and ends with "etc.": DV-110's firearms box
@@ -705,6 +745,17 @@ app.post('/edit_pdf', async (req, res) => {
             break;
           case 'PDFTextField': {
             let text = String(value);
+            const maxLen = field.getMaxLength();
+            if (maxLen && text.length > maxLen) {
+              const code = stateCode(text);
+              if (code && code.length <= maxLen) {
+                limitFit.push(key + ' "' + text + '" -> "' + code + '"');
+                text = code;
+              } else {
+                unfitted.push(key);
+                text = text.slice(0, maxLen);
+              }
+            }
             field.setText(text);
             let fit = fitToBox(field, helv, text);
             const sep = typeof lists[key] === 'string' ? lists[key] : '';
@@ -759,6 +810,7 @@ app.post('/edit_pdf', async (req, res) => {
 
     if (shrunk.length) console.log(`[edit_pdf] ${outputName}: set smaller to fit their boxes: ${shrunk.join(', ')}`);
     if (listCut.length) console.log(`[edit_pdf] ${outputName}: lists kept to what fits, ending "etc.": ${listCut.join(', ')}`);
+    if (limitFit.length) console.log(`[edit_pdf] ${outputName}: fitted to the box's character limit: ${limitFit.join(', ')}`);
     if (unfitted.length) {
       console.log(`[edit_pdf] ${outputName}: DOES NOT FIT even at ${MIN_FIT_FONT_SIZE}pt - the rest is not printed: ${unfitted.join(', ')}`);
     }
@@ -1061,6 +1113,29 @@ app.use('/form/:projectId', (req, res, next) => {
     }
   }
   express.static(path.join(LIVE_SITES_DIR, slug))(req, res, next);
+});
+
+/**
+ * A folder link - /live-sites/<name>/section.html - goes to the link the
+ * project hands out, /form/<projectId>/section.html?saved=<newest>.
+ *
+ * The folder always holds the newest build, but its address kept whatever
+ * stamp it was typed with, or none, so a bookmark or a mistyped link showed the
+ * newest page under an old name. Sent on to the form link, it lands on the
+ * newest build and says so. Only the pages move; the CSS, county lookup and
+ * PDFs beside them are still served from the folder.
+ */
+app.get('/live-sites/:slug/:page', (req, res, next) => {
+  if (!/^(index|section|question|all)\.html$/i.test(req.params.page)) return next();
+  const manifest = readLiveSiteManifest(req.params.slug);
+  const projectId = manifest && manifest.projectId;
+  if (!projectId) return next();
+  const params = new URLSearchParams(String(req.originalUrl.split('?')[1] || ''));
+  params.delete('saved');
+  const stamp = liveSiteStamp(manifest);
+  if (stamp) params.set('saved', stamp);
+  const query = params.toString();
+  res.redirect(302, '/form/' + encodeURIComponent(projectId) + '/' + req.params.page + (query ? '?' + query : ''));
 });
 
 app.post('/api/publish-live-site', (req, res) => {

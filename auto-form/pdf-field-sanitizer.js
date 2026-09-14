@@ -220,7 +220,51 @@ async function sanitizePdfFields(pdfBytes, fieldConfig) {
     }
   }
 
+  // One checkbox field, several boxes told apart by export value: FL-155 item
+  // 4's four tax statuses are a single field whose boxes are /Yes, /1, /2 and
+  // /3. pdf-lib ticks a field, not a box, so only the first could ever print.
+  // A config entry with "widget": "<export value>" names one of those boxes;
+  // it is split off here into a checkbox of its own, named like any other.
+  // The entry without "widget" keeps the field and the boxes left in it.
+  const boxEntries = fieldConfig.fields.filter((m) => m && m.id && m.newName && m.widget != null);
+  for (const m of boxEntries) {
+    const wanted = String(m.widget).replace(/^\//, '');
+    try {
+      const baseRef = fieldRefById.get(m.id);
+      if (!baseRef) throw new Error(`Field not found: ${m.id}`);
+      const baseDict = context.lookup(baseRef);
+      const kids = baseDict.lookup(PDFName.of('Kids'));
+      if (!(kids instanceof PDFArray)) throw new Error(`${m.id} has one box; there is nothing to split`);
+      let at = -1;
+      for (let i = 0; i < kids.size() && at < 0; i++) {
+        const box = context.lookup(kids.get(i));
+        const ap = box instanceof PDFDict ? box.lookup(PDFName.of('AP')) : null;
+        const normal = ap instanceof PDFDict ? ap.lookup(PDFName.of('N')) : null;
+        const states = normal instanceof PDFDict ? normal.keys().map((k) => k.decodeText()) : [];
+        if (states.includes(wanted)) at = i;
+      }
+      if (at < 0) throw new Error(`${m.id} has no box with export value /${wanted}`);
+      const boxRef = kids.get(at);
+      kids.remove(at);
+      const own = context.obj({ FT: 'Btn', V: 'Off', Kids: [boxRef] });
+      own.set(PDFName.of('T'), PDFString.of(m.newName));
+      const flags = baseDict.get(PDFName.of('Ff'));
+      if (flags) own.set(PDFName.of('Ff'), flags);
+      const ownRef = context.register(own);
+      const boxDict = context.lookup(boxRef);
+      boxDict.set(PDFName.of('Parent'), ownRef);
+      boxDict.set(PDFName.of('AS'), PDFName.of('Off'));
+      context.lookup(fieldsRef).push(ownRef);
+      keptFieldRefs.push(ownRef);
+      keptNames.add(m.newName);
+      renamed.push({ from: m.id + ' /' + wanted, to: m.newName });
+    } catch (err) {
+      failed.push({ id: m.id + ' /' + wanted, reason: err.message });
+    }
+  }
+
   for (const mapping of fieldConfig.fields) {
+    if (mapping && mapping.widget != null) continue;
     const { id, newName } = mapping;
     if (!id || !newName) {
       failed.push({ id: id || '(missing)', reason: 'missing id or newName' });

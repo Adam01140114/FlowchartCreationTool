@@ -1,0 +1,285 @@
+{
+  "formName": "MC-031 Attached Declaration",
+  "edgeStyle": "curved",
+  "cells": [
+    {
+      "id": "2",
+      "value": "What is your name?",
+      "geometry": {
+        "x": 610,
+        "y": 60,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=person_asking_protection_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is your name?",
+      "_questionId": "1",
+      "_nameId": "person_asking_protection_name",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "3",
+      "value": "Who do you want protection from?",
+      "geometry": {
+        "x": 610,
+        "y": 326,
+        "width": 300,
+        "height": 96
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=person_to_restrain_full_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Who do you want protection from?",
+      "_questionId": "2",
+      "_nameId": "person_to_restrain_full_name",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "4",
+      "value": "What does that person want to say in their statement?",
+      "geometry": {
+        "x": 610,
+        "y": 592,
+        "width": 300,
+        "height": 120
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=bigParagraph;nodeId=mc031_declaration_text;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What does that person want to say in their statement?",
+      "_questionId": "3",
+      "_nameId": "mc031_declaration_text",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "5",
+      "value": "What is the full name of the person giving the statement?",
+      "geometry": {
+        "x": 610,
+        "y": 882,
+        "width": 300,
+        "height": 120
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=16;fontSize=16;align=center;verticalAlign=middle;questionType=text;nodeId=mc031_declarant_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "What is the full name of the person giving the statement?",
+      "_questionId": "4",
+      "_nameId": "mc031_declarant_name",
+      "_placeholder": "",
+      "_mirrorTargets": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "6",
+      "value": "End",
+      "geometry": {
+        "x": 700,
+        "y": 1172,
+        "width": 120,
+        "height": 60
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "7",
+      "value": "<div style=\"text-align:center;padding:6px;\"><strong>Linked Logic</strong><br><span style=\"font-size:12px;\">mc031_signature_date</span></div>",
+      "geometry": {
+        "x": 1460,
+        "y": 60,
+        "width": 220,
+        "height": 80
+      },
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=14;align=center;verticalAlign=middle;fillColor=#DDA0DD;fontColor=#3d0a3d;strokeColor=#9370DB;",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_linkedLogicNodeId": "mc031_signature_date",
+      "_linkedFields": [
+        "current_date"
+      ],
+      "_linkedJoin": " ",
+      "_pdfName": "",
+      "_pdfFile": "",
+      "_pdfPrice": ""
+    },
+    {
+      "id": "8",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "2",
+      "target": "3",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 168
+          },
+          {
+            "x": 760,
+            "y": 320
+          }
+        ]
+      }
+    },
+    {
+      "id": "9",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "3",
+      "target": "4",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 432
+          },
+          {
+            "x": 760,
+            "y": 584
+          }
+        ]
+      }
+    },
+    {
+      "id": "10",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "4",
+      "target": "5",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 720
+          },
+          {
+            "x": 760,
+            "y": 872
+          }
+        ]
+      }
+    },
+    {
+      "id": "11",
+      "value": "",
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;",
+      "vertex": false,
+      "edge": true,
+      "source": "5",
+      "target": "6",
+      "edgeGeometry": {
+        "points": [
+          {
+            "x": 760,
+            "y": 1008
+          },
+          {
+            "x": 760,
+            "y": 1168
+          }
+        ]
+      }
+    }
+  ],
+  "sectionPrefs": {
+    "1": {
+      "borderColor": "hsl(0, 100%, 80%)",
+      "name": "The Witness's Statement"
+    }
+  },
+  "groups": [],
+  "defaultPdfProperties": {
+    "pdfName": "MC-031 Attached Declaration",
+    "pdfFile": "form.pdf",
+    "pdfPrice": "0"
+  },
+  "overflowLinks": [
+    {
+      "nameId": "mc031_declaration_text",
+      "_why": "Rule the-packet-uses-mc025-for-more-space: a statement longer than MC-031's box continues on MC-025, which says that when the item it continues is made under penalty of perjury, so is the attachment. MC-031 has no \"more space\" box to tick.",
+      "page": {
+        "name": "MC031_Declaration",
+        "heading": "MC-031, Attached Declaration",
+        "item": "",
+        "itemTitle": "",
+        "form": "MC-031"
+      }
+    }
+  ],
+  "autofilledFields": [
+    {
+      "field": "mc031_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "The packet dates every signature the day the papers are prepared, as it does for the filer's."
+    }
+  ]
+}

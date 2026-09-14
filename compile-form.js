@@ -850,6 +850,31 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
   let lastIndex = -1;
 
   const choices = (hints.choices || []).slice();
+  // An invented choice question the schema cannot express (trainer rule D).
+  const placeChoice = (c) => {
+    // A choice with no options is a question no PDF box holds, answered in
+    // words: FL-155 item 12's "attach extra sheet with the information". Its
+    // answer goes on MC-025 (an overflow link with "noBox"). With an empty
+    // options list it would be a question with no way out of it.
+    const hasOptions = Array.isArray(c.options) && c.options.length > 0;
+    const step = makeStep({
+      nameId: c.nameId,
+      text: c.question,
+      type: c.type || (hasOptions ? 'dropdown' : 'bigParagraph'),
+      options: hasOptions ? c.options.map((o) => (
+        typeof o === 'string'
+          ? { label: o, nameId: slug(o), follow: [] }
+          : { label: o.label, nameId: o.nameId || slug(o.label), follow: [] }
+      )) : null,
+      origin: 'choice'
+    });
+    if (c.optional) step.optional = true;
+    if (c.subtitle) step.subtitle = c.subtitle;
+    place(step, c.onlyWhen ? hostFor({ conditional: { onlyWhen: c.onlyWhen } }) : null);
+    notes.push(step.options
+      ? `choice hint: "${c.question}" with ${step.options.length} options`
+      : `choice hint: "${c.question}" answered in words (no PDF box)`);
+  };
 
   // a gates hint on a field with no conditional still creates the gate
   fields.forEach((f) => {
@@ -860,21 +885,9 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
   });
 
   order.forEach((field) => {
-    // an invented choice question the schema cannot express (trainer rule D)
+    // an invented choice question, asked just before the field it names
     choices.filter((c) => c.before === field.id || c.before === field.nameId).forEach((c) => {
-      const step = makeStep({
-        nameId: c.nameId,
-        text: c.question,
-        type: c.type || 'dropdown',
-        options: (c.options || []).map((o) => (
-          typeof o === 'string'
-            ? { label: o, nameId: slug(o), follow: [] }
-            : { label: o.label, nameId: o.nameId || slug(o.label), follow: [] }
-        )),
-        origin: 'choice'
-      });
-      place(step, c.onlyWhen ? hostFor({ conditional: { onlyWhen: c.onlyWhen } }) : null);
-      notes.push(`choice hint: "${c.question}" with ${step.options.length} options`);
+      placeChoice(c);
       choices.splice(choices.indexOf(c), 1);
     });
 
@@ -1062,6 +1075,16 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
     raiseMinimumForGatedBlock(repeat, repeatHost, notes);
     place(step, repeatHost);
     notes.push(`repeat: ${repeat.nameId} -> "${repeat.question}" (${repeat.min} to ${repeat.max} entries)`);
+  });
+
+  // A choice asked after everything the form's own fields ask: "at": "end".
+  // DV-100's last fields are its signatures, which the form fills for itself,
+  // so no asked field comes after the questions that decide how the papers are
+  // served and how the filer attends the hearing. A choice whose "before"
+  // names no field this form asks used to vanish without a word; it is noted.
+  choices.forEach((c) => {
+    if (c.at === 'end') placeChoice(c);
+    else notes.push(`choice hint "${c.question}" NOT ASKED: its "before" (${c.before}) names no field this form asks`);
   });
 
   return { steps, notes, groups };
@@ -1792,7 +1815,8 @@ function compile(schema, hints = {}) {
   if (overflowLinks.length) {
     flowchart.overflowLinks = overflowLinks;
     overflowLinks.forEach((o) => notes.push(
-      'overflow link ' + o.nameId + ' -> ' + o.form + ' when it outgrows its box'));
+      'overflow link ' + o.nameId + ' -> '
+      + (o.page ? 'MC-025 (' + (o.page.heading || o.page.name) + ')' : o.form) + ' when it outgrows its box'));
   }
   if (computed.length) {
     flowchart.computedFields = computed;
@@ -1975,6 +1999,26 @@ if (require.main === module) {
     saidOptional.forEach((c) => console.error('  - ' + (c._nameId || '') + ': "' + c._questionText + '"'));
     console.error('Take the word out and mark the question "optional": true in the hints;'
       + ' the Next button then lets the filer past it.');
+    process.exitCode = 3;
+    return;
+  }
+  // Nor does anything the filer reads send them off to get a form: the packet
+  // brings in and fills every form the answers call for.
+  // See form-rules.html#rule-the-interview-never-sends-the-filer-for-a-form
+  const { sendsFilerForAForm } = require('./wording-rules');
+  const sentAway = [];
+  (result.flowchart.cells || []).forEach((c) => {
+    if (!c) return;
+    [c._questionText, c._subtitle, c._alertText].forEach((s) => {
+      const t = sendsFilerForAForm(s);
+      if (t) sentAway.push({ where: c._nameId || c.id, text: String(s), tell: t });
+    });
+  });
+  if (sentAway.length) {
+    console.error('\nThe interview never sends the filer for a form. Not written:');
+    sentAway.forEach((c) => console.error('  - ' + c.where + ': "' + c.text + '"   <- "' + c.tell + '"'));
+    console.error('Bring the form into the packet instead (dv-packet.spec.json; Hand Off/PIPELINE.md,'
+      + ' "Adding a form to the packet"), so the filer gets it filled with the rest.');
     process.exitCode = 3;
     return;
   }

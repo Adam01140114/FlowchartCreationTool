@@ -1,0 +1,282 @@
+{
+  "formTitle": "DV-200 Proof of Personal Service",
+  "_comment": "DV-200 is the server's form: the person who hands the papers to the restrained person completes items 5 to 7 and signs it, so every one of those fields is courtUse with a _why saying so. The filer pre-fills only what identifies the case - the two names (items 1 and 2), the court, and the list of papers in item 4 the packet knows it is serving. Each of those carries the name of the answer that already decides it, so DV-200 asks nothing new: it is in the packet because DV-100's sheriff question was answered No, and that No ticks 4a and 4b; DV-100's custody box ticks 4c.",
+  "fields": [
+    {
+      "id": "DV-200[0].#pageSet[0].PageArea1[0].FooterSub[0].#area[0].Print_bt[0]",
+      "newName": "dv200_print_button",
+      "type": "button",
+      "label": "Print button",
+      "courtUse": true,
+      "_why": "A form control (print, save, reset), not something that prints an answer."
+    },
+    {
+      "id": "DV-200[0].#pageSet[0].PageArea1[0].FooterSub[0].#area[0].Save_bt[0]",
+      "newName": "dv200_save_button",
+      "type": "button",
+      "label": "Save button",
+      "courtUse": true,
+      "_why": "A form control (print, save, reset), not something that prints an answer."
+    },
+    {
+      "id": "DV-200[0].#pageSet[0].PageArea1[0].FooterSub[0].#area[0].Reset_bt[0]",
+      "newName": "dv200_reset_button",
+      "type": "button",
+      "label": "Clear (reset) button",
+      "courtUse": true,
+      "_why": "A form control (print, save, reset), not something that prints an answer."
+    },
+    {
+      "id": "DV-200[0].#pageSet[0].PageArea1[0].FooterSub[0].#area[0].T23[1]",
+      "newName": "dv200_footer_button",
+      "type": "button",
+      "label": "Footer button",
+      "courtUse": true,
+      "_why": "A form control (print, save, reset), not something that prints an answer."
+    },
+    {
+      "id": "DV-200[0].Page1[0].Stamp_court_case[0].CourtInfo_ft[0]",
+      "newName": "court_name_and_street_address",
+      "type": "text",
+      "label": "Court name and street address"
+    },
+    {
+      "id": "DV-200[0].Page1[0].Stamp_court_case[0].CaseNumber_ft[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number",
+      "courtUse": true,
+      "_why": "DV-200 prints \"Court clerk fills in case number when form is filed.\" case_number is courtUse on every form in the packet: there is no case number until the court files DV-100, so no form asks it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List1[0].Li1[0].TextField2[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "1. Name of party asking for protection"
+    },
+    {
+      "id": "DV-200[0].Page1[0].List2[0].Li1[0].TextField2[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "2. Name of party to be restrained"
+    },
+    {
+      "id": "DV-200[0].Page1[0].List4[0].Li1[0].item4a_cb[0]",
+      "newName": "papers_served_by_sheriff_no",
+      "type": "checkbox",
+      "label": "4a. DV-109 with DV-100 and a blank DV-120",
+      "_why": "DV-200 is in the packet only because DV-100's \"Do you want the sheriff or marshal to serve the papers ... for free?\" was answered No - someone else serves - and DV-109 with DV-100 and a blank DV-120 are always served, so the No of that answer (papers_served_by_sheriff_no) ticks the box. The filer pre-fills it; the server signs that they gave them."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List4[0].Li2[0].item4b_cb[0]",
+      "newName": "papers_served_by_sheriff_no",
+      "type": "checkbox",
+      "label": "4b. DV-110 (Temporary Restraining Order)",
+      "_why": "DV-110 always travels with DV-109 (the spec activates it unconditionally) and is always served, so the same No ticks it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List4[0].Li3[0].item4c_cb[0]",
+      "newName": "child_custody_and_visitation_order_requested",
+      "type": "checkbox",
+      "label": "4c. DV-105 and DV-140 (child custody and visitation)",
+      "_why": "DV-105 and DV-140 are in the packet exactly when DV-100's custody box is ticked, and that box carries this name (DV-140 item 3 uses it the same way), so one answer ticks it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List4[0].Li4[0].item4d_cb[0]",
+      "newName": "dv200_served_fl150",
+      "type": "checkbox",
+      "label": "4d. FL-150 with a blank FL-150",
+      "_why": "Ticked when FL-150 is in the packet - DV-100 asks for child or spousal support - because the packet serves it (computed in dv200-hints.json)."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List4[0].Li5[0].item4e_cb[0]",
+      "newName": "dv200_served_fl155",
+      "type": "checkbox",
+      "label": "4e. FL-155 with a blank FL-155",
+      "courtUse": true,
+      "_why": "FL-155 is not made by this packet yet (formsStillToBuild in the spec), so nothing here knows it is served; the server ticks it at service."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List4[0].Li6[0].item4f_cb[0]",
+      "newName": "dv200_served_dv115",
+      "type": "checkbox",
+      "label": "4f. DV-115 (Request to Continue Hearing)",
+      "courtUse": true,
+      "_why": "DV-115 is served later in a case, not with this packet; the server ticks it at that service, so it stays blank here."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List4[0].Li7[0].item4g_cb[0]",
+      "newName": "dv200_served_dv116",
+      "type": "checkbox",
+      "label": "4g. DV-116 (Order on Request to Continue Hearing)",
+      "courtUse": true,
+      "_why": "DV-116 is served later in a case, not with this packet; the server ticks it at that service, so it stays blank here."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List4[0].Li8[0].item4h_cb[0]",
+      "newName": "dv200_served_dv130",
+      "type": "checkbox",
+      "label": "4h. DV-130 (Restraining Order After Hearing)",
+      "courtUse": true,
+      "_why": "DV-130 is served later in a case, not with this packet; the server ticks it at that service, so it stays blank here."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List4[0].Li9[0].item4h_cb[0]",
+      "newName": "dv200_served_other",
+      "type": "checkbox",
+      "label": "4i. Other documents served",
+      "_why": "RA-010 is served with the packet when the filer will attend by phone or video, and no box in 4a-4h names it; 4i does (computed in dv200-hints.json)."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List4[0].Li9[0].OtherSpecify_tf[0]",
+      "newName": "dv200_served_other_description",
+      "type": "text",
+      "label": "4i. Other documents served (specify)",
+      "_why": "RA-010 is served with the packet when the filer will attend by phone or video, and no box in 4a-4h names it; 4i does (computed in dv200-hints.json)."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List5[0].Li1[0].date[0]",
+      "newName": "dv200_service_date",
+      "type": "text",
+      "label": "5a. Date served",
+      "courtUse": true,
+      "_why": "Item 5 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List5[0].Li1[0].time[0]",
+      "newName": "dv200_service_time",
+      "type": "text",
+      "label": "5a. Time served",
+      "courtUse": true,
+      "_why": "Item 5 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List5[0].Li1[0].TeimDef_cb[0]",
+      "newName": "dv200_service_time_pm",
+      "type": "checkbox",
+      "label": "5a. Time served - p.m.",
+      "courtUse": true,
+      "_why": "Item 5 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List5[0].Li1[0].TeimDef_cb[1]",
+      "newName": "dv200_service_time_am",
+      "type": "checkbox",
+      "label": "5a. Time served - a.m.",
+      "courtUse": true,
+      "_why": "Item 5 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List5[0].Li2[0].T1611[0]",
+      "newName": "dv200_service_street_address",
+      "type": "text",
+      "label": "5b. Address where served",
+      "courtUse": true,
+      "_why": "Item 5 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List5[0].Li2[0].T1981[0]",
+      "newName": "dv200_service_city",
+      "type": "text",
+      "label": "5b. City where served",
+      "courtUse": true,
+      "_why": "Item 5 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List5[0].Li2[0].T1982[0]",
+      "newName": "dv200_service_state",
+      "type": "text",
+      "label": "5b. State where served",
+      "courtUse": true,
+      "_why": "Item 5 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List5[0].Li2[0].T1983[0]",
+      "newName": "dv200_service_zip_code",
+      "type": "text",
+      "label": "5b. Zip where served",
+      "courtUse": true,
+      "_why": "Item 5 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List6[0].Li1[0].T198[0]",
+      "newName": "dv200_server_name",
+      "type": "text",
+      "label": "6. Server's name",
+      "courtUse": true,
+      "_why": "Item 6 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List6[0].Li1[0].T199[0]",
+      "newName": "dv200_server_street_address",
+      "type": "text",
+      "label": "6. Server's address",
+      "courtUse": true,
+      "_why": "Item 6 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List6[0].Li1[0].T200[0]",
+      "newName": "dv200_server_city",
+      "type": "text",
+      "label": "6. Server's city",
+      "courtUse": true,
+      "_why": "Item 6 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List6[0].Li1[0].T1981[0]",
+      "newName": "dv200_server_state",
+      "type": "text",
+      "label": "6. Server's state",
+      "courtUse": true,
+      "_why": "Item 6 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List6[0].Li1[0].T1982[0]",
+      "newName": "dv200_server_zip_code",
+      "type": "text",
+      "label": "6. Server's zip",
+      "courtUse": true,
+      "_why": "Item 6 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List6[0].Li1[0].Tel_tf[0]",
+      "newName": "dv200_server_telephone",
+      "type": "text",
+      "label": "6. Server's telephone",
+      "courtUse": true,
+      "_why": "Item 6 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List6[0].Li1[0].T2981[0]",
+      "newName": "dv200_server_registration_county",
+      "type": "text",
+      "label": "6. Registered process server - county of registration",
+      "courtUse": true,
+      "_why": "Item 6 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List6[0].Li1[0].T12298[0]",
+      "newName": "dv200_server_registration_number",
+      "type": "text",
+      "label": "6. Registered process server - registration number",
+      "courtUse": true,
+      "_why": "Item 6 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List7[0].Li1[0].T161[0]",
+      "newName": "dv200_server_signature_date",
+      "type": "text",
+      "label": "7. Server's signature date",
+      "courtUse": true,
+      "_why": "Item 7 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    },
+    {
+      "id": "DV-200[0].Page1[0].List7[0].Li1[0].T214[0]",
+      "newName": "dv200_server_printed_name",
+      "type": "text",
+      "label": "7. Server's printed name",
+      "courtUse": true,
+      "_why": "Item 7 is the server's: the person who serves the papers completes it at service and signs the proof. The filer never completes it."
+    }
+  ]
+}

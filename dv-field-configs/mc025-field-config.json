@@ -1,0 +1,18 @@
+{
+  "formTitle": "MC-025 Attachment",
+  "_comment": "MC-025 is the one continuation form of the packet (rule the-packet-uses-mc025-for-more-space): anything that needs more space - a narrative that outgrows its box, a table with more entries than the paper has rows - goes on MC-025 pages, never on DV-101, MC-020 or a drawn blank sheet. It is never asked about: FormWiz GUI/attachment-page.js fills it from what overflowed, one or more pages, numbered Page N of M. Field names come from the rectangles (pipeline-field-labels.js): FillText6 is SHORT TITLE, FillText5 CASE NUMBER, FillText9 ATTACHMENT (Number), FillText4 the body, FillText8 and FillText7 the page number and count. The notice header and footer boxes and the three buttons are the form's own furniture.",
+  "fields": [
+    { "id": "FillText6", "newName": "mc025_short_title", "type": "text", "label": "SHORT TITLE" },
+    { "id": "FillText5", "newName": "mc025_case_number", "type": "text", "label": "CASE NUMBER", "courtUse": true, "_why": "The court gives the case number when the request is filed; like every case number in the packet it is left for the clerk." },
+    { "id": "FillText9", "newName": "mc025_attachment_number", "type": "text", "label": "ATTACHMENT (Number)" },
+    { "id": "FillText4", "newName": "mc025_text", "type": "text", "label": "Attachment text (the continued item)" },
+    { "id": "FillText8", "newName": "mc025_page", "type": "text", "label": "Page" },
+    { "id": "FillText7", "newName": "mc025_page_count", "type": "text", "label": "of" },
+    { "id": "NoticeHeader1", "newName": "mc025_notice_header", "type": "text", "label": "Form notice header - not a question", "courtUse": true },
+    { "id": "WhiteOut", "newName": "mc025_white_out", "type": "text", "label": "Form notice area - not a question", "courtUse": true },
+    { "id": "NoticeFooter1", "newName": "mc025_notice_footer", "type": "text", "label": "Form notice footer - not a question", "courtUse": true },
+    { "id": "Save", "newName": "mc025_save_button", "type": "button", "label": "Form button - not a question", "courtUse": true },
+    { "id": "Print", "newName": "mc025_print_button", "type": "button", "label": "Form button - not a question", "courtUse": true },
+    { "id": "ResetForm", "newName": "mc025_reset_button", "type": "button", "label": "Form button - not a question", "courtUse": true }
+  ]
+}

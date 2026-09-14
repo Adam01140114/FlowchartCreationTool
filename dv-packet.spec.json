@@ -2,7 +2,7 @@
   "project": "DV Restraining Order Packet",
   "projectId": "p_mtumpmov7t2gh0",
   "_projectIdNote": "The project is its id: the editor library, the live site folder and every /form/<id> link are keyed on it. It lives here, in a source the build reads, because keeping it only in the last build output lost it when that file was overwritten - the rebuild minted a new id and the live site landed in a second folder.",
-  "_comment": "Each Judicial Council form prints who completes it. DV-100 is the request and the filer completes all of it. DV-109 and DV-110 say the filer completes only items 1-2 and 1-3; the rest is the court's, and those fields are marked courtUse in the field configs so no question is ever generated for them. DV-100, DV-109 and DV-110 are always filed together, so those connectors are unconditional. DV-101 and DV-105 are attachments: the form itself says when to attach it, and the connector asks the same question the form does. DV-101 hangs off item 3's 'Do you need more space to describe the abuse?', and DV-105 off the 'Child custody and visitation' box in the list of orders requested - so a filer who wants neither never sees either interview.",
+  "_comment": "Each Judicial Council form prints who completes it. DV-100 is the request and the filer completes all of it. DV-109 and DV-110 say the filer completes only items 1-2 and 1-3; the rest is the court's, and those fields are marked courtUse in the field configs so no question is ever generated for them. DV-100, DV-109 and DV-110 are always filed together, so those connectors are unconditional. DV-105 is an attachment: the form itself says when to attach it, and the connector asks the same question the form does - it hangs off the 'Child custody and visitation' box in the list of orders requested, so a filer who asks for no custody orders never sees its interview. Anything that needs more space continues on MC-025 (\"continuation\" below), which is filled from the answers and never asked about.",
   "forms": [
     {
       "name": "DV-100",
@@ -10,12 +10,6 @@
       "flowchart": "dv100-flowchart.json",
       "pdf": "dv100.pdf",
       "activates": [
-        {
-          "form": "DV-101",
-          "whenFieldTicked": "other_abuse_incident_additional_space_attached_yes",
-          "whenLabel": "only if item 7f needs more space",
-          "_why": "DV-101 continues item 7f. Nobody is asked whether they need it: the box is ticked when the description outgrows its own, so the connector waits on the field rather than on an answer. whenLabel is what the canvas prints under the connector, because the condition lives in its style and a chain under End otherwise reads as 'always, in this order'."
-        },
         {
           "form": "DV-105",
           "whenQuestion": "orders_requested",
@@ -28,15 +22,74 @@
           "_why": "DV-100 page 13: \"If you are asking for child custody and visitation orders, you must complete form DV-105 ... and form DV-140.\" The same box brings in both, so they are wired to the same answer. DV-140 itself is attached to DV-110 and is the judge's order; the filer supplies only its items 1, 2 and 3, and every one of those is a question DV-105 or DV-100 already asks."
         },
         "DV-109",
-        "CLETS-001"
+        "CLETS-001",
+        {
+          "form": "DV-160",
+          "whenQuestion": "keep_minor_information_confidential",
+          "isAnswer": "Yes",
+          "_why": "DV-100 page 1 points a filer with sensitive information about a child to DV-160-INFO; the question at the end of DV-100 asks it outright."
+        },
+        {
+          "form": "DV-165",
+          "whenQuestion": "keep_minor_information_confidential",
+          "isAnswer": "Yes",
+          "_why": "The order the judge signs on DV-160; the filer supplies its identifying items."
+        },
+        {
+          "form": "FL-150",
+          "whenQuestion": "orders_requested",
+          "isAnswer": "Spousal support",
+          "_why": "DV-100 page 13: \"If you are asking for child support or spousal support you must also complete form FL-150, Income and Expense Declaration.\" Spousal support always needs FL-150 (DV-570's second question)."
+        },
+        {
+          "form": "FL-150",
+          "whenQuestion": "orders_requested",
+          "isAnswer": "Lawyer's fees and costs",
+          "_why": "Asking the other person to pay lawyer's fees needs the full financial disclosure: DV-570's fourth question sends any Yes to FL-150."
+        },
+        {
+          "form": "FL-150",
+          "whenQuestion": "dv570_self_employed",
+          "isAnswer": "Yes",
+          "_why": "Child support alone may use the simpler FL-155, unless a DV-570 screening question is Yes. Self-employed: FL-150."
+        },
+        {
+          "form": "FL-150",
+          "whenQuestion": "dv570_other_party_spousal_support",
+          "isAnswer": "Yes",
+          "_why": "DV-570: the other side asks for spousal support - FL-150."
+        },
+        {
+          "form": "FL-150",
+          "whenQuestion": "dv570_other_party_lawyer_fees",
+          "isAnswer": "Yes",
+          "_why": "DV-570: the other side asks the filer to pay lawyer's fees - FL-150."
+        },
+        {
+          "form": "FL-150",
+          "whenQuestion": "dv570_other_income",
+          "isAnswer": "Yes",
+          "_why": "DV-570: income outside the kinds FL-155 lists - FL-150."
+        },
+        {
+          "form": "FL-155",
+          "whenFieldTicked": "financial_statement_simplified_allowed",
+          "whenLabel": "only if DV-570 allows the simpler form",
+          "_why": "DV-570: with every screening answer No, FL-155 may be used instead of FL-150, and the packet uses it - it is the simpler form. The box is computed in dv100-hints.json (tickWhen): child support asked for, no spousal support and no lawyer's fees asked for, and the last screening question answered No (each is asked only after the one before is No)."
+        },
+        {
+          "form": "MC-030",
+          "whenQuestion": "add_sworn_statement",
+          "isAnswer": "Yes",
+          "_why": "The petitioner wants to include an additional sworn statement with the first filing."
+        },
+        {
+          "form": "MC-031",
+          "whenQuestion": "witness_statement",
+          "isAnswer": "Yes",
+          "_why": "Someone - a witness - gives a sworn statement attached to the request."
+        }
       ]
-    },
-    {
-      "name": "DV-101",
-      "title": "DV-101 Description of Abuse",
-      "flowchart": "dv101-flowchart.json",
-      "pdf": "dv101.pdf",
-      "attachedTo": "DV-100"
     },
     {
       "name": "DV-105",
@@ -45,13 +98,50 @@
       "pdf": "dv105.pdf",
       "activates": [
         {
+          "form": "DV-105(A)",
+          "whenQuestion": "dv105_children_lived_together_five_years",
+          "isAnswer": "No",
+          "_why": "DV-105 item 4a: \"If no, complete form DV-105(A). Do not complete the section below.\" The packet completes it: a No brings DV-105(A) in, the way a Yes to item 8 brings in DV-108. The interview once answered this with a subtitle telling the filer to get DV-105(A) from the court clerk and fill it out themselves."
+        },
+        {
           "form": "DV-108",
           "whenQuestion": "dv105_abduction_risk",
           "isAnswer": "Yes",
           "_why": "DV-105 item 8 says it in as many words: \"To ask for orders to help prevent abduction, you must complete form DV-108 ... and attach it to this form.\" So the form asks the question and the packet obeys the answer - the same shape as DV-105 itself hanging off the custody box on DV-100."
+        },
+        {
+          "form": "DV-145",
+          "whenQuestion": "dv105_abduction_risk",
+          "isAnswer": "Yes",
+          "_why": "DV-145 is the proposed order for what DV-108 requests; the filer prepares its identifying and proposed items and the judge completes the ruling. The same answer brings in both."
         }
       ],
       "attachedTo": "DV-100"
+    },
+    {
+      "name": "DV-105(A)",
+      "title": "DV-105(A) City and State Where Children Lived",
+      "flowchart": "dv105a-flowchart.json",
+      "pdf": "dv105a.pdf",
+      "_source": "https://courts.ca.gov/documents/dv105a.pdf",
+      "activates": [
+        {
+          "form": "DV-105(A) (2)",
+          "whenQuestion": "dv105a_other_children_on_another_form",
+          "isAnswer": "Yes",
+          "_why": "DV-105(A) item 3 ends: \"Check here to list other children with a different residence history than the children you've already listed. Use another form DV-105(A) and attach it to this form.\" Answered Yes, the box ticks and the second copy comes in."
+        }
+      ],
+      "attachedTo": "DV-105"
+    },
+    {
+      "name": "DV-105(A) (2)",
+      "title": "DV-105(A) City and State Where Children Lived (second copy)",
+      "flowchart": "dv105a2-flowchart.json",
+      "pdf": "dv105a2.pdf",
+      "blank": "dv105a.pdf",
+      "_blankNote": "A second copy of a form the paper asks for more of. \"pdf\" is the copy's own sanitized file, named for its own field config; \"blank\" is the downloaded form it is made from.",
+      "attachedTo": "DV-105"
     },
     {
       "name": "DV-108",
@@ -87,7 +177,145 @@
       "title": "DV-110 Temporary Restraining Order",
       "flowchart": "dv110-flowchart.json",
       "pdf": "dv110.pdf"
+    },
+    {
+      "name": "DV-160",
+      "title": "DV-160 Request to Keep Minor's Information Confidential",
+      "flowchart": "dv160-flowchart.json",
+      "pdf": "dv160.pdf",
+      "_source": "https://courts.ca.gov/documents/dv160.pdf"
+    },
+    {
+      "name": "DV-165",
+      "title": "DV-165 Order on Request to Keep Minor's Information Confidential",
+      "flowchart": "dv165-flowchart.json",
+      "pdf": "dv165.pdf",
+      "_source": "https://courts.ca.gov/documents/dv165.pdf"
+    },
+    {
+      "name": "DV-145",
+      "title": "DV-145 Order to Prevent Child Abduction",
+      "flowchart": "dv145-flowchart.json",
+      "pdf": "dv145.pdf",
+      "_source": "https://courts.ca.gov/documents/dv145.pdf",
+      "attachedTo": "DV-140",
+      "_attachedToWhy": "DV-145 page 1: \"This form is attached to DV-140, Child Custody and Visitation Order.\""
+    },
+    {
+      "name": "FL-150",
+      "title": "FL-150 Income and Expense Declaration",
+      "flowchart": "fl150-flowchart.json",
+      "pdf": "fl150.pdf",
+      "_source": "https://courts.ca.gov/documents/fl150.pdf"
+    },
+    {
+      "name": "FL-155",
+      "title": "FL-155 Financial Statement (Simplified)",
+      "flowchart": "fl155-flowchart.json",
+      "pdf": "fl155.pdf",
+      "_source": "https://courts.ca.gov/documents/fl155.pdf"
+    },
+    {
+      "name": "MC-030",
+      "title": "MC-030 Declaration",
+      "flowchart": "mc030-flowchart.json",
+      "pdf": "mc030.pdf",
+      "_source": "https://courts.ca.gov/documents/mc030.pdf"
+    },
+    {
+      "name": "MC-031",
+      "title": "MC-031 Attached Declaration",
+      "flowchart": "mc031-flowchart.json",
+      "pdf": "mc031.pdf",
+      "_source": "https://courts.ca.gov/documents/mc031.pdf",
+      "attachedTo": "DV-100"
     }
   ],
+  "scope": {
+    "_comment": "The forms this packet covers, as the user defined them on September 14, 2026 (\"First Filing Forms\"): opening a new California DVRO case. Nothing else is built into the packet, however the paper mentions it. pipeline-form-refs.js --check fails on a form in \"forms\" that is not listed here, and every other form the paper names must be declared in formsNotInPacket, formsOutOfScope or formsToRead. MC-025 is the continuation form (\"continuation\" below). DV-105(A) (2) is a second copy of DV-105(A).",
+    "forms": ["DV-100", "CLETS-001", "DV-109", "DV-110", "DV-105", "DV-105(A)", "DV-108", "DV-140", "DV-145", "FL-150", "FL-155", "DV-160", "DV-165", "MC-025", "MC-030", "MC-031"]
+  },
+  "formsNotInPacket": {
+    "_comment": "Forms the packet's paper tells someone to complete that are not the filer's to prepare. pipeline-form-refs.js fails on any form the paper asks for that is neither in \"forms\" nor here, so each entry says whose form it is.",
+    "DV-120": "The response to the request. DV-109 page 3 addresses it \"To the Person in 2\": it is the restrained person's to file, not the filer's.",
+    "DV-125": "The restrained person's response to a request for custody and visitation orders. DV-105(A) item 1 lists it as one DV-105(A) can be attached to, 'For person in 2'.",
+    "DV-325": "The restrained person's response to a request to change custody and visitation orders (the change-or-end process, after an order exists). DV-105(A) item 1 lists it as one DV-105(A) can be attached to, 'Use this form to list where your children have lived'.",
+    "DV-150": "Mandatory Findings for Child Custody and Visitation Order - 'This is a Court Order' at the foot of every page. The judge makes the findings; items 1-2 are only the parties' names, and no form or guide tells the filer to prepare it.",
+    "DV-116": "The court's order on a request to reschedule the hearing (DV-115). The court completes it.",
+    "FL-342": "Child Support Information and Order Attachment - the judge's, attached to the order when child support is ordered.",
+    "FL-343": "Spousal, Domestic Partner, or Family Support Order Attachment - the judge's, attached to the order when spousal support is ordered.",
+    "DV-170": "The court's notice of an order protecting a minor's information (DV-109 item 5). The court completes it.",
+    "DV-800": "Receipt for Firearms, Firearm Parts, and Ammunition. DV-110 item 6 tells the restrained person to file it, or law enforcement / the dealer completes it; it is not the filer's.",
+    "JV-270": "The juvenile-court version of DV-800 (DV-110 prints 'DV-800/JV-270'); the restrained person's, not the filer's.",
+    "DV-820": "An attachment the judge adds to the order (DV-110 item 24, 'Attachments include forms'). The court completes it.",
+    "EPO-001": "An Emergency Protective Order, issued by a judge at law enforcement's request (DV-110 page 9). Not something the filer prepares.",
+    "FL-341(C)": "The Children's Holiday Schedule Attachment to the judge's custody order (DV-140 item 15: 'use a separate attachment (e.g., FL-341(C))'). It attaches to the court's order; the holidays the filer wants are asked on DV-105.",
+    "GV-100": "A gun violence restraining order request. CLETS-001 mentions it only to say which items to skip for that kind of case; this packet is a domestic violence request.",
+    "RT-100": "A retail crime restraining order request. CLETS-001 mentions it only to say which items to skip for that kind of case; this packet is a domestic violence request.",
+    "CH-170": "A civil harassment form; SER-001 lists it among the papers a sheriff can serve in other kinds of cases.",
+    "FL-100": "A petition for divorce or legal separation; SER-001 lists it among papers a sheriff serves. Not part of a domestic violence restraining order request.",
+    "FW-003": "An order on a fee waiver; SER-001 asks about one because a sheriff charges some fees. Serving a domestic violence restraining order is free (DV-110 item 23), so no fee waiver is needed.",
+    "FW-005": "An order on a fee waiver (SER-001 asks about one). Serving a domestic violence restraining order is free, so it is not needed.",
+    "SC-100": "A small claims form; SER-001 lists it among papers a sheriff serves in other kinds of cases.",
+    "WG-001": "A wage garnishment form; SER-001 lists it among papers a sheriff serves in other kinds of cases.",
+    "WG-035": "A wage garnishment form; SER-001 lists it among papers a sheriff serves in other kinds of cases.",
+    "POS-040": "A civil proof of service. RA-010 allows one for its notice; in this packet RA-010 is served with everything else and proved on DV-200 or by the sheriff.",
+    "POS-050": "A proof of electronic service. RA-010 allows one for its notice; in this packet RA-010 is served with everything else.",
+    "RA-015": "The court's order on a remote appearance (RA-010 points to it); the court completes it."
+  },
+  "continuation": {
+    "form": "MC-025",
+    "pdf": "mc025.pdf",
+    "_why": "Rule the-packet-uses-mc025-for-more-space. MC-025, Attachment, \"may be used with any Judicial Council form\", and the packet uses it for anything that needs more space: a narrative past what its box prints (DV-100 item 7(f); DV-160 items 6a, 6b, 8b and 8c - the overflow block in each form's hints) and a table's entries past its rows (DV-105 item 3, the other protected people on DV-100, DV-110 and CLETS-001, DV-160's minors and redactions - repeats[].attachment). The filer is never asked for it: FormWiz GUI/attachment-page.js fills one MC-025 per continued item, as many sheets as it takes, numbered Page N of M, with the short title and the item it continues. Substantive forms that happen to hold more information - DV-105, DV-108, FL-150, DV-160 - are never replaced by it.",
+    "replaces": {
+      "DV-101": "Description of Abuse, which DV-100 item 7 offers for more space to describe the abuse. MC-025 takes the rest of item 7(f) instead, as many sheets as it runs to; DV-101 held 387 characters more and then needed a sheet of the filer's own.",
+      "MC-020": "Additional Page, the declaration continuation some forms name for more space. MC-025 does the same job for every item in the packet, so one form carries every continuation."
+    }
+  },
+  "referenceSources": [
+    {
+      "name": "DV-500-INFO",
+      "pdf": "dv500info.pdf",
+      "why": "Can a Domestic Violence Restraining Order Help Me? The court's overview of the whole process."
+    },
+    {
+      "name": "DV-505-INFO",
+      "pdf": "dv505info.pdf",
+      "why": "How Do I Ask for a Temporary Restraining Order? The filer's steps, and the forms each step needs."
+    },
+    {
+      "name": "DV-520-INFO",
+      "pdf": "dv520info.pdf",
+      "why": "Get Ready for the Restraining Order Court Hearing: the forms the filer brings or files before the hearing."
+    },
+    {
+      "name": "DV-570",
+      "pdf": "dv570.pdf",
+      "why": "Which Financial Form - For Child Support? Decides between FL-150 and FL-155."
+    }
+  ],
+  "_referenceSourcesNote": "The court's own guides to the process, kept in reference-forms/. pipeline-form-refs.js reads them with the packet's PDFs, so a form the process needs that no packet form mentions is still found. They are read, never filled.",
+  "formsToRead": {
+    "_comment": "Guides the paperwork points the filer to that are read, not filed, and do not end in -INFO. What they say is built into the interview instead: a filer never has to read one to finish.",
+    "DV-570": "Which Financial Form - For Child Support? DV-100 page 13: \"Read form DV-570 to see if you are eligible\" for FL-155 instead of FL-150. The interview asks its eligibility questions itself, so the filer never has to read it."
+  },
+  "formsStillToBuild": {
+    "_comment": "The filer's forms, inside the packet's scope, that the paper asks for and the packet does not make yet. pipeline-form-refs.js prints these on every run, so a known gap is never a quiet one. The interview does not tell the filer to get them - the fix is to build them."
+  },
+  "formsOutOfScope": {
+    "_comment": "Forms the paper mentions that the filer may use, but outside the first-filing forms this packet covers (\"scope\"). The user narrowed the packet to those on September 14, 2026; everything here is a later stage, or a request the packet no longer makes. pipeline-form-refs.js accepts them and lists them, and the interview never sends the filer for one.",
+    "SER-001": "Request for Sheriff to Serve Court Papers - serving the papers comes after filing. It was in the packet until September 14, 2026.",
+    "DV-200": "Proof of Personal Service - completed by whoever serves the papers, after filing. It was in the packet until September 14, 2026.",
+    "INT-300": "Request for Interpreter - a request about the hearing, not a first-filing form. It was in the packet until September 14, 2026.",
+    "MC-410": "Disability Accommodation Request - a request to the court about access, not a first-filing form. It was in the packet until September 14, 2026.",
+    "RA-010": "Notice of Remote Appearance - about how the filer attends the hearing, not a first-filing form. It was in the packet until September 14, 2026.",
+    "DV-112": "Waiver of Hearing on Denied Request for Temporary Restraining Order (DV-109 page 3: \"If you want to cancel the hearing, use form DV-112\"). The filer's, only after a judge denies the temporary order - a later stage than this interview.",
+    "DV-130": "Restraining Order After Hearing. A later stage: the filer marks the orders the judge granted at the hearing (the guides point to it); the identifying items are the packet's answers.",
+    "DV-305": "Request to Change Child Custody and Visitation Orders - the filer's in the change-or-end process, once an order exists. A later stage than this interview; DV-105(A) item 1 lists it as one DV-105(A) can be attached to.",
+    "DV-310": "Notice of Court Hearing and Temporary Order in the change-or-end process: the court's, with items 1-2 filled by the filer. A later stage than this interview; DV-140 lists it among the orders DV-140 can be attached to.",
+    "DV-115": "Request to Continue Hearing - the filer's, when the papers could not be served in time (SER-001 and DV-200 point to it). A later stage than filing: it is needed only once service fails.",
+    "DV-175": "Cover Sheet for Confidential Information - the filer's, but only later: DV-165 item 12b requires it when filing papers that include information a granted DV-165 made confidential.",
+    "DV-250": "Proof of Service by Mail - completed by whoever mails the papers; the filer fills the identifying items. Only where the court allows service by mail, which is a later stage than the first service."
+  },
   "_attachedToNote": "attachedTo is what each form says it is attached to, on its own first line - not what switches it on. DV-140 is switched on by DV-100's custody box and printed as attached to DV-110, and treating the first as the second put its six pages into DV-100 item 32. DV-109, DV-110 and CLETS-001 are filed alongside and attached to nothing."
 }

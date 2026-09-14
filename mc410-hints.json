@@ -1,0 +1,216 @@
+{
+  "_comment": "MC-410 asks for a disability accommodation at court. It is CONFIDENTIAL and is not filed in the case file: the court keeps it apart from the record, so the other side does not see it (Cal. Rules of Court, rule 1.100). It comes into the packet on the filer's answer that they need an accommodation, so the filer is its subject. Page 1 is the filer's and page 2 is the court's reply, all courtUse. Item 1 is the filer's own details under the packet's names, asked once: the address box that holds city, state and ZIP together is a split of the packet's three answers, so the combine is DV-100's own and collapses into it. The case name or type is not asked - the form is only ever filed in this packet, so it is the type of this case, written when the answer that brings the form in is given. Item 3 is one box for two things, when and where, so it is asked as two.",
+  "groups": [],
+  "questions": {
+    "person_asking_protection_name": {
+      "text": "What is your name?",
+      "_why": "Item 1 and the page 2 header print the filer's name, which DV-100 item 1 already asks under this name; the packet asks it once and this wording is for the form compiled on its own."
+    },
+    "mc410_accommodation_needed": {
+      "text": "What accommodation do you need at the court?",
+      "subtitle": "For example: a sign language interpreter, an assistive listening device, a wheelchair-accessible courtroom, breaks, or real-time captioning.",
+      "type": "bigParagraph"
+    },
+    "mc410_accommodation_reason": {
+      "text": "Why do you need this accommodation to take part in court?",
+      "subtitle": "Describe your disability only as much as you need to explain the request. This form is kept confidential and is not put in your case file.",
+      "type": "bigParagraph"
+    },
+    "mc410_more_information_attached": {
+      "text": "Will you give the court more papers about this request, such as a letter from your doctor?",
+      "_why": "Item 5 ends with a box, 'More information on this request is attached.' It is about papers the filer already has - a doctor's letter, say - not about running out of room, so it is asked."
+    },
+    "needs_disability_accommodation_yes": {
+      "text": "Are you asking for this accommodation as a party to the case?",
+      "_why": "MC-410 item 2, \"Party\". In the packet DV-100's accommodation answer ticks it and it is never asked; the wording is for the form compiled on its own."
+    }
+  },
+  "splits": [
+    {
+      "field": "court_name_and_street_address",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "court_name",
+          "label": "Court name",
+          "question": "What is the name of the court?"
+        },
+        {
+          "nameId": "court_street_address",
+          "label": "Court street address",
+          "question": "What is the court's street address?"
+        }
+      ]
+    },
+    {
+      "field": "mc410_city_state_zip",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "person_asking_protection_mailing_city",
+          "label": "City"
+        },
+        {
+          "nameId": "person_asking_protection_mailing_state",
+          "label": "State"
+        },
+        {
+          "nameId": "person_asking_protection_mailing_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    },
+    {
+      "field": "mc410_when_and_where",
+      "join": "; ",
+      "parts": [
+        {
+          "nameId": "mc410_accommodation_when",
+          "label": "When",
+          "question": "When do you need the accommodation?"
+        },
+        {
+          "nameId": "mc410_accommodation_where",
+          "label": "Where",
+          "question": "Where do you need the accommodation?"
+        }
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "Where can the court send you papers?",
+      "fields": [
+        {
+          "field": "person_asking_protection_mailing_address",
+          "label": "Street address"
+        },
+        {
+          "field": "person_asking_protection_mailing_city",
+          "label": "City"
+        },
+        {
+          "field": "person_asking_protection_mailing_state",
+          "label": "State"
+        },
+        {
+          "field": "person_asking_protection_mailing_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    },
+    {
+      "question": "How can the court reach you?",
+      "optional": true,
+      "fields": [
+        {
+          "field": "person_asking_protection_telephone",
+          "label": "Phone number",
+          "type": "phone"
+        },
+        {
+          "field": "person_asking_protection_email",
+          "label": "Email address",
+          "type": "email"
+        }
+      ]
+    },
+    {
+      "question": "How can the court reach the person who helped you?",
+      "fields": [
+        {
+          "field": "mc410_helper_name",
+          "label": "Name"
+        },
+        {
+          "field": "mc410_helper_email",
+          "label": "Email address",
+          "type": "email",
+          "optional": true
+        },
+        {
+          "field": "mc410_helper_phone",
+          "label": "Phone number",
+          "type": "phone",
+          "optional": true
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "mc410_helper_provided",
+        "gateQuestion": "Did someone, such as a court employee or a caregiver, help you with this request and agree to answer the court's questions about it?"
+      }
+    }
+  ],
+  "computed": {
+    "mc410_case_name_or_type": {
+      "_why": "The caption box 'Case Name/Type (if you know it)' has one answer in this packet: the form is only ever filed with a request for a domestic violence restraining order, and it is here only because the filer answered that they need an accommodation. So it is written when that answer is given, not asked.",
+      "wordsWhenTicked": [
+        {
+          "when": "needs_disability_accommodation_yes",
+          "words": "Domestic violence restraining order"
+        }
+      ]
+    }
+  },
+  "autofill": [
+    {
+      "field": "mc410_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "The date beside the signature at the foot of page 1 has one correct answer and the form already knows it."
+    },
+    {
+      "field": "mc410_signature_printed_name",
+      "from": [
+        "person_asking_protection_name"
+      ],
+      "why": "The typed name under the signature on page 1 is the name the filer gave in item 1."
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "mc410_helper_provided",
+      "why": "The helper's contact line at the foot of page 1 is asked whatever the answer about more papers in item 5; it comes after that box only because the box is the last thing item 5 asks."
+    },
+    {
+      "question": "mc410_accommodation_when",
+      "why": "MC-410 item 3 asks every requester when the accommodation is needed; it follows item 1 only because it comes next."
+    }
+  ],
+  "sections": [
+    {
+      "name": "Your Information",
+      "fields": [
+        "person_asking_protection_name",
+        "person_asking_protection_mailing_address",
+        "person_asking_protection_mailing_city",
+        "person_asking_protection_mailing_state",
+        "person_asking_protection_mailing_zip_code",
+        "person_asking_protection_telephone",
+        "person_asking_protection_email",
+        "court_name",
+        "court_street_address"
+      ]
+    },
+    {
+      "name": "The Accommodation",
+      "fields": [
+        "mc410_accommodation_when",
+        "mc410_accommodation_where",
+        "mc410_accommodation_needed",
+        "mc410_accommodation_reason",
+        "mc410_more_information_attached"
+      ]
+    },
+    {
+      "name": "Someone Who Helped You",
+      "fields": [
+        "mc410_helper_provided",
+        "mc410_helper_name",
+        "mc410_helper_email",
+        "mc410_helper_phone"
+      ]
+    }
+  ]
+}

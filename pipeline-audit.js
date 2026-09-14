@@ -80,6 +80,11 @@ function postedNames(gui) {
       // the number goes: {n} in the middle for a PDF that names its rows
       // firearm_item_3_description, appended otherwise.
       const max = parseInt(q.max, 10);
+      // The block's own "how many?" posts its count under the node's id
+      // (<select id="dv105_child" name="dv105_child">). FL-150 item 16a prints
+      // that count, and both this rule and the preview check called the box
+      // unfilled because a block question carries a nodeId and no nameId.
+      if (q.type === 'numberedDropdown') add(q.nameId || q.nodeId, q);
       if (q.type === 'numberedDropdown' && max > 0) {
         const perEntry = (base) => {
           if (!base) return;
@@ -138,7 +143,9 @@ async function pdfFieldNames(file) {
  * separate piece of paper" and the like. Read from the page itself: the field
  * configs label these boxes with their own names, not their words.
  */
-const MORE_SPACE = /need (more|additional) (space|room)|(list|have) more (children|people|persons)|more (children|people) to list|separate (piece of |sheet of )?(paper|page|sheet)|attach (a|another) (sheet|page)/i;
+// "not enough space" too: DV-160 prints "Check here if there is not enough
+// space (Attachment 6a)" three times, and none of the three was caught.
+const MORE_SPACE = /need (more|additional) (space|room)|not enough (space|room)|(list|have) more (children|people|persons)|more (children|people) to list|separate (piece of |sheet of )?(paper|page|sheet)|attach (a|another) (sheet|page)/i;
 let pdfjsForText = null;
 async function moreSpaceBoxes(file) {
   if (!pdfjsForText) pdfjsForText = await import('pdfjs-dist/legacy/build/pdf.mjs');
@@ -183,7 +190,10 @@ async function moreSpaceBoxes(file) {
 function readFieldConfig(file) {
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
   return (data.fields || []).map((f) => ({
-    id: f.id, name: f.newName, label: f.label, courtUse: f.courtUse === true
+    id: f.id, name: f.newName, label: f.label, courtUse: f.courtUse === true,
+    // RULE 18: the form's author saying a blank is the right answer when the
+    // question behind this field is never reached - and why.
+    blankWhenNotAsked: (typeof f.blankWhenNotAsked === 'string' && f.blankWhenNotAsked.trim()) || null
   }));
 }
 
@@ -281,9 +291,13 @@ async function main() {
       (gui.overflowLinks || []).forEach((o) => {
         if (o && o.marks) spill.add(o.marks);
         if (o && o.field) spill.add(o.field);
-        // The third box in the chain: DV-101 item 5's own "attach a sheet",
-        // ticked when the answer outgrows both of the printed ones.
+        // An old link's third box (DV-101 item 5's own "attach a sheet"). RULE
+        // 21 fails such a link; it is exempted here so it is reported once.
         if (o && o.marksBeyond) spill.add(o.marksBeyond);
+        // A box whose own label asks for a separate sheet, served by an MC-025
+        // page the form does not tick it for - FL-155 item 8a's "specify
+        // reasons for expenses on separate sheet" is the filer's own box.
+        if (o && o.sheetFor) spill.add(o.sheetFor);
       });
       // And the box a block ticks when its entries run onto an attached page.
       (gui.sections || []).forEach((s) => (s.questions || []).forEach((q) => {
@@ -311,6 +325,26 @@ async function main() {
     } catch (e) {
       report.rule13.push({ form: form.name, field: '(PDF text unreadable: ' + e.message + ')', page: 0, text: '' });
     }
+
+    // RULE 22 (every-box-can-be-ticked): one checkbox field whose boxes carry
+    // different export values ticks only its first box when it is filled -
+    // FL-155 item 4's four tax statuses were one field, and the paper could
+    // only ever say "single". Each box the filer can choose is split into a
+    // field of its own by a "widget" entry in the field config.
+    report.rule22 = report.rule22 || [];
+    try {
+      const doc = await PDFDocument.load(fs.readFileSync(pdfPath), { ignoreEncryption: true });
+      doc.getForm().getFields().forEach((f) => {
+        if (f.constructor.name !== 'PDFCheckBox') return;
+        const widgets = f.acroField.getWidgets();
+        if (widgets.length < 2) return;
+        const values = new Set(widgets.map((w) => { try { return w.getOnValue().toString(); } catch (err) { return '?'; } }));
+        if (values.size < 2) return;
+        const cfg = byName.get(f.getName());
+        if (cfg && cfg.courtUse) return;
+        report.rule22.push({ form: form.name, field: f.getName(), values: [...values].join(' ') });
+      });
+    } catch (e) { /* an unreadable PDF is reported by RULE 13 above */ }
 
     // Rule 1 is about what the filer must answer. A field the form itself says
     // the court completes is left blank on purpose, and asking for it would be
@@ -381,6 +415,16 @@ async function main() {
       const q = owner.get(f.name);
       if (!q) return;                        // rule 1 already reports unreachable
       if (q.type === 'bigParagraph') return;
+      // A block's entry or a multi-part question's box asked in several lines:
+      // DV-160's redaction columns are each a textarea inside the block.
+      const entries = [].concat(q.allFieldsInOrder || [], q.textboxes || []);
+      const asParagraph = entries.some((e) => {
+        if (!e || e.type !== 'bigParagraph' || !e.nodeId) return false;
+        if (e.nodeId === f.name) return true;
+        const escaped = String(e.nodeId).split('{n}').map((p) => p.replace(/[.*+?^$()|[\]\\]/g, '\\$&'));
+        return new RegExp('^' + escaped.join('[0-9]+') + '$').test(f.name);
+      });
+      if (asParagraph) return;
       // A split's parts are short values that happen to share one tall box.
       if ((gui.linkedFields || []).some(function (l) { return l.linkedFieldId === f.name; })) return;
       report.rule12.push({ form: form.name, field: f.name, type: q.type,
@@ -429,19 +473,78 @@ async function main() {
   // Rule 15: optional is coded, never said. "How can the court reach you?
   // (optional)" said it and was required all the same: nothing had marked it.
   report.rule15 = [];
+  // Rule 20: nothing the filer reads sends them off to get, fill in or attach a
+  // form. The packet brings in and fills every form the answers call for;
+  // DV-105 once told the filer to get DV-105(A) from the court clerk.
+  const { sendsFilerForAForm } = require('./wording-rules');
+  report.rule20 = [];
+  const sentAway = (who, where, s) => {
+    const t = sendsFilerForAForm(s);
+    if (t) report.rule20.push({ question: who, where: where, text: String(s), tell: t });
+  };
+  // Rule 21 (the-packet-uses-mc025-for-more-space): whatever needs more room
+  // continues on MC-025. An overflow names an MC-025 page; one that continues
+  // on another form's box instead is how DV-100 item 7 came to be capped at the
+  // sum of two boxes (DV-101 item 5). A form the continuation replaces is never
+  // in the packet as a form of its own, and the blank the pages are drawn on
+  // must be there.
+  report.rule21 = [];
+  (() => {
+    let spec = {};
+    try { spec = JSON.parse(fs.readFileSync(flag('spec', 'dv-packet.spec.json'), 'utf8')); } catch (e) { return; }
+    const cont = spec.continuation || {};
+    const say = (what, why) => report.rule21.push({ what, why });
+    if (!cont.form) {
+      say('dv-packet.spec.json', 'names no continuation form - "continuation": { "form": "MC-025", "pdf": "mc025.pdf", "replaces": {...} }');
+    }
+    const blank = path.join(PDF_DIR, cont.pdf || 'mc025.pdf');
+    if (!fs.existsSync(blank)) say(blank, 'is missing, so the continuation pages have no form to be drawn on (node pipeline-sanitize.js mc025)');
+    const seen = new Map();
+    const named = (name, who) => {
+      if (seen.has(name)) say(who, 'draws its page as ' + name + ', which ' + seen.get(name) + ' already uses - one would be drawn over the other');
+      else seen.set(name, who);
+    };
+    (gui.overflowLinks || []).forEach((o) => {
+      if (!o || !o.nameId) return;
+      if (!o.page || !o.page.name || !o.page.heading) {
+        say(o.nameId, 'continues on ' + (o.form ? o.form + (o.field ? ' ' + o.field : '') : 'nothing')
+          + ' instead of an MC-025 page - give the overflow a "page": { name, heading, item, itemTitle, form }');
+        return;
+      }
+      if (o.field || o.marksBeyond) {
+        say(o.nameId, 'also continues on another form\'s box (' + (o.field || o.marksBeyond) + '); MC-025 takes the rest, as many sheets as it needs');
+      }
+      named(o.page.name, o.nameId);
+    });
+    (gui.sections || []).forEach((s) => (s.questions || []).forEach((q) => {
+      if (!q || !q.attachment || typeof q.attachment !== 'object' || !q.attachment.name) return;
+      [q.attachment].concat(Array.isArray(q.attachment.otherPages) ? q.attachment.otherPages : [])
+        .forEach((p) => { if (p && p.name) named(p.name, (q.nameId || q.nodeId || 'q' + q.questionId) + ' (' + (p.heading || p.name) + ')'); });
+    }));
+    const replaced = Object.keys(cont.replaces || {}).filter((k) => !k.startsWith('_'));
+    (spec.forms || []).forEach((f) => {
+      if (replaced.includes(f.name)) say(f.name, 'is in the packet, but ' + cont.form + ' replaces it: ' + cont.replaces[f.name]);
+    });
+  })();
+  (gui.alertRules || []).forEach((r) => sentAway(r.id || 'alert', 'alert', r.message));
   (gui.sections || []).forEach((sec) => (sec.questions || []).forEach((q) => {
     const who = q.nameId || q.nodeId || ('q' + q.questionId);
     const text = String(q.text || '');
     if (!text) return;
+    sentAway(who, 'question', text);
+    sentAway(who, 'subtitle', q.subtitle && q.subtitle.text);
+    sentAway(who, 'info box', q.infoBox && q.infoBox.text);
     const tell = conditionTell(text);
     if (tell) report.rule2wording.push({ question: who, where: 'question', text: text, tell: tell });
     (q.allFieldsInOrder || []).forEach((f) => {
       const t = conditionTell(f && f.label);
       if (t) report.rule2wording.push({ question: who, where: 'box', text: String(f.label), tell: t });
+      sentAway(who, 'box', f && f.label);
     });
     labelsOf(q).forEach((label) => {
       const t = conditionTell(label);
       if (t) report.rule2wording.push({ question: who, where: 'choice', text: label, tell: t });
+      sentAway(who, 'choice', label);
     });
     const problem = sentenceProblem(text);
     if (problem) report.rule14.push({ question: who, text: text, problem: problem });
@@ -868,6 +971,12 @@ async function main() {
   // Shown given these answers: a condition met by one of them, one on a
   // question inside a form they open, or one on a question that is itself
   // shown and passes on whatever it is answered.
+  // How many "under each answer" steps deep a check already is (keyed by the
+  // stack of the call that started it), so trying branches stays bounded.
+  const depthOf = new WeakMap();
+  // One answer per question-and-assumed-answers, so trying branches six deep
+  // stays a few thousand checks rather than millions.
+  const branchCache = new Map();
   const shownGiven = (q, given, memo, stack, inside) => {
     const id = String(q.questionId);
     if (memo.has(id)) return memo.get(id);
@@ -894,6 +1003,41 @@ async function main() {
         if (anyAnswer && shownGiven(prev, given, memo, stack, inside)) { ok = true; break; }
       }
     }
+    // Every branch of a question that is itself shown: "shown when q60 = No, or
+    // when q62 is answered" and q62 is asked on q60 = Yes, so the firearms
+    // question is reached whatever q60 says. Taken one condition at a time
+    // neither half proves it, and SER-001 was failed for printing an answer
+    // DV-100 always asks. So try the question under each answer of a question
+    // it depends on. DV-100's three incidents each branch on "did the police
+    // come?" and "is there another?", so proving the firearms question is
+    // always reached takes six such steps; a cache keeps it fast.
+    // A step is an answer assumed, not a question looked at: checking that the
+    // question it depends on is shown, on the same answers, costs nothing. The
+    // first version counted both, and ran out twelve questions up DV-100's
+    // incidents before it reached the first one.
+    const here = depthOf.get(stack) || 0;
+    if (!ok && here < 12) {
+      const cached = (target, answers, depth) => {
+        const key = String(target.questionId) + '|' + answers.map((g) => g.q + '=' + g.a).sort().join(',');
+        if (!branchCache.has(key)) {
+          const s = new Set();
+          depthOf.set(s, depth);
+          branchCache.set(key, false);          // a cycle through here proves nothing
+          branchCache.set(key, shownGiven(target, answers, new Map(), s, inside));
+          if (process.env.RULE18_DEBUG) console.error('RULE18 depth ' + depth + ' q' + key + ' -> ' + branchCache.get(key));
+        }
+        return branchCache.get(key);
+      };
+      const pivots = [...new Set(conds.map((c) => String(c.prevQuestion)))]
+        .map((pid) => qById.get(pid))
+        .filter((p) => p && optionLabels(p).length && !given.some((g) => g.q === String(p.questionId)));
+      for (const p of pivots) {
+        if (!cached(p, given, here)) continue;
+        const every = optionLabels(p).every((label) =>
+          cached(q, given.concat([{ q: String(p.questionId), a: label }]), here + 1));
+        if (every) { ok = true; break; }
+      }
+    }
     stack.delete(id);
     memo.set(id, ok);
     return ok;
@@ -908,7 +1052,7 @@ async function main() {
     if (!fs.existsSync(cfgPath)) return;
     const seenQ = new Set();
     const inside = opened(given);
-    readFieldConfig(cfgPath).filter((c) => !c.courtUse).forEach((c) => {
+    readFieldConfig(cfgPath).filter((c) => !c.courtUse && !c.blankWhenNotAsked).forEach((c) => {
       const q = owner.get(c.name);
       if (!q || ownedByForm(q, form) || seenQ.has(String(q.questionId))) return;
       if (shownGiven(q, given, new Map(), new Set(), inside)) return;
@@ -1197,6 +1341,36 @@ async function main() {
     report.rule19.forEach((r) => console.log('      - ' + r.question + ': "' + r.text + '"   (after ' + r.after + ')'));
   }
   console.log('');
+  console.log('RULE 20 — the interview never sends the filer for a form');
+  if (!(report.rule20 || []).length) {
+    console.log('  passes');
+  } else {
+    console.log('  FAILS  ' + report.rule20.length + ' place(s) tell the filer to get, fill in or attach a form themselves:');
+    report.rule20.forEach((r) => console.log('      - ' + r.question + ' [' + r.where + ']: "' + String(r.text).slice(0, 140)
+      + '"   <- "' + r.tell + '"'));
+    console.log('      Bring the form into the packet (dv-packet.spec.json) so it is filled with the rest; pipeline-form-refs.js');
+    console.log('      lists every form the paper asks for.');
+  }
+  console.log('');
+  console.log('RULE 21 — anything that needs more space continues on MC-025');
+  if (!(report.rule21 || []).length) {
+    const pages = (gui.overflowLinks || []).filter((o) => o && o.page).length;
+    console.log('  passes  (' + pages + ' long answer(s) and every table past its rows continue on MC-025)');
+  } else {
+    console.log('  FAILS  ' + report.rule21.length + ' continuation(s) not on MC-025:');
+    report.rule21.forEach((r) => console.log('      - ' + r.what + ': ' + r.why));
+  }
+  console.log('');
+  console.log('RULE 22 — every box the filer can choose can be ticked');
+  if (!(report.rule22 || []).length) {
+    console.log('  passes  (no checkbox field on a filer\'s PDF holds boxes with different export values)');
+  } else {
+    console.log('  FAILS  ' + report.rule22.length + ' checkbox field(s) hold several boxes, and only the first can ever be ticked:');
+    report.rule22.forEach((r) => console.log('      - ' + r.form + ' ' + r.field + '  (export values ' + r.values + ')'));
+    console.log('      Give each other box a field-config entry with the same id and "widget": "<export value>";');
+    console.log('      pipeline-sanitize.js splits it into a field of its own. A box the court ticks can be courtUse instead.');
+  }
+  console.log('');
   console.log('RULE 15 — optional is coded, never said');
   const markedOptional = (gui.sections || []).reduce((n, s) =>
     n + (s.questions || []).filter((q) => q.required === false).length, 0);
@@ -1263,9 +1437,16 @@ async function main() {
     ['RULE 7', report.rule7.filter((f) => !f.pdfFile || (!f.alwaysIncluded && !f.activatedBy.length) || f.dead.length).length],
     ['RULE 8', report.rule8.compound.length],
     ['RULE 10', report.rule10.length],
+    // Printed as a note for months, and the note became the baseline: nine
+    // multi-line boxes stayed one-line questions. A rule that reports and does
+    // not stop the build is one nobody fixes.
+    ['RULE 12', (report.rule12 || []).length],
     ['RULE 14', (report.rule14 || []).length],
     ['RULE 15', (report.rule15 || []).length],
-    ['RULE 19', (report.rule19 || []).length]
+    ['RULE 19', (report.rule19 || []).length],
+    ['RULE 20', (report.rule20 || []).length],
+    ['RULE 21', (report.rule21 || []).length],
+    ['RULE 22', (report.rule22 || []).length]
   ].filter((b) => b[1]);
   if (blocking.length) {
     console.log('');

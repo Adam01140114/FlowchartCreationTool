@@ -1,0 +1,323 @@
+{
+  "_comment": "INT-300 asks the court for an interpreter. It comes into the packet on the filer's answer that they need one, so item 3's box - 'I need an interpreter in the following language when I am in court' - carries that answer's name and is ticked by it; what the interview asks is which language. Item 1 is the filer's details under the packet's names and item 2 is which side of the case they are on. Item 4 is a witness who also needs an interpreter: the paper holds one witness per form, and the court's hearing date is usually not set when the request is filed, which is what the 'No date is set yet' box is for. The questions after item 3's box are asked whenever the form is here; they follow that box only because it is printed first.",
+  "groups": [
+    {
+      "nameId": "int300_party_role",
+      "question": "Which party are you in this case?",
+      "members": [
+        "int300_party_role_petitioner",
+        "int300_party_role_respondent",
+        "int300_party_role_other"
+      ],
+      "labels": [
+        "Plaintiff or petitioner (the person asking for the restraining order)",
+        "Defendant or respondent",
+        "Something else"
+      ]
+    },
+    {
+      "nameId": "int300_language",
+      "question": "Which language do you need an interpreter in?",
+      "members": [
+        "int300_language_spanish",
+        "int300_language_vietnamese",
+        "int300_language_korean",
+        "int300_language_mandarin",
+        "int300_language_cantonese",
+        "int300_language_farsi",
+        "int300_language_russian",
+        "int300_language_tagalog",
+        "int300_language_arabic",
+        "int300_language_punjabi",
+        "int300_language_other"
+      ],
+      "labels": [
+        "Spanish (español)",
+        "Vietnamese (Tiếng Việt)",
+        "Korean (한국어)",
+        "Mandarin (普通话)",
+        "Cantonese (广东话)",
+        "Farsi or Persian (فارسی)",
+        "Russian (русский)",
+        "Tagalog",
+        "Arabic (العربية)",
+        "Punjabi (ਪੰਜਾਬੀ)",
+        "Another language"
+      ]
+    },
+    {
+      "nameId": "int300_witness_language",
+      "question": "Which language does your witness need an interpreter in?",
+      "conditional": {
+        "onlyWhen": "int300_witness_needs_interpreter"
+      },
+      "members": [
+        "int300_witness_language_same",
+        "int300_witness_language_other"
+      ],
+      "labels": [
+        "The same language as mine",
+        "Another language"
+      ]
+    }
+  ],
+  "questions": {
+    "person_asking_protection_name": {
+      "text": "What is your name?",
+      "_why": "Item 1 and the page 2 header print the filer's name, which DV-100 item 1 already asks under this name; the packet asks it once and this wording is for the form compiled on its own."
+    },
+    "int300_party_role_other_description": {
+      "text": "How are you involved in the case?",
+      "conditional": {
+        "onlyWhen": "int300_party_role_other"
+      }
+    },
+    "needs_interpreter_yes": {
+      "text": "Do you need an interpreter when you are in court?",
+      "_why": "Item 3's box is ticked exactly when the filer answers on DV-100 that they need an interpreter - the box carries that answer's name, so the packet never asks this; the wording is for the form compiled on its own."
+    },
+    "int300_language_other_name": {
+      "text": "What is the name of the language you speak?",
+      "conditional": {
+        "onlyWhen": "int300_language_other"
+      }
+    },
+    "int300_indigenous_town_of_origin": {
+      "text": "What is your town of origin?",
+      "subtitle": "The court uses it to find an interpreter who speaks your language the way it is spoken where you are from.",
+      "conditional": {
+        "onlyWhen": "int300_speaks_indigenous_language_yes"
+      }
+    },
+    "int300_witness_needs_interpreter": {
+      "text": "Does a witness in your case need an interpreter in court?"
+    },
+    "int300_witness_no_date_set": {
+      "text": "Are you still waiting to hear the date your witness will be in court?",
+      "type": "dropdown",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "int300_witness_no_date_set_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "int300_witness_no_date_set_no"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "int300_witness_needs_interpreter"
+      },
+      "_why": "Item 4a's box 'No date is set yet' is ticked by Yes. When the request is filed with DV-100 the hearing date is set later by the court (DV-109), so Yes is the usual answer."
+    },
+    "int300_witness_language_other_name": {
+      "text": "What language does your witness speak?",
+      "conditional": {
+        "onlyWhen": "int300_witness_language_other"
+      }
+    }
+  },
+  "choices": [
+    {
+      "nameId": "int300_speaks_indigenous_language",
+      "question": "Is it an indigenous language, such as Mixteco, Zapoteco, or Triqui?",
+      "before": "int300_indigenous_town_of_origin",
+      "onlyWhen": "int300_language_other",
+      "options": [
+        {
+          "label": "Yes",
+          "nameId": "int300_speaks_indigenous_language_yes"
+        },
+        {
+          "label": "No",
+          "nameId": "int300_speaks_indigenous_language_no"
+        }
+      ]
+    }
+  ],
+  "splits": [
+    {
+      "field": "court_name_and_street_address",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "court_name",
+          "label": "Court name",
+          "question": "What is the name of the court?"
+        },
+        {
+          "nameId": "court_street_address",
+          "label": "Court street address",
+          "question": "What is the court's street address?"
+        }
+      ]
+    },
+    {
+      "field": "int300_witness_hearing_department_and_judicial_officer",
+      "join": ", ",
+      "parts": [
+        {
+          "nameId": "int300_witness_hearing_department",
+          "label": "Department"
+        },
+        {
+          "nameId": "int300_witness_hearing_judicial_officer",
+          "label": "Judicial officer"
+        }
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "Where can the court send you papers?",
+      "fields": [
+        {
+          "field": "person_asking_protection_mailing_address",
+          "label": "Street address"
+        },
+        {
+          "field": "person_asking_protection_mailing_city",
+          "label": "City"
+        },
+        {
+          "field": "person_asking_protection_mailing_state",
+          "label": "State"
+        },
+        {
+          "field": "person_asking_protection_mailing_zip_code",
+          "label": "ZIP code"
+        }
+      ]
+    },
+    {
+      "question": "How can the court reach you?",
+      "optional": true,
+      "fields": [
+        {
+          "field": "person_asking_protection_telephone",
+          "label": "Phone number",
+          "type": "phone"
+        },
+        {
+          "field": "person_asking_protection_email",
+          "label": "Email address",
+          "type": "email"
+        }
+      ]
+    },
+    {
+      "question": "What are your lawyer's State Bar number and law firm?",
+      "fields": [
+        {
+          "field": "person_asking_protection_lawyer_state_bar_number",
+          "label": "State bar number"
+        },
+        {
+          "field": "person_asking_protection_lawyer_firm_name",
+          "label": "Law firm name"
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "has_lawyer",
+        "gateQuestion": "Do you have a lawyer?"
+      }
+    },
+    {
+      "question": "When is your witness due in court?",
+      "fields": [
+        {
+          "field": "int300_witness_hearing_date",
+          "label": "Date",
+          "type": "date"
+        },
+        {
+          "field": "int300_witness_hearing_time",
+          "label": "Time"
+        },
+        {
+          "field": "int300_witness_hearing_department",
+          "label": "Department",
+          "optional": true
+        },
+        {
+          "field": "int300_witness_hearing_judicial_officer",
+          "label": "Judicial officer",
+          "optional": true
+        }
+      ],
+      "conditional": {
+        "onlyWhen": "int300_witness_no_date_set_no"
+      }
+    }
+  ],
+  "autofill": [
+    {
+      "field": "int300_signature_date",
+      "from": [
+        "current_date"
+      ],
+      "why": "The date beside the signature at the foot of page 1 has one correct answer and the form already knows it."
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "court_name",
+      "why": "The court's name and address in the caption are asked whether or not the filer has a lawyer; the lawyer question is the last of item 1."
+    },
+    {
+      "question": "int300_language",
+      "why": "INT-300 is in the packet only because the filer said they need an interpreter, so item 3's language is asked whenever the form is here. It follows item 3's box only because the box is printed first."
+    },
+    {
+      "question": "int300_witness_needs_interpreter",
+      "why": "Item 4 is asked whatever language item 3 named; it follows the town-of-origin question only because that is the last thing item 3 asks."
+    },
+    {
+      "question": "int300_witness_language",
+      "why": "Item 4b, the witness's language, is asked whether or not item 4a's date is set; it follows the date only because 4a is printed first."
+    }
+  ],
+  "sections": [
+    {
+      "name": "Your Information",
+      "fields": [
+        "person_asking_protection_name",
+        "person_asking_protection_mailing_address",
+        "person_asking_protection_telephone",
+        "person_asking_protection_email",
+        "has_lawyer",
+        "person_asking_protection_lawyer_state_bar_number",
+        "person_asking_protection_lawyer_firm_name",
+        "court_name",
+        "court_street_address",
+        "int300_party_role_petitioner",
+        "int300_party_role_respondent",
+        "int300_party_role_other",
+        "int300_party_role_other_description"
+      ]
+    },
+    {
+      "name": "Your Interpreter",
+      "fields": [
+        "needs_interpreter_yes",
+        "int300_language_spanish",
+        "int300_language_other",
+        "int300_language_other_name",
+        "int300_speaks_indigenous_language",
+        "int300_indigenous_town_of_origin"
+      ]
+    },
+    {
+      "name": "A Witness's Interpreter",
+      "fields": [
+        "int300_witness_needs_interpreter",
+        "int300_witness_no_date_set",
+        "int300_witness_hearing_date",
+        "int300_witness_hearing_time",
+        "int300_witness_language_same",
+        "int300_witness_language_other",
+        "int300_witness_language_other_name"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,564 @@
+{
+  "formTitle": "DV-145 Order to Prevent Child Abduction",
+  "_comment": "DV-145 is the judge's order on the DV-108 request - \"This is a Court Order.\" at the foot of both pages - and its first line says \"This form is attached to DV-140, Child Custody and Visitation Order.\" The filer prepares items 1 and 2 (the two names and their relationships to the children, carrying DV-105's names exactly as DV-140 does) and the proposed orders in items 4-10, which are DV-108 items 4-10 box for box and carry DV-108's names, so the orders the filer asked for there are the orders printed here and nothing is asked twice. The judge completes the rest: item 3 is headed \"Court's Decision\" (the findings), item 4's choice of area, item 11 (enforcement) and item 12 (other orders and jurisdiction), and the case number is the clerk's. The form has no court name, lawyer, children or signature box. Court fields are named dv145_court_ from what they print, so none shares a filer name. Names come from the widget rectangles checked against the printed text; the label tool read item 6's five boxes one line off.",
+  "fields": [
+    {
+      "id": "DV-145[0].#pageSet[0].PageArea1[0].FooterSub[0].Footer[0].Button1[0]",
+      "newName": "dv145_button_page1_footer",
+      "type": "text",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-145[0].#pageSet[0].MP2[0].FooterSub[0].Footer[0].#area[0].Warning[0]",
+      "newName": "dv145_button_warning",
+      "type": "text",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-145[0].#pageSet[0].MP2[0].FooterSub[0].Footer[0].#area[0].Print[0]",
+      "newName": "dv145_button_print",
+      "type": "text",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-145[0].#pageSet[0].MP2[0].FooterSub[0].Footer[0].#area[0].Save[0]",
+      "newName": "dv145_button_save",
+      "type": "text",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-145[0].#pageSet[0].MP2[0].FooterSub[0].Footer[0].#area[0].Reset[0]",
+      "newName": "dv145_button_reset",
+      "type": "text",
+      "label": "Form button - not a question",
+      "courtUse": true
+    },
+    {
+      "id": "DV-145[0].Page1[0].RightCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 1)",
+      "courtUse": true,
+      "_why": "The case number is the clerk's on every form in this packet - DV-100 prints \"Court fills in case number when form is filed.\""
+    },
+    {
+      "id": "DV-145[0].Page1[0].List1[0].Li1[0].FullName_ft[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "1. Name of Protected Person"
+    },
+    {
+      "id": "DV-145[0].Page1[0].List1[0].Li1[0].CheckBoxRightCaptionItem1[0]",
+      "newName": "dv105_your_relationship_parent",
+      "type": "checkbox",
+      "label": "1. Relationship to children - Parent"
+    },
+    {
+      "id": "DV-145[0].Page1[0].List1[0].Li1[0].CheckBoxRightCaptionItem1[1]",
+      "newName": "dv105_your_relationship_legal_guardian",
+      "type": "checkbox",
+      "label": "1. Relationship to children - Legal Guardian"
+    },
+    {
+      "id": "DV-145[0].Page1[0].List1[0].Li1[0].CheckBoxRightCaptionItem1[2]",
+      "newName": "dv105_your_relationship_other",
+      "type": "checkbox",
+      "label": "1. Relationship to children - Other"
+    },
+    {
+      "id": "DV-145[0].Page1[0].List1[0].Li1[0].TextField[0]",
+      "newName": "dv105_your_relationship_other_description",
+      "type": "text",
+      "label": "1. Relationship to children - Other (describe)"
+    },
+    {
+      "id": "DV-145[0].Page1[0].List2[0].LI1[0].FullName_ft1[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "2. Name of Restrained Person"
+    },
+    {
+      "id": "DV-145[0].Page1[0].List2[0].LI1[0].CheckBoxRightCaptionItem2[1]",
+      "newName": "dv105_their_relationship_parent",
+      "type": "checkbox",
+      "label": "2. Relationship to children - Parent",
+      "_why": "Item 2 numbers its boxes out of printed order: [1] sits beside Parent, [2] beside Legal Guardian and [0] beside Other (read from the widget rectangles)."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List2[0].LI1[0].CheckBoxRightCaptionItem2[2]",
+      "newName": "dv105_their_relationship_legal_guardian",
+      "type": "checkbox",
+      "label": "2. Relationship to children - Legal Guardian"
+    },
+    {
+      "id": "DV-145[0].Page1[0].List2[0].LI1[0].CheckBoxRightCaptionItem2[0]",
+      "newName": "dv105_their_relationship_other",
+      "type": "checkbox",
+      "label": "2. Relationship to children - Other"
+    },
+    {
+      "id": "DV-145[0].Page1[0].List2[0].LI1[0].TextField[0]",
+      "newName": "dv105_their_relationship_other_description",
+      "type": "text",
+      "label": "2. Relationship to children - Other (describe)"
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li1[0].MultilineCheckBox[0]",
+      "newName": "dv145_court_finding_no_risk",
+      "type": "checkbox",
+      "label": "3a. There is not a risk that the person in 2 might take the children without proper permission",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].CheckBoxRightCaption[0]",
+      "newName": "dv145_court_finding_risk",
+      "type": "checkbox",
+      "label": "3b. There is a risk that the person in 2 might take the children without permission",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv145_court_finding_violated_custody_order",
+      "type": "checkbox",
+      "label": "3b(1). Has violated or threatened to violate a custody or visitation order",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li2[0].CheckBoxRightCaption[0]",
+      "newName": "dv145_court_finding_no_ties_to_california",
+      "type": "checkbox",
+      "label": "3b(2). Does not have strong ties to California",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption[0]",
+      "newName": "dv145_court_finding_preparing_to_take_children",
+      "type": "checkbox",
+      "label": "3b(3). Has done things recently that make it easy to take the children",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption1[0]",
+      "newName": "dv145_court_finding_preparation_quit_a_job",
+      "type": "checkbox",
+      "label": "3b(3). Quit a job",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption2[0]",
+      "newName": "dv145_court_finding_preparation_sold_home_or_ended_lease",
+      "type": "checkbox",
+      "label": "3b(3). Sold a home or ended a lease",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption3[0]",
+      "newName": "dv145_court_finding_preparation_closed_bank_account",
+      "type": "checkbox",
+      "label": "3b(3). Closed a bank account",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption4[0]",
+      "newName": "dv145_court_finding_preparation_hid_or_destroyed_documents",
+      "type": "checkbox",
+      "label": "3b(3). Hidden or destroyed documents",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption5[0]",
+      "newName": "dv145_court_finding_preparation_sold_property",
+      "type": "checkbox",
+      "label": "3b(3). Sold or gotten rid of property",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li3[0].CheckBoxRightCaption6[0]",
+      "newName": "dv145_court_finding_preparation_applied_for_documents",
+      "type": "checkbox",
+      "label": "3b(3). Applied for a passport, birth certificate, or school or medical records",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li4[0].CheckBoxRightCaption[0]",
+      "newName": "dv145_court_finding_has_a_history",
+      "type": "checkbox",
+      "label": "3b(4). Has a history of",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li4[0].CheckBoxRightCaption1[0]",
+      "newName": "dv145_court_finding_history_abusing_protected_person",
+      "type": "checkbox",
+      "label": "3b(4). Abusing person in 1",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li4[0].CheckBoxRightCaption2[0]",
+      "newName": "dv145_court_finding_history_taking_children",
+      "type": "checkbox",
+      "label": "3b(4). Taking the children without permission",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li4[0].CheckBoxRightCaption3[0]",
+      "newName": "dv145_court_finding_history_abusing_other_partners",
+      "type": "checkbox",
+      "label": "3b(4). Abusing other partners",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li4[0].CheckBoxRightCaption4[0]",
+      "newName": "dv145_court_finding_history_not_cooperating_in_parenting",
+      "type": "checkbox",
+      "label": "3b(4). Not cooperating with person in 1 in parenting",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li4[0].CheckBoxRightCaption5[0]",
+      "newName": "dv145_court_finding_history_child_abuse",
+      "type": "checkbox",
+      "label": "3b(4). Child abuse",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li5[0].CheckBoxRightCaption[0]",
+      "newName": "dv145_court_finding_criminal_record",
+      "type": "checkbox",
+      "label": "3b(5). Has a criminal record",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li6[0].CheckBoxRightCaption[0]",
+      "newName": "dv145_court_finding_strong_ties_elsewhere",
+      "type": "checkbox",
+      "label": "3b(6). Has strong ties in",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li6[0].CheckBoxRightCaption1[0]",
+      "newName": "dv145_court_finding_ties_another_california_county",
+      "type": "checkbox",
+      "label": "3b(6). Another county in California",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li6[0].TextField[0]",
+      "newName": "dv145_court_finding_ties_california_county_name",
+      "type": "text",
+      "label": "3b(6). Another county in California (list county)",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li6[0].CheckBoxRightCaption2[0]",
+      "newName": "dv145_court_finding_ties_another_state",
+      "type": "checkbox",
+      "label": "3b(6). Another state",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li6[0].TextField1[0]",
+      "newName": "dv145_court_finding_ties_state_names",
+      "type": "text",
+      "label": "3b(6). Another state (list states)",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li6[0].CheckBoxRightCaption3[0]",
+      "newName": "dv145_court_finding_ties_another_country",
+      "type": "checkbox",
+      "label": "3b(6). Another country",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li6[0].TextField4[0]",
+      "newName": "dv145_court_finding_ties_country_name",
+      "type": "text",
+      "label": "3b(6). Another country (list country)",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li7[0].CheckBoxRightCaption[0]",
+      "newName": "dv145_court_finding_citizen_of_another_country",
+      "type": "checkbox",
+      "label": "3b(7). Is a citizen of another country",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li7[0].TextField[0]",
+      "newName": "dv145_court_finding_citizenship_countries",
+      "type": "text",
+      "label": "3b(7). Is a citizen of another country (list country)",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li8[0].CheckBoxRightCaption[0]",
+      "newName": "dv145_court_finding_other_reasons",
+      "type": "checkbox",
+      "label": "3b(8). Other reasons",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li8[0].TextFielditem3b8[0]",
+      "newName": "dv145_court_finding_other_reasons_text",
+      "type": "text",
+      "label": "3b(8). Other reasons (first line)",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List3[0].Li2[0].List[0].Li8[0].TextFielditem3b8Cont[0]",
+      "newName": "dv145_court_finding_other_reasons_text_continued",
+      "type": "text",
+      "label": "3b(8). Other reasons (continued)",
+      "courtUse": true,
+      "_why": "Item 3 is headed \"Court's Decision\": \"Based on the information given, the judge finds that\" - a finding the judge makes, not a fact the filer supplies. The filer's reasons are on DV-108 item 3, under DV-108's own names; this box must not carry them or the filer's claim would print as the judge's finding."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List4[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv108_order_no_move_without_permission",
+      "type": "checkbox",
+      "label": "4. Do Not Move Without Written Permission of the Other Parent or Court Order",
+      "_why": "The same order DV-108 item 4 asks for (\"not move with our children without my written permission or the judge's permission\"), so it carries DV-108's name and is ticked by that answer."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List4[0].Li1[0].ChoiceItem4[0]",
+      "newName": "dv145_court_no_move_outside_this_county",
+      "type": "checkbox",
+      "label": "4. Must not move with the children outside - This county",
+      "courtUse": true,
+      "_why": "Item 4 reads \"The person in 2 must not move with the children outside [this county / California / The United States / Other]\". DV-108 item 4, the filer's request, asks only that they not move the children without permission and gives no choice of area; how far the order reaches is the judge's to decide."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List4[0].Li1[0].ChoiceItem4[1]",
+      "newName": "dv145_court_no_move_outside_california",
+      "type": "checkbox",
+      "label": "4. Must not move with the children outside - California",
+      "courtUse": true,
+      "_why": "Item 4 reads \"The person in 2 must not move with the children outside [this county / California / The United States / Other]\". DV-108 item 4, the filer's request, asks only that they not move the children without permission and gives no choice of area; how far the order reaches is the judge's to decide."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List4[0].Li1[0].ChoiceItem4[2]",
+      "newName": "dv145_court_no_move_outside_united_states",
+      "type": "checkbox",
+      "label": "4. Must not move with the children outside - The United States",
+      "courtUse": true,
+      "_why": "Item 4 reads \"The person in 2 must not move with the children outside [this county / California / The United States / Other]\". DV-108 item 4, the filer's request, asks only that they not move the children without permission and gives no choice of area; how far the order reaches is the judge's to decide."
+    },
+    {
+      "id": "DV-145[0].Page1[0].List4[0].Li1[0].TextField2[0]",
+      "newName": "dv145_court_no_move_outside_other_area",
+      "type": "text",
+      "label": "4. Must not move with the children outside - Other (specify)",
+      "courtUse": true,
+      "_why": "Item 4 reads \"The person in 2 must not move with the children outside [this county / California / The United States / Other]\". DV-108 item 4, the filer's request, asks only that they not move the children without permission and gives no choice of area; how far the order reaches is the judge's to decide."
+    },
+    {
+      "id": "DV-145[0].Page2[0].CaptionSub[0].PxCaption[0].RightCaption[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 2)",
+      "courtUse": true,
+      "_why": "The case number is the clerk's on every form in this packet - DV-100 prints \"Court fills in case number when form is filed.\""
+    },
+    {
+      "id": "DV-145[0].Page2[0].List5[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv108_order_turn_in_travel_documents",
+      "type": "checkbox",
+      "label": "5. Turn In and Do Not Apply for Passports or Other Important Documents",
+      "_why": "DV-108 item 5, the same order in the same words."
+    },
+    {
+      "id": "DV-145[0].Page2[0].List5[0].Li1[0].TextField[0]",
+      "newName": "dv108_travel_documents_to_turn_in",
+      "type": "text",
+      "label": "5. Documents to turn in"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List5[0].Li1[0].DateField1[0]",
+      "newName": "dv108_travel_documents_due_date",
+      "type": "text",
+      "label": "5. Turn in by (date)"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List5[0].Li1[0].TextField2[0]",
+      "newName": "dv108_travel_documents_recipient_name",
+      "type": "text",
+      "label": "5. Turn in to (name)"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List6[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv108_order_provide_travel_plan",
+      "type": "checkbox",
+      "label": "6. Provide Travel Plan and Documents",
+      "_why": "DV-108 item 6, the same order and the same five choices."
+    },
+    {
+      "id": "DV-145[0].Page2[0].List6[0].Li1[0].CheckBoxRightCaption[1]",
+      "newName": "dv108_travel_plan_schedule",
+      "type": "checkbox",
+      "label": "6. Children's travel schedule",
+      "_why": "Read from the widget rectangles: the label tool puts these five boxes one line off. CheckBoxRightCaption[1] sits beside the travel schedule, then 1, 2, 3 and 4 down to Other."
+    },
+    {
+      "id": "DV-145[0].Page2[0].List6[0].Li1[0].CheckBoxRightCaption1[0]",
+      "newName": "dv108_travel_plan_round_trip_tickets",
+      "type": "checkbox",
+      "label": "6. Copies of round-trip airline tickets"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List6[0].Li1[0].CheckBoxRightCaption2[0]",
+      "newName": "dv108_travel_plan_contact_details",
+      "type": "checkbox",
+      "label": "6. Addresses and telephone numbers where children can be reached"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List6[0].Li1[0].CheckBoxRightCaption3[0]",
+      "newName": "dv108_travel_plan_open_ticket_for_me",
+      "type": "checkbox",
+      "label": "6. An open airline ticket for the person in 1 in case the children are not returned"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List6[0].Li1[0].CheckBoxRightCaption4[0]",
+      "newName": "dv108_travel_plan_other",
+      "type": "checkbox",
+      "label": "6. Other"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List6[0].Li1[0].TextField2[0]",
+      "newName": "dv108_travel_plan_other_description",
+      "type": "text",
+      "label": "6. Other (describe)"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List7[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv108_order_notify_other_state",
+      "type": "checkbox",
+      "label": "7. Notify Other State of Travel Restrictions",
+      "_why": "DV-108 item 7, the same order."
+    },
+    {
+      "id": "DV-145[0].Page2[0].List7[0].Li1[0].TextField[0]",
+      "newName": "dv108_notify_state_county_and_state",
+      "type": "text",
+      "label": "7. Register this order with (list county and state)"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List8[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv108_order_notify_foreign_embassy",
+      "type": "checkbox",
+      "label": "8. Notify Foreign Embassy or Consulate of Passport Restrictions",
+      "_why": "DV-108 item 8, the same order."
+    },
+    {
+      "id": "DV-145[0].Page2[0].List8[0].Li1[0].TextField[0]",
+      "newName": "dv108_embassy_or_consulate_name",
+      "type": "text",
+      "label": "8. Name of embassy or consulate"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List8[0].Li1[0].DateField2[0]",
+      "newName": "dv108_embassy_proof_due_date",
+      "type": "text",
+      "label": "8. Provide the court with proof of the notice by (date)"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List9[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv108_order_foreign_custody_order",
+      "type": "checkbox",
+      "label": "9. Foreign Custody and Visitation Order",
+      "_why": "DV-108 item 9, the same order."
+    },
+    {
+      "id": "DV-145[0].Page2[0].List9[0].Li1[0].TextField[0]",
+      "newName": "dv108_foreign_custody_country",
+      "type": "text",
+      "label": "9. Before the children can travel to (list country)"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List10[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv108_order_post_a_bond",
+      "type": "checkbox",
+      "label": "10. Post a Bond",
+      "_why": "DV-108 item 10, the same order."
+    },
+    {
+      "id": "DV-145[0].Page2[0].List10[0].Li1[0].TextField5[0]",
+      "newName": "dv108_bond_amount",
+      "type": "text",
+      "label": "10. Must post a bond for $"
+    },
+    {
+      "id": "DV-145[0].Page2[0].List11[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv145_court_enforcing_order",
+      "type": "checkbox",
+      "label": "11. Enforcing Order",
+      "courtUse": true,
+      "_why": "Item 11, \"Enforcing Order\": \"The court authorizes any law enforcement officer to enforce this order. In this county, contact the Child Abduction Unit of the Office of the District Attorney at:\" - the court's authorization and its own county's office. DV-108 has no request for it."
+    },
+    {
+      "id": "DV-145[0].Page2[0].List11[0].Li1[0].TextField[0]",
+      "newName": "dv145_court_district_attorney_child_abduction_unit",
+      "type": "text",
+      "label": "11. Child Abduction Unit of the Office of the District Attorney at",
+      "courtUse": true,
+      "_why": "Item 11, \"Enforcing Order\": \"The court authorizes any law enforcement officer to enforce this order. In this county, contact the Child Abduction Unit of the Office of the District Attorney at:\" - the court's authorization and its own county's office. DV-108 has no request for it."
+    },
+    {
+      "id": "DV-145[0].Page2[0].List12[0].Li1[0].CheckBoxRightCaption[0]",
+      "newName": "dv145_court_other_orders",
+      "type": "checkbox",
+      "label": "12. Other",
+      "courtUse": true,
+      "_why": "Item 12, \"Other (list other orders or jurisdictional factors)\" - the Notice to Authorities says \"If jurisdiction is based on other factors, they will be listed above in 12.\" The court's jurisdiction and any orders of its own; DV-108 has no \"other\" order."
+    },
+    {
+      "id": "DV-145[0].Page2[0].List12[0].Li1[0].TextFielditem12[0]",
+      "newName": "dv145_court_other_orders_text",
+      "type": "text",
+      "label": "12. Other orders or jurisdictional factors (first line)",
+      "courtUse": true,
+      "_why": "Item 12, \"Other (list other orders or jurisdictional factors)\" - the Notice to Authorities says \"If jurisdiction is based on other factors, they will be listed above in 12.\" The court's jurisdiction and any orders of its own; DV-108 has no \"other\" order."
+    },
+    {
+      "id": "DV-145[0].Page2[0].List12[0].Li1[0].TextFielditem12Cont[0]",
+      "newName": "dv145_court_other_orders_text_continued",
+      "type": "text",
+      "label": "12. Other orders or jurisdictional factors (continued)",
+      "courtUse": true,
+      "_why": "Item 12, \"Other (list other orders or jurisdictional factors)\" - the Notice to Authorities says \"If jurisdiction is based on other factors, they will be listed above in 12.\" The court's jurisdiction and any orders of its own; DV-108 has no \"other\" order."
+    }
+  ]
+}

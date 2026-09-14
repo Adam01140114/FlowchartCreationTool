@@ -88,7 +88,8 @@ section at a time). `index.html` is a router - `index.html?mode=question` and
 
 - The same page Download Payload zips: test deployment, so the thank-you screen has
   Download PDFs / Preview PDFs and the debug menu; there is no sign-in, no saved
-  answers, no Stripe and no cart.
+  answers, no Firebase, no Stripe and no cart. Test mode checks that the form is
+  built right; nothing typed into it is meant to be saved.
 - Its PDFs are filled by the dev server's `POST /edit_pdf`, so it has to be opened
   through the dev server, not as a file. The folder still keeps its own copies of
   every PDF so it is complete on its own.

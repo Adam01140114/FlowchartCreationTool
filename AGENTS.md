@@ -8,8 +8,13 @@ The project turns court PDFs into guided online interviews. The flowchart
 editor (`index.html`) builds a form's interview as a flowchart; that compiles to
 a GUI JSON; `FormWiz GUI/generate.js` turns the JSON into an HTML form; the
 filer's answers fill the PDFs through the dev server. The current work is the
-California domestic violence restraining order packet (DV-100 with DV-101,
-DV-105, DV-108, DV-140, CLETS-001, DV-109, DV-110).
+California domestic violence restraining order packet for a first filing -
+exactly the sixteen forms in `scope` in `dv-packet.spec.json` and
+[`Hand Off/FORMS.md`](Hand%20Off/FORMS.md): DV-100, CLETS-001, DV-109, DV-110,
+DV-105, DV-105(A), DV-108, DV-140, DV-145, FL-150, FL-155, DV-160, DV-165,
+MC-025, MC-030, MC-031. Nothing else goes in without the user saying so.
+Anything that needs more space continues on MC-025 (rule
+`the-packet-uses-mc025-for-more-space`).
 
 ---
 
@@ -26,7 +31,11 @@ DV-105, DV-108, DV-140, CLETS-001, DV-109, DV-110).
 5. [`form-rules.html`](form-rules.html) (open it at
    `http://localhost:8080/form-rules.html`) - every rule: what it requires, why
    it exists, and what enforces it.
-6. As the task needs it: [`Hand Off/NEW-FORM.md`](Hand%20Off/NEW-FORM.md) (a new
+6. [`Hand Off/FORMS.md`](Hand%20Off/FORMS.md) - every form in the domestic
+   violence process, who completes it, and whether the packet makes it. The
+   packet must cover every document the filer needs; nothing may tell them to
+   get a form themselves.
+7. As the task needs it: [`Hand Off/NEW-FORM.md`](Hand%20Off/NEW-FORM.md) (a new
    form), [`Hand Off/PDF-PAGE-AUDIT.md`](Hand%20Off/PDF-PAGE-AUDIT.md) (reading
    the printed pages), [`Hand Off/syntax.txt`](Hand%20Off/syntax.txt) (**before
    editing the runtime in `generate.js`**), the publish skill
@@ -40,6 +49,8 @@ DV-105, DV-108, DV-140, CLETS-001, DV-109, DV-110).
   formId `DV-100 Request for Domestic Violence Restraining Order` is theirs:
   never delete or overwrite it. Browser tests stub Firestore writes, or use the
   published site (no Firebase) or `pipeline-nav-audit.js` (throwaway profile).
+  A test-mode page never loads Firebase: test mode checks that a form is built
+  right, and nothing typed into it is meant to be saved.
 - **Never sign in with credentials**, never write code that reads credentials
   from `.env` to sign in, and never put a credential in a file.
 - **Never leave the browser draft changed.** Filling a form writes the user's
@@ -51,6 +62,12 @@ DV-105, DV-108, DV-140, CLETS-001, DV-109, DV-110).
   from the hints, field configs and code; an edit there is lost at the next
   build. Fix the source.
 - **Never write a rule for one form.** Every fix is general (rule `no-hard-coding`).
+- **Never send the filer for a form.** Nothing the interview says tells them to
+  get, fill in or attach a form themselves: every form the paper asks the filer
+  for is brought into the packet and filled (rules
+  `the-packet-makes-every-form-the-paper-asks-for` and
+  `the-interview-never-sends-the-filer-for-a-form`). `pipeline-form-refs.js`
+  lists what the paper asks for, and the forms the packet does not make yet.
 - **Never commit or push unless the user asks.** Never force-push `main`.
 - **Never hand-edit `FormWiz GUI/CountyLookup/zipData.js`** - regenerate it with
   `node "FormWiz GUI/CountyLookup/build-zip-data.js"`. `FormWiz GUI/CountyLookup/` is copied by hand into a
@@ -152,6 +169,8 @@ Several agents may work here at once. They share one machine, one dev server
 | Dev server | `npm start` -> `http://localhost:8080` (editor at `/index.html`, form builder at `/FormWiz%20GUI/gui.html`, rules at `/form-rules.html`) |
 | Published form | `/form/<projectId>/section.html?saved=<stamp>` (project `p_mtumpmov7t2gh0`, set in `dv-packet.spec.json`) |
 | Static audits | `npm run audit` |
+| Every form the paperwork mentions, and what covers it | `node pipeline-form-refs.js` (in `npm run audit` as `--check`) |
+| A court form's blank PDF | [`Hand Off/NEW-FORM.md` §0](Hand%20Off/NEW-FORM.md) - `curl` from courts.ca.gov; the user has given standing permission to download PDFs |
 | Published-site audit | `npm run audit:nav` (`pipeline-nav-audit.js`) |
 | Every script | [`AUDIT.md` §9](Hand%20Off/AUDIT.md) |
 | A full audit and docs refresh | [`update_docs_and_audit.txt`](update_docs_and_audit.txt) - the user pastes it as a prompt; follow it end to end |

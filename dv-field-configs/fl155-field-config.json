@@ -1,0 +1,610 @@
+{
+  "formTitle": "FL-155 Financial Statement (Simplified)",
+  "_comment": "FL-155 [Rev. January 1, 2004] is the simplified financial statement a parent may use instead of FL-150 when the only support asked for is child support and every eligibility question on its page 2 is No (not self-employed, no spousal support or lawyer's fees asked by either side, income only from welfare, salary or wages, disability, unemployment, interest, workers' compensation, social security or retirement). That screening is asked in DV-100 (DV-570), never here. Every field is the filer's except the case number (the clerk's), the second and third lines of the TELEPHONE NO. column and item 13 (blank by design), and the on-screen notices and buttons. FL-150 and FL-155 are never in one packet, and FL-150's sections are switched off when FL-155 is on, so everything only FL-155 asks is fl155_*; names are shared only with answers DV-100 or DV-105 asks every FL-155 filer: the filer's name, street address, city, state, ZIP code and phone, the lawyer's name and firm, the person to be restrained, the court's street address, and the children (dv105_child, the count of DV-105's children block, as FL-150 item 16a). Four fields are one AcroForm field with several boxes told apart by export value - item 4's tax status (/Yes single, /1 jointly, /2 head of household, /3 separately), item 8g (/Yes rent, /No mortgage), item 9 (/Yes current, /No most recent) and the declarant role under the signature (/Yes petitioner, /1 respondent). Each is named for its first box, the only one pdf-lib's check() can tick, and is computed (the hints): the tax, housing and work choices are asked with options of their own, and the first box ticks when its option is chosen. The declarant box ticks on DV-100's child support answer, which every FL-155 filer has given - the filer asking for protection is the petitioner. Rows were read from the rectangles and a tagged test fill, not the XFA names: item 5's amounts run 0b (salary), then retirement, unemployment, workers' compensation, social security, disability and interest; the unnamed field under 3c at x=61 is 3c's second ruled line.",
+  "fields": [
+    {
+      "id": "TEXT.0.0",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Your name and address or attorney's name and address, line 1 - the filer's name (DV-100 item 1a)"
+    },
+    {
+      "id": "TEXT.0.1",
+      "newName": "person_asking_protection_mailing_address",
+      "type": "text",
+      "label": "Your name and address, line 2 - street address (DV-100 item 1c)"
+    },
+    {
+      "id": "TEXT.0.2",
+      "newName": "fl155_party_city_state_zip",
+      "type": "text",
+      "label": "Your name and address, line 3 - city, state, ZIP code (DV-100 item 1c, joined)"
+    },
+    {
+      "id": "TEXT.0.3.0",
+      "newName": "fl155_lawyer_name_and_firm",
+      "type": "text",
+      "label": "Your name and address or attorney's name and address, line 4 - the lawyer's name and law firm (DV-100 item 1d, joined)"
+    },
+    {
+      "id": "Telephone.0",
+      "newName": "person_asking_protection_telephone",
+      "type": "phone",
+      "label": "Telephone no. (DV-100 item 1c)"
+    },
+    {
+      "id": "Telephone.1",
+      "newName": "fl155_telephone_line_2",
+      "type": "text",
+      "label": "Telephone no. column, second line",
+      "courtUse": true,
+      "_why": "Blank by design, not the court's: the TELEPHONE NO. column rules three lines under one label; the filer has one phone number (DV-100 item 1c) and it prints on the first."
+    },
+    {
+      "id": "Telephone.2",
+      "newName": "fl155_telephone_line_3",
+      "type": "text",
+      "label": "Telephone no. column, third line",
+      "courtUse": true,
+      "_why": "Blank by design, not the court's: the third line of the TELEPHONE NO. column, as above."
+    },
+    {
+      "id": "TEXT.0.3.1.0",
+      "newName": "fl155_attorney_for",
+      "type": "text",
+      "label": "Attorney for (name) - the filer, only when a lawyer represents them"
+    },
+    {
+      "id": "TEXT.0.3.1.1",
+      "newName": "fl155_court_county",
+      "type": "text",
+      "label": "Superior Court of California, County of"
+    },
+    {
+      "id": "TEXT.0.3.1.2",
+      "newName": "court_street_address",
+      "type": "text",
+      "label": "Court street address (DV-100 caption)"
+    },
+    {
+      "id": "TEXT.0.3.1.3",
+      "newName": "fl155_court_mailing_address",
+      "type": "text",
+      "label": "Court mailing address"
+    },
+    {
+      "id": "TEXT.0.3.1.4.0",
+      "newName": "fl155_court_city_and_zip",
+      "type": "text",
+      "label": "Court city and ZIP code"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.0",
+      "newName": "fl155_court_branch_name",
+      "type": "text",
+      "label": "Court branch name"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.1",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Petitioner/Plaintiff (pages 1 and 2)"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.0",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "Respondent/Defendant (pages 1 and 2)"
+    },
+    {
+      "id": "TEXT.0.3.156564..3.0",
+      "newName": "fl155_other_parent_name",
+      "type": "text",
+      "label": "Other parent (pages 1 and 2)"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.0",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (pages 1 and 2)",
+      "courtUse": true,
+      "_why": "The clerk fills in the case number when the form is filed, as on every form in this packet."
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.0",
+      "newName": "dv105_child",
+      "type": "number",
+      "label": "2. I am the parent of the following number of natural or adopted children from this relationship (the count DV-100 item 3 / DV-105 item 3 asks)"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.0",
+      "newName": "fl155_percent_time_with_me",
+      "type": "number",
+      "label": "3a. The children from this relationship are with me this amount of time (%)"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.0",
+      "newName": "fl155_percent_time_with_other_parent",
+      "type": "number",
+      "label": "3b. The children from this relationship are with the other parent this amount of time (%)"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.0",
+      "newName": "fl155_custody_arrangement_line_1",
+      "type": "text",
+      "label": "3c. Our arrangement for custody and visitation is (specify, using extra sheet if necessary) - first line"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.0.0",
+      "newName": "fl155_custody_arrangement_line_2",
+      "type": "text",
+      "label": "3c. Our arrangement for custody and visitation - second line"
+    },
+    {
+      "id": "CB.0.0.0",
+      "newName": "fl155_only_income_public_assistance",
+      "type": "checkbox",
+      "label": "1a. My only source of income is TANF, SSI, or GA/GR."
+    },
+    {
+      "id": "CB.0.1.0",
+      "newName": "fl155_applied_public_assistance",
+      "type": "checkbox",
+      "label": "1b. I have applied for TANF, SSI, or GA/GR."
+    },
+    {
+      "id": "CB.0.0.1.0a",
+      "newName": "fl155_tax_status_single",
+      "type": "checkbox",
+      "label": "4. My tax filing status is: single (the first box of a field with four; each of the others is its own entry, split off by the sanitizer)"
+    },
+    {
+      "id": "CB.0.0.1.0a",
+      "widget": "1",
+      "newName": "fl155_tax_status_married_jointly",
+      "type": "checkbox",
+      "label": "4. My tax filing status is: married filing jointly (export value /1 of the shared field)"
+    },
+    {
+      "id": "CB.0.0.1.0a",
+      "widget": "2",
+      "newName": "fl155_tax_status_head_of_household",
+      "type": "checkbox",
+      "label": "4. My tax filing status is: head of household (export value /2 of the shared field)"
+    },
+    {
+      "id": "CB.0.0.1.0a",
+      "widget": "3",
+      "newName": "fl155_tax_status_married_separately",
+      "type": "checkbox",
+      "label": "4. My tax filing status is: married filing separately (export value /3 of the shared field)"
+    },
+    {
+      "id": "CB.0.0.1.1.0",
+      "newName": "fl155_has_salary",
+      "type": "checkbox",
+      "label": "5. Salary/wages"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.0b",
+      "newName": "fl155_income_salary",
+      "type": "money",
+      "label": "5. Salary/wages: amount before taxes per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.0",
+      "newName": "fl155_has_retirement",
+      "type": "checkbox",
+      "label": "5. Retirement"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_income_retirement",
+      "type": "money",
+      "label": "5. Retirement: amount before taxes per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.0",
+      "newName": "fl155_has_unemployment",
+      "type": "checkbox",
+      "label": "5. Unemployment compensation"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_income_unemployment",
+      "type": "money",
+      "label": "5. Unemployment compensation: amount per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.0",
+      "newName": "fl155_has_workers_comp",
+      "type": "checkbox",
+      "label": "5. Workers' compensation"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_income_workers_comp",
+      "type": "money",
+      "label": "5. Workers' compensation: amount per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.1",
+      "newName": "fl155_has_social_security",
+      "type": "checkbox",
+      "label": "5. Social security"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.2",
+      "newName": "fl155_social_security_ssi",
+      "type": "checkbox",
+      "label": "5. Social security: SSI"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.0",
+      "newName": "fl155_social_security_other",
+      "type": "checkbox",
+      "label": "5. Social security: Other"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_income_social_security",
+      "type": "money",
+      "label": "5. Social security: amount per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.0",
+      "newName": "fl155_has_disability",
+      "type": "checkbox",
+      "label": "5. Disability"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_income_disability",
+      "type": "money",
+      "label": "5. Disability: amount per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.k1.1.3.1.0",
+      "newName": "fl155_has_interest",
+      "type": "checkbox",
+      "label": "5. Interest income (from bank accounts or other)"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_income_interest",
+      "type": "money",
+      "label": "5. Interest income: amount per month"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.0",
+      "newName": "fl155_income_total",
+      "type": "money",
+      "label": "5. My current gross income (before taxes) per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.0",
+      "newName": "fl155_child_expense_has_childcare",
+      "type": "checkbox",
+      "label": "6a. Day care or preschool to allow me to work or go to school"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_child_expense_childcare",
+      "type": "money",
+      "label": "6a. Day care or preschool - amount per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.0",
+      "newName": "fl155_child_expense_has_health_care",
+      "type": "checkbox",
+      "label": "6b. Health care not paid for by insurance"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_child_expense_health_care",
+      "type": "money",
+      "label": "6b. Health care not paid for by insurance - amount per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.0",
+      "newName": "fl155_child_expense_has_education",
+      "type": "checkbox",
+      "label": "6c. School, education, tuition, or other special needs of the child"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_child_expense_education",
+      "type": "money",
+      "label": "6c. School, education, tuition, or other special needs - amount per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.1.0",
+      "newName": "fl155_child_expense_has_travel",
+      "type": "checkbox",
+      "label": "6d. Travel expenses for visitation"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.0",
+      "newName": "fl155_child_expense_travel",
+      "type": "money",
+      "label": "6d. Travel expenses for visitation - amount per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.1.1.0",
+      "newName": "fl155_has_other_children_living_with_me",
+      "type": "checkbox",
+      "label": "7. There are other minor children of mine living with me"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1",
+      "newName": "fl155_other_children_count",
+      "type": "number",
+      "label": "7. Number of other minor children of mine living with me"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.0",
+      "newName": "fl155_other_children_expenses",
+      "type": "money",
+      "label": "7. Their monthly expenses that I pay"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.1.1.1.0",
+      "newName": "fl155_pays_job_expenses",
+      "type": "checkbox",
+      "label": "8a. Job-related expenses that are not paid by my employer"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.0",
+      "newName": "fl155_expense_job",
+      "type": "money",
+      "label": "8a. Job-related expenses not paid by my employer - average per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_pays_union_dues",
+      "type": "checkbox",
+      "label": "8b. Required union dues"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.0",
+      "newName": "fl155_expense_union_dues",
+      "type": "money",
+      "label": "8b. Required union dues - average per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_pays_retirement",
+      "type": "checkbox",
+      "label": "8c. Required retirement payments (not social security, FICA, 401k or IRA)"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.0",
+      "newName": "fl155_expense_retirement",
+      "type": "money",
+      "label": "8c. Required retirement payments - average per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_pays_health_insurance",
+      "type": "checkbox",
+      "label": "8d. Health insurance costs"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.0",
+      "newName": "fl155_expense_health_insurance",
+      "type": "money",
+      "label": "8d. Health insurance costs - average per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_pays_child_support",
+      "type": "checkbox",
+      "label": "8e. Child support I am paying for other minor children of mine who are not living with me"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.1.0",
+      "newName": "fl155_expense_child_support",
+      "type": "money",
+      "label": "8e. Child support I pay for other minor children - average per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_pays_spousal_support",
+      "type": "checkbox",
+      "label": "8f. Spousal support I am paying because of a court order for another relationship"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.1.1.0",
+      "newName": "fl155_expense_spousal_support",
+      "type": "money",
+      "label": "8f. Spousal support I pay by court order - average per month"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1",
+      "newName": "fl155_pays_housing",
+      "type": "checkbox",
+      "label": "8g. Monthly housing costs"
+    },
+    {
+      "id": "c",
+      "newName": "fl155_housing_rent",
+      "type": "checkbox",
+      "label": "8g. Monthly housing costs: rent (the first box of a field with two; mortgage is split off by the sanitizer)"
+    },
+    {
+      "id": "c",
+      "widget": "No",
+      "newName": "fl155_housing_mortgage",
+      "type": "checkbox",
+      "label": "8g. Monthly housing costs: mortgage (export value /No of the shared field)"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.1.1.1.0",
+      "newName": "fl155_expense_housing",
+      "type": "money",
+      "label": "8g. Monthly housing costs - average per month"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.hghghgh.1",
+      "newName": "fl155_mortgage_interest",
+      "type": "money",
+      "label": "8g. If mortgage: interest payments"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.hghghgh.2",
+      "newName": "fl155_property_taxes",
+      "type": "money",
+      "label": "8g. If mortgage: real property taxes"
+    },
+    {
+      "id": "d",
+      "newName": "fl155_employment_current",
+      "type": "checkbox",
+      "label": "9. Information concerning my current employment (the first box of a field with two; most recent is split off by the sanitizer)"
+    },
+    {
+      "id": "d",
+      "widget": "No",
+      "newName": "fl155_employment_most_recent",
+      "type": "checkbox",
+      "label": "9. Information concerning my most recent employment (export value /No of the shared field)"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.1.1.1.1",
+      "newName": "fl155_employer_name",
+      "type": "text",
+      "label": "9. Employer"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1ty.1.1.1.1.1.1.1",
+      "newName": "fl155_employer_address",
+      "type": "text",
+      "label": "9. Address"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.1.1.1.2",
+      "newName": "fl155_employer_phone",
+      "type": "phone",
+      "label": "9. Telephone number"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.1.1.1.3",
+      "newName": "fl155_occupation",
+      "type": "text",
+      "label": "9. My occupation"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.1.1.1.4",
+      "newName": "fl155_job_start_date",
+      "type": "date",
+      "label": "9. Date work started"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.1.1.1.5.0",
+      "newName": "fl155_job_end_date",
+      "type": "date",
+      "label": "9. Date work stopped (if applicable)"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.uuu1.1.1.1.1.5.0",
+      "newName": "fl155_income_before_job_ended",
+      "type": "money",
+      "label": "9. What was your gross income (before taxes) before work stopped"
+    },
+    {
+      "id": "TEXT.0.3i.1.1.5.1.0",
+      "newName": "fl155_other_party_monthly_income",
+      "type": "money",
+      "label": "10. My estimate of the other party's gross monthly income (before taxes)"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.1.1.1.5.1.0",
+      "newName": "fl155_spouse_monthly_income",
+      "type": "money",
+      "label": "11. My current spouse's monthly income (before taxes)"
+    },
+    {
+      "id": "q3.0.1.0a",
+      "newName": "fl155_fl150_page_3_attached",
+      "type": "checkbox",
+      "label": "13. I am attaching a copy of page 3 of form FL-150, Income and Expense Declaration, showing my expenses",
+      "courtUse": true,
+      "_why": "Blank by design, not the court's: item 13 offers page 3 of FL-150 in place of the expenses FL-155 asks for. The packet asks those expenses in items 6 to 8 and makes no FL-150 when FL-155 is filed, so nothing is attached and the box stays unticked."
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.1.1.1.5.1.1",
+      "newName": "fl155_signature_date",
+      "type": "date",
+      "label": "Declaration - date"
+    },
+    {
+      "id": "TEXT.0.3.1.4.1.3.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.0.1.1.1.1.1.1.1.1.5.1.2",
+      "newName": "fl155_signature_printed_name",
+      "type": "text",
+      "label": "Declaration - type or print name"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.1.1.1.1.1.1.1.1.3.0.1.0a",
+      "newName": "fl155_declarant_petitioner",
+      "type": "checkbox",
+      "label": "Under the signature: PETITIONER/PLAINTIFF (the first box of a field with two; respondent is split off by the sanitizer)"
+    },
+    {
+      "id": "CB.0.0.1.1.1.1.1.3.1.1.1.1.1.1.1.1.1.1.1.1.3.0.1.0a",
+      "widget": "1",
+      "newName": "fl155_declarant_respondent",
+      "type": "checkbox",
+      "label": "Under the signature: RESPONDENT/DEFENDANT (export value /1 of the shared field)",
+      "courtUse": true,
+      "_why": "The filer asking for protection is the petitioner, so the respondent box is never theirs to tick."
+    },
+    {
+      "id": "NoticeHeaderMulti2",
+      "newName": "fl155_notice_header",
+      "type": "text",
+      "label": "Form notice header - not a question",
+      "courtUse": true,
+      "_why": "An on-screen notice box in the FOR COURT USE ONLY area, not a question."
+    },
+    {
+      "id": "WhiteOut",
+      "newName": "fl155_white_out",
+      "type": "text",
+      "label": "Form notice area - not a question",
+      "courtUse": true,
+      "_why": "An on-screen notice box in the FOR COURT USE ONLY area, not a question."
+    },
+    {
+      "id": "NoticeFooter1",
+      "newName": "fl155_notice_footer",
+      "type": "text",
+      "label": "Form notice footer - not a question",
+      "courtUse": true,
+      "_why": "An on-screen notice box under page 2, not a question."
+    },
+    {
+      "id": "Save",
+      "newName": "fl155_save_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true,
+      "_why": "The form's Save button, not a question."
+    },
+    {
+      "id": "Print",
+      "newName": "fl155_print_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true,
+      "_why": "The form's Print button, not a question."
+    },
+    {
+      "id": "ResetForm",
+      "newName": "fl155_reset_button",
+      "type": "button",
+      "label": "Form button - not a question",
+      "courtUse": true,
+      "_why": "The form's Clear button, not a question."
+    }
+  ]
+}

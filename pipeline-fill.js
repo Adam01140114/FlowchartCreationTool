@@ -14,8 +14,11 @@
  * The PDFs are also rendered to PNG so the pages can be read against the blank
  * form, which is the only way 4b is finished.
  *
- * A block with more entries than the paper has rows (DV-105's children) also
- * gets the page the form draws for the rest, built from the same answers.
+ * Anything that needs more space continues on MC-025 (rule
+ * the-packet-uses-mc025-for-more-space), built from the same answers: a block
+ * with more entries than the paper has rows (DV-105's children), and a long
+ * answer past its box (DV-100 item 7(f)), cut where the form cuts it. Each
+ * page's sheets are counted against the layout the form counts them with.
  *
  * Usage:  node pipeline-fill.js [answers.json] [--answers file] [--out dir]
  *                                 [--render] [--scale n] [--server url]
@@ -39,6 +42,7 @@ const OUT = flag('out', 'pipeline-out');
 const SERVER = flag('server', 'http://127.0.0.1:8080');
 const RENDER = args.includes('--render');
 const { packetForms } = require('./packet-forms');
+const layout = require('./FormWiz GUI/continuation-layout');
 const FORMS = (flag('forms', '') || packetForms().join(',')).split(',').filter(Boolean);
 // Big enough to read a filled box against the printed label, small enough
 // that thirteen pages stay a reasonable size on disk.
@@ -318,15 +322,57 @@ function attachmentSpec(page, data, count) {
     // An entry the filer left empty is not a row, as on the form.
     if (values.some((v) => v.value)) entries.push({ number: n, values });
   }
+  return Object.assign(pageHeader(att, data), { entries });
+}
+
+/** MC-025's header for a page, as attachmentSpecFor in generate.js builds it. */
+function pageHeader(att, data) {
   return {
     name: att.name, heading: att.heading || '', item: att.item || '', itemTitle: att.itemTitle || '',
+    attachmentNumber: att.attachmentNumber || '',
     caseNumber: String(data.case_number || '').trim(),
-    entries
+    shortTitle: String(data.case_short_title || '').trim()
   };
+}
+
+/**
+ * The long answers that continue on MC-025: each overflow link that names a
+ * page, with the answer cut by the same overflowSplit the form uses - so the
+ * box here gets exactly what it gets from a filer, and the page the rest.
+ */
+function continuationPages(data) {
+  let gui;
+  try { gui = JSON.parse(fs.readFileSync(GUI, 'utf8')); } catch (e) { return []; }
+  const caps = gui.fieldCapacity || {};
+  // The short title is worked out by the form (a computed field); an answer
+  // set captured without it gets it the same way.
+  const title = (gui.computedFields || []).find((c) => c && c.nameId === 'case_short_title' && c.joinFields);
+  if (title && !String(data.case_short_title || '').trim()) {
+    const parts = (title.joinFields.fields || []).map((f) => String(data[f] || '').trim());
+    if (parts.length && parts.every(Boolean)) data.case_short_title = parts.join(title.joinFields.separator == null ? ' ' : title.joinFields.separator);
+  }
+  return (gui.overflowLinks || []).filter((l) => l && l.page && l.page.name).map((link) => {
+    const full = data[link.nameId] == null ? '' : String(data[link.nameId]);
+    const cap = Number(caps[link.nameId] || 0);
+    // No box on the paper (FL-155 item 12): the whole answer is the page.
+    if (link.noBox) return { link, full, cap: 0, head: '', tail: full.trim() };
+    // What the form posted: the box's value already cut to what it prints,
+    // and the rest beside it (overflowContinuedFields in generate.js).
+    const posted = data['__continued_' + link.nameId];
+    if (posted != null && String(posted) !== '') {
+      return { link, full: full + ' ' + String(posted), cap, head: full, tail: String(posted) };
+    }
+    const split = layout.overflowSplit(full, cap);
+    return { link, full, cap, head: split.head, tail: split.tail };
+  });
 }
 
 async function main() {
   const data = JSON.parse(fs.readFileSync(ANSWERS, 'utf8'));
+  // A capture merged from every request the form posted also holds the last
+  // MC-025 page's spec. Sent with a form, it makes the server draw that page
+  // instead of filling the form; each page's spec is built here instead.
+  delete data.__attachment;
   fs.mkdirSync(OUT, { recursive: true });
   let defects = 0;
   // Which answers are lists of joined parts, as the form tells the server
@@ -351,6 +397,27 @@ async function main() {
   attachments.forEach((a) => {
     const marks = a.att.marks;
     if (a.count > a.rows && marks && !ticked(data[marks])) data[marks] = 'on';
+  });
+  // A long answer is cut where the form cuts it: its box gets what it prints,
+  // an MC-025 page the rest, and the "not enough space" box is ticked. The
+  // answer set must hold the whole answer - a value captured from what the
+  // form posts is already cut to its box, and the rest is nowhere.
+  const continued = continuationPages(data);
+  const spilling = new Set(continued.filter((c) => c.tail).map((c) => c.link.marks).filter(Boolean));
+  const promised = new Set();
+  continued.forEach((c) => {
+    const m = c.link.marks;
+    if (m && ticked(data[m]) && !spilling.has(m) && !promised.has(m)) {
+      promised.add(m);
+      console.log('DEFECT: ' + m + ' says a page is attached, but no answer it covers is longer than its box here ('
+        + c.link.nameId + ' = ' + c.full.length + ' of ' + c.cap + ') - capture the whole answer, not the posted one');
+      defects++;
+    }
+  });
+  continued.forEach((c) => {
+    if (!c.tail) return;
+    data[c.link.nameId] = c.head;
+    if (c.link.marks && !ticked(data[c.link.marks])) data[c.link.marks] = 'on';
   });
 
   for (const base of FORMS) {
@@ -427,14 +494,23 @@ async function main() {
     }
   }
 
-  for (const a of attachments) {
-    const att = a.att;
-    const base = String(att.name).toLowerCase();
+  // Every MC-025 page: a block's entries past its rows, then a long answer's
+  // remainder.
+  const drawn = attachments.map((a) => ({
+    name: a.att.name, marks: a.att.marks, needed: a.count > a.rows,
+    why: a.q.nodeId + ' = ' + a.count + ', the form prints ' + a.rows,
+    spec: () => attachmentSpec(a, data, a.count)
+  })).concat(continued.map((c) => ({
+    name: c.link.page.name, marks: c.link.marks, needed: !!c.tail,
+    why: c.link.nameId + ' holds ' + c.full.length + ' characters, its box prints ' + c.cap,
+    spec: () => Object.assign(pageHeader(c.link.page, data), { text: c.tail })
+  })));
+  for (const d of drawn) {
+    const base = String(d.name).toLowerCase();
     const file = path.join(OUT, base + '-filled.pdf');
     const pagesDir = path.join(OUT, base + '-pages');
-    if (a.count <= a.rows) {
-      console.log('\n' + att.name + ': no attachment needed (' + a.q.nodeId + ' = ' + a.count
-        + ', the form prints ' + a.rows + ')');
+    if (!d.needed) {
+      console.log('\n' + d.name + ': no continuation needed (' + d.why + ')');
       // pipeline-current-output.js publishes every -pages folder it finds, so
       // a sheet from an earlier run with more entries would still be shown as
       // part of a packet that no longer has it.
@@ -442,16 +518,26 @@ async function main() {
       fs.rmSync(pagesDir, { recursive: true, force: true });
       continue;
     }
-    const spec = attachmentSpec(a, data, a.count);
+    const spec = d.spec();
     let buffer;
-    try { buffer = (await fillOne(att.name, { __attachment: JSON.stringify(spec) })).buffer; }
-    catch (err) { console.log('\n' + att.name + ': ' + err.message); continue; }
+    try { buffer = (await fillOne(d.name, { __attachment: JSON.stringify(spec) })).buffer; }
+    catch (err) { console.log('\n' + d.name + ': ' + err.message); defects++; continue; }
     fs.writeFileSync(file, buffer);
-    console.log('\n' + att.name + '  ->  ' + file);
-    console.log('  "' + spec.heading + '", item ' + spec.item + ': ' + a.q.nodeId + ' = ' + a.count
-      + ', the form prints ' + a.rows + ', ' + spec.entries.length + ' entr'
-      + (spec.entries.length === 1 ? 'y' : 'ies') + ' drawn'
-      + (att.marks ? '   (' + att.marks + ' ticked)' : ''));
+    // The form counts these sheets for "pages attached" with the same layout;
+    // a page drawn longer than it was counted is a count the filer signs wrong.
+    const sheets = (await PDFDocument.load(buffer)).getPageCount();
+    const counted = layout.pageCount(spec);
+    console.log('\n' + d.name + '  ->  ' + file);
+    console.log('  MC-025 "' + spec.heading + '", item ' + spec.item + ': ' + d.why + '; '
+      + (spec.entries ? spec.entries.length + ' entr' + (spec.entries.length === 1 ? 'y' : 'ies')
+        : spec.text.length + ' characters continued')
+      + ' on ' + sheets + ' sheet' + (sheets === 1 ? '' : 's')
+      + (d.marks ? '   (' + d.marks + ' ticked)' : ''));
+    if (sheets !== counted) {
+      console.log('  DEFECT: ' + sheets + ' sheet(s) drawn where the form counts ' + counted
+        + ' - the pages-attached count would be wrong');
+      defects++;
+    }
     if (RENDER) {
       // A shorter list draws fewer pages; last run's extra PNGs would stay.
       fs.rmSync(pagesDir, { recursive: true, force: true });

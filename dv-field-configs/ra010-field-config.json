@@ -1,0 +1,742 @@
+{
+  "formTitle": "RA-010 Notice of Remote Appearance",
+  "_comment": "RA-010 comes into the packet when the filer says they will appear remotely. Filed WITH the request it meets the deadline the form itself gives the party asking for a hearing on a protective order (page 3, item 4: 'With the moving papers or at least 5 court days before the hearing'), and item 2a, 'Throughout the case', needs no hearing date - which the filer cannot know at filing, because the court sets it on DV-109. What the filer supplies is the caption, items 1 to 5 and the signature on page 2; the caption carries the packet's names (person_asking_protection_*, person_to_restrain_full_name, court_street_address) so it is asked once, and item 1's Plaintiff/Petitioner box carries the answer that switches the form on (appear_remotely_yes), the way DV-105(A) box 1 carries DV-105's No. Three things are left blank by design and marked courtUse only because that is the flag that keeps a field out of the interview - none of them is the court's, and each says why in its _why: (1) the Declaration of Notice on page 2, which the filer signs under penalty of perjury after notice has been given; at filing it has not been, and the form lets a proof of service show it instead - the other side is told when this form is served on them with the rest of the papers; (2) item 1's Defendant/Respondent and their attorney, who give their own notice; (3) the caption's OTHER CASE NAME line, for a case that is not named by its parties. Page 3 is instructions and need not be filed. The six push buttons (print, save, clear, warning, two links) are type button and courtUse. The case number is courtUse as on every form in the packet.",
+  "fields": [
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].Name[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Attorney or party without attorney - name"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].Street[0]",
+      "newName": "person_asking_protection_mailing_address",
+      "type": "text",
+      "label": "Attorney or party without attorney - street address"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].City[0]",
+      "newName": "person_asking_protection_mailing_city",
+      "type": "text",
+      "label": "Attorney or party without attorney - city"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].State[0]",
+      "newName": "person_asking_protection_mailing_state",
+      "type": "text",
+      "label": "Attorney or party without attorney - state"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].Zip[0]",
+      "newName": "person_asking_protection_mailing_zip_code",
+      "type": "text",
+      "label": "Attorney or party without attorney - ZIP code"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].Phone[0]",
+      "newName": "person_asking_protection_telephone",
+      "type": "text",
+      "label": "Attorney or party without attorney - telephone number"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].Fax[0]",
+      "newName": "person_asking_protection_fax",
+      "type": "text",
+      "label": "Attorney or party without attorney - fax number"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].Email[0]",
+      "newName": "person_asking_protection_email",
+      "type": "text",
+      "label": "Attorney or party without attorney - email address"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].AttyBarNo[0]",
+      "newName": "person_asking_protection_lawyer_state_bar_number",
+      "type": "text",
+      "label": "State bar number (your lawyer's)",
+      "blankWhenNotAsked": "Only a filer with a lawyer names one (DV-100: \"Do you have a lawyer?\"). With no lawyer these lines are rightly blank."
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].AttyFirm[0]",
+      "newName": "person_asking_protection_lawyer_firm_name",
+      "type": "text",
+      "label": "Firm name (your lawyer's)",
+      "blankWhenNotAsked": "Only a filer with a lawyer names one (DV-100: \"Do you have a lawyer?\"). With no lawyer these lines are rightly blank."
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].AttyPartyInfo[0].AttyFor[0]",
+      "newName": "ra010_attorney_for",
+      "type": "text",
+      "label": "Attorney for (name of the party the lawyer represents)"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].CourtInfo[0].CrtCounty[0]",
+      "newName": "ra010_court_county",
+      "type": "text",
+      "label": "Superior Court of California, County of"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].CourtInfo[0].CrtStreet[0]",
+      "newName": "court_street_address",
+      "type": "text",
+      "label": "Court street address"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].CourtInfo[0].CrtMailingAdd[0]",
+      "newName": "ra010_court_mailing_address",
+      "type": "text",
+      "label": "Court mailing address"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].CourtInfo[0].CrtCityZip[0]",
+      "newName": "ra010_court_city_and_zip",
+      "type": "text",
+      "label": "Court city and ZIP code"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].CourtInfo[0].CrtBranch[0]",
+      "newName": "ra010_court_branch_name",
+      "type": "text",
+      "label": "Court branch name"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].TitlePartyName[0].Party1[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Plaintiff/Petitioner (caption, page 1)"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].TitlePartyName[0].Party2[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "Defendant/Respondent (caption, page 1)"
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].TitlePartyName[0].Party3[0]",
+      "newName": "ra010_other_case_name",
+      "type": "text",
+      "label": "Other case name (caption, page 1)",
+      "courtUse": true,
+      "_why": "Blank by design, not the court's: the caption's third line is for a case named some other way than by its parties. This case is named by the petitioner and respondent on the two lines above it."
+    },
+    {
+      "id": "RA-010[0].Page1[0].Header_sf[0].CaseNumber[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 1)",
+      "courtUse": true
+    },
+    {
+      "id": "RA-010[0].Page1[0].List1[0].item1[0].CheckBox1[0]",
+      "newName": "appear_remotely_yes",
+      "type": "checkbox",
+      "label": "1. The person who intends to appear remotely is: Plaintiff/Petitioner"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List1[0].item1[0].TextField1[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "1. Plaintiff/Petitioner (name)"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List1[0].item1[0].CheckBox2[0]",
+      "newName": "ra010_lawyer_appears_remotely",
+      "type": "checkbox",
+      "label": "1. Attorney for Plaintiff/Petitioner"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List1[0].item1[0].TextField2[0]",
+      "newName": "ra010_lawyer_appears_remotely_name",
+      "type": "text",
+      "label": "1. Attorney for Plaintiff/Petitioner (name)"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List1[0].item1[0].CheckBox3[0]",
+      "newName": "ra010_respondent_appears_remotely",
+      "type": "checkbox",
+      "label": "1. Defendant/Respondent",
+      "courtUse": true,
+      "_why": "Blank by design, not the court's: item 1 names who is giving this notice, and the person to be restrained gives their own. The filer cannot give notice for them."
+    },
+    {
+      "id": "RA-010[0].Page1[0].List1[0].item1[0].TextField3[0]",
+      "newName": "ra010_respondent_appears_remotely_name",
+      "type": "text",
+      "label": "1. Defendant/Respondent (name)",
+      "courtUse": true,
+      "_why": "Blank by design, not the court's: item 1's Defendant/Respondent line belongs to the other side's own notice."
+    },
+    {
+      "id": "RA-010[0].Page1[0].List1[0].item1[0].CheckBox4[0]",
+      "newName": "ra010_respondent_lawyer_appears_remotely",
+      "type": "checkbox",
+      "label": "1. Attorney for Defendant/Respondent",
+      "courtUse": true,
+      "_why": "Blank by design, not the court's: item 1's attorney for the other side gives that side's own notice."
+    },
+    {
+      "id": "RA-010[0].Page1[0].List1[0].item1[0].TextField4[0]",
+      "newName": "ra010_respondent_lawyer_appears_remotely_name",
+      "type": "text",
+      "label": "1. Attorney for Defendant/Respondent (name)",
+      "courtUse": true,
+      "_why": "Blank by design, not the court's: item 1's attorney for the other side gives that side's own notice."
+    },
+    {
+      "id": "RA-010[0].Page1[0].List1[0].item1[0].CheckBox5[0]",
+      "newName": "ra010_other_appears_remotely",
+      "type": "checkbox",
+      "label": "1. Other"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List1[0].item1[0].TextField5[0]",
+      "newName": "ra010_other_person_name_and_role",
+      "type": "text",
+      "label": "1. Other (name and role in case)"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List1[0].item1[0].TextField6[0]",
+      "newName": "ra010_other_person_name_and_role_line_2",
+      "type": "text",
+      "label": "1. Other (name and role in case), second line"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List2[0].Lia[0].Ch1[0]",
+      "newName": "ra010_appear_throughout_case",
+      "type": "checkbox",
+      "label": "2a. Throughout the case"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List2[0].Lib[0].Ch1[0]",
+      "newName": "ra010_appear_at_one_proceeding",
+      "type": "checkbox",
+      "label": "2b. At the proceeding described below, including any later dates if it is continued"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List2[0].Lib[0].FillText23[0]",
+      "newName": "ra010_proceeding_type",
+      "type": "text",
+      "label": "2b. Type of proceeding"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List2[0].Lib[0].FillText24[0]",
+      "newName": "ra010_proceeding_date",
+      "type": "text",
+      "label": "2b. Set on (date)"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List2[0].Lib[0].FillText25[0]",
+      "newName": "ra010_proceeding_time",
+      "type": "text",
+      "label": "2b. At (time)"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List2[0].Lib[0].FillText26[0]",
+      "newName": "ra010_proceeding_department",
+      "type": "text",
+      "label": "2b. In (department)"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List2[0].Lib[0].FillText27[0]",
+      "newName": "ra010_proceeding_judicial_officer",
+      "type": "text",
+      "label": "2b. Before (name of judicial officer)"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List3[0].item3[0].Ch2[0]",
+      "newName": "ra010_appear_by_videoconference",
+      "type": "checkbox",
+      "label": "3. Videoconference"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List3[0].item3[0].Ch3[0]",
+      "newName": "ra010_appear_by_audio_only",
+      "type": "checkbox",
+      "label": "3. Audio only (including telephone)"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List4[0].item4[0].CheckBox8[0]",
+      "newName": "ra010_other_remote_aspects_requested",
+      "type": "checkbox",
+      "label": "4. For an evidentiary hearing or trial: the party requests other aspects of the proceeding be conducted remotely"
+    },
+    {
+      "id": "RA-010[0].Page1[0].List4[0].item4[0].TextField11[0]",
+      "newName": "ra010_other_remote_aspects_description",
+      "type": "text",
+      "label": "4. What the party wants done remotely, and why"
+    },
+    {
+      "id": "RA-010[0].Page2[0].PxCaption[0].TitlePartyName[0].Party1[0]",
+      "newName": "person_asking_protection_name",
+      "type": "text",
+      "label": "Plaintiff (caption, page 2)"
+    },
+    {
+      "id": "RA-010[0].Page2[0].PxCaption[0].TitlePartyName[0].Party2[0]",
+      "newName": "person_to_restrain_full_name",
+      "type": "text",
+      "label": "Defendant (caption, page 2)"
+    },
+    {
+      "id": "RA-010[0].Page2[0].PxCaption[0].CaseNumber[0].CaseNumber[0]",
+      "newName": "case_number",
+      "type": "text",
+      "label": "Case number (page 2)",
+      "courtUse": true
+    },
+    {
+      "id": "RA-010[0].Page2[0].List5[0].item5[0].CheckBox12[0]",
+      "newName": "ra010_agree_to_keep_confidential",
+      "type": "checkbox",
+      "label": "5. I agree to keep the proceeding confidential to the same extent as if appearing in person"
+    },
+    {
+      "id": "RA-010[0].Page2[0].Sign1[0].Date1[0]",
+      "newName": "ra010_signature_date",
+      "type": "text",
+      "label": "Signature date (item 5)"
+    },
+    {
+      "id": "RA-010[0].Page2[0].Sign1[0].Print1[0]",
+      "newName": "ra010_signature_printed_name",
+      "type": "text",
+      "label": "Type or print name (item 5 signature)"
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List1[0].CheckBox20[0]",
+      "newName": "ra010_notice_1_plaintiff_given",
+      "type": "checkbox",
+      "label": "Declaration of Notice 1. Plaintiff/Petitioner",
+      "courtUse": true,
+      "_why": "Blank by design, not the court's: the Declaration of Notice (page 2) swears that notice was already given. At filing it has not been - the other side is told when this form is served on them with the rest of the papers, and the form lets a proof of service show that instead."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List1[0].Lia[0].T154[0]",
+      "newName": "ra010_notice_1_name",
+      "type": "text",
+      "label": "Declaration of Notice 1a. Name",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List1[0].Lib[0].T155[0]",
+      "newName": "ra010_notice_1_date",
+      "type": "text",
+      "label": "Declaration of Notice 1b. Date of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List1[0].Lic[0].T156[0]",
+      "newName": "ra010_notice_1_method",
+      "type": "text",
+      "label": "Declaration of Notice 1c. Method of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List1[0].Lid[0].T157[0]",
+      "newName": "ra010_notice_1_address",
+      "type": "text",
+      "label": "Declaration of Notice 1d. Address or phone number",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List2[0].CheckBox21[0]",
+      "newName": "ra010_notice_2_attorney_given",
+      "type": "checkbox",
+      "label": "Declaration of Notice 2. Attorney for",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List2[0].Field1[0]",
+      "newName": "ra010_notice_2_attorney_for",
+      "type": "text",
+      "label": "Declaration of Notice 2. Attorney for (whom)",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List2[0].Lia[0].T158[0]",
+      "newName": "ra010_notice_2_name",
+      "type": "text",
+      "label": "Declaration of Notice 2a. Name",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List2[0].Lib[0].T159[0]",
+      "newName": "ra010_notice_2_date",
+      "type": "text",
+      "label": "Declaration of Notice 2b. Date of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List2[0].Lic[0].T160[0]",
+      "newName": "ra010_notice_2_method",
+      "type": "text",
+      "label": "Declaration of Notice 2c. Method of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List2[0].Lid[0].T161[0]",
+      "newName": "ra010_notice_2_address",
+      "type": "text",
+      "label": "Declaration of Notice 2d. Address or phone number",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List3[0].CheckBox22[0]",
+      "newName": "ra010_notice_3_defendant_given",
+      "type": "checkbox",
+      "label": "Declaration of Notice 3. Defendant/Respondent",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List3[0].Lia[0].T162[0]",
+      "newName": "ra010_notice_3_name",
+      "type": "text",
+      "label": "Declaration of Notice 3a. Name",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List3[0].Lib[0].T163[0]",
+      "newName": "ra010_notice_3_date",
+      "type": "text",
+      "label": "Declaration of Notice 3b. Date of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List3[0].Lic[0].T164[0]",
+      "newName": "ra010_notice_3_method",
+      "type": "text",
+      "label": "Declaration of Notice 3c. Method of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List3[0].Lid[0].T165[0]",
+      "newName": "ra010_notice_3_address",
+      "type": "text",
+      "label": "Declaration of Notice 3d. Address or phone number",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List4[0].CheckBox24[0]",
+      "newName": "ra010_notice_4_attorney_given",
+      "type": "checkbox",
+      "label": "Declaration of Notice 4. Attorney for",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List4[0].Field2[0]",
+      "newName": "ra010_notice_4_attorney_for",
+      "type": "text",
+      "label": "Declaration of Notice 4. Attorney for (whom)",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List4[0].Lia[0].T166[0]",
+      "newName": "ra010_notice_4_name",
+      "type": "text",
+      "label": "Declaration of Notice 4a. Name",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List4[0].Lib[0].T167[0]",
+      "newName": "ra010_notice_4_date",
+      "type": "text",
+      "label": "Declaration of Notice 4b. Date of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List4[0].Lic[0].T168[0]",
+      "newName": "ra010_notice_4_method",
+      "type": "text",
+      "label": "Declaration of Notice 4c. Method of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List4[0].Lid[0].T169[0]",
+      "newName": "ra010_notice_4_address",
+      "type": "text",
+      "label": "Declaration of Notice 4d. Address or phone number",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List5\\.1[0].CheckBox29[0]",
+      "newName": "ra010_notice_5_other_given",
+      "type": "checkbox",
+      "label": "Declaration of Notice 5. Other",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List5\\.1[0].Field5[0]",
+      "newName": "ra010_notice_5_other_specify",
+      "type": "text",
+      "label": "Declaration of Notice 5. Other (specify)",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List5\\.1[0].Lia[0].T162[0]",
+      "newName": "ra010_notice_5_name",
+      "type": "text",
+      "label": "Declaration of Notice 5a. Name",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List5\\.1[0].Lib[0].T163[0]",
+      "newName": "ra010_notice_5_date",
+      "type": "text",
+      "label": "Declaration of Notice 5b. Date of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List5\\.1[0].Lic[0].T164[0]",
+      "newName": "ra010_notice_5_method",
+      "type": "text",
+      "label": "Declaration of Notice 5c. Method of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List5\\.1[0].Lid[0].T165[0]",
+      "newName": "ra010_notice_5_address",
+      "type": "text",
+      "label": "Declaration of Notice 5d. Address or phone number",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List6[0].CheckBox24[0]",
+      "newName": "ra010_notice_6_attorney_given",
+      "type": "checkbox",
+      "label": "Declaration of Notice 6. Attorney for",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List6[0].Field2[0]",
+      "newName": "ra010_notice_6_attorney_for",
+      "type": "text",
+      "label": "Declaration of Notice 6. Attorney for (whom)",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List6[0].Lia[0].T166[0]",
+      "newName": "ra010_notice_6_name",
+      "type": "text",
+      "label": "Declaration of Notice 6a. Name",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List6[0].Lib[0].T167[0]",
+      "newName": "ra010_notice_6_date",
+      "type": "text",
+      "label": "Declaration of Notice 6b. Date of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List6[0].Lic[0].T168[0]",
+      "newName": "ra010_notice_6_method",
+      "type": "text",
+      "label": "Declaration of Notice 6c. Method of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List6[0].Lid[0].T169[0]",
+      "newName": "ra010_notice_6_address",
+      "type": "text",
+      "label": "Declaration of Notice 6d. Address or phone number",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List7[0].CheckBox29[0]",
+      "newName": "ra010_notice_7_other_given",
+      "type": "checkbox",
+      "label": "Declaration of Notice 7 (left column). Other",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List7[0].Field5[0]",
+      "newName": "ra010_notice_7_other_specify",
+      "type": "text",
+      "label": "Declaration of Notice 7 (left column). Other (specify)",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List7[0].Lia[0].T162[0]",
+      "newName": "ra010_notice_7_name",
+      "type": "text",
+      "label": "Declaration of Notice 7a (left column). Name",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List7[0].Lib[0].T163[0]",
+      "newName": "ra010_notice_7_date",
+      "type": "text",
+      "label": "Declaration of Notice 7b (left column). Date of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List7[0].Lic[0].T164[0]",
+      "newName": "ra010_notice_7_method",
+      "type": "text",
+      "label": "Declaration of Notice 7c (left column). Method of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List7[0].Lid[0].T165[0]",
+      "newName": "ra010_notice_7_address",
+      "type": "text",
+      "label": "Declaration of Notice 7d (left column). Address or phone number",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List8[0].CheckBox29[0]",
+      "newName": "ra010_notice_8_other_given",
+      "type": "checkbox",
+      "label": "Declaration of Notice 7 (right column). Other",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List8[0].Field5[0]",
+      "newName": "ra010_notice_8_other_specify",
+      "type": "text",
+      "label": "Declaration of Notice 7 (right column). Other (specify)",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List8[0].Lia[0].T162[0]",
+      "newName": "ra010_notice_8_name",
+      "type": "text",
+      "label": "Declaration of Notice 7a (right column). Name",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List8[0].Lib[0].T163[0]",
+      "newName": "ra010_notice_8_date",
+      "type": "text",
+      "label": "Declaration of Notice 7b (right column). Date of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List8[0].Lic[0].T164[0]",
+      "newName": "ra010_notice_8_method",
+      "type": "text",
+      "label": "Declaration of Notice 7c (right column). Method of notice",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].List8[0].Lid[0].T165[0]",
+      "newName": "ra010_notice_8_address",
+      "type": "text",
+      "label": "Declaration of Notice 7d (right column). Address or phone number",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].Mc025[0].CheckBox19[0]",
+      "newName": "ra010_notice_more_people_attached",
+      "type": "checkbox",
+      "label": "Declaration of Notice - more people were given notice (MC-025 attached)",
+      "courtUse": true,
+      "_why": "Blank by design: part of the Declaration of Notice (page 2), which cannot be sworn at filing."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].Sign2[0].Date2[0]",
+      "newName": "ra010_notice_signature_date",
+      "type": "text",
+      "label": "Declaration of Notice - signature date",
+      "courtUse": true,
+      "_why": "Blank by design: the Declaration of Notice (page 2) is signed under penalty of perjury once notice has been given, which at filing it has not."
+    },
+    {
+      "id": "RA-010[0].Page2[0].NoticetoOtherParties[0].Sign2[0].Print2[0]",
+      "newName": "ra010_notice_signature_printed_name",
+      "type": "text",
+      "label": "Declaration of Notice - type or print name",
+      "courtUse": true,
+      "_why": "Blank by design: the Declaration of Notice (page 2) is signed under penalty of perjury once notice has been given, which at filing it has not."
+    },
+    {
+      "id": "RA-010[0].#pageSet[0].PageArea1[0].Footer1[0].CourtLink[0]",
+      "newName": "ra010_button_footer_link",
+      "type": "button",
+      "label": "Footer link to courts.ca.gov (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "RA-010[0].Page3[0].Instructions[0].Li1[0].Link1[0]",
+      "newName": "ra010_button_find_my_court_link",
+      "type": "button",
+      "label": "Link to find-my-court (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "RA-010[0].#pageSet[0].LastPage[0].p3Footer[0].FooterButtons[0].Warning[0]",
+      "newName": "ra010_button_privacy_warning",
+      "type": "button",
+      "label": "Privacy warning (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "RA-010[0].#pageSet[0].LastPage[0].p3Footer[0].FooterButtons[0].Print[0]",
+      "newName": "ra010_button_print",
+      "type": "button",
+      "label": "Print this form (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "RA-010[0].#pageSet[0].LastPage[0].p3Footer[0].FooterButtons[0].Save[0]",
+      "newName": "ra010_button_save",
+      "type": "button",
+      "label": "Save this form (push button)",
+      "courtUse": true
+    },
+    {
+      "id": "RA-010[0].#pageSet[0].LastPage[0].p3Footer[0].FooterButtons[0].Reset[0]",
+      "newName": "ra010_button_reset",
+      "type": "button",
+      "label": "Clear this form (push button)",
+      "courtUse": true
+    }
+  ]
+}
