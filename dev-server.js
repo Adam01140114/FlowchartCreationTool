@@ -166,8 +166,9 @@ function publicFrontPage() {
       + '<h2>' + esc(m.title || s) + '</h2>'
       + (facts ? '<p class="facts">' + facts + '</p>' : '')
       + '<div class="actions">'
-      + button('question', 'primary', 'One question at a time', 'Guided, one step per screen')
-      + button('section', 'secondary', 'One section at a time', 'See a whole part of the form')
+      // One section at a time is the default way in: first, filled, and labelled so.
+      + button('section', 'primary', 'One section at a time <em class="pill">Default</em>', 'A whole part of the form on each page')
+      + button('question', 'secondary', 'One question at a time', 'Guided, one step per screen')
       + '</div>'
       + '<a class="flow" href="/flowchart/' + esc(encodeURIComponent(m.projectId)) + '">View the flowchart &rarr;</a>'
       + '</article>';
@@ -199,6 +200,7 @@ function publicFrontPage() {
     + '.txt{display:flex;flex-direction:column;gap:3px}'
     + '.btn small{font-weight:500;font-size:.8rem;opacity:.85}'
     + '.arrow{font-size:1.25rem;line-height:1;transition:transform .15s ease}'
+    + '.pill{font-style:normal;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.35);padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}'
     + '.btn:hover .arrow{transform:translateX(3px)}'
     + '.btn:hover{transform:translateY(-1px)}'
     + '.btn:focus-visible,.flow:focus-visible{outline:3px solid #7fb3ff;outline-offset:2px}'
@@ -211,7 +213,7 @@ function publicFrontPage() {
     + '</style></head><body>'
     + '<header><div class="bar"><div class="mark" aria-hidden="true">//</div><div class="brand">FormWiz</div></div></header>'
     + '<main><h1>Forms</h1>'
-    + '<p class="lead">Pick a form and answer its questions in plain words. Go one question at a time, or a whole section at a time &mdash; your answers fill in the paperwork for you.</p>'
+    + '<p class="lead">Pick a form and answer its questions in plain words. Go a whole section at a time, or one question at a time &mdash; your answers fill in the paperwork for you.</p>'
     + (cards ? '<div class="grid">' + cards + '</div>' : '<div class="empty">No forms are published yet.</div>')
     + '</main></body></html>';
 }
