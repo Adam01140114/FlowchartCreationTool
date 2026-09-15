@@ -43,7 +43,18 @@ const SERVER = flag('server', 'http://127.0.0.1:8080');
 const RENDER = args.includes('--render');
 const { packetForms } = require('./packet-forms');
 const layout = require('./FormWiz GUI/continuation-layout');
-const FORMS = (flag('forms', '') || packetForms().join(',')).split(',').filter(Boolean);
+// The forms the page filled for these answers, when the capture recorded them
+// (__forms): a form the answers never brought in is not filled, and filling it
+// here reads its blanks as answers that went missing.
+const CAPTURED_FORMS = (() => {
+  try {
+    const saved = JSON.parse(fs.readFileSync(ANSWERS, 'utf8'));
+    return Array.isArray(saved.__forms) ? saved.__forms : null;
+  } catch (e) { return null; }
+})();
+const FORMS = (flag('forms', '')
+  || (CAPTURED_FORMS ? packetForms().filter((f) => CAPTURED_FORMS.includes(f)).join(',') : '')
+  || packetForms().join(',')).split(',').filter(Boolean);
 // Big enough to read a filled box against the printed label, small enough
 // that thirteen pages stay a reasonable size on disk.
 const RENDER_SCALE = Number(flag('scale', '1.6')) || 1.6;
@@ -369,6 +380,8 @@ function continuationPages(data) {
 
 async function main() {
   const data = JSON.parse(fs.readFileSync(ANSWERS, 'utf8'));
+  // Which forms were filled is the capture's note, not an answer to post.
+  delete data.__forms;
   // A capture merged from every request the form posted also holds the last
   // MC-025 page's spec. Sent with a form, it makes the server draw that page
   // instead of filling the form; each page's spec is built here instead.

@@ -81,6 +81,16 @@ Anything that needs more space continues on MC-025 (rule
 ## How the user works
 
 - Requests are short. Take the obvious reading, do it, and say what you did.
+- **Every link you give the user uses `https://onbase-demo.tail7f705f.ts.net/`**,
+  never `http://localhost:8080/` - same path, different host. The user follows
+  along from devices where localhost does not reach the dev server. This Mac is
+  `onbase-demo`: `tailscale serve` forwards that host (tailnet only) to
+  `http://127.0.0.1:8080`. Tailscale runs in userspace mode, so this Mac cannot
+  look up its own `ts.net` name, and a curl of the tailnet link from here always
+  fails - that does not mean the link is broken. Check a link by fetching the
+  same path on `127.0.0.1:8080`, and the mapping with
+  `tailscale --socket=/Users/platnm/.tailscale-userspace/tailscaled.sock serve status`.
+  Never change the Tailscale settings.
 - **"Run this"** about the project or site means publish the live site (the
   publish-live-site skill) and hand back the link.
 - **"Git push to main"** means commit everything the session changed and push -

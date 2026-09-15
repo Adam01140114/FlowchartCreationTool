@@ -342,6 +342,36 @@ and it only redrew when the filer changed page - after Fill maximum path
 brought in six forms it still showed three. The nav audit reads the bar on a
 fresh page and after each fill and fails it if it is wrong.
 
+**Every page fits the screen it is on.** On a desktop the light-blue section
+card is 1240px and the question boxes and arrows 1160px (they were 960px and
+737px), and they shrink with the window. Widening them turned up the phone: a
+375px screen laid the page out at 759px and showed the whole form zoomed out,
+and no check had ever looked at a phone. Three things held the page wide:
+
+- repeating entry blocks had a fixed 585px minimum (now `min(585px, 100%)`);
+- a dropdown is as wide as its longest option, and "Brother, sister, sibling,
+  stepsibling, or sibling in-law" is 358px (dropdowns and text boxes are now
+  capped at their box);
+- the white box is a grid item, which grows to hold its widest box, so no cap
+  inside it could work until it was given `min-width: 0`.
+
+On a phone the section around the white box also drops its 50px sides. The nav
+audit now lays every section of each page out on a 375px screen after the
+maximum fill, and names the box that cannot shrink. On the old build it failed
+29 sections of each page.
+
+Finding that box took three tries, and each failed a different way:
+
+- The box that sticks out of one that fits: a flex or grid item grows with its
+  content, so nothing sticks out.
+- The box forced to its narrowest: a text box at 100% reports its default
+  columns.
+- The box it sits in, squeezed to nothing: a row whose items fit one by one is
+  never named.
+
+What works is laying the box it sits in out at its own narrowest, with its
+siblings hidden.
+
 **FL-150 or FL-155 is DV-570's decision, made in the interview.** FL-150 comes
 in on spousal support or lawyer's fees among DV-100's orders, or on a Yes to any
 of DV-570's four remaining questions (self-employed; the other person asking for

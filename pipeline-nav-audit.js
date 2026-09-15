@@ -30,7 +30,13 @@
  *     a tab of its own): every answer, and every element drawn the same way;
  *   - the same holds on a page that restored a saved draft first, eight
  *     seconds on - a returning filer's page, where the restore used to land
- *     over the fill and empty every repeating block.
+ *     over the fill and empty every repeating block;
+ *   - the numbered steps show exactly the forms the answers need, numbered 1
+ *     to n, on a fresh page and after the fill, and an idle page raises no
+ *     storm of change events (--idle-events, 50 a second);
+ *   - on a phone-sized screen (--phone-width, 375px) no section is wider than
+ *     the screen: one fixed-width box lays the whole page out wider, and the
+ *     phone shows every section zoomed out.
  *
  * Drawn, because the next defect after the slow button was on the screen and
  * nowhere else. The recorded fill wrote every date, and 46 date boxes still
@@ -50,7 +56,8 @@
  *
  * Usage: node pipeline-nav-audit.js [--site dv-restraining-order-packet]
  *          [--server http://localhost:8080] [--modes section,question]
- *          [--paths minimum,maximum]
+ *          [--paths minimum,maximum] [--fill-budget 3000] [--idle-events 50]
+ *          [--phone-width 375] [--phone-only]
  */
 const { spawn } = require('child_process');
 const fs = require('fs');
@@ -76,11 +83,19 @@ const SERVER = flag('server', 'http://localhost:8080').replace(/\/+$/, '');
 // Question-at-a-time walks every question one press at a time, a few minutes
 // per path; the section pages share the same Back code, so they are the default.
 const MODES = flag('modes', 'section').split(',').map((s) => s.trim()).filter(Boolean);
-const PATHS = flag('paths', 'minimum,maximum').split(',').map((s) => s.trim()).filter(Boolean);
+// --phone-only runs the phone check alone, walking no fill path.
+const PATHS = args.includes('--phone-only') ? []
+  : flag('paths', 'minimum,maximum').split(',').map((s) => s.trim()).filter(Boolean);
 const FILL_BUDGET_MS = Number(flag('fill-budget', '3000'));
 // Change/input events an idle page may raise in one second - a few land just
 // after load; the loop that got through raised about 7,600.
 const IDLE_EVENT_LIMIT = Number(flag('idle-events', '50'));
+// A phone's screen, in CSS pixels: nothing on a page may be wider, or the phone
+// lays the whole page out wider and shows it zoomed out. 0 skips the check.
+const PHONE_WIDTH = Number(flag('phone-width', '375'));
+// A fixed window of the phone's width, not the phone's own zoom-out: that
+// widens the page to fit what sticks out, and would hide it.
+const PHONE_DEVICE = { width: PHONE_WIDTH, height: 812, deviceScaleFactor: 1, mobile: false };
 
 function findChrome() {
   const candidates = [
@@ -521,11 +536,145 @@ function appearanceDifferences(a, b) {
 }
 
 /**
+ * Runs inside a phone-sized page: fill the maximum path - the most questions
+ * and entry blocks on screen - then show every section in turn and list what
+ * sticks out past the screen's right edge. One box wider than a phone lays the
+ * whole page out wider, and the phone shows every section zoomed out: a 585px
+ * entry block once laid a 375px phone out at 759px.
+ */
+function phoneWidthInPage() {
+  return (async () => {
+    await fillMaximumPath({ markers: true, solve: true });
+    await new Promise((r) => setTimeout(r, 1500));
+    const root = document.documentElement;
+    const screenWidth = root.clientWidth;
+    const inFixedBox = (el) => {
+      for (let c = el; c && c !== document.body; c = c.parentElement) {
+        if (getComputedStyle(c).position === 'fixed') return true;
+      }
+      return false;
+    };
+    const describeEl = (el) => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '')
+      + (typeof el.className === 'string' && el.className.trim()
+        ? '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.') : '')
+      + (el.getAttribute('for') ? '[for=' + el.getAttribute('for') + ']' : '')
+      + (!el.id && el.getAttribute('name') ? '[name=' + el.getAttribute('name') + ']' : '')
+      + (!el.id && !el.children.length && el.textContent.trim() ? ' "' + el.textContent.trim().slice(0, 40) + '"' : '');
+    // The box to name is the one whose own width does it - a min-width, a
+    // dropdown's longest option, a label that may not wrap. Every box around it
+    // grows to hold it (a flex item grows to its widest child) and every block
+    // inside a grown box stretches with it, so neither width nor position tells
+    // them apart. What the page grows to is what its content needs at its
+    // narrowest (the white box grew past the screen with its content), so lay
+    // the box it sits in out at its own narrowest and see who is
+    // still too wide: a stretched box, or one sized in percent (a text box at
+    // 100%), shrinks with it; a min-width, a row that cannot wrap and a long
+    // dropdown option do not. Forcing the box itself to min-content is wrong
+    // (a text box reports its default columns), and so is squeezing the box it
+    // sits in to nothing (a row whose items fit one by one is never named).
+    // A wrapper that draws no box of its own (inline, contents) is passed over.
+    // The box's siblings are hidden while it is measured: a box is never
+    // narrower than its widest child, so one 585px block beside it would make
+    // every sibling read 585px.
+    const tooWide = (el) => el.getBoundingClientRect().width > screenWidth + 1;
+    const narrowest = (el) => {
+      let p = el.parentElement;
+      while (p && p !== document.body && /^(inline|contents)$/.test(getComputedStyle(p).display)) p = p.parentElement;
+      if (!p || p === document.body) return el.getBoundingClientRect().width;
+      const saved = [];
+      const set = (node, prop, value) => {
+        saved.push([node, node.getAttribute('style')]);
+        node.style.setProperty(prop, value, 'important');
+      };
+      for (let c = el; c !== p; c = c.parentElement) {
+        Array.from(c.parentElement.children).forEach((s) => { if (s !== c) set(s, 'display', 'none'); });
+      }
+      set(p, 'width', 'min-content');
+      set(p, 'min-width', '0px');
+      set(p, 'max-width', 'none');
+      const w = el.getBoundingClientRect().width;
+      for (let i = saved.length - 1; i >= 0; i--) {
+        const [node, style] = saved[i];
+        if (style === null) node.removeAttribute('style'); else node.setAttribute('style', style);
+      }
+      return w;
+    };
+    const widest = (scope) => {
+      const setters = [];
+      [scope].concat(Array.from(scope.querySelectorAll('*'))).forEach((el) => {
+        if (!tooWide(el) || inFixedBox(el)) return;
+        if (narrowest(el) > screenWidth + 1) setters.push(el);
+      });
+      // The innermost: a box holding one that cannot shrink only grows with it.
+      return setters.filter((el) => !setters.some((o) => o !== el && el.contains(o))).slice(0, 3).map((el) => {
+        const minWidth = getComputedStyle(el).minWidth;
+        // When nothing inside it is too wide on its own, its padding around its
+        // widest part is: name that part too.
+        let part = null;
+        Array.from(el.children).forEach((c) => {
+          if (!c.getBoundingClientRect().width || inFixedBox(c)) return;
+          const w = narrowest(c);
+          if (!part || w > part.w) part = { el: c, w };
+        });
+        return { element: describeEl(el), narrowest: Math.round(narrowest(el)),
+          minWidth: /px$/.test(minWidth) && parseFloat(minWidth) > screenWidth ? minWidth : '',
+          part: part ? describeEl(part.el) + ' ' + Math.round(part.w) + 'px' : '' };
+      });
+    };
+    // Nothing too wide, and the page still is: something is pushed past the
+    // right edge (a margin, an offset, a transform). The boxes that reach past
+    // it while the box around them does not.
+    const stickingOut = (scope) => {
+      const out = [];
+      scope.querySelectorAll('*').forEach((el) => {
+        if (out.length >= 3) return;
+        const r = el.getBoundingClientRect();
+        if (!r.width || r.right <= screenWidth + 1) return;
+        const p = el.parentElement ? el.parentElement.getBoundingClientRect() : null;
+        if (p && p.right > screenWidth + 1) return;
+        if (inFixedBox(el)) return;
+        const cs = getComputedStyle(el);
+        out.push({ element: describeEl(el), right: Math.round(r.right), width: Math.round(r.width),
+          how: [cs.position !== 'static' ? 'position ' + cs.position + ' left ' + cs.left : '',
+            cs.marginLeft !== '0px' ? 'margin-left ' + cs.marginLeft : '',
+            cs.transform !== 'none' ? 'transform ' + cs.transform : ''].filter(Boolean).join(', ') });
+      });
+      return out;
+    };
+    const titleOf = (sec) => {
+      const h = sec.querySelector('h2, h1, .section-title');
+      return h ? h.textContent.trim().slice(0, 60) : '';
+    };
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const results = [];
+    // Outside every section first: the header, the numbered steps, the footer.
+    sections.forEach((s) => s.classList.remove('active'));
+    const outsideTooWide = root.scrollWidth > screenWidth + 1;
+    if (outsideTooWide) {
+      results.push({ section: 0, form: '', title: '', pageWidth: root.scrollWidth, wide: widest(document.body) });
+    }
+    for (const sec of sections) {
+      sections.forEach((s) => s.classList.toggle('active', s === sec));
+      // Question-at-a-time shows one question of a section; lay them all out.
+      sec.querySelectorAll('.question-step-hidden').forEach((q) => q.classList.remove('question-step-hidden'));
+      if (root.scrollWidth <= screenWidth + 1) continue;
+      const wide = widest(sec);
+      if (!wide.length && outsideTooWide) continue;
+      const n = Number(sec.id.slice(7));
+      const f = (typeof formOwningSection === 'function') ? formOwningSection(n) : null;
+      results.push({ section: n, form: f ? f.name : '', title: titleOf(sec), pageWidth: root.scrollWidth, wide,
+        stickOut: wide.length ? [] : stickingOut(document.body) });
+    }
+    return { screenWidth, sections: sections.length, results };
+  })();
+}
+
+/**
  * Open the page in a fresh tab with empty storage - the page saves its answers
  * as it fills, and one tab's must not come back in the next - run one
  * expression in it, and close it. Null when the page never loads.
  */
-async function inPage(send, url, expression, beforeReload) {
+async function inPage(send, url, expression, beforeReload, device) {
   const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
   try {
     const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
@@ -537,6 +686,12 @@ async function inPage(send, url, expression, beforeReload) {
     await send('Network.enable', {}, sessionId);
     await send('Network.setBlockedURLs', { urls: FIREBASE_URLS }, sessionId);
     await send('Storage.clearDataForOrigin', { origin: new URL(url).origin, storageTypes: 'all' }, sessionId);
+    // A phone-sized window (PHONE_DEVICE), with scrollbars that take no room,
+    // as on a phone.
+    if (device) {
+      await send('Emulation.setDeviceMetricsOverride', device, sessionId);
+      await send('Emulation.setScrollbarsHidden', { hidden: true }, sessionId);
+    }
     await send('Page.navigate', { url }, sessionId);
     const waitReady = async () => {
       for (let i = 0; i < 120; i++) {
@@ -742,6 +897,32 @@ function check(result, fillPath) {
         }
         problems.forEach((p) => console.log('   - ' + p));
         if (problems.length) failed++;
+      }
+      // The same page on a phone-sized screen: every section, filled to the
+      // maximum, must fit it.
+      if (PHONE_WIDTH > 0) {
+        const url = SERVER + '/live-sites/' + SITE + '/' + mode + '.html';
+        const label = mode + ' page, ' + PHONE_WIDTH + 'px phone screen';
+        const phone = await inPage(send, url, '(' + phoneWidthInPage.toString() + ')()', null, PHONE_DEVICE);
+        if (!phone) {
+          console.log('FAILS  ' + label + ': the page never finished loading');
+          failed++;
+        } else {
+          const problems = phone.results.map((r) => (r.section
+            ? 'section ' + r.section + ' (' + r.form + ' "' + r.title + '")' : 'outside every section, the page')
+            + ' is ' + r.pageWidth + 'px wide on a ' + phone.screenWidth + 'px screen, so a phone shows it zoomed out: '
+            + (r.wide.length
+              ? r.wide.map((w) => w.element + ' cannot be narrower than ' + w.narrowest + 'px'
+                + (w.minWidth ? ' (min-width ' + w.minWidth + ')' : '')
+                + (w.part ? ', around ' + w.part : '')).join('; ')
+              : (r.stickOut || []).length
+                ? 'nothing is too wide, but ' + r.stickOut.map((s) => s.element + ' (' + s.width + 'px) reaches '
+                  + s.right + 'px' + (s.how ? ' - ' + s.how : '')).join('; ')
+                : 'no single box found'));
+          console.log((problems.length ? 'FAILS  ' : 'passes ') + label + '   ' + phone.sections + ' sections laid out');
+          problems.forEach((p) => console.log('   - ' + p));
+          if (problems.length) failed++;
+        }
       }
     }
   } finally {

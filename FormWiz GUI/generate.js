@@ -651,7 +651,13 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '    <script src="../../CountyLookup/courtLookup.js"></script>',
     '    <style>',
     '        .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }',
-    '        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 737px; width: 100%; }',
+    // Nothing on the form may be wider than the screen it is on. A dropdown is
+    // as wide as its longest option, and one that long ("Brother, sister,
+    // sibling, stepsibling, or sibling in-law") pushed a phone's page wider.
+    // A class that caps a box lower (the 400px address boxes) still wins.
+    // pipeline-nav-audit.js lays every section out on a 375px screen.
+    '        select, textarea { max-width: 100%; }',
+    '        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 1160px; width: 100%; }',
     '        .question-container .question-text { margin-top: 0; }',
     // A title that fits on one line is centred; one that wraps reads left-aligned.
     // The label carries a class rather than being found with :has() - on a page
@@ -662,7 +668,7 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '        .question-container label.fw-question-title { display: block; text-align: center; }',
     '        .question-container .question-text { display: inline-block; max-width: 100%; text-align: left; }',
     '        .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }',
-    '        .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 737px; }',
+    '        .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 1160px; }',
     '        .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }',
     '        .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }',
     '        .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }',
@@ -673,7 +679,10 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '        .nav-context-menu .nav-context-hint { padding: 2px 12px 7px; color: #64748b; font-size: 11px; letter-spacing: 0.03em; text-transform: uppercase; }',
     '        .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }',
     '        .question-step-hidden { display: none !important; }',
-    '        .section-form-card { background: linear-gradient(180deg, #f7fbff 0%, #eef5ff 100%); border: 1px solid #c5d9f7; border-radius: 24px; padding: 12px 12px 32px; max-width: 960px; margin: 0 auto 36px; box-shadow: 0 12px 32px rgba(30,73,150,0.10); }',
+    // The light-blue card and the question boxes in it use a desktop screen's
+    // width (card 1240px, questions and arrows 1160px) and shrink with a smaller
+    // window. generate.css repeats the card's width; this inline rule wins.
+    '        .section-form-card { background: linear-gradient(180deg, #f7fbff 0%, #eef5ff 100%); border: 1px solid #c5d9f7; border-radius: 24px; padding: 12px 12px 32px; max-width: 1240px; margin: 0 auto 36px; box-shadow: 0 12px 32px rgba(30,73,150,0.10); }',
     '        .section-form-card .section-title { margin: 18px 12px 10px; }',
     '        body.form-style-all .section { display: block !important; }',
     '        body.form-style-all .section .question-nav { display: none; }',
@@ -692,14 +701,21 @@ const showProductionCheckout = formDeploymentStyle !== 'test';
     '        @keyframes fwStepAdded { 0% { transform: scale(0.6); box-shadow: 0 0 0 0 rgba(41, 128, 185, 0.6); } 40% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(41, 128, 185, 0.25); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(41, 128, 185, 0); } }',
     '        @keyframes fwStepLabelAdded { 0% { opacity: 0; } 100% { opacity: 1; } }',
     '        @media (max-width: 640px) { .stepper-label { white-space: normal; max-width: 160px; } }',
-    '        #box { padding-top: 100px; margin: 50px; }',
+    // The white box sits in a grid (generate.css: section), and a grid item is
+    // never narrower than its content unless told: it grew to hold its widest
+    // box, and on a phone the page grew with it. At min-width 0 it takes the
+    // room there is, and what is in it shrinks to fit.
+    '        #box { padding-top: 100px; margin: 50px; min-width: 0; }',
     // Half the gap above a step bar: 100px of padding plus the bar's own 12px
     // margin left 116px of empty card above the form's steps. A card with no
     // step bar keeps its spacing.
     '        #box:has(.stepper-progress-bar) { padding-top: 46px; }',
     '        @media (max-width: 600px) {',
     '            body { padding: 0 !important; }',
-    '            #box { margin: 12px !important; max-width: none !important; }',
+    // A phone has no room to spare: the section around the white box drops its
+    // 50px sides, and the box keeps 12px of its own.
+    '            #questions > section { padding: 0 !important; }',
+    '            #box { margin: 12px !important; max-width: none !important; padding-left: 12px !important; padding-right: 12px !important; }',
     '            .question-container { margin: 6px auto !important; padding: 20px 18px !important; }',
     '            .question-nav { margin: 40px auto 0 !important; }',
     '        }',
@@ -3617,7 +3633,7 @@ if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
             // Create entry container div
             const entryContainer = document.createElement('div');
             entryContainer.className = 'entry-container';
-            entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 10px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 585px; max-width: 100%; box-sizing: border-box;';
+            entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 10px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: min(585px, 100%); max-width: 100%; box-sizing: border-box;';
             // Process all fields in creation order
             for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
               const field = allFieldsInOrder[fieldIndex];
@@ -12435,7 +12451,7 @@ function showTextboxLabels(questionId, count){
         // Create entry container div
         const entryContainer = document.createElement('div');
         entryContainer.className = 'entry-container';
-        entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 585px; max-width: 100%; box-sizing: border-box;';
+        entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: min(585px, 100%); max-width: 100%; box-sizing: border-box;';
         // Add entry title if configured
         const entryTitle = (window.entryTitleMap && window.entryTitleMap[questionId]) ? window.entryTitleMap[questionId] : '';
         if (entryTitle) {

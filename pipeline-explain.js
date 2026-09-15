@@ -17,6 +17,20 @@ const flag = (n, d) => { const i = args.indexOf('--' + n); return i >= 0 ? args[
 const BASE = args.find((a) => !a.startsWith('--')) || 'dv110';
 const gui = JSON.parse(fs.readFileSync(flag('gui', 'dv-packet-gui.json'), 'utf8'));
 const answers = JSON.parse(fs.readFileSync(flag('answers', 'pipeline-answers.json'), 'utf8'));
+// The forms the page filled for these answers, as the capture recorded them
+// (__forms). A form the answers never brought in is not filled at all, so none
+// of its blanks is a defect: explained as if it were in the packet, three of
+// FL-155's court boxes read as defects on a path that files FL-150.
+if (Array.isArray(answers.__forms) && !answers.__forms.includes(BASE)) {
+  const note = BASE + ': not in the packet for these answers, so nothing fills it and none of its blanks is a defect'
+    + ' (the page filled ' + answers.__forms.join(', ') + ')';
+  if (args.includes('--json')) {
+    console.log(JSON.stringify({ form: BASE, inPacket: false, counts: { defect: 0 }, note }, null, 1));
+  } else {
+    console.log(note);
+  }
+  process.exit(0);
+}
 const readback = JSON.parse(fs.readFileSync(flag('readback', 'pipeline-out/' + BASE + '-readback.json'), 'utf8'));
 // Fields the form says the court completes are blank on purpose, so they are
 // not "unmapped" - they are the packet doing what the printed instruction says.

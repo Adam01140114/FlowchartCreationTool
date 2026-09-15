@@ -235,7 +235,7 @@ Defaults:
 |------|---------|
 | `FormWiz GUI/gui.html` | Loads preview JSON; sets `window.__FORM_QUESTION_STYLE__` |
 | `FormWiz GUI/generate.js` | **Form HTML generator** — question styles, section cards, debug menu, nav, test/prod deployment UI, PDF fill helpers |
-| `FormWiz GUI/generate.css` / `generate2.css` | Form + stepper styles |
+| `FormWiz GUI/generate.css` / `generate2.css` | Form + stepper styles. The publish copies them into `live-sites/<name>/` unchanged. The `<style>` block `generate.js` writes into each page comes after them and wins, so a width or colour set in both takes the `generate.js` value: change it there, and keep the CSS file's copy the same (the light-blue section card is 1240px, the question boxes and arrows 1160px). Nothing may hold a width wider than a phone: a repeating entry block keeps 585px only when there is room (`min-width: min(585px, 100%)`), dropdowns and text boxes are capped at their box (`max-width: 100%`), and the white box - a grid item in `generate.css`'s `section`, which grows to hold its widest box - has `min-width: 0`. Without these a 375px phone laid the page out at 759px and showed the whole form zoomed out. On a phone the section around the white box also drops its 50px sides. `pipeline-nav-audit.js` fails a page wider than a phone screen |
 | `FormWiz GUI/download.js` | `showPreview()`, import/export; supports option `{ text, nameId }` |
 | `FormWiz GUI/W9.pdf` | W-9 AcroForm template used by `/edit_pdf` |
 

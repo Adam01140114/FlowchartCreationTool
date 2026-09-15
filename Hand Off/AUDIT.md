@@ -235,13 +235,27 @@ in a fresh headless tab with empty storage and:
    running. Anything the fill wrote that is gone eight seconds later fails -
    a returning filer's page, where a restore once landed over the fill and
    emptied every repeating block.
+9. **Checks the numbered steps** on the fresh page and after the fill: they
+   show exactly the forms the answers need, numbered 1 to n. It also counts
+   the change and input events an idle page raises in one second, and fails
+   above `--idle-events` (50). A loop once raised about 7,600 a second, and the
+   steps never caught up.
+10. **Lays each page out on a phone-sized screen** (`--phone-width`, 375px;
+   `--phone-only` runs this check alone). It fills the maximum path, shows every
+   section in turn, and fails on any section wider than the screen, naming
+   the box that sticks out. One box wider than a phone lays the whole page out
+   wider, and the phone shows every section zoomed out: a 585px entry block
+   once laid a 375px phone out at 759px. The window is a fixed 375px, not the
+   phone's own zoom-out, which widens the page to fit and hides the overflow.
 
 Output: `passes|FAILS <mode> page, <path> path   fill 1.6 s, 11 sections forward,
-11 back`, then the Next and Back paths, then one line per problem. The last line
+11 back`, then the Next and Back paths, then one line per problem; and for each
+page, `passes|FAILS <mode> page, 375px phone screen   50 sections laid out`. The last line
 is `NOT SHIPPABLE - N paths failed` or `The fill buttons are quick and complete,
 and Back retraces Next on every path walked`. Exit 1 on any failure. A run takes
 3-4 minutes. Flags: `--site`, `--server`, `--modes section,question`,
-`--paths minimum,maximum`, `--fill-budget <ms>`.
+`--paths minimum,maximum`, `--fill-budget <ms>`, `--idle-events <n>`,
+`--phone-width <px>` (0 skips the phone check), `--phone-only`.
 
 ### Step 8 in detail: capturing the answers
 
@@ -250,7 +264,13 @@ debug fill posted, saved from the generated form. Fill the form (debug menu,
 Ctrl+Shift, Fill maximum path), capture the payload, save it with
 `/api/dev-save`, then run `pipeline-fill.js --render`. The payload is every
 `/edit_pdf` request the form posts, merged (stub the downloads while you do it);
-leave out `__attachment`, which is one MC-025 page's spec. A long answer posts
+leave out `__attachment`, which is one MC-025 page's spec. Record the forms the
+page posted as `__forms`: a list of each request's `?pdf=` name, without `.pdf`.
+The page fills only the forms the answers bring in. With that list,
+`pipeline-fill.js` fills only those forms, and `pipeline-explain.js` reports
+any other form as not in the packet. Without it, the blanks of a form the page
+never filled read as defects: three of FL-155's court boxes did, on a path that
+files FL-150. A long answer posts
 only what its box prints, and the rest rides along as `__continued_<name>`:
 `pipeline-fill.js` draws the MC-025 page from it, and fails when a "more space"
 box is ticked but the set holds nothing past the box. It writes the filled PDFs
@@ -447,6 +467,7 @@ of the day passed, and the check that now catches it.
 | FL-150's and RA-010's STATE box printed blank | pdf-lib throws on text longer than a box's character limit, and the error was swallowed; every value check read the answer, not the PDF | The page read (§3 step 10); `/edit_pdf` fits a state to its code and reports any other cut as not fitting |
 | FL-150's household incomes stayed empty on the maximum path and Next locked | The fill knew a money box by the word "amount" in its name | The nav audit (empty fields, Next disabled); `hasValidatedShape` reads `inputmode="decimal"` |
 | FL-150's "People Who Live With You" section vanished and its list landed in "Your Assets" | The export drops a section holding only a block | The nav audit found the stranded list; the block now follows its own Yes/No question |
+| On a phone the whole form showed zoomed out: a 375px screen laid the page out at 759px. Repeating entry blocks had a fixed 585px minimum, a dropdown was as wide as its longest option ("Brother, sister, sibling, stepsibling, or sibling in-law"), and a text box kept its default 50 columns | Every check ran at a desktop width; nothing laid a page out on a phone. Found while widening the desktop layout (card 1240px, questions 1160px) | `pipeline-nav-audit.js` lays each page out on a 375px screen, fills the maximum path, shows every section and fails on one wider than the screen, naming the box that cannot shrink. Entry blocks keep 585px only when there is room (`min(585px, 100%)`), dropdowns and text boxes are capped at their container (`max-width: 100%`), and the white box - a grid item, which grows to hold its widest box, so no cap inside it could work - has `min-width: 0` |
 
 ---
 
