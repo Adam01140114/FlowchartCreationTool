@@ -2643,7 +2643,9 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
         // 2) The <select> itself
         // Add console logging to track dropdown generation
 
-        formHTML += `<select id="${ddNm}" name="${ddNm}" data-question-id="${questionId}"
+        // data-fw-choice-list: its options are the flowchart's option nodes, the
+        // choices "Edit question" may reword (a state or number list is not).
+        formHTML += `<select id="${ddNm}" name="${ddNm}" data-question-id="${questionId}" data-fw-choice-list="1"
                       onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields();${pdfPreviewHandlerCall}${latexPreviewHandlerCall}${statusHandlerCall}${hardAlertHandlerCall}">
                        <option value="" disabled selected>Select an option</option>`;
         const ddOps = qBlock.querySelectorAll(
@@ -3086,7 +3088,7 @@ for (let co = 0; co < cOptsDivs.length; co++){
     formHTML += `
       <span class="checkbox-inline" id="checkbox-container-${optionNameId}">
         <label class="checkbox-label">
-          <input type="${inputType}" id="${optionNameId}" name="${inputName}" value="${optionValue}" data-label="${labelText}"
+          <input type="${inputType}" id="${optionNameId}" name="${inputName}" value="${optionValue}" data-label="${labelText}" data-fw-choice="1"
                  ${onChangeHandler}>
           ${labelText}
         </label>
@@ -9899,7 +9901,10 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var computedFields = ${JSON.stringify(window.computedFieldsConfig || [])};\n`;
   formHTML += `var projectId = ${JSON.stringify(window.projectIdConfig || '')};\n`;
   formHTML += `var fieldCapacity = ${JSON.stringify(window.fieldCapacityConfig || {})};\n`;
-  formHTML += `var overflowLinks = ${JSON.stringify(window.overflowLinksConfig || [])};\n`;
+  // A choice's shown words (the GUI JSON's displayWords): the page draws them
+  // over the option's value, which it posts and fills with as before.
+  formHTML += `var fwDisplayWords = ${JSON.stringify(window.displayWordsConfig || {}).split('<').join('\\u003c')};\n`;
+  formHTML += `var overflowLinks =${JSON.stringify(window.overflowLinksConfig || [])};\n`;
   // The MC-025 layout (continuation-layout.js, loaded by gui.html) - the same
   // code attachment-page.js draws with - so where a narrative is split, and how
   // many sheets DV-100 item 32 counts, are what the server will draw. Its own
@@ -20117,6 +20122,9 @@ function createAddressInput(id, label, index, type = 'text', prefill = '', isAmo
         <button id="viewFlowchartBtn" style="background: linear-gradient(90deg, #0f766e 0%, #14b8a6 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(15, 118, 110, 0.35);">
           🗺️ View flowchart
         </button>
+        <button id="exportFlowchartBtn" style="background: linear-gradient(90deg, #334155 0%, #64748b 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(51, 65, 85, 0.35);">
+          📤 Export flowchart
+        </button>
         </div>
       </div>
     </div>
@@ -20353,6 +20361,493 @@ if (typeof document !== 'undefined' && !window.__NAV_CONTEXT_MENU_BOUND__) {
     if (e.key === 'Escape') closeNavContextMenu();
   });
   window.addEventListener('scroll', closeNavContextMenu, true);
+}
+
+/**
+ * Test mode: right-click a question and choose "Edit question" to change the
+ * words a person reads - its title, its choices, its boxes' labels. Only the
+ * words: every id, every value an answer posts and every box it fills on the
+ * PDF stay as they are (a dropdown keeps its option values, a checkbox its
+ * data-label). The edits are kept in this browser for the project and put back
+ * when the page loads; "Export flowchart" in the debug menu writes them into
+ * the project's flowchart, so a rebuild draws the page as it reads now.
+ * Written with no backticks, dollar-braces or backslashes: this is page code.
+ */
+var FW_TEXT_EDITS_KEY = 'fwTextEdits_' + ((typeof projectId !== 'undefined' && projectId) ? projectId : (window.formId || 'form'));
+function fwOneLine(t) {
+  var s = String(t == null ? '' : t);
+  [10, 13, 9].forEach(function (code) { s = s.split(String.fromCharCode(code)).join(' '); });
+  return s.split(' ').filter(function (w) { return w; }).join(' ');
+}
+function fwLoadTextEdits() {
+  try {
+    var raw = localStorage.getItem(FW_TEXT_EDITS_KEY);
+    var v = raw ? JSON.parse(raw) : {};
+    return v && typeof v === 'object' ? v : {};
+  } catch (e) { return {}; }
+}
+function fwSaveTextEdits(all) {
+  try { localStorage.setItem(FW_TEXT_EDITS_KEY, JSON.stringify(all)); } catch (e) { /* storage off: shown until reload */ }
+}
+// The words of one question as the page draws them. A choice is every spot on
+// the page that shows the same flowchart words - a box's label on each entry
+// that repeats it, a dropdown's option - and each spot keeps the words the page
+// first drew in data-fw-orig: the export finds the flowchart's node by them,
+// however many times they are changed.
+var FW_OPTIONAL_TAIL = ' (optional)';
+function fwEach(list, fn) { Array.prototype.forEach.call(list, fn); }
+function fwSpot(holder, raw, write) {
+  var text = fwOneLine(raw);
+  var tail = '';
+  // The page adds " (optional)" to an optional box's label; the flowchart
+  // holds the label without it.
+  if (text.length > FW_OPTIONAL_TAIL.length && text.slice(-FW_OPTIONAL_TAIL.length) === FW_OPTIONAL_TAIL) {
+    tail = FW_OPTIONAL_TAIL;
+    text = text.slice(0, text.length - FW_OPTIONAL_TAIL.length);
+  }
+  if (!holder.hasAttribute('data-fw-orig')) holder.setAttribute('data-fw-orig', text);
+  return { from: holder.getAttribute('data-fw-orig'), now: text, write: function (t) { write(t + tail); } };
+}
+function fwTitleOrig(title) {
+  if (!title) return '';
+  if (!title.hasAttribute('data-fw-orig')) title.setAttribute('data-fw-orig', fwOneLine(title.textContent));
+  return title.getAttribute('data-fw-orig');
+}
+function fwQuestionWords(container) {
+  var title = container.querySelector('.question-text');
+  var words = { title: title, titleFrom: fwTitleOrig(title), choices: [] };
+  var byKey = {};
+  // target: the field a choice's new words are filed under (displayWords);
+  // base: the value they are shown over.
+  var add = function (kind, id, spot, target, base) {
+    var key = kind + ':' + id;
+    var c = byKey[key];
+    if (!c) {
+      c = byKey[key] = { kind: kind, key: key, from: spot.from, now: spot.now, spots: [], target: target || '', base: base || '' };
+      words.choices.push(c);
+    }
+    c.spots.push(spot);
+  };
+  // A dropdown's choices: the options drawn from the flowchart's option nodes
+  // (data-fw-choice-list), not a list of states or numbers the page makes.
+  fwEach(container.querySelectorAll('select[data-fw-choice-list]'), function (sel) {
+    fwEach(sel.options, function (o) {
+      if (!o.value || o.disabled) return;
+      add('option', o.value, fwSpot(o, o.textContent, function (t) { o.textContent = t; }), 'option:' + sel.id + ':' + o.value, o.value);
+    });
+  });
+  // A checkbox's choices (data-fw-choice); "None of the above" is no node's.
+  fwEach(container.querySelectorAll('input[data-fw-choice]'), function (input) {
+    var label = input.closest('label');
+    if (!label) return;
+    var node = null;
+    for (var i = 0; i < label.childNodes.length; i++) {
+      var n = label.childNodes[i];
+      if (n.nodeType === 3 && fwOneLine(n.nodeValue)) node = n;
+    }
+    if (node) add('checkbox', input.id || input.value, fwSpot(label, node.nodeValue, function (t) { node.nodeValue = ' ' + t + ' '; }),
+      input.id ? 'checkbox:' + input.id : '', input.getAttribute('data-label') || input.value);
+  });
+  // A box's label: its placeholder, or a date box's caption.
+  fwEach(container.querySelectorAll('input[placeholder], textarea[placeholder]'), function (b) {
+    if (!b.placeholder || b.type === 'hidden') return;
+    var spot = fwSpot(b, b.placeholder, function (t) {
+      var named = fwOneLine(b.getAttribute('aria-label')) === fwOneLine(b.placeholder);
+      b.placeholder = t;
+      if (named) b.setAttribute('aria-label', t);
+    });
+    add('box', spot.from, spot);
+  });
+  fwEach(container.querySelectorAll('.fw-date-caption'), function (s) {
+    var input = s.parentNode ? s.parentNode.querySelector('input') : null;
+    var spot = fwSpot(s, s.textContent, function (t) {
+      s.textContent = t;
+      if (input) input.setAttribute('aria-label', t);
+    });
+    add('box', spot.from, spot);
+  });
+  // An entry's title, "Restraining Order #2": the words before the number.
+  fwEach(container.querySelectorAll('.entry-container > h4'), function (h) {
+    var text = fwOneLine(h.textContent);
+    var at = text.lastIndexOf(' #');
+    if (at < 1 || !/^[0-9]+$/.test(text.slice(at + 2))) return;
+    var number = text.slice(at + 1);
+    var spot = fwSpot(h, text.slice(0, at), function (t) { h.textContent = t + ' ' + number; });
+    add('entry', spot.from, spot);
+  });
+  return words;
+}
+function fwTextOf(c) { return c.now; }
+function fwSetText(c, text) {
+  c.spots.forEach(function (s) { s.write(text); });
+  c.now = text;
+}
+function fwQuestionKey(container) {
+  return String(container.getAttribute('data-question-id') || container.id || '');
+}
+// The field names inside a question: how the export tells apart two questions
+// that read the same.
+function fwNamesIn(container) {
+  var names = [];
+  fwEach(container.querySelectorAll('input[id], select[id], textarea[id]'), function (el) {
+    if (el.id && names.length < 60) names.push(el.id);
+  });
+  return names;
+}
+function fwApplyTextEdits() {
+  if (!isTestDeployment()) return;
+  var all = fwLoadTextEdits();
+  var dirty = false;
+  Object.keys(all).forEach(function (qkey) {
+    var edit = all[qkey];
+    var container = document.querySelector('.question-container[data-question-id="' + qkey + '"]');
+    if (!container || !edit) return;
+    var words = fwQuestionWords(container);
+    // A page rebuilt from an exported flowchart already reads the edited
+    // words: those edits are done, and are dropped.
+    if (edit.title && edit.title.to === words.titleFrom) { edit.title = null; dirty = true; }
+    edit.choices = (edit.choices || []).filter(function (ce) {
+      var done = words.choices.some(function (c) {
+        return (c.key === ce.key && c.from === ce.to) || ((ce.kind === 'box' || ce.kind === 'entry') && c.key === ce.kind + ':' + ce.to);
+      });
+      if (done) dirty = true;
+      return !done;
+    });
+    if (!edit.title && !edit.choices.length) { delete all[qkey]; return; }
+    if (edit.question !== words.titleFrom && !edit.title) edit.question = words.titleFrom;
+    if (edit.title && edit.title.to && words.title && fwOneLine(words.title.textContent) !== edit.title.to) words.title.textContent = edit.title.to;
+    edit.choices.forEach(function (ce) {
+      words.choices.forEach(function (c) {
+        if (c.key !== ce.key || !ce.to) return;
+        if (c.spots.some(function (s) { return s.now !== ce.to; })) fwSetText(c, ce.to);
+      });
+    });
+  });
+  if (dirty) fwSaveTextEdits(all);
+}
+// The editor offers a box's label or an entry's title only when the flowchart
+// holds those words, so the export can write every edit back.
+var fwProjectPromise = null;
+function fwProjectJson() {
+  if (typeof projectId === 'undefined' || !projectId) return Promise.reject(new Error('This page has no project id.'));
+  if (!fwProjectPromise) {
+    fwProjectPromise = fetch('/api/project/' + encodeURIComponent(projectId), { cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('The project did not load (HTTP ' + r.status + ').');
+        return r.json();
+      });
+    fwProjectPromise.catch(function () { fwProjectPromise = null; });
+  }
+  return fwProjectPromise.then(function (p) { return JSON.parse(JSON.stringify(p)); });
+}
+function fwFlowchartWords(project) {
+  var known = {};
+  ((project && project.forms) || []).forEach(function (f) {
+    ((f.flowchart && f.flowchart.cells) || []).forEach(function (c) {
+      (c._textboxes || []).forEach(function (b) {
+        if (!b) return;
+        known['box:' + fwOneLine(b.label)] = true;
+        known['box:' + fwOneLine(b.placeholder)] = true;
+      });
+      if (c._placeholder) known['box:' + fwOneLine(c._placeholder)] = true;
+      if (c._dropdownTitle) known['entry:' + fwOneLine(c._dropdownTitle)] = true;
+    });
+  });
+  return known;
+}
+function fwOpenQuestionEditor(container) {
+  closeNavContextMenu();
+  var draw = function (known) { fwDrawQuestionEditor(container, known); };
+  fwProjectJson().then(function (p) { draw(fwFlowchartWords(p)); }, function () { draw(null); });
+}
+function fwDrawQuestionEditor(container, known) {
+  var old = document.getElementById('fwQuestionEditor');
+  if (old) old.remove();
+  var words = fwQuestionWords(container);
+  var shown = words.choices.filter(function (c) {
+    return c.kind === 'option' || c.kind === 'checkbox' || !known || known[c.key];
+  });
+  var qkey = fwQuestionKey(container);
+  var all = fwLoadTextEdits();
+  var entry = all[qkey] || { choices: [] };
+  var overlay = document.createElement('div');
+  overlay.id = 'fwQuestionEditor';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:100002;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px;';
+  var box = document.createElement('div');
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-label', 'Edit question');
+  box.style.cssText = 'background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:85vh;overflow:auto;padding:22px 22px 18px;box-shadow:0 20px 50px rgba(0,0,0,.25);text-align:left;font-family:inherit;';
+  var head = document.createElement('div');
+  head.style.cssText = 'font-size:18px;font-weight:700;color:#1f2937;margin-bottom:4px;';
+  head.textContent = 'Edit question';
+  var note = document.createElement('div');
+  note.style.cssText = 'font-size:13px;color:#64748b;margin-bottom:16px;';
+  note.textContent = 'Only the words change. Every name, value and PDF box stays the same. Export flowchart in the debug menu saves the new words into the flowchart.';
+  box.appendChild(head);
+  box.appendChild(note);
+  var addField = function (labelText, value, multiline) {
+    var wrap = document.createElement('label');
+    wrap.style.cssText = 'display:block;margin:0 0 12px;font-size:13px;font-weight:600;color:#334155;';
+    wrap.appendChild(document.createTextNode(labelText));
+    var input = document.createElement(multiline ? 'textarea' : 'input');
+    if (!multiline) input.type = 'text';
+    input.value = value;
+    input.style.cssText = 'display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:9px 11px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;font-weight:400;font-size:14px;color:#111827;background:#fff;'
+      + (multiline ? 'min-height:64px;resize:vertical;' : '');
+    wrap.appendChild(input);
+    box.appendChild(wrap);
+    return input;
+  };
+  var titleInput = words.title ? addField('Question', fwOneLine(words.title.textContent), true) : null;
+  var counts = {};
+  var fields = shown.map(function (c) {
+    var name = c.kind === 'box' ? 'Box' : (c.kind === 'entry' ? 'Entry title' : 'Choice');
+    counts[name] = (counts[name] || 0) + 1;
+    return { c: c, input: addField(name === 'Entry title' ? name : name + ' ' + counts[name], fwTextOf(c), false) };
+  });
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px;';
+  var makeButton = function (text, primary) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = text;
+    b.style.cssText = 'padding:9px 16px;border-radius:8px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;'
+      + (primary ? 'background:#2563eb;color:#fff;border:1px solid #2563eb;' : 'background:#fff;color:#334155;border:1px solid #cbd5e1;');
+    row.appendChild(b);
+    return b;
+  };
+  var undo = makeButton('Undo my edits', false);
+  var cancel = makeButton('Cancel', false);
+  var save = makeButton('Save', true);
+  box.appendChild(row);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  var close = function () { overlay.remove(); };
+  cancel.addEventListener('click', close);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+  overlay.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  undo.addEventListener('click', function () {
+    if (words.title && words.titleFrom) words.title.textContent = words.titleFrom;
+    words.choices.forEach(function (c) { fwSetText(c, c.from); });
+    delete all[qkey];
+    fwSaveTextEdits(all);
+    close();
+  });
+  save.addEventListener('click', function () {
+    // The words the page first drew: how the export finds the question's node.
+    if (!entry.question) entry.question = words.titleFrom;
+    entry.names = fwNamesIn(container);
+    if (titleInput && words.title) {
+      var now = fwOneLine(titleInput.value);
+      if (now) {
+        words.title.textContent = now;
+        entry.title = now === words.titleFrom ? null : { from: words.titleFrom, to: now };
+      }
+    }
+    var kept = [];
+    fields.forEach(function (f) {
+      var now = fwOneLine(f.input.value);
+      var prior = (entry.choices || []).filter(function (x) { return x.key === f.c.key; })[0];
+      if (!now) { if (prior) kept.push(prior); return; }
+      if (now !== f.c.now) fwSetText(f.c, now);
+      if (now !== f.c.from) kept.push({ key: f.c.key, kind: f.c.kind, from: f.c.from, to: now, target: f.c.target, base: f.c.base });
+    });
+    // An edit to words not on the page just now - an entry not opened - stays.
+    (entry.choices || []).forEach(function (x) {
+      if (!fields.some(function (f) { return f.c.key === x.key; })) kept.push(x);
+    });
+    entry.choices = kept;
+    if (entry.title || kept.length) all[qkey] = entry;
+    else delete all[qkey];
+    fwSaveTextEdits(all);
+    close();
+  });
+  if (titleInput) titleInput.focus();
+}
+// The project's flowchart with those edits written in: the question's text,
+// each box's label and an entry's title go into the question's node; each
+// choice's new words go into the project's displayWords, keyed by its field,
+// because a choice's words are its value and the root of its field names, so
+// its node keeps them. Nothing else moves - ids, names, values and arrows stay.
+function fwApplyEditsToProject(project, edits) {
+  var changed = 0;
+  var missed = 0;
+  var forms = (project && project.forms) || [];
+  var plain = function (v) { var d = document.createElement('div'); d.innerHTML = String(v == null ? '' : v); return fwOneLine(d.textContent); };
+  var esc = function (t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
+  var questions = [];
+  forms.forEach(function (f) {
+    var cells = (f.flowchart && f.flowchart.cells) || [];
+    var byId = {};
+    var arrowsFrom = {};
+    cells.forEach(function (c) {
+      byId[c.id] = c;
+      if (c.edge) (arrowsFrom[c.source] = arrowsFrom[c.source] || []).push(c);
+    });
+    cells.forEach(function (c) {
+      if (c.vertex && /nodeType=question/.test(c.style || '')) questions.push({ cell: c, byId: byId, arrowsFrom: arrowsFrom });
+    });
+  });
+  // A question's choices: the option nodes its arrows reach, directly or
+  // through a merge hub (a checkbox question fans its options out of one).
+  var optionsOf = function (m) {
+    var found = [];
+    var seen = {};
+    var walk = function (id, depth) {
+      if (seen[id] || depth > 3) return;
+      seen[id] = true;
+      (m.arrowsFrom[id] || []).forEach(function (edge) {
+        var c = m.byId[edge.target];
+        if (!c) return;
+        if (/nodeType=options/.test(c.style || '')) { if (found.indexOf(c) === -1) found.push(c); }
+        else if (/nodeType=mergeHub/.test(c.style || '')) walk(c.id, depth + 1);
+      });
+    };
+    walk(m.cell.id, 0);
+    return found;
+  };
+  var holdsAName = function (m, names) {
+    var q = m.cell;
+    if (q._nameId && names.indexOf(q._nameId) !== -1) return true;
+    if ((q._textboxes || []).some(function (b) { return b && names.indexOf(b.fullNameId) !== -1; })) return true;
+    return optionsOf(m).some(function (o) { return o._nameId && names.indexOf(o._nameId) !== -1; });
+  };
+  // How many questions on this page first read the same. One: every node with
+  // those words is that question (a packet asks it once for all its forms).
+  // More: the field names tell them apart.
+  var readsOnPage = function (text) {
+    var n = 0;
+    fwEach(document.querySelectorAll('.question-container .question-text'), function (t) {
+      if ((t.getAttribute('data-fw-orig') || fwOneLine(t.textContent)) === text) n++;
+    });
+    return n;
+  };
+  var shown = (project && project.displayWords && typeof project.displayWords === 'object') ? project.displayWords : {};
+  Object.keys(edits || {}).forEach(function (qkey) {
+    var edit = edits[qkey];
+    if (!edit) return;
+    var cellEdits = [];
+    (edit.choices || []).forEach(function (ce) {
+      if (ce.kind !== 'option' && ce.kind !== 'checkbox') { cellEdits.push(ce); return; }
+      if (!ce.target) { missed++; return; }
+      if (ce.to === ce.base) delete shown[ce.target];
+      else shown[ce.target] = ce.to;
+      changed++;
+    });
+    if (!edit.title && !cellEdits.length) return;
+    var from = edit.question || (edit.title && edit.title.from) || '';
+    var names = edit.names || [];
+    var matches = questions.filter(function (m) { return plain(m.cell._questionText || m.cell.value) === from; });
+    if (names.length && (!matches.length || readsOnPage(from) > 1)) {
+      var named = (matches.length ? matches : questions).filter(function (m) { return holdsAName(m, names); });
+      if (named.length) matches = named;
+    }
+    if (!matches.length) { missed += (edit.title ? 1 : 0) + cellEdits.length; return; }
+    if (edit.title && edit.title.to) {
+      matches.forEach(function (m) {
+        m.cell._questionText = edit.title.to;
+        m.cell.value = esc(edit.title.to);
+        changed++;
+      });
+    }
+    cellEdits.forEach(function (ce) {
+      var hit = 0;
+      matches.forEach(function (m) {
+        var q = m.cell;
+        if (ce.kind === 'box') {
+          (q._textboxes || []).forEach(function (b) {
+            if (!b) return;
+            if (fwOneLine(b.label) === ce.from) { b.label = ce.to; hit++; }
+            if (fwOneLine(b.placeholder) === ce.from) { b.placeholder = ce.to; hit++; }
+          });
+          if (fwOneLine(q._placeholder) === ce.from) { q._placeholder = ce.to; hit++; }
+        } else if (ce.kind === 'entry') {
+          if (fwOneLine(q._dropdownTitle) === ce.from) { q._dropdownTitle = ce.to; hit++; }
+        }
+      });
+      if (hit) changed += hit;
+      else missed++;
+    });
+  });
+  if (project) {
+    if (Object.keys(shown).length) project.displayWords = shown;
+    else delete project.displayWords;
+  }
+  return { changed: changed, missed: missed };
+}
+// A choice's words from the flowchart's displayWords, drawn over its value in
+// every deployment, test or not: the value is still what the page posts, what
+// its logic compares and what fills the PDF.
+function fwApplyDisplayWords() {
+  var shown = (typeof fwDisplayWords !== 'undefined' && fwDisplayWords) ? fwDisplayWords : {};
+  Object.keys(shown).forEach(function (target) {
+    var to = fwOneLine(shown[target]);
+    if (!to) return;
+    if (target.indexOf('option:') === 0) {
+      var rest = target.slice(7);
+      var at = rest.indexOf(':');
+      var sel = at > 0 ? document.getElementById(rest.slice(0, at)) : null;
+      if (!sel || !sel.options) return;
+      var value = rest.slice(at + 1);
+      fwEach(sel.options, function (o) { if (o.value === value && o.textContent !== to) o.textContent = to; });
+    } else if (target.indexOf('checkbox:') === 0) {
+      var input = document.getElementById(target.slice(9));
+      var label = input && input.closest ? input.closest('label') : null;
+      if (!label) return;
+      for (var i = label.childNodes.length - 1; i >= 0; i--) {
+        var n = label.childNodes[i];
+        if (n.nodeType === 3 && fwOneLine(n.nodeValue)) {
+          if (fwOneLine(n.nodeValue) !== to) n.nodeValue = ' ' + to + ' ';
+          return;
+        }
+      }
+    }
+  });
+}
+if (typeof document !== 'undefined' && !window.__FW_QUESTION_EDITOR_BOUND__) {
+  window.__FW_QUESTION_EDITOR_BOUND__ = true;
+  document.addEventListener('contextmenu', function (e) {
+    if (!isTestDeployment()) return;
+    var t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest('.question-next') || t.closest('#debugMenu') || t.closest('#fwQuestionEditor')) return;
+    // A text box keeps the browser's own menu: copy and paste.
+    if (t.closest('input[type=text], input:not([type]), textarea')) return;
+    var container = t.closest('.question-container');
+    if (!container) return;
+    e.preventDefault();
+    closeNavContextMenu();
+    var menu = document.createElement('div');
+    menu.className = 'nav-context-menu';
+    menu.id = 'navContextMenu';
+    var hint = document.createElement('div');
+    hint.className = 'nav-context-hint';
+    hint.textContent = 'Test mode';
+    menu.appendChild(hint);
+    var edit = document.createElement('button');
+    edit.type = 'button';
+    edit.textContent = 'Edit question';
+    edit.addEventListener('click', function () { fwOpenQuestionEditor(container); });
+    menu.appendChild(edit);
+    document.body.appendChild(menu);
+    var rect = menu.getBoundingClientRect();
+    menu.style.left = Math.max(8, Math.min(e.clientX, window.innerWidth - rect.width - 8)) + 'px';
+    menu.style.top = Math.max(8, Math.min(e.clientY, window.innerHeight - rect.height - 8)) + 'px';
+    edit.focus();
+  });
+  var fwApplySoon = function () {
+    try { fwApplyDisplayWords(); } catch (err) { /* nothing to draw */ }
+    try { fwApplyTextEdits(); } catch (err) { /* nothing to put back */ }
+  };
+  // Once the page is drawn, again after a saved draft has had time to restore,
+  // and after any change: an entry a count opens is drawn with the flowchart's words.
+  var fwStartApplying = function () {
+    try { fwApplyDisplayWords(); } catch (err) { /* nothing to draw */ }
+    [300, 1500, 4000].forEach(function (ms) { setTimeout(fwApplySoon, ms); });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fwStartApplying);
+  else fwStartApplying();
+  document.addEventListener('change', function () { setTimeout(fwApplySoon, 0); }, true);
 }
 
 /**
@@ -24295,6 +24790,41 @@ document.getElementById('viewFlowchartBtn').addEventListener('click', function()
   var id = (typeof projectId !== 'undefined' && projectId) ? String(projectId) : '';
   if (!id) { alert('This form was not published from a project, so there is no flowchart to show.'); return; }
   window.open('/flowchart/' + encodeURIComponent(id), '_blank', 'noopener');
+});
+// The project's flowchart with the words changed through "Edit question" (see
+// fwApplyEditsToProject): the file that, built again, draws this page as it
+// reads now.
+document.getElementById('exportFlowchartBtn').addEventListener('click', function() {
+  var id = (typeof projectId !== 'undefined' && projectId) ? String(projectId) : '';
+  if (!id) { alert('This form was not published from a project, so there is no flowchart to export.'); return; }
+  var btn = this;
+  var label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Exporting...';
+  fetch('/api/project/' + encodeURIComponent(id), { cache: 'no-store' })
+    .then(function (r) {
+      if (r.ok) return r.json();
+      throw new Error(r.status === 404 ? 'There is no flowchart saved for this form.' : 'The flowchart could not be loaded (' + r.status + ').');
+    })
+    .then(function (project) {
+      var result = fwApplyEditsToProject(project, fwLoadTextEdits());
+      var name = String(project.projectName || id).toLowerCase().split(' ').filter(function (w) { return w; }).join('-') + '-project.json';
+      var blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      window.__fwLastFlowchartExport = { name: name, changed: result.changed, missed: result.missed };
+      var msg = 'Flowchart exported with ' + result.changed + ' change' + (result.changed === 1 ? '' : 's')
+        + (result.missed ? ' (' + result.missed + ' could not be matched)' : '');
+      if (typeof showQuestionInfoNote === 'function') showQuestionInfoNote(msg, true);
+    })
+    .catch(function (e) { alert(e && e.message ? e.message : 'The flowchart could not be exported.'); })
+    .then(function () { btn.disabled = false; btn.textContent = label; });
 });
 document.getElementById('fillMinimumPathBtn').addEventListener('click', function() {
   fillMaximumPath({ markers: true, minimum: true }).then(closeDebugMenuAfterFill);

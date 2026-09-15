@@ -347,6 +347,17 @@ Every item below is here because skipping it let a defect reach the user.
    an answer back. *A description stayed on screen, holding what was typed,
    after "Is there another incident?" went to No.* The human read (§3 step 9) and the page images (step 10) are
    the only checks that can find a new kind of problem.
+11. **"Only the words change" is a claim about the rebuilt page, so test the
+   rebuild.** Take the feature's output all the way round - flowchart → editor →
+   GUI JSON → `getFormHTML()` in `gui.html` - and compare every input, select,
+   option and textarea (id, name, value, `data-label`, type) with the same
+   export of the untouched project: the set must be identical, and a diff of
+   the two GUI JSONs must show only the words. *"Edit question" renamed a
+   checkbox choice in its option cell; the page it was tried on looked right,
+   but `library.js` builds a checkbox option's nameId from its text, so the
+   rebuilt field was `..._together_reworded` and its PDF box went empty. The
+   words now travel in `displayWords`, and the round trip reads 3,889 fields,
+   0 different.*
 
 Practical notes for the Browser pane:
 

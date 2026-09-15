@@ -743,7 +743,12 @@ function reportGroupProblems(merged) {
     merged.formName = (document.getElementById('projectNameInput') || {}).value
       || merged.formName || 'Project';
     merged.fieldCapacity = window.fieldCapacity || {};
-    merged.projectId = (typeof window.currentProjectId === 'function')
+    // A choice's shown words, keyed by the field it belongs to (generate.js
+    // draws them; the value underneath does not change).
+    if (window.projectDisplayWords && Object.keys(window.projectDisplayWords).length) {
+      merged.displayWords = window.projectDisplayWords;
+    }
+    merged.projectId =(typeof window.currentProjectId === 'function')
       ? window.currentProjectId(true) : (window.projectId || '');
     merged.projectForms = ranges;
     // Fields the form asks for that no question can answer, gathered from

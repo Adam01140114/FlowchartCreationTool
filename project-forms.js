@@ -185,6 +185,11 @@
       // made a named project anonymous.
       projectName: projectNameInput() ? projectNameInput().value.trim() : '',
       fieldCapacity: window.fieldCapacity || {},
+      // The words a choice shows in place of its value ("Edit question" in a
+      // test-mode form, then its Export flowchart): cosmetic only, so the
+      // value, its field names and the PDF stay as the option node has them.
+      ...(window.projectDisplayWords && Object.keys(window.projectDisplayWords).length
+        ? { displayWords: window.projectDisplayWords } : {}),
       exportedAt: new Date().toISOString(),
       currentFormIndex: window.currentFormIndex,
       forms: window.projectForms.map(function (f) {
@@ -257,6 +262,7 @@
     // The file first, then whatever this browser was last working on.
     rememberProjectId(String(data.projectId || '').trim() || currentProjectId(true));
     window.fieldCapacity = data.fieldCapacity || {};
+    window.projectDisplayWords = (data.displayWords && typeof data.displayWords === 'object') ? data.displayWords : {};
     // Always set, even to nothing: leaving the box alone kept the last
     // project's name on the one just opened.
     if (projectNameInput()) projectNameInput().value = String(data.projectName || '').trim();

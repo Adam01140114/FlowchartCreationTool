@@ -3093,6 +3093,10 @@ function loadFormData(formData) {
     window.overflowLinksConfig = Array.isArray(formData.overflowLinks) ? formData.overflowLinks : [];
     window.projectIdConfig = String(formData.projectId || '');
     window.fieldCapacityConfig = formData.fieldCapacity || {};
+    // The words a choice shows in place of its value, keyed "option:<select
+    // id>:<value>" or "checkbox:<input id>" - cosmetic, like the fields above
+    // they travel whole to the generated page.
+    window.displayWordsConfig = (formData.displayWords && typeof formData.displayWords === 'object') ? formData.displayWords : {};
     // Load linked fields
     if (formData.linkedFields && formData.linkedFields.length > 0) {
         // Initialize linked fields configuration
@@ -3271,6 +3275,9 @@ function exportForm(options) {
     }
     if (window.fieldCapacityConfig && Object.keys(window.fieldCapacityConfig).length) {
         formData.fieldCapacity = window.fieldCapacityConfig;
+    }
+    if (window.displayWordsConfig && Object.keys(window.displayWordsConfig).length) {
+        formData.displayWords = window.displayWordsConfig;
     }
     if (Array.isArray(window.overflowLinksConfig) && window.overflowLinksConfig.length > 0) {
         formData.overflowLinks = window.overflowLinksConfig;
