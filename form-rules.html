@@ -306,6 +306,12 @@ const RULES = [
     why: 'Widening the desktop layout turned up the phone: a 375px screen laid the page out at 759px and showed the whole form zoomed out. Entry blocks had a fixed 585px minimum, a dropdown was as wide as its longest option ("Brother, sister, sibling, stepsibling, or sibling in-law"), and every check ran at a desktop width.',
     by: 'pipeline-nav-audit.js lays each page out on a 375px screen (--phone-width), fills the maximum path, shows every section in turn, and fails on one wider than the screen, naming the box that cannot shrink. On the old build it failed 29 sections of each page, naming the 585px entry blocks and the long dropdowns' },
 
+  { id: 'the-filer-never-sees-the-papers-machinery', group: 'interview', num: 'Rule 2',
+    title: 'The filer never sees the paper’s machinery',
+    says: 'Nothing the filer reads says where an answer goes on the paper: no “on the attached page”, no attachment numbers such as “Attachment 2b(2)”, no MC-025, no “continued on”. The packet puts each answer where it belongs - a fifth child on the MC-025 page that continues the table - and the interview only asks. An entry in a block is its name and number: “Minor #5”.',
+    why: 'The page titled every entry past the rows the paper prints “Minor #5 - on the attached page (DV-160, Attachment 2b(2))” - 32 titles across DV-100, DV-105 and DV-160 on the maximum path. The user found it. Every audit had passed, because the words were written by the page as it drew the block: they were in no file the interview audit read, and the site audit, which drove that very page, never read what was on screen.',
+    by: 'mentionsThePaper in wording-rules.js (self-tested); pipeline-audit.js RULE 2 (PAPER’S MACHINERY) reads every question, subtitle, box, choice and entry title in the GUI and blocks the build; pipeline-nav-audit.js “words on screen” fills the maximum path and reads every section of the live page, the words the page writes for itself included - on the old build it failed 32 lines on both pages' },
+
   { id: 'a-form-is-on-only-for-an-answer-in-a-form-that-is-on', group: 'packet', num: 'Rule',
     title: 'A form is in the packet only for an answer given in a form that is in the packet',
     says: 'A form an answer brings in is on only while that answer stands and the form it is asked in is itself on. An activation rule belongs to the form it names exactly - never to a form whose name merely starts the same.',

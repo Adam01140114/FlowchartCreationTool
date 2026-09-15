@@ -16,6 +16,12 @@ MC-025, MC-030, MC-031. Nothing else goes in without the user saying so.
 Anything that needs more space continues on MC-025 (rule
 `the-packet-uses-mc025-for-more-space`).
 
+A second project stands on its own: California DOJ **BCIA 8016**, Request for
+Live Scan Service (`bcia8016.spec.json` -> `bcia8016-project.json`, project
+`p_bcia8016_livescan`, published as `live-sites/request-for-live-scan-service`).
+Its files are named after its spec, and the commands to build and check it are
+in [`Hand Off/NEW-FORM.md`](Hand%20Off/NEW-FORM.md), "A project of its own".
+
 ---
 
 ## Read, in this order
@@ -178,6 +184,7 @@ Several agents may work here at once. They share one machine, one dev server
 |---|---|
 | Dev server | `npm start` -> `http://localhost:8080` (editor at `/index.html`, form builder at `/FormWiz%20GUI/gui.html`, rules at `/form-rules.html`) |
 | Published form | `/form/<projectId>/section.html?saved=<stamp>` (project `p_mtumpmov7t2gh0`, set in `dv-packet.spec.json`) |
+| Public site (Render, `https://formwiz.onrender.com`) | `node server.js`: the dev server in public mode (`FORMWIZ_PUBLIC=1`). It answers only the published forms (`/form/<site name or projectId>/...`), `POST /edit_pdf`, the read-only flowchart view the forms' "View flowchart" button opens (`/flowchart/<project>`), and a list of the forms at `/` - everything else is 404 (`publicAllows` in `dev-server.js`). Render deploys `main` and runs `node server.js`; `npm start` is the private server with everything |
 | Static audits | `npm run audit` |
 | Every form the paperwork mentions, and what covers it | `node pipeline-form-refs.js` (in `npm run audit` as `--check`) |
 | A court form's blank PDF | [`Hand Off/NEW-FORM.md` §0](Hand%20Off/NEW-FORM.md) - `curl` from courts.ca.gov; the user has given standing permission to download PDFs |

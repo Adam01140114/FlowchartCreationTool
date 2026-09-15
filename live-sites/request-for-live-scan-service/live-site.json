@@ -1,0 +1,29 @@
+{
+  "title": "Request for Live Scan Service",
+  "tabTitle": "",
+  "folder": "live-sites/request-for-live-scan-service",
+  "url": "/live-sites/request-for-live-scan-service/index.html",
+  "modes": [
+    "question",
+    "section"
+  ],
+  "links": {
+    "question": "/live-sites/request-for-live-scan-service/index.html?mode=question",
+    "section": "/live-sites/request-for-live-scan-service/index.html?mode=section"
+  },
+  "pages": {
+    "question": "/live-sites/request-for-live-scan-service/question.html",
+    "section": "/live-sites/request-for-live-scan-service/section.html"
+  },
+  "formLinks": {
+    "question": "/form/request-for-live-scan-service/question.html?saved=9-14-26_9-13pm",
+    "section": "/form/request-for-live-scan-service/section.html?saved=9-14-26_9-13pm"
+  },
+  "builtAt": "2026-09-15T04:13:54.472Z",
+  "source": "bcia8016-gui.json",
+  "projectId": "p_bcia8016_livescan",
+  "pdfs": [
+    "bcia8016.pdf"
+  ],
+  "missingPdfs": []
+}

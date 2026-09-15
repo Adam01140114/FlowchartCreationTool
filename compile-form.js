@@ -884,6 +884,30 @@ function buildInterview(fields, hints, repeats = [], combines = []) {
     }
   });
 
+  // With an order hint, a field's place in that order is its index. A combined
+  // question is asked where the first of its fields is, measured by index, so
+  // left at the PDF's own order it landed where its box sits on the page: BCIA
+  // 8016's two-column page put the home address between the agency's phone
+  // number and its billing number. The fields a combined question or a block
+  // absorbs are not in the list the loop walks, so each is placed by its name
+  // in the order hint too; renumbering only the walked list compared their
+  // page positions with order positions and sent every address to the end.
+  if (hints.order && hints.order.length) {
+    const placeOf = (f) => {
+      const at = hints.order.indexOf(f.id);
+      return at !== -1 ? at : hints.order.indexOf(f.nameId);
+    };
+    order.forEach((f, i) => {
+      const at = placeOf(f);
+      f.index = at !== -1 ? at : hints.order.length + i;
+    });
+    combines.concat(repeats).forEach((c) => {
+      if (!c.anchor) return;
+      const at = placeOf(c.anchor);
+      if (at !== -1) c.anchor.index = at;
+    });
+  }
+
   order.forEach((field) => {
     // an invented choice question, asked just before the field it names
     choices.filter((c) => c.before === field.id || c.before === field.nameId).forEach((c) => {

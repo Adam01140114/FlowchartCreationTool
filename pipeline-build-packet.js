@@ -27,8 +27,15 @@ const { addTitleNote } = require('./title-note');
 const OUT_DIR = 'FormWiz GUI';
 
 const SPEC = process.argv[2] || 'dv-packet.spec.json';
-const OUT = process.argv[3] || 'dv-packet-project.json';
-const DISQUALIFIERS = process.argv[4] || 'dv-packet-disqualifiers.json';
+// A packet's other files are named after its spec: dv-packet.spec.json goes
+// with dv-packet-project.json, -disqualifiers.json and -capacity.json. A second
+// project built from its own spec reads its own, not the DV packet's box sizes
+// and alerts.
+const PACKET = path.join(path.dirname(SPEC),
+  path.basename(SPEC).replace(/\.spec\.json$/i, '').replace(/\.json$/i, ''));
+const OUT = process.argv[3] || PACKET + '-project.json';
+const DISQUALIFIERS = process.argv[4] || PACKET + '-disqualifiers.json';
+const CAPACITY = PACKET + '-capacity.json';
 const alerted = {};
 
 const CONNECTOR_STYLE = 'shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;'
@@ -386,7 +393,7 @@ async function main() {
   // with it. No PDF field is named __wraps.
   let fieldCapacity = {};
   try {
-    const measured = JSON.parse(fs.readFileSync('dv-packet-capacity.json', 'utf8'));
+    const measured = JSON.parse(fs.readFileSync(CAPACITY, 'utf8'));
     fieldCapacity = measured.fields || {};
     if (measured.wraps && Object.keys(measured.wraps).length) {
       fieldCapacity.__wraps = measured.wraps;

@@ -1,5 +1,5 @@
 {
- "measuredAt": "2026-09-14T21:27:53.304Z",
+ "measuredAt": "2026-09-15T02:42:30.544Z",
  "reference": "Helvetica, laid out over a corpus of form answers",
  "fields": {
   "court_name_and_street_address": 153,
@@ -8,7 +8,7 @@
   "person_asking_protection_age": 4,
   "person_asking_protection_mailing_address": 40,
   "person_asking_protection_mailing_city": 11,
-  "person_asking_protection_mailing_state": 5,
+  "person_asking_protection_mailing_state": 2,
   "person_asking_protection_mailing_zip_code": 5,
   "person_asking_protection_telephone": 11,
   "person_asking_protection_fax": 11,

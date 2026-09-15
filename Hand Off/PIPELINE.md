@@ -372,6 +372,24 @@ Finding that box took three tries, and each failed a different way:
 What works is laying the box it sits in out at its own narrowest, with its
 siblings hidden.
 
+**The filer never sees the paper's machinery.** An entry in a block is its
+name and number, "Minor #5". The page used to title every entry past the rows
+the paper prints "Minor #5 - on the attached page (DV-160, Attachment
+2b(2))", 32 titles on the maximum path, and the user found it. Every audit
+passed, and for a reason worth remembering:
+
+- The words were written by the page as it drew the block (`generate.js`), so
+  they were in no file the interview audit reads.
+- The site audit drove that very page and filled it to the fifth minor, but
+  it read values and layout, never the words on screen.
+
+Now `mentionsThePaper` (`wording-rules.js`) is read by both. `pipeline-audit.js`
+checks every question, subtitle, box, choice and entry title in the GUI.
+`pipeline-nav-audit.js` fills the maximum path and reads every section of the
+live page ("words on screen"). On the old build it failed those 32 lines on
+both pages. Any text the runtime writes for the filer is only ever checked by
+reading the page.
+
 **FL-150 or FL-155 is DV-570's decision, made in the interview.** FL-150 comes
 in on spousal support or lawyer's fees among DV-100's orders, or on a Yes to any
 of DV-570's four remaining questions (self-employed; the other person asking for

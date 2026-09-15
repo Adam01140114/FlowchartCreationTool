@@ -77,6 +77,81 @@ const PORT = process.env.PORT || 8080;
 const BODY_LIMIT = process.env.BODY_LIMIT || '50mb';
 
 const app = express();
+// Public mode (FORMWIZ_PUBLIC=1, which server.js sets for a public host such as
+// Render): only what publicAllows names is answered, before anything else runs -
+// no body is even read for the rest.
+const PUBLIC_MODE = process.env.FORMWIZ_PUBLIC === '1';
+if (PUBLIC_MODE) {
+  app.use((req, res, next) => {
+    if (publicAllows(req)) return next();
+    console.log('[public] refused ' + req.method + ' ' + String(req.originalUrl).slice(0, 200));
+    res.status(404).set('X-Robots-Tag', 'noindex, nofollow').type('text/plain').send('Not available on the public site.');
+  });
+  app.use((req, res, next) => { res.set('X-Robots-Tag', 'noindex, nofollow'); next(); });
+  // Ahead of express.static, which would answer / with the editor's index.html.
+  app.get('/', (req, res) => res.type('html').send(publicFrontPage()));
+}
+
+/**
+ * What a public host answers: the published forms under /form/<site name or
+ * project id>/..., the PDFs they fill (POST /edit_pdf, by a PDF's own name),
+ * the editor only as the read-only flowchart view (/flowchart/<project>, which
+ * opens /index.html?view=...) and the files that page loads, the flowchart it
+ * shows (/api/project/<project>), and / listing the forms. Everything else - the
+ * editor's saving and publishing, the builder, the pipeline's files and every
+ * other /api route - stays on the private server.
+ */
+const PUBLIC_FORM_PATH = /^\/form\/[A-Za-z0-9_-]{1,80}(?:\/[A-Za-z0-9_.()\- ]*)*$/;
+const PUBLIC_PDF_NAME = /^[A-Za-z0-9_()\- ]+\.pdf$/i;
+// The files the editor page loads, read from index.html itself, so the view
+// works and no other file beside the server is handed out.
+const PUBLIC_EDITOR_FILES = (() => {
+  const files = new Set(['/view-only.js', '/css/common.css']);
+  try {
+    const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+    for (const m of html.matchAll(/<(?:script|link)\b[^>]*\b(?:src|href)="([^"#?:]+)"/g)) {
+      files.add('/' + m[1].replace(/^\.?\//, ''));
+    }
+  } catch (e) { /* no editor beside the server */ }
+  return files;
+})();
+function publicAllows(req) {
+  let p;
+  try { p = decodeURIComponent(req.path); } catch (e) { return false; }
+  if (p.includes('..') || p.includes('\\')) return false;
+  const read = req.method === 'GET' || req.method === 'HEAD';
+  if (read && (p === '/' || PUBLIC_FORM_PATH.test(p))) return true;
+  if (read && /^\/(flowchart|api\/project)\/[A-Za-z0-9_-]{1,80}$/.test(p)) return true;
+  if (read && p === '/index.html') return !!req.query.view;
+  if (read && (PUBLIC_EDITOR_FILES.has(p) || /^\/resources\/[A-Za-z0-9_-]+\.txt$/.test(p))) return true;
+  // The view's PDF preview (pdf-preview.js): the PDF library and its worker, and
+  // a blank form by its own name - the boxes a question fills, drawn on the page.
+  if (read && /^\/node_modules\/pdfjs-dist\/build\/pdf(\.worker)?\.mjs$/.test(p)) return true;
+  if (read && /^\/FormWiz GUI\/[A-Za-z0-9_()\- ]+\.pdf$/i.test(p)) return true;
+  if (req.method === 'POST' && p === '/edit_pdf') return PUBLIC_PDF_NAME.test(String(req.query.pdf || ''));
+  return false;
+}
+/** The public site's front page: the forms published here, by name. */
+function publicFrontPage() {
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const sites = fs.existsSync(LIVE_SITES_DIR)
+    ? fs.readdirSync(LIVE_SITES_DIR).map((s) => ({ s, m: readLiveSiteManifest(s) })).filter((x) => x.m && x.m.projectId)
+    : [];
+  const items = sites.map(({ s, m }) => {
+    const modes = LIVE_SITE_MODES.filter((mode) => fs.existsSync(path.join(LIVE_SITES_DIR, s, mode + '.html')));
+    const links = formLinksFor(m.projectId, modes, liveSiteStamp(m));
+    const words = { section: 'one section at a time', question: 'one question at a time' };
+    return '<li><strong>' + esc(m.title || s) + '</strong> - '
+      + Object.keys(links).map((k) => '<a href="' + esc(links[k]) + '">' + esc(words[k] || k) + '</a>').join(' &middot; ')
+      + '</li>';
+  }).join('');
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
+    + '<meta name="viewport" content="width=device-width, initial-scale=1"><title>Forms</title></head>'
+    + '<body style="font-family:system-ui,sans-serif;max-width:720px;margin:48px auto;padding:0 16px;color:#1f2a37">'
+    + '<h1 style="font-size:1.5rem">Forms</h1>'
+    + (items ? '<ul style="line-height:1.9">' + items + '</ul>' : '<p>No forms are published yet.</p>')
+    + '</body></html>';
+}
 // The auto-form endpoints post base64 PDFs and whole field dumps, well past
 // body-parser's 100kb default. These global parsers are registered before the
 // per-route limits in auto-form/routes.js, so they consume the body first and
@@ -740,17 +815,44 @@ app.post('/edit_pdf', async (req, res) => {
             if (radioValue) field.select(radioValue);
             break;
           }
-          case 'PDFDropdown':
-            field.select(String(value));
+          case 'PDFDropdown': {
+            // A dropdown on the paper holds one of its own options. An answer
+            // written differently from the option it means - a state spelled
+            // out where the paper lists two-letter codes, or in another case -
+            // is matched to that option. Set as it was, pdf-lib made it a
+            // custom value and printed "California" in a box sized for "CA".
+            let choice = String(value);
+            if (choice === '') { field.clear(); break; }
+            const options = field.getOptions();
+            if (!options.includes(choice)) {
+              const same = options.find((o) => o.toLowerCase() === choice.toLowerCase());
+              const code = stateCode(choice);
+              const matched = same || (code && options.includes(code) ? code : '');
+              if (matched) {
+                limitFit.push(key + ' "' + choice + '" -> "' + matched + '"');
+                choice = matched;
+              }
+            }
+            field.select(choice);
             break;
+          }
           case 'PDFTextField': {
             let text = String(value);
             const maxLen = field.getMaxLength();
             if (maxLen && text.length > maxLen) {
               const code = stateCode(text);
+              // A box that counts characters, and a number typed with its
+              // punctuation - a phone number as (555)-555-5555 in a ten-digit
+              // box, a Social Security number with its dashes in a nine-digit
+              // one - takes the digits. Only an answer of digits and
+              // punctuation: letters are never dropped to make something fit.
+              const digits = text.replace(/[^0-9]/g, '');
               if (code && code.length <= maxLen) {
                 limitFit.push(key + ' "' + text + '" -> "' + code + '"');
                 text = code;
+              } else if (digits && digits.length <= maxLen && /^[\s0-9()+.\-\/]+$/.test(text)) {
+                limitFit.push(key + ' "' + text + '" -> "' + digits + '"');
+                text = digits;
               } else {
                 unfitted.push(key);
                 text = text.slice(0, maxLen);
@@ -1024,10 +1126,15 @@ const PROJECT_ID_RE = /^[A-Za-z0-9_-]{1,80}$/;
 /** The live-site folder that says it belongs to this project, or null. */
 function liveSiteOfProject(projectId) {
   if (!projectId || !PROJECT_ID_RE.test(projectId) || !fs.existsSync(LIVE_SITES_DIR)) return null;
-  return fs.readdirSync(LIVE_SITES_DIR).find((s) => {
+  const byId = fs.readdirSync(LIVE_SITES_DIR).find((s) => {
     const m = readLiveSiteManifest(s);
     return m && m.projectId === projectId;
-  }) || null;
+  });
+  if (byId) return byId;
+  // Or the site by its own name, which is what a form link carries:
+  // /form/dv-restraining-order-packet/section.html.
+  const named = readLiveSiteManifest(projectId);
+  return named && named.projectId ? projectId : null;
 }
 
 /**
@@ -1050,13 +1157,47 @@ function liveSiteStamp(manifest) {
 
 /** The links that carry the project id, one per way of asking, stamped with the save. */
 function formLinksFor(projectId, modes, stamp) {
+  // By the site's name, so the link says which form it is:
+  // /form/dv-restraining-order-packet/section.html. The id still works.
+  const name = liveSiteOfProject(projectId) || projectId;
   const links = {};
   (modes || LIVE_SITE_MODES).forEach((mode) => {
-    links[mode] = '/form/' + encodeURIComponent(projectId) + '/' + mode + '.html'
+    links[mode] = '/form/' + encodeURIComponent(name) + '/' + mode + '.html'
       + (stamp ? '?saved=' + encodeURIComponent(stamp) : '');
   });
   return links;
 }
+
+/**
+ * A project's flowchart, for the read-only view a form's "View flowchart" button
+ * opens: the *-project.json beside the server whose projectId matches, found by
+ * the project's id or its site's name.
+ */
+function projectFileOf(idOrName) {
+  const site = readLiveSiteManifest(idOrName);
+  const id = site && site.projectId ? site.projectId : idOrName;
+  for (const f of fs.readdirSync(ROOT)) {
+    if (!/-project\.json$/.test(f)) continue;
+    try {
+      const head = fs.readFileSync(path.join(ROOT, f), 'utf8').slice(0, 400);
+      const hit = /"projectId"\s*:\s*"([^"]+)"/.exec(head);
+      if (hit && hit[1] === id) return path.join(ROOT, f);
+    } catch (e) { /* unreadable: not this one */ }
+  }
+  return null;
+}
+app.get('/api/project/:project', (req, res) => {
+  const key = String(req.params.project || '');
+  if (!PROJECT_ID_RE.test(key)) return res.status(400).json({ error: 'Not a project' });
+  const file = projectFileOf(key);
+  if (!file) return res.status(404).json({ error: 'No flowchart is saved for this project' });
+  res.type('application/json').sendFile(file);
+});
+app.get('/flowchart/:project', (req, res) => {
+  const key = String(req.params.project || '');
+  if (!PROJECT_ID_RE.test(key)) return res.status(404).end();
+  res.redirect(302, '/index.html?view=' + encodeURIComponent(key));
+});
 
 app.get('/api/live-site', (req, res) => {
   const projectId = String(req.query.projectId || '').trim();

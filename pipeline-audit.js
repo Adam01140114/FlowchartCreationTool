@@ -459,8 +459,14 @@ async function main() {
   // belonged and matched nothing. The patterns now live in wording-rules.js,
   // which the compiler reads too and which tests itself; and the check reads
   // every box label and choice, not only titles.
-  const { conditionTell, sentenceProblem, saysOptional, twoThingsInOneBox, twoQuestionsInOneBox, asksForDate } = require('./wording-rules');
+  const { conditionTell, sentenceProblem, saysOptional, twoThingsInOneBox, twoQuestionsInOneBox, asksForDate, mentionsThePaper } = require('./wording-rules');
   report.rule2wording = [];
+  // Rule the-filer-never-sees-the-papers-machinery: nothing the filer reads
+  // says where an answer goes on the paper - no "on the attached page", no
+  // attachment numbers, no MC-025. The page itself once titled entries "Minor
+  // #5 - on the attached page (DV-160, Attachment 2b(2))"; that text was never
+  // in this file, so pipeline-nav-audit.js reads the page too.
+  report.rule2machinery = [];
   // Rule 11: a question that does not say what to enter. "What is your custody
   // case details?" is answerable only by someone holding the paper form, which
   // is the person the interview exists to spare.
@@ -490,15 +496,24 @@ async function main() {
   // must be there.
   report.rule21 = [];
   (() => {
+    const specPath = flag('spec', 'dv-packet.spec.json');
     let spec = {};
-    try { spec = JSON.parse(fs.readFileSync(flag('spec', 'dv-packet.spec.json'), 'utf8')); } catch (e) { return; }
+    try { spec = JSON.parse(fs.readFileSync(specPath, 'utf8')); } catch (e) { return; }
     const cont = spec.continuation || {};
     const say = (what, why) => report.rule21.push({ what, why });
-    if (!cont.form) {
-      say('dv-packet.spec.json', 'names no continuation form - "continuation": { "form": "MC-025", "pdf": "mc025.pdf", "replaces": {...} }');
+    // A continuation form is needed only by a project where something
+    // continues: an overflow link, or a block whose extra rows go on a page.
+    // BCIA 8016 has neither, and failed here for not naming MC-025.
+    const continues = (gui.overflowLinks || []).some((o) => o && o.nameId)
+      || (gui.sections || []).some((s) => (s.questions || []).some((q) => q && q.attachment
+        && typeof q.attachment === 'object' && q.attachment.name));
+    if (!cont.form && continues) {
+      say(specPath, 'names no continuation form - "continuation": { "form": "MC-025", "pdf": "mc025.pdf", "replaces": {...} }');
     }
     const blank = path.join(PDF_DIR, cont.pdf || 'mc025.pdf');
-    if (!fs.existsSync(blank)) say(blank, 'is missing, so the continuation pages have no form to be drawn on (node pipeline-sanitize.js mc025)');
+    if ((cont.form || continues) && !fs.existsSync(blank)) {
+      say(blank, 'is missing, so the continuation pages have no form to be drawn on (node pipeline-sanitize.js mc025)');
+    }
     const seen = new Map();
     const named = (name, who) => {
       if (seen.has(name)) say(who, 'draws its page as ' + name + ', which ' + seen.get(name) + ' already uses - one would be drawn over the other');
@@ -546,6 +561,14 @@ async function main() {
       if (t) report.rule2wording.push({ question: who, where: 'choice', text: label, tell: t });
       sentAway(who, 'choice', label);
     });
+    [['question', text], ['subtitle', q.subtitle && q.subtitle.text], ['info box', q.infoBox && q.infoBox.text],
+      ['entry title', q.entryTitle]]
+      .concat((q.allFieldsInOrder || []).map((f) => ['box', f && f.label]))
+      .concat(labelsOf(q).map((l) => ['choice', l]))
+      .forEach(([where, s]) => {
+        const m = mentionsThePaper(s);
+        if (m) report.rule2machinery.push({ question: who, where: where, text: String(s), tell: m });
+      });
     const problem = sentenceProblem(text);
     if (problem) report.rule14.push({ question: who, text: text, problem: problem });
     if (saysOptional(text)) {
@@ -1205,6 +1228,15 @@ async function main() {
     report.rule2wording.forEach((r) => console.log('      - ' + r.question + ' [' + r.where + ']: "'
       + r.text + '"   <- "' + r.tell + '"'));
   }
+  console.log('RULE 2 — the filer never sees the paper\'s machinery');
+  if (!(report.rule2machinery || []).length) {
+    console.log('  passes  (every question, subtitle, box, choice and entry title read; the page\'s own words are read by pipeline-nav-audit.js)');
+  } else {
+    console.log('  FAILS  ' + report.rule2machinery.length + ' place(s) say where an answer goes on the paper.');
+    console.log('      The packet puts an answer where it belongs; say only what to answer:');
+    report.rule2machinery.forEach((r) => console.log('      - ' + r.question + ' [' + r.where + ']: "'
+      + r.text + '"   <- "' + r.tell + '"'));
+  }
   // Anything the author declared always-shown, with its reason, read out of the
   // per-form flowcharts beside the packet.
   const declared = new Map();
@@ -1431,6 +1463,7 @@ async function main() {
   // and a run that found one says so in its exit code.
   const blocking = [
     ['RULE 2 (CORNERSTONE)', (report.rule2wording || []).length],
+    ['RULE 2 (PAPER\'S MACHINERY)', (report.rule2machinery || []).length],
     ['JUMPS', (report.deadJumps || []).length],
     ['RULE 17', (report.rule17 || []).length],
     ['RULE 18', (report.rule18 || []).length],

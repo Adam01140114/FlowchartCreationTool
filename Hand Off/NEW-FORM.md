@@ -225,6 +225,12 @@ export value, and the sanitizer splits it into a field of its own:
 Find the values and which box is which by position (`getOnValue()` and each
 widget's rectangle against the printed label). RULE 22 fails an unsplit field.
 
+A **radio group** splits the same way, by each box's appearance state (the
+`/AP /N` names, `/0` `/1` `/2`), not by the `/Opt` display values - BCIA 8016's
+sex group lists `1, 2, 2`, so choosing Female also ticked Nonbinary. A box taken
+out of a radio group becomes a checkbox of its own (the sanitizer clears the
+radio flags); ask the boxes as a hint `group`.
+
 **A question whose answers are PDF boxes is a hint `group`**, members the box
 names: each answer then ticks its own box. As a `choice` with the boxes'
 names, the boxes are also asked again on their own (and the preview check fails).
@@ -408,3 +414,63 @@ they mostly declare `mirrors` onto names the DV-100 already chose.
 So: **compile the primary form first, and let the others borrow its names.**
 `project-gui-export.js` builds `packetMirrors` from the overlap, and
 `projectForms` records which sections belong to which PDF.
+
+---
+
+## A project of its own
+
+A form outside the DV packet gets its own spec and its own files, named after
+the spec. BCIA 8016 (California DOJ, Request for Live Scan Service) was built
+this way on September 14, 2026:
+
+```bash
+node compile-form.js dv-field-configs/bcia8016-field-config.json bcia8016-flowchart.json --hints bcia8016-hints.json
+node pipeline-sanitize.js bcia8016                                   # FormWiz GUI/bcia8016.pdf
+node pipeline-capacity.js bcia8016 --out bcia8016-capacity.json
+node pipeline-build-packet.js bcia8016.spec.json                     # bcia8016-project.json
+node pipeline-audit-flowchart.js bcia8016-project.json
+# editor: applyProjectJson(/bcia8016-project.json), wait, export -> /api/dev-save bcia8016-gui.json
+node pipeline-audit.js bcia8016-gui.json --spec bcia8016.spec.json
+node pipeline-node-fields.js bcia8016-gui.json --spec bcia8016.spec.json
+node pipeline-review.js bcia8016-gui.json
+# publish: buildLiveSite({ gui: '/bcia8016-gui.json' }) -> live-sites/<title>/
+node pipeline-nav-audit.js --site request-for-live-scan-service --modes section,question
+# capture to bcia8016-answers.json (with __forms), then:
+node pipeline-fill.js --render --answers bcia8016-answers.json --gui bcia8016-gui.json
+node pipeline-explain.js bcia8016 --answers bcia8016-answers.json --gui bcia8016-gui.json
+```
+
+`pipeline-build-packet.js <x>.spec.json` reads `<x>-capacity.json` and
+`<x>-disqualifiers.json` and writes `<x>-project.json`. It used to read the DV
+packet's box sizes and alerts whatever spec it was given. Save a capture under
+its own name, never over `pipeline-answers.json`, and give it `__forms`:
+`pipeline-fill.js` fills the forms it names, the packet's or not.
+
+What the form taught, all general now:
+
+- **`order` places everything.** With an order hint, a field's place in the
+  list is where it is asked, and a combined question (an address) is asked at
+  the place of the first of its fields. Name the parts of a `split` in the
+  order, not the box they came from - a name the list does not have is asked
+  last. Without this, a two-column page asked the home address between the
+  agency's phone and its billing number.
+- **A box that counts characters holds that many.** `pipeline-capacity.js` caps
+  a box at the PDF's `MaxLen` (BCIA 8016's job title: 111 wide, 30 allowed). The
+  dev server puts a phone or Social Security number typed with punctuation into
+  a box that counts digits as the digits, and matches an answer to a dropdown's
+  own option (a state spelled out, or in another case, to its two-letter code).
+  Phone boxes are drawn as `tel` inputs and are never capped by capacity: the
+  form types the punctuation for you.
+- **An optional question is asked as text when something follows it.** An
+  optional dropdown made every question after it wait on an answer, so a filer
+  with no suffix never reached the rest of the section. An optional text box is
+  passed over when left empty.
+- **A question after a Yes/No that the paper asks of everyone** is declared in
+  `alwaysShown`, with the item that asks it, or the audit reads it as a
+  follow-up of both answers.
+- **A continuation form is needed only where something continues.** RULE 21
+  asks the spec for one when the interview has an overflow link or a block whose
+  rows go on a page; a form with neither needs no MC-025.
+- **A box under four characters is filled to fit on the maximum path.** The fill
+  button used to leave such a box its test value - the field's own name, sixteen
+  characters in a three-character suffix box.

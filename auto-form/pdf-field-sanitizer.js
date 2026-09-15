@@ -248,8 +248,16 @@ async function sanitizePdfFields(pdfBytes, fieldConfig) {
       kids.remove(at);
       const own = context.obj({ FT: 'Btn', V: 'Off', Kids: [boxRef] });
       own.set(PDFName.of('T'), PDFString.of(m.newName));
+      // A box taken out of a radio group is a checkbox of its own. Kept as a
+      // radio it is a one-option group, which a fill selects by export value -
+      // and a group can repeat a value (BCIA 8016's sex boxes are 1, 2, 2), so
+      // choosing one box ticked another.
       const flags = baseDict.get(PDFName.of('Ff'));
-      if (flags) own.set(PDFName.of('Ff'), flags);
+      const RADIO = 1 << 15;
+      const NO_TOGGLE_TO_OFF = 1 << 14;
+      const ownFlags = flags && typeof flags.asNumber === 'function'
+        ? flags.asNumber() & ~RADIO & ~NO_TOGGLE_TO_OFF : 0;
+      if (ownFlags) own.set(PDFName.of('Ff'), context.obj(ownFlags));
       const ownRef = context.register(own);
       const boxDict = context.lookup(boxRef);
       boxDict.set(PDFName.of('Parent'), ownRef);

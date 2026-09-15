@@ -247,6 +247,11 @@ in a fresh headless tab with empty storage and:
    wider, and the phone shows every section zoomed out: a 585px entry block
    once laid a 375px phone out at 759px. The window is a fixed 375px, not the
    phone's own zoom-out, which widens the page to fit and hides the overflow.
+11. **Reads the words on every section** after the maximum fill, the ones the
+   page writes for itself included, and fails on the paper's machinery ("on the
+   attached page", "Attachment 2b(2)", MC-025, "continued on") - rule
+   `the-filer-never-sees-the-papers-machinery`. The page once titled 32 entries
+   "Minor #5 - on the attached page (...)", words in no file any audit read.
 
 Output: `passes|FAILS <mode> page, <path> path   fill 1.6 s, 11 sections forward,
 11 back`, then the Next and Back paths, then one line per problem; and for each
@@ -255,7 +260,9 @@ is `NOT SHIPPABLE - N paths failed` or `The fill buttons are quick and complete,
 and Back retraces Next on every path walked`. Exit 1 on any failure. A run takes
 3-4 minutes. Flags: `--site`, `--server`, `--modes section,question`,
 `--paths minimum,maximum`, `--fill-budget <ms>`, `--idle-events <n>`,
-`--phone-width <px>` (0 skips the phone check), `--phone-only`.
+`--phone-width <px>` (0 skips the phone check), `--phone-only`, and
+`--only paths,phone,words` to run some checks alone (`--only words` reads the
+page's words without walking the paths).
 
 ### Step 8 in detail: capturing the answers
 
@@ -468,6 +475,7 @@ of the day passed, and the check that now catches it.
 | FL-150's household incomes stayed empty on the maximum path and Next locked | The fill knew a money box by the word "amount" in its name | The nav audit (empty fields, Next disabled); `hasValidatedShape` reads `inputmode="decimal"` |
 | FL-150's "People Who Live With You" section vanished and its list landed in "Your Assets" | The export drops a section holding only a block | The nav audit found the stranded list; the block now follows its own Yes/No question |
 | On a phone the whole form showed zoomed out: a 375px screen laid the page out at 759px. Repeating entry blocks had a fixed 585px minimum, a dropdown was as wide as its longest option ("Brother, sister, sibling, stepsibling, or sibling in-law"), and a text box kept its default 50 columns | Every check ran at a desktop width; nothing laid a page out on a phone. Found while widening the desktop layout (card 1240px, questions 1160px) | `pipeline-nav-audit.js` lays each page out on a 375px screen, fills the maximum path, shows every section and fails on one wider than the screen, naming the box that cannot shrink. Entry blocks keep 585px only when there is room (`min(585px, 100%)`), dropdowns and text boxes are capped at their container (`max-width: 100%`), and the white box - a grid item, which grows to hold its widest box, so no cap inside it could work - has `min-width: 0` |
+| Entries past the rows the paper prints were titled "Minor #5 - on the attached page (DV-160, Attachment 2b(2))" - 32 titles across DV-100, DV-105 and DV-160. The user found it | The page wrote the words as it drew the block, so they were in no file the interview audit read; the site audit filled that page to the fifth minor and never read what it said | Rule `the-filer-never-sees-the-papers-machinery`: `mentionsThePaper` in `wording-rules.js`, read by `pipeline-audit.js` RULE 2 (PAPER'S MACHINERY) on the GUI and by `pipeline-nav-audit.js` "words on screen" on every section of the live page after the maximum fill (it failed 32 lines on both pages of the old build). Entry titles are the name and number only |
 
 ---
 

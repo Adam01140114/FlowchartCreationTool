@@ -128,7 +128,17 @@ function sendsFilerForAForm(text) {
   return null;
 }
 
-module.exports = { conditionTell, sentenceProblem, saysOptional, twoThingsInOneBox, twoQuestionsInOneBox, asksForDate, sendsFilerForAForm, CONDITION_TELLS };
+// Where an answer goes on the paper - "on the attached page", "Attachment
+// 2b(2)", MC-025, "continued on" - is the packet's business, never the filer's.
+// The page titled a block's fifth minor "Minor #5 - on the attached page
+// (DV-160, Attachment 2b(2))", and no check read the words the page wrote.
+const PAPER_MACHINERY = /\b(?:on|onto|to) (?:the|an|a) (?:attached|separate|extra|additional) (?:page|sheet)\b|\battached (?:page|sheet)s?\b|\battachment\s*\d|\bMC-?025\b|\bcontinue[sd]? on\b/i;
+function mentionsThePaper(text) {
+  const m = PAPER_MACHINERY.exec(String(text == null ? '' : text));
+  return m ? m[0].trim() : null;
+}
+
+module.exports = { conditionTell, sentenceProblem, saysOptional, twoThingsInOneBox, twoQuestionsInOneBox, asksForDate, sendsFilerForAForm, mentionsThePaper, PAPER_MACHINERY, CONDITION_TELLS };
 
 // A checker that cannot fail is not a checker. Run: node wording-rules.js
 if (require.main === module) {
@@ -144,6 +154,11 @@ if (require.main === module) {
   expect('cornerstone: "(include the serial number if you know it)"', conditionTell('Describe it (include the serial number if you know it)'), true);
   expect('cornerstone passes: "Is there another parent or legal guardian ...?"', conditionTell('Is there another parent or legal guardian besides you and the other person?'), false);
   expect('cornerstone passes: a continuation line', conditionTell('Continue here if the answer did not fit'), false);
+  expect('paper machinery: "Minor #5 - on the attached page (DV-160, Attachment 2b(2))"', mentionsThePaper('Minor #5 - on the attached page (DV-160, Attachment 2b(2))'), true);
+  expect('paper machinery: "The rest continues on MC-025"', mentionsThePaper('The rest continues on MC-025'), true);
+  expect('paper machinery: "(Attachment 6a)"', mentionsThePaper('Check here if there is not enough space (Attachment 6a)'), true);
+  expect('paper machinery passes: "Minor #5"', mentionsThePaper('Minor #5'), false);
+  expect('paper machinery passes: "What is the name of the court?"', mentionsThePaper('What is the name of the court?'), false);
   expect('sentence: "And before that?"', sentenceProblem('And before that?'), true);
   expect('sentence: "Which county?"', sentenceProblem('Which county?'), true);
   expect('sentence: "Your lawyer\'s information"', sentenceProblem("Your lawyer's information"), true);

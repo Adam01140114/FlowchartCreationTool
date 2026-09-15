@@ -9,7 +9,7 @@
     "person_asking_protection_age": 4,
     "person_asking_protection_mailing_address": 40,
     "person_asking_protection_mailing_city": 11,
-    "person_asking_protection_mailing_state": 5,
+    "person_asking_protection_mailing_state": 2,
     "person_asking_protection_mailing_zip_code": 5,
     "person_asking_protection_telephone": 11,
     "person_asking_protection_fax": 11,
@@ -1052,7 +1052,7 @@
       "mc031_notice_header": 2
     }
   },
-  "exportedAt": "2026-09-14T22:34:10.154Z",
+  "exportedAt": "2026-09-15T02:43:13.117Z",
   "projectName": "DV Restraining Order Packet",
   "currentFormIndex": 0,
   "forms": [

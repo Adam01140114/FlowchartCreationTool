@@ -1,0 +1,251 @@
+{
+  "_comment": "Interview for California DOJ BCIA 8016, Request for Live Scan Service, as the applicant meets it. The top of the form belongs to the agency that asked for the fingerprints; the applicant copies what the agency gave them, so each of those questions says where the answer comes from. The Live Scan operator's block at the foot of page 1 has no fields and is not asked. The signature is signed by hand on the printed line; its date fills itself.",
+  "sections": [
+    { "name": "Agency Information", "fields": [
+      "ori_code", "authorized_applicant_type", "license_type_or_working_title",
+      "agency_name", "agency_mail_code",
+      "agency_street_address", "agency_city", "agency_state", "agency_zip_code",
+      "agency_contact_name", "agency_contact_telephone",
+      "level_of_service", "level_of_service_doj", "level_of_service_fbi",
+      "oca_number", "agency_billing_number", "misc_identification_number"
+    ] },
+    { "name": "About You", "fields": [
+      "applicant_first_name_and_middle_initial", "applicant_first_name", "applicant_middle_initial",
+      "applicant_last_name", "applicant_suffix",
+      "has_other_name", "applicant_other_last_name", "applicant_other_first_name", "applicant_other_suffix",
+      "applicant_date_of_birth",
+      "applicant_sex", "applicant_sex_male", "applicant_sex_female", "applicant_sex_nonbinary",
+      "has_drivers_license", "applicant_drivers_license_number",
+      "applicant_place_of_birth",
+      "has_social_security_number", "applicant_social_security_number"
+    ] },
+    { "name": "Your Description", "fields": [
+      "applicant_height", "applicant_weight", "applicant_eye_color", "applicant_hair_color"
+    ] },
+    { "name": "Your Home Address", "fields": [
+      "applicant_home_street_address", "applicant_home_city", "applicant_home_state", "applicant_home_zip_code"
+    ] },
+    { "name": "Resubmission", "fields": [
+      "is_resubmission", "original_ati_number"
+    ] },
+    { "name": "Your Employer", "fields": [
+      "employer_information_requested", "employer_name",
+      "employer_street_address", "employer_city", "employer_state", "employer_zip_code",
+      "employer_telephone", "employer_mail_code"
+    ] }
+  ],
+  "_orderWhy": "Without an order the compiler asks the fields in the order their boxes sit on the page, which ran from the home address back to four agency questions and asked the place of birth after the description. This is the order of the sections above.",
+  "order": [
+    "ori_code", "authorized_applicant_type", "license_type_or_working_title",
+    "agency_name", "agency_mail_code",
+    "agency_street_address", "agency_city", "agency_state", "agency_zip_code",
+    "agency_contact_name", "agency_contact_telephone",
+    "level_of_service_doj", "level_of_service_fbi",
+    "oca_number", "agency_billing_number", "misc_identification_number",
+    "applicant_first_name", "applicant_middle_initial", "applicant_last_name", "applicant_suffix",
+    "applicant_other_last_name", "applicant_other_first_name", "applicant_other_suffix",
+    "applicant_date_of_birth",
+    "applicant_sex_male", "applicant_sex_female", "applicant_sex_nonbinary",
+    "applicant_drivers_license_number", "applicant_place_of_birth", "applicant_social_security_number",
+    "applicant_height", "applicant_weight", "applicant_eye_color", "applicant_hair_color",
+    "applicant_home_street_address", "applicant_home_city", "applicant_home_state", "applicant_home_zip_code",
+    "original_ati_number",
+    "employer_name", "employer_street_address", "employer_city", "employer_state", "employer_zip_code",
+    "employer_telephone", "employer_mail_code",
+    "applicant_signature_date"
+  ],
+  "questions": {
+    "ori_code": {
+      "text": "What is the agency's ORI code?",
+      "subtitle": "The agency that asked for your fingerprints gives you this code. DOJ assigns it to the agency."
+    },
+    "authorized_applicant_type": {
+      "text": "What is your authorized applicant type?",
+      "subtitle": "Use the type the agency gave you, for example Employment, Licensing or Volunteer."
+    },
+    "license_type_or_working_title": {
+      "text": "What license, certification, permit or job title are you being fingerprinted for?",
+      "subtitle": "Up to 30 characters. If DOJ assigned a title, use that title exactly."
+    },
+    "agency_name": {
+      "text": "What is the name of the agency that will receive your record?",
+      "subtitle": "This is the agency authorized to receive criminal record information about you."
+    },
+    "agency_mail_code": {
+      "text": "What is the agency's mail code?",
+      "subtitle": "A five-digit code DOJ assigned to the agency."
+    },
+    "agency_contact_name": {
+      "text": "Who is the contact person at the agency?",
+      "subtitle": "A school must give a contact name.",
+      "optional": true
+    },
+    "agency_contact_telephone": {
+      "text": "What is the agency's contact phone number?",
+      "type": "phone"
+    },
+    "oca_number": {
+      "text": "What number did the agency give you?",
+      "subtitle": "The agency's own number for you, called an OCA number.",
+      "optional": true
+    },
+    "agency_billing_number": {
+      "text": "What is the agency's billing number?",
+      "subtitle": "The agency gives you this when it is paying for your fingerprints.",
+      "optional": true
+    },
+    "misc_identification_number": {
+      "text": "What other identification number did the agency ask you to give?",
+      "subtitle": "For example, a license number or an employee number.",
+      "optional": true
+    },
+    "applicant_last_name": {
+      "text": "What is your last name?"
+    },
+    "_suffixWhy": "Asked as optional text, not a dropdown: an optional dropdown made every question after it wait on a suffix being chosen, so a filer with no suffix never reached the rest of About You. An optional text box is passed over when it is left empty.",
+    "applicant_suffix": {
+      "text": "What is the suffix of your name?",
+      "subtitle": "For example Jr or III.",
+      "optional": true
+    },
+    "applicant_other_suffix": {
+      "text": "What is the suffix of that other name?",
+      "subtitle": "For example Jr or III.",
+      "optional": true,
+      "conditional": { "onlyWhen": "has_other_name" }
+    },
+    "applicant_date_of_birth": {
+      "text": "What is your date of birth?",
+      "type": "date"
+    },
+    "applicant_drivers_license_number": {
+      "text": "What is your driver's license number?",
+      "conditional": { "onlyWhen": "has_drivers_license", "gateQuestion": "Do you have a driver's license?" }
+    },
+    "applicant_place_of_birth": {
+      "text": "Where were you born?",
+      "subtitle": "The state, or the country if you were born outside the United States."
+    },
+    "applicant_social_security_number": {
+      "text": "What is your Social Security number?",
+      "subtitle": "Nine digits, without dashes.",
+      "conditional": { "onlyWhen": "has_social_security_number", "gateQuestion": "Do you have a Social Security number?" }
+    },
+    "applicant_height": {
+      "text": "How tall are you?",
+      "subtitle": "In feet and inches, for example 5'10\"."
+    },
+    "applicant_weight": {
+      "text": "How much do you weigh?",
+      "subtitle": "In pounds."
+    },
+    "applicant_eye_color": {
+      "text": "What color are your eyes?",
+      "type": "dropdown",
+      "options": ["Black", "Blue", "Brown", "Gray", "Green", "Hazel", "Maroon", "Pink", "Multicolored"]
+    },
+    "applicant_hair_color": {
+      "text": "What color is your hair?",
+      "type": "dropdown",
+      "options": ["Bald", "Black", "Blond", "Brown", "Gray", "Red", "Sandy", "White", "Blue", "Green", "Orange", "Pink", "Purple"]
+    },
+    "original_ati_number": {
+      "text": "What was the ATI number of your earlier fingerprints?",
+      "subtitle": "It is on the receipt from your first Live Scan. Bring proof that those fingerprints were rejected.",
+      "conditional": { "onlyWhen": "is_resubmission", "gateQuestion": "Are you being fingerprinted again because your earlier fingerprints were rejected?" }
+    },
+    "employer_name": {
+      "text": "What is your employer's name?",
+      "conditional": { "onlyWhen": "employer_information_requested", "gateQuestion": "Did the agency ask you for your employer's information?" }
+    },
+    "employer_telephone": {
+      "text": "What is your employer's phone number?",
+      "type": "phone",
+      "optional": true,
+      "conditional": { "onlyWhen": "employer_information_requested" }
+    },
+    "employer_mail_code": {
+      "text": "What is your employer's mail code?",
+      "subtitle": "The five-digit code DOJ assigned to your employer. The agency gives it to you.",
+      "optional": true,
+      "conditional": { "onlyWhen": "employer_information_requested" }
+    }
+  },
+  "splits": [
+    {
+      "field": "applicant_first_name_and_middle_initial",
+      "join": " ",
+      "parts": [
+        { "nameId": "applicant_first_name", "label": "First name", "question": "What is your first name?" },
+        { "nameId": "applicant_middle_initial", "label": "Middle initial", "question": "What is your middle initial?", "optional": true }
+      ]
+    }
+  ],
+  "combines": [
+    {
+      "question": "What is the agency's address?",
+      "fields": [
+        { "field": "agency_street_address", "label": "Street address or P.O. box" },
+        { "field": "agency_city", "label": "City" },
+        { "field": "agency_state", "label": "State" },
+        { "field": "agency_zip_code", "label": "ZIP code" }
+      ]
+    },
+    {
+      "question": "What other name have you used?",
+      "fields": [
+        { "field": "applicant_other_last_name", "label": "Last name" },
+        { "field": "applicant_other_first_name", "label": "First name" }
+      ],
+      "conditional": { "onlyWhen": "has_other_name", "gateQuestion": "Have you ever used another name, such as a maiden name or an alias?" }
+    },
+    {
+      "question": "What is your home address?",
+      "fields": [
+        { "field": "applicant_home_street_address", "label": "Street address or P.O. box" },
+        { "field": "applicant_home_city", "label": "City" },
+        { "field": "applicant_home_state", "label": "State" },
+        { "field": "applicant_home_zip_code", "label": "ZIP code" }
+      ]
+    },
+    {
+      "question": "What is your employer's address?",
+      "fields": [
+        { "field": "employer_street_address", "label": "Street address or P.O. box" },
+        { "field": "employer_city", "label": "City" },
+        { "field": "employer_state", "label": "State" },
+        { "field": "employer_zip_code", "label": "ZIP code" }
+      ],
+      "conditional": { "onlyWhen": "employer_information_requested" }
+    }
+  ],
+  "groups": [
+    {
+      "nameId": "level_of_service",
+      "question": "Which records did the agency ask to have checked?",
+      "subtitle": "If the FBI is checked, your fingerprints are also used to check the FBI's criminal history records.",
+      "multiSelect": true,
+      "members": ["level_of_service_doj", "level_of_service_fbi"],
+      "labels": ["California Department of Justice (DOJ)", "FBI"]
+    },
+    {
+      "nameId": "applicant_sex",
+      "question": "What is your sex?",
+      "members": ["applicant_sex_male", "applicant_sex_female", "applicant_sex_nonbinary"],
+      "labels": ["Male", "Female", "Nonbinary or unspecified"]
+    }
+  ],
+  "alwaysShown": [
+    {
+      "question": "applicant_date_of_birth",
+      "why": "Page 1 asks every applicant for a date of birth, whether or not they have used another name; the other-name question is the last of the name lines and rejoins right after it."
+    }
+  ],
+  "autofill": [
+    {
+      "field": "applicant_signature_date",
+      "from": ["current_date"],
+      "why": "The date beside the applicant's signature has one correct answer, the day the form is made, and the form already knows it."
+    }
+  ]
+}

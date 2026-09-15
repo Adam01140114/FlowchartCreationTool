@@ -52,8 +52,12 @@ const CAPTURED_FORMS = (() => {
     return Array.isArray(saved.__forms) ? saved.__forms : null;
   } catch (e) { return null; }
 })();
+// In the packet's order where they are the packet's forms; a capture from
+// another project (BCIA 8016's) names forms the DV packet does not have, and
+// those are filled too rather than falling back to every DV form.
 const FORMS = (flag('forms', '')
-  || (CAPTURED_FORMS ? packetForms().filter((f) => CAPTURED_FORMS.includes(f)).join(',') : '')
+  || (CAPTURED_FORMS ? packetForms().filter((f) => CAPTURED_FORMS.includes(f))
+    .concat(CAPTURED_FORMS.filter((f) => !packetForms().includes(f))).join(',') : '')
   || packetForms().join(',')).split(',').filter(Boolean);
 // Big enough to read a filled box against the printed label, small enough
 // that thirteen pages stay a reasonable size on disk.

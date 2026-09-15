@@ -288,9 +288,16 @@ async function main() {
 
     const sizes = {};
     const lib = await PDFDocument.load(bytes);
+    // A box that counts its own characters holds no more than that, however
+    // wide it is drawn: BCIA 8016's job title box is 111 characters wide and
+    // takes 30. Measured by width alone, the interview let 111 through and
+    // the fill cut the answer at 30.
+    const maxLengths = {};
     lib.getForm().getFields().forEach((f) => {
       if (f.constructor.name !== 'PDFTextField') return;
       sizes[f.getName()] = declaredSize(f);
+      const max = f.getMaxLength();
+      if (max) maxLengths[f.getName()] = max;
     });
 
     // pdf-lib insets by a point each side and the border sits inside that.
@@ -332,8 +339,9 @@ async function main() {
       // hand afterwards.
       let widths = lineWidths(box, size);
       chain.forEach((c) => { widths = widths.concat(lineWidths(c, size)); });
-      const chars = charsThatFit(helv, size, widths);
-      if (!chars) continue;
+      const fitted = charsThatFit(helv, size, widths);
+      if (!fitted) continue;
+      const chars = maxLengths[box.name] ? Math.min(fitted, maxLengths[box.name]) : fitted;
       if (widths.length > 1) wraps[box.name] = widths.length;
 
       // A field printed more than once must fit in the smallest of its boxes.

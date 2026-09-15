@@ -1,0 +1,16 @@
+{
+  "project": "Request for Live Scan Service",
+  "projectId": "p_bcia8016_livescan",
+  "_projectIdNote": "Chosen once for this project and kept here, the way dv-packet.spec.json keeps the DV packet's: it keys the editor library, the live-site folder and every /form/<projectId> link, so a new one every build would orphan the links already handed out.",
+  "_comment": "One form, filled by the applicant: California Department of Justice BCIA 8016, Request for Live Scan Service. Build with: node pipeline-build-packet.js bcia8016.spec.json (writes bcia8016-project.json, reads bcia8016-capacity.json).",
+  "forms": [
+    {
+      "name": "BCIA 8016",
+      "title": "BCIA 8016 Request for Live Scan Service",
+      "flowchart": "bcia8016-flowchart.json",
+      "pdf": "bcia8016.pdf",
+      "_source": "Uploaded by the user on September 14, 2026: California Department of Justice form BCIA 8016 (Rev. 03/2024), 4 pages, fillable page 1."
+    }
+  ],
+  "scope": ["BCIA 8016"]
+}

@@ -83,16 +83,22 @@ const SERVER = flag('server', 'http://localhost:8080').replace(/\/+$/, '');
 // Question-at-a-time walks every question one press at a time, a few minutes
 // per path; the section pages share the same Back code, so they are the default.
 const MODES = flag('modes', 'section').split(',').map((s) => s.trim()).filter(Boolean);
-// --phone-only runs the phone check alone, walking no fill path.
-const PATHS = args.includes('--phone-only') ? []
+// Which checks run: paths (the fill buttons, Next and Back), phone (a
+// phone-sized screen), words (what the filer reads on every section). All by
+// default; --only words runs one alone, and --phone-only is --only phone.
+const ONLY = args.includes('--phone-only') ? ['phone']
+  : flag('only', 'paths,phone,words').split(',').map((s) => s.trim()).filter(Boolean);
+const PATHS = !ONLY.includes('paths') ? []
   : flag('paths', 'minimum,maximum').split(',').map((s) => s.trim()).filter(Boolean);
+// What nothing the filer reads may say: where an answer goes on the paper.
+const { PAPER_MACHINERY } = require('./wording-rules');
 const FILL_BUDGET_MS = Number(flag('fill-budget', '3000'));
 // Change/input events an idle page may raise in one second - a few land just
 // after load; the loop that got through raised about 7,600.
 const IDLE_EVENT_LIMIT = Number(flag('idle-events', '50'));
 // A phone's screen, in CSS pixels: nothing on a page may be wider, or the phone
 // lays the whole page out wider and shows it zoomed out. 0 skips the check.
-const PHONE_WIDTH = Number(flag('phone-width', '375'));
+const PHONE_WIDTH = ONLY.includes('phone') ? Number(flag('phone-width', '375')) : 0;
 // A fixed window of the phone's width, not the phone's own zoom-out: that
 // widens the page to fit what sticks out, and would hide it.
 const PHONE_DEVICE = { width: PHONE_WIDTH, height: 812, deviceScaleFactor: 1, mobile: false };
@@ -536,6 +542,40 @@ function appearanceDifferences(a, b) {
 }
 
 /**
+ * Runs inside the page: fill the maximum path - every block at its most
+ * entries, every gate open - then show every section in turn and read what the
+ * filer reads there, the words the page writes for itself included. A block's
+ * entries past the paper's rows were titled "Minor #5 - on the attached page
+ * (DV-160, Attachment 2b(2))" by the page as it drew them; the words were in no
+ * file an audit read, and every audit passed.
+ */
+function screenWordsInPage(source, flags) {
+  return (async () => {
+    const machinery = new RegExp(source, flags);
+    await fillMaximumPath({ markers: true, solve: true });
+    await new Promise((r) => setTimeout(r, 1500));
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const titleOf = (sec) => {
+      const h = sec.querySelector('h2, h1, .section-title');
+      return h ? h.textContent.trim().slice(0, 60) : '';
+    };
+    const found = [];
+    for (const sec of sections) {
+      sections.forEach((s) => s.classList.toggle('active', s === sec));
+      // Question-at-a-time shows one question of a section; read them all.
+      sec.querySelectorAll('.question-step-hidden').forEach((q) => q.classList.remove('question-step-hidden'));
+      const lines = Array.from(new Set(String(sec.innerText || '').split('\n')
+        .map((l) => l.trim()).filter((l) => l && machinery.test(l))));
+      if (!lines.length) continue;
+      const n = Number(sec.id.slice(7));
+      const f = (typeof formOwningSection === 'function') ? formOwningSection(n) : null;
+      found.push({ section: n, form: f ? f.name : '', title: titleOf(sec), lines: lines.map((l) => l.slice(0, 140)) });
+    }
+    return { sections: sections.length, found };
+  })();
+}
+
+/**
  * Runs inside a phone-sized page: fill the maximum path - the most questions
  * and entry blocks on screen - then show every section in turn and list what
  * sticks out past the screen's right edge. One box wider than a phone lays the
@@ -922,6 +962,27 @@ function check(result, fillPath) {
           console.log((problems.length ? 'FAILS  ' : 'passes ') + label + '   ' + phone.sections + ' sections laid out');
           problems.forEach((p) => console.log('   - ' + p));
           if (problems.length) failed++;
+        }
+      }
+      // What the filer reads, on every section of the maximum path: never the
+      // paper's machinery (rule the-filer-never-sees-the-papers-machinery).
+      if (ONLY.includes('words')) {
+        const url = SERVER + '/live-sites/' + SITE + '/' + mode + '.html';
+        const label = mode + ' page, words on screen';
+        const words = await inPage(send, url, '(' + screenWordsInPage.toString() + ')('
+          + JSON.stringify(PAPER_MACHINERY.source) + ', ' + JSON.stringify(PAPER_MACHINERY.flags) + ')');
+        if (!words) {
+          console.log('FAILS  ' + label + ': the page never finished loading');
+          failed++;
+        } else {
+          const lineCount = words.found.reduce((n, s) => n + s.lines.length, 0);
+          console.log((words.found.length ? 'FAILS  ' : 'passes ') + label + '   ' + words.sections + ' sections read'
+            + (words.found.length ? ', ' + lineCount + ' line(s) show the paper\'s machinery' : ''));
+          words.found.forEach((s) => {
+            console.log('   - section ' + s.section + ' (' + s.form + ' "' + s.title + '"): "' + s.lines[0] + '"'
+              + (s.lines.length > 1 ? ' and ' + (s.lines.length - 1) + ' more like it' : ''));
+          });
+          if (words.found.length) failed++;
         }
       }
     }
