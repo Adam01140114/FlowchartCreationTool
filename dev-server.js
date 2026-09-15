@@ -131,26 +131,89 @@ function publicAllows(req) {
   if (req.method === 'POST' && p === '/edit_pdf') return PUBLIC_PDF_NAME.test(String(req.query.pdf || ''));
   return false;
 }
-/** The public site's front page: the forms published here, by name. */
+/**
+ * The public site's front page: a card for each form published here, with the
+ * two ways to fill it in, when it was last updated and its flowchart. It wears
+ * the forms' own colours - the navy header, the blue buttons, Montserrat - so a
+ * filer moves from this page into a form without changing places.
+ */
 function publicFrontPage() {
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // "9-14-26_9-30pm" -> "Sep 14, 2026, 9:30 pm": the stamp the site kept.
+  const when = (stamp) => {
+    const t = /^(\d{1,2})-(\d{1,2})-(\d{2})_(\d{1,2})-(\d{2})(am|pm)$/.exec(String(stamp || ''));
+    if (!t) return '';
+    const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][Number(t[1]) - 1] || '';
+    return month + ' ' + Number(t[2]) + ', 20' + t[3] + ', ' + Number(t[4]) + ':' + t[5] + ' ' + t[6];
+  };
   const sites = fs.existsSync(LIVE_SITES_DIR)
     ? fs.readdirSync(LIVE_SITES_DIR).map((s) => ({ s, m: readLiveSiteManifest(s) })).filter((x) => x.m && x.m.projectId)
     : [];
-  const items = sites.map(({ s, m }) => {
+  const cards = sites.map(({ s, m }) => {
     const modes = LIVE_SITE_MODES.filter((mode) => fs.existsSync(path.join(LIVE_SITES_DIR, s, mode + '.html')));
-    const links = formLinksFor(m.projectId, modes, liveSiteStamp(m));
-    const words = { section: 'one section at a time', question: 'one question at a time' };
-    return '<li><strong>' + esc(m.title || s) + '</strong> - '
-      + Object.keys(links).map((k) => '<a href="' + esc(links[k]) + '">' + esc(words[k] || k) + '</a>').join(' &middot; ')
-      + '</li>';
+    const stamp = liveSiteStamp(m);
+    const links = formLinksFor(m.projectId, modes, stamp);
+    const pdfs = Array.isArray(m.pdfs) ? m.pdfs.length : 0;
+    const facts = [pdfs ? pdfs + (pdfs === 1 ? ' form' : ' forms') + ' filled for you' : '', when(stamp) ? 'Updated ' + when(stamp) : '']
+      .filter(Boolean).map(esc).join('<span class="dot" aria-hidden="true">&middot;</span>');
+    const button = (mode, cls, label, hint) => links[mode]
+      ? '<a class="btn ' + cls + '" href="' + esc(links[mode]) + '"><span class="txt"><span>' + label + '</span><small>'
+        + hint + '</small></span><span class="arrow" aria-hidden="true">&rarr;</span></a>' : '';
+    return '<article class="card">'
+      + '<div class="badge" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"'
+      + ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'
+      + '<path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg></div>'
+      + '<h2>' + esc(m.title || s) + '</h2>'
+      + (facts ? '<p class="facts">' + facts + '</p>' : '')
+      + '<div class="actions">'
+      + button('question', 'primary', 'One question at a time', 'Guided, one step per screen')
+      + button('section', 'secondary', 'One section at a time', 'See a whole part of the form')
+      + '</div>'
+      + '<a class="flow" href="/flowchart/' + esc(encodeURIComponent(m.projectId)) + '">View the flowchart &rarr;</a>'
+      + '</article>';
   }).join('');
   return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
-    + '<meta name="viewport" content="width=device-width, initial-scale=1"><title>Forms</title></head>'
-    + '<body style="font-family:system-ui,sans-serif;max-width:720px;margin:48px auto;padding:0 16px;color:#1f2a37">'
-    + '<h1 style="font-size:1.5rem">Forms</h1>'
-    + (items ? '<ul style="line-height:1.9">' + items + '</ul>' : '<p>No forms are published yet.</p>')
-    + '</body></html>';
+    + '<meta name="viewport" content="width=device-width, initial-scale=1"><title>FormWiz Forms</title>'
+    + '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    + '<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">'
+    + '<style>'
+    + ':root{--navy:#2c3e50;--blue:#2980b9;--link:#1f6fb2;--ink:#1f2a37;--muted:#5b6b7f;--line:#d7e3f2;--card:#fff;--bg1:#eaf1f8;--bg2:#f7fbff}'
+    + '@media (prefers-color-scheme:dark){:root{--link:#8cc2ff;--ink:#e6edf6;--muted:#9fb0c4;--line:#2a3a4d;--card:#16212e;--bg1:#0f1822;--bg2:#131e2a}}'
+    + '*{box-sizing:border-box}'
+    + 'body{margin:0;min-height:100vh;font-family:Montserrat,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--bg1),var(--bg2))}'
+    + 'header{background:var(--navy);color:#fff}'
+    + '.bar{max-width:1040px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;gap:12px}'
+    + '.mark{width:38px;height:38px;border:2px solid #fff;border-radius:8px;display:grid;place-items:center;font-weight:800;letter-spacing:-1px}'
+    + '.brand{font-weight:800;font-size:1.25rem;letter-spacing:.02em}'
+    + 'main{max-width:1040px;margin:0 auto;padding:48px 24px 72px}'
+    + 'h1{font-size:clamp(1.9rem,4vw,2.6rem);margin:0 0 10px;font-weight:800;letter-spacing:-.01em}'
+    + '.lead{margin:0 0 36px;color:var(--muted);font-size:1.05rem;line-height:1.6;max-width:640px}'
+    + '.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px}'
+    + '.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px 28px 22px;box-shadow:0 12px 32px rgba(30,73,150,.10);display:flex;flex-direction:column}'
+    + '.badge{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#2f7bff,#0d4ed8);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.3rem;margin-bottom:16px;box-shadow:0 8px 20px rgba(13,78,216,.25)}'
+    + '.card h2{margin:0 0 8px;font-size:1.35rem;font-weight:700;line-height:1.3}'
+    + '.facts{margin:0 0 22px;color:var(--muted);font-size:.92rem}'
+    + '.dot{margin:0 8px}'
+    + '.actions{display:grid;gap:12px;margin-top:auto}'
+    + '.btn{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 18px;border-radius:12px;text-decoration:none;font-weight:700;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}'
+    + '.txt{display:flex;flex-direction:column;gap:3px}'
+    + '.btn small{font-weight:500;font-size:.8rem;opacity:.85}'
+    + '.arrow{font-size:1.25rem;line-height:1;transition:transform .15s ease}'
+    + '.btn:hover .arrow{transform:translateX(3px)}'
+    + '.btn:hover{transform:translateY(-1px)}'
+    + '.btn:focus-visible,.flow:focus-visible{outline:3px solid #7fb3ff;outline-offset:2px}'
+    + '.primary{background:linear-gradient(135deg,#2f7bff,#0d4ed8);color:#fff;box-shadow:0 8px 20px rgba(13,78,216,.28)}'
+    + '.secondary{background:transparent;color:var(--link);border:2px solid var(--line)}'
+    + '.secondary:hover{border-color:var(--link)}'
+    + '.flow{align-self:flex-start;margin-top:18px;color:var(--muted);font-size:.9rem;font-weight:600;text-decoration:none}'
+    + '.flow:hover{color:var(--link)}'
+    + '.empty{background:var(--card);border:1px dashed var(--line);border-radius:20px;padding:40px;text-align:center;color:var(--muted)}'
+    + '</style></head><body>'
+    + '<header><div class="bar"><div class="mark" aria-hidden="true">//</div><div class="brand">FormWiz</div></div></header>'
+    + '<main><h1>Forms</h1>'
+    + '<p class="lead">Pick a form and answer its questions in plain words. Go one question at a time, or a whole section at a time &mdash; your answers fill in the paperwork for you.</p>'
+    + (cards ? '<div class="grid">' + cards + '</div>' : '<div class="empty">No forms are published yet.</div>')
+    + '</main></body></html>';
 }
 // The auto-form endpoints post base64 PDFs and whole field dumps, well past
 // body-parser's 100kb default. These global parsers are registered before the
@@ -1146,6 +1209,8 @@ function liveSiteOfProject(projectId) {
  */
 function liveSiteStamp(manifest) {
   const m = manifest || {};
+  // The stamp the publish kept, worked out on the machine that built the site.
+  if (/^\d{1,2}-\d{1,2}-\d{2}_\d{1,2}-\d{2}(am|pm)$/.test(String(m.stamp || ''))) return m.stamp;
   const t = /(\d{1,2})\/(\d{1,2})\/(\d{2}) (\d{1,2}):(\d{2})\s*(am|pm)\s*$/i.exec(String(m.tabTitle || ''));
   if (t) return t[1] + '-' + t[2] + '-' + t[3] + '_' + t[4] + '-' + t[5] + t[6].toLowerCase();
   const d = new Date(m.builtAt || '');
@@ -1365,16 +1430,23 @@ app.post('/api/publish-live-site', (req, res) => {
       pageLinks[mode] = `/live-sites/${encodeURIComponent(slug)}/${mode}.html`;
     });
     const builtAt = new Date().toISOString();
+    // The moment of the save as its links carry it, worked out here - on the
+    // machine that built the site, in its clock - and kept, so a server in
+    // another time zone hands out the same links. Worked out again from
+    // builtAt, Render's UTC clock turned a 9:12pm build into
+    // saved=9-15-26_4-12am.
+    const stamp = liveSiteStamp({ tabTitle, builtAt });
     const manifest = {
       title,
       tabTitle,
+      stamp,
       folder: `live-sites/${slug}`,
       url,
       modes,
       links,
       pages: pageLinks,
-      // The links to hand out: they name the project, not the folder.
-      formLinks: projectId ? formLinksFor(projectId, modes, liveSiteStamp({ tabTitle, builtAt })) : {},
+      // The links to hand out: by the site's name (formLinksFor).
+      formLinks: projectId ? formLinksFor(projectId, modes, stamp) : {},
       builtAt,
       source: String(body.source || ''),
       projectId,
