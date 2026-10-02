@@ -97,3 +97,9 @@ Current Form Output/index.json.tmp
 # A guest's saved projects (dev-server.js /api/guest-library). Personal
 # work, one machine's library - never committed.
 guest-library/
+
+# DocHelper: people's uploaded PDFs, answers and filled forms, and the
+# prompt packages handed to and from Claude. Personal data - never committed.
+DocHelper/sessions/
+DocHelper/inbox/
+DocHelper/outbox/

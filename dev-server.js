@@ -800,6 +800,18 @@ function fitToBox(field, font, text) {
 
 app.post('/edit_pdf', async (req, res) => {
   try {
+    // A form post carries every line break as CRLF (the multipart rules say
+    // so, and every browser's FormData does it). pdf-lib splits lines on \r and
+    // on \n separately, so "one\r\ntwo" printed as three lines with a blank one
+    // between - a statement typed in two paragraphs came out double-spaced and
+    // lost a line of its box to every break. One break is one break.
+    if (req.body && typeof req.body === 'object') {
+      Object.keys(req.body).forEach((k) => {
+        if (typeof req.body[k] === 'string' && req.body[k].indexOf('\r') !== -1) {
+          req.body[k] = req.body[k].replace(/\r\n?/g, '\n');
+        }
+      });
+    }
     // A page the form draws itself: entries past the rows the paper prints.
     // There is no template to fill - the form sends the rows it wants drawn.
     if (req.body && req.body.__attachment) {
@@ -1638,6 +1650,9 @@ app.post('/api/guest-library/delete', (req, res) => {
 });
 
 const autoFormStatus = registerAutoFormRoutes(app);
+// DocHelper: drop in PDFs, answer questions in a chat, get them back filled
+// (DocHelper/README.md). Before express.static, which would serve its sessions.
+require('./DocHelper/server/routes').registerDocHelperRoutes(app, { port: PORT });
 
 app.use(express.static(ROOT));
 

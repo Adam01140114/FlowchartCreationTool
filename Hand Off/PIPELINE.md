@@ -1806,6 +1806,18 @@ Nothing is lost on paper - the server shrinks to the true width and the ink
 check fails anything that does not fit - but the limits should be measured the
 same way, and rebuilding them means a re-export and a publish.
 
+## A line break is one line break
+
+Found October 2, 2026, measuring DocHelper's answers against the filler. A form
+post sends every line break as CRLF - the multipart rules say so, and every
+browser's `FormData` does it - and pdf-lib splits lines on `\r` and on `\n`
+separately. So `"First paragraph.\r\nSecond paragraph."` printed as three lines
+with a blank one between: anything typed in paragraphs came out double-spaced
+on paper, and a box lost a line of room to every break. The value read back
+from the PDF field held the `\r`, which is why nothing that reads values saw a
+problem. `/edit_pdf` now turns CRLF and lone CR into `\n` before it fills
+anything.
+
 ## Every form the paper asks for, the packet makes
 
 DV-105 item 4a asks "Have all the children listed in 3 lived together for the

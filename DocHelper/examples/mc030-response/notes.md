@@ -1,0 +1,3 @@
+- This is set up for someone filing without a lawyer. A lawyer's lines (State Bar number, "Attorney for", the party boxes at the bottom) are left blank.
+- Sign the printed signature line by hand after you print the form.
+- The statement box holds about one page. A very long statement is printed in smaller type to fit; if it gets too small to read, shorten it or continue on an MC-025 attachment page.

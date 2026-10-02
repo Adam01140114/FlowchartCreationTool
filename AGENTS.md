@@ -190,4 +190,5 @@ Several agents may work here at once. They share one machine, one dev server
 | A court form's blank PDF | [`Hand Off/NEW-FORM.md` §0](Hand%20Off/NEW-FORM.md) - `curl` from courts.ca.gov; the user has given standing permission to download PDFs |
 | Published-site audit | `npm run audit:nav` (`pipeline-nav-audit.js`) |
 | Every script | [`AUDIT.md` §9](Hand%20Off/AUDIT.md) |
+| DocHelper (drop in any fillable PDFs, answer in a chat, get them back filled) | `/DocHelper/` on the dev server; [`DocHelper/README.md`](DocHelper/README.md). With no API key, "process the DocHelper inbox" is the `dochelper-inbox` skill |
 | A full audit and docs refresh | [`update_docs_and_audit.txt`](update_docs_and_audit.txt) - the user pastes it as a prompt; follow it end to end |

@@ -1,0 +1,85 @@
+{
+  "_comment": "MC-030 for a person filing without a lawyer: the case caption first (they copy it from their court papers), then who they are, then the statement itself. The date beside the signature fills itself; the signature is signed by hand on the printed line.",
+  "sections": [
+    { "name": "Your Case", "fields": [
+      "case_number", "court_county",
+      "court_street_address", "court_mailing_address", "court_city_zip", "court_branch_name",
+      "plaintiff_petitioner_name", "defendant_respondent_name"
+    ] },
+    { "name": "About You", "fields": [
+      "filer_name", "filer_street_address", "filer_city_state_zip", "filer_phone", "filer_email"
+    ] },
+    { "name": "Your Declaration", "fields": [
+      "declarant_name", "declaration_text", "declaration_date"
+    ] }
+  ],
+  "order": [
+    "case_number", "court_county",
+    "court_street_address", "court_mailing_address", "court_city_zip", "court_branch_name",
+    "plaintiff_petitioner_name", "defendant_respondent_name",
+    "filer_name", "filer_street_address", "filer_city_state_zip", "filer_phone", "filer_email",
+    "declarant_name", "declaration_text", "declaration_date"
+  ],
+  "questions": {
+    "case_number": {
+      "text": "What is the case number?",
+      "subtitle": "It is printed at the top of the court papers in your case."
+    },
+    "court_county": {
+      "text": "Which county is the court in?",
+      "subtitle": "Just the county name, for example Monterey."
+    },
+    "plaintiff_petitioner_name": {
+      "text": "Who is the plaintiff or petitioner in the case?",
+      "subtitle": "Write the name exactly as it appears on your court papers."
+    },
+    "defendant_respondent_name": {
+      "text": "Who is the defendant or respondent in the case?",
+      "subtitle": "Write the name exactly as it appears on your court papers."
+    },
+    "filer_phone": {
+      "text": "What is your phone number?",
+      "type": "phone"
+    },
+    "filer_email": {
+      "text": "What is your email address?",
+      "type": "email",
+      "optional": true
+    },
+    "declarant_name": {
+      "text": "What is the full name of the person making this declaration?",
+      "subtitle": "This is usually you. A witness giving their own statement uses their name."
+    },
+    "declaration_text": {
+      "text": "What do you want to tell the court?",
+      "subtitle": "Write only what you know first-hand, in your own words. Include dates, places and what happened.",
+      "type": "bigParagraph"
+    }
+  },
+  "combines": [
+    {
+      "question": "What is the court's address?",
+      "fields": [
+        { "field": "court_street_address", "label": "Street address" },
+        { "field": "court_mailing_address", "label": "Mailing address", "optional": true },
+        { "field": "court_city_zip", "label": "City and ZIP code" },
+        { "field": "court_branch_name", "label": "Branch name", "optional": true }
+      ]
+    },
+    {
+      "question": "What is your name and mailing address?",
+      "fields": [
+        { "field": "filer_name", "label": "Full name" },
+        { "field": "filer_street_address", "label": "Street address" },
+        { "field": "filer_city_state_zip", "label": "City, state and ZIP code" }
+      ]
+    }
+  ],
+  "autofill": [
+    {
+      "field": "declaration_date",
+      "from": ["current_date"],
+      "why": "The date beside the signature is the day the declaration is made, and the form already knows it."
+    }
+  ]
+}
