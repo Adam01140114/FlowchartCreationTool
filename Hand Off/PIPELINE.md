@@ -1818,6 +1818,66 @@ from the PDF field held the `\r`, which is why nothing that reads values saw a
 problem. `/edit_pdf` now turns CRLF and lone CR into `\n` before it fills
 anything.
 
+## A long paragraph fills in a fraction of a second
+
+Found October 2, 2026: `/edit_pdf` slowed sharply on long answers typed as a
+single paragraph, both in the published forms and in DocHelper's final fill.
+The cause is pdf-lib's line breaking. `splitOutLines`
+(`pdf-lib/cjs/api/text/layout.js`) starts every line with the whole rest of the
+paragraph, encodes and measures it, and backs off one word at a time until what
+is left fits. That is quadratic in the paragraph's length for every line.
+`measureAsDrawn` adds a character at a time, so each measurement is itself as
+long as the text. `fitToBox` lays the answer out at every half point from the
+declared size down to the one that fits, and pdf-lib's appearance providers lay
+it out again. Text broken into paragraphs was never slow, because each paragraph
+starts over.
+
+`layoutMultilineTextOnePass` in `dev-server.js` keeps pdf-lib's rule exactly
+and finds each line in one pass. The rule: break at the last whitespace (never
+the first character) where the text before it measures strictly less than the
+box is wide. If the whole rest fits, take it. A word too long for any line
+takes the whole rest. Trim the rest, and if it trims to nothing it still makes
+an empty line. Widths only grow as characters are added, so the scan stops at
+the first prefix that does not fit. Each width is the same left-to-right sum
+`measureAsDrawn` makes, so it is equal to the bit. The function is installed on
+pdf-lib's layout module, so pdf-lib's own appearance providers use it as well as
+`fitToBox` and the ruled layouts. It applies only to a font measured as drawn at
+a size the field declares; anything else goes to pdf-lib unchanged. The width of
+one character at one size is cached per fill.
+
+MC-030's declaration box (one field, sanitized PDF), the same answers before and
+after:
+
+| Answer | Before | After |
+|---|---|---|
+| 1,044 characters, one paragraph | 0.4-0.7s | 0.1-0.6s (first fill includes the ruled-line read) |
+| 2,088 characters, one paragraph | 2.2-3.7s | 0.12s |
+| 3,654 characters, one paragraph | 27-45s | 0.17s |
+| 3,654 characters, in paragraphs | 0.9-1.4s | 0.09s |
+| 6,000 characters, one paragraph | 138-250s | 0.35s |
+
+(The higher "before" figures came from a run while a second server was up.)
+
+How it was checked, in case the layout is touched again. Every check compared
+pdf-lib's own layout with the new one, or the old server with the new one:
+
+- 6,000 random layouts compared directly, about 122,000 lines in all. They
+  covered CRLF, `\f`, `\v`, non-breaking spaces, overlong words, leading and
+  trailing spaces, sizes from 6 to 12pt, widths from 0 to 520pt, and all three
+  alignments. Every line's text, encoded hex, width, x and y matched.
+- Both servers filled the same answers: every text field of 19 PDFs, twice,
+  with lengths up to 1,600 characters and half the multiline boxes as one
+  paragraph, plus the five MC-030 answers above. Across 43 fills, every
+  widget's decoded appearance stream (2,205 widgets), every field's DA and
+  value, and the `X-Fill-Shrunk`, `X-Fill-Unfitted` and `X-Fill-Listcut`
+  headers were identical.
+- `audit-pdf-pages.js` rendered 29 pages from both servers (MC-030, DV-100,
+  DV-101, DV-110 and FL-155). The PNGs were byte-identical.
+
+Found along the way, not fixed: a tab, or a line break sent to a single-line
+box, fails the whole fill with a 500 ("WinAnsi cannot encode"). The forms do
+not send either today.
+
 ## Every form the paper asks for, the packet makes
 
 DV-105 item 4a asks "Have all the children listed in 3 lived together for the

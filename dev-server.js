@@ -17,7 +17,6 @@ const {
   pushGraphicsState,
   popGraphicsState,
   translate,
-  layoutMultilineText,
   drawTextLines,
   TextAlignment,
   rgb,
@@ -570,7 +569,7 @@ function ruledPitchAppearance(field, widget, font, size) {
   if (!text) return null;
 
   const inset = 2;
-  const laid = layoutMultilineText(text, {
+  const laid = layoutMultilineTextOnePass(text, {
     alignment: TextAlignment.Left,
     fontSize: size,
     font: font,
@@ -704,7 +703,7 @@ function ruledLineTextAppearance(field, widget, font) {
   try {
     linesUsed = Math.max(
       1,
-      layoutMultilineText(field.getText() || '', {
+      layoutMultilineTextOnePass(field.getText() || '', {
         alignment: field.getAlignment(),
         fontSize: size,
         font,
@@ -755,13 +754,137 @@ function ruledLineTextAppearance(field, widget, font) {
  */
 function measureAsDrawn(font) {
   const kerned = font.widthOfTextAtSize.bind(font);
+  // One character's width depends only on the character and the size, so it
+  // is asked of pdf-lib once. The sum below adds the same numbers in the same
+  // order as before, so every width comes out bit for bit the same.
+  const bySize = new Map();
+  font.charWidthAsDrawn = function (ch, size) {
+    let widths = bySize.get(size);
+    if (!widths) bySize.set(size, widths = new Map());
+    let width = widths.get(ch);
+    if (width === undefined) widths.set(ch, width = kerned(ch, size));
+    return width;
+  };
   font.widthOfTextAtSize = function (text, size) {
     let width = 0;
-    for (const ch of String(text)) width += kerned(ch, size);
+    for (const ch of String(text)) width += font.charWidthAsDrawn(ch, size);
     return width;
   };
   return font;
 }
+
+/**
+ * pdf-lib's line breaking, in one pass.
+ *
+ * pdf-lib (splitOutLines in pdf-lib/cjs/api/text/layout.js) starts every line
+ * with the whole rest of the paragraph, encodes and measures it, and backs off
+ * one word at a time until what is left fits - for each line of each paragraph.
+ * A statement typed as one long paragraph costs the square of its length per
+ * line, and fitToBox lays it out again at every half point down to 6pt: MC-030's
+ * declaration box took 0.4s at 1,044 characters, 2.2s at 2,088, 27s at 3,654 and
+ * 138s at 6,000, all in one paragraph. The same 3,654 characters in paragraphs
+ * took 0.9s.
+ *
+ * The rule is kept exactly: a line ends at the last whitespace (never the
+ * first character) where the text before it measures strictly less than the
+ * box is wide, or takes the whole rest when the rest fits; a word too long for
+ * any line takes the whole rest; the rest is trimmed, and a rest that trims to
+ * nothing still makes an empty line. Widths only grow as characters are added
+ * (none is negative), so the scan stops at the first prefix that does not fit -
+ * no later break could. Each width is the same sum measureAsDrawn makes, so the
+ * lines, their widths and their positions are the ones pdf-lib drew.
+ *
+ * It stands in for pdf-lib's layoutMultilineText everywhere - fitToBox, the
+ * ruled layouts, and pdf-lib's own appearance providers, which call it through
+ * the module - but only for a font measured as drawn at a size the field gives;
+ * anything else goes to pdf-lib's own.
+ */
+const pdfLibLayout = require('pdf-lib/cjs/api/text/layout');
+const { cleanText, lineSplit } = require('pdf-lib/cjs/utils');
+const pdfLibLayoutMultilineText = pdfLibLayout.layoutMultilineText;
+
+function splitOutLineOnePass(input, maxWidth, font, fontSize) {
+  // pdf-lib's first try is the whole rest, encoded and measured, so a
+  // character the font cannot encode throws here just as it did there.
+  const encodedAll = input.length ? font.encodeText(input) : null;
+  let width = 0;
+  let grows = true;
+  let breakAt = 0;
+  let breakWidth = 0;
+  let pos = 0;
+  for (const ch of input) {
+    if (!(width < maxWidth)) {
+      if (grows) break;
+    } else if (pos > 0 && /\s/.test(input[pos])) {
+      breakAt = pos;
+      breakWidth = width;
+    }
+    const w = font.charWidthAsDrawn(ch, fontSize);
+    if (!(w >= 0)) grows = false;
+    width += w;
+    pos += ch.length;
+  }
+  if (input.length && pos === input.length && width < maxWidth) {
+    return { line: input, encoded: encodedAll, width, remainder: undefined };
+  }
+  if (breakAt > 0) {
+    const line = input.substring(0, breakAt);
+    return {
+      line,
+      encoded: font.encodeText(line),
+      width: breakWidth,
+      remainder: input.substring(breakAt) || undefined,
+    };
+  }
+  return {
+    line: input,
+    encoded: encodedAll || font.encodeText(input),
+    width: font.widthOfTextAtSize(input, fontSize),
+    remainder: undefined,
+  };
+}
+
+// pdf-lib's layoutMultilineText with splitOutLines replaced; the rest is theirs.
+function layoutMultilineTextOnePass(text, options) {
+  const { alignment, font, bounds } = options;
+  const fontSize = options.fontSize;
+  if (!fontSize || !font || typeof font.charWidthAsDrawn !== 'function') {
+    return pdfLibLayoutMultilineText(text, options);
+  }
+  const lines = lineSplit(cleanText(text));
+  const height = font.heightAtSize(fontSize);
+  const lineHeight = height + height * 0.2;
+  const textLines = [];
+  let minX = bounds.x;
+  let minY = bounds.y;
+  let maxX = bounds.x + bounds.width;
+  let maxY = bounds.y + bounds.height;
+  let y = bounds.y + bounds.height;
+  for (let idx = 0, len = lines.length; idx < len; idx++) {
+    let prevRemainder = lines[idx];
+    while (prevRemainder !== undefined) {
+      const { line, encoded, width, remainder } = splitOutLineOnePass(prevRemainder, bounds.width, font, fontSize);
+      const x = (alignment === TextAlignment.Left ? bounds.x
+        : alignment === TextAlignment.Center ? bounds.x + (bounds.width / 2) - (width / 2)
+          : alignment === TextAlignment.Right ? bounds.x + bounds.width - width
+            : bounds.x);
+      y -= lineHeight;
+      if (x < minX) minX = x;
+      if (y < minY) minY = y;
+      if (x + width > maxX) maxX = x + width;
+      if (y + height > maxY) maxY = y + height;
+      textLines.push({ text: line, encoded, width, height, x, y });
+      prevRemainder = remainder === undefined ? undefined : remainder.trim();
+    }
+  }
+  return {
+    fontSize,
+    lineHeight,
+    lines: textLines,
+    bounds: { x: minX, y: minY, width: maxX - minX, height: maxY - minY },
+  };
+}
+pdfLibLayout.layoutMultilineText = layoutMultilineTextOnePass;
 
 const MIN_FIT_FONT_SIZE = 6;
 function fitToBox(field, font, text) {
@@ -784,7 +907,7 @@ function fitToBox(field, font, text) {
       return font.widthOfTextAtSize(text, s) <= rect.width - 4;
     }
     const lines = printed.length >= 2 ? printed.length : Math.floor((rect.height - 2) / lineHeight);
-    const laid = layoutMultilineText(text, {
+    const laid = layoutMultilineTextOnePass(text, {
       alignment: TextAlignment.Left, fontSize: s, font,
       bounds: { x: 2, y: 2, width: rect.width - 4, height: rect.height - 4 },
     });
