@@ -1874,9 +1874,78 @@ pdf-lib's own layout with the new one, or the old server with the new one:
 - `audit-pdf-pages.js` rendered 29 pages from both servers (MC-030, DV-100,
   DV-101, DV-110 and FL-155). The PNGs were byte-identical.
 
-Found along the way, not fixed: a tab, or a line break sent to a single-line
-box, fails the whole fill with a 500 ("WinAnsi cannot encode"). The forms do
-not send either today.
+## A tab or a line break never fails a fill
+
+Found October 2, 2026, while timing the layout above. Fixed October 5.
+
+A tab anywhere in an answer failed the whole PDF with a 500 ("WinAnsi cannot
+encode"). So did a line break sent to a one-line box. Both happened on every
+one of the 19 PDFs the packet and BCIA 8016 fill. pdf-lib draws a tab as four
+spaces and a line break in a one-line box as a space (`cleanText` and
+`mergeLines`, applied before it draws). The server, though, measured the raw
+text to decide what fits, and Helvetica has no glyph for either character. The
+continuation spill measures before the fill loop, outside its per-field guard,
+so one tab took down the whole document.
+
+There was a quieter version too. Inside the fill loop, the same throw was
+caught, logged as `Field <name>: WinAnsi cannot encode` and skipped. The box was
+never fitted and never reported, and printed at its declared size, cut off at
+the edge. DV-100's `extend_service_deadline_reason` and
+`most_recent_abuse_harm_description` are flagged multiline but are one line
+tall, and a line break typed into either was cut this way.
+
+`measureAsDrawn` now measures text the way pdf-lib draws it on one line. pdf-lib
+only ever measures text it has already cleaned, so its own layouts are
+unchanged.
+
+Checked by filling the same answers on the old and new server. With tabs and
+line breaks in every field (CRLF too), all 19 PDFs went from 500 to filled, and
+no field logged an error. The clean answer sets matched the original baseline
+exactly, except those two DV-100 boxes. They now shrink to 6pt and, still too
+long, are named in `X-Fill-Unfitted` instead of printing cut off and unreported.
+A realistic MC-030 declaration was rendered and read: paragraphs indented with
+a tab, sent with CRLF breaks. Each tab prints as an indent and each break as one
+break, and the tab in the case number and in the printed name prints as spaces.
+
+## A character the font cannot print becomes "?"
+
+Fixed October 5, 2026. A form's Helvetica draws WinAnsi and nothing else:
+Latin letters with their accents, curly quotes, dashes and the euro. Any other
+character in an answer failed the whole PDF with a 500. That includes an emoji,
+a Chinese name, a stray control character, or an accent typed as a separate
+mark after its letter. Unlike a tab, pdf-lib has no stand-in for such a
+character, so its own drawing throws too. One heart in a declaration, and the
+filer got no papers.
+
+`/edit_pdf` now runs every answer through `printableIn` before anything
+measures or draws it. This follows the continuation page's own rule
+(`drawable()` in `FormWiz GUI/continuation-layout.js`): a character the font
+cannot print becomes "?".
+
+- Whether a character prints is asked of the font itself, one character at a
+  time, not looked up in a table kept here.
+- An answer the font can print whole comes back exactly as sent, so every fill
+  that worked before is byte-for-byte the same.
+- An answer that cannot print whole is first put in composed form (NFC), so "e"
+  plus a combining accent prints as "é".
+- The pieces an emoji is built from fold into its one "?": joiners, skin tones,
+  variation selectors, and the second letter of a flag. A heart, a family or a
+  flag is one "?", not a row of them. A keycap "9️⃣" prints as "9".
+- The boxes this happened to are named in `X-Fill-Replaced` and in the server
+  log. `pipeline-fill.js` prints them. That is a note, not a defect, since the
+  filer typed it.
+
+Checked: 18 cases of `printableIn` against the embedded font, and every result
+encodes. A real MC-030 fill, rendered and read: an emoji in the declaration and
+in the case number, a heart, a flag, a skin-toned fist, "José" typed with a
+separate accent, and a Chinese name. It printed "?" for each emoji, "José"
+whole, and "???" for the three Chinese characters. The earlier answer sets (43
+fills, plus the tab and line-break set on all 19 PDFs) are identical before and
+after, and none of them was reported as replaced.
+
+Not done: DocHelper's own fit estimate (`DocHelper/server/fit.js`) prices an
+unprintable character at the width of "W" rather than "?", so it can ask a
+person to shorten an answer slightly more than needed. It never under-counts.
 
 ## Every form the paper asks for, the packet makes
 

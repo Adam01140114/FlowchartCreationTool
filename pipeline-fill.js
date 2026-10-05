@@ -86,7 +86,8 @@ async function fillOne(base, data) {
   // either: the value is whole in the field whatever the ink does.
   const list = (h) => decodeURIComponent(res.headers.get(h) || '').split(',').filter(Boolean);
   return { buffer: Buffer.from(await res.arrayBuffer()), shrunk: list('x-fill-shrunk'),
-           unfitted: list('x-fill-unfitted'), listCut: list('x-fill-listcut') };
+           unfitted: list('x-fill-unfitted'), listCut: list('x-fill-listcut'),
+           replaced: list('x-fill-replaced') };
 }
 
 /** What the filled PDF actually holds, field by field. */
@@ -482,6 +483,10 @@ async function main() {
     }
     if (filled.listCut.length) {
       console.log('  lists kept to what fits, ending "etc." (' + filled.listCut.length + '): ' + filled.listCut.join(', '));
+    }
+    if (filled.replaced.length) {
+      console.log('  characters the font has no letter for, printed as "?" (' + filled.replaced.length + '): '
+        + filled.replaced.join(', '));
     }
     if (filled.unfitted.length) {
       console.log('  DEFECT: ' + filled.unfitted.length + ' answer(s) do not fit their box even at 6pt, and the rest'

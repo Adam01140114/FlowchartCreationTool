@@ -751,6 +751,14 @@ function ruledLineTextAppearance(field, widget, font) {
  * and the width is the drawn one. Everything that lays text out here -
  * fitToBox, the continuation spill, the ruled layout and pdf-lib's own
  * appearance providers - asks the font, so all of them see it.
+ *
+ * Text is measured as pdf-lib draws it on one line: a tab as four spaces and a
+ * line break as a space (cleanText and mergeLines, which pdf-lib's single-line
+ * layout applies before it draws). The font has no glyph for either, so a tab
+ * typed into any answer, or a line break sent to a one-line box, threw "WinAnsi
+ * cannot encode" from the continuation spill and failed the whole PDF with a
+ * 500 - on every one of the packet's forms. pdf-lib only ever measures text it
+ * has already cleaned, so for its own layouts this changes nothing.
  */
 function measureAsDrawn(font) {
   const kerned = font.widthOfTextAtSize.bind(font);
@@ -767,7 +775,7 @@ function measureAsDrawn(font) {
   };
   font.widthOfTextAtSize = function (text, size) {
     let width = 0;
-    for (const ch of String(text)) width += font.charWidthAsDrawn(ch, size);
+    for (const ch of mergeLines(cleanText(String(text)))) width += font.charWidthAsDrawn(ch, size);
     return width;
   };
   return font;
@@ -800,7 +808,7 @@ function measureAsDrawn(font) {
  * anything else goes to pdf-lib's own.
  */
 const pdfLibLayout = require('pdf-lib/cjs/api/text/layout');
-const { cleanText, lineSplit } = require('pdf-lib/cjs/utils');
+const { cleanText, lineSplit, mergeLines } = require('pdf-lib/cjs/utils');
 const pdfLibLayoutMultilineText = pdfLibLayout.layoutMultilineText;
 
 function splitOutLineOnePass(input, maxWidth, font, fontSize) {
@@ -885,6 +893,71 @@ function layoutMultilineTextOnePass(text, options) {
   };
 }
 pdfLibLayout.layoutMultilineText = layoutMultilineTextOnePass;
+
+/**
+ * An answer as the font can print it: every character Helvetica has no code
+ * for becomes "?".
+ *
+ * A form's Helvetica draws WinAnsi - Latin letters with their accents, curly
+ * quotes, dashes, the euro - and nothing else. An emoji, a Chinese name or a
+ * stray control character threw "WinAnsi cannot encode" inside pdf-lib and
+ * failed the whole PDF with a 500: one heart in a declaration and the filer got
+ * no papers at all. The continuation page already prints such a character as
+ * "?" (drawable() in FormWiz GUI/continuation-layout.js); the boxes now do too,
+ * and every box it happened to is named in X-Fill-Replaced.
+ *
+ * The font is asked, character by character, rather than a table kept here.
+ * Tabs and line breaks are left alone: pdf-lib draws them as spaces and breaks.
+ * An answer the font can print whole comes back exactly as it was sent; only
+ * one that cannot is put in composed form (NFC) first, so a letter typed as
+ * "e" plus an accent prints as the "é" the font has. The pieces an emoji is
+ * built from - joiners, skin tones, variation selectors, the second letter of
+ * a flag, and stray accents with no letter to sit on - fold into one "?", so a
+ * red heart or a family is one "?", not a row of them.
+ */
+const LEFT_TO_PDF_LIB = /[\t\n\r\f\v\b\u0085\u2028\u2029]/;
+const NO_GLYPH_OF_ITS_OWN = /^[\p{M}\uFE00-\uFE0F\u{E0020}-\u{E007F}\u{1F3FB}-\u{1F3FF}]$/u;
+const REGIONAL_INDICATOR = /^[\u{1F1E6}-\u{1F1FF}]$/u;
+const ZERO_WIDTH_JOINER = '\u200D';
+function printableIn(font, text) {
+  if (!font.drawsChar) {
+    const known = new Map();
+    font.drawsChar = (ch) => {
+      let ok = known.get(ch);
+      if (ok === undefined) {
+        try { font.encodeText(ch); ok = true; } catch (e) { ok = false; }
+        known.set(ch, ok);
+      }
+      return ok;
+    };
+  }
+  const prints = (ch) => LEFT_TO_PDF_LIB.test(ch) || font.drawsChar(ch);
+  let all = true;
+  for (const ch of text) if (!prints(ch)) { all = false; break; }
+  if (all) return text;
+
+  let out = '';
+  let afterQuestion = false; // the last thing written was a "?" for a character
+  let joining = false;       // a joiner asked for the next character to join it
+  let flagHalf = false;      // that "?" is the first letter of a flag
+  for (const ch of text.normalize('NFC')) {
+    if (prints(ch)) {
+      out += ch;
+      afterQuestion = joining = flagHalf = false;
+    } else if (ch === ZERO_WIDTH_JOINER) {
+      joining = afterQuestion;
+    } else if (NO_GLYPH_OF_ITS_OWN.test(ch)) {
+      // nothing to print: it shapes the character before it
+    } else if (joining || (flagHalf && REGIONAL_INDICATOR.test(ch))) {
+      joining = flagHalf = false;
+    } else {
+      out += '?';
+      afterQuestion = true;
+      flagHalf = REGIONAL_INDICATOR.test(ch);
+    }
+  }
+  return out;
+}
 
 const MIN_FIT_FONT_SIZE = 6;
 function fitToBox(field, font, text) {
@@ -973,6 +1046,19 @@ app.post('/edit_pdf', async (req, res) => {
     const helv = measureAsDrawn(await pdfDoc.embedFont(StandardFonts.Helvetica));
 
     const fieldNames = new Set(form.getFields().map((field) => field.getName()));
+
+    // What the font cannot print becomes "?" before anything measures or draws
+    // it (printableIn). The boxes it happened to are named, not hidden.
+    const replaced = [];
+    Object.keys(req.body || {}).forEach((key) => {
+      const value = req.body[key];
+      if (!fieldNames.has(key) || typeof value !== 'string') return;
+      const printable = printableIn(helv, value);
+      if (printable !== value) {
+        req.body[key] = printable;
+        replaced.push(key);
+      }
+    });
 
     // Read the printed rules before the fill loop, which is synchronous and
     // so cannot do it itself.
@@ -1112,6 +1198,7 @@ app.post('/edit_pdf', async (req, res) => {
 
     if (shrunk.length) console.log(`[edit_pdf] ${outputName}: set smaller to fit their boxes: ${shrunk.join(', ')}`);
     if (listCut.length) console.log(`[edit_pdf] ${outputName}: lists kept to what fits, ending "etc.": ${listCut.join(', ')}`);
+    if (replaced.length) console.log(`[edit_pdf] ${outputName}: set in characters the font can print ("?" for any it has no letter for): ${replaced.join(', ')}`);
     if (limitFit.length) console.log(`[edit_pdf] ${outputName}: fitted to the box's character limit: ${limitFit.join(', ')}`);
     if (unfitted.length) {
       console.log(`[edit_pdf] ${outputName}: DOES NOT FIT even at ${MIN_FIT_FONT_SIZE}pt - the rest is not printed: ${unfitted.join(', ')}`);
@@ -1124,7 +1211,8 @@ app.post('/edit_pdf', async (req, res) => {
         'Content-Disposition': `inline; filename="${outputName}"`,
         'X-Fill-Shrunk': encodeURIComponent(shrunk.join(',')),
         'X-Fill-Unfitted': encodeURIComponent(unfitted.join(',')),
-        'X-Fill-Listcut': encodeURIComponent(listCut.join(','))
+        'X-Fill-Listcut': encodeURIComponent(listCut.join(',')),
+        'X-Fill-Replaced': encodeURIComponent(replaced.join(','))
       })
       .send(Buffer.from(edited));
   } catch (error) {
